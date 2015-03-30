@@ -71,7 +71,7 @@ public class FishGUI extends GUIState{
         FishState state = (FishState) this.state;
 
         myPortrayal.setField(state.getRasterBathymetry().getGrid());
-        myPortrayal.setMap(new SimpleColorMap(-6000,6000,Color.BLUE,Color.GREEN));
+        myPortrayal.setMap(new TriColorMap(-6000,0,6000,Color.BLUE,Color.CYAN,Color.GREEN,Color.RED));
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
         display2D.repaint();
