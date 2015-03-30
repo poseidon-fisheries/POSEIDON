@@ -1,0 +1,58 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'Main'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+sourceSets
+        {
+  main {
+    java {
+      srcDir 'src/main/java'
+    }
+    resources {
+      srcDir 'src/main/resources'
+    }
+  }
+  test {
+    java {
+      srcDir 'src/test/java'
+    }
+    resources {
+      srcDir 'src/test/resources'
+    }
+  }
+}
+
+
+
+//here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
+dependencies
+{
+    compile fileTree(dir: 'libs/mason', include: '*.jar')
+    compile fileTree(dir: 'libs/geomason', include: '*.jar')
+    testCompile "junit:junit:4.12"
+}
+
+
+//this makes tests multi-threaded when called from gradle. Useful!
+test{
+    maxParallelForks = Math.max(Runtime.runtime.availableProcessors() -1,1)
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+
+test {
+  useJUnit()
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+}
