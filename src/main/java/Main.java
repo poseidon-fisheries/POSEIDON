@@ -10,6 +10,5 @@ class Main{
         FishGUI vid = new FishGUI();
         Console c = new Console(vid);
         c.setVisible(true);
-        System.out.println("As a lawyer I was trained. Remember Thomas Miur");
     }
 }

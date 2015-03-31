@@ -9,13 +9,13 @@ import sim.field.grid.DoubleGrid2D;
 /**
  * Test reading the california1000.asc file. Very much like ReadASCSpike
  */
-public class AscRasterReaderTest extends TestCase
+public class GISReadersTest extends TestCase
 {
 
 
     public void testName() throws Exception {
 
-        GeomGridField field = AscRasterReader.read("california1000.asc");
+        GeomGridField field = GISReaders.readRaster("california1000.asc");
 
         //the dimensions are correct
         Assert.assertEquals(field.getGridHeight(), 1887);
