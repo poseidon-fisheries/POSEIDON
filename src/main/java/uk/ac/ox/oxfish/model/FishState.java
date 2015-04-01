@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import uk.ac.ox.oxfish.utility.GISReaders;
@@ -54,8 +55,12 @@ public class FishState  extends SimState{
 
 
         //schedule to print repeatedly the day
-        schedule.scheduleRepeating(simState ->
-                System.out.println("the time is " + simState.schedule.getTime()));
+        schedule.scheduleRepeating(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                System.out.println("the time is " + simState.schedule.getTime());
+            }
+        });
 
 
 

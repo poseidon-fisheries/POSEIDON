@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.utility.GISReaders;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 /**
  * A simple test to show that I can read shape files
@@ -69,15 +70,18 @@ public class ReadShpSpike
 
 
         //the centers of all these MPAs ought to be in the water!
+        mainloop:
         for(Object geo : vectorField.getGeometries())
         {
             MasonGeometry mpa = (MasonGeometry) geo; //need to cast it
-            String mpaName = mpa.getAttribute("Name").toString();
+            final String mpaName = mpa.getAttribute("Name").toString();
 
             System.out.println("MPA: " + mpaName);
             // because this is MASON and generics are a sign of weakness
-            if(landReserves.stream().anyMatch(s -> (mpaName.contains(s))))
-                continue; //don't check if you are a land-based reserve
+            for(String special : landReserves)
+                if(mpaName.contains(special))
+                    continue  mainloop;
+
 
             Point centroid = mpa.getGeometry().getCentroid();
             int x = grid.toXCoord(centroid.getX());
