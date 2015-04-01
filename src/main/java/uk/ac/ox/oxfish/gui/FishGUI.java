@@ -63,7 +63,6 @@ public class FishGUI extends GUIState{
         display2D.attach(mpaPortrayal,"MPAs");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
-        displayFrame.setVisible(true);
     }
 
     /**
@@ -72,6 +71,7 @@ public class FishGUI extends GUIState{
     @Override
     public void start() {
         super.start();
+        displayFrame.setVisible(true);
 
         FishState state = (FishState) this.state;
 
@@ -85,5 +85,19 @@ public class FishGUI extends GUIState{
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
         display2D.repaint();
+    }
+
+
+    //one of the most annoying parts of mason: overriding static methods
+    public static Object getInfo()
+    {
+        return "On play the model will read the bathymetry of california and paste the known MPAs on it as little black polygons. \n" +
+                "It takes a bit because the bathymetry data is about 30MB. Good news is that most of it is land or deep ocean" +
+                "so there will be plenty to cut out";
+    }
+
+    public static String getName()
+    {
+        return  "Proto-Prototype of a Fishery Model";
     }
 }
