@@ -21,6 +21,10 @@ public class NauticalMap
      */
     private GeomGridField rasterBathymetry;
 
+    /**
+     * the proper grid behind raster bathymetry. You can get it by rasterBathymetry.getGrid() and cast but this skips the
+     * casting
+     */
     private ObjectGrid2D rasterBackingGrid;
 
     /**
@@ -71,22 +75,42 @@ public class NauticalMap
         //now go again through all the grid and set tiles as protected if need be
         //this might take a while but that's why we do it here once and never have to do it again for all the rest
         //of the simulation
+        recomputeTilesMPA();
+
+
+    }
+
+    /**
+     * this is called at initialization but can be called again if there is a change in MPAs. It basically checks
+     * for each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it is set to the tile.
+     */
+    public void recomputeTilesMPA() {
         //todo this works but make a test to be sure
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
             for(int j=0; j<rasterBackingGrid.getHeight(); j++)
             {
                 Point gridPoint = rasterBathymetry.toPoint(i, j);
                 Bag coveringObjects = mpaVectorField.getCoveringObjects(gridPoint);
+                SeaTile seaTile = getSeaTile(i, j);
+
                 if(coveringObjects.size() > 0)
                 {
-                    assert coveringObjects.size() == 1; //assume there is no double MPA
-                    ((SeaTile)rasterBackingGrid.get(i,j)).setMpa((MasonGeometry) coveringObjects.get(0));
+                    assert coveringObjects.size() == 1 : "got a tile covered by multiple MPAs, is that normal?"; //assume there is no double MPA
+                    seaTile.setMpa((MasonGeometry) coveringObjects.get(0));
+                    assert seaTile.isProtected() : "Set a tile to an MPA but it doesn't set the protected state to true";
+                }
+                else
+                {
+                    seaTile.setMpa(null);
+                    assert !seaTile.isProtected() : "This tile has no MPA but still is protected";
+
                 }
 
             }
+    }
 
-
-
+    public SeaTile getSeaTile(int gridX, int gridY) {
+        return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
 
@@ -97,4 +121,5 @@ public class NauticalMap
     public GeomVectorField getMpaVectorField() {
         return mpaVectorField;
     }
+
 }
