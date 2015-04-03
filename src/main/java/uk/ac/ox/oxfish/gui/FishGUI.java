@@ -7,10 +7,12 @@ import sim.engine.SimState;
 import sim.field.geo.GeomVectorField;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
+import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.SeaTile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +28,14 @@ public class FishGUI extends GUIState{
     private Display2D display2D;
     private JFrame displayFrame;
 
-    private FastValueGridPortrayal2D myPortrayal = new FastValueGridPortrayal2D();
+    private FastObjectGridPortrayal2D myPortrayal = new FastObjectGridPortrayal2D()
+    {
+        //this obviously should be done by a Transformer/Function object but this is mason and we have to use java 1.2
+        @Override
+        public double doubleValue(Object obj) {
+            return ((SeaTile)obj).getAltitude();
+        }
+    };
     private GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal();
 
     /**

@@ -38,6 +38,12 @@ public class GISReaders {
 
     }
 
+    /**
+     * reads the new files and then expands everyone's MBR so that they are equal
+     * @param toMerge the tile raster representing the sea
+     * @param filenames all the files with MPAs geometries
+     * @return a unique GeomVectorField holding all the shapes.
+     */
     public  static GeomVectorField readShapeAndMergeWithRaster(GeomGridField toMerge, String... filenames)
     {
         if(filenames.length < 1)

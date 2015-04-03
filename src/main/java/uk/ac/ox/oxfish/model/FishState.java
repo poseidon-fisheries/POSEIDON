@@ -14,16 +14,8 @@ import uk.ac.ox.oxfish.utility.GISReaders;
  */
 public class FishState  extends SimState{
 
-    /**
-     * this holds the bathymetry raster grid
-     */
-    private  GeomGridField rasterBathymetry;
 
-
-    /**
-     * holds the MPAs
-     */
-    GeomVectorField mpaVectorField;
+    private  NauticalMap map;
 
 
 
@@ -41,13 +33,10 @@ public class FishState  extends SimState{
         super.start();
 
 
-        //read raster bathymetry
-        rasterBathymetry = GISReaders.readRaster("california1000.asc");
 
-        //read in MPAs
-        mpaVectorField = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry, "cssr_mpa/reprojected/mpa_central.shp"
-                ,"ncssr_mpa/reprojected/mpa_north.shp"
-        );
+        //read raster bathymetry
+        map = new NauticalMap();
+        map.initializeWithDefaultValues();
 
 
 
@@ -69,10 +58,10 @@ public class FishState  extends SimState{
 
 
     public GeomGridField getRasterBathymetry() {
-        return rasterBathymetry;
+        return map.getRasterBathymetry();
     }
 
     public GeomVectorField getMpaVectorField() {
-        return mpaVectorField;
+        return map.getMpaVectorField();
     }
 }

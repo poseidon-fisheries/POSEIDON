@@ -36,6 +36,7 @@ dependencies
     compile fileTree(dir: 'libs/mason', include: '*.jar')
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
     testCompile "junit:junit:4.12"
+    testCompile "org.mockito:mockito-all:1.9.5"
 }
 
 
@@ -55,3 +56,5 @@ test {
     events "passed", "skipped", "failed"
   }
 }
+
+
