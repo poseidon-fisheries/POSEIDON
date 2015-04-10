@@ -35,8 +35,7 @@ public class FishState  extends SimState{
 
 
         //read raster bathymetry
-        map = new NauticalMap();
-        map.initializeWithDefaultValues();
+        map = NauticalMap.initializeWithDefaultValues();
   //      map.addCities("cities/cities.shp");
 
 

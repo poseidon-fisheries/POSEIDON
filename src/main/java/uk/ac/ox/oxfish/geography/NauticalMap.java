@@ -28,6 +28,11 @@ public class NauticalMap
     private ObjectGrid2D rasterBackingGrid;
 
     /**
+     * the distance calculator, maybe useful, maybe not
+     */
+    private Distance distance;
+
+    /**
      * todo move to parameter list
      */
     final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
@@ -43,6 +48,21 @@ public class NauticalMap
      */
     private GeomVectorField cities = new GeomVectorField();
 
+
+    /**
+     * set all the base fields. Calls recomputeTilesMPA() in order to tell tiles if they are covered by an MPA or not
+     * @param rasterBathymetry the bathymetry object. It assumes it is backed by a SeaTile grid (ObjectGrid2D)
+     * @param mpaVectorField the vector field with the MPAs polygons
+     * @param distance the distance calculator
+     */
+    public NauticalMap(GeomGridField rasterBathymetry, GeomVectorField mpaVectorField, Distance distance) {
+        this.rasterBathymetry = rasterBathymetry;
+        this.mpaVectorField = mpaVectorField;
+        this.distance = distance;
+        this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
+        recomputeTilesMPA();
+    }
+
     /**
      * todo move to parameter list
      */
@@ -51,62 +71,14 @@ public class NauticalMap
 
 
 
-    public void initializeWithDefaultValues()
+
+
+    public static NauticalMap initializeWithDefaultValues()
     {
-        initialize( DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
-    }
-
-    public  void initialize(String bathymetryResource, String... mpaSources)
-    {
-        //read raster bathymetry
-        GeomGridField temporaryField = GISReaders.readRaster(bathymetryResource);
-        DoubleGrid2D temporaryGrid = (DoubleGrid2D)temporaryField.getGrid(); //cast cast cast. Welcome to mason
-        //now turn it into a grid of sea tiles
-        rasterBackingGrid = new ObjectGrid2D(temporaryField.getGridWidth(),temporaryField.getGridHeight());
-        for(int i=0;i<rasterBackingGrid.getWidth(); i++)
-            for(int j=0; j<rasterBackingGrid.getHeight(); j++)
-                rasterBackingGrid.field[i][j]=new SeaTile(i,j,temporaryGrid.field[i][j]);
-        //now from this grid create the correct bathymetry object
-        rasterBathymetry = new GeomGridField(rasterBackingGrid);
-        rasterBathymetry.setPixelHeight(temporaryField.getPixelHeight());
-        rasterBathymetry.setPixelWidth(temporaryField.getPixelWidth());
-        rasterBathymetry.setMBR(temporaryField.getMBR());
-
-
-
-        //read in MPAs
-        mpaVectorField = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry, mpaSources);
-
-        //now go again through all the grid and set tiles as protected if need be
-        //this might take a while but that's why we do it here once and never have to do it again for all the rest
-        //of the simulation
-        recomputeTilesMPA();
-
+       return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
     }
 
 
-    /**
-     * not strictly required and so separate from the initialization proper, but basically a shape file can be used to
-     * add cities in
-     */
-    public void addCities(String cityResources)
-    {
-
-        cities = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry,cityResources);
-        //now transform the MasonGeometries into Cities
-        Envelope savedMBR = new Envelope(cities.getMBR());
-        Bag oldGeometries = new Bag(cities.getGeometries());
-        cities.getGeometries().clear();
-        for(Object old : oldGeometries)
-        {
-            MasonGeometry geometry = (MasonGeometry) old;
-
-            cities.addGeometry(new City(geometry.getGeometry(),geometry.getStringAttribute("AREANAME"),
-                    geometry.getIntegerAttribute("POP2000")));
-        }
-
-
-    }
 
     /**
      * this is called at initialization but can be called again if there is a change in MPAs. It basically checks
@@ -152,5 +124,28 @@ public class NauticalMap
 
     public GeomVectorField getCities() {
         return cities;
+    }
+
+
+    /**
+     * the distance (in km) between the cell at (startXGrid,startYGrid) and the cell at (endXGrid,endYGrid)
+     * @param startXGrid the starting x grid coordinate
+     * @param startYGrid the starting y grid coordinate
+     * @param endXGrid the ending x grid coordinate
+     * @param endYGrid the ending y grid coordinate
+     * @return kilometers between the two points
+     */
+    public double distance(int startXGrid, int startYGrid, int endXGrid, int endYGrid) {
+        return distance.distance(startXGrid, startYGrid, endXGrid, endYGrid);
+    }
+
+    /**
+     * the distance between two sea-tiles
+     * @param start starting sea-tile
+     * @param end ending sea-tile
+     * @return kilometers between the two
+     */
+    public double distance(SeaTile start, SeaTile end) {
+        return distance.distance(start, end);
     }
 }
