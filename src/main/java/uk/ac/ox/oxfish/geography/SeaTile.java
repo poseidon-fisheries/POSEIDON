@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.geography;
 
 import sim.util.geo.MasonGeometry;
 

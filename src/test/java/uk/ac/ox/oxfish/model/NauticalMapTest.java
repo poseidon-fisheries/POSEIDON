@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 
 import static org.junit.Assert.*;
 
@@ -12,7 +13,7 @@ public class NauticalMapTest {
 
 
     @Test
-    public void readTilesDepthCorrectly() throws Exception {
+    public void readTilesDepthCorrectly() {
 
 
         NauticalMap map = new NauticalMap();
@@ -31,7 +32,7 @@ public class NauticalMapTest {
     }
 
     @Test
-    public void readMPAsCorrectly() throws Exception {
+    public void readMPAsCorrectly() {
 
 
         NauticalMap map = new NauticalMap();
@@ -49,4 +50,6 @@ public class NauticalMapTest {
 
 
     }
+
+
 }

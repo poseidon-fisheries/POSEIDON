@@ -4,15 +4,12 @@ import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import sim.engine.SimState;
-import sim.field.geo.GeomVectorField;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
-import sim.portrayal.grid.FastValueGridPortrayal2D;
-import sim.util.gui.ColorMap;
-import sim.util.gui.SimpleColorMap;
+import sim.portrayal.simple.OvalPortrayal2D;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.SeaTile;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +25,7 @@ public class FishGUI extends GUIState{
     private Display2D display2D;
     private JFrame displayFrame;
 
-    private FastObjectGridPortrayal2D myPortrayal = new FastObjectGridPortrayal2D()
+    private final FastObjectGridPortrayal2D myPortrayal = new FastObjectGridPortrayal2D(true)
     {
         //this obviously should be done by a Transformer/Function object but this is mason and we have to use java 1.2
         @Override
@@ -36,7 +33,9 @@ public class FishGUI extends GUIState{
             return ((SeaTile)obj).getAltitude();
         }
     };
-    private GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal();
+    private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
+
+    private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
     /**
      * create a random fishstate with seed = milliseconds since epoch
@@ -64,12 +63,13 @@ public class FishGUI extends GUIState{
     public void init(Controller controller) {
         super.init(controller);
         
-        
+
         //create the display2d
         display2D = new Display2D(WIDTH, HEIGHT,this);
         //attach it the portrayal
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
+        display2D.attach(cities,"Cities");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
     }
@@ -86,10 +86,12 @@ public class FishGUI extends GUIState{
 
         myPortrayal.setField(state.getRasterBathymetry().getGrid());
         myPortrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
-
+        //MPAs portrayal
         mpaPortrayal.setField(state.getMpaVectorField());
         mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLACK, true));
-
+        //cities portrayal
+        cities.setField(state.getCities());
+        cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK,.05, true));
 
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);

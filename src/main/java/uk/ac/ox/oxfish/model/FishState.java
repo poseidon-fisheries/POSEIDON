@@ -4,7 +4,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import uk.ac.ox.oxfish.utility.GISReaders;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 
 /**
  *
@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.utility.GISReaders;
 public class FishState  extends SimState{
 
 
-    private  NauticalMap map;
+    private NauticalMap map;
 
 
 
@@ -37,6 +37,7 @@ public class FishState  extends SimState{
         //read raster bathymetry
         map = new NauticalMap();
         map.initializeWithDefaultValues();
+  //      map.addCities("cities/cities.shp");
 
 
 
@@ -63,5 +64,9 @@ public class FishState  extends SimState{
 
     public GeomVectorField getMpaVectorField() {
         return map.getMpaVectorField();
+    }
+
+    public GeomVectorField getCities() {
+        return map.getCities();
     }
 }

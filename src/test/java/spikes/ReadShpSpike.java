@@ -47,7 +47,7 @@ public class ReadShpSpike
 
 
 
-    private static ArrayList<String> landReserves = new ArrayList<>();
+    private static final ArrayList<String> landReserves = new ArrayList<>();
     static {
         landReserves.add("Elkhorn Slough"); //natural park
         landReserves.add("Morro Bay"); //wetlands

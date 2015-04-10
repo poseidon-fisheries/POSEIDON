@@ -24,9 +24,9 @@ import sim.util.gui.SimpleColorMap;
  */
 public class TriColorMap implements ColorMap
 {
-    SimpleColorMap lowerHalf;
-    SimpleColorMap upperHalf;
-    double mid;
+    private final SimpleColorMap lowerHalf;
+    private final SimpleColorMap upperHalf;
+    private final double mid;
 
 
     public TriColorMap(double min, double mid, double max, Color minColor, Color midColor, Color maxColor) {

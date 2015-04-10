@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.geography;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
@@ -39,6 +39,11 @@ public class NauticalMap
     private GeomVectorField mpaVectorField;
 
     /**
+     * holds the cities
+     */
+    private GeomVectorField cities = new GeomVectorField();
+
+    /**
      * todo move to parameter list
      */
     final static private String[] DEFAULT_MPA_SOURCES = {"cssr_mpa/reprojected/mpa_central.shp",
@@ -76,6 +81,29 @@ public class NauticalMap
         //this might take a while but that's why we do it here once and never have to do it again for all the rest
         //of the simulation
         recomputeTilesMPA();
+
+    }
+
+
+    /**
+     * not strictly required and so separate from the initialization proper, but basically a shape file can be used to
+     * add cities in
+     */
+    public void addCities(String cityResources)
+    {
+
+        cities = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry,cityResources);
+        //now transform the MasonGeometries into Cities
+        Envelope savedMBR = new Envelope(cities.getMBR());
+        Bag oldGeometries = new Bag(cities.getGeometries());
+        cities.getGeometries().clear();
+        for(Object old : oldGeometries)
+        {
+            MasonGeometry geometry = (MasonGeometry) old;
+
+            cities.addGeometry(new City(geometry.getGeometry(),geometry.getStringAttribute("AREANAME"),
+                    geometry.getIntegerAttribute("POP2000")));
+        }
 
 
     }
@@ -122,4 +150,7 @@ public class NauticalMap
         return mpaVectorField;
     }
 
+    public GeomVectorField getCities() {
+        return cities;
+    }
 }
