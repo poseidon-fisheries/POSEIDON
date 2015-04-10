@@ -32,6 +32,23 @@ public class NauticalMapTest {
     }
 
     @Test
+    public void readDistancesCorrectly() {
+
+
+        //test2.asc is like test.asc but it should be so that lower-left corner center grid is exactly lat0,long0 and
+        //grid size is 1
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("test2.asc", "fakempa.shp");
+        //open the test grid and the test mpas
+
+        //now, the grid ought to be simple: the altitude increases for each element from the row
+        //here I assumed the distance is computed by the EquirectangularDistance object. Could change
+        assertEquals(map.distance(0, 0, 3, 3), 471.8, .1);
+
+
+
+    }
+
+    @Test
     public void readMPAsCorrectly() {
 
 
