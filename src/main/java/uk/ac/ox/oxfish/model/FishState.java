@@ -5,6 +5,7 @@ import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 
 /**
  *
@@ -35,7 +36,8 @@ public class FishState  extends SimState{
 
 
         //read raster bathymetry
-        map = NauticalMap.initializeWithDefaultValues();
+      //  map = NauticalMap.initializeWithDefaultValues();
+        map = NauticalMapFactory.prototypeMap(4,random,1000000);
   //      map.addCities("cities/cities.shp");
 
 

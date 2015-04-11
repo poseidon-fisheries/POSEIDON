@@ -1,13 +1,18 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.vividsolutions.jts.geom.Envelope;
+import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.utility.GISReaders;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A bunch of static methods that build maps
@@ -46,6 +51,102 @@ public class NauticalMapFactory {
 
     }
 
+
+    /**
+     * creates a map like the NETLOGO prototype. That's a 50x50 map
+     */
+    public static NauticalMap prototypeMap(int coastalRoughness,
+                                           MersenneTwisterFast random,
+                                           int smoothingNumber)
+    {
+
+        //build the grid
+        ObjectGrid2D baseGrid =  new ObjectGrid2D(50,50);
+
+        //the 10 rightmost patches are land, the rest is sea
+        for(int x=0; x<50; x++)
+            for(int y=0; y<50; y++)
+                baseGrid.field[x][y] = x <40 ?
+                        new SeaTile(x,y,-5000) :
+                        new SeaTile(x,y,2000);
+    /***
+     *       ___              _        _   ___               _
+     *      / __|___  __ _ __| |_ __ _| | | _ \___ _  _ __ _| |_  _ _  ___ ______
+     *     | (__/ _ \/ _` (_-<  _/ _` | | |   / _ \ || / _` | ' \| ' \/ -_|_-<_-<
+     *      \___\___/\__,_/__/\__\__,_|_| |_|_\___/\_,_\__, |_||_|_||_\___/__/__/
+     *                                                 |___/
+     */
+        for(int i=0; i<coastalRoughness; i++) {
+            //now go roughen up the coast
+            List<SeaTile> toFlip = new LinkedList<>();
+            //go through all the tiles
+            for (int x = 0; x < 50; x++)
+                for (int y = 0; y < 50; y++) {
+                    SeaTile tile = (SeaTile) baseGrid.field[x][y];
+                    if (tile.getAltitude() < 0)
+                        continue; //if it's ocean, don't bother
+
+                    Bag neighbors = new Bag();
+                    baseGrid.getMooreNeighbors(x, y, 1, Grid2D.BOUNDED, false, neighbors, null, null);
+                    //count how many neighbors are ocean
+                    int seaNeighbors = 0;
+                    for (Object neighbor : neighbors) {
+                        if (((SeaTile) neighbor).getAltitude() < 0)
+                            seaNeighbors++;
+                    }
+                    //if it has at least one neighbor, 40% chance of turning into sea
+                    if (seaNeighbors > 0 && random.nextBoolean(.4))
+                        toFlip.add(tile);
+                }
+            //remove all the marked land tiles and turn them into ocean
+            for (SeaTile toRemove : toFlip) {
+                assert toRemove.getAltitude() > 0; //should be removing land!
+                SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -5000);
+                assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
+                baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
+            }
+        }
+
+        /***
+         *      ___                _   _    _
+         *     / __|_ __  ___  ___| |_| |_ (_)_ _  __ _
+         *     \__ \ '  \/ _ \/ _ \  _| ' \| | ' \/ _` |
+         *     |___/_|_|_\___/\___/\__|_||_|_|_||_\__, |
+         *                                        |___/
+         */
+
+        for(int i=0; i<smoothingNumber; i++)
+        {
+            int x = random.nextInt(50);
+            int y = random.nextInt(50);
+            SeaTile toChange = (SeaTile) baseGrid.get(x,y);
+            x += random.nextInt(3)-1; x= Math.max(0,x); x = Math.min(x,49);
+            y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
+            SeaTile fixed = (SeaTile) baseGrid.get(x,y);
+            double newAltitude = toChange.getAltitude() +
+                    (random.nextDouble()*.10) *
+                            (fixed.getAltitude()-toChange.getAltitude());
+            if(newAltitude <0 && toChange.getAltitude() > 0)
+                newAltitude = 1;
+            if(newAltitude >0 && toChange.getAltitude() < 0)
+                newAltitude = -1;
+
+            //put the new one in!
+            baseGrid.set(toChange.getGridX(),toChange.getGridY(),
+                    new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude));
+
+
+        }
+
+
+        GeomGridField bathymetry = new GeomGridField(baseGrid);
+        GeomVectorField mpas = new GeomVectorField(); //empty MPAs
+        Distance distance = new EquirectangularDistance(0,1);
+        return new NauticalMap(bathymetry,mpas,distance);
+
+
+
+    }
 
 
 
