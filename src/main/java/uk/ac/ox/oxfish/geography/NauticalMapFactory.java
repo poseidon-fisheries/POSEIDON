@@ -8,7 +8,6 @@ import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.util.LinkedList;
@@ -124,7 +123,7 @@ public class NauticalMapFactory {
             y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
             SeaTile fixed = (SeaTile) baseGrid.get(x,y);
             double newAltitude = toChange.getAltitude() +
-                    (random.nextDouble()*.10) *
+                    (random.nextDouble()*.05) *
                             (fixed.getAltitude()-toChange.getAltitude());
             if(newAltitude <0 && toChange.getAltitude() > 0)
                 newAltitude = 1;
