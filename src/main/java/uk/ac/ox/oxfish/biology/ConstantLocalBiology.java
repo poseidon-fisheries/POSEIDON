@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
 /**
- * This local biology has a fixed biome. It never gets ruined by fishing and is the same for any specie
+ * This local biology has the same fixed biomass for each specie . It never gets ruined by fishing and is the same for any specie
  * Created by carrknight on 4/11/15.
  */
 public class ConstantLocalBiology implements LocalBiology {

@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.geography;
 
 import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Specie;
 
 /**
  * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected or not
@@ -24,6 +26,11 @@ public class SeaTile {
      * the mpa this tile belongs to
      */
     private MasonGeometry mpa;
+
+    /**
+     * the local-biology object, used to check biomass
+     */
+    private LocalBiology biology;
 
     public SeaTile(int gridX, int gridY, double altitude) {
         this.gridX = gridX;
@@ -58,5 +65,32 @@ public class SeaTile {
 
     public void setMpa(MasonGeometry mpa) {
         this.mpa = mpa;
+    }
+
+
+    /**
+     * set the biology object. Without there is no biomass!
+     * @param biology the local biology
+     */
+    public void setBiology(LocalBiology biology) {
+        this.biology = biology;
+    }
+
+    /**
+     * the biomass at this location for a single specie.
+     * @param specie  the specie you care about
+     * @return the biomass of this specie
+     */
+    public Integer getBiomass(Specie specie) {
+        return biology.getBiomass(specie);
+    }
+
+    /**
+     * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
+     * @param specie the specie fished
+     * @param biomassFished the biomass fished
+     */
+    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Integer biomassFished) {
+        biology.reactToThisAmountOfBiomassBeingFished(specie, biomassFished);
     }
 }

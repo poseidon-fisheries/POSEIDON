@@ -8,10 +8,18 @@ import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
+import java.util.function.Function;
+
 /**
- * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries
+ * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
+ * It ought to be initialized as follows:
+ * <ul>
+ *     <li> Constructor</li>
+ *     <li> initializeBiology()</li>
+ * </ul>
  * Created by carrknight on 4/2/15.
  */
 public class NauticalMap
@@ -76,6 +84,21 @@ public class NauticalMap
     public static NauticalMap initializeWithDefaultValues()
     {
        return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
+    }
+
+
+    /**
+     * goes through all seatiles and calls the initialize function to create/assign a LocalBiology to each SeaTile
+     * @param initializer the local biology factory
+     */
+    public void initializeBiology(Function<SeaTile,LocalBiology> initializer)
+    {
+        for(Object element : rasterBackingGrid.elements())
+        {
+            SeaTile tile = (SeaTile) element; //cast
+            tile.setBiology(initializer.apply(tile)); //put new biology in
+        }
+
     }
 
 

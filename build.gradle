@@ -35,6 +35,7 @@ dependencies
 {
     compile fileTree(dir: 'libs/mason', include: '*.jar')
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
+    compile "com.google.guava:guava:18.0"
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-all:1.9.5"
 }

@@ -4,8 +4,12 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+
+import java.util.LinkedList;
 
 /**
  *
@@ -18,6 +22,7 @@ public class FishState  extends SimState{
 
     private NauticalMap map;
 
+    private GlobalBiology biology;
 
 
     public FishState(long seed) {
@@ -36,10 +41,11 @@ public class FishState  extends SimState{
 
 
         //read raster bathymetry
-      //  map = NauticalMap.initializeWithDefaultValues();
-        map = NauticalMapFactory.prototypeMap(4,random,1000000);
-  //      map.addCities("cities/cities.shp");
+        //  map = NauticalMap.initializeWithDefaultValues();
+        map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(4,random,1000000,10,5000);
+        //      map.addCities("cities/cities.shp");
 
+        biology = new GlobalBiology(new Specie("TEST SPECIE"));
 
 
 
