@@ -2,8 +2,10 @@ package uk.ac.ox.oxfish.model;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.field.SparseField2D;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
+import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -42,7 +44,7 @@ public class FishState  extends SimState{
 
         //read raster bathymetry
         //  map = NauticalMap.initializeWithDefaultValues();
-        map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(4,random,1000000,10,5000);
+        map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(4,random,1000000,1000000,10,5000,2);
         //      map.addCities("cities/cities.shp");
 
         biology = new GlobalBiology(new Specie("TEST SPECIE"));
@@ -71,6 +73,10 @@ public class FishState  extends SimState{
 
     public GeomVectorField getMpaVectorField() {
         return map.getMpaVectorField();
+    }
+
+    public SparseGrid2D getPortGrid(){
+        return map.getPortMap();
     }
 
     public GeomVectorField getCities() {

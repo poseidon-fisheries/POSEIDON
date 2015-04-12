@@ -11,10 +11,10 @@ import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -43,7 +43,11 @@ public class NauticalMapFactory {
 
 
         //read in MPAs
-        GeomVectorField mpaVectorField = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry, mpaSources);
+        GeomVectorField mpaVectorField;
+        if(mpaSources.length > 0)
+            mpaVectorField = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry, mpaSources);
+        else
+            mpaVectorField = new GeomVectorField();
 
         EquirectangularDistance distance = new EquirectangularDistance(temporaryField.toXCoord(0.5),
                 temporaryField.getPixelHeight());
@@ -60,7 +64,7 @@ public class NauticalMapFactory {
      */
     public static NauticalMap prototypeMap(int coastalRoughness,
                                            MersenneTwisterFast random,
-                                           int smoothingNumber)
+                                           int depthSmoothing)
     {
 
         //build the grid
@@ -70,7 +74,7 @@ public class NauticalMapFactory {
         for(int x=0; x<50; x++)
             for(int y=0; y<50; y++)
                 baseGrid.field[x][y] = x <40 ?
-                        new SeaTile(x,y,-5000) :
+                        new SeaTile(x,y,-random.nextInt(5000)) :
                         new SeaTile(x,y,2000);
         /***
          *       ___              _        _   ___               _
@@ -104,7 +108,7 @@ public class NauticalMapFactory {
             //remove all the marked land tiles and turn them into ocean
             for (SeaTile toRemove : toFlip) {
                 assert toRemove.getAltitude() > 0; //should be removing land!
-                SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -5000);
+                SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000));
                 assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
                 baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
             }
@@ -118,7 +122,8 @@ public class NauticalMapFactory {
          *                                        |___/
          */
 
-        for(int i=0; i<smoothingNumber; i++)
+
+        for(int i=0; i<depthSmoothing; i++)
         {
             int x = random.nextInt(50);
             int y = random.nextInt(50);
@@ -127,7 +132,7 @@ public class NauticalMapFactory {
             y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
             SeaTile fixed = (SeaTile) baseGrid.get(x,y);
             double newAltitude = toChange.getAltitude() +
-                    (random.nextDouble()*.05) *
+                    (random.nextDouble()*.04) *
                             (fixed.getAltitude()-toChange.getAltitude());
             if(newAltitude <0 && toChange.getAltitude() > 0)
                 newAltitude = 1;
@@ -140,6 +145,11 @@ public class NauticalMapFactory {
 
 
         }
+
+
+
+
+
 
 
         GeomGridField bathymetry = new GeomGridField(baseGrid);
@@ -157,11 +167,13 @@ public class NauticalMapFactory {
      */
     public static NauticalMap prototypeMapWithRandomSmoothedBiology(int coastalRoughness,
                                                                     MersenneTwisterFast random,
-                                                                    int smoothingNumber,
+                                                                    int depthSmoothing,
+                                                                    int biologySmoothing,
                                                                     int minBiomass,
-                                                                    int maxBiomass){
+                                                                    int maxBiomass,
+                                                                    int ports){
 
-        NauticalMap map = prototypeMap(coastalRoughness,random,smoothingNumber);
+        NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
         map.initializeBiology(randomConstantBiology(random,minBiomass,maxBiomass));;
         /***
@@ -172,7 +184,7 @@ public class NauticalMapFactory {
          *                                                    |___/ |__/
          */
         ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
-        for(int i=0; i<smoothingNumber; i++)
+        for(int i=0; i<biologySmoothing; i++)
         {
             int x = random.nextInt(50);
             int y = random.nextInt(50);
@@ -187,7 +199,7 @@ public class NauticalMapFactory {
             SeaTile fixed = (SeaTile) baseGrid.get(x,y);
             //null is not a specie but we know that the map is filled with constant biology so we are in the clear
             int newBiology = Math.round(toChange.getBiomass(null) +
-                    (random.nextFloat()*.05f) *
+                    (random.nextFloat()*.025f) *
                             (fixed.getBiomass(null)-toChange.getBiomass(null)));
             if(newBiology <=0)
                 newBiology = 1;
@@ -196,6 +208,40 @@ public class NauticalMapFactory {
             toChange.setBiology(new ConstantLocalBiology(newBiology));
 
 
+        }
+
+
+        /***
+         *        _      _    _   ___         _
+         *       /_\  __| |__| | | _ \___ _ _| |_ ___
+         *      / _ \/ _` / _` | |  _/ _ \ '_|  _(_-<
+         *     /_/ \_\__,_\__,_| |_| \___/_|  \__/__/
+         *
+         */
+        ArrayList<SeaTile> candidateTiles = new ArrayList<>();
+        for(int x=0; x<50; x++)
+            for(int y=0; y<50; y++)
+            {
+                SeaTile possible = (SeaTile) baseGrid.get(x,y);
+                if(possible.getAltitude() <= 0) //sea tiles aren't welcome!
+                    continue;
+                int neighboringSeaTiles = 0;
+                Bag neighbors = new Bag();
+                baseGrid.getMooreNeighbors(x,y,1,Grid2D.BOUNDED,false,neighbors,null,null);
+                for(Object neighbor : neighbors)
+                    if(((SeaTile)neighbor).getAltitude() < 0 )
+                        neighboringSeaTiles++;
+
+                if(neighboringSeaTiles >=4)
+                    candidateTiles.add(possible);
+
+            }
+        //get all candidates (land tiles with at least 4 sea tiles next to them)
+
+        Collections.shuffle(candidateTiles,new Random(random.nextLong()));
+        for(int i=0; i<ports; i++) {
+            Port port = new Port(candidateTiles.get(i));
+            map.addPort(port);
         }
 
         return map;

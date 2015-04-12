@@ -72,4 +72,9 @@ public class Port {
     {
         return fishersHere.contains(fisher);
     }
+
+
+    public SeaTile getLocation() {
+        return location;
+    }
 }

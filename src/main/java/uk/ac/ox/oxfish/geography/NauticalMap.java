@@ -1,16 +1,24 @@
 package uk.ac.ox.oxfish.geography;
 
+import com.google.common.base.Preconditions;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
+import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -41,6 +49,17 @@ public class NauticalMap
     private Distance distance;
 
     /**
+     * The list of ports
+     */
+    private HashSet<Port> ports;
+
+    /**
+     * the grid containing the location of all the ports
+     */
+    private SparseGrid2D portMap;
+
+
+    /**
      * todo move to parameter list
      */
     final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
@@ -69,6 +88,9 @@ public class NauticalMap
         this.distance = distance;
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
         recomputeTilesMPA();
+
+        ports = new HashSet<>();
+        portMap = new SparseGrid2D(rasterBathymetry.getGridWidth(),rasterBathymetry.getGridHeight());
     }
 
     /**
@@ -85,6 +107,9 @@ public class NauticalMap
     {
        return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
     }
+
+
+
 
 
     /**
@@ -170,5 +195,52 @@ public class NauticalMap
      */
     public double distance(SeaTile start, SeaTile end) {
         return distance.distance(start, end);
+    }
+
+
+    /**
+     * Given a port, sets it on the map but first check that:
+     * <ul>
+     *     <li> The port is on land</li>
+     *     <li> There is at least one patch of sea nearby </li>
+     * </ul>
+     * @param port the port to add to the map
+     */
+    public void addPort(Port port)
+    {
+        //check location
+        SeaTile portSite = port.getLocation();
+        Preconditions.checkArgument(portSite.getAltitude() >= 0, "port is not on land");
+        //check it's coastal
+        Bag neighbors = new Bag();
+        rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
+                Grid2D.BOUNDED, false, neighbors,null,null);
+        boolean isCoastal = false;
+        for(Object tile : neighbors)
+        {
+            isCoastal = ((SeaTile)tile).getAltitude() < 0;
+            if(isCoastal)
+                break;
+        }
+        Preconditions.checkArgument(isCoastal,"port has no neighboring sea tiles");
+
+        //put it in the masterlist
+        boolean wasNotIn = ports.add(port);
+        Preconditions.checkArgument(wasNotIn, "This port was already registered!");
+
+        portMap.setObjectLocation(port,portSite.getGridX(),portSite.getGridY());
+
+    }
+
+    /**
+     * the map of ports. Don't use directly (it is public for gui weirdness)
+     * @return the sparsegrid with ports
+     */
+    public SparseGrid2D getPortMap() {
+        return portMap;
+    }
+
+    public HashSet<Port> getPorts() {
+        return ports;
     }
 }

@@ -22,7 +22,7 @@ public class ReadASCSpike
     public void canRead() throws Exception {
 
 
-        URL resource = getClass().getClassLoader().getResource("california1000.asc");
+        URL resource = getClass().getClassLoader().getResource("5by5.asc");
         Assert.assertNotNull("can't open the inputStream!", resource);
         FileInputStream inputStream = new FileInputStream(resource.getFile());
 
@@ -30,16 +30,15 @@ public class ReadASCSpike
         ArcInfoASCGridImporter.read(inputStream, GeomGridField.GridDataType.DOUBLE, field);
 
         //the dimensions are correct
-        Assert.assertEquals(field.getGridHeight(), 1887);
-        Assert.assertEquals(field.getGridWidth(), 1000);
+        Assert.assertEquals(field.getGridHeight(), 5);
+        Assert.assertEquals(field.getGridWidth(), 5);
 
         //randomly check cells, make sure they are correct
         DoubleGrid2D grid = (DoubleGrid2D) field.getGrid();
-        //notice two things: (1) columns come first here (so the opposite of cartesian)
-        //(2) this being java the first element is at 0,0 while in R it is in 1,1
-        // so 10,100 here is 101,11 there
-        Assert.assertEquals(grid.field[10][100], -1046.217,.01);
-        Assert.assertEquals(grid.field[100][10], -19.68794,.01);
+        //notice that this being java the first element is at 0,0 while in R it is in 1,1
+        // so 4,4 here is 5,5 there
+        Assert.assertEquals(grid.field[0][0], -10,.01);
+        Assert.assertEquals(grid.field[4][4],10,.01);
 
 
     }

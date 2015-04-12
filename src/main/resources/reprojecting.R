@@ -1,0 +1,87 @@
+library(rgdal)
+library(maptools)
+
+#read the mpa
+data.shape<-readOGR(dsn="/home/carrknight/code/oxfish/src/main/resources/cssr_mpa/",layer="CCSR_MarineProtectedAreas")
+plot(data.shape)
+
+
+#read the raster
+library(rgdal)
+library(RColorBrewer)
+library(raster)
+
+path<-"/home/carrknight/Downloads/wc1000/wc1000/w001001.adf"
+
+x <- new("GDALReadOnlyDataset", path)
+getDriver(x)
+getDriverLongName(getDriver(x))
+xx<-asSGDF_GROD(x)
+
+
+r<-raster(xx)
+plot(r)
+plot(data.shape,add=TRUE) #can't see it because
+#the projections are wrong
+proj4string(xx)
+proj4string(data.shape)
+#translate
+data.shape<-spTransform(data.shape,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#replot
+plot(r)
+plot(data.shape,add=TRUE)
+
+
+#cities
+data.shape2<-readOGR(dsn="/home/carrknight/Downloads/tmp/major/",layer="Major_US_Cities")
+data.shape2<-spTransform(data.shape2,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#clip the cities
+data.shape2<-crop(data.shape2,extent(r))
+plot(data.shape2,add=TRUE)
+
+
+
+
+#save
+writeOGR(data.shape,dsn = "/home/carrknight/code/oxfish/src/main/resources/cssr_mpa/reprojected/",layer = "mpa_central",driver="ESRI Shapefile")
+
+#modify the others too
+data.shape<-readOGR(dsn="/home/carrknight/code/oxfish/src/main/resources/ncssr_mpa/",layer="MPA_NCCSR_AdoptedMPAs")
+data.shape<-spTransform(data.shape,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(r)
+plot(data.shape,add=TRUE)
+writeOGR(data.shape,dsn = "/home/carrknight/code/oxfish/src/main/resources/ncssr_mpa/reprojected/",layer = "mpa_north",driver="ESRI Shapefile")
+
+data.shape<-readOGR(dsn="/home/carrknight/code/oxfish/src/main/resources/ncssr_mpa/",layer="MPA_NCCSR_AdoptedMPAs")
+data.shape<-spTransform(data.shape,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(r)
+plot(data.shape,add=TRUE)
+writeOGR(data.shape,dsn = "/home/carrknight/code/oxfish/src/main/resources/ncssr_mpa/reprojected/",layer = "mpa_north",driver="ESRI Shapefile")
+
+
+
+
+#CITIES
+plot(r)
+plot(data.shape,add=TRUE)
+
+
+#cities
+data.shape2<-readOGR(dsn="/home/carrknight/Downloads/tmp/major/",layer="Major_US_Cities")
+data.shape2<-spTransform(data.shape2,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#clip the cities
+data.shape2<-crop(data.shape2,extent(r))
+plot(r)
+plot(data.shape,add=TRUE)
+plot(data.shape2,add=TRUE)
+writeOGR(data.shape2,dsn = "/home/carrknight/code/oxfish/src/main/resources/cities/",layer = "cities",driver="ESRI Shapefile")
+
+
+#sablefish
+sable<-readOGR(dsn="/home/carrknight/Downloads/tmp/sablefish/",layer="A_fimbria2006")
+sable<-spTransform(sable,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(r)
+plot(data.shape,add=TRUE)
+plot(data.shape2,add=TRUE)
+plot(sable,add=TRUE)
+head(sable@data)

@@ -7,6 +7,8 @@ import sim.engine.SimState;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
+import sim.portrayal.grid.SparseGridPortrayal2D;
+import sim.portrayal.simple.ImagePortrayal2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -35,7 +37,11 @@ public class FishGUI extends GUIState{
     };
     private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
 
+    private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
+
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
+
+    private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
 
     /**
      * create a random fishstate with seed = milliseconds since epoch
@@ -70,6 +76,7 @@ public class FishGUI extends GUIState{
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
+        display2D.attach(ports,"Ports");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
     }
@@ -91,7 +98,10 @@ public class FishGUI extends GUIState{
         mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLACK, true));
         //cities portrayal
         cities.setField(state.getCities());
-        cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK,.05, true));
+        cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
+        //ports
+        ports.setField(state.getPortGrid());
+        ports.setPortrayalForAll(new ImagePortrayal2D(portIcon));
 
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
