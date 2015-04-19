@@ -85,3 +85,7 @@ plot(data.shape,add=TRUE)
 plot(data.shape2,add=TRUE)
 plot(sable,add=TRUE)
 head(sable@data)
+
+
+rr<-readGDAL(  "/home/carrknight/Dropbox/OC Systems-Based Fisheries Management/ABM1 development/Parameters & logic/Spatial Ecological Data/shp/NCCOS Darkblotched rockfish Abundance1.tif")
+plot(tiff)

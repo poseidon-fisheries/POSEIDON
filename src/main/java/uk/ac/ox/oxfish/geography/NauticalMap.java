@@ -1,24 +1,18 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.google.common.base.Preconditions;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -47,6 +41,17 @@ public class NauticalMap
      * the distance calculator, maybe useful, maybe not
      */
     private Distance distance;
+
+    /**
+     * pre-recorded distance between cell 0,0 and 1,1. Useful to compute grid distances quickly
+     */
+    private double obliqueDistanceInKm = Double.NaN;
+    /**
+     * pre-recorded distance between cell 0,0 and 0,1
+     */
+    private double horizontalVerticalDistanceInKm = Double.NaN;
+
+
 
     /**
      * The list of ports
@@ -85,12 +90,23 @@ public class NauticalMap
     public NauticalMap(GeomGridField rasterBathymetry, GeomVectorField mpaVectorField, Distance distance) {
         this.rasterBathymetry = rasterBathymetry;
         this.mpaVectorField = mpaVectorField;
-        this.distance = distance;
+        this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
         recomputeTilesMPA();
 
         ports = new HashSet<>();
-        portMap = new SparseGrid2D(rasterBathymetry.getGridWidth(),rasterBathymetry.getGridHeight());
+        portMap = new SparseGrid2D(getWidth(), getHeight());
+    }
+
+    public int getHeight() {
+        return rasterBathymetry.getGridHeight();
+    }
+
+    /**
+     * how many cells horizontally
+     */
+    public int getWidth() {
+        return rasterBathymetry.getGridWidth();
     }
 
     /**
@@ -243,4 +259,25 @@ public class NauticalMap
     public HashSet<Port> getPorts() {
         return ports;
     }
+
+    public void setDistance(Distance distance) {
+        this.distance = distance;
+        horizontalVerticalDistanceInKm = distance(0,0,1,0);
+        obliqueDistanceInKm = distance(0,0,1,1);
+    }
+
+    /**
+     *
+     * @return distance from 0,0 to 1,0
+     */
+    public double getObliqueDistanceInKm() {
+        return obliqueDistanceInKm;
+    }
+
+    public double getHorizontalVerticalDistanceInKm() {
+        return horizontalVerticalDistanceInKm;
+    }
+
+
+
 }

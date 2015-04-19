@@ -66,6 +66,9 @@ public class FishState  extends SimState{
 
     }
 
+    public NauticalMap getMap() {
+        return map;
+    }
 
     public GeomGridField getRasterBathymetry() {
         return map.getRasterBathymetry();
