@@ -30,6 +30,10 @@ public class FishState  extends SimState{
 
 
     private Scenario scenario = new PrototypeScenario();
+    {
+        //todo delete this!
+        ((PrototypeScenario)scenario).setFishers(1);
+    }
     /**
      * how many hours in a step, basically.
      */
@@ -59,6 +63,9 @@ public class FishState  extends SimState{
         biology = initialization.getBiology();
 
         fishers = initialization.getAgents();
+        //start the fishers
+        for(Fisher fisher : fishers)
+                fisher.start(this);
 
 
 
@@ -103,5 +110,13 @@ public class FishState  extends SimState{
 
     public void setScenario(Scenario scenario) {
         this.scenario = scenario;
+    }
+
+    public List<Fisher> getFishers() {
+        return fishers;
+    }
+
+    public SparseGrid2D getFisherGrid() {
+        return map.getFisherGrid();
     }
 }

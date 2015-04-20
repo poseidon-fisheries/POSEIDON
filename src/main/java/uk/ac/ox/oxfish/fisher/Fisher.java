@@ -6,6 +6,8 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.actions.ActionResult;
+import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
@@ -62,12 +64,22 @@ public class Fisher implements Steppable{
      */
     private Boat boat;
 
-    public Fisher(Port homePort, MersenneTwisterFast random) {
+    public Fisher(
+            Port homePort, MersenneTwisterFast random, DepartingStrategy departingStrategy,
+            DestinationStrategy destinationStrategy, Boat boat) {
         this.homePort = homePort; this.random = random;
         this.location = homePort.getLocation();
         this.destination = homePort.getLocation();
         homePort.dock(this);//we dock
+        this.departingStrategy = departingStrategy;
+        this.destinationStrategy =destinationStrategy;
+        this.boat=boat;
+        this.action = new AtPort();
     }
+
+
+
+
 
     public SeaTile getLocation()
     {
@@ -75,12 +87,27 @@ public class Fisher implements Steppable{
     }
 
 
+    public void start(FishState state)
+    {
+        state.schedule.scheduleRepeating(this);
+    }
+
     @Override
     public void step(SimState simState) {
-        FishState fish = (FishState) simState;
+        FishState model = (FishState) simState;
 
         //tell equipment!
         boat.newStep();
+
+        //run the state machine
+        while(true)
+        {
+            ActionResult result = action.act(model, this);
+            action = result.getNextState();
+            if(!result.isActAgainThisTurn())
+                break;
+        }
+
 
     }
 

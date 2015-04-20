@@ -38,10 +38,12 @@ public class FishGUI extends GUIState{
     private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
 
     private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
+    private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();
 
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
     private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
+    private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
     /**
      * create a random fishstate with seed = milliseconds since epoch
@@ -76,6 +78,7 @@ public class FishGUI extends GUIState{
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
+        display2D.attach(boats,"Boats");
         display2D.attach(ports,"Ports");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
@@ -99,6 +102,10 @@ public class FishGUI extends GUIState{
         //cities portrayal
         cities.setField(state.getCities());
         cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
+        //boats
+        boats.setField(state.getFisherGrid());
+        boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon));
+
         //ports
         ports.setField(state.getPortGrid());
         ports.setPortrayalForAll(new ImagePortrayal2D(portIcon));

@@ -77,4 +77,9 @@ public class Port {
     public SeaTile getLocation() {
         return location;
     }
+
+    @Override
+    public String toString() {
+        return "Port at " +location;
+    }
 }

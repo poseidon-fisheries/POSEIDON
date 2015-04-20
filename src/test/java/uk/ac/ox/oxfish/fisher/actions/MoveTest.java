@@ -8,6 +8,7 @@ import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
@@ -69,12 +70,14 @@ public class MoveTest
         map.setDistance(new CartesianDistance(1.0));
 
         //lots of crap to initialize.
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0,0));
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast());
+        Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2,0));
-        fisher.setDestinationStrategy(strategy);
-        fisher.setBoat(new Boat(0.1));
+        when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2, 0));
+
+        Fisher fisher = new Fisher(port,new MersenneTwisterFast(),
+                                   mock(DepartingStrategy.class),
+                                   strategy,
+                                   new Boat(0.1) );
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher);
@@ -92,12 +95,11 @@ public class MoveTest
         map.setDistance(new CartesianDistance(2.0));
 
         //lots of crap to initialize.
-        Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0,0));
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast());
+        Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2,0));
-        fisher.setDestinationStrategy(strategy);
-        fisher.setBoat(new Boat(0.1));
+        when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
+        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), null, strategy,new Boat(0.1) );
+
 
         //should move and spend 20 hours doing so
         move.act(simple,fisher);

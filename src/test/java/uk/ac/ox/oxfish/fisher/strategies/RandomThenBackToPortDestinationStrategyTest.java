@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -35,7 +36,10 @@ public class RandomThenBackToPortDestinationStrategyTest {
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = new Fisher(port,random);
+        Fisher fisher = new Fisher(port,random,
+                                   mock(DepartingStrategy.class),
+                                   mock(DestinationStrategy.class),
+                                   mock(Boat.class));
 
 
         //choose 100 times

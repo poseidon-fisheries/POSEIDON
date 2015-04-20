@@ -7,11 +7,14 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.FixedProbabilityDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 
-import java.util.Collections;
 import java.util.LinkedList;
 
 /**
@@ -62,7 +65,15 @@ public class PrototypeScenario implements Scenario {
     /**
      * Uses Caartesian distance
      */
-    private double gridSizeInKm = 1;
+    private double gridSizeInKm = 10;
+
+    private double minDepartingProbability = 0.2;
+
+    private double maxDepartingProbability = 0.8;
+
+    private double minSpeedInKmh = 1;
+
+    private double maxSpeedInKmh = 5;
 
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
@@ -103,7 +114,15 @@ public class PrototypeScenario implements Scenario {
         for(int i=0;i<fishers;i++)
         {
             Port port = ports[random.nextInt(ports.length)];
-            fisherList.add(new Fisher(port,random));
+            DepartingStrategy departing = new FixedProbabilityDepartingStrategy(
+                    random.nextDouble(true,true)*(maxDepartingProbability-minDepartingProbability)
+                            + minDepartingProbability);
+            double speed = random.nextDouble(true,true) *
+                    (maxSpeedInKmh - minSpeedInKmh) + minSpeedInKmh;
+            fisherList.add(new Fisher(port,random, departing,
+                                      new RandomThenBackToPortDestinationStrategy(),
+                                      new Boat(speed)
+                                      ));
         }
 
         return new ScenarioResult(biology,map,fisherList);
@@ -188,5 +207,37 @@ public class PrototypeScenario implements Scenario {
 
     public void setGridSizeInKm(double gridSizeInKm) {
         this.gridSizeInKm = gridSizeInKm;
+    }
+
+    public double getMinDepartingProbability() {
+        return minDepartingProbability;
+    }
+
+    public void setMinDepartingProbability(double minDepartingProbability) {
+        this.minDepartingProbability = minDepartingProbability;
+    }
+
+    public double getMaxDepartingProbability() {
+        return maxDepartingProbability;
+    }
+
+    public void setMaxDepartingProbability(double maxDepartingProbability) {
+        this.maxDepartingProbability = maxDepartingProbability;
+    }
+
+    public double getMinSpeedInKmh() {
+        return minSpeedInKmh;
+    }
+
+    public void setMinSpeedInKmh(double minSpeedInKmh) {
+        this.minSpeedInKmh = minSpeedInKmh;
+    }
+
+    public double getMaxSpeedInKmh() {
+        return maxSpeedInKmh;
+    }
+
+    public void setMaxSpeedInKmh(double maxSpeedInKmh) {
+        this.maxSpeedInKmh = maxSpeedInKmh;
     }
 }

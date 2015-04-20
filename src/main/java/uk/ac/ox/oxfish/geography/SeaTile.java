@@ -93,4 +93,14 @@ public class SeaTile {
     public void reactToThisAmountOfBiomassBeingFished(Specie specie, Integer biomassFished) {
         biology.reactToThisAmountOfBiomassBeingFished(specie, biomassFished);
     }
+
+
+    @Override
+    public String toString() {
+        return "SeaTile at" +
+                + gridX +
+                "," + gridY +
+                " altitude=" + altitude +
+                '}';
+    }
 }

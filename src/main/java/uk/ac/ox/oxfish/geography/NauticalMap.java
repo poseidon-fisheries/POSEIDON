@@ -276,4 +276,8 @@ public class NauticalMap
     public boolean recordFisherLocation(Fisher fisher, int x, int y) {
         return fishersMap.setObjectLocation(fisher, x, y);
     }
+
+    public SparseGrid2D getFisherGrid() {
+        return fishersMap;
+    }
 }
