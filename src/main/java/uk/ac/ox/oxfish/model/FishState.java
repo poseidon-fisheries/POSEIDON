@@ -27,6 +27,12 @@ public class FishState  extends SimState{
     private GlobalBiology biology;
 
 
+    /**
+     * how many hours in a step, basically.
+     */
+    final public static double HOURS_AVAILABLE_TO_TRAVEL_EACH_STEP = 24;
+
+
     public FishState(long seed) {
         super(seed);
     }

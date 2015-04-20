@@ -1,4 +1,7 @@
-package uk.ac.ox.oxfish.fisher;
+package uk.ac.ox.oxfish.fisher.strategies;
+
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * The strategy used by the fisher to decide whether to leave port or not
@@ -10,6 +13,6 @@ public interface DepartingStrategy {
      * The fisher asks himself if he wants to leave the warm comfort of his bed.
      * @return  true if the fisherman wants to leave port.
      */
-    boolean leavePort();
+    boolean shouldFisherLeavePort(Fisher fisher, FishState model);
 
 }

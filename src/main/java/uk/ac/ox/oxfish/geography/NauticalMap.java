@@ -8,8 +8,10 @@ import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
+import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 
 import java.util.HashSet;
@@ -65,6 +67,11 @@ public class NauticalMap
 
 
     /**
+     * map holding location of all fishers.
+     */
+    private SparseGrid2D fishersMap;
+
+    /**
      * todo move to parameter list
      */
     final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
@@ -96,6 +103,7 @@ public class NauticalMap
 
         ports = new HashSet<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
+        fishersMap = new SparseGrid2D(getWidth(), getHeight());
     }
 
     public int getHeight() {
@@ -262,22 +270,10 @@ public class NauticalMap
 
     public void setDistance(Distance distance) {
         this.distance = distance;
-        horizontalVerticalDistanceInKm = distance(0,0,1,0);
-        obliqueDistanceInKm = distance(0,0,1,1);
-    }
-
-    /**
-     *
-     * @return distance from 0,0 to 1,0
-     */
-    public double getObliqueDistanceInKm() {
-        return obliqueDistanceInKm;
-    }
-
-    public double getHorizontalVerticalDistanceInKm() {
-        return horizontalVerticalDistanceInKm;
     }
 
 
-
+    public boolean recordFisherLocation(Fisher fisher, int x, int y) {
+        return fishersMap.setObjectLocation(fisher, x, y);
+    }
 }
