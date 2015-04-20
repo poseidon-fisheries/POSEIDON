@@ -2,16 +2,16 @@ package uk.ac.ox.oxfish.model;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.field.SparseField2D;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -26,7 +26,10 @@ public class FishState  extends SimState{
 
     private GlobalBiology biology;
 
+    private List<Fisher> fishers;
 
+
+    private Scenario scenario = new PrototypeScenario();
     /**
      * how many hours in a step, basically.
      */
@@ -46,14 +49,16 @@ public class FishState  extends SimState{
     public void start() {
         super.start();
 
-
+        ScenarioResult initialization = scenario.start(this);
 
         //read raster bathymetry
         //  map = NauticalMap.initializeWithDefaultValues();
-        map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(4,random,1000000,1000000,10,5000,2);
+        map = initialization.getMap();
         //      map.addCities("cities/cities.shp");
 
-        biology = new GlobalBiology(new Specie("TEST SPECIE"));
+        biology = initialization.getBiology();
+
+        fishers = initialization.getAgents();
 
 
 
@@ -90,5 +95,13 @@ public class FishState  extends SimState{
 
     public GeomVectorField getCities() {
         return map.getCities();
+    }
+
+    public Scenario getScenario() {
+        return scenario;
+    }
+
+    public void setScenario(Scenario scenario) {
+        this.scenario = scenario;
     }
 }

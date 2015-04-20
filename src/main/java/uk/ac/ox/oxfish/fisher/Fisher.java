@@ -120,6 +120,11 @@ public class Fisher implements Steppable{
         return boat.totalTravelTimeAfterAddingThisSegment(segmentLengthInKilometers);
     }
 
+    /**
+     * set new location, consume time and tell the map about our new location
+     * @param newPosition the new position
+     * @param map the map on which we are moving
+     */
     public void move(SeaTile newPosition,NauticalMap map)
     {
         Preconditions.checkArgument(newPosition != location); //i am not already here!

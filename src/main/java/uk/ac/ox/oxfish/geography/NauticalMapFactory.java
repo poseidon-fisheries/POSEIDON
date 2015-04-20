@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography;
 
-import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -18,7 +17,8 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * A bunch of static methods that build maps
+ * A bunch of static methods that build maps. I wonder if I should just hide this within the calling scenarios, but maybe
+ * they'll come in handy as separate methods at some point.
  * Created by carrknight on 4/10/15.
  */
 public class NauticalMapFactory {
@@ -165,13 +165,14 @@ public class NauticalMapFactory {
      * calls prototypeMap and adds a randomized biology and then smooths it a bit
      * @return the nautical map
      */
-    public static NauticalMap prototypeMapWithRandomSmoothedBiology(int coastalRoughness,
-                                                                    MersenneTwisterFast random,
-                                                                    int depthSmoothing,
-                                                                    int biologySmoothing,
-                                                                    int minBiomass,
-                                                                    int maxBiomass,
-                                                                    int ports){
+    public static NauticalMap prototypeMapWithRandomSmoothedBiology(
+            int coastalRoughness,
+            MersenneTwisterFast random,
+            int depthSmoothing,
+            int biologySmoothing,
+            int minBiomass,
+            int maxBiomass,
+            int ports, int width, int height){
 
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
@@ -186,8 +187,8 @@ public class NauticalMapFactory {
         ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
         for(int i=0; i<biologySmoothing; i++)
         {
-            int x = random.nextInt(50);
-            int y = random.nextInt(50);
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
             SeaTile toChange = (SeaTile) baseGrid.get(x,y);
             if(toChange.getAltitude() > 0) //land is cool man
             {
@@ -219,8 +220,8 @@ public class NauticalMapFactory {
          *
          */
         ArrayList<SeaTile> candidateTiles = new ArrayList<>();
-        for(int x=0; x<50; x++)
-            for(int y=0; y<50; y++)
+        for(int x=0; x<width; x++)
+            for(int y=0; y<height; y++)
             {
                 SeaTile possible = (SeaTile) baseGrid.get(x,y);
                 if(possible.getAltitude() <= 0) //sea tiles aren't welcome!
