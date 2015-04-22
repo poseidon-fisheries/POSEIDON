@@ -9,11 +9,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
-import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.FixedProbabilityDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -132,10 +129,16 @@ public class PrototypeScenario implements Scenario {
                     (maxHoldSize - minHoldSize) + minHoldSize;
             double efficiency = random.nextDouble(true,true) *
                     (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
-            fisherList.add(new Fisher(port,random, departing,
-                                      new RandomThenBackToPortDestinationStrategy(),
-                                      new Boat(speed),
-                                      new Hold(capacity,biology.getSize()),
+            fisherList.add(new Fisher(port, random, departing,
+                                      new FavoriteDestinationStrategy(map,random),
+                                      new FishingStrategy() { //never fish!
+                                          @Override
+                                          public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
+                                                                    FishState model) {
+                                              return false;
+                                          }
+                                      }, new Boat(speed),
+                                      new Hold(capacity, biology.getSize()),
                                       new FixedProportionGear(efficiency)
             ));
         }

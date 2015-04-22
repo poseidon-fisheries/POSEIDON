@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -61,6 +62,10 @@ public class Fisher implements Steppable{
      */
     private Action action;
 
+    /**
+     * time spent at sea
+     */
+    private int stepsAtSea = 0;
 
     /***
      *      ___           _                    _
@@ -101,11 +106,20 @@ public class Fisher implements Steppable{
      */
     private DestinationStrategy destinationStrategy;
 
+    /**
+     * the decision process of the fisher to choose whether to fish when arrived and for how long to do it
+     */
+    private FishingStrategy fishingStrategy;
+
 
 
     public Fisher(
-            Port homePort, MersenneTwisterFast random, DepartingStrategy departingStrategy,
-            DestinationStrategy destinationStrategy, Boat boat, Hold hold, Gear gear) {
+            Port homePort, MersenneTwisterFast random,
+            //strategies:
+            DepartingStrategy departingStrategy,
+            DestinationStrategy destinationStrategy, FishingStrategy fishingStrategy,
+            //equipment:
+            Boat boat, Hold hold, Gear gear) {
         this.homePort = homePort; this.random = random;
         this.location = homePort.getLocation();
         this.destination = homePort.getLocation();
@@ -116,6 +130,7 @@ public class Fisher implements Steppable{
         this.hold = hold;
         this.action = new AtPort();
         this.gear = gear;
+        this.fishingStrategy = fishingStrategy;
     }
 
 
@@ -149,6 +164,9 @@ public class Fisher implements Steppable{
                 break;
         }
 
+        //if you are not at home
+        if(!location.equals(getHomePort().getLocation()))
+            stepsAtSea++;
 
     }
 
@@ -240,6 +258,23 @@ public class Fisher implements Steppable{
         this.departingStrategy = departingStrategy;
     }
 
+
+    public FishingStrategy getFishingStrategy() {
+        return fishingStrategy;
+    }
+
+    public void setFishingStrategy(FishingStrategy fishingStrategy) {
+        this.fishingStrategy = fishingStrategy;
+    }
+
+    public boolean shouldIFish(FishState state)
+    {
+        return fishingStrategy.shouldFish(this,random,state);
+
+    }
+
+
+
     /**
      * store the catch
      * @param caught the catch
@@ -300,5 +335,14 @@ public class Fisher implements Steppable{
 
     public void setGear(Gear gear) {
         this.gear = gear;
+    }
+
+    /**
+     *
+     * @return true if destination == location
+     */
+    public boolean isAtDestination()
+    {
+        return destination.equals(location);
     }
 }

@@ -119,4 +119,8 @@ public class FishState  extends SimState{
     public SparseGrid2D getFisherGrid() {
         return map.getFisherGrid();
     }
+
+    public GlobalBiology getBiology() {
+        return biology;
+    }
 }

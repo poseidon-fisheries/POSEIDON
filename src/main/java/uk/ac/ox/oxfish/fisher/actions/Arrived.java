@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * Still to be done
+ * Arrived to destination, should I fish or look for another destination?
  * Created by carrknight on 4/19/15.
  */
 public class Arrived implements Action{
@@ -18,6 +18,10 @@ public class Arrived implements Action{
      */
     @Override
     public ActionResult act(FishState model, Fisher agent) {
+        assert agent.isAtDestination();
+
+        if(agent.shouldIFish(model)) //if you want to fish
+                return new ActionResult(new FishHere(),true);
 
 
         //adapt if needed

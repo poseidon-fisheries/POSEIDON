@@ -41,7 +41,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         Fisher fisher = new Fisher(port,random,
                                    mock(DepartingStrategy.class),
                                    mock(DestinationStrategy.class),
-                                   mock(Boat.class),mock(Hold.class),mock(Gear.class) );
+                                   mock(FishingStrategy.class), mock(Boat.class),mock(Hold.class),mock(Gear.class) );
 
 
         //choose 100 times

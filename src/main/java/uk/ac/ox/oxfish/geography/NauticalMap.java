@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.geography;
 
 import com.google.common.base.Preconditions;
 import com.vividsolutions.jts.geom.Point;
+import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.Grid2D;
@@ -279,5 +280,22 @@ public class NauticalMap
 
     public SparseGrid2D getFisherGrid() {
         return fishersMap;
+    }
+
+
+    public SeaTile getRandomBelowWaterLineSeaTile(MersenneTwisterFast random)
+    {
+        SeaTile toReturn;
+        int tries = 0;
+        do{
+            toReturn = getSeaTile(random.nextInt(getWidth()),
+                                      random.nextInt(getHeight()));
+
+            tries++;
+            if(tries > 100000)
+                throw new RuntimeException("Tried 100000 time to get a random sea tile and failed. Maybe it's time to stop");
+
+        }while (toReturn.getAltitude() > 0); //keep looking if you found something at sea
+        return toReturn;
     }
 }

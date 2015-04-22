@@ -4,7 +4,6 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -31,18 +30,9 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
             assert fisher.getHomePort().isDocked(fisher);
             assert currentAction instanceof AtPort;
             assert fisher.getDestination().equals(fisher.getHomePort().getLocation()); //I assume at port your destination is still the port
-            //grab random location
-            NauticalMap map = model.getMap();
-
-            SeaTile toReturn;
-            do{
-                toReturn = map.getSeaTile(random.nextInt(map.getWidth()),
-                                          random.nextInt(map.getHeight()));
-
-            }while (toReturn.getAltitude() > 0); //keep looking if you found something at sea
 
             //that's where we are headed!
-            return toReturn;
+            return model.getMap().getRandomBelowWaterLineSeaTile(random);
         }
         else
         {
