@@ -81,7 +81,7 @@ public class SeaTile {
      * @param specie  the specie you care about
      * @return the biomass of this specie
      */
-    public Integer getBiomass(Specie specie) {
+    public Double getBiomass(Specie specie) {
         return biology.getBiomass(specie);
     }
 
@@ -90,7 +90,7 @@ public class SeaTile {
      * @param specie the specie fished
      * @param biomassFished the biomass fished
      */
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Integer biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
         biology.reactToThisAmountOfBiomassBeingFished(specie, biomassFished);
     }
 

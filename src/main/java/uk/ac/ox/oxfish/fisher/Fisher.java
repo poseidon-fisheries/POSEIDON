@@ -5,10 +5,15 @@ import com.sun.scenario.effect.impl.prism.PrCropPeer;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -24,21 +29,18 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class Fisher implements Steppable{
 
+    /***
+     *     __   __        _      _    _
+     *     \ \ / /_ _ _ _(_)__ _| |__| |___ ___
+     *      \ V / _` | '_| / _` | '_ \ / -_|_-<
+     *       \_/\__,_|_| |_\__,_|_.__/_\___/__/
+     *
+     */
+
     /**
      * the location of the port!
      */
     private SeaTile location;
-
-    /**
-     *
-     */
-    private DepartingStrategy departingStrategy;
-
-
-    /**
-     * The strategy deciding where to go
-     */
-    private DestinationStrategy destinationStrategy;
 
     /**
      * Home is where the port is
@@ -59,14 +61,51 @@ public class Fisher implements Steppable{
      */
     private Action action;
 
+
+    /***
+     *      ___           _                    _
+     *     | __|__ _ _  _(_)_ __ _ __  ___ _ _| |_
+     *     | _|/ _` | || | | '_ \ '  \/ -_) ' \  _|
+     *     |___\__, |\_,_|_| .__/_|_|_\___|_||_\__|
+     *            |_|      |_|
+     */
+
     /**
      * boat statistics (also holds information about how much the boat has travelled so far)
      */
     private Boat boat;
 
+    /**
+     * basically the inventory of the ship
+     */
+    private Hold hold;
+
+    private Gear gear;
+
+    /***
+     *      ___ _            _            _
+     *     / __| |_ _ _ __ _| |_ ___ __ _(_)___ ___
+     *     \__ \  _| '_/ _` |  _/ -_) _` | / -_|_-<
+     *     |___/\__|_| \__,_|\__\___\__, |_\___/__/
+     *                              |___/
+     */
+
+    /**
+     * the strategy deciding whether to leave port or not
+     */
+    private DepartingStrategy departingStrategy;
+
+
+    /**
+     * The strategy deciding where to go
+     */
+    private DestinationStrategy destinationStrategy;
+
+
+
     public Fisher(
             Port homePort, MersenneTwisterFast random, DepartingStrategy departingStrategy,
-            DestinationStrategy destinationStrategy, Boat boat) {
+            DestinationStrategy destinationStrategy, Boat boat, Hold hold, Gear gear) {
         this.homePort = homePort; this.random = random;
         this.location = homePort.getLocation();
         this.destination = homePort.getLocation();
@@ -74,7 +113,9 @@ public class Fisher implements Steppable{
         this.departingStrategy = departingStrategy;
         this.destinationStrategy =destinationStrategy;
         this.boat=boat;
+        this.hold = hold;
         this.action = new AtPort();
+        this.gear = gear;
     }
 
 
@@ -197,5 +238,67 @@ public class Fisher implements Steppable{
 
     public void setDepartingStrategy(DepartingStrategy departingStrategy) {
         this.departingStrategy = departingStrategy;
+    }
+
+    /**
+     * store the catch
+     * @param caught the catch
+     */
+    public void load(Catch caught) {
+        hold.load(caught);
+    }
+
+    /**
+     * how many pounds of a specific specie are we carrying
+     * @param specie the specie
+     * @return lbs of specie carried
+     */
+    public double getPoundsCarried(Specie specie) {
+        return hold.getPoundsCarried(specie);
+    }
+
+    /**
+     * the total pounds of fish carried
+     * @return pounds carried
+     */
+    public double getPoundsCarried() {
+        return hold.getPoundsCarried();
+    }
+
+    /**
+     * how much can this fish hold
+     * @return the maximum load
+     */
+    public double getMaximumLoad() {
+        return hold.getMaximumLoad();
+    }
+
+    /**
+     * unload all the cargo
+     * @return the cargo as a catch object
+     */
+    public Catch unload() {
+        return hold.unload();
+    }
+
+
+    /**
+     * tell the fisher to use its gear to fish at current location. It stores everything in the hold
+     * @param modelBiology the global biology object
+     * @return the fish caught and stored (barring overcapacity)
+     */
+    public Catch fishHere(GlobalBiology modelBiology) {
+        Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
+        Catch catchOfTheDay = gear.fish(this, location, modelBiology);
+        hold.load(catchOfTheDay);
+        return catchOfTheDay;
+    }
+
+    public Gear getGear() {
+        return gear;
+    }
+
+    public void setGear(Gear gear) {
+        this.gear = gear;
     }
 }

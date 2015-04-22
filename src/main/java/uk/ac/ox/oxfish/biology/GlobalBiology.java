@@ -15,28 +15,38 @@ public class GlobalBiology
     /**
      * an unmodifiable list of species.
      */
-    private final List<Specie> species;
+    private final Specie species[];
 
-    /**
-     * for now all this has is a lot of species
-     * @param species the species
-     */
-    public GlobalBiology(List<Specie> species)
-    {
-        this.species = Collections.unmodifiableList(species);
-    }
+
+    private final List<Specie> unmodifiableView;
 
     public GlobalBiology(Specie... species)
     {
 
 
-        this.species = Collections.unmodifiableList(Arrays.asList(species));
+
+        this.species = species;
+        for(int i=0; i<species.length; i++) //now assign a number to each
+            species[i].setIndex(i);
+        unmodifiableView = Collections.unmodifiableList(Arrays.asList(species));
     }
     /**
      *
      * @return an unmodifiable list of all the species available
      */
-    public List<Specie> getSpecies() {
-        return species;
+    public List<Specie> getSpecies()
+    {
+        return unmodifiableView;
     }
+
+    public Specie getSpecie(int order)
+    {
+        return species[order];
+    }
+
+    public int getSize()
+    {
+        return species.length;
+    }
+
 }

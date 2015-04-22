@@ -199,7 +199,7 @@ public class NauticalMapFactory {
             y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
             SeaTile fixed = (SeaTile) baseGrid.get(x,y);
             //null is not a specie but we know that the map is filled with constant biology so we are in the clear
-            int newBiology = Math.round(toChange.getBiomass(null) +
+            double newBiology = Math.round(toChange.getBiomass(null) +
                     (random.nextFloat()*.025f) *
                             (fixed.getBiomass(null)-toChange.getBiomass(null)));
             if(newBiology <=0)

@@ -8,6 +8,9 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
+import uk.ac.ox.oxfish.fisher.equipment.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy;
@@ -75,6 +78,12 @@ public class PrototypeScenario implements Scenario {
 
     private double maxSpeedInKmh = 5;
 
+    private double minHoldSize = 100;
+    private double maxHoldSize = 100;
+
+    private double minFishingEfficiency = .02;
+    private double maxFishingEfficiency = .02;
+
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -119,10 +128,16 @@ public class PrototypeScenario implements Scenario {
                             + minDepartingProbability);
             double speed = random.nextDouble(true,true) *
                     (maxSpeedInKmh - minSpeedInKmh) + minSpeedInKmh;
+            double capacity = random.nextDouble(true,true) *
+                    (maxHoldSize - minHoldSize) + minHoldSize;
+            double efficiency = random.nextDouble(true,true) *
+                    (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
             fisherList.add(new Fisher(port,random, departing,
                                       new RandomThenBackToPortDestinationStrategy(),
-                                      new Boat(speed)
-                                      ));
+                                      new Boat(speed),
+                                      new Hold(capacity,biology.getSize()),
+                                      new FixedProportionGear(efficiency)
+            ));
         }
 
         return new ScenarioResult(biology,map,fisherList);
@@ -239,5 +254,37 @@ public class PrototypeScenario implements Scenario {
 
     public void setMaxSpeedInKmh(double maxSpeedInKmh) {
         this.maxSpeedInKmh = maxSpeedInKmh;
+    }
+
+    public double getMinHoldSize() {
+        return minHoldSize;
+    }
+
+    public void setMinHoldSize(double minHoldSize) {
+        this.minHoldSize = minHoldSize;
+    }
+
+    public double getMaxHoldSize() {
+        return maxHoldSize;
+    }
+
+    public void setMaxHoldSize(double maxHoldSize) {
+        this.maxHoldSize = maxHoldSize;
+    }
+
+    public double getMinFishingEfficiency() {
+        return minFishingEfficiency;
+    }
+
+    public void setMinFishingEfficiency(double minFishingEfficiency) {
+        this.minFishingEfficiency = minFishingEfficiency;
+    }
+
+    public double getMaxFishingEfficiency() {
+        return maxFishingEfficiency;
+    }
+
+    public void setMaxFishingEfficiency(double maxFishingEfficiency) {
+        this.maxFishingEfficiency = maxFishingEfficiency;
     }
 }

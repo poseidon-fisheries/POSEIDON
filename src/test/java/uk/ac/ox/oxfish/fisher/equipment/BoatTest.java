@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

@@ -14,6 +14,8 @@ public class Boat {
      */
     private final double speedInKilometersPerHour;
 
+
+
     /**
      * how many hours have been spent travelling in this step
      */

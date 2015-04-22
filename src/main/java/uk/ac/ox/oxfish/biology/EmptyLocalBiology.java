@@ -14,8 +14,8 @@ public class EmptyLocalBiology implements LocalBiology
      * @return the biomass of this specie
      */
     @Override
-    public Integer getBiomass(Specie specie) {
-        return 0;
+    public Double getBiomass(Specie specie) {
+        return 0d;
     }
 
     /**
@@ -25,7 +25,7 @@ public class EmptyLocalBiology implements LocalBiology
      * @param biomassFished the biomass fished
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Integer biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
         throw new IllegalStateException("It's impossible to take biomass from the empty biology");
     }
 }

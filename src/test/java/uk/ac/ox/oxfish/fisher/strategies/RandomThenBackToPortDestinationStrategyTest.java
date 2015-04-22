@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,7 +41,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         Fisher fisher = new Fisher(port,random,
                                    mock(DepartingStrategy.class),
                                    mock(DestinationStrategy.class),
-                                   mock(Boat.class));
+                                   mock(Boat.class),mock(Hold.class),mock(Gear.class) );
 
 
         //choose 100 times

@@ -8,6 +8,8 @@ import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
@@ -77,7 +79,7 @@ public class MoveTest
         Fisher fisher = new Fisher(port,new MersenneTwisterFast(),
                                    mock(DepartingStrategy.class),
                                    strategy,
-                                   new Boat(0.1) );
+                                   new Boat(0.1),mock(Hold.class),mock(Gear.class) );
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher);
@@ -98,7 +100,8 @@ public class MoveTest
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), null, strategy,new Boat(0.1) );
+        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), null, strategy,new Boat(0.1),
+                                   mock(Hold.class),mock(Gear.class));
 
 
         //should move and spend 20 hours doing so

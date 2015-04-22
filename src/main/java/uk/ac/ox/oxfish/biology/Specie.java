@@ -8,6 +8,11 @@ public class Specie {
 
     private final String name;
 
+    /**
+     * the specie index, basically its order in the species array.
+     */
+    private int index;
+
     public Specie(String name) {
         this.name = name;
     }
@@ -15,5 +20,13 @@ public class Specie {
     public String getName()
     {
         return name;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

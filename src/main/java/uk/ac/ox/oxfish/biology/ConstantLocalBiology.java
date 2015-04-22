@@ -6,9 +6,9 @@ package uk.ac.ox.oxfish.biology;
  */
 public class ConstantLocalBiology implements LocalBiology {
 
-    final private Integer fixedBiomass;
+    final private Double fixedBiomass;
 
-    public ConstantLocalBiology(int fixedBiomass) {
+    public ConstantLocalBiology(double fixedBiomass) {
         this.fixedBiomass = fixedBiomass;
     }
 
@@ -16,7 +16,7 @@ public class ConstantLocalBiology implements LocalBiology {
      * returned the fixed biomass
      */
     @Override
-    public Integer getBiomass(Specie specie) {
+    public Double getBiomass(Specie specie) {
         return fixedBiomass;
     }
 
@@ -24,7 +24,7 @@ public class ConstantLocalBiology implements LocalBiology {
      * nothing happens
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Integer biomassFished)
+    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished)
     {
 
     }
