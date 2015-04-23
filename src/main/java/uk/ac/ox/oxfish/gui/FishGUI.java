@@ -6,12 +6,9 @@ import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
-import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
-import sim.portrayal.simple.OvalPortrayal2D;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.geography.SeaTile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,14 +24,8 @@ public class FishGUI extends GUIState{
     private Display2D display2D;
     private JFrame displayFrame;
 
-    private final FastObjectGridPortrayal2D myPortrayal = new FastObjectGridPortrayal2D(true)
-    {
-        //this obviously should be done by a Transformer/Function object but this is mason and we have to use java 1.2
-        @Override
-        public double doubleValue(Object obj) {
-            return ((SeaTile)obj).getAltitude();
-        }
-    };
+    private final ColorfulGrid myPortrayal;
+
     private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
 
     private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
@@ -51,6 +42,8 @@ public class FishGUI extends GUIState{
     public FishGUI()
     {
         super(new FishState(System.currentTimeMillis()));
+        myPortrayal = new ColorfulGrid(guirandom);
+
     }
 
     /**
@@ -60,6 +53,8 @@ public class FishGUI extends GUIState{
     public FishGUI(SimState state)
     {
         super(state);
+        myPortrayal = new ColorfulGrid(guirandom);
+
     }
 
 
@@ -78,7 +73,7 @@ public class FishGUI extends GUIState{
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
-        display2D.attach(boats,"Boats");
+        display2D.attach(boats, "Boats");
         display2D.attach(ports,"Ports");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
@@ -110,9 +105,14 @@ public class FishGUI extends GUIState{
         ports.setField(state.getPortGrid());
         ports.setPortrayalForAll(new ImagePortrayal2D(portIcon));
 
+        ((JComponent) display2D.getComponent(0)).add(
+                new ColorfulGridSwitcher(myPortrayal,state.getBiology(), display2D));
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
         display2D.repaint();
+
+
+
     }
 
 
