@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Anarchy;
 
 import java.util.Queue;
 
@@ -57,7 +58,7 @@ public class MoveTest
         when(fisher.getDestination()).thenReturn(map.getSeaTile(0,0));
         when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0));
 
-        ActionResult result = move.act(simple, fisher);
+        ActionResult result = move.act(simple, fisher, new Anarchy() );
         verify(fisher,never()).move(any(),any()); //never moved
         assertTrue(result.isActAgainThisTurn()); //think he has arrived
         assertTrue(result.getNextState() instanceof Arrived);
@@ -78,12 +79,12 @@ public class MoveTest
         when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2, 0));
 
         Fisher fisher = new Fisher(port,new MersenneTwisterFast(),
-                                   mock(DepartingStrategy.class),
+                                   new Anarchy(), mock(DepartingStrategy.class),
                                    strategy,
                                    mock(FishingStrategy.class), new Boat(0.1),mock(Hold.class),mock(Gear.class) );
 
         //should move and spend 20 hours doing so
-        move.act(simple, fisher);
+        move.act(simple, fisher, new Anarchy());
         assertEquals(fisher.getHoursTravelledToday(), 20, .001);
         assertEquals(fisher.getLocation(), map.getSeaTile(2, 0));
 
@@ -101,12 +102,12 @@ public class MoveTest
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), null, strategy, mock(FishingStrategy.class), new Boat(0.1),
+        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), new Anarchy(), null, strategy, mock(FishingStrategy.class), new Boat(0.1),
                                    mock(Hold.class),mock(Gear.class));
 
 
         //should move and spend 20 hours doing so
-        move.act(simple,fisher);
+        move.act(simple,fisher,new Anarchy() );
         assertEquals(fisher.getHoursTravelledToday(), 20, .001);
         assertEquals(fisher.getLocation(),map.getSeaTile(1, 0));
 

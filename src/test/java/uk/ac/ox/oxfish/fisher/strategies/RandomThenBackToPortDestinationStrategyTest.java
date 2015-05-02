@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Anarchy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -39,7 +40,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
         Fisher fisher = new Fisher(port,random,
-                                   mock(DepartingStrategy.class),
+                                   new Anarchy(), mock(DepartingStrategy.class),
                                    mock(DestinationStrategy.class),
                                    mock(FishingStrategy.class), mock(Boat.class),mock(Hold.class),mock(Gear.class) );
 
@@ -141,4 +142,5 @@ public class RandomThenBackToPortDestinationStrategyTest {
         when(model.getMap()).thenReturn(map);
         return model;
     }
+
 }

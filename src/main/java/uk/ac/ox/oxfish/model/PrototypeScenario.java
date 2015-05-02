@@ -14,6 +14,8 @@ import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.model.regs.Anarchy;
+import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
 
@@ -81,6 +83,9 @@ public class PrototypeScenario implements Scenario {
     private double minFishingEfficiency = .02;
     private double maxFishingEfficiency = .02;
 
+
+    private Regulations regulation =  new Anarchy();
+
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -113,7 +118,7 @@ public class PrototypeScenario implements Scenario {
             public void step(SimState simState) {
                 System.out.println("the time is " + simState.schedule.getTime());
             }
-        });
+        }, StepOrder.FISHER_PHASE.ordinal(),1.0);
 
         LinkedList<Fisher> fisherList = new LinkedList<>();
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
@@ -129,7 +134,7 @@ public class PrototypeScenario implements Scenario {
                     (maxHoldSize - minHoldSize) + minHoldSize;
             double efficiency = random.nextDouble(true,true) *
                     (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
-            fisherList.add(new Fisher(port, random, departing,
+            fisherList.add(new Fisher(port, random, regulation, departing,
                                       new FavoriteDestinationStrategy(map,random),
                                       new FishingStrategy() { //never fish!
                                           @Override
@@ -289,5 +294,13 @@ public class PrototypeScenario implements Scenario {
 
     public void setMaxFishingEfficiency(double maxFishingEfficiency) {
         this.maxFishingEfficiency = maxFishingEfficiency;
+    }
+
+    public Regulations getRegulation() {
+        return regulation;
+    }
+
+    public void setRegulation(Regulations regulation) {
+        this.regulation = regulation;
     }
 }

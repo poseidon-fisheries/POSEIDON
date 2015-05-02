@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Regulations;
 
 /**
  * This is the starting state and is in general the state the fisher stays at while at port
@@ -15,12 +15,15 @@ public class AtPort implements Action {
      *
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
+     * @param regulations the regulation that tells us whether we can leave
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent)
+    public ActionResult act(FishState model, Fisher agent, Regulations regulations)
     {
-        if(agent.shouldFisherLeavePort(model))
+        if(regulations.allowedAtSea(agent, model)
+                &&
+                agent.shouldFisherLeavePort(model))
         {
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
