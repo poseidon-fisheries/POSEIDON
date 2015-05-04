@@ -12,7 +12,7 @@ import java.util.LinkedList;
 /**
  * The action of moving
  */
-public class Move implements Action
+public class Moving implements Action
 {
 
 
@@ -32,7 +32,7 @@ public class Move implements Action
         agent.updateDestination(model,this);
 
         if(agent.getDestination().equals(agent.getLocation()))
-            return new ActionResult(new Arrived(),true);
+            return new ActionResult(new Arriving(),true);
 
         Deque<SeaTile> route = getRoute(model.getMap(),agent.getLocation(),agent.getDestination());
         //while there are still places to go
@@ -49,13 +49,13 @@ public class Move implements Action
                 agent.move(step, map);
                 assert agent.getLocation().equals(step);
                 if(step.equals(agent.getDestination()))
-                    return new ActionResult(new Arrived(),true);
+                    return new ActionResult(new Arriving(),true);
                 else
-                    return new ActionResult(new Move(),false);
+                    return new ActionResult(new Moving(),false);
             }
            //too far, try closer
         }
-        return new ActionResult(new Move(),false);
+        return new ActionResult(new Moving(),false);
 
 
 

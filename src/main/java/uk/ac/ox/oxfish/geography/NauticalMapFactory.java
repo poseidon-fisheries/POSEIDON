@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.util.*;
@@ -172,7 +173,7 @@ public class NauticalMapFactory {
             int biologySmoothing,
             int minBiomass,
             int maxBiomass,
-            int ports, int width, int height){
+            int width, int height){
 
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
@@ -211,7 +212,19 @@ public class NauticalMapFactory {
 
         }
 
+        return map;
 
+
+
+    }
+
+    /**
+     * add random ports to the map
+     * @param map
+     */
+    public static void addRandomPortsToMap(NauticalMap map,int ports,
+                                           Function<SeaTile,Markets> marketFactory,
+                                           MersenneTwisterFast random){
         /***
          *        _      _    _   ___         _
          *       /_\  __| |__| | | _ \___ _ _| |_ ___
@@ -219,11 +232,16 @@ public class NauticalMapFactory {
          *     /_/ \_\__,_\__,_| |_| \___/_|  \__/__/
          *
          */
+        ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
+        int width = baseGrid.getWidth();
+        int height = baseGrid.getHeight();
+
         ArrayList<SeaTile> candidateTiles = new ArrayList<>();
         for(int x=0; x<width; x++)
             for(int y=0; y<height; y++)
             {
-                SeaTile possible = (SeaTile) baseGrid.get(x,y);
+
+                SeaTile possible = (SeaTile) baseGrid.get(x, y);
                 if(possible.getAltitude() <= 0) //sea tiles aren't welcome!
                     continue;
                 int neighboringSeaTiles = 0;
@@ -241,13 +259,9 @@ public class NauticalMapFactory {
 
         Collections.shuffle(candidateTiles,new Random(random.nextLong()));
         for(int i=0; i<ports; i++) {
-            Port port = new Port(candidateTiles.get(i));
+            Port port = new Port(candidateTiles.get(i),marketFactory.apply(candidateTiles.get(i)) );
             map.addPort(port);
         }
-
-        return map;
-
-
 
     }
 

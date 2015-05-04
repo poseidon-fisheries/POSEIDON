@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 
-public class MoveTest
+public class MovingTest
 {
 
 
@@ -38,7 +38,7 @@ public class MoveTest
     public void pathToItselfIsEmpty() throws Exception {
 
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
         Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(2, 2), map.getSeaTile(2, 2));
@@ -51,7 +51,7 @@ public class MoveTest
     public void moveInPlace() throws Exception {
 
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
         NauticalMap map = simple.getMap();
 
         Fisher fisher = mock(Fisher.class);
@@ -61,7 +61,7 @@ public class MoveTest
         ActionResult result = move.act(simple, fisher, new Anarchy() );
         verify(fisher,never()).move(any(),any()); //never moved
         assertTrue(result.isActAgainThisTurn()); //think he has arrived
-        assertTrue(result.getNextState() instanceof Arrived);
+        assertTrue(result.getNextState() instanceof Arriving);
 
 
     }
@@ -69,7 +69,7 @@ public class MoveTest
     @Test
     public void moveAllTheWay() throws Exception {
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
         NauticalMap map = simple.getMap();
         map.setDistance(new CartesianDistance(1.0));
 
@@ -94,7 +94,7 @@ public class MoveTest
     @Test
     public void movePartially() throws Exception {
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
         NauticalMap map = simple.getMap();
         map.setDistance(new CartesianDistance(2.0));
 
@@ -117,7 +117,7 @@ public class MoveTest
     public void simpleHorizontalPath() throws Exception {
 
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
         Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 2), map.getSeaTile(2, 2));
@@ -133,7 +133,7 @@ public class MoveTest
     public void simpleVerticalPath() throws Exception {
 
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
         Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(2, 0), map.getSeaTile(2, 2));
@@ -149,7 +149,7 @@ public class MoveTest
     public void simpleDiagonalPath() throws Exception {
 
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
         Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 0), map.getSeaTile(2, 2));
@@ -163,7 +163,7 @@ public class MoveTest
     @Test
     public void diagonalFirstPath(){
         FishState simple = generateSimple4x4Map();
-        Move move = new Move();
+        Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
         Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 0), map.getSeaTile(2, 3));

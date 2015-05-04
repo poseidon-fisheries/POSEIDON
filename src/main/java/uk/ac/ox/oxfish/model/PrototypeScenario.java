@@ -14,12 +14,14 @@ import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -105,13 +107,20 @@ public class PrototypeScenario implements Scenario {
                                                                                    biologySmoothing,
                                                                                    minBiomass,
                                                                                    maxBiomass,
-                                                                                   ports,
                                                                                    width,
                                                                                    height);
         map.setDistance(new CartesianDistance(gridSizeInKm));
 
 
+        //general biology
         GlobalBiology biology = new GlobalBiology(new Specie("TEST SPECIE"));
+        //create fixed price market
+        Markets markets = new Markets(biology);
+        for(Specie specie : biology.getSpecies())
+            markets.addMarket(specie,new FixedPriceMarket(specie,1.0));
+
+        //create random ports, all sharing the same market
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets,random);
 
 
         //schedule to print repeatedly the day
@@ -142,7 +151,7 @@ public class PrototypeScenario implements Scenario {
                                           @Override
                                           public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
                                                                     FishState model) {
-                                              return false;
+                                              return random.nextBoolean(.50);
                                           }
                                       }, new Boat(speed),
                                       new Hold(capacity, biology.getSize()),
@@ -150,10 +159,7 @@ public class PrototypeScenario implements Scenario {
             ));
         }
 
-        //create fixed price market
-        Markets markets = new Markets(biology);
-        for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie,1.0));
+
 
         return new ScenarioResult(biology,map,fisherList,markets);
     }

@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.DataGatherer;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -31,13 +33,25 @@ public abstract class AbstractMarket implements Market {
 
     private final DataGatherer<Market> dailyObservations = new DataGatherer<>(false);
 
+    /**
+     * flag to avoid starting multiple times if start is called repeatedly
+     */
+    private boolean started = false;
+
     public AbstractMarket(Specie specie) {
         this.specie = specie;
     }
 
+    /**
+     * starts gathering data. If called multiple times all the calls after the first are ignored
+     * @param state the model
+     */
     @Override
     public void start(FishState state)
     {
+        if(started) //don't start twice
+            return;
+
         dailyObservations.start(state,this);
         //the gatherers reset the counters as a side effect
         dailyObservations.registerGather("MONEY_EXCHANGED", market -> {
@@ -52,6 +66,7 @@ public abstract class AbstractMarket implements Market {
             return biomass;
         },Double.NaN);
 
+        started = true;
 
 
 
@@ -96,5 +111,9 @@ public abstract class AbstractMarket implements Market {
 
     public Specie getSpecie() {
         return specie;
+    }
+
+    public Map<String, List<Double>> getData() {
+        return dailyObservations.getDataView();
     }
 }

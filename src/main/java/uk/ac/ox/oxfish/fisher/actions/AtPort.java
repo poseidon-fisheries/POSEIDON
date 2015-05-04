@@ -27,7 +27,8 @@ public class AtPort implements Action {
         {
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
-            return new ActionResult(new Move(),true);
+            agent.getHomePort().depart(agent);
+            return new ActionResult(new Moving(),true);
         }
         else //if you don't want to leave port, stay home
             return new ActionResult(this,false);

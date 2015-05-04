@@ -3,14 +3,12 @@ package uk.ac.ox.oxfish.fisher.strategies;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.Arrived;
+import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.fisher.actions.Move;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.Random;
 
 /**
  * The fisher has one spot they really like and they always go there.
@@ -49,7 +47,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
         //we were going to port already
         if(fisher.getLocation().equals(favoriteSpot))
         {
-            assert currentAction instanceof Arrived; //this should have been called by "arrived"
+            assert currentAction instanceof Arriving; //this should have been called by "arrived"
 
             //go back home
             return fisher.getHomePort().getLocation();
@@ -61,7 +59,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
                 return fisher.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot
-            assert  currentAction instanceof Move || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock
+            assert  currentAction instanceof Moving || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock
             return favoriteSpot;
         }
 

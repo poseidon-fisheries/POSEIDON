@@ -9,6 +9,7 @@ import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -32,7 +33,7 @@ public class FishState  extends SimState{
 
     private List<Fisher> fishers;
 
-    private Markets markets;
+
 
 
     private Scenario scenario = new PrototypeScenario();
@@ -76,13 +77,13 @@ public class FishState  extends SimState{
 
         fishers = initialization.getAgents();
 
-        markets = initialization.getMarkets();
 
         //start the fishers
         for(Fisher fisher : fishers)
                 fisher.start(this);
-        //start the markets
-        for(Market market : markets.asList())
+        //start the markets (for each port
+        for(Port port : map.getPorts())
+            for(Market market : port.getMarkets().asList())
                 market.start(this);
 
 
@@ -167,5 +168,10 @@ public class FishState  extends SimState{
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)
     {
         return schedule.scheduleRepeating(steppable,order.ordinal(),365*STEPS_PER_DAY);
+    }
+
+    public Stoppable scheduleEveryStep(Steppable steppable, StepOrder order)
+    {
+        return schedule.scheduleRepeating(steppable,order.ordinal(),1.0);
     }
 }

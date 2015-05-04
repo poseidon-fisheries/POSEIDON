@@ -1,12 +1,14 @@
 package uk.ac.ox.oxfish.model;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.market.Markets;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Testing the map itself
@@ -80,7 +82,7 @@ public class NauticalMapTest {
         //I can put a port for each coastal land port
         for(int row=0; row<5; row++)
         {
-            Port port = new Port(map.getSeaTile(3,row));
+            Port port = new Port(map.getSeaTile(3,row),mock(Markets.class) );
             map.addPort(port);
             map.getPorts().contains(port);
             assertEquals(map.getPortMap().getObjectLocation(port).x,3);
@@ -97,14 +99,14 @@ public class NauticalMapTest {
     public void addPortsOnSeaIsWrong()
     {
         NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
-        map.addPort(new Port(map.getSeaTile(2, 0))); //throws exception since the seatile is underwater
+        map.addPort(new Port(map.getSeaTile(2, 0),mock(Markets.class)  )); //throws exception since the seatile is underwater
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void addPortsAwayFromSeaIsWrong()
     {
         NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
-        map.addPort(new Port(map.getSeaTile(4,0))); //it's on land but there is no sea around.
+        map.addPort(new Port(map.getSeaTile(4,0),mock(Markets.class)  )); //it's on land but there is no sea around.
     }
 
 

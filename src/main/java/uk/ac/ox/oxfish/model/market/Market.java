@@ -50,7 +50,11 @@ public interface Market {
 
         //find out legal biomass sold
         double biomassActuallySellable = Math.min(biomass,
-                                                  regulations.maximumBiomassSellable(fisher,specie,state));
+                                                  regulations.maximumBiomassSellable(fisher, specie, state));
+        if(biomassActuallySellable <=0)
+            return new TradeInfo(0,specie,0);
+
+
         double revenue = biomassToRevenue.apply(biomassActuallySellable);
 
         //give fisher the money

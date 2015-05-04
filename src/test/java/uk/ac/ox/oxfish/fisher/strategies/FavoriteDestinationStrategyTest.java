@@ -4,9 +4,9 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.actions.Arrived;
+import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.fisher.actions.Move;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -57,7 +57,7 @@ public class FavoriteDestinationStrategyTest {
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher, new MersenneTwisterFast(), mock(FishState.class),
-                                                         mock(Move.class));
+                                                         mock(Moving.class));
 
         assertEquals(destination,favoriteTile);
 
@@ -80,7 +80,7 @@ public class FavoriteDestinationStrategyTest {
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher, new MersenneTwisterFast(),
                                                          mock(FishState.class),
-                                                         mock(Arrived.class));
+                                                         mock(Arriving.class));
 
         assertEquals(destination,portTile);
 
@@ -105,7 +105,7 @@ public class FavoriteDestinationStrategyTest {
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher, new MersenneTwisterFast(),
                                                          mock(FishState.class),
-                                                         mock(Move.class));
+                                                         mock(Moving.class));
 
         assertEquals(destination,portTile);
 

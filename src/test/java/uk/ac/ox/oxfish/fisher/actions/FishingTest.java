@@ -15,19 +15,20 @@ import uk.ac.ox.oxfish.fisher.strategies.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public class FishHereTest {
+public class FishingTest {
 
 
     @Test
     public void simpleVerify() throws Exception {
 
-        Action fishing = new FishHere();
+        Action fishing = new Fishing();
 
         Fisher agent = mock(Fisher.class);
         when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1));
@@ -46,7 +47,7 @@ public class FishHereTest {
         GlobalBiology biology = new GlobalBiology(specie);
         when(fishState.getBiology()).thenReturn(biology);
 
-        Port port = new Port(fishState.getMap().getSeaTile(1,1));
+        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class)  );
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),any())).thenReturn(new Catch(specie, 50.0, biology));

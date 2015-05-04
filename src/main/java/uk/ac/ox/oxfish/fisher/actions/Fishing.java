@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.regs.Regulations;
  * For now fish means use gear here (checking that we are at destination and it makes sense)
  * Created by carrknight on 4/22/15.
  */
-public class FishHere implements Action
+public class Fishing implements Action
 {
 
     /**
@@ -30,7 +30,7 @@ public class FishHere implements Action
         agent.fishHere(model.getBiology());
 
         //go back to "arrived" state
-        return new ActionResult(new Arrived(),false);
+        return new ActionResult(new Arriving(),false);
 
     }
 }

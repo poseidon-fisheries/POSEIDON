@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.market.Markets;
 
 import java.util.*;
 
@@ -21,10 +22,15 @@ public class Port {
      */
     private final SeaTile location;
 
+    /**
+     *  the markets available at this port
+     */
+    private final Markets markets;
 
-    public Port(SeaTile location)
+    public Port(SeaTile location, Markets markets)
     {
         this.location = location;
+        this.markets = markets;
         fishersHere = new HashSet<>();
     }
 
@@ -82,4 +88,10 @@ public class Port {
     public String toString() {
         return "Port at " +location;
     }
+
+    public Markets getMarkets() {
+        return markets;
+    }
+
+
 }

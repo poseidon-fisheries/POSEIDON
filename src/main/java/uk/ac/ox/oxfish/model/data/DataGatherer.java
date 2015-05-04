@@ -66,7 +66,7 @@ public class DataGatherer<T> implements Steppable
         if(yearly)
             state.scheduleEveryYear(this,StepOrder.DATA_GATHERING);
         else
-            state.schedule.scheduleRepeating(this,StepOrder.DATA_GATHERING.ordinal(),1.0);
+            state.scheduleEveryStep(this,StepOrder.DATA_GATHERING);
     }
 
     @Override

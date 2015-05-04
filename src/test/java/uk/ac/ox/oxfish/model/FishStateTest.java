@@ -2,7 +2,11 @@ package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.market.Markets;
+
+import java.util.HashSet;
 
 import static org.mockito.Mockito.*;
 
@@ -19,7 +23,8 @@ public class FishStateTest {
         Scenario scenario = mock(Scenario.class);
         ScenarioResult result = mock(ScenarioResult.class);
         when(scenario.start(state)).thenReturn(result);
-        when(result.getMarkets()).thenReturn(mock(Markets.class));
+        NauticalMap map = mock(NauticalMap.class); when(result.getMap()).thenReturn(map);
+        when(map.getPorts()).thenReturn(new HashSet<Port>());
 
         state.setScenario(scenario);
         state.start();

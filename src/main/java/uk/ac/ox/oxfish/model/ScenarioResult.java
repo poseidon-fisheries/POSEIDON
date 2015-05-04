@@ -18,15 +18,12 @@ public class ScenarioResult {
 
     private final List<Fisher> agents;
 
-    private final Markets markets;
-
 
     public ScenarioResult(
             GlobalBiology biology, NauticalMap map, List<Fisher> agents, Markets markets) {
         this.biology = biology;
         this.map = map;
         this.agents = agents;
-        this.markets = markets;
     }
 
     public GlobalBiology getBiology() {
@@ -41,7 +38,4 @@ public class ScenarioResult {
         return agents;
     }
 
-    public Markets getMarkets() {
-        return markets;
-    }
 }

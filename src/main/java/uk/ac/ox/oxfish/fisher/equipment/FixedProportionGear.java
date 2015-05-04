@@ -36,4 +36,10 @@ public class FixedProportionGear implements Gear
         }
         return new Catch(caught);
     }
+
+
+    @Override
+    public String toString() {
+        return "fixed efficiency: " + proportionFished ;
+    }
 }

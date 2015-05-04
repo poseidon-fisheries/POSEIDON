@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.model.regs.Regulations;
  * Arrived to destination, should I fish or look for another destination?
  * Created by carrknight on 4/19/15.
  */
-public class Arrived implements Action{
+public class Arriving implements Action{
 
     /**
      * Do something and returns a result which is the next state and whether or not it should be run on the same turn
@@ -22,17 +22,21 @@ public class Arrived implements Action{
     public ActionResult act(FishState model, Fisher agent, Regulations regulations) {
         assert agent.isAtDestination();
 
+        if (agent.getLocation().equals(agent.getHomePort().getLocation()))
+            return new ActionResult(new Docking(),true);
+
         if(regulations.canFishHere(agent,agent.getLocation(), model)
-                    &&
+                &&
                 agent.shouldIFish(model)) //if you want to fish
-                return new ActionResult(new FishHere(),true);
+            return new ActionResult(new Fishing(),true);
+
 
 
         //adapt if needed
         agent.updateDestination(model,this);
         if(agent.getDestination().equals(agent.getLocation()))
-            return new ActionResult(new Arrived(),false);
+            return new ActionResult(new Arriving(), false);
         else
-            return new ActionResult(new Move(),true);
+            return new ActionResult(new Moving(),true);
     }
 }
