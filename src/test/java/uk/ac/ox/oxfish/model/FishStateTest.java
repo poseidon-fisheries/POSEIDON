@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.model.market.Markets;
 
 import static org.mockito.Mockito.*;
 
@@ -15,7 +16,11 @@ public class FishStateTest {
         Steppable steppable = mock(Steppable.class);
 
         FishState state = new FishState(1l);
-        Scenario scenario = mock(Scenario.class); when(scenario.start(state)).thenReturn(mock(ScenarioResult.class));
+        Scenario scenario = mock(Scenario.class);
+        ScenarioResult result = mock(ScenarioResult.class);
+        when(scenario.start(state)).thenReturn(result);
+        when(result.getMarkets()).thenReturn(mock(Markets.class));
+
         state.setScenario(scenario);
         state.start();
         state.scheduleEveryYear(steppable, StepOrder.AFTER_FISHER_PHASE);

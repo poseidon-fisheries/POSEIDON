@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.market.Markets;
 
 import java.util.List;
 
@@ -17,10 +18,15 @@ public class ScenarioResult {
 
     private final List<Fisher> agents;
 
-    public ScenarioResult(GlobalBiology biology, NauticalMap map, List<Fisher> agents) {
+    private final Markets markets;
+
+
+    public ScenarioResult(
+            GlobalBiology biology, NauticalMap map, List<Fisher> agents, Markets markets) {
         this.biology = biology;
         this.map = map;
         this.agents = agents;
+        this.markets = markets;
     }
 
     public GlobalBiology getBiology() {
@@ -33,5 +39,9 @@ public class ScenarioResult {
 
     public List<Fisher> getAgents() {
         return agents;
+    }
+
+    public Markets getMarkets() {
+        return markets;
     }
 }

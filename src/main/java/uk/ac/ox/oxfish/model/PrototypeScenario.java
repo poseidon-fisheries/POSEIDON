@@ -14,6 +14,8 @@ import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
+import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
@@ -148,7 +150,12 @@ public class PrototypeScenario implements Scenario {
             ));
         }
 
-        return new ScenarioResult(biology,map,fisherList);
+        //create fixed price market
+        Markets markets = new Markets(biology);
+        for(Specie specie : biology.getSpecies())
+            markets.addMarket(specie,new FixedPriceMarket(specie,1.0));
+
+        return new ScenarioResult(biology,map,fisherList,markets);
     }
 
 

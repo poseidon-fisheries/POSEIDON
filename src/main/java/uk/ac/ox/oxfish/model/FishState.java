@@ -11,6 +11,8 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public class FishState  extends SimState{
     private GlobalBiology biology;
 
     private List<Fisher> fishers;
+
+    private Markets markets;
 
 
     private Scenario scenario = new PrototypeScenario();
@@ -71,9 +75,15 @@ public class FishState  extends SimState{
         biology = initialization.getBiology();
 
         fishers = initialization.getAgents();
+
+        markets = initialization.getMarkets();
+
         //start the fishers
         for(Fisher fisher : fishers)
                 fisher.start(this);
+        //start the markets
+        for(Market market : markets.asList())
+                market.start(this);
 
 
 

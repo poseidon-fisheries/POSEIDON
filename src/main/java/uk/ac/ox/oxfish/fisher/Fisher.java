@@ -19,7 +19,11 @@ import uk.ac.ox.oxfish.fisher.strategies.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.YearlyFisherDataGatherer;
 import uk.ac.ox.oxfish.model.regs.Regulations;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * The boat catching all that delicious fish.
@@ -71,6 +75,16 @@ public class Fisher implements Steppable{
      * time spent at sea
      */
     private int stepsAtSea = 0;
+
+    /**
+     * the data gatherer that fires once a year
+     */
+    private final YearlyFisherDataGatherer yearlyDataGatherer = new YearlyFisherDataGatherer();
+
+    /**
+     * the cash owned by the firm
+     */
+    private double cash = 0;
 
     /***
      *      ___           _                    _
@@ -152,7 +166,9 @@ public class Fisher implements Steppable{
 
     public void start(FishState state)
     {
+
         state.schedule.scheduleRepeating(this);
+        yearlyDataGatherer.start(state,this);
     }
 
     @Override
@@ -367,5 +383,24 @@ public class Fisher implements Steppable{
 
     public void setRegulations(Regulations regulations) {
         this.regulations = regulations;
+    }
+
+
+    public Map<String, List<Double>> getYearlyData() {
+        return yearlyDataGatherer.getDataView();
+    }
+
+    public double getCash(){
+        return cash;
+    };
+
+    public void earn(double moneyEarned)
+    {
+        cash += moneyEarned;
+    }
+
+    public void spend(double moneySpent)
+    {
+        cash -=moneySpent;
     }
 }
