@@ -21,6 +21,8 @@ public class AtPort implements Action {
     @Override
     public ActionResult act(FishState model, Fisher agent, Regulations regulations)
     {
+        agent.setStepsAtSea(0); //reset at sea counter
+
         if(regulations.allowedAtSea(agent, model)
                 &&
                 agent.shouldFisherLeavePort(model))

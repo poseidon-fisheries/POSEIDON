@@ -19,8 +19,8 @@ public class TradeInfo {
         this.biomassTraded = biomassTraded;
         this.specie = specie;
         this.moneyExchanged = moneyExchanged;
-        Preconditions.checkArgument(biomassTraded>0);
-        Preconditions.checkArgument(moneyExchanged>0);
+        Preconditions.checkArgument(biomassTraded>=0);
+        Preconditions.checkArgument(moneyExchanged>=0);
     }
 
     public double getBiomassTraded() {

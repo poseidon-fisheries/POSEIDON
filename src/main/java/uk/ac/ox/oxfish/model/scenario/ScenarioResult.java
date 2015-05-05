@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;

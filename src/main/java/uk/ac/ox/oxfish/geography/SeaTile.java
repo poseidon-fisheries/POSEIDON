@@ -97,10 +97,10 @@ public class SeaTile {
 
     @Override
     public String toString() {
-        return "SeaTile at" +
+        return "SeaTile "
                 + gridX +
                 "," + gridY +
                 " altitude=" + altitude +
-                '}';
+                " bio = " + biology;
     }
 }

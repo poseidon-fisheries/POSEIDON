@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataGatherer;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -286,6 +287,13 @@ public class Fisher implements Steppable{
         this.departingStrategy = departingStrategy;
     }
 
+    public DepartingStrategy getDepartingStrategy() {
+        return departingStrategy;
+    }
+
+    public DestinationStrategy getDestinationStrategy() {
+        return destinationStrategy;
+    }
 
     public FishingStrategy getFishingStrategy() {
         return fishingStrategy;
@@ -386,7 +394,7 @@ public class Fisher implements Steppable{
     }
 
 
-    public Map<String, List<Double>> getYearlyData() {
+    public Map<String, LinkedList<Double>> getYearlyData() {
         return yearlyDataGatherer.getDataView();
     }
 
@@ -402,5 +410,13 @@ public class Fisher implements Steppable{
     public void spend(double moneySpent)
     {
         cash -=moneySpent;
+    }
+
+    public int getStepsAtSea() {
+        return stepsAtSea;
+    }
+
+    public void setStepsAtSea(int stepsAtSea) {
+        this.stepsAtSea = stepsAtSea;
     }
 }

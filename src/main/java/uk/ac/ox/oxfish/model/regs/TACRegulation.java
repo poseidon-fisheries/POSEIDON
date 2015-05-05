@@ -111,7 +111,7 @@ public class TACRegulation implements Regulations, Steppable {
     @Override
     public void reactToSale(Specie specie, double biomass, double revenue) {
 
-        quotaRemaining-=biomass;
-        Preconditions.checkState(quotaRemaining >= 0);
+        quotaRemaining -= biomass;
+        Preconditions.checkState(quotaRemaining >= 0, quotaRemaining);
     }
 }

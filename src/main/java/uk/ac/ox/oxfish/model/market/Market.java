@@ -61,7 +61,7 @@ public interface Market {
         fisher.earn(revenue);
 
         //tell regulations
-        regulations.reactToSale(specie,biomass,revenue);
+        regulations.reactToSale(specie,biomassActuallySellable,revenue);
 
         //return biomass sellable
         return new TradeInfo(biomassActuallySellable,specie,revenue);

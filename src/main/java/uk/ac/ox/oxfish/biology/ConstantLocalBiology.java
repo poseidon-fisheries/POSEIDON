@@ -28,4 +28,9 @@ public class ConstantLocalBiology implements LocalBiology {
     {
 
     }
+
+    @Override
+    public String toString() {
+        return "fixed at " + fixedBiomass;
+    }
 }

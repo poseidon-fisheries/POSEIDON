@@ -10,6 +10,8 @@ public enum StepOrder {
 
     AFTER_FISHER_PHASE,
 
-    DATA_GATHERING;
+    DATA_GATHERING,
+
+    AFTER_DATA;
 
 }

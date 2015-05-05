@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.DataGatherer;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -113,7 +114,7 @@ public abstract class AbstractMarket implements Market {
         return specie;
     }
 
-    public Map<String, List<Double>> getData() {
+    public Map<String, LinkedList<Double>> getData() {
         return dailyObservations.getDataView();
     }
 }

@@ -1,6 +1,7 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.model.scenario;
 
-import java.util.HashMap;
+import uk.ac.ox.oxfish.model.FishState;
+
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 

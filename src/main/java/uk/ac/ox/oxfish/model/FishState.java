@@ -7,15 +7,17 @@ import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.scenario.GeneticLocationScenario;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.ScenarioResult;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,15 +35,14 @@ public class FishState  extends SimState{
 
     private List<Fisher> fishers;
 
+    private List<Startable> toStart;
 
 
 
-    private Scenario scenario = new PrototypeScenario();
-    {
-        //todo delete this!
-        ((PrototypeScenario)scenario).setFishers(1);
-    }
 
+    private Scenario scenario = new GeneticLocationScenario();
+
+    private boolean started = false;
 
     /**
      * x steps equal 1 day
@@ -55,6 +56,7 @@ public class FishState  extends SimState{
 
     public FishState(long seed) {
         super(seed);
+        toStart = new LinkedList<>();
     }
 
 
@@ -86,17 +88,13 @@ public class FishState  extends SimState{
             for(Market market : port.getMarkets().asList())
                 market.start(this);
 
+        for(Startable startable : toStart)
+                startable.start(this);
+        started=true;
 
 
 
 
-        //schedule to print repeatedly the day
-        schedule.scheduleRepeating(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                System.out.println("the time is " + simState.schedule.getTime());
-            }
-        });
 
 
 
@@ -173,5 +171,17 @@ public class FishState  extends SimState{
     public Stoppable scheduleEveryStep(Steppable steppable, StepOrder order)
     {
         return schedule.scheduleRepeating(steppable,order.ordinal(),1.0);
+    }
+
+    /**
+     * if the model hasn't started, register this object to be started when the model is. Otherwise start it now
+     * @param startable the object to start
+     */
+    public void registerStartable(Startable startable)
+    {
+        if(started)
+            startable.start(this);
+        else
+            toStart.add(startable);
     }
 }

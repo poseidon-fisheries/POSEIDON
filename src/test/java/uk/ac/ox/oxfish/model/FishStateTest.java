@@ -4,7 +4,8 @@ import org.junit.Test;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.ScenarioResult;
 
 import java.util.HashSet;
 

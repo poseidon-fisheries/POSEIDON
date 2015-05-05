@@ -35,7 +35,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      */
     private Specie selectedSpecie = null;
 
-    private int maxBiomass = 5000;
+    private int maxBiomass = 4000;
 
     private MersenneTwisterFast random;
 

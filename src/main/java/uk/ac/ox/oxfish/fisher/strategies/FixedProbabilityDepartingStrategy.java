@@ -31,4 +31,9 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model) {
         return fisher.getRandom().nextBoolean(probabilityToLeavePort);
     }
+
+
+    public double getProbabilityToLeavePort() {
+        return probabilityToLeavePort;
+    }
 }

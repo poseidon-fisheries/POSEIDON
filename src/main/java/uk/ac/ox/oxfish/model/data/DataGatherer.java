@@ -15,9 +15,9 @@ import java.util.function.Function;
  */
 public class DataGatherer<T> implements Steppable
 {
-    final private Map<String,List<Double>> data;
+    final private Map<String,LinkedList<Double>> data;
 
-    final private Map<String,List<Double>> dataView;
+    final private Map<String,LinkedList<Double>> dataView;
 
     /**
      * the functions to run on studied object to gather their data
@@ -72,7 +72,7 @@ public class DataGatherer<T> implements Steppable
     @Override
     public void step(SimState simState) {
 
-        for(Map.Entry<String,List<Double>> columns : data.entrySet())
+        for(Map.Entry<String,LinkedList<Double>> columns : data.entrySet())
         {
             columns.getValue().add(gatherers.get(columns.getKey()).apply(observed));
         }
@@ -116,7 +116,7 @@ public class DataGatherer<T> implements Steppable
         }
     }
 
-    public Map<String, List<Double>> getDataView() {
+    public Map<String, LinkedList<Double>> getDataView() {
         return dataView;
     }
 }

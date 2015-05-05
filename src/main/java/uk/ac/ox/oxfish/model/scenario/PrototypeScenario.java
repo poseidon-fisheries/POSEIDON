@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
@@ -14,14 +14,15 @@ import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
+import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
-import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -84,11 +85,11 @@ public class PrototypeScenario implements Scenario {
     private double minHoldSize = 100;
     private double maxHoldSize = 100;
 
-    private double minFishingEfficiency = .02;
-    private double maxFishingEfficiency = .02;
+    private double minFishingEfficiency = .01;
+    private double maxFishingEfficiency = .01;
 
 
-    private Regulations regulation =  new Anarchy();
+    private Regulations regulation =  new FishingSeason(true,300);
 
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
@@ -123,13 +124,6 @@ public class PrototypeScenario implements Scenario {
         NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets,random);
 
 
-        //schedule to print repeatedly the day
-        model.schedule.scheduleRepeating(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                System.out.println("the time is " + simState.schedule.getTime());
-            }
-        }, StepOrder.FISHER_PHASE.ordinal(),1.0);
 
         LinkedList<Fisher> fisherList = new LinkedList<>();
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
@@ -147,13 +141,8 @@ public class PrototypeScenario implements Scenario {
                     (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
             fisherList.add(new Fisher(port, random, regulation, departing,
                                       new FavoriteDestinationStrategy(map,random),
-                                      new FishingStrategy() { //never fish!
-                                          @Override
-                                          public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
-                                                                    FishState model) {
-                                              return random.nextBoolean(.50);
-                                          }
-                                      }, new Boat(speed),
+                                      new FishOnceStrategy(),
+                                      new Boat(speed),
                                       new Hold(capacity, biology.getSize()),
                                       new FixedProportionGear(efficiency)
             ));
