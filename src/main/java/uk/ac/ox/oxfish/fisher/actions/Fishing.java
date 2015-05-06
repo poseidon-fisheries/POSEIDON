@@ -28,6 +28,7 @@ public class Fishing implements Action
         Preconditions.checkState(regulations.canFishHere(agent,agent.getLocation(), model)); //i should be allowed to fish here!
         //fish!
         agent.fishHere(model.getBiology());
+        model.recordFishing(agent.getLocation());
 
         //go back to "arrived" state
         return new ActionResult(new Arriving(),false);

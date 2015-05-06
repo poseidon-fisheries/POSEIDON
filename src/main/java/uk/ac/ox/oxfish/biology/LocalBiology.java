@@ -14,6 +14,7 @@ public interface LocalBiology
 
 
 
+
     /**
      * the biomass at this location for a single specie.
      * @param specie  the specie you care about

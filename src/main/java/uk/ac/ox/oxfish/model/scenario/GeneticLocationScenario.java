@@ -1,15 +1,22 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 import org.jenetics.Chromosome;
 import org.jenetics.DoubleChromosome;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
+import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.Anarchy;
+import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.TACRegulation;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.function.Consumer;
@@ -33,17 +40,19 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected PrototypeScenario modifyPrototypeScenario(PrototypeScenario scenario, FishState model) {
-        scenario.setFishers(200); //200 fishermen
+        scenario.setFishers(100); //200 fishermen
         //fixed probability of going out
-        scenario.setMaxDepartingProbability(.8);
-        scenario.setMinDepartingProbability(.8);
+        scenario.setMaxDepartingProbability(1);
+        scenario.setMinDepartingProbability(1);
         //fixed low efficiency
         scenario.setMaxFishingEfficiency(.01);
         scenario.setMinFishingEfficiency(.01);
 
+        scenario.setRegulation(new FishingSeason(true,1000));
+        // scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
 
 
-        scenario.setGridSizeInKm(2);
+        scenario.setGridSizeInKm(5);
 
         return scenario;
     }
@@ -54,6 +63,15 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected ScenarioResult modifyScenarioResult(ScenarioResult result) {
+
+
+        /*
+        final NauticalMap map = result.getMap();
+        for(int i=0; i<10; i++)
+            for(int j=0;j<getHeight(); j++)
+                map.getSeaTile(i,j).setMpa(new MasonGeometry());
+*/
+
         return result;
     }
 
@@ -69,8 +87,8 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
     {
         //two chromosomes, one is the location proper, the other is just a random key
         //x,y as a proportion of the total width and height
-        Chromosome<DoubleGene> location = new DoubleChromosome(0.0,1.0,2);
-        Chromosome<DoubleGene> randomKey = new DoubleChromosome(0.0,1.0,1);
+        Chromosome<DoubleGene> location = new DoubleChromosome(0.0,.9999,2);
+        Chromosome<DoubleGene> randomKey = new DoubleChromosome(0.0,.9999,1);
 
         return Genotype.of(location,randomKey);
     }
@@ -97,9 +115,9 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
                 double x = (double)favoriteSpot.getGridX()/(double)getWidth();
                 double y = (double)favoriteSpot.getGridY()/(double)getHeight();
                 Chromosome<DoubleGene> location = DoubleChromosome.of(
-                        DoubleGene.of(x,0d,1d),DoubleGene.of(y,0d,1d)
+                        DoubleGene.of(x,0d,.9999),DoubleGene.of(y,0d,.9999)
                 );
-                Chromosome<DoubleGene> randomKey = new DoubleChromosome(0.0,1.0,1);
+                Chromosome<DoubleGene> randomKey = new DoubleChromosome(0.0,.9999,1);
                 return Genotype.of(location,randomKey);
 
             }
@@ -127,7 +145,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
                 //grab new spot
                 int x = (int) Math.floor(chromosome.getGene(0).floatValue() * getWidth());
                 int y = (int) Math.floor(chromosome.getGene(1).floatValue() * getHeight());
-        //        System.out.println(x + " --- " + y);
+                //System.out.println(x + " --- " + y);
                 SeaTile seaTile = map.getSeaTile(x, y);
                 final Fisher fisher = fisherGenotypePair.getFirst();
 

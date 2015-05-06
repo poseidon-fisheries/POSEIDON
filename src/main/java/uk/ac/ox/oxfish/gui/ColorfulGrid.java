@@ -35,7 +35,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      */
     private Specie selectedSpecie = null;
 
-    private int maxBiomass = 4000;
+    private int maxBiomass = 4100;
 
     private MersenneTwisterFast random;
 
@@ -56,7 +56,10 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     public double encodeSeaTile(SeaTile tile)
     {
         if(selectedSpecie == null)
-            return tile.getAltitude();
+            if(tile.isProtected())
+                return Double.NaN;
+            else
+                return tile.getAltitude();
         else
             return tile.getBiomass(selectedSpecie);
     }
@@ -79,8 +82,8 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         else {
 
             colors.putIfAbsent(selectedSpecie, new Color(random.nextInt(256),
-                                                                          random.nextInt(256),
-                                                                          random.nextInt(256)));
+                                                         random.nextInt(256),
+                                                         random.nextInt(256)));
             this.setMap(new SimpleColorMap(0, maxBiomass,Color.WHITE,
                                            colors.get(selectedSpecie)));
             this.setImmutableField(false);

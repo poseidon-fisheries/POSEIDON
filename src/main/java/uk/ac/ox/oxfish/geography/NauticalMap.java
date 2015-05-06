@@ -1,11 +1,15 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.google.common.base.Preconditions;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.Grid2D;
+import sim.field.grid.IntGrid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
@@ -14,6 +18,9 @@ import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.HashSet;
 import java.util.function.Function;
@@ -27,7 +34,7 @@ import java.util.function.Function;
  * </ul>
  * Created by carrknight on 4/2/15.
  */
-public class NauticalMap
+public class NauticalMap implements Startable
 {
     /**
      * this holds the bathymetry raster grid
@@ -73,6 +80,11 @@ public class NauticalMap
     private SparseGrid2D fishersMap;
 
     /**
+     * a map holding
+     */
+    private IntGrid2D fishedMap;
+
+    /**
      * todo move to parameter list
      */
     final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
@@ -105,6 +117,7 @@ public class NauticalMap
         ports = new HashSet<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
+        fishedMap = new IntGrid2D(getWidth(),getHeight());
     }
 
     public int getHeight() {
@@ -152,6 +165,17 @@ public class NauticalMap
     }
 
 
+    @Override
+    public void start(FishState model) {
+        model.scheduleEveryYear(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                for(int i=0;i<getWidth();i++)
+                    for(int j=0; j<getHeight();j++)
+                        fishedMap.field[i][j] = 0;
+            }
+        }, StepOrder.DATA_GATHERING);
+    }
 
     /**
      * this is called at initialization but can be called again if there is a change in MPAs. It basically checks
@@ -184,6 +208,11 @@ public class NauticalMap
 
     public SeaTile getSeaTile(int gridX, int gridY) {
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
+    }
+
+    public Coordinate coordinate(int gridX, int gridY)
+    {
+        return rasterBathymetry.toPoint(gridX,gridY).getCoordinate();
     }
 
 
@@ -278,6 +307,15 @@ public class NauticalMap
         return fishersMap.setObjectLocation(fisher, x, y);
     }
 
+    /**
+     * record the fact that somebody fished somewhere
+     * @param tile where it has been fished
+     */
+    public void recordFishing(SeaTile tile)
+    {
+        fishedMap.field[tile.getGridX()][tile.getGridY()]++;
+    }
+
     public SparseGrid2D getFisherGrid() {
         return fishersMap;
     }
@@ -297,5 +335,9 @@ public class NauticalMap
 
         }while (toReturn.getAltitude() > 0); //keep looking if you found something at sea
         return toReturn;
+    }
+
+    public IntGrid2D getFishedMap() {
+        return fishedMap;
     }
 }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
+import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -30,6 +31,7 @@ public class FishStateTest {
         state.setScenario(scenario);
         state.start();
         state.scheduleEveryYear(steppable, StepOrder.AFTER_FISHER_PHASE);
+        state.scheduleEveryStep(simState -> {},StepOrder.AFTER_DATA);
         //should step twice
         for(int i=0; i<730; i++)
             state.schedule.step(state);

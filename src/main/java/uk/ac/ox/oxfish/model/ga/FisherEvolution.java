@@ -81,7 +81,8 @@ public class FisherEvolution<G extends Gene<?,G>> implements Steppable, Startabl
                 .survivorsSelector(new StochasticUniversalSelector<>())
                 .offspringSelector(new TournamentSelector<>(5))
                 .alterers(
-                        new Mutator<>(0.1),
+                        new Mutator<>(0.005),
+                        new GaussianMutator(0.1),
                         new SinglePointCrossover<>(0.5))
                 .build();
 

@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -15,10 +13,8 @@ import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
-import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
@@ -78,7 +74,7 @@ public class PrototypeScenario implements Scenario {
 
     private double maxDepartingProbability = 0.8;
 
-    private double minSpeedInKmh = 1;
+    private double minSpeedInKmh = 5;
 
     private double maxSpeedInKmh = 5;
 
@@ -118,10 +114,10 @@ public class PrototypeScenario implements Scenario {
         //create fixed price market
         Markets markets = new Markets(biology);
         for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie,1.0));
+            markets.addMarket(specie,new FixedPriceMarket(specie,10.0));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets,random);
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, random);
 
 
 

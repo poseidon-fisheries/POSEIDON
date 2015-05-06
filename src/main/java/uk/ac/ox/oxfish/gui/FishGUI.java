@@ -1,14 +1,20 @@
 package uk.ac.ox.oxfish.gui;
 
+import com.google.common.primitives.Ints;
 import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.field.grid.IntGrid2D;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
+import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +36,7 @@ public class FishGUI extends GUIState{
 
     private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
     private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();
+    private final FastValueGridPortrayal2D fishingHotspots = new FastValueGridPortrayal2D("Fishing Hotspots");
 
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
@@ -73,6 +80,7 @@ public class FishGUI extends GUIState{
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
+        display2D.attach(fishingHotspots,"Fishing Hotspots");
         display2D.attach(boats, "Boats");
         display2D.attach(ports,"Ports");
         displayFrame = display2D.createFrame();
@@ -97,6 +105,21 @@ public class FishGUI extends GUIState{
         //cities portrayal
         cities.setField(state.getCities());
         cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
+        //fishing hotspots
+        fishingHotspots.setField(state.getFishedMap());
+        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size(), new Color(0, 0, 0, 0), Color.RED));
+        //reset your color map every year
+        state.scheduleEveryYear(simState -> {
+            final IntGrid2D fishedMap = state.getFishedMap();
+            int max = 0;
+            for(int i=0; i<fishedMap.field.length; i++)
+                max = Math.max(Ints.max(fishedMap.field[i]),max);
+
+            final int finalMax = max;
+            scheduleImmediatelyAfter(
+                    simState1 -> fishingHotspots.setMap(new SimpleColorMap(0, finalMax *1.05, new Color(0, 0, 0, 0), Color.RED)));
+
+        }, StepOrder.BEFORE_FISHER_PHASE);
         //boats
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon));

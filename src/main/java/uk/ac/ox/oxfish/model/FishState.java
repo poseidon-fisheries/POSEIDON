@@ -5,11 +5,13 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
+import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 import uk.ac.ox.oxfish.model.scenario.GeneticLocationScenario;
@@ -80,6 +82,7 @@ public class FishState  extends SimState{
         fishers = initialization.getAgents();
 
 
+        map.start(this);
         //start the fishers
         for(Fisher fisher : fishers)
                 fisher.start(this);
@@ -183,5 +186,17 @@ public class FishState  extends SimState{
             startable.start(this);
         else
             toStart.add(startable);
+    }
+
+    /**
+     * record the fact that somebody fished somewhere
+     * @param tile where it has been fished
+     */
+    public void recordFishing(SeaTile tile) {
+        map.recordFishing(tile);
+    }
+
+    public IntGrid2D getFishedMap() {
+        return map.getFishedMap();
     }
 }

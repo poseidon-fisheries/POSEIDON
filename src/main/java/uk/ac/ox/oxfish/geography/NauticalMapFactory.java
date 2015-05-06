@@ -177,7 +177,8 @@ public class NauticalMapFactory {
 
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
-        map.initializeBiology(randomConstantBiology(random,minBiomass,maxBiomass));;
+        //map.initializeBiology(randomConstantBiology(random,minBiomass,maxBiomass));;
+        map.initializeBiology( fromLeftToRightBiology(maxBiomass,width));;
         /***
          *      ___                _   _      ___ _     _
          *     / __|_ __  ___  ___| |_| |_   | _ |_)___| |___  __ _ _  _
@@ -309,4 +310,16 @@ public class NauticalMapFactory {
         };
     }
 
+
+    public static Function<SeaTile,LocalBiology> fromLeftToRightBiology(int max,int width)
+    {
+        assert  width > 0;
+
+        return seaTile -> {
+            if (seaTile.getAltitude() > 0)
+                return new EmptyLocalBiology();
+            else
+                return new ConstantLocalBiology(max*Math.pow((1-seaTile.getGridX()/(double)width),2));
+        };
+    }
 }
