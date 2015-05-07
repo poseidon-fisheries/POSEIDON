@@ -40,7 +40,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected PrototypeScenario modifyPrototypeScenario(PrototypeScenario scenario, FishState model) {
-        scenario.setFishers(100); //200 fishermen
+        scenario.setFishers(100); //100 fishermen
         //fixed probability of going out
         scenario.setMaxDepartingProbability(1);
         scenario.setMinDepartingProbability(1);
@@ -49,7 +49,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         scenario.setMinFishingEfficiency(.01);
 
         scenario.setRegulation(new FishingSeason(true,1000));
-        // scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
+        scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
 
 
         scenario.setGridSizeInKm(5);

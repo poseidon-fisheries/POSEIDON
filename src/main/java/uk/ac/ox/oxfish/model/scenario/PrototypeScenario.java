@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -12,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.strategies.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
@@ -19,6 +21,8 @@ import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -26,6 +30,15 @@ import java.util.LinkedList;
  */
 public class PrototypeScenario implements Scenario {
 
+    /**
+     * number of species
+     */
+    private int numberOfSpecies = 1;
+
+    /**
+     * market prices for each species
+     */
+    private double[] marketPrices = new double[]{10.0};
     /**
      * higher the more the coast gets jagged
      */
@@ -55,6 +68,9 @@ public class PrototypeScenario implements Scenario {
      * map width
      */
     private int width = 50;
+    private final Function<SeaTile, LocalBiology> biologyInitializer =
+            NauticalMapFactory.fromLeftToRightBiology(
+            maxBiomass, width);
     /**
      * map height
      */
@@ -87,6 +103,11 @@ public class PrototypeScenario implements Scenario {
 
     private Regulations regulation =  new FishingSeason(true,300);
 
+    private Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker =
+            NauticalMapFactory.smoothConstantBiology(
+                    biologySmoothing,
+                    width, height);;
+
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -98,23 +119,25 @@ public class PrototypeScenario implements Scenario {
     public ScenarioResult start(FishState model) {
 
         MersenneTwisterFast random = model.random;
+
+        Specie[] species = new Specie[numberOfSpecies];
+        for(int i=0; i< numberOfSpecies; i++)
+            species[i] = new Specie("Specie "+i);
+        GlobalBiology biology = new GlobalBiology(species);
+
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    random,
                                                                                    depthSmoothing,
-                                                                                   biologySmoothing,
-                                                                                   minBiomass,
-                                                                                   maxBiomass,
-                                                                                   width,
-                                                                                   height);
+                                                                                   biologyInitializer,
+                                                                                   biologySmootherMaker.apply(random));
         map.setDistance(new CartesianDistance(gridSizeInKm));
 
 
         //general biology
-        GlobalBiology biology = new GlobalBiology(new Specie("TEST SPECIE"));
         //create fixed price market
         Markets markets = new Markets(biology);
         for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie,10.0));
+            markets.addMarket(specie,new FixedPriceMarket(specie,marketPrices[specie.getIndex()]));
 
         //create random ports, all sharing the same market
         NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, random);
@@ -300,5 +323,27 @@ public class PrototypeScenario implements Scenario {
 
     public void setRegulation(Regulations regulation) {
         this.regulation = regulation;
+    }
+
+
+    public Function<SeaTile, LocalBiology> getBiologyInitializer() {
+        return biologyInitializer;
+    }
+
+    public Function<MersenneTwisterFast, Consumer<NauticalMap>> getBiologySmootherMaker() {
+        return biologySmootherMaker;
+    }
+
+    public void setBiologySmootherMaker(
+            Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker) {
+        this.biologySmootherMaker = biologySmootherMaker;
+    }
+
+    public int getNumberOfSpecies() {
+        return numberOfSpecies;
+    }
+
+    public void setNumberOfSpecies(int numberOfSpecies) {
+        this.numberOfSpecies = numberOfSpecies;
     }
 }

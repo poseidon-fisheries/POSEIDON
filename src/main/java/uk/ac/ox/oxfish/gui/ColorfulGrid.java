@@ -81,9 +81,11 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         }
         else {
 
-            colors.putIfAbsent(selectedSpecie, new Color(random.nextInt(256),
+        /*    colors.putIfAbsent(selectedSpecie, new Color(random.nextInt(256),
                                                          random.nextInt(256),
                                                          random.nextInt(256)));
+                                                         */
+            colors.putIfAbsent(selectedSpecie, Color.RED);
             this.setMap(new SimpleColorMap(0, maxBiomass,Color.WHITE,
                                            colors.get(selectedSpecie)));
             this.setImmutableField(false);

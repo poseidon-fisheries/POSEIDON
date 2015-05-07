@@ -14,10 +14,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulations;
-import uk.ac.ox.oxfish.model.scenario.GeneticLocationScenario;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.ScenarioResult;
+import uk.ac.ox.oxfish.model.scenario.*;
 
 import java.util.LinkedList;
 import java.util.List;

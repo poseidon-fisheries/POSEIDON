@@ -7,14 +7,13 @@ import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
-import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -63,17 +62,18 @@ public class NauticalMapFactory {
     /**
      * creates a map like the NETLOGO prototype. That's a 50x50 map
      */
-    public static NauticalMap prototypeMap(int coastalRoughness,
-                                           MersenneTwisterFast random,
-                                           int depthSmoothing)
+    public static NauticalMap prototypeMap(
+            int coastalRoughness,
+            MersenneTwisterFast random,
+            int depthSmoothing)
     {
 
         //build the grid
-        ObjectGrid2D baseGrid =  new ObjectGrid2D(50,50);
+        ObjectGrid2D baseGrid =  new ObjectGrid2D(50, 50);
 
         //the 10 rightmost patches are land, the rest is sea
-        for(int x=0; x<50; x++)
-            for(int y=0; y<50; y++)
+        for(int x=0; x< 50; x++)
+            for(int y=0; y< 50; y++)
                 baseGrid.field[x][y] = x <40 ?
                         new SeaTile(x,y,-random.nextInt(5000)) :
                         new SeaTile(x,y,2000);
@@ -163,22 +163,20 @@ public class NauticalMapFactory {
     }
 
     /**
-     * calls prototypeMap and adds a randomized biology and then smooths it a bit
+     * calls prototypeMap and adds a local biology and then smooths it a bit
      * @return the nautical map
      */
     public static NauticalMap prototypeMapWithRandomSmoothedBiology(
             int coastalRoughness,
             MersenneTwisterFast random,
             int depthSmoothing,
-            int biologySmoothing,
-            int minBiomass,
-            int maxBiomass,
-            int width, int height){
+            Function<SeaTile, LocalBiology> biologyInitializer,
+            Consumer<NauticalMap> biologySmoother){
 
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
         //map.initializeBiology(randomConstantBiology(random,minBiomass,maxBiomass));;
-        map.initializeBiology( fromLeftToRightBiology(maxBiomass,width));;
+        map.initializeBiology(biologyInitializer);;
         /***
          *      ___                _   _      ___ _     _
          *     / __|_ __  ___  ___| |_| |_   | _ |_)___| |___  __ _ _  _
@@ -186,35 +184,64 @@ public class NauticalMapFactory {
          *     |___/_|_|_\___/\___/\__|_||_| |___/_\___/_\___/\__, |\_, |
          *                                                    |___/ |__/
          */
-        ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
-        for(int i=0; i<biologySmoothing; i++)
-        {
-            int x = random.nextInt(width);
-            int y = random.nextInt(height);
-            SeaTile toChange = (SeaTile) baseGrid.get(x,y);
-            if(toChange.getAltitude() > 0) //land is cool man
-            {
-                assert toChange.getBiomass(null) <=0;
-                continue;
-            }
-            x += random.nextInt(3)-1; x= Math.max(0,x); x = Math.min(x,49);
-            y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
-            SeaTile fixed = (SeaTile) baseGrid.get(x,y);
-            //null is not a specie but we know that the map is filled with constant biology so we are in the clear
-            double newBiology = Math.round(toChange.getBiomass(null) +
-                    (random.nextFloat()*.025f) *
-                            (fixed.getBiomass(null)-toChange.getBiomass(null)));
-            if(newBiology <=0)
-                newBiology = 1;
-
-            //put the new one in!
-            toChange.setBiology(new ConstantLocalBiology(newBiology));
-
-
-        }
+        biologySmoother.accept(map);
 
         return map;
 
+
+
+    }
+
+    /**
+     * simple biology smoother that works with constant local biologies. This is a very confusing object,
+     * but basically you give it a few parameters and it returns a Function. When you give this function the randomizer
+     * it will return a Consumer which is basically the smoother. Give the smoother the map and it will smooth it for you
+     * @param biologySmoothing how much biology smoothing to do
+     * @param width width
+     * @param height height
+     * @return the smoother
+     */
+    public static Function<MersenneTwisterFast,Consumer<NauticalMap>>  smoothConstantBiology(
+            int biologySmoothing, int width, int height) {
+        return new Function<MersenneTwisterFast, Consumer<NauticalMap>>() {
+            @Override
+            public Consumer<NauticalMap> apply(MersenneTwisterFast random) {
+                return new Consumer<NauticalMap>() {
+                    @Override
+                    public void accept(NauticalMap map) {
+                        ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
+                        for (int i = 0; i < biologySmoothing; i++) {
+                            int x = random.nextInt(width);
+                            int y = random.nextInt(height);
+                            SeaTile toChange = (SeaTile) baseGrid.get(x, y);
+                            if (toChange.getAltitude() > 0) //land is cool man
+                            {
+                                assert toChange.getBiomass(null) <= 0;
+                                continue;
+                            }
+                            x += random.nextInt(3) - 1;
+                            x = Math.max(0, x);
+                            x = Math.min(x, 49);
+                            y += random.nextInt(3) - 1;
+                            y = Math.max(0, y);
+                            y = Math.min(y, 49);
+                            SeaTile fixed = (SeaTile) baseGrid.get(x, y);
+                            //null is not a specie but we know that the map is filled with constant biology so we are in the clear
+                            double newBiology = Math.round(toChange.getBiomass(null) +
+                                                                   (random.nextFloat() * .025f) *
+                                                                           (fixed.getBiomass(null) - toChange.getBiomass(
+                                                                                   null)));
+                            if (newBiology <= 0)
+                                newBiology = 1;
+
+                            //put the new one in!
+                            toChange.setBiology(new ConstantLocalBiology(newBiology));
+
+                        }
+                    }
+                };
+            }
+        };
 
 
     }
@@ -292,9 +319,9 @@ public class NauticalMapFactory {
 
     /**
      * confusing? A function that returns an initialization function
-     * @param random
-     * @param min
-     * @param max
+     * @param random randomizer
+     * @param min minimum biomass
+     * @param max maximum biomass
      * @return
      */
     public static Function<SeaTile,LocalBiology> randomConstantBiology(MersenneTwisterFast random,
@@ -310,6 +337,24 @@ public class NauticalMapFactory {
         };
     }
 
+
+    public static Function<SeaTile,LocalBiology> randomMultipleSpecies(MersenneTwisterFast random,
+                                                                       int max, int numberOfSpecies)
+    {
+        assert numberOfSpecies > 1;
+
+        return seaTile -> {
+            if (seaTile.getAltitude() > 0)
+                return new EmptyLocalBiology();
+            else {
+                double[] biomass = new double[numberOfSpecies];
+                for(int i=0; i<biomass.length; i++)
+                    biomass[i]=random.nextDouble()*max;
+                return new ConstantHeterogeneousLocalBiology(biomass);
+            }
+        };
+
+    }
 
     public static Function<SeaTile,LocalBiology> fromLeftToRightBiology(int max,int width)
     {

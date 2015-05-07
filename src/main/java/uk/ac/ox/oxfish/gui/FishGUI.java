@@ -107,7 +107,7 @@ public class FishGUI extends GUIState{
         cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
         //fishing hotspots
         fishingHotspots.setField(state.getFishedMap());
-        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size(), new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size()+100, new Color(0, 0, 0, 0), Color.RED));
         //reset your color map every year
         state.scheduleEveryYear(simState -> {
             final IntGrid2D fishedMap = state.getFishedMap();
@@ -117,7 +117,7 @@ public class FishGUI extends GUIState{
 
             final int finalMax = max;
             scheduleImmediatelyAfter(
-                    simState1 -> fishingHotspots.setMap(new SimpleColorMap(0, finalMax *1.05, new Color(0, 0, 0, 0), Color.RED)));
+                    simState1 -> fishingHotspots.setMap(new SimpleColorMap(0, (finalMax+1) *1.05, new Color(0, 0, 0, 0), Color.RED)));
 
         }, StepOrder.BEFORE_FISHER_PHASE);
         //boats
