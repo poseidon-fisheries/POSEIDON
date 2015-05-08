@@ -155,12 +155,16 @@ public class FishState  extends SimState{
      */
     public int getDayOfTheYear()
     {
-        return (int) ((schedule.getSteps() / STEPS_PER_DAY) % 365) + 1;
+        return (int) ((schedule.getTime() / STEPS_PER_DAY) % 365) + 1;
     }
 
     public int getYear()
     {
-        return (int) ((schedule.getSteps() / STEPS_PER_DAY) / 365);
+        return (int) ((schedule.getTime() / STEPS_PER_DAY) / 365);
+    }
+
+    public int getHour() {
+        return (int) (schedule.getTime() % STEPS_PER_DAY * 24 / STEPS_PER_DAY);
     }
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)

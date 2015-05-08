@@ -9,6 +9,7 @@ class Main{
 
         FishGUI vid = new FishGUI();
         Console c = new Console(vid);
+
         c.setVisible(true);
     }
 }

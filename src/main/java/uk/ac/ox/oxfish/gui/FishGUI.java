@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.gui;
 
 import com.google.common.primitives.Ints;
+import sim.display.Console;
 import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;
@@ -80,11 +81,14 @@ public class FishGUI extends GUIState{
         display2D.attach(myPortrayal,"Bathymetry");
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
-        display2D.attach(fishingHotspots,"Fishing Hotspots");
+        display2D.attach(fishingHotspots, "Fishing Hotspots");
         display2D.attach(boats, "Boats");
-        display2D.attach(ports,"Ports");
+        display2D.attach(ports, "Ports");
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
+
+
+
     }
 
     /**
@@ -93,9 +97,27 @@ public class FishGUI extends GUIState{
     @Override
     public void start() {
         super.start();
+
         displayFrame.setVisible(true);
 
         FishState state = (FishState) this.state;
+
+        //so the console label is a pain in the ass so we need to really use the wrecking ball to modify the way
+        //the label is used
+        final Box timeBox = (Box) ((Console) controller).getContentPane().getComponents()[0];
+        while(timeBox.getComponents().length>3)
+            timeBox.remove(3);
+
+        final JLabel timeLabel = new JLabel("Not Started Yet");
+        (timeBox).add(timeLabel);
+        scheduleRepeatingImmediatelyAfter(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                assert SwingUtilities.isEventDispatchThread();
+                timeLabel.setText("Year: " +state.getYear() + " day: " +
+                                          state.getDayOfTheYear() + " hour: " + state.getHour());
+            }
+        });
 
         myPortrayal.setField(state.getRasterBathymetry().getGrid());
         myPortrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));

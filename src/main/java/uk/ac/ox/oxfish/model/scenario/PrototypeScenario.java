@@ -68,6 +68,8 @@ public class PrototypeScenario implements Scenario {
      * map width
      */
     private int width = 50;
+
+
     private final Function<SeaTile, LocalBiology> biologyInitializer =
             NauticalMapFactory.fromLeftToRightBiology(
             maxBiomass, width);

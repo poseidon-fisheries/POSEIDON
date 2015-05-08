@@ -49,7 +49,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         scenario.setMinFishingEfficiency(.01);
 
         scenario.setRegulation(new FishingSeason(true,1000));
-        scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
+      //  scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
 
 
         scenario.setGridSizeInKm(5);
