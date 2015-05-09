@@ -88,4 +88,18 @@ head(sable@data)
 
 
 rr<-readGDAL(  "/home/carrknight/Dropbox/OC Systems-Based Fisheries Management/ABM1 development/Parameters & logic/Spatial Ecological Data/shp/NCCOS Darkblotched rockfish Abundance1.tif")
+proj4string(rr)
+rr<-spTransform(rr,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+tiff<-raster(rr)
 plot(tiff)
+
+#wgs 1984 utm zome 10n
+# ellipses: wgs 1984
+
+library(gdalUtils)
+gdalwarp(srcfile = "/home/carrknight/Dropbox/OC Systems-Based Fisheries Management/ABM1 development/Parameters & logic/Spatial Ecological Data/shp/NCCOS Darkblotched rockfish Abundance1.tif",
+         dstfile= "/home/carrknight/rocktest.tif"
+         ,t_srs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
+         verbose=TRUE,output_Raster=TRUE)
+src_dataset<-readGDAL("/home/carrknight/rocktest.tif")
+proj4string(src_dataset)

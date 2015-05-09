@@ -364,7 +364,7 @@ public class Fisher implements Steppable{
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
         Catch catchOfTheDay = gear.fish(this, location, modelBiology);
         regulations.reactToCatch(catchOfTheDay);
-        hold.load(catchOfTheDay);
+        load(catchOfTheDay);
         return catchOfTheDay;
     }
 
