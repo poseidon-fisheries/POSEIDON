@@ -1,7 +1,6 @@
-package uk.ac.ox.oxfish.fisher.strategies;
+package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.geography.SeaTile;

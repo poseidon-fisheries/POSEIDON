@@ -1,22 +1,16 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 import org.jenetics.Chromosome;
 import org.jenetics.DoubleChromosome;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.regs.TACRegulation;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.function.Consumer;

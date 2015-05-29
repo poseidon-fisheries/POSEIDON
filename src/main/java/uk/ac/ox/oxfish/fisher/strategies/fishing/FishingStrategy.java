@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.strategies;
+package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;

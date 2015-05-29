@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

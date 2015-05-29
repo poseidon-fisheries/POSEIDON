@@ -11,7 +11,9 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.*;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 

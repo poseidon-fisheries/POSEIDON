@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.strategies;
+package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 /**
  * The fisher has one spot they really like and they always go there.
@@ -73,4 +74,95 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
     public void setFavoriteSpot(SeaTile favoriteSpot) {
         this.favoriteSpot = favoriteSpot;
     }
+
+
+
+
+    /**
+     * takes map and randomizer from the state and simply call the constructor of the strategy
+     */
+    //this factory doesn't get his own class because it doesn't really have setters and getters
+    public static  final StrategyFactory<FavoriteDestinationStrategy> RANDOM_FAVORITE_DESTINATION_FACTORY =
+        new StrategyFactory<FavoriteDestinationStrategy>() {
+            @Override
+            public Class<? super FavoriteDestinationStrategy> getStrategySuperClass()
+            {
+                return  DestinationStrategy.class;
+            }
+
+            @Override
+            public FavoriteDestinationStrategy apply(FishState state) {
+
+                MersenneTwisterFast random = state.random;
+                NauticalMap map = state.getMap();
+                return new FavoriteDestinationStrategy(map,random);
+
+            }
+        };
+
+
+    /**
+     * Factory expecting an x and y to generate favorite destination. Not terribly useful at the present state
+     */
+    public static  final FixedFavoriteDestinationFactory FIXED_FAVORITE_DESTINATION_FACTORY =
+            new FixedFavoriteDestinationFactory();
+
+}
+
+
+/***
+ *      ___ _   ___ _____ ___  _____   __
+ *     | __/_\ / __|_   _/ _ \| _ \ \ / /
+ *     | _/ _ \ (__  | || (_) |   /\ V /
+ *     |_/_/ \_\___| |_| \___/|_|_\ |_|
+ *
+ */
+
+/**
+ * this factory gets its own class because it has setters and getters which can be found through reflection
+ */
+class FixedFavoriteDestinationFactory implements  StrategyFactory<FavoriteDestinationStrategy>
+{
+
+    /**
+     * x grid of the sea tile
+     */
+    private int x=0;
+
+    /**
+     * y grid of the sea tile
+     */
+    private int y=0;
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    @Override
+    public Class<? super FavoriteDestinationStrategy> getStrategySuperClass()
+    {
+        return  DestinationStrategy.class;
+    }
+
+    @Override
+    public FavoriteDestinationStrategy apply(FishState state) {
+
+        MersenneTwisterFast random = state.random;
+        NauticalMap map = state.getMap();
+        return new FavoriteDestinationStrategy(map.getSeaTile(x,y));
+
+    }
+
 }

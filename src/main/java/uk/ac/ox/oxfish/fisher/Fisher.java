@@ -13,9 +13,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -23,7 +23,6 @@ import uk.ac.ox.oxfish.model.data.YearlyFisherDataGatherer;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**

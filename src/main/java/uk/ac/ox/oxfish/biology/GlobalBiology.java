@@ -30,6 +30,18 @@ public class GlobalBiology
             species[i].setIndex(i);
         unmodifiableView = Collections.unmodifiableList(Arrays.asList(species));
     }
+
+
+    /**
+     * just a bunch of species with no particular properties
+     * @param numberOfSpecies the number of species
+     */
+    public static GlobalBiology genericListOfSpecies(int numberOfSpecies){
+        Specie[] generics = new Specie[numberOfSpecies];
+        for(int i=0; i<numberOfSpecies; i++)
+            generics[i] = new Specie("Specie " + i);
+        return new GlobalBiology(generics);
+    }
     /**
      *
      * @return an unmodifiable list of all the species available

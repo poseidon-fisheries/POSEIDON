@@ -7,5 +7,10 @@ package uk.ac.ox.oxfish.model;
 public interface Startable {
 
 
+    /**
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+     * or just to percolate a reference to the model
+     * @param model the model
+     */
     public void start(FishState model);
 }

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.strategies;
+package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 /**
  * Random-walk like decision. Not very useful but the easiest to make
@@ -49,4 +50,30 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
 
 
     }
+
+
+    /***
+     *      ___ _   ___ _____ ___  _____   __
+     *     | __/_\ / __|_   _/ _ \| _ \ \ / /
+     *     | _/ _ \ (__  | || (_) |   /\ V /
+     *     |_/_/ \_\___| |_| \___/|_|_\ |_|
+     *
+     */
+
+    /**
+     * Returns the RandomThenBackToPortDestinationStrategy. There are no fields to set
+     */
+    public static final StrategyFactory<RandomThenBackToPortDestinationStrategy>
+            RANDOM_THEN_BACK_TO_PORT_DESTINATION_STRATEGY_FACTORY = new
+            StrategyFactory<RandomThenBackToPortDestinationStrategy>() {
+        @Override
+        public Class<? super RandomThenBackToPortDestinationStrategy> getStrategySuperClass() {
+            return DestinationStrategy.class;
+        }
+
+        @Override
+        public RandomThenBackToPortDestinationStrategy apply(FishState state) {
+            return new RandomThenBackToPortDestinationStrategy();
+        }
+    };
 }

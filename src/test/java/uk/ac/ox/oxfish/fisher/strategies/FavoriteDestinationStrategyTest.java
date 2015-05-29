@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 

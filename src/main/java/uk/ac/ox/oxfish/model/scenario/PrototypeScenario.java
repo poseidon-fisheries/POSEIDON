@@ -9,7 +9,10 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.*;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishOnceStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -110,6 +113,12 @@ public class PrototypeScenario implements Scenario {
                     biologySmoothing,
                     width, height);;
 
+
+    public PrototypeScenario() {
+    }
+
+
+
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -122,10 +131,7 @@ public class PrototypeScenario implements Scenario {
 
         MersenneTwisterFast random = model.random;
 
-        Specie[] species = new Specie[numberOfSpecies];
-        for(int i=0; i< numberOfSpecies; i++)
-            species[i] = new Specie("Specie "+i);
-        GlobalBiology biology = new GlobalBiology(species);
+        GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
 
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    random,
