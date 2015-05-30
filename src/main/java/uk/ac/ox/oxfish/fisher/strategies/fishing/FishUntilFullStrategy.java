@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 /**
  * The fisher keeps fishing until the percentage of hold filled is above a threshold.
@@ -50,40 +50,5 @@ public class FishUntilFullStrategy implements FishingStrategy {
 
 }
 
-
-
-/***
- *      ___ _   ___ _____ ___  _____   __
- *     | __/_\ / __|_   _/ _ \| _ \ \ / /
- *     | _/ _ \ (__  | || (_) |   /\ V /
- *     |_/_/ \_\___| |_| \___/|_|_\ |_|
- *
- */
-class FishUntilFullFactory implements   StrategyFactory<FishUntilFullStrategy>
-{
-
-    public FishUntilFullFactory() {
-    }
-
-    private double minimumPercentageFull = 1;
-
-    public double getMinimumPercentageFull() {
-        return minimumPercentageFull;
-    }
-
-    public void setMinimumPercentageFull(double minimumPercentageFull) {
-        this.minimumPercentageFull = minimumPercentageFull;
-    }
-
-    @Override
-    public Class<? super FishUntilFullStrategy> getStrategySuperClass() {
-        return FishUntilFullStrategy.class;
-    }
-
-    @Override
-    public FishUntilFullStrategy apply(FishState state) {
-        return new FishUntilFullStrategy(getMinimumPercentageFull());
-    }
-}
 
 

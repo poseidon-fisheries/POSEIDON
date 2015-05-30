@@ -23,3 +23,6 @@ public interface StrategyFactory<T> extends Function<FishState,T>
     public Class<? super T> getStrategySuperClass();
 
 }
+
+
+

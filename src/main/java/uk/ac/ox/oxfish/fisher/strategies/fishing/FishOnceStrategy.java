@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 
@@ -37,16 +38,10 @@ public class FishOnceStrategy implements FishingStrategy {
     /**
      * returns a new instance of the FishOnceStrategy. It has no fields
      */
-    public static  final StrategyFactory<FishOnceStrategy> FISH_ONCE_FACTORY = new StrategyFactory<FishOnceStrategy>()
+    public static  final StrategyFactory<FishOnceStrategy> FISH_ONCE_FACTORY = new FishOnceFactory();
     {
-        @Override
-        public Class<? super FishOnceStrategy> getStrategySuperClass() {
-            return  FishOnceStrategy.class;
-        }
 
-        @Override
-        public FishOnceStrategy apply(FishState state) {
-            return new FishOnceStrategy();
-        }
     };
 }
+
+

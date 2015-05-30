@@ -33,10 +33,18 @@ sourceSets
 //here we add all the dependencies notice that mason and geomason are not on maven so we need to add them separately
 dependencies
 {
+    //mason libraries. They aren't on maven so we have to lug their jars around
     compile fileTree(dir: 'libs/mason', include: '*.jar')
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
+    //guava. Useful for PreConditions and sometimes specialized collections
     compile "com.google.guava:guava:18.0"
+    //shiny new genetic algorithm library. So far very unimpressive. Might switch back to watchmaker
     compile "org.bitbucket.fwilhelm:org.jenetics:3.1.0"
+    //metawidget + apache binders. Useful for the gui
+    compile "org.metawidget.modules:metawidget-all:4.1"
+    compile "commons-beanutils:commons-beanutils:1.8.3"
+
+    //testing:
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-all:1.9.5"
 }

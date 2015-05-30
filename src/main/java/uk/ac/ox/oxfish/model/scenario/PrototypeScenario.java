@@ -9,10 +9,13 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishOnceStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -22,6 +25,7 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 import java.util.LinkedList;
 import java.util.function.Consumer;
@@ -106,6 +110,17 @@ public class PrototypeScenario implements Scenario {
     private double maxFishingEfficiency = .01;
 
 
+    /**
+     * factory to produce departing strategy
+     */
+    private StrategyFactory<? extends DepartingStrategy> departingStrategy = FixedProbabilityDepartingStrategy.factory;
+
+    /**
+     * factory to produce fishing strategy
+     */
+    private StrategyFactory<? extends FishingStrategy> fishingStrategy = FishUntilFullStrategy.FISH_UNTIL_FULL_FACTORY;
+
+
     private Regulations regulation =  new FishingSeason(true,300);
 
     private Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker =
@@ -157,9 +172,7 @@ public class PrototypeScenario implements Scenario {
         for(int i=0;i<fishers;i++)
         {
             Port port = ports[random.nextInt(ports.length)];
-            DepartingStrategy departing = new FixedProbabilityDepartingStrategy(
-                    random.nextDouble(true,true)*(maxDepartingProbability-minDepartingProbability)
-                            + minDepartingProbability);
+            DepartingStrategy departing = departingStrategy.apply(model);
             double speed = random.nextDouble(true,true) *
                     (maxSpeedInKmh - minSpeedInKmh) + minSpeedInKmh;
             double capacity = random.nextDouble(true,true) *
@@ -168,7 +181,7 @@ public class PrototypeScenario implements Scenario {
                     (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
             fisherList.add(new Fisher(port, random, regulation, departing,
                                       new FavoriteDestinationStrategy(map,random),
-                                      new FishOnceStrategy(),
+                                      fishingStrategy.apply(model),
                                       new Boat(speed),
                                       new Hold(capacity, biology.getSize()),
                                       new FixedProportionGear(efficiency)
@@ -353,5 +366,24 @@ public class PrototypeScenario implements Scenario {
 
     public void setNumberOfSpecies(int numberOfSpecies) {
         this.numberOfSpecies = numberOfSpecies;
+    }
+
+
+    public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
+        return departingStrategy;
+    }
+
+    public void setDepartingStrategy(
+            StrategyFactory<? extends DepartingStrategy> departingStrategy) {
+        this.departingStrategy = departingStrategy;
+    }
+
+    public StrategyFactory<? extends FishingStrategy> getFishingStrategy() {
+        return fishingStrategy;
+    }
+
+    public void setFishingStrategy(
+            StrategyFactory<? extends FishingStrategy> fishingStrategy) {
+        this.fishingStrategy = fishingStrategy;
     }
 }

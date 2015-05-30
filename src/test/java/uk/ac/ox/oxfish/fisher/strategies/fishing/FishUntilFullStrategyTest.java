@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
