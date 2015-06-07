@@ -20,11 +20,6 @@ public interface Scenario {
 
 
 
-    //todo move this to the GUI side of things
-    public static LinkedHashMap<Class<? extends Scenario>,Supplier<Scenario>> constructors = new LinkedHashMap<>();
 
-    public static LinkedHashMap<Class<? extends Scenario>,String> name = new LinkedHashMap<>();
-
-    public static LinkedHashMap<Class<? extends Scenario>,String> description = new LinkedHashMap<>();
 
 }

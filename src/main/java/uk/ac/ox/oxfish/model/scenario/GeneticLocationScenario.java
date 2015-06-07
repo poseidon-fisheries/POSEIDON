@@ -6,12 +6,14 @@ import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,11 +38,11 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
     protected PrototypeScenario modifyPrototypeScenario(PrototypeScenario scenario, FishState model) {
         scenario.setFishers(100); //100 fishermen
         //fixed probability of going out
-        scenario.setMaxDepartingProbability(1);
-        scenario.setMinDepartingProbability(1);
+        final FixedProbabilityDepartingFactory departingStrategy = new FixedProbabilityDepartingFactory();
+        departingStrategy.setProbabilityToLeavePort(new FixedDoubleParameter(1));
+        scenario.setDepartingStrategy(departingStrategy);
         //fixed low efficiency
-        scenario.setMaxFishingEfficiency(.01);
-        scenario.setMinFishingEfficiency(.01);
+        scenario.setFishingEfficiency(new FixedDoubleParameter(.01));
 
         scenario.setRegulation(new FishingSeason(true,1000));
       //  scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));

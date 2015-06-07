@@ -9,11 +9,9 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishOnceStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
@@ -26,6 +24,8 @@ import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.function.Consumer;
@@ -88,26 +88,27 @@ public class PrototypeScenario implements Scenario {
     /**
      * the number of fishers
      */
-    private int fishers = 0;
+    private int fishers = 50;
 
     /**
      * Uses Caartesian distance
      */
     private double gridSizeInKm = 10;
 
-    private double minDepartingProbability = 0.2;
+    /**
+     * boat speed
+     */
+    private DoubleParameter speedInKmh = new FixedDoubleParameter(5);
 
-    private double maxDepartingProbability = 0.8;
+    /**
+     * hold size
+     */
+    private DoubleParameter holdSize = new FixedDoubleParameter(100);
 
-    private double minSpeedInKmh = 5;
-
-    private double maxSpeedInKmh = 5;
-
-    private double minHoldSize = 100;
-    private double maxHoldSize = 100;
-
-    private double minFishingEfficiency = .01;
-    private double maxFishingEfficiency = .01;
+    /**
+     * efficiency
+     */
+    private DoubleParameter fishingEfficiency = new FixedDoubleParameter(.01);
 
 
     /**
@@ -173,12 +174,9 @@ public class PrototypeScenario implements Scenario {
         {
             Port port = ports[random.nextInt(ports.length)];
             DepartingStrategy departing = departingStrategy.apply(model);
-            double speed = random.nextDouble(true,true) *
-                    (maxSpeedInKmh - minSpeedInKmh) + minSpeedInKmh;
-            double capacity = random.nextDouble(true,true) *
-                    (maxHoldSize - minHoldSize) + minHoldSize;
-            double efficiency = random.nextDouble(true,true) *
-                    (maxFishingEfficiency - minFishingEfficiency) + minFishingEfficiency;
+            double speed = speedInKmh.apply(random);
+            double capacity = holdSize.apply(random);
+            double efficiency =fishingEfficiency.apply(random);
             fisherList.add(new Fisher(port, random, regulation, departing,
                                       new FavoriteDestinationStrategy(map,random),
                                       fishingStrategy.apply(model),
@@ -274,68 +272,20 @@ public class PrototypeScenario implements Scenario {
         this.gridSizeInKm = gridSizeInKm;
     }
 
-    public double getMinDepartingProbability() {
-        return minDepartingProbability;
+    public DoubleParameter getSpeedInKmh() {
+        return speedInKmh;
     }
 
-    public void setMinDepartingProbability(double minDepartingProbability) {
-        this.minDepartingProbability = minDepartingProbability;
+    public void setSpeedInKmh(DoubleParameter speedInKmh) {
+        this.speedInKmh = speedInKmh;
     }
 
-    public double getMaxDepartingProbability() {
-        return maxDepartingProbability;
+    public DoubleParameter getFishingEfficiency() {
+        return fishingEfficiency;
     }
 
-    public void setMaxDepartingProbability(double maxDepartingProbability) {
-        this.maxDepartingProbability = maxDepartingProbability;
-    }
-
-    public double getMinSpeedInKmh() {
-        return minSpeedInKmh;
-    }
-
-    public void setMinSpeedInKmh(double minSpeedInKmh) {
-        this.minSpeedInKmh = minSpeedInKmh;
-    }
-
-    public double getMaxSpeedInKmh() {
-        return maxSpeedInKmh;
-    }
-
-    public void setMaxSpeedInKmh(double maxSpeedInKmh) {
-        this.maxSpeedInKmh = maxSpeedInKmh;
-    }
-
-    public double getMinHoldSize() {
-        return minHoldSize;
-    }
-
-    public void setMinHoldSize(double minHoldSize) {
-        this.minHoldSize = minHoldSize;
-    }
-
-    public double getMaxHoldSize() {
-        return maxHoldSize;
-    }
-
-    public void setMaxHoldSize(double maxHoldSize) {
-        this.maxHoldSize = maxHoldSize;
-    }
-
-    public double getMinFishingEfficiency() {
-        return minFishingEfficiency;
-    }
-
-    public void setMinFishingEfficiency(double minFishingEfficiency) {
-        this.minFishingEfficiency = minFishingEfficiency;
-    }
-
-    public double getMaxFishingEfficiency() {
-        return maxFishingEfficiency;
-    }
-
-    public void setMaxFishingEfficiency(double maxFishingEfficiency) {
-        this.maxFishingEfficiency = maxFishingEfficiency;
+    public void setFishingEfficiency(DoubleParameter fishingEfficiency) {
+        this.fishingEfficiency = fishingEfficiency;
     }
 
     public Regulations getRegulation() {
@@ -385,5 +335,14 @@ public class PrototypeScenario implements Scenario {
     public void setFishingStrategy(
             StrategyFactory<? extends FishingStrategy> fishingStrategy) {
         this.fishingStrategy = fishingStrategy;
+    }
+
+
+    public DoubleParameter getHoldSize() {
+        return holdSize;
+    }
+
+    public void setHoldSize(DoubleParameter holdSize) {
+        this.holdSize = holdSize;
     }
 }

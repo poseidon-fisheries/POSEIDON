@@ -12,7 +12,7 @@ import javax.swing.*;
 
 /**
  * The metawidget created by inspecting a scenario object. The name itself is a misnomer because
- * the JComponent (the widget) is actually a field rather than the class itself, but the use it the same:
+ * the JComponent (the widget) is actually a field rather than the class itself, but the use is the same:
  * point it to a scenario, it will generate all the gui you can access by getting the JComponent.
  *
  * <p>
@@ -39,7 +39,9 @@ public class ScenarioJComponent {
                 //default for swing
                 new PropertyTypeInspector(),
                 //adds information for selecting factories
-                new StrategyFactoryInspector()
+                new StrategyFactoryInspector(),
+                //adds information on randomizable parameters
+                new DoubleParameterInspector()
         );
         widget.setInspector(new CompositeInspector(inspectorConfig));
         //add the processor
@@ -49,13 +51,18 @@ public class ScenarioJComponent {
         widget.addWidgetProcessor(new ImmediateBinder());
         // this one creates the combo-boxes for strategy factories
         widget.addWidgetProcessor(new StrategyWidgetProcessor());
+        //creates combo-boxes for double parameters
+        widget.addWidgetProcessor(new DoubleParameterWidgetProcessor());
 
         widget.setToInspect(scenario);
-
 
     }
 
      public JComponent getJComponent(){
          return widget;
      }
+
+    public Scenario getScenario() {
+        return scenario;
+    }
 }

@@ -16,6 +16,8 @@ import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 import uk.ac.ox.oxfish.model.scenario.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -199,5 +201,14 @@ public class FishState  extends SimState{
 
     public IntGrid2D getFishedMap() {
         return map.getFishedMap();
+    }
+
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

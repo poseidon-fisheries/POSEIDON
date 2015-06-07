@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * This class looks for factory_strategy attributes and if it finds them it creates a combo-box so
@@ -47,20 +49,39 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
                 Class strategyClass = Class.forName(attributes.get("factory_strategy"));
                 //get list of constructors
                 Map<String,? extends StrategyFactory> constructors = StrategyFactories.CONSTRUCTOR_MAP.get(strategyClass);
+                //try to select
 
                 //build JComponent
                 final JComboBox<String> factoryBox = new JComboBox<>();
                 //fill it with the strings from the constructor masterlist
                 for(String title : constructors.keySet())
                     factoryBox.addItem(title);
-                factoryBox.setSelectedIndex(-1); //have none selected
+                factoryBox.setSelectedIndex(-1);
+                //find out which strategy factory is currently selected and try to show it in the combo-box
+                try {
+                    //current class
+                    Class actualClass = PropertyUtils.getSimpleProperty(metawidget.getToInspect(),
+                                                                        attributes.get("name")).getClass();
+                    //go through the constructors looking for that class
+                    final Optional<? extends Map.Entry<String, ? extends StrategyFactory>> found =
+                            constructors.entrySet().stream().filter(
+                                    stringEntry ->
+                                            stringEntry.getValue().getClass().equals(actualClass)
+                            ).findFirst();
+                    //if found, set selected
+                    if(found.isPresent())
+                        factoryBox.setSelectedItem(found.get().getKey());
+
+
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
                 //gui layout and panelling:
                 JPanel panel = new JPanel();
                 BoxLayout layout = new BoxLayout(panel,BoxLayout.PAGE_AXIS);
                 panel.setLayout(layout);
                 panel.add(factoryBox);
                 panel.add(new JSeparator());
-                panel.add(new JLabel(attributes.get("actual-class")));
                 panel.add(widget);
 
                 //now listen carefully to combobx

@@ -34,7 +34,7 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
 
 
 
-        System.out.println(property);
+        System.out.println(property + "-----" + property.getType());
         //turn String into Class object, if possible
         if(property.isWritable()) {
             try {

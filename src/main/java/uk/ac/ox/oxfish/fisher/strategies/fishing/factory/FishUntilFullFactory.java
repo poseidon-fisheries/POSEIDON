@@ -23,12 +23,21 @@ public class FishUntilFullFactory implements StrategyFactory<FishUntilFullStrate
         return minimumPercentageFull;
     }
 
-    public void setMinimumPercentageFull(double minimumPercentageFull) {
-        if(minimumPercentageFull < 0 || minimumPercentageFull > 1)
+    public void setMinimumPercentageFull(double newValue) {
+        newValue =  FishState.round(newValue,2);
+
+        if(newValue < 0) {
             System.err.println("Probability has to be in [0,1]. New value is ignored");
+            this.minimumPercentageFull = 0;
+        }
+        else
+        if(newValue  > 1) {
+            System.err.println("Probability has to be in [0,1]. New value is ignored");
+            this.minimumPercentageFull = 1;
+        }
         else
 
-            this.minimumPercentageFull = minimumPercentageFull;
+            this.minimumPercentageFull = newValue;
     }
 
     @Override

@@ -3,10 +3,12 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class FixedProbabilityDepartingFactory implements StrategyFactory<FixedProbabilityDepartingStrategy>
 {
-    private double probabilityToLeavePort=0;
+    private DoubleParameter probabilityToLeavePort= new FixedDoubleParameter(1);
 
     /**
      * Applies this function to the given argument.
@@ -16,19 +18,16 @@ public class FixedProbabilityDepartingFactory implements StrategyFactory<FixedPr
      */
     @Override
     public FixedProbabilityDepartingStrategy apply(FishState state) {
-        return new FixedProbabilityDepartingStrategy(probabilityToLeavePort);
+        return new FixedProbabilityDepartingStrategy(probabilityToLeavePort.apply(state.random));
     }
 
 
-    public double getProbabilityToLeavePort() {
+    public DoubleParameter getProbabilityToLeavePort() {
         return probabilityToLeavePort;
     }
 
-    public void setProbabilityToLeavePort(double probabilityToLeavePort) {
-        if(probabilityToLeavePort < 0 || probabilityToLeavePort > 1)
-            System.err.println("Probability has to be in [0,1]. New value is ignored");
-        else
-            this.probabilityToLeavePort = probabilityToLeavePort;
+    public void setProbabilityToLeavePort(DoubleParameter probabilityToLeavePort) {
+        this.probabilityToLeavePort = probabilityToLeavePort;
     }
 
     /**

@@ -21,7 +21,7 @@ public class ScenarioJComponentSpike {
         JFrame frame = new JFrame( "Metawidget Tutorial" );
         frame.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
         frame.getContentPane().add(component.getJComponent());
-        frame.setSize( 400, 250 );
+        frame.pack();
         frame.setVisible( true );
 
     }

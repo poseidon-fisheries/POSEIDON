@@ -1,13 +1,21 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import ec.util.MersenneTwisterFast;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.ga.FisherEvolution;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -98,37 +106,14 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setDepthSmoothing(depthSmoothing);
     }
 
-    public double getMaxDepartingProbability() {
-        return delegate.getMaxDepartingProbability();
-    }
 
-    public double getMinFishingEfficiency() {
-        return delegate.getMinFishingEfficiency();
-    }
+
 
     public Regulations getRegulation() {
         return delegate.getRegulation();
     }
 
-    public void setMaxDepartingProbability(double maxDepartingProbability) {
-        delegate.setMaxDepartingProbability(maxDepartingProbability);
-    }
 
-    public int getCoastalRoughness() {
-        return delegate.getCoastalRoughness();
-    }
-
-    public int getMaxBiomass() {
-        return delegate.getMaxBiomass();
-    }
-
-    public double getMinSpeedInKmh() {
-        return delegate.getMinSpeedInKmh();
-    }
-
-    public void setMinSpeedInKmh(double minSpeedInKmh) {
-        delegate.setMinSpeedInKmh(minSpeedInKmh);
-    }
 
     public void setRegulation(Regulations regulation) {
         delegate.setRegulation(regulation);
@@ -138,97 +123,18 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         return delegate.getHeight();
     }
 
-    public int getDepthSmoothing() {
-        return delegate.getDepthSmoothing();
-    }
 
-    public double getMaxSpeedInKmh() {
-        return delegate.getMaxSpeedInKmh();
-    }
-
-    public int getMinBiomass() {
-        return delegate.getMinBiomass();
-    }
-
-    public void setFishers(int fishers) {
-        delegate.setFishers(fishers);
-    }
-
-    public double getMinDepartingProbability() {
-        return delegate.getMinDepartingProbability();
-    }
-
-    public double getMaxHoldSize() {
-        return delegate.getMaxHoldSize();
-    }
-
-    public int getBiologySmoothing() {
-        return delegate.getBiologySmoothing();
-    }
-
-    public void setMaxBiomass(int maxBiomass) {
-        delegate.setMaxBiomass(maxBiomass);
-    }
-
-    public double getMinHoldSize() {
-        return delegate.getMinHoldSize();
-    }
-
-    public void setBiologySmoothing(int biologySmoothing) {
-        delegate.setBiologySmoothing(biologySmoothing);
-    }
-
-    public double getMaxFishingEfficiency() {
-        return delegate.getMaxFishingEfficiency();
-    }
-
-    public void setCoastalRoughness(int coastalRoughness) {
-        delegate.setCoastalRoughness(coastalRoughness);
-    }
-
-    public double getGridSizeInKm() {
-        return delegate.getGridSizeInKm();
-    }
-
-    public void setWidth(int width) {
-        delegate.setWidth(width);
-    }
-
-    public int getPorts() {
-        return delegate.getPorts();
-    }
-
-    public void setGridSizeInKm(double gridSizeInKm) {
-        delegate.setGridSizeInKm(gridSizeInKm);
-    }
-
-    public void setMaxFishingEfficiency(double maxFishingEfficiency) {
-        delegate.setMaxFishingEfficiency(maxFishingEfficiency);
-    }
-
-    public void setMaxHoldSize(double maxHoldSize) {
-        delegate.setMaxHoldSize(maxHoldSize);
-    }
 
     public void setMinBiomass(int minBiomass) {
         delegate.setMinBiomass(minBiomass);
     }
 
-    public void setMinHoldSize(double minHoldSize) {
-        delegate.setMinHoldSize(minHoldSize);
-    }
 
-    public void setMinFishingEfficiency(double minFishingEfficiency) {
-        delegate.setMinFishingEfficiency(minFishingEfficiency);
-    }
 
     public int getFishers() {
         return delegate.getFishers();
     }
 
-    public void setMaxSpeedInKmh(double maxSpeedInKmh) {
-        delegate.setMaxSpeedInKmh(maxSpeedInKmh);
-    }
 
     public void setPorts(int ports) {
         delegate.setPorts(ports);
@@ -242,7 +148,119 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setHeight(height);
     }
 
-    public void setMinDepartingProbability(double minDepartingProbability) {
-        delegate.setMinDepartingProbability(minDepartingProbability);
+
+    public void setGridSizeInKm(double gridSizeInKm) {
+        delegate.setGridSizeInKm(gridSizeInKm);
+    }
+
+    public void setBiologySmoothing(int biologySmoothing) {
+        delegate.setBiologySmoothing(biologySmoothing);
+    }
+
+    public int getMinBiomass() {
+        return delegate.getMinBiomass();
+    }
+
+    public DoubleParameter getFishingEfficiency() {
+        return delegate.getFishingEfficiency();
+    }
+
+    public Function<MersenneTwisterFast, Consumer<NauticalMap>> getBiologySmootherMaker() {
+        return delegate.getBiologySmootherMaker();
+    }
+
+    public void setSpeedInKmh(DoubleParameter speedInKmh) {
+        delegate.setSpeedInKmh(speedInKmh);
+    }
+
+    public int getNumberOfSpecies() {
+        return delegate.getNumberOfSpecies();
+    }
+
+    public void setFishers(int fishers) {
+        delegate.setFishers(fishers);
+    }
+
+    public Function<SeaTile, LocalBiology> getBiologyInitializer() {
+        return delegate.getBiologyInitializer();
+    }
+
+    public void setBiologySmootherMaker(
+            Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker) {
+        delegate.setBiologySmootherMaker(biologySmootherMaker);
+    }
+
+    public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
+        return delegate.getDepartingStrategy();
+    }
+
+    public void setFishingEfficiency(DoubleParameter fishingEfficiency) {
+        delegate.setFishingEfficiency(fishingEfficiency);
+    }
+
+    public void setWidth(int width) {
+        delegate.setWidth(width);
+    }
+
+    public DoubleParameter getHoldSize() {
+        return delegate.getHoldSize();
+    }
+
+    public void setFishingStrategy(
+            StrategyFactory<? extends FishingStrategy> fishingStrategy) {
+        delegate.setFishingStrategy(fishingStrategy);
+    }
+
+    public int getCoastalRoughness() {
+        return delegate.getCoastalRoughness();
+    }
+
+    public void setHoldSize(DoubleParameter holdSize) {
+        delegate.setHoldSize(holdSize);
+    }
+
+    public void setCoastalRoughness(int coastalRoughness) {
+        delegate.setCoastalRoughness(coastalRoughness);
+    }
+
+    public StrategyFactory<? extends FishingStrategy> getFishingStrategy() {
+        return delegate.getFishingStrategy();
+    }
+
+    public int getDepthSmoothing() {
+        return delegate.getDepthSmoothing();
+    }
+
+    public int getPorts() {
+        return delegate.getPorts();
+    }
+
+    public int getBiologySmoothing() {
+        return delegate.getBiologySmoothing();
+    }
+
+    public void setDepartingStrategy(
+            StrategyFactory<? extends DepartingStrategy> departingStrategy) {
+        delegate.setDepartingStrategy(departingStrategy);
+    }
+
+    public void setNumberOfSpecies(int numberOfSpecies) {
+        delegate.setNumberOfSpecies(numberOfSpecies);
+    }
+
+    public int getMaxBiomass() {
+        return delegate.getMaxBiomass();
+    }
+
+    public void setMaxBiomass(int maxBiomass) {
+        delegate.setMaxBiomass(maxBiomass);
+    }
+
+    public double getGridSizeInKm() {
+        return delegate.getGridSizeInKm();
+    }
+
+    public DoubleParameter getSpeedInKmh() {
+        return delegate.getSpeedInKmh();
     }
 }
