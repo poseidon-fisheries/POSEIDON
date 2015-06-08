@@ -3,25 +3,32 @@ package uk.ac.ox.oxfish.gui.widget;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.widgetprocessor.iface.WidgetProcessor;
-import uk.ac.ox.oxfish.utility.StrategyFactories;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import sim.display.GUIState;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameters;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
- * This class looks for factory_strategy attributes and if it finds them it creates a combo-box so
- * users can change the scenario factory used
- * Created by carrknight on 5/29/15.
+ * finds actual strategies and place a button to change them on the fly
+ * Created by carrknight on 6/8/15.
  */
-public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,SwingMetawidget>
-{
+public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,SwingMetawidget>{
+
+
+    /**
+     * strategies require fishstate reference to be instantiated from the factory so we can only use this
+     * when a GUISTate already exists. It is also important for syncing anyway
+     */
+    private final GUIState state;
+
+    public StrategyWidgetProcessor(GUIState state) {
+        this.state = state;
+    }
 
     /**
      * Process the given widget. Called after a widget has been built by the
@@ -40,94 +47,71 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
      */
     @Override
     public JComponent processWidget(
-            JComponent widget, String elementName, Map<String, String> attributes, SwingMetawidget metawidget)
-    {
+            JComponent widget, String elementName, Map<String, String> attributes, SwingMetawidget metawidget) {
+
+        if(!attributes.containsKey(StrategyInspector.KEY))
+            return widget;
 
         try {
-            if (attributes.containsKey("factory_strategy"))
-            {
-                //find it what are you building
-                Class strategyClass = Class.forName(attributes.get("factory_strategy"));
-                //get list of constructors
-                Map<String,? extends Supplier<? extends StrategyFactory>> constructors = StrategyFactories.CONSTRUCTOR_MAP.get(strategyClass);
-                Map<? extends Class<? extends StrategyFactory>,String> names = StrategyFactories.NAMES_MAP.get(strategyClass);
 
-                final Object beingInspected = metawidget.getToInspect();
-                final String fieldName = attributes.get("name");
+            //contains the key
+            final Object toModify = DoubleParameterWidgetProcessor.getToInspectByTraversingMPath(
+                    (SwingMetawidget) widget,metawidget);
+            //get the super class
+            Class superClass = Class.forName(attributes.get(StrategyInspector.KEY));
+            //get current class (that's the name on the button)
+            Class actualClass = PropertyUtils.getNestedProperty(toModify,
+                                                                attributes.get("name")).getClass();
 
-                //try to select
+            //add a button to change strategy
+            JButton changeStrategy = new JButton(actualClass.getSimpleName());
+            widget.add(changeStrategy);
+            changeStrategy.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    //if possible, pause!
 
-                //build JComponent
-                final JComboBox<String> factoryBox = new JComboBox<>();
-                //fill it with the strings from the constructor masterlist
-                constructors.keySet().forEach(factoryBox::addItem);
-                factoryBox.setSelectedIndex(-1);
-                //find out which strategy factory is currently selected and try to show it in the combo-box
-                try {
-                    //current class
-                    Class actualClass = PropertyUtils.getSimpleProperty(metawidget.getToInspect(),
-                                                                        attributes.get("name")).getClass();
-                    //go through the constructors looking for that class
-                    String name = names.get(actualClass);
-
-                    //if found, set selected
-                    factoryBox.setSelectedItem(name);
-
-
-                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-
-
-                //gui layout and panelling:
-                JPanel panel = new JPanel();
-                BoxLayout layout = new BoxLayout(panel,BoxLayout.PAGE_AXIS);
-                panel.setLayout(layout);
-                panel.add(factoryBox);
-                panel.add(new JSeparator());
-                panel.add(widget);
-
-                //now listen carefully to combobx
-                factoryBox.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        //we need to make changes!
+                    StrategyFactoryDialog dialog = new StrategyFactoryDialog(superClass);
+                    int returned = JOptionPane.showOptionDialog(widget,dialog,"Select New Strategy",JOptionPane.OK_CANCEL_OPTION,
+                                                                JOptionPane.QUESTION_MESSAGE,null,null,null);
+                    //if ok was pressed on the dialog
+                    if(returned == JOptionPane.OK_OPTION)
+                    {
+                        final Object newStrategy = dialog.getSelected().apply(state.state);
+                        //use the beansutils to set the new value to the field
                         try {
-                            //use the beansutils to set the new value to the field
-                            PropertyUtils.setSimpleProperty(
-                                    //the object to modify
-                                    beingInspected,
-                                    //the name of the field
-                                    fieldName,
-                                    //the new value (table lookup)
-                                    constructors.get((String) factoryBox.getSelectedItem()).get());
-
-                            //now update the gui
-                            //for some reason rebind alone is not enough here (although it is strange because it works elsewhere for the same change)
-                            //metawidget.getWidgetProcessor(BeanUtilsBindingProcessor.class).rebind(metawidget.getToInspect(),metawidget);
-
-                            //so i bind it again by setter
-                            metawidget.setToInspect(beingInspected);
+                            synchronized(state.state.schedule) {
+                                PropertyUtils.setSimpleProperty(
+                                        //the object to modify
+                                        toModify,
+                                        //the name of the field
+                                        attributes.get("name"),
+                                        //the new value (table lookup)
+                                        newStrategy);
+                            }
                         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
-                            System.err.print("failed to find class! " + e1);
+                            System.err.print("failed to set new strategy! " + e1);
                             e1.printStackTrace();
                         }
 
-
+                        //reb
+                        metawidget.setToInspect(metawidget.getToInspect());
                     }
-                });
+                }
+            });
 
-                return panel;
-            }
+
+
+
+
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.err.println("Could not find key!");
+            e.printStackTrace();
         }
-        catch (ClassNotFoundException c){
-            System.err.print("failed to find class! " + c);
-            c.printStackTrace();
-
-        }
-
-
-
         return widget;
+
+
     }
 }

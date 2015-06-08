@@ -54,20 +54,8 @@ public class DoubleParameterWidgetProcessor implements WidgetProcessor<JComponen
                 final JComboBox<String> parameterBox = new JComboBox<>();
                 //fill it with the strings from the constructor masterlist
                 DoubleParameters.DOUBLE_PARAMETERS.keySet().forEach(parameterBox::addItem);
+                final Object toModify = getToInspectByTraversingMPath((SwingMetawidget) widget, metawidget);
 
-                //if the property is nested we need to find it
-                String[] path = ((SwingMetawidget) widget).getPath().split("/");
-                LinkedList<String> toTraverse = new LinkedList<>(Arrays.asList(path));
-                //remove the first (root) and last (property name)
-                toTraverse.removeFirst(); toTraverse.removeLast();
-                //if there are still some nodes in the path then it is a nested property and we need to traverse it
-                Object toInspect = metawidget.getToInspect();
-                for(String node : toTraverse)
-                {
-                    toInspect = PropertyUtils.getProperty(toInspect,node);
-                    //toInspect.getClass().getDeclaredField(node).get(toInspect);
-                }
-                final Object toModify = toInspect;
 
                 //get through reflection
                 Class actualClass = PropertyUtils.getNestedProperty(toModify,
@@ -79,7 +67,7 @@ public class DoubleParameterWidgetProcessor implements WidgetProcessor<JComponen
                 box.add(parameterBox);
                 widget.add(box,0);
                 parameterBox.addActionListener(new ActionListener() {
-                    //todo ugly code replication from StrategyWidgetProcessor
+                    //todo ugly code replication from StrategyFactoryWidgetProcessor
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         //we need to make changes!
@@ -118,5 +106,24 @@ public class DoubleParameterWidgetProcessor implements WidgetProcessor<JComponen
         }
         return widget;
 
+    }
+
+    public static Object getToInspectByTraversingMPath(
+            SwingMetawidget widget,
+            SwingMetawidget metawidget) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        //if the property is nested we need to find it
+        String[] path = widget.getPath().split("/");
+        LinkedList<String> toTraverse = new LinkedList<>(Arrays.asList(path));
+        //remove the first (root) and last (property name)
+        toTraverse.removeFirst();
+        toTraverse.removeLast();
+        //if there are still some nodes in the path then it is a nested property and we need to traverse it
+        Object toInspect = metawidget.getToInspect();
+        for(String node : toTraverse)
+        {
+            toInspect = PropertyUtils.getProperty(toInspect, node);
+            //toInspect.getClass().getDeclaredField(node).get(toInspect);
+        }
+        return toInspect;
     }
 }

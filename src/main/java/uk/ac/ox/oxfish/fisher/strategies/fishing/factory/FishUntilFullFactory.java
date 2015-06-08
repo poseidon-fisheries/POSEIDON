@@ -41,11 +41,6 @@ public class FishUntilFullFactory implements StrategyFactory<FishUntilFullStrate
     }
 
     @Override
-    public Class<? super FishUntilFullStrategy> getStrategySuperClass() {
-        return FishUntilFullStrategy.class;
-    }
-
-    @Override
     public FishUntilFullStrategy apply(FishState state) {
         return new FishUntilFullStrategy(getMinimumPercentageFull());
     }

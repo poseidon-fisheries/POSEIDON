@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
@@ -37,12 +36,6 @@ public class FixedFavoriteDestinationFactory implements StrategyFactory<Favorite
 
     public void setY(int y) {
         this.y = y;
-    }
-
-    @Override
-    public Class<? super FavoriteDestinationStrategy> getStrategySuperClass()
-    {
-        return  DestinationStrategy.class;
     }
 
     @Override

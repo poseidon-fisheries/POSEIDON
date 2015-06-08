@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -30,15 +29,4 @@ public class FixedProbabilityDepartingFactory implements StrategyFactory<FixedPr
         this.probabilityToLeavePort = probabilityToLeavePort;
     }
 
-    /**
-     * sometimes I have a factory but I want to know what is the superclass it generates. It would be nice to do this through reflection
-     * but that's actually not possible: http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#Which information related to generics can I access reflectively?
-     * so I do it through a method. Somewhere I have to keep a big map linking strategies super-classes with constructor lists
-     *
-     * @return the strategy super-class
-     */
-    @Override
-    public Class<? super FixedProbabilityDepartingStrategy> getStrategySuperClass() {
-        return DepartingStrategy.class;
-    }
 }

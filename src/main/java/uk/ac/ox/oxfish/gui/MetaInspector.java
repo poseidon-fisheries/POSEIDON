@@ -44,7 +44,8 @@ public class MetaInspector extends Inspector
      * Setup standard widget with the usual binders and post-processors
      * @param widget the widget to set up
      * @param toSyncAgainst nullable: a link to the gui-state if we need to sync
-     *                      the writing to the model.
+     *                      the writing to the model. It is also where we get the randomizer so it
+     *                      is important whenever the model has already started
      */
     public static void STANDARD_WIDGET_SETUP(SwingMetawidget widget, GUIState toSyncAgainst) {
         //create inspectors
@@ -53,6 +54,8 @@ public class MetaInspector extends Inspector
                 new PropertyTypeInspector(),
                 //adds information for selecting factories
                 new StrategyFactoryInspector(),
+                //tags already instantiated strategies. Useful only with GUI state
+                new StrategyInspector(),
                 //adds information on randomizable parameters
                 new DoubleParameterInspector()
         );
@@ -61,14 +64,17 @@ public class MetaInspector extends Inspector
         //this makes the binding between ui and model possible
         widget.addWidgetProcessor(new BeanUtilsBindingProcessor(new BeanUtilsBindingProcessorConfig()));
         //this one makes the binding immediate
-        if(toSyncAgainst == null)
+        if(toSyncAgainst == null) {
             widget.addWidgetProcessor(new ImmediateBinder());
-        //this one makes it almost immediate: waits for the guischedule
-        else
+        }
+        else {
+            //this one makes binding almost immediate: waits for the guischedule
             widget.addWidgetProcessor(new GUISyncedBinder(toSyncAgainst));
-
+            //with GUI state we get the randomizer and so we can swap strategies on the fly
+            widget.addWidgetProcessor(new StrategyWidgetProcessor(toSyncAgainst));
+        }
         // this one creates the combo-boxes for strategy factories
-        widget.addWidgetProcessor(new StrategyWidgetProcessor());
+        widget.addWidgetProcessor(new StrategyFactoryWidgetProcessor());
         //creates combo-boxes for double parameters
         widget.addWidgetProcessor(new DoubleParameterWidgetProcessor());
     }

@@ -8,11 +8,6 @@ public class FishOnceFactory implements StrategyFactory<FishOnceStrategy>
 {
 
     @Override
-    public Class<? super FishOnceStrategy> getStrategySuperClass() {
-        return  FishOnceStrategy.class;
-    }
-
-    @Override
     public FishOnceStrategy apply(FishState state) {
         return new FishOnceStrategy();
     }

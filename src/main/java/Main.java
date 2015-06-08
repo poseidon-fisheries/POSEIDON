@@ -42,7 +42,6 @@ class Main{
         state.setScenario(scenarioSelector.getScenario());
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);
-
         c.setVisible(true);
     }
 }

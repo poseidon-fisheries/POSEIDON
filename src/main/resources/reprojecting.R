@@ -103,3 +103,4 @@ gdalwarp(srcfile = "/home/carrknight/Dropbox/OC Systems-Based Fisheries Manageme
          verbose=TRUE,output_Raster=TRUE)
 src_dataset<-readGDAL("/home/carrknight/rocktest.tif")
 proj4string(src_dataset)
+plot(raster(src_dataset))
