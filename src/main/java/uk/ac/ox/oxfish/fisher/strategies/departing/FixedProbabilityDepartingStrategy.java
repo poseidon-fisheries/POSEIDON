@@ -52,10 +52,6 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     }
 
 
-    /**
-     * the factory to create as many
-     */
-    public static StrategyFactory<FixedProbabilityDepartingStrategy> factory =
-             new FixedProbabilityDepartingFactory();
+
 }
 

@@ -8,6 +8,9 @@ import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.grid.IntGrid2D;
+import sim.portrayal.Inspector;
+import sim.portrayal.LocationWrapper;
+import sim.portrayal.SimpleInspector;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
@@ -100,6 +103,7 @@ public class FishGUI extends GUIState{
 
         displayFrame.setVisible(true);
 
+        final FishGUI self = this;
         FishState state = (FishState) this.state;
 
         //so the console label is a pain in the ass so we need to really use the wrecking ball to modify the way
@@ -144,7 +148,14 @@ public class FishGUI extends GUIState{
         }, StepOrder.BEFORE_FISHER_PHASE);
         //boats
         boats.setField(state.getFisherGrid());
-        boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon));
+        boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon)
+        {
+            @Override
+            public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
+                return wrapper == null?null:
+                        new MetaInspector(wrapper.getObject(),self);
+            }
+        });
 
         //ports
         ports.setField(state.getPortGrid());

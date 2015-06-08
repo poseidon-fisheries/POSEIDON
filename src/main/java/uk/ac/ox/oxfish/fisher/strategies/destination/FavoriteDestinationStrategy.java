@@ -80,19 +80,8 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
 
 
 
-    /**
-     * takes map and randomizer from the state and simply call the constructor of the strategy
-     */
-    //this factory doesn't get his own class because it doesn't really have setters and getters
-    public static  final StrategyFactory<FavoriteDestinationStrategy> RANDOM_FAVORITE_DESTINATION_FACTORY =
-        new RandomFavoriteDestinationFactory();
 
 
-    /**
-     * Factory expecting an x and y to generate favorite destination. Not terribly useful at the present state
-     */
-    public static  final FixedFavoriteDestinationFactory FIXED_FAVORITE_DESTINATION_FACTORY =
-            new FixedFavoriteDestinationFactory();
 
 }
 

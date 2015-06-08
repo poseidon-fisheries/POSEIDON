@@ -60,7 +60,7 @@ public class ImmediateBinder implements WidgetProcessor<JComponent, SwingMetawid
         return jComponent;
     }
 
-    private void writeToObject(SwingMetawidget metawidget) {
+    public void writeToObject(SwingMetawidget metawidget) {
         metawidget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).save( metawidget );
         metawidget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).rebind( metawidget.getToInspect(),metawidget );
     }

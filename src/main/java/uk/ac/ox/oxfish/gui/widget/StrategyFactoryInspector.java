@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.utility.StrategyFactory;
 import java.util.Map;
 
 /**
- * The "inspector" (in the metawidget sense, not the mason sense) that looks for StrategyFactories.
+ * The "MetaInspector" (in the metawidget sense, not the mason sense) that looks for StrategyFactories.
  * If it finds one it adds a "factory" attribute to the element
  * Created by carrknight on 5/29/15.
  */
@@ -34,7 +34,6 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
 
 
 
-        System.out.println(property + "-----" + property.getType());
         //turn String into Class object, if possible
         if(property.isWritable()) {
             try {

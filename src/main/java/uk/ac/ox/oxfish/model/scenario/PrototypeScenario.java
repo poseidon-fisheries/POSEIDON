@@ -10,10 +10,12 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -114,12 +116,12 @@ public class PrototypeScenario implements Scenario {
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DepartingStrategy> departingStrategy = FixedProbabilityDepartingStrategy.factory;
+    private StrategyFactory<? extends DepartingStrategy> departingStrategy = new FixedProbabilityDepartingFactory();
 
     /**
      * factory to produce fishing strategy
      */
-    private StrategyFactory<? extends FishingStrategy> fishingStrategy = FishUntilFullStrategy.FISH_UNTIL_FULL_FACTORY;
+    private StrategyFactory<? extends FishingStrategy> fishingStrategy = new FishUntilFullFactory();
 
 
     private Regulations regulation =  new FishingSeason(true,300);

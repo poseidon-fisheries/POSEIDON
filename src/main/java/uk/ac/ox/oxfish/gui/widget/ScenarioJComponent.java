@@ -1,11 +1,7 @@
 package uk.ac.ox.oxfish.gui.widget;
 
-import org.metawidget.inspector.composite.CompositeInspector;
-import org.metawidget.inspector.composite.CompositeInspectorConfig;
-import org.metawidget.inspector.propertytype.PropertyTypeInspector;
 import org.metawidget.swing.SwingMetawidget;
-import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingProcessor;
-import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingProcessorConfig;
+import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import javax.swing.*;
@@ -34,25 +30,9 @@ public class ScenarioJComponent {
     public ScenarioJComponent(Scenario scenario) {
         this.scenario = scenario;
 
-        //create inspectors
-        CompositeInspectorConfig inspectorConfig = new CompositeInspectorConfig().setInspectors(
-                //default for swing
-                new PropertyTypeInspector(),
-                //adds information for selecting factories
-                new StrategyFactoryInspector(),
-                //adds information on randomizable parameters
-                new DoubleParameterInspector()
-        );
-        widget.setInspector(new CompositeInspector(inspectorConfig));
-        //add the processor
-        //this makes the binding between ui and model possible
-        widget.addWidgetProcessor(new BeanUtilsBindingProcessor(new BeanUtilsBindingProcessorConfig()));
-        //this one makes the binding immediate
-        widget.addWidgetProcessor(new ImmediateBinder());
-        // this one creates the combo-boxes for strategy factories
-        widget.addWidgetProcessor(new StrategyWidgetProcessor());
-        //creates combo-boxes for double parameters
-        widget.addWidgetProcessor(new DoubleParameterWidgetProcessor());
+
+        MetaInspector.STANDARD_WIDGET_SETUP(widget, null);
+
 
         widget.setToInspect(scenario);
 

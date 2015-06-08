@@ -43,11 +43,6 @@ public class FishUntilFullStrategy implements FishingStrategy {
     }
 
 
-    /**
-     * returns a new instance of the FishOnceStrategy.
-     */
-    public static  final FishUntilFullFactory FISH_UNTIL_FULL_FACTORY = new FishUntilFullFactory();
-
 }
 
 

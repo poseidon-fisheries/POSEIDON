@@ -53,20 +53,7 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
     }
 
 
-    /***
-     *      ___ _   ___ _____ ___  _____   __
-     *     | __/_\ / __|_   _/ _ \| _ \ \ / /
-     *     | _/ _ \ (__  | || (_) |   /\ V /
-     *     |_/_/ \_\___| |_| \___/|_|_\ |_|
-     *
-     */
 
-    /**
-     * Returns the RandomThenBackToPortDestinationStrategy. There are no fields to set
-     */
-    public static final StrategyFactory<RandomThenBackToPortDestinationStrategy>
-            RANDOM_THEN_BACK_TO_PORT_DESTINATION_STRATEGY_FACTORY = new
-            RandomThenBackToPortFactory();
 
 }
 

@@ -27,21 +27,7 @@ public class FishOnceStrategy implements FishingStrategy {
     }
 
 
-    /***
-     *      ___ _   ___ _____ ___  _____   __
-     *     | __/_\ / __|_   _/ _ \| _ \ \ / /
-     *     | _/ _ \ (__  | || (_) |   /\ V /
-     *     |_/_/ \_\___| |_| \___/|_|_\ |_|
-     *
-     */
 
-    /**
-     * returns a new instance of the FishOnceStrategy. It has no fields
-     */
-    public static  final StrategyFactory<FishOnceStrategy> FISH_ONCE_FACTORY = new FishOnceFactory();
-    {
-
-    };
 }
 
 

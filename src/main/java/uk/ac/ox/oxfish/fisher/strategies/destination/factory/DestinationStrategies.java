@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.RandomThenBackToPortDestina
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 /**
  * The collection of all the destination strategies factories.
@@ -19,13 +20,23 @@ public class DestinationStrategies
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,StrategyFactory<? extends DestinationStrategy>> CONSTRUCTORS =
+    public static final LinkedHashMap<String,Supplier<StrategyFactory<? extends DestinationStrategy>>> CONSTRUCTORS =
             new LinkedHashMap<>();
+
+    public static final LinkedHashMap<Class<? extends StrategyFactory>,String> NAMES = new LinkedHashMap<>();
+
     static{
-        CONSTRUCTORS.put("Random Favorite", FavoriteDestinationStrategy.RANDOM_FAVORITE_DESTINATION_FACTORY);
-        CONSTRUCTORS.put("Fixed Favorite", FavoriteDestinationStrategy.FIXED_FAVORITE_DESTINATION_FACTORY);
+        CONSTRUCTORS.put("Random Favorite",
+                         RandomFavoriteDestinationFactory::new
+                         );
+        NAMES.put(RandomFavoriteDestinationFactory.class,"Random Favorite");
+        CONSTRUCTORS.put("Fixed Favorite",
+                         FixedFavoriteDestinationFactory::new);
+        NAMES.put(FixedFavoriteDestinationFactory.class,"Fixed Favorite");
         CONSTRUCTORS.put("Always Random",
-                         RandomThenBackToPortDestinationStrategy.RANDOM_THEN_BACK_TO_PORT_DESTINATION_STRATEGY_FACTORY);
+                         RandomThenBackToPortFactory::new);
+        NAMES.put(RandomThenBackToPortFactory.class,"Always Random");
+
     }
 
     private DestinationStrategies() {}

@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import junit.framework.TestCase;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;
@@ -19,7 +20,7 @@ public class FishOnceStrategyTest
     public void fishOnce() throws Exception {
 
         Fisher fisher = mock(Fisher.class);
-        FishOnceStrategy strategy = FishOnceStrategy.FISH_ONCE_FACTORY.apply(mock(FishState.class));
+        FishOnceStrategy strategy = new FishOnceFactory().apply(mock(FishState.class));
 
 
         when(fisher.getPoundsCarried()).thenReturn(0d);

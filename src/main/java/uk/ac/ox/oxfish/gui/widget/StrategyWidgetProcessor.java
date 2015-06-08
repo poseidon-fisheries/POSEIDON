@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * This class looks for factory_strategy attributes and if it finds them it creates a combo-box so
@@ -48,14 +49,18 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
                 //find it what are you building
                 Class strategyClass = Class.forName(attributes.get("factory_strategy"));
                 //get list of constructors
-                Map<String,? extends StrategyFactory> constructors = StrategyFactories.CONSTRUCTOR_MAP.get(strategyClass);
+                Map<String,? extends Supplier<? extends StrategyFactory>> constructors = StrategyFactories.CONSTRUCTOR_MAP.get(strategyClass);
+                Map<? extends Class<? extends StrategyFactory>,String> names = StrategyFactories.NAMES_MAP.get(strategyClass);
+
+                final Object beingInspected = metawidget.getToInspect();
+                final String fieldName = attributes.get("name");
+
                 //try to select
 
                 //build JComponent
                 final JComboBox<String> factoryBox = new JComboBox<>();
                 //fill it with the strings from the constructor masterlist
-                for(String title : constructors.keySet())
-                    factoryBox.addItem(title);
+                constructors.keySet().forEach(factoryBox::addItem);
                 factoryBox.setSelectedIndex(-1);
                 //find out which strategy factory is currently selected and try to show it in the combo-box
                 try {
@@ -63,19 +68,17 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
                     Class actualClass = PropertyUtils.getSimpleProperty(metawidget.getToInspect(),
                                                                         attributes.get("name")).getClass();
                     //go through the constructors looking for that class
-                    final Optional<? extends Map.Entry<String, ? extends StrategyFactory>> found =
-                            constructors.entrySet().stream().filter(
-                                    stringEntry ->
-                                            stringEntry.getValue().getClass().equals(actualClass)
-                            ).findFirst();
+                    String name = names.get(actualClass);
+
                     //if found, set selected
-                    if(found.isPresent())
-                        factoryBox.setSelectedItem(found.get().getKey());
+                    factoryBox.setSelectedItem(name);
 
 
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     e.printStackTrace();
                 }
+
+
                 //gui layout and panelling:
                 JPanel panel = new JPanel();
                 BoxLayout layout = new BoxLayout(panel,BoxLayout.PAGE_AXIS);
@@ -93,18 +96,18 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
                             //use the beansutils to set the new value to the field
                             PropertyUtils.setSimpleProperty(
                                     //the object to modify
-                                    metawidget.getToInspect(),
+                                    beingInspected,
                                     //the name of the field
-                                    attributes.get("name"),
+                                    fieldName,
                                     //the new value (table lookup)
-                                    constructors.get((String) factoryBox.getSelectedItem()));
+                                    constructors.get((String) factoryBox.getSelectedItem()).get());
 
                             //now update the gui
                             //for some reason rebind alone is not enough here (although it is strange because it works elsewhere for the same change)
                             //metawidget.getWidgetProcessor(BeanUtilsBindingProcessor.class).rebind(metawidget.getToInspect(),metawidget);
 
                             //so i bind it again by setter
-                            metawidget.setToInspect(metawidget.getToInspect());
+                            metawidget.setToInspect(beingInspected);
                         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                             System.err.print("failed to find class! " + e1);
                             e1.printStackTrace();

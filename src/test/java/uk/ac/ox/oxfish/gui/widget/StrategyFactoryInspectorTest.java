@@ -10,6 +10,8 @@ import org.metawidget.inspector.propertytype.PropertyTypeInspector;
 import org.w3c.dom.Element;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FixedFavoriteDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 /**
@@ -43,7 +45,7 @@ public class StrategyFactoryInspectorTest {
 
 
 /**
- * this class exists only so that we can make sure the inspector reads  correctly.
+ * this class exists only so that we can make sure the MetaInspector reads  correctly.
  */
 class ToSerialize
 {
@@ -55,7 +57,7 @@ class ToSerialize
     /**
      * a factory
      */
-    StrategyFactory<? extends DestinationStrategy> firstFactory = FavoriteDestinationStrategy.RANDOM_FAVORITE_DESTINATION_FACTORY;
+    StrategyFactory<? extends DestinationStrategy> firstFactory = new RandomFavoriteDestinationFactory();
 
     public int getRedHerring() {
         return redHerring;
@@ -85,7 +87,7 @@ class ToSerialize2
     /**
      * a customized factory
      */
-    StrategyFactory<? extends DestinationStrategy> firstFactory = FavoriteDestinationStrategy.FIXED_FAVORITE_DESTINATION_FACTORY;
+    StrategyFactory<? extends DestinationStrategy> firstFactory = new FixedFavoriteDestinationFactory();
 
     public int getRedHerring() {
         return redHerring;

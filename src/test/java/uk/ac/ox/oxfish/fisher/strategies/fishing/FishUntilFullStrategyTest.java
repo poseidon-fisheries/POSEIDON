@@ -10,15 +10,13 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by carrknight on 5/28/15.
- */
+
 public class FishUntilFullStrategyTest {
 
     @Test
     public void factoryTest() throws Exception {
 
-        final FishUntilFullFactory factory = FishUntilFullStrategy.FISH_UNTIL_FULL_FACTORY;
+        final FishUntilFullFactory factory = new FishUntilFullFactory();
         factory.setMinimumPercentageFull(.5); //needs to be 50% full
         final FishUntilFullStrategy strategy = factory.apply(mock(FishState.class));
 
