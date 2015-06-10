@@ -1,19 +1,20 @@
 package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.model.data.DataGatherer;
+import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 
-public class DataGathererTest {
+public class DataSetTest {
 
 
     @Test
     public void gathersCorrectly() throws Exception {
 
-        DataGatherer<String> gatherer = new DataGatherer<String>(true) {
+        DataSet<String> gatherer = new DataSet<String>(IntervalPolicy.EVERY_YEAR) {
         };
 
         FishState state = mock(FishState.class);

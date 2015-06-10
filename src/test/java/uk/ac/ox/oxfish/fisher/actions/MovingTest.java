@@ -59,7 +59,7 @@ public class MovingTest
         when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0));
 
         ActionResult result = move.act(simple, fisher, new Anarchy() );
-        verify(fisher,never()).move(any(),any()); //never moved
+        verify(fisher,never()).move(any(),any(),any()); //never moved
         assertTrue(result.isActAgainThisTurn()); //think he has arrived
         assertTrue(result.getNextState() instanceof Arriving);
 
@@ -186,6 +186,8 @@ public class MovingTest
                                           new EquirectangularDistance(0.0,1));
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
         return model;
     }
 

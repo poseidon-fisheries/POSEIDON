@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.function.Function;
@@ -11,12 +12,11 @@ import java.util.function.Function;
  * The market for a specie of fish
  * Created by carrknight on 5/3/15.
  */
-public interface Market {
+public interface Market extends Startable {
 
 
 
 
-    public void start(FishState state);
 
     /**
      * Sells the a specific amount of fish here

@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.data;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.function.Function;
 
@@ -13,12 +12,12 @@ import java.util.function.Function;
  *     <li> NET_CASH_FLOW</li>
  * </ul>
  */
-public class YearlyFisherDataGatherer extends DataGatherer<Fisher>
+public class YearlyFisherDataSet extends DataSet<Fisher>
 {
 
 
-    public YearlyFisherDataGatherer() {
-        super(true);
+    public YearlyFisherDataSet() {
+        super(IntervalPolicy.EVERY_YEAR);
     }
 
     /**

@@ -32,21 +32,28 @@ public class AbstractMarketTest {
         doAnswer(invocation -> {
             steppables.add((Steppable) invocation.getArguments()[0]);
             return mock(Stoppable.class);
-        }).when(model).scheduleEveryStep(
+        }).when(model).scheduleEveryDay(
                 any(), any());
+        doAnswer(invocation -> {
+            steppables.add((Steppable) invocation.getArguments()[0]);
+            return mock(Stoppable.class);
+        }).when(model).schedulePerPolicy(
+                any(), any(), any());
 
 
         market.start(model);
-        assertEquals(1, steppables.size());
+        assertEquals(2, steppables.size());
         market.recordTrade(new TradeInfo(100, test, 100));
         market.recordTrade(new TradeInfo(10, test, 200));
+        steppables.get(1).step(model);
         steppables.get(0).step(model);
 
-        assertEquals(110, market.getData().get("BIOMASS_TRADED").get(0), .0001);
-        assertEquals(300, market.getData().get("MONEY_EXCHANGED").get(0), .0001);
+        assertEquals(110, market.getData().get(AbstractMarket.LANDINGS_COLUMN_NAME).get(0), .0001);
+        assertEquals(300, market.getData().get(AbstractMarket.EARNINGS_COLUMN_NAME).get(0), .0001);
 
+        steppables.get(1).step(model);
         steppables.get(0).step(model);
-        assertEquals(0, market.getData().get("BIOMASS_TRADED").get(1), .0001);
-        assertEquals(0, market.getData().get("MONEY_EXCHANGED").get(1), .0001);
+        assertEquals(0, market.getData().get(AbstractMarket.LANDINGS_COLUMN_NAME).get(1), .0001);
+        assertEquals(0, market.getData().get(AbstractMarket.EARNINGS_COLUMN_NAME).get(1), .0001);
     }
 }

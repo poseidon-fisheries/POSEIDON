@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model;
 
+import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -12,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 import uk.ac.ox.oxfish.model.scenario.*;
@@ -48,18 +50,35 @@ public class FishState  extends SimState{
     /**
      * x steps equal 1 day
      */
-    final public static int STEPS_PER_DAY = 1;
+    final private int stepsPerDay;
+
+    public int getStepsPerDay() {
+        return stepsPerDay;
+    }
+
     /**
      * how many hours in a step, basically.
      */
-    final public static double HOURS_AVAILABLE_TO_TRAVEL_EACH_STEP = 24.0/(double)STEPS_PER_DAY;
-
-
-    public FishState(long seed) {
-        super(seed);
-        toStart = new LinkedList<>();
+    public double getHoursPerStep() {
+        return 24.0/(double) stepsPerDay;
     }
 
+
+    /**
+     * create a fishstate model with one step per day
+     * @param seed the random seed
+     */
+    public FishState(long seed) {
+        this(seed,1);
+    }
+
+    public FishState(long seed, int stepsPerDay)
+    {
+        super(seed);
+        this.stepsPerDay = stepsPerDay;
+        toStart = new LinkedList<>();
+
+    }
 
     /**
      * so far it does the following:
@@ -157,26 +176,46 @@ public class FishState  extends SimState{
      */
     public int getDayOfTheYear()
     {
-        return (int) ((schedule.getTime() / STEPS_PER_DAY) % 365) + 1;
+        return (int) ((schedule.getTime() / stepsPerDay) % 365) + 1;
     }
 
     public int getYear()
     {
-        return (int) ((schedule.getTime() / STEPS_PER_DAY) / 365);
+        return (int) ((schedule.getTime() / stepsPerDay) / 365);
     }
 
     public int getHour() {
-        return (int) (schedule.getTime() % STEPS_PER_DAY * 24 / STEPS_PER_DAY);
+        return (int) (schedule.getTime() % stepsPerDay * 24 / stepsPerDay);
     }
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)
     {
-        return schedule.scheduleRepeating(steppable,order.ordinal(),365*STEPS_PER_DAY);
+        return schedule.scheduleRepeating(steppable,order.ordinal(),365* stepsPerDay);
     }
 
     public Stoppable scheduleEveryStep(Steppable steppable, StepOrder order)
     {
         return schedule.scheduleRepeating(steppable,order.ordinal(),1.0);
+    }
+
+    public Stoppable scheduleEveryDay(Steppable steppable, StepOrder order)
+    {
+        return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay);
+    }
+
+    public Stoppable schedulePerPolicy(Steppable steppable, StepOrder order, IntervalPolicy policy)
+    {
+        switch (policy){
+            case EVERY_STEP:
+                return scheduleEveryStep(steppable,order);
+            case EVERY_DAY:
+                return scheduleEveryDay(steppable,order);
+            case EVERY_YEAR:
+                return scheduleEveryYear(steppable, order);
+            default:
+                Preconditions.checkState(false,"Reset Policy not found");
+        }
+        return null;
     }
 
     /**

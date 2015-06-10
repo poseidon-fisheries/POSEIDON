@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.ga;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.jenetics.*;
@@ -9,6 +10,7 @@ import org.jenetics.util.Factory;
 import org.jenetics.util.RandomRegistry;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -70,8 +72,13 @@ public class FisherEvolution<G extends Gene<?,G>> implements Steppable, Startabl
 
     private int generation = 1;
 
+    private Stoppable receipt = null;
+
     public void start(FishState model)
     {
+
+        Preconditions.checkArgument(receipt==null,"Already started");
+
 
         //weird setting up of the randomizer
         RandomRegistry.setRandom(new Random(model.seed()));
@@ -90,8 +97,16 @@ public class FisherEvolution<G extends Gene<?,G>> implements Steppable, Startabl
 
 
         //schedule yourself every year!
-        model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
+        receipt = model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
 
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        receipt.stop();
     }
 
     @Override

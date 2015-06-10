@@ -44,9 +44,9 @@ public class Moving implements Action
 
             double distance = map.distance(agent.getLocation(),step);
             //if you have time move
-            if(agent.totalTravelTimeAfterAddingThisSegment(distance) <= FishState.HOURS_AVAILABLE_TO_TRAVEL_EACH_STEP)
+            if(agent.totalTravelTimeAfterAddingThisSegment(distance) <= model.getHoursPerStep())
             {
-                agent.move(step, map);
+                agent.move(step, map,model);
                 assert agent.getLocation().equals(step);
                 if(step.equals(agent.getDestination()))
                     return new ActionResult(new Arriving(),true);

@@ -13,4 +13,9 @@ public interface Startable {
      * @param model the model
      */
     public void start(FishState model);
+
+    /**
+     * tell the startable to turnoff,
+     */
+    public void turnOff();
 }

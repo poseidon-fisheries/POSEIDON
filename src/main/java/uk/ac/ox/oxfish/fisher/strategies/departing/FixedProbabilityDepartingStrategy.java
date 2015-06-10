@@ -52,6 +52,12 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     }
 
 
-
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        //nothing
+    }
 }
 

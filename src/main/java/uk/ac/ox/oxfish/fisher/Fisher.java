@@ -19,7 +19,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.YearlyFisherDataGatherer;
+import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
@@ -79,7 +79,7 @@ public class Fisher implements Steppable{
     /**
      * the data gatherer that fires once a year
      */
-    private final YearlyFisherDataGatherer yearlyDataGatherer = new YearlyFisherDataGatherer();
+    private final YearlyFisherDataSet yearlyDataGatherer = new YearlyFisherDataSet();
 
     /**
      * the cash owned by the firm
@@ -234,7 +234,7 @@ public class Fisher implements Steppable{
      * @param newPosition the new position
      * @param map the map on which we are moving
      */
-    public void move(SeaTile newPosition,NauticalMap map)
+    public void move(SeaTile newPosition,NauticalMap map, FishState state)
     {
         Preconditions.checkArgument(newPosition != location); //i am not already here!
         double distanceTravelled = map.distance(location, newPosition);
@@ -242,7 +242,7 @@ public class Fisher implements Steppable{
         location = newPosition;
         map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
 
-        Preconditions.checkState(boat.getHoursTravelledToday() <= FishState.HOURS_AVAILABLE_TO_TRAVEL_EACH_STEP);
+        Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep());
         Preconditions.checkState(newPosition == location);
     }
 

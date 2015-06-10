@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.data;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
@@ -13,7 +14,7 @@ import java.util.function.Function;
  * Basically a map<String,Double> to collect data about an object of type T
  * Created by carrknight on 5/2/15.
  */
-public class DataGatherer<T> implements Steppable
+public class DataSet<T> implements Steppable
 {
     final private Map<String,LinkedList<Double>> data;
 
@@ -27,7 +28,7 @@ public class DataGatherer<T> implements Steppable
     /**
      * if this is true, gather data every year. Otherwise gather data step every step
      */
-    private final boolean yearly;
+    private final IntervalPolicy policy;
 
     private T observed;
 
@@ -53,6 +54,8 @@ public class DataGatherer<T> implements Steppable
     }
 
 
+
+    private Stoppable receipt = null;
     /**
      * call this to start the observation
      * @param state model
@@ -63,10 +66,14 @@ public class DataGatherer<T> implements Steppable
         assert  this.observed == null;
         this.observed = observed;
 
-        if(yearly)
-            state.scheduleEveryYear(this,StepOrder.DATA_GATHERING);
-        else
-            state.scheduleEveryStep(this,StepOrder.DATA_GATHERING);
+        receipt = state.schedulePerPolicy(this,StepOrder.DATA_GATHERING,policy);
+
+
+    }
+
+    public void stop()
+    {
+        receipt.stop();
     }
 
     @Override
@@ -82,8 +89,8 @@ public class DataGatherer<T> implements Steppable
 
 
 
-    public DataGatherer(boolean yearly) {
-        this.yearly = yearly;
+    public DataSet(IntervalPolicy policy) {
+        this.policy = policy;
         data = new HashMap<>();
         dataView = Collections.unmodifiableMap(data);
         gatherers = new HashMap<>();

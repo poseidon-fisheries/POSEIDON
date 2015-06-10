@@ -145,6 +145,8 @@ public class RandomThenBackToPortDestinationStrategyTest {
                                           new EquirectangularDistance(0.0,1));
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
         return model;
     }
 

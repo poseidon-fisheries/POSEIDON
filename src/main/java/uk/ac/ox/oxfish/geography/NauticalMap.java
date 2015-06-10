@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.Grid2D;
@@ -164,9 +165,17 @@ public class NauticalMap implements Startable
 
     }
 
+    /**
+     * proof that you were started
+     */
+    private Stoppable receipt;
+
 
     @Override
     public void start(FishState model) {
+        Preconditions.checkArgument(receipt == null, "already started, love");
+        //reset fished map count
+        receipt =
         model.scheduleEveryYear(new Steppable() {
             @Override
             public void step(SimState simState) {
@@ -174,7 +183,15 @@ public class NauticalMap implements Startable
                     for(int j=0; j<getHeight();j++)
                         fishedMap.field[i][j] = 0;
             }
-        }, StepOrder.DATA_GATHERING);
+        }, StepOrder.DATA_RESET);
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        receipt.stop();
     }
 
     /**

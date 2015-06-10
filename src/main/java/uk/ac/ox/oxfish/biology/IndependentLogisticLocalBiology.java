@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -191,6 +192,11 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
     }
 
 
+    /**
+     * proof that you have started
+     */
+    private Stoppable receipt;
+
 
     /**
      * schedule to act each year
@@ -198,7 +204,17 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      */
     @Override
     public void start(FishState model) {
+
+        Preconditions.checkArgument(receipt==null,"Already started");
         model.scheduleEveryYear(this, StepOrder.BEFORE_FISHER_PHASE);
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        receipt.stop();
     }
 
     /**

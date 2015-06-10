@@ -3,13 +3,13 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DataGatherer;
+import uk.ac.ox.oxfish.model.data.Counter;
+import uk.ac.ox.oxfish.model.data.IntervalPolicy;
+import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Adds data collection to the interface
@@ -17,22 +17,19 @@ import java.util.function.Function;
  */
 public abstract class AbstractMarket implements Market {
 
-    /**
-     * money counter, reset by the dailyObservations gatherer
-     */
-    private double dailyEarnings = 0;
 
-    /**
-     * biomass counter, reset by the dailyObservations gatherer
-     */
-    private double dailyBiomassTraded = 0;
+    public static final String LANDINGS_COLUMN_NAME = "Landings";
+    public static final String EARNINGS_COLUMN_NAME = "Earnings";
+
+
+    private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
 
     /**
      * specie to trade in
      */
     private final Specie specie;
 
-    private final DataGatherer<Market> dailyObservations = new DataGatherer<>(false);
+    private final DataSet<Market> dailyObservations = new DataSet<>(IntervalPolicy.EVERY_DAY);
 
     /**
      * flag to avoid starting multiple times if start is called repeatedly
@@ -53,27 +50,30 @@ public abstract class AbstractMarket implements Market {
         if(started) //don't start twice
             return;
 
+        //start the counter
+        dailyCounter.start(state);
+        dailyCounter.addColumn(EARNINGS_COLUMN_NAME);
+        dailyCounter.addColumn(LANDINGS_COLUMN_NAME);
+
+        //start the data-set where we are going to store the history of the counter
         dailyObservations.start(state,this);
         //the gatherers reset the counters as a side effect
-        dailyObservations.registerGather("MONEY_EXCHANGED", market -> {
-            double money = dailyEarnings;
-            dailyEarnings = 0;
-            return money;
-        }, Double.NaN);
+        dailyObservations.registerGather(EARNINGS_COLUMN_NAME, market -> dailyCounter.getColumn(EARNINGS_COLUMN_NAME), Double.NaN);
 
-        dailyObservations.registerGather("BIOMASS_TRADED", market -> {
-            double biomass = dailyBiomassTraded;
-            dailyBiomassTraded = 0;
-            return biomass;
-        },Double.NaN);
+        dailyObservations.registerGather(LANDINGS_COLUMN_NAME, market -> dailyCounter.getColumn(LANDINGS_COLUMN_NAME),Double.NaN);
 
         started = true;
 
-
-
-
     }
 
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        dailyCounter.turnOff();
+        dailyObservations.stop();
+    }
 
     /**
      * Sells the a specific amount of fish here by calling sellFishImplementation and then store the trade result details
@@ -105,8 +105,8 @@ public abstract class AbstractMarket implements Market {
     public void recordTrade(TradeInfo info)
     {
         assert specie.equals(info.getSpecie());
-        dailyEarnings += info.getMoneyExchanged();
-        dailyBiomassTraded += info.getBiomassTraded();
+        dailyCounter.count(EARNINGS_COLUMN_NAME,info.getMoneyExchanged());
+        dailyCounter.count(LANDINGS_COLUMN_NAME, info.getBiomassTraded());
 
     }
 
