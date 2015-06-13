@@ -114,7 +114,7 @@ public abstract class AbstractMarket implements Market {
         return specie;
     }
 
-    public Map<String, LinkedList<Double>> getData() {
-        return dailyObservations.getDataView();
+    public DataSet<Market> getData() {
+        return dailyObservations;
     }
 }

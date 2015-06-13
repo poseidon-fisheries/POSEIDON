@@ -4,11 +4,18 @@ import org.metawidget.inspector.composite.CompositeInspector;
 import org.metawidget.inspector.composite.CompositeInspectorConfig;
 import org.metawidget.inspector.propertytype.PropertyTypeInspector;
 import org.metawidget.swing.SwingMetawidget;
+import org.metawidget.swing.widgetbuilder.OverriddenWidgetBuilder;
+import org.metawidget.swing.widgetbuilder.ReadOnlyWidgetBuilder;
+import org.metawidget.swing.widgetbuilder.SwingWidgetBuilder;
 import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingProcessor;
 import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingProcessorConfig;
+import org.metawidget.widgetbuilder.composite.CompositeWidgetBuilder;
+import org.metawidget.widgetbuilder.composite.CompositeWidgetBuilderConfig;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import uk.ac.ox.oxfish.gui.widget.*;
+
+import javax.swing.*;
 
 /**
  * A meta-widget implementation of the usual inspector. Makes modifying strategy parameters a lot easier
@@ -21,7 +28,7 @@ public class MetaInspector extends Inspector
 
     final private SwingMetawidget widget = new SwingMetawidget();
 
-    public MetaInspector(Object toInspect, GUIState gui) {
+    public MetaInspector(Object toInspect, FishGUI gui) {
         this.toInspect = toInspect;
 
         STANDARD_WIDGET_SETUP(widget, gui);
@@ -47,7 +54,7 @@ public class MetaInspector extends Inspector
      *                      the writing to the model. It is also where we get the randomizer so it
      *                      is important whenever the model has already started
      */
-    public static void STANDARD_WIDGET_SETUP(SwingMetawidget widget, GUIState toSyncAgainst) {
+    public static void STANDARD_WIDGET_SETUP(SwingMetawidget widget, FishGUI toSyncAgainst) {
         //create inspectors
         CompositeInspectorConfig inspectorConfig = new CompositeInspectorConfig().setInspectors(
                 //default for swing
@@ -60,6 +67,21 @@ public class MetaInspector extends Inspector
                 new DoubleParameterInspector()
         );
         widget.setInspector(new CompositeInspector(inspectorConfig));
+        //if you have a gui start with add the data widgets, so you can plot datasets on the fly
+        if(toSyncAgainst != null)
+        {
+            CompositeWidgetBuilder<JComponent, SwingMetawidget> composite = new CompositeWidgetBuilder<JComponent, SwingMetawidget>(
+                    new CompositeWidgetBuilderConfig<JComponent, SwingMetawidget>().
+                            setWidgetBuilders(
+                                    new DataWidgetBuilder(toSyncAgainst),
+                                    new OverriddenWidgetBuilder(),
+                                    new ReadOnlyWidgetBuilder(),
+                                    new SwingWidgetBuilder()
+                            )
+            );
+            widget.setWidgetBuilder(composite);
+        }
+
         //add the processor
         //this makes the binding between ui and model possible
         widget.addWidgetProcessor(new BeanUtilsBindingProcessor(new BeanUtilsBindingProcessorConfig()));

@@ -7,7 +7,9 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import javax.xml.crypto.Data;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -16,9 +18,9 @@ import java.util.function.Function;
  */
 public class DataSet<T> implements Steppable
 {
-    final private Map<String,LinkedList<Double>> data;
+    final private Map<String,DataColumn> data;
 
-    final private Map<String,LinkedList<Double>> dataView;
+    final private Map<String,DataColumn> dataView;
 
     /**
      * the functions to run on studied object to gather their data
@@ -43,7 +45,7 @@ public class DataSet<T> implements Steppable
     {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists");
         int size =noGatherers() ? 0 : numberOfObservations();
-        LinkedList<Double> column = new LinkedList<>();
+        DataColumn column = new DataColumn(title);
         data.put(title, column);
         //fill if needed
         for(int i=0; i<size; i++)
@@ -79,7 +81,7 @@ public class DataSet<T> implements Steppable
     @Override
     public void step(SimState simState) {
 
-        for(Map.Entry<String,LinkedList<Double>> columns : data.entrySet())
+        for(Map.Entry<String,DataColumn> columns : data.entrySet())
         {
             columns.getValue().add(gatherers.get(columns.getKey()).apply(observed));
         }
@@ -123,7 +125,25 @@ public class DataSet<T> implements Steppable
         }
     }
 
-    public Map<String, LinkedList<Double>> getDataView() {
+    /**
+     * get an unmodifiable map showing the data
+     */
+    public Map<String, DataColumn> getDataView() {
         return dataView;
+    }
+
+    /**
+     * get a specific column
+     */
+    public DataColumn getColumn(String name){
+        return dataView.get(name);
+    }
+
+   public Collection<DataColumn> getColumns(){
+       return dataView.values();
+   }
+
+    public IntervalPolicy getPolicy() {
+        return policy;
     }
 }

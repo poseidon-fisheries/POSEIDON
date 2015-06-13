@@ -8,6 +8,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.DataColumn;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,12 +49,15 @@ public class AbstractMarketTest {
         steppables.get(1).step(model);
         steppables.get(0).step(model);
 
-        assertEquals(110, market.getData().get(AbstractMarket.LANDINGS_COLUMN_NAME).get(0), .0001);
-        assertEquals(300, market.getData().get(AbstractMarket.EARNINGS_COLUMN_NAME).get(0), .0001);
+        final DataColumn landings = market.getData().getColumn(AbstractMarket.LANDINGS_COLUMN_NAME);
+        final DataColumn earnings = market.getData().getColumn(AbstractMarket.EARNINGS_COLUMN_NAME);
+
+        assertEquals(110, landings.get(0), .0001);
+        assertEquals(300, earnings.get(0), .0001);
 
         steppables.get(1).step(model);
         steppables.get(0).step(model);
-        assertEquals(0, market.getData().get(AbstractMarket.LANDINGS_COLUMN_NAME).get(1), .0001);
-        assertEquals(0, market.getData().get(AbstractMarket.EARNINGS_COLUMN_NAME).get(1), .0001);
+        assertEquals(0, landings.get(1), .0001);
+        assertEquals(0, earnings.get(1), .0001);
     }
 }

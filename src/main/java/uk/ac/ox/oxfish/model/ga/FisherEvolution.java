@@ -147,7 +147,7 @@ public class FisherEvolution<G extends Gene<?,G>> implements Steppable, Startabl
      * the fitness function. By default it's just the net-cash-flow of the fisher
      */
     public Function<Fisher,Double> fitness =
-            fisher -> fisher.getYearlyData().get("NET_CASH_FLOW").peekLast();
+            fisher -> fisher.getYearlyData().getColumn("NET_CASH_FLOW").getLatest();
 
     private Function<Genotype<G>,Double> genotypeFitness =
             chromosomes -> {

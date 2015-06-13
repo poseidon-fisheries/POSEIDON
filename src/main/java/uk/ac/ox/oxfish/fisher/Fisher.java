@@ -19,6 +19,8 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.DataColumn;
+import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulations;
 
@@ -393,8 +395,9 @@ public class Fisher implements Steppable{
     }
 
 
-    public Map<String, LinkedList<Double>> getYearlyData() {
-        return yearlyDataGatherer.getDataView();
+    public DataSet getYearlyData() {
+        return yearlyDataGatherer;
+
     }
 
     public double getCash(){
