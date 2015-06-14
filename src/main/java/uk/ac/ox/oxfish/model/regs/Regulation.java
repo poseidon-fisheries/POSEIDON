@@ -12,7 +12,8 @@ import uk.ac.ox.oxfish.model.FishState;
  * or not
  * Created by carrknight on 5/2/15.
  */
-public interface Regulations {
+public interface Regulation
+{
 
 
     /**

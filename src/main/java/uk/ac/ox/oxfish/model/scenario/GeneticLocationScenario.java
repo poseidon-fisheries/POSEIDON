@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -44,8 +45,8 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         //fixed low efficiency
         scenario.setFishingEfficiency(new FixedDoubleParameter(.01));
 
-        scenario.setRegulation(new FishingSeason(true,1000));
-      //  scenario.setRegulation(new TACRegulation(10*scenario.getFishers(),model));
+        scenario.setRegulation(new ProtectedAreasOnlyFactory());
+      //  scenario.setRegulation(new MonoQuotaRegulation(10*scenario.getFishers(),model));
 
 
         scenario.setGridSizeInKm(5);

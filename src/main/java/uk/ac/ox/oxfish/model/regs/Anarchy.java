@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * This is basically no-rules. It's always valid to fish (even in an MPA) and no limits are ever imposed
  */
-public class Anarchy implements Regulations {
+public class Anarchy implements Regulation {
     /**
      * can always fish
      */

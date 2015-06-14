@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.ga.FisherEvolution;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -107,16 +107,13 @@ public abstract class PrototypeGeneticScenario implements Scenario {
     }
 
 
-
-
-    public Regulations getRegulation() {
-        return delegate.getRegulation();
+    public void setRegulation(
+            StrategyFactory<? extends Regulation> regulation) {
+        delegate.setRegulation(regulation);
     }
 
-
-
-    public void setRegulation(Regulations regulation) {
-        delegate.setRegulation(regulation);
+    public StrategyFactory<? extends Regulation> getRegulation() {
+        return delegate.getRegulation();
     }
 
     public int getHeight() {

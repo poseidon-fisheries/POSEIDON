@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategi
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,8 @@ public class StrategyFactories {
         NAMES_MAP.put(DestinationStrategy.class, DestinationStrategies.NAMES);
         CONSTRUCTOR_MAP.put(FishingStrategy.class, FishingStrategies.CONSTRUCTORS);
         NAMES_MAP.put(FishingStrategy.class, FishingStrategies.NAMES);
+        CONSTRUCTOR_MAP.put(Regulation.class, Regulations.CONSTRUCTORS);
+        NAMES_MAP.put(Regulation.class, Regulations.NAMES);
 
 
     }

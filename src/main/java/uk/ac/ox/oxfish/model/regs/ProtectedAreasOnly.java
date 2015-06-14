@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * No limits on catch but you can only fish outside of MPAs
  * Created by carrknight on 5/2/15.
  */
-public class ProtectedAreasOnly implements Regulations {
+public class ProtectedAreasOnly implements Regulation {
     /**
      * can the agent fish at this location?
      *

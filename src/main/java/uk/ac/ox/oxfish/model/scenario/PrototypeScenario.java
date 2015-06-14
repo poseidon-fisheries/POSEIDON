@@ -11,9 +11,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
@@ -24,7 +22,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -124,7 +123,7 @@ public class PrototypeScenario implements Scenario {
     private StrategyFactory<? extends FishingStrategy> fishingStrategy = new FishUntilFullFactory();
 
 
-    private Regulations regulation =  new FishingSeason(true,300);
+    private StrategyFactory<? extends Regulation> regulation =  new FishingSeasonFactory(300,true);
 
     private Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker =
             NauticalMapFactory.smoothConstantBiology(
@@ -179,7 +178,9 @@ public class PrototypeScenario implements Scenario {
             double speed = speedInKmh.apply(random);
             double capacity = holdSize.apply(random);
             double efficiency =fishingEfficiency.apply(random);
-            fisherList.add(new Fisher(port, random, regulation, departing,
+            fisherList.add(new Fisher(port, random,
+                                      regulation.apply(model),
+                                      departing,
                                       new FavoriteDestinationStrategy(map,random),
                                       fishingStrategy.apply(model),
                                       new Boat(speed),
@@ -290,14 +291,15 @@ public class PrototypeScenario implements Scenario {
         this.fishingEfficiency = fishingEfficiency;
     }
 
-    public Regulations getRegulation() {
+
+    public StrategyFactory<? extends Regulation> getRegulation() {
         return regulation;
     }
 
-    public void setRegulation(Regulations regulation) {
+    public void setRegulation(
+            StrategyFactory<? extends Regulation> regulation) {
         this.regulation = regulation;
     }
-
 
     public Function<SeaTile, LocalBiology> getBiologyInitializer() {
         return biologyInitializer;

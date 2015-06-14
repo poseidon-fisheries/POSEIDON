@@ -36,7 +36,7 @@ public class MetaInspector extends Inspector
         setVolatile(true); //volatile by default
 
 
-        widget.setToInspect(toInspect);
+        widget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).rebind(widget.getToInspect(), widget);
         this.add(widget);
 
     }

@@ -19,13 +19,9 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DataColumn;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
-import uk.ac.ox.oxfish.model.regs.Regulations;
-
-import java.util.LinkedList;
-import java.util.Map;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * The boat catching all that delicious fish.
@@ -66,7 +62,7 @@ public class Fisher implements Steppable{
     /**
      * the regulation object to obey
      */
-    private Regulations regulations;
+    private Regulation regulation;
 
     /**
      * the state of the fisher: the next action they are taking
@@ -136,7 +132,7 @@ public class Fisher implements Steppable{
 
     public Fisher(
             Port homePort, MersenneTwisterFast random,
-            Regulations regulations,
+            Regulation regulation,
             //strategies:
             DepartingStrategy departingStrategy,
             DestinationStrategy destinationStrategy, FishingStrategy fishingStrategy,
@@ -153,7 +149,7 @@ public class Fisher implements Steppable{
         this.action = new AtPort();
         this.gear = gear;
         this.fishingStrategy = fishingStrategy;
-        this.regulations = regulations;
+        this.regulation = regulation;
     }
 
 
@@ -183,7 +179,7 @@ public class Fisher implements Steppable{
         //run the state machine
         while(true)
         {
-            ActionResult result = action.act(model, this,regulations );
+            ActionResult result = action.act(model, this, regulation);
             action = result.getNextState();
             if(!result.isActAgainThisTurn())
                 break;
@@ -258,14 +254,14 @@ public class Fisher implements Steppable{
     }
 
     /**
-     * tell the fisher to check his destination and update it if necessary. If the regulations forbid us to be at sea
+     * tell the fisher to check his destination and update it if necessary. If the regulation forbid us to be at sea
      * the destination is always port
      * @param model the model link
      * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
      * */
     public void updateDestination(FishState model, Action currentAction) {
 
-        if(!regulations.allowedAtSea(this, model))
+        if(!regulation.allowedAtSea(this, model))
             destination = homePort.getLocation();
         else
             destination =  destinationStrategy.chooseDestination(this, random, model, currentAction);
@@ -364,7 +360,7 @@ public class Fisher implements Steppable{
     public Catch fishHere(GlobalBiology modelBiology) {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
         Catch catchOfTheDay = gear.fish(this, location, modelBiology);
-        regulations.reactToCatch(catchOfTheDay);
+        regulation.reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
         return catchOfTheDay;
     }
@@ -386,12 +382,12 @@ public class Fisher implements Steppable{
         return destination.equals(location);
     }
 
-    public Regulations getRegulations() {
-        return regulations;
+    public Regulation getRegulation() {
+        return regulation;
     }
 
-    public void setRegulations(Regulations regulations) {
-        this.regulations = regulations;
+    public void setRegulation(Regulation regulation) {
+        this.regulation = regulation;
     }
 
 

@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -51,7 +52,9 @@ public class FishingTest {
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),any())).thenReturn(new Catch(specie, 50.0, biology));
-        Fisher fisher = new Fisher(port, new MersenneTwisterFast(), new Anarchy(), new FixedProbabilityDepartingStrategy(1.0),
+        Fisher fisher = new Fisher(port, new MersenneTwisterFast(),
+                                   new AnarchyFactory().apply(fishState),
+                                   new FixedProbabilityDepartingStrategy(1.0),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 0)),
                                    (fisher1, random, model) -> true,
                                    new Boat(100.0),

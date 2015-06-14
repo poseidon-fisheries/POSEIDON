@@ -21,7 +21,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 
-public class RegulationsTest {
+public class RegulationTest {
 
 
     //if the regulations never allow to go out, you don't go out
@@ -31,12 +31,12 @@ public class RegulationsTest {
     public void neverGoOut() throws Exception {
 
         Fisher fisher = mock(Fisher.class);
-        Regulations regulations = mock(Regulations.class);
-        when(regulations.allowedAtSea(any(),any() )).thenReturn(false); //you can't go out!
+        Regulation regulation = mock(Regulation.class);
+        when(regulation.allowedAtSea(any(),any() )).thenReturn(false); //you can't go out!
 
         AtPort port = new AtPort();
         when(fisher.shouldFisherLeavePort(any())).thenReturn(true); //the fisher wants to go out!
-        ActionResult act = port.act(mock(FishState.class), fisher,regulations );
+        ActionResult act = port.act(mock(FishState.class), fisher, regulation);
 
         //must be still at port!
         assertTrue(act.getNextState() instanceof AtPort);
@@ -58,7 +58,7 @@ public class RegulationsTest {
         when(destination.chooseDestination(any(),any(),any(),any())).thenReturn(destinationTile);
         FishState model = mock(FishState.class);
 
-        Regulations regs = mock(Regulations.class);
+        Regulation regs = mock(Regulation.class);
 
         Fisher fisher = new Fisher(port,new MersenneTwisterFast(),regs,
                                    mock(DepartingStrategy.class),

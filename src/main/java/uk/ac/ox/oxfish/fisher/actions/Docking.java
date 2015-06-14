@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Markets;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * Landing, selling all the hold and docking
@@ -21,12 +21,12 @@ public class Docking implements Action{
      *
      * @param model       a link to the model, in case you need to grab global objects
      * @param agent       a link to the fisher in case you need to get or set agent's variables
-     * @param regulations the regulations governing the agent
+     * @param regulation the regulation governing the agent
      * @return the next action to take and whether or not to take it now
      */
     @Override
     public ActionResult act(
-            FishState model, Fisher agent, Regulations regulations)
+            FishState model, Fisher agent, Regulation regulation)
     {
 
         Port port = agent.getHomePort();
@@ -48,7 +48,7 @@ public class Docking implements Action{
             assert  biomass>=0;
             if(biomass>0)
                 //this should take care of everything
-                markets.getMarket(specie).sellFish(biomass,agent,regulations,model);
+                markets.getMarket(specie).sellFish(biomass,agent, regulation,model);
         }
 
         assert agent.getLocation().equals(port.getLocation());

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.actions;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * Arrived to destination, should I fish or look for another destination?
@@ -15,17 +15,17 @@ public class Arriving implements Action{
      *
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
-     * @param regulations regulations that tells us whether we can fish here or not
+     * @param regulation regulation that tells us whether we can fish here or not
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulations regulations) {
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation) {
         assert agent.isAtDestination();
 
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
             return new ActionResult(new Docking(),true);
 
-        if(regulations.canFishHere(agent,agent.getLocation(), model)
+        if(regulation.canFishHere(agent,agent.getLocation(), model)
                 &&
                 agent.shouldIFish(model)) //if you want to fish
             return new ActionResult(new Fishing(),true);

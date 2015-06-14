@@ -11,11 +11,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 /**
- * Fixed quota after which the season stops till the end of the year.
+ * Fixed biomass quota (no species difference) after which the season stops till the end of the year.
  * The quota gets counted only when the fish is sold at the market
  * Created by carrknight on 5/2/15.
  */
-public class TACRegulation implements Regulations, Steppable {
+public class MonoQuotaRegulation implements Regulation, Steppable {
 
 
     public static final double EPSILON = .1;
@@ -34,7 +34,8 @@ public class TACRegulation implements Regulations, Steppable {
      * @param yearlyQuota the yearly quota
      * @param state the model link to schedule on
      */
-    public TACRegulation(double yearlyQuota, FishState state) {
+    //todo turn regulations into startable so they don't need a fish-state reference
+    public MonoQuotaRegulation(double yearlyQuota, FishState state) {
         this.yearlyQuota = yearlyQuota;
         this.quotaRemaining = yearlyQuota;
         state.scheduleEveryYear(this, StepOrder.AFTER_FISHER_PHASE);
@@ -113,5 +114,21 @@ public class TACRegulation implements Regulations, Steppable {
 
         quotaRemaining -= biomass;
         Preconditions.checkState(quotaRemaining >= 0, quotaRemaining);
+    }
+
+    public double getYearlyQuota() {
+        return yearlyQuota;
+    }
+
+    public double getQuotaRemaining() {
+        return quotaRemaining;
+    }
+
+    public void setYearlyQuota(double yearlyQuota) {
+        this.yearlyQuota = yearlyQuota;
+    }
+
+    public void setQuotaRemaining(double quotaRemaining) {
+        this.quotaRemaining = quotaRemaining;
     }
 }

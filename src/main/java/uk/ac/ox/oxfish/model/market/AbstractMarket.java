@@ -6,10 +6,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Counter;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.DataSet;
-import uk.ac.ox.oxfish.model.regs.Regulations;
-
-import java.util.LinkedList;
-import java.util.Map;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * Adds data collection to the interface
@@ -80,12 +77,12 @@ public abstract class AbstractMarket implements Market {
      *
      * @param biomass     pounds of fish sold
      * @param fisher      the seller
-     * @param regulations the regulation object the seller abides to
+     * @param regulation the regulation object the seller abides to
      * @param state       the model
      */
     @Override
-    final public TradeInfo sellFish(double biomass, Fisher fisher, Regulations regulations, FishState state) {
-        TradeInfo receipt = sellFishImplementation(biomass,fisher,regulations,state);
+    final public TradeInfo sellFish(double biomass, Fisher fisher, Regulation regulation, FishState state) {
+        TradeInfo receipt = sellFishImplementation(biomass,fisher, regulation,state);
         recordTrade(receipt);
         return receipt;
     }
@@ -94,12 +91,12 @@ public abstract class AbstractMarket implements Market {
      * the only method to implement for subclasses. Needs to actually do the trading and return the result
      * @param biomass the biomass caught by the seller
      * @param fisher the seller
-     * @param regulations the rules the seller abides to
+     * @param regulation the rules the seller abides to
      * @param state the model
      * @return TradeInfo  results
      */
     protected abstract TradeInfo sellFishImplementation(double biomass, Fisher fisher,
-                                                        Regulations regulations, FishState state);
+                                                        Regulation regulation, FishState state);
 
 
     public void recordTrade(TradeInfo info)

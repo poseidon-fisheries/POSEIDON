@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -22,11 +22,11 @@ public class Moving implements Action
      *
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
-     * @param regulations the regulation object that tells us whether we can be out at all
+     * @param regulation the regulation object that tells us whether we can be out at all
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulations regulations) {
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation) {
 
         //adapt if needed
         agent.updateDestination(model,this);

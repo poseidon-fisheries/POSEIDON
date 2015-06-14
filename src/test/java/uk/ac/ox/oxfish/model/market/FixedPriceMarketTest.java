@@ -5,9 +5,8 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -35,11 +34,11 @@ public class FixedPriceMarketTest {
         FixedPriceMarket market = new FixedPriceMarket(new Specie("pippo"),2.0);
 
         Fisher seller = mock(Fisher.class);
-        Regulations regulations = mock(Regulations.class);
-        when(regulations.maximumBiomassSellable(any(),any(),any())).thenReturn(50.0); //can only sell 50!
+        Regulation regulation = mock(Regulation.class);
+        when(regulation.maximumBiomassSellable(any(),any(),any())).thenReturn(50.0); //can only sell 50!
 
 
-        market.sellFishImplementation(100.0,seller, regulations,mock(FishState.class));
+        market.sellFishImplementation(100.0,seller, regulation,mock(FishState.class));
         verify(seller).earn(100.0);
 
     }

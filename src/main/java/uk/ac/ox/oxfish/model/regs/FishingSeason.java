@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * A regulation that allows fishing/selling/navigation only for the first x days of the year
  * Created by carrknight on 5/2/15.
  */
-public class FishingSeason implements Regulations
+public class FishingSeason implements Regulation
 {
 
     /**
@@ -80,5 +80,13 @@ public class FishingSeason implements Regulations
     @Override
     public void reactToSale(Specie specie, double biomass, double revenue) {
 
+    }
+
+    public boolean isRespectMPAs() {
+        return respectMPAs;
+    }
+
+    public int getDaysOpened() {
+        return daysOpened;
     }
 }

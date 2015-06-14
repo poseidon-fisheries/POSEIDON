@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.regs.Regulations;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.*;
 
 import java.math.BigDecimal;
@@ -162,10 +162,10 @@ public class FishState  extends SimState{
         return biology;
     }
 
-    public void setRegulationsForAllFishers(Regulations regulations)
+    public void setRegulationsForAllFishers(Regulation regulation)
     {
         for(Fisher fisher : fishers)
-            fisher.setRegulations(regulations);
+            fisher.setRegulation(regulation);
     }
 
 
