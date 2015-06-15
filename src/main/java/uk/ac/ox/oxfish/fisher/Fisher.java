@@ -23,6 +23,10 @@ import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import javax.xml.crypto.Data;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * The boat catching all that delicious fish.
  * At its core it is a discrete-state automata: the Action class represents a possible state and the fisher can go through
@@ -78,6 +82,7 @@ public class Fisher implements Steppable{
      * the data gatherer that fires once a year
      */
     private final YearlyFisherDataSet yearlyDataGatherer = new YearlyFisherDataSet();
+
 
     /**
      * the cash owned by the firm

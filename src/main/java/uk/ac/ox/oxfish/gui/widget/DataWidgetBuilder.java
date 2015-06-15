@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.gui.widget;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.jfree.data.general.Dataset;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -49,12 +51,11 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
         try {
             if (DataSet.class.isAssignableFrom(actualClass)) {
-                System.out.println(attributes.get("name") + " of: " + metawidget.getToInspect() + " is to be drawn!");
-
+                System.out.println("it's a dataset!'");
                 //create panel
-                GridLayout layout = new GridLayout(0, 1);
+                //todo figure out to make this nested
 
-                return buildDataSetPanel(layout, (DataSet) PropertyUtils.getProperty(metawidget.getToInspect(),
+                return buildDataSetPanel((DataSet) PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                                 attributes.get("name")));
 
             }
@@ -64,18 +65,40 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         }
 
 
+        //now imagine it is a list of data-sets
+        try {
+            //if it is a collection
+            if (Collection.class.isAssignableFrom(actualClass)) {
+                final Class<?> type = Class.forName(attributes.get("parameterized-type"));
+                if(DataSet.class.isAssignableFrom(type)) {
+                    System.out.println("it's a collection of datasets!");
+                    final Collection<DataSet> datasets = (Collection<DataSet>) PropertyUtils.getProperty(
+                            metawidget.getToInspect(),
+                            attributes.get("name"));
+                    //return a common tabbed pane
+                    JTabbedPane many = new JTabbedPane();
+                    int i=0;
+                    for(DataSet d : datasets)
+                        many.add("data :" + i++,buildDataSetPanel(d));
+                    return many;
+                }
+
+            }
+        } catch (InvocationTargetException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.err.println("failed to instantiate charting buttons!");
+        }
 
 
         return null;
     }
 
-    public JPanel buildDataSetPanel(
-            GridLayout layout, final DataSet<?> dataset) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        JPanel buttons = new JPanel(layout);
+    public JPanel buildDataSetPanel(final DataSet<?> dataset) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         //grab the actual data
         //contains the key
-        //todo figure out to make this nested
 
+        GridLayout layout = new GridLayout(0, 1);
+        JPanel buttons = new JPanel(layout);
 
         for(DataColumn column : dataset.getColumns()){
             JButton columnButton = new JButton(column.getName());
