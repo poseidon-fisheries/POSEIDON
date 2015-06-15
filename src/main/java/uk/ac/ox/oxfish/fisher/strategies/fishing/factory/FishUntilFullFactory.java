@@ -3,6 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /***
  *      ___ _   ___ _____ ___  _____   __
@@ -17,31 +19,19 @@ public class FishUntilFullFactory implements StrategyFactory<FishUntilFullStrate
     public FishUntilFullFactory() {
     }
 
-    private double minimumPercentageFull = 1;
+    private DoubleParameter minimumPercentageFull =  new FixedDoubleParameter(1);
 
-    public double getMinimumPercentageFull() {
+
+    public DoubleParameter getMinimumPercentageFull() {
         return minimumPercentageFull;
     }
 
-    public void setMinimumPercentageFull(double newValue) {
-        newValue =  FishState.round(newValue,2);
-
-        if(newValue < 0) {
-            System.err.println("Probability has to be in [0,1]. New value is ignored");
-            this.minimumPercentageFull = 0;
-        }
-        else
-        if(newValue  > 1) {
-            System.err.println("Probability has to be in [0,1]. New value is ignored");
-            this.minimumPercentageFull = 1;
-        }
-        else
-
-            this.minimumPercentageFull = newValue;
+    public void setMinimumPercentageFull(DoubleParameter minimumPercentageFull) {
+        this.minimumPercentageFull = minimumPercentageFull;
     }
 
     @Override
     public FishUntilFullStrategy apply(FishState state) {
-        return new FishUntilFullStrategy(getMinimumPercentageFull());
+        return new FishUntilFullStrategy(getMinimumPercentageFull().apply(state.random));
     }
 }

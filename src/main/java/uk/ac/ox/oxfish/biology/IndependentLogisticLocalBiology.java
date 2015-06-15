@@ -206,7 +206,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
     public void start(FishState model) {
 
         Preconditions.checkArgument(receipt==null,"Already started");
-        model.scheduleEveryYear(this, StepOrder.BEFORE_FISHER_PHASE);
+        model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
     }
 
     /**

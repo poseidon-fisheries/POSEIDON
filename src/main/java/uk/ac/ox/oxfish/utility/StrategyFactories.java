@@ -21,7 +21,7 @@ public class StrategyFactories {
 
 
     //notice the <? extends StrategyFactory>. It's the need for hacks like these that explains why so many engineers
-    //join terrorist organizations.
+    //join terrorist organizations.mason
     public static final Map<Class,Map<String,? extends Supplier<? extends StrategyFactory<?>>>> CONSTRUCTOR_MAP = new HashMap<>();
     public static final Map<Class,Map<? extends Class<? extends StrategyFactory>,String>> NAMES_MAP = new HashMap<>();
     static

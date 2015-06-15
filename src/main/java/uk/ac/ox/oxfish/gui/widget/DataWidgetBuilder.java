@@ -53,28 +53,9 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
                 //create panel
                 GridLayout layout = new GridLayout(0, 1);
-                JPanel buttons = new JPanel(layout);
-                //grab the actual data
-                //contains the key
-                //todo figure out to make this nested
-                final DataSet<?> toModify = (DataSet) PropertyUtils.getProperty(metawidget.getToInspect(), attributes.get("name"));
 
-
-                for(DataColumn column : toModify.getColumns()){
-                    JButton columnButton = new JButton(column.getName());
-                    //add it to panel
-                    buttons.add(columnButton);
-                    //on click starts the chart
-                    columnButton.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            DataCharter charter = new DataCharter(toModify.getPolicy(),column);
-                            charter.start(gui);
-                        }
-                    });
-                }
-
-                return buttons;
+                return buildDataSetPanel(layout, (DataSet) PropertyUtils.getProperty(metawidget.getToInspect(),
+                                                                                attributes.get("name")));
 
             }
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
@@ -82,6 +63,33 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             System.err.println("failed to instantiate charting buttons!");
         }
 
+
+
+
         return null;
+    }
+
+    public JPanel buildDataSetPanel(
+            GridLayout layout, final DataSet<?> dataset) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        JPanel buttons = new JPanel(layout);
+        //grab the actual data
+        //contains the key
+        //todo figure out to make this nested
+
+
+        for(DataColumn column : dataset.getColumns()){
+            JButton columnButton = new JButton(column.getName());
+            //add it to panel
+            buttons.add(columnButton);
+            //on click starts the chart
+            columnButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    DataCharter charter = new DataCharter(dataset.getPolicy(),column);
+                    charter.start(gui);
+                }
+            });
+        }
+        return buttons;
     }
 }

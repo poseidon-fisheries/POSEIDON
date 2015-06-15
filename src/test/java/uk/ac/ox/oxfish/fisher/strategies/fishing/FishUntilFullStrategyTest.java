@@ -5,6 +5,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -17,7 +18,7 @@ public class FishUntilFullStrategyTest {
     public void factoryTest() throws Exception {
 
         final FishUntilFullFactory factory = new FishUntilFullFactory();
-        factory.setMinimumPercentageFull(.5); //needs to be 50% full
+        factory.setMinimumPercentageFull(new FixedDoubleParameter(.5)); //needs to be 50% full
         final FishUntilFullStrategy strategy = factory.apply(mock(FishState.class));
 
         Fisher fisher = mock(Fisher.class);

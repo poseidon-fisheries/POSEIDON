@@ -38,7 +38,7 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
     public MonoQuotaRegulation(double yearlyQuota, FishState state) {
         this.yearlyQuota = yearlyQuota;
         this.quotaRemaining = yearlyQuota;
-        state.scheduleEveryYear(this, StepOrder.AFTER_FISHER_PHASE);
+        state.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
     }
 
     private boolean isFishingStillAllowed(){

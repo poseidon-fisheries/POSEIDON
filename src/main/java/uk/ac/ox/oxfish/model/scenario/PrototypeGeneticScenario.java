@@ -241,9 +241,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setDepartingStrategy(departingStrategy);
     }
 
-    public void setNumberOfSpecies(int numberOfSpecies) {
-        delegate.setNumberOfSpecies(numberOfSpecies);
-    }
 
     public int getMaxBiomass() {
         return delegate.getMaxBiomass();

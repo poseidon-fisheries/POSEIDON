@@ -10,7 +10,6 @@ import sim.engine.Steppable;
 import sim.field.grid.IntGrid2D;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
-import sim.portrayal.SimpleInspector;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
@@ -145,7 +144,7 @@ public class FishGUI extends GUIState{
             scheduleImmediatelyAfter(
                     simState1 -> fishingHotspots.setMap(new SimpleColorMap(0, (finalMax+1) *1.05, new Color(0, 0, 0, 0), Color.RED)));
 
-        }, StepOrder.BEFORE_FISHER_PHASE);
+        }, StepOrder.BIOLOGY_PHASE);
         //boats
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon)

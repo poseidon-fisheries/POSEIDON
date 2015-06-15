@@ -1,0 +1,66 @@
+  \documentclass[tikz]{standalone}
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\begin{document}
+\pagestyle{empty}
+
+
+% Define block styles
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{stepp} = [rectangle, draw, fill=red!40, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+    
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+   \node [stepp] (init1) {Step 1};
+   \node [block, right of=init1, node distance=3cm] (fish1) {Fishers Act};
+   \node [block, right of=fish1, node distance=3cm] (bio1) {Biology Model Acts};
+   \node [block, right of=bio1, node distance=3cm] (pol1) {Policy Updates};
+   \node [block, right of=pol1, node distance=3cm] (data1) {Data Gathered};
+   \node [stepp, below of=init1,node distance=3cm] (init2) {Step 2};
+   \node [block, right of=init2, node distance=3cm] (fish2) {Fishers Act};
+   \node [block, right of=fish2, node distance=3cm] (bio2) {Biology Model Acts};
+   \node [block, right of=bio2, node distance=3cm] (pol2) {Policy Updates};
+   \node [block, right of=pol2, node distance=3cm] (data2) {Data Gathered};
+   \node [stepp, below of=init2,node distance=3cm] (init3) {Step 3};
+
+\path [line] (init1) -- (fish1);
+\path [line] (fish1) -- (bio1);
+\path [line] (bio1) -- (pol1);
+\path [line] (pol1) -- (data1);
+\path [line] (data1)  --  (init2);
+
+
+\path [line] (init2) -- (fish2);
+\path [line] (fish2) -- (bio2);
+\path [line] (bio2) -- (pol2);
+\path [line] (pol2) -- (data2);
+\path [line] (data2) -- (init3);
+
+
+ %   \node [cloud, left of=init] (expert) {expert};
+%    \node [cloud, right of=init] (system) {system};
+ %   \node [block, below of=init] (identify) {identify candidate models};
+%    \node [block, below of=identify] (evaluate) {evaluate candidate models};
+%    \node [block, left of=evaluate, node distance=3cm] (update) {update model};
+%    \node [decision, below of=evaluate] (decide) {is best candidate better?};
+%    \node [block, below of=decide, node distance=3cm] (stop) {stop};
+    % Draw edges
+   % \path [line] (init) -- (identify);
+%    \path [line] (identify) -- (evaluate);
+%    \path [line] (evaluate) -- (decide);
+%    \path [line] (decide) -| node [near start] {yes} (update);
+%    \path [line] (update) |- (identify);
+%    \path [line] (decide) -- node {no}(stop);
+%    \path [line,dashed] (expert) -- (init);
+%    \path [line,dashed] (system) -- (init);
+%    \path [line,dashed] (system) |- (evaluate);
+\end{tikzpicture}
+\end{document}

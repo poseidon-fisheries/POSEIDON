@@ -28,7 +28,9 @@ import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -90,6 +92,8 @@ public class PrototypeScenario implements Scenario {
      * the number of fishers
      */
     private int fishers = 50;
+
+
 
     /**
      * Uses Caartesian distance
@@ -318,9 +322,6 @@ public class PrototypeScenario implements Scenario {
         return numberOfSpecies;
     }
 
-    public void setNumberOfSpecies(int numberOfSpecies) {
-        this.numberOfSpecies = numberOfSpecies;
-    }
 
 
     public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
