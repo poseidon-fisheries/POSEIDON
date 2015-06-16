@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
@@ -64,6 +65,14 @@ public class FishStateDailyDataSet extends DataSet<FishState> {
                                    value -> value.getData().getLatestObservation(earningsColumnName))
                                    .sum(),Double.NaN);
         }
+
+        final List<Fisher> fishers = state.getFishers();
+        //number of fishers
+        registerGather("Number of Fishers", ignored -> (double) fishers.size(),0d);
+        //fishers who are actually out
+        registerGather("Fishers at Sea", ignored -> fishers.stream().mapToDouble(
+                value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum(),0d);
+
 
         super.start(state, observed);
     }

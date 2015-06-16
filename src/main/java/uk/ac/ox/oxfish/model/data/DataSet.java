@@ -93,7 +93,7 @@ public class DataSet<T> implements Steppable
     public DataSet(IntervalPolicy policy, StepOrder stepOrder) {
         this.policy = policy;
         this.stepOrder = stepOrder;
-        data = new HashMap<>();
+        data = new LinkedHashMap<>();
         dataView = Collections.unmodifiableMap(data);
         gatherers = new HashMap<>();
     }
