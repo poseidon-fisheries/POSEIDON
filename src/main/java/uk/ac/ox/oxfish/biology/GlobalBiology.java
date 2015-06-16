@@ -33,7 +33,7 @@ public class GlobalBiology
 
 
     /**
-     * just a bunch of species with no particular properties
+     * instantiate a list of random species
      * @param numberOfSpecies the number of species
      */
     public static GlobalBiology genericListOfSpecies(int numberOfSpecies){

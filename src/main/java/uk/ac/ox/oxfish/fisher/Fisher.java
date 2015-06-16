@@ -25,7 +25,9 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import javax.xml.crypto.Data;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The boat catching all that delicious fish.
@@ -107,7 +109,12 @@ public class Fisher implements Steppable{
      */
     private Hold hold;
 
+    /**
+     * what is used for fishing
+     */
     private Gear gear;
+
+
 
     /***
      *      ___ _            _            _

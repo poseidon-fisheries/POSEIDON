@@ -9,6 +9,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -20,6 +21,7 @@ import uk.ac.ox.oxfish.model.scenario.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,6 +41,8 @@ public class FishState  extends SimState{
     private List<Fisher> fishers;
 
     private List<Startable> toStart;
+
+    private final FishStateDailyDataSet dailyDataSet = new FishStateDailyDataSet();
 
 
 
@@ -80,6 +84,8 @@ public class FishState  extends SimState{
 
     }
 
+
+
     /**
      * so far it does the following:
      *  * read in the data into a the raster
@@ -105,12 +111,13 @@ public class FishState  extends SimState{
         for(Fisher fisher : fishers)
                 fisher.start(this);
         //start the markets (for each port
-        for(Port port : map.getPorts())
+        for(Port port : getPorts())
             for(Market market : port.getMarkets().asList())
                 market.start(this);
 
         for(Startable startable : toStart)
                 startable.start(this);
+        dailyDataSet.start(this,this);
         started=true;
 
 
@@ -120,6 +127,22 @@ public class FishState  extends SimState{
 
 
 
+    }
+
+    /**
+     * a short-cut from map.getPorts()
+     * @return the set of ports in the model
+     */
+    public HashSet<Port> getPorts() {
+        return map.getPorts();
+    }
+
+    /**
+     *
+     * @return an unmodifiable list of all the species available
+     */
+    public List<Specie> getSpecies() {
+        return biology.getSpecies();
     }
 
     public NauticalMap getMap() {
@@ -259,5 +282,9 @@ public class FishState  extends SimState{
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public FishStateDailyDataSet getDailyDataSet() {
+        return dailyDataSet;
     }
 }

@@ -7,9 +7,7 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import javax.xml.crypto.Data;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -31,6 +29,8 @@ public class DataSet<T> implements Steppable
      * if this is true, gather data every year. Otherwise gather data step every step
      */
     private final IntervalPolicy policy;
+
+    private final StepOrder stepOrder;
 
     private T observed;
 
@@ -68,7 +68,7 @@ public class DataSet<T> implements Steppable
         assert  this.observed == null;
         this.observed = observed;
 
-        receipt = state.schedulePerPolicy(this,StepOrder.DATA_GATHERING,policy);
+        receipt = state.schedulePerPolicy(this,stepOrder,policy);
 
 
     }
@@ -90,12 +90,16 @@ public class DataSet<T> implements Steppable
     }
 
 
-
-    public DataSet(IntervalPolicy policy) {
+    public DataSet(IntervalPolicy policy, StepOrder stepOrder) {
         this.policy = policy;
+        this.stepOrder = stepOrder;
         data = new HashMap<>();
         dataView = Collections.unmodifiableMap(data);
         gatherers = new HashMap<>();
+    }
+
+    public DataSet(IntervalPolicy policy) {
+       this(policy,StepOrder.INDIVIDUAL_DATA_GATHERING);
     }
 
     public boolean isEmpty(){
@@ -132,6 +136,11 @@ public class DataSet<T> implements Steppable
         return dataView;
     }
 
+
+    public double getLatestObservation(String columnName)
+    {
+        return data.get(columnName).getLatest();
+    }
     /**
      * get a specific column
      */

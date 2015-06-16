@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.Markets;
 
 import java.util.*;
@@ -21,6 +23,8 @@ public class Port {
      * the location of the port
      */
     private final SeaTile location;
+
+
 
     /**
      *  the markets available at this port
@@ -93,5 +97,7 @@ public class Port {
         return markets;
     }
 
-
+    public Market getMarket(Specie specie) {
+        return markets.getMarket(specie);
+    }
 }

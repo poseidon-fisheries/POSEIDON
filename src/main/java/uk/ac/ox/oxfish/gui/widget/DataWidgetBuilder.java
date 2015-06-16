@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.gui.widget;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.jfree.data.general.Dataset;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
@@ -19,7 +18,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * For every Dataset add a bunch of buttons to plot that column
+ * For every Dataset add a bunch of buttons to plot that column. Also do that for every Collection or Map or Maps of maps.
+ * They could all be strictly different builders, but this way i lower the amount of useless code replication
  * Created by carrknight on 6/13/15.
  */
 public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidget>{
@@ -55,8 +55,8 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                 //create panel
                 //todo figure out to make this nested
 
-                return buildDataSetPanel((DataSet) PropertyUtils.getProperty(metawidget.getToInspect(),
-                                                                                attributes.get("name")));
+                return buildDataSetPanel((DataSet) PropertyUtils.getNestedProperty(metawidget.getToInspect(),
+                                                                                   attributes.get("name")));
 
             }
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
@@ -66,13 +66,15 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
 
         //now imagine it is a list of data-sets
+        final String parametrizedType = attributes.get("parameterized-type");
+
         try {
             //if it is a collection
-            if (Collection.class.isAssignableFrom(actualClass)) {
-                final Class<?> type = Class.forName(attributes.get("parameterized-type"));
+            if (Collection.class.isAssignableFrom(actualClass) && parametrizedType != null) {
+                final Class<?> type = Class.forName(parametrizedType);
                 if(DataSet.class.isAssignableFrom(type)) {
                     System.out.println("it's a collection of datasets!");
-                    final Collection<DataSet> datasets = (Collection<DataSet>) PropertyUtils.getProperty(
+                    final Collection<DataSet> datasets = (Collection<DataSet>) PropertyUtils.getNestedProperty(
                             metawidget.getToInspect(),
                             attributes.get("name"));
                     //return a common tabbed pane
@@ -89,11 +91,103 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             System.err.println("failed to instantiate charting buttons!");
         }
 
+        //now imagine it's a map of data-sets
+        try {
+            //if it is a map
+            if (Map.class.isAssignableFrom(actualClass) && parametrizedType != null) {
+
+                if(DataSet.class.isAssignableFrom(whatIsTheMapHolding(parametrizedType)))
+                {
+                    final Map<?, DataSet> datasets = (Map<?, DataSet>) PropertyUtils.getNestedProperty(
+                            metawidget.getToInspect(),
+                            attributes.get("name"));
+
+                    return buildMapTabbedPane(datasets);
+                }
+
+            }
+
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("failed to instantiate charting buttons!");
+        }
+
+        //finally what if it is a map of maps?
+        try {
+            //if it is a map
+            if (Map.class.isAssignableFrom(actualClass) && parametrizedType != null ) {
+                //and it holds a map
+                if(Map.class.isAssignableFrom(whatIsTheMapHolding(parametrizedType)))
+                {
+                    //grab everything inside the < >
+                    String typeOfType = parametrizedType.substring(parametrizedType.indexOf("<"),
+                                                                   parametrizedType.lastIndexOf(">") + 1);
+                    //is that a valid map?
+                    if(DataSet.class.isAssignableFrom(whatIsTheMapHolding(typeOfType)))
+                    {
+                        final Map<?,Map<?, DataSet>> datasets = (Map<?,Map<?, DataSet>>) PropertyUtils.getNestedProperty(
+                                metawidget.getToInspect(),
+                                attributes.get("name"));
+
+                        //return a common tabbed pane
+                        JTabbedPane many = new JTabbedPane();
+                        int i=0;
+                        for(Map.Entry<?, Map<?,DataSet>> md : datasets.entrySet())
+                        {
+                            many.add(buildMapTabbedPane(md.getValue()));
+                        }
+                        return many;
+                    }
+                }
+
+            }
+
+            return null;
+
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("failed to instantiate charting buttons!");
+        }
+
 
         return null;
     }
 
-    public JPanel buildDataSetPanel(final DataSet<?> dataset) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public JComponent buildMapTabbedPane(Map<?, DataSet> datasets) {
+        //return a common tabbed pane
+        JTabbedPane many = new JTabbedPane();
+        int i=0;
+        for(Map.Entry<?, DataSet> d : datasets.entrySet())
+        {
+                many.add(d.getKey().toString(),buildDataSetPanel(d.getValue()));
+        }
+        return many;
+    }
+
+    /**
+     * gets what the map supposedly has as values. If it doesn't hold anything. Returns Object.class
+     * @throws ClassNotFoundException
+     */
+    private Class whatIsTheMapHolding(String parametrizedType) throws ClassNotFoundException {
+        if(parametrizedType == null)
+            return Object.class;
+        try {
+            //notice here that i want the second type (it's a map) and I want it cleared of subtype
+
+            String typeName = parametrizedType.split(",")[1];
+            if (typeName == null || typeName.length() < 1)
+                return Object.class;
+            //remove subtype, if necessary
+            typeName = typeName.replaceAll("<.*?> ?", "");
+            //is it a map of datasets?
+            return Class.forName(typeName);
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            return Object.class;
+        }
+    }
+
+    public JPanel buildDataSetPanel(final DataSet<?> dataset) {
         //grab the actual data
         //contains the key
 
@@ -115,4 +209,41 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         }
         return buttons;
     }
+
+
+    //stolen from: http://stackoverflow.com/a/19136617/975904
+    private String removeParentheses(String toClean)
+    {
+        int open = 0;
+        int closed = 0;
+        boolean changed = true;
+        int startIndex = 0, openIndex = -1, closeIndex = -1;
+
+        while (changed) {
+            changed = false;
+            for (int a = startIndex; a < toClean.length(); a++) {
+                if (toClean.charAt(a) == '<') {
+                    open++;
+                    if (open == 1) {
+                        openIndex = a;
+                    }
+                } else if (toClean.charAt(a) == '>') {
+                    closed++;
+                    if (open == closed) {
+                        closeIndex = a;
+                        toClean = toClean.substring(0, openIndex)
+                                + toClean.substring(closeIndex + 1);
+                        changed = true;
+                        break;
+                    }
+                } else {
+                    if (open == 0)
+                        startIndex++;
+                }
+            }
+        }
+        return toClean;
+    }
+
+
 }

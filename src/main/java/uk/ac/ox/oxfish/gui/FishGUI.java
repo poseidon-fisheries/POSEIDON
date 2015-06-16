@@ -46,6 +46,9 @@ public class FishGUI extends GUIState{
     private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
     private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
+    private final JPanel aggregateData = new JPanel();
+
+
     /**
      * create a random fishstate with seed = milliseconds since epoch
      */
@@ -165,6 +168,11 @@ public class FishGUI extends GUIState{
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
         display2D.repaint();
+
+
+        //build aggregate data
+        ((Console)controller).getTabPane().add("Aggregate Data",new MetaInspector(new FishStateProxy(state), self) );
+
 
 
 

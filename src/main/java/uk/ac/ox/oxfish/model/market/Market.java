@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.function.Function;
@@ -67,4 +68,19 @@ public interface Market extends Startable {
         return new TradeInfo(biomassActuallySellable,specie,revenue);
 
     }
+
+
+    /**
+     * specie this market relates to
+     * @return
+     */
+    public Specie getSpecie();
+
+    /**
+     * get the daily data of this market
+     * @return
+     */
+    public DataSet<Market> getData();
+
+
 }
