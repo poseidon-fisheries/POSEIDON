@@ -16,6 +16,9 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
 {
 
 
+    public static final String CASH_COLUMN = "CASH";
+    public static final String CASH_FLOW_COLUMN = "NET_CASH_FLOW";
+
     public YearlyFisherDataSet() {
         super(IntervalPolicy.EVERY_YEAR);
     }
@@ -29,9 +32,9 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
     @Override
     public void start(FishState state, Fisher observed) {
         //CASH
-        registerGather("CASH", Fisher::getCash,Double.NaN);
+        registerGather(CASH_COLUMN, Fisher::getCash,Double.NaN);
 
-        registerGather("NET_CASH_FLOW", new Function<Fisher, Double>() {
+        registerGather(CASH_FLOW_COLUMN, new Function<Fisher, Double>() {
             double oldCash = observed.getCash();
             @Override
             public Double apply(Fisher fisher) {

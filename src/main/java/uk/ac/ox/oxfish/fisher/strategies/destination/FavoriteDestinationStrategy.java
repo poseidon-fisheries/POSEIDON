@@ -33,6 +33,23 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
         this.favoriteSpot = map.getRandomBelowWaterLineSeaTile(random);
     }
 
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+
+    }
+
     /**
      * decides where to go.
      *

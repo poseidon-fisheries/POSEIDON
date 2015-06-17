@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Markets;
@@ -56,9 +57,25 @@ public class FishingTest {
                                    new AnarchyFactory().apply(fishState),
                                    new FixedProbabilityDepartingStrategy(1.0),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 0)),
-                                   (fisher1, random, model) -> true,
+                                   new FishingStrategy() {
+                                       @Override
+                                       public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
+                                                                 FishState model) {
+                                           return true;
+                                       }
+
+                                       @Override
+                                       public void start(FishState model) {
+
+                                       }
+
+                                       @Override
+                                       public void turnOff() {
+
+                                       }
+                                   },
                                    new Boat(100.0),
-                                   new Hold(100.0,1),
+                                   new Hold(100.0, 1),
                                    gear);
         fisher.step(fishState);
 

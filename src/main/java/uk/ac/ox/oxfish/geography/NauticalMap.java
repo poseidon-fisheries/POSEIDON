@@ -223,7 +223,16 @@ public class NauticalMap implements Startable
             }
     }
 
+    /**
+     * returns sea tile at that coordinates. If it isn't there returns null
+     * @param gridX the x coordinate of the cell
+     * @param gridY the y coordinate of the cell
+     * @return the cell or null if there isn't anything
+     */
     public SeaTile getSeaTile(int gridX, int gridY) {
+        if(rasterBackingGrid.getHeight() <= gridY || rasterBackingGrid.getWidth() <= gridX
+                 || gridX < 0 || gridY <0)
+            return null;
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 

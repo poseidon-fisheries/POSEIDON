@@ -27,7 +27,21 @@ public class FishOnceStrategy implements FishingStrategy {
     }
 
 
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model) {
 
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
+
+    }
 }
 
 

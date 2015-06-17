@@ -94,7 +94,7 @@ public class FishState  extends SimState{
     public void start() {
         super.start();
 
-        ScenarioResult initialization = scenario.start(this);
+        ScenarioEssentials initialization = scenario.start(this);
 
         //read raster bathymetry
         //  map = NauticalMap.initializeWithDefaultValues();
@@ -103,8 +103,8 @@ public class FishState  extends SimState{
 
         biology = initialization.getBiology();
 
-        fishers = initialization.getAgents();
 
+        fishers = scenario.populateModel(this);
 
         map.start(this);
         //start the fishers

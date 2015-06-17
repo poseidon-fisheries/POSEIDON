@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -31,6 +32,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
 
+    private ScenarioEssentials result;
 
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
@@ -40,14 +42,29 @@ public abstract class PrototypeGeneticScenario implements Scenario {
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
     @Override
-    public ScenarioResult start(FishState model) {
+    public ScenarioEssentials start(FishState model) {
 
         //modify the scenario before starting, if needed
         modifyPrototypeScenario(delegate, model);
 
-        ScenarioResult result = delegate.start(model);
+        result = delegate.start(model);
         //modify results, if needed
         result = modifyScenarioResult(result);
+
+        return result;
+    }
+
+    /**
+     * called shortly after the essentials are set, it is time now to return a list of all the agents
+     *
+     * @param model the model
+     * @return a list of agents
+     */
+    @Override
+    public List<Fisher> populateModel(FishState model) {
+        List<Fisher> fishers = delegate.populateModel(model);
+
+
 
         //get the required functions
         Factory<Genotype<DoubleGene>> factory = generateGenotypeFactory(result);
@@ -62,10 +79,9 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
         //set it up
         model.registerStartable(evolution);
+        return fishers;
 
-        return result;
     }
-
 
     /**
      * if we need to change anything of the prototype scenario, do it here
@@ -79,28 +95,28 @@ public abstract class PrototypeGeneticScenario implements Scenario {
      * @param result the result of starting the scenario
      * @return the final result
      */
-    protected abstract ScenarioResult modifyScenarioResult(ScenarioResult result);
+    protected abstract ScenarioEssentials modifyScenarioResult(ScenarioEssentials result);
 
     /**
      * the factory that generates new random genotypes
      * @param result the scenario result, if you need to focus on it
      * @return the factory
      */
-    protected abstract Factory<Genotype<DoubleGene>> generateGenotypeFactory(ScenarioResult result);
+    protected abstract Factory<Genotype<DoubleGene>> generateGenotypeFactory(ScenarioEssentials result);
 
     /**
      * the function that transforms fishers to genotypes ready to be optimized
      * @param result the scenario result
      * @return the transformer
      */
-    protected abstract Function<Fisher,Genotype<DoubleGene>> generateFisherToGenotypeTransformer(ScenarioResult result);
+    protected abstract Function<Fisher,Genotype<DoubleGene>> generateFisherToGenotypeTransformer(ScenarioEssentials result);
 
     /**
      * the function that modifies fishers with their new genotype
      * @param result the scenario result
      * @return the adapter
      */
-    protected abstract Consumer<Pair<Fisher,Genotype<DoubleGene>>> generateFisherAdapterToNewGenotype(ScenarioResult result);
+    protected abstract Consumer<Pair<Fisher,Genotype<DoubleGene>>> generateFisherAdapterToNewGenotype(ScenarioEssentials result);
 
     public void setDepthSmoothing(int depthSmoothing) {
         delegate.setDepthSmoothing(depthSmoothing);

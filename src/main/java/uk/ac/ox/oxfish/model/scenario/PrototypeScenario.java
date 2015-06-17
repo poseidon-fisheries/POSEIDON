@@ -11,7 +11,8 @@ import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
@@ -21,14 +22,12 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
-import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -122,6 +121,10 @@ public class PrototypeScenario implements Scenario {
     private StrategyFactory<? extends DepartingStrategy> departingStrategy = new FixedProbabilityDepartingFactory();
 
     /**
+     * factory to produce departing strategy
+     */
+    private StrategyFactory<? extends DestinationStrategy> destinationStrategy = new RandomFavoriteDestinationFactory();
+    /**
      * factory to produce fishing strategy
      */
     private StrategyFactory<? extends FishingStrategy> fishingStrategy = new FishUntilFullFactory();
@@ -148,7 +151,7 @@ public class PrototypeScenario implements Scenario {
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
     @Override
-    public ScenarioResult start(FishState model) {
+    public ScenarioEssentials start(FishState model) {
 
         MersenneTwisterFast random = model.random;
 
@@ -173,7 +176,26 @@ public class PrototypeScenario implements Scenario {
 
 
 
+
+
+        return new ScenarioEssentials(biology,map,markets);
+    }
+
+
+    /**
+     * called shortly after the essentials are set, it is time now to return a list of all the agents
+     *
+     * @param model the model
+     * @return a list of agents
+     */
+    @Override
+    public List<Fisher> populateModel(FishState model) {
+
         LinkedList<Fisher> fisherList = new LinkedList<>();
+        final NauticalMap map = model.getMap();
+        final GlobalBiology biology = model.getBiology();
+        final MersenneTwisterFast random = model.random;
+
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
         for(int i=0;i<fishers;i++)
         {
@@ -185,7 +207,7 @@ public class PrototypeScenario implements Scenario {
             fisherList.add(new Fisher(port, random,
                                       regulation.apply(model),
                                       departing,
-                                      new FavoriteDestinationStrategy(map,random),
+                                      destinationStrategy.apply(model),
                                       fishingStrategy.apply(model),
                                       new Boat(speed),
                                       new Hold(capacity, biology.getSize()),
@@ -193,11 +215,8 @@ public class PrototypeScenario implements Scenario {
             ));
         }
 
-
-
-        return new ScenarioResult(biology,map,fisherList,markets);
+        return fisherList;
     }
-
 
     public int getCoastalRoughness() {
         return coastalRoughness;
@@ -349,5 +368,14 @@ public class PrototypeScenario implements Scenario {
 
     public void setHoldSize(DoubleParameter holdSize) {
         this.holdSize = holdSize;
+    }
+
+    public StrategyFactory<? extends DestinationStrategy> getDestinationStrategy() {
+        return destinationStrategy;
+    }
+
+    public void setDestinationStrategy(
+            StrategyFactory<? extends DestinationStrategy> destinationStrategy) {
+        this.destinationStrategy = destinationStrategy;
     }
 }

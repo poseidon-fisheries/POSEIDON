@@ -150,4 +150,22 @@ public class RandomThenBackToPortDestinationStrategyTest {
         return model;
     }
 
+    public static FishState generateSimpleSquareMap(int size) {
+        ObjectGrid2D grid2D = new ObjectGrid2D(size,size);
+
+        for(int i=0; i<size; i++)
+            for(int j=0; j<size; j++)
+            {
+                grid2D.field[i][j] = new SeaTile(i,j,-100);
+            }
+
+        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
+                                          new EquirectangularDistance(0.0,1));
+        FishState model = mock(FishState.class);
+        when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
+        return model;
+    }
+
 }

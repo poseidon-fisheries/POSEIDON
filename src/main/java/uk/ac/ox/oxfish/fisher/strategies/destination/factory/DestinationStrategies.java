@@ -36,6 +36,9 @@ public class DestinationStrategies
         CONSTRUCTORS.put("Always Random",
                          RandomThenBackToPortFactory::new);
         NAMES.put(RandomThenBackToPortFactory.class,"Always Random");
+        CONSTRUCTORS.put("HillClimber",
+                         HillClimberDestinationFactory::new);
+        NAMES.put(HillClimberDestinationFactory.class,"HillClimber");
 
     }
 

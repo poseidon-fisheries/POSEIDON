@@ -10,20 +10,20 @@ import java.util.List;
 /**
  * All the objects that I expect were created by a Scenario
  */
-public class ScenarioResult {
+public class ScenarioEssentials {
 
     private final GlobalBiology biology;
 
     private final NauticalMap map;
 
-    private final List<Fisher> agents;
+    private final Markets markets;
 
 
-    public ScenarioResult(
-            GlobalBiology biology, NauticalMap map, List<Fisher> agents, Markets markets) {
+    public ScenarioEssentials(
+            GlobalBiology biology, NauticalMap map, Markets markets) {
         this.biology = biology;
         this.map = map;
-        this.agents = agents;
+        this.markets = markets;
     }
 
     public GlobalBiology getBiology() {
@@ -34,8 +34,8 @@ public class ScenarioResult {
         return map;
     }
 
-    public List<Fisher> getAgents() {
-        return agents;
-    }
 
+    public Markets getMarkets() {
+        return markets;
+    }
 }

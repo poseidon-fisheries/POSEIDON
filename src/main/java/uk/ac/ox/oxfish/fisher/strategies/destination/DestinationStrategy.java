@@ -5,12 +5,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 
 /**
  * Decision-making of the fisher to choose where to go next!
  * Created by carrknight on 4/19/15.
  */
-public interface DestinationStrategy {
+public interface DestinationStrategy extends Startable {
 
 
     /**

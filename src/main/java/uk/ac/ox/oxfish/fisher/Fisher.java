@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -19,6 +20,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -36,7 +38,7 @@ import java.util.Map;
  * Strategies are instead the fisher way to deal with decision points (should I go fish or not? Where do I go?)
  * Created by carrknight on 4/2/15.
  */
-public class Fisher implements Steppable{
+public class Fisher implements Steppable, Startable{
 
     /***
      *     __   __        _      _    _
@@ -84,6 +86,13 @@ public class Fisher implements Steppable{
      * the data gatherer that fires once a year
      */
     private final YearlyFisherDataSet yearlyDataGatherer = new YearlyFisherDataSet();
+
+
+    /**
+     * a link to the model. Got when start() is called. It's not used or shared except when a new strategy is plugged in
+     * at which point this reference is used to call their start
+     */
+    private FishState state;
 
 
     /**
@@ -140,6 +149,10 @@ public class Fisher implements Steppable{
      */
     private FishingStrategy fishingStrategy;
 
+    /**
+     * the stop switch to call when the fisher is turned off
+     */
+    private Stoppable receipt;
 
 
     public Fisher(
@@ -177,8 +190,29 @@ public class Fisher implements Steppable{
     public void start(FishState state)
     {
 
-        state.schedule.scheduleRepeating(this);
+        this.state = state;
+        receipt = state.schedule.scheduleRepeating(this);
         yearlyDataGatherer.start(state,this);
+
+        //start the strategies
+        destinationStrategy.start(state);
+        fishingStrategy.start(state);
+        departingStrategy.start(state);
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        receipt.stop();
+        yearlyDataGatherer.stop();
+        destinationStrategy.turnOff();
+
+        //start the strategies
+        destinationStrategy.start(state);
+        fishingStrategy.start(state);
+        departingStrategy.start(state);
     }
 
     @Override
@@ -288,12 +322,22 @@ public class Fisher implements Steppable{
         return boat.getHoursTravelledToday();
     }
 
-    public void setDestinationStrategy(DestinationStrategy destinationStrategy) {
-        this.destinationStrategy = destinationStrategy;
+    public void setDestinationStrategy(DestinationStrategy newStrategy) {
+        this.destinationStrategy = newStrategy;
+        if(state != null) //if we have started already
+        {
+            newStrategy.turnOff(); //turn off old strategy
+            destinationStrategy.start(state);
+        }
     }
 
-    public void setDepartingStrategy(DepartingStrategy departingStrategy) {
-        this.departingStrategy = departingStrategy;
+    public void setDepartingStrategy(DepartingStrategy newStrategy) {
+        this.departingStrategy = newStrategy;
+        if(state != null) //if we have started already
+        {
+            newStrategy.turnOff(); //turn off old strategy
+            departingStrategy.start(state);
+        }
     }
 
     public DepartingStrategy getDepartingStrategy() {
@@ -308,8 +352,14 @@ public class Fisher implements Steppable{
         return fishingStrategy;
     }
 
-    public void setFishingStrategy(FishingStrategy fishingStrategy) {
-        this.fishingStrategy = fishingStrategy;
+    public void setFishingStrategy(FishingStrategy newStrategy) {
+
+        this.fishingStrategy = newStrategy;
+        if(state != null) //if we have started already
+        {
+            newStrategy.turnOff(); //turn off old strategy
+            fishingStrategy.start(state);
+        }
     }
 
     public boolean shouldIFish(FishState state)
@@ -406,6 +456,13 @@ public class Fisher implements Steppable{
     public DataSet getYearlyData() {
         return yearlyDataGatherer;
 
+    }
+
+    /**
+     * shortcut for getYearlyData().getLatestObservation(columnName)
+     */
+    public double getLatestYearlyObservation(String columnName) {
+        return yearlyDataGatherer.getLatestObservation(columnName);
     }
 
     public double getCash(){

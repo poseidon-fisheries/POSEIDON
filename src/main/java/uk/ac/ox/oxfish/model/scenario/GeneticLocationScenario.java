@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -59,7 +58,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      * ignored
      */
     @Override
-    protected ScenarioResult modifyScenarioResult(ScenarioResult result) {
+    protected ScenarioEssentials modifyScenarioResult(ScenarioEssentials result) {
 
 
         /*
@@ -80,7 +79,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected Factory<Genotype<DoubleGene>> generateGenotypeFactory(
-            ScenarioResult result)
+            ScenarioEssentials result)
     {
         //two chromosomes, one is the location proper, the other is just a random key
         //x,y as a proportion of the total width and height
@@ -98,7 +97,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected Function<Fisher, Genotype<DoubleGene>> generateFisherToGenotypeTransformer(
-            ScenarioResult result) {
+            ScenarioEssentials result) {
 
 
 
@@ -129,7 +128,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
      */
     @Override
     protected Consumer<Pair<Fisher, Genotype<DoubleGene>>> generateFisherAdapterToNewGenotype(
-            ScenarioResult result) {
+            ScenarioEssentials result) {
 
         NauticalMap map = result.getMap();
 

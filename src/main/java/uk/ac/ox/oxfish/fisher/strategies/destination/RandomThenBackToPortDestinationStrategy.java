@@ -53,8 +53,23 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
     }
 
 
+    /**
+     * ignored
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(FishState model) {
 
+    }
 
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
+
+    }
 }
 
 
