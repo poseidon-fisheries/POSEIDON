@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -11,12 +10,15 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
+import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
+import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 
 /**
- * A random hill-climber, every year randomly shocking its favorite destination and comparing it with the previous one
+ * A strategy that every year iteratively tries a new sea-patch to fish on. It uses net cash-flow as a fitness value
+ * to decide whether the new sea-patch is better than the one before
  * Created by carrknight on 6/17/15.
  */
-public class HillClimberDestinationStrategy implements DestinationStrategy, Steppable
+public class YearlyIterativeDestinationStrategy implements DestinationStrategy, Steppable
 {
 
 
@@ -35,25 +37,14 @@ public class HillClimberDestinationStrategy implements DestinationStrategy, Step
      */
     private double previousYearCashFlow =  Double.NaN;
 
-    /**
-     * when we randomly choose a new sea-tile, how far (in grid terms) do we look?
-     */
-    private int maxStepSize = 5;
 
-    /**
-     * how many random attempts we make to find a new sea-tile before giving up (failures are things like choosing a land
-     * sea-tile, a port or similar)
-     */
-    private int attempts = 20;
+    private IterativeMovement algorithm;
 
     /**
      * this gets set when chooseDestination is called the first time. I am assuming that it's called more than once a year
      */
     private Fisher fisher;
 
-    private final NauticalMap map;
-
-    private final MersenneTwisterFast random;
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -68,28 +59,30 @@ public class HillClimberDestinationStrategy implements DestinationStrategy, Step
         model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
     }
 
-    public HillClimberDestinationStrategy(
+    public YearlyIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate, NauticalMap map, MersenneTwisterFast random)
     {
-        this.delegate = delegate;
-        this.map = map;
-        this.random = random;
+        this(delegate,new HillClimbingMovement(map,random));
     }
 
+    public YearlyIterativeDestinationStrategy(
+            FavoriteDestinationStrategy delegate, IterativeMovement algorithm)
+    {
+        this.delegate = delegate;
+        this.algorithm = algorithm;
+    }
 
-    public HillClimberDestinationStrategy(
+    public YearlyIterativeDestinationStrategy(
             NauticalMap map, MersenneTwisterFast random)
     {
-        this.delegate = new FavoriteDestinationStrategy(map,random);
-        this.random = random;
-        this.map = map;
+        this(new FavoriteDestinationStrategy(map,random),map,random);
+
     }
 
-    public HillClimberDestinationStrategy(SeaTile tile, NauticalMap map, MersenneTwisterFast random)
+    public YearlyIterativeDestinationStrategy(SeaTile tile, NauticalMap map, MersenneTwisterFast random)
     {
-        this.delegate = new FavoriteDestinationStrategy(tile);
-        this.map = map;
-        this.random = random;
+        this(new FavoriteDestinationStrategy(tile),map,random);
+
     }
 
     /**
@@ -113,30 +106,13 @@ public class HillClimberDestinationStrategy implements DestinationStrategy, Step
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
         if(this.fisher == null)
             this.fisher = fisher;
-        assert this.fisher == fisher : "the hill-climber is a personal strategy and should not be shared";
+        assert this.fisher == fisher : "YearlyIterativeDestinationStrategy is a personal strategy and should not be shared";
 
         return delegate.chooseDestination(fisher,random,model,currentAction);
     }
 
 
-    private SeaTile randomStep()
-    {
-        assert  fisher != null; //can't be called otherwise
 
-        SeaTile current = delegate.getFavoriteSpot();
-        for(int i=0; i<attempts; i++)
-        {
-            int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStepSize+1) : -random.nextInt(maxStepSize+1));
-            int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStepSize+1) : -random.nextInt(maxStepSize+1));
-            SeaTile candidate = map.getSeaTile(x,y);
-            if(candidate != null && candidate.getAltitude() < 0 && !fisher.getHomePort().getLocation().equals(candidate))
-                return candidate;
-        }
-
-        //stay where you are
-        return current;
-
-    }
 
     @Override
     public void step(SimState simState) {
@@ -152,33 +128,8 @@ public class HillClimberDestinationStrategy implements DestinationStrategy, Step
         assert current != null;
         assert Double.isFinite(currentCashFlow);
 
-
-
-
-        //if you didn't move before (or you are stuck) you don't have a gradient yet so just try a new step
-        if(previousLocation == null || Double.isNaN(previousYearCashFlow) || previousLocation== current )
-        {
-            SeaTile candidate = randomStep();
-            //it is a valid candidate because the check is done by randomStep(.)
-            delegate.setFavoriteSpot(candidate);
-
-        }
-
-        //not your first step and the step is meaningful
-        else {
-            //was it (strictly) better before?
-            if(currentCashFlow<previousYearCashFlow)
-            {
-                //go back!
-                delegate.setFavoriteSpot(previousLocation);
-
-            }
-            //otherwise randomize from here
-            SeaTile candidate = randomStep();
-            //it is a valid candidate because the check is done by randomStep(.)
-            delegate.setFavoriteSpot(candidate);
-
-        }
+        //adapt!
+        delegate.setFavoriteSpot(algorithm.adapt(previousLocation,current,previousYearCashFlow,currentCashFlow));
 
         //record
         previousLocation = current;
@@ -193,20 +144,13 @@ public class HillClimberDestinationStrategy implements DestinationStrategy, Step
 
     }
 
-    public int getAttempts() {
-        return attempts;
+
+    public IterativeMovement getAlgorithm() {
+        return algorithm;
     }
 
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
-    }
-
-    public int getMaxStepSize() {
-        return maxStepSize;
-    }
-
-    public void setMaxStepSize(int maxStepSize) {
-        this.maxStepSize = maxStepSize;
+    public void setAlgorithm(IterativeMovement algorithm) {
+        this.algorithm = algorithm;
     }
 
     public SeaTile getPreviousLocation() {

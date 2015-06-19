@@ -21,7 +21,6 @@ public class AtPort implements Action {
     @Override
     public ActionResult act(FishState model, Fisher agent, Regulation regulation)
     {
-        agent.setStepsAtSea(0); //reset at sea counter
 
         if(regulation.allowedAtSea(agent, model)
                 &&
@@ -29,7 +28,7 @@ public class AtPort implements Action {
         {
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
-            agent.getHomePort().depart(agent);
+            agent.undock();
             return new ActionResult(new Moving(),true);
         }
         else //if you don't want to leave port, stay home

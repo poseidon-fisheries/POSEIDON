@@ -63,7 +63,7 @@ public class Port {
     {
         boolean wasHere =fishersHere.remove(fisher);
         if(!wasHere)
-            throw new IllegalStateException(fisher +" called depart() but wasn't in the list of docked fishers ");
+            throw new IllegalStateException(fisher +" called undock() but wasn't in the list of docked fishers ");
         assert !fishersHere.contains(fisher); //shouldn't be here anymore
 
     }

@@ -34,10 +34,9 @@ public class Docking implements Action{
         assert agent.isAtDestination();
         assert !port.isDocked(agent); //shouldn't have docked already!
 
-        //land
-        port.dock(agent);
 
-        //now sell
+
+        //sell your stuff
         Catch toSell = agent.unload();
         GlobalBiology biology = model.getBiology();
 
@@ -50,6 +49,9 @@ public class Docking implements Action{
                 //this should take care of everything
                 markets.getMarket(specie).sellFish(biomass,agent, regulation,model);
         }
+
+        //anchor
+        agent.dock();
 
         assert agent.getLocation().equals(port.getLocation());
         assert agent.isAtDestination();

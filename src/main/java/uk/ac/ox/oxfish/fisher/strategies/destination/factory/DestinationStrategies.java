@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.RandomThenBackToPortDestinationStrategy;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 import java.util.LinkedHashMap;
@@ -36,9 +34,12 @@ public class DestinationStrategies
         CONSTRUCTORS.put("Always Random",
                          RandomThenBackToPortFactory::new);
         NAMES.put(RandomThenBackToPortFactory.class,"Always Random");
-        CONSTRUCTORS.put("HillClimber",
-                         HillClimberDestinationFactory::new);
-        NAMES.put(HillClimberDestinationFactory.class,"HillClimber");
+        CONSTRUCTORS.put("Yearly HillClimber",
+                         YearlyIterativeDestinationFactory::new);
+        NAMES.put(YearlyIterativeDestinationFactory.class,"Yearly HillClimber");
+        CONSTRUCTORS.put("Per Trip Iterative",
+                         PerTripIterativeDestinationFactory::new);
+        NAMES.put(PerTripIterativeDestinationFactory.class,"Per Trip Iterative");
 
     }
 

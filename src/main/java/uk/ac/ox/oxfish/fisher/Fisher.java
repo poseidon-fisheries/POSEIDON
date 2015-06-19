@@ -14,6 +14,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripLogger;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -93,6 +96,11 @@ public class Fisher implements Steppable, Startable{
      * at which point this reference is used to call their start
      */
     private FishState state;
+
+    /**
+     * stores trip information
+     */
+    private TripLogger tripLogger = new TripLogger();
 
 
     /**
@@ -193,6 +201,7 @@ public class Fisher implements Steppable, Startable{
         this.state = state;
         receipt = state.schedule.scheduleRepeating(this);
         yearlyDataGatherer.start(state,this);
+        tripLogger.start(state);
 
         //start the strategies
         destinationStrategy.start(state);
@@ -207,12 +216,12 @@ public class Fisher implements Steppable, Startable{
     public void turnOff() {
         receipt.stop();
         yearlyDataGatherer.stop();
-        destinationStrategy.turnOff();
+        tripLogger.turnOff();
 
         //start the strategies
-        destinationStrategy.start(state);
-        fishingStrategy.start(state);
-        departingStrategy.start(state);
+        destinationStrategy.turnOff();
+        fishingStrategy.turnOff();
+        departingStrategy.turnOff();
     }
 
     @Override
@@ -288,6 +297,27 @@ public class Fisher implements Steppable, Startable{
 
         Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep());
         Preconditions.checkState(newPosition == location);
+    }
+
+    /**
+     * departs
+     */
+    public void undock() {
+        assert this.stepsAtSea == 0;
+        assert this.getLocation().equals(homePort.getLocation());
+        homePort.depart(this);
+        tripLogger.newTrip();
+    }
+
+    /**
+     * anchors at home-port and sets the trip to "over"
+     */
+    public void dock(){
+        assert this.getLocation().equals(homePort.getLocation());
+        homePort.dock(this);
+        tripLogger.finishTrip(stepsAtSea);
+
+        stepsAtSea = 0;
     }
 
     /**
@@ -472,18 +502,51 @@ public class Fisher implements Steppable, Startable{
     public void earn(double moneyEarned)
     {
         cash += moneyEarned;
+        tripLogger.recordEarnings(moneyEarned);
     }
 
     public void spend(double moneySpent)
     {
         cash -=moneySpent;
+        tripLogger.recordCosts(moneySpent);
+
     }
+
+
 
     public int getStepsAtSea() {
         return stepsAtSea;
     }
 
-    public void setStepsAtSea(int stepsAtSea) {
-        this.stepsAtSea = stepsAtSea;
+    public TripRecord getCurrentTrip() {
+        return tripLogger.getCurrentTrip();
+    }
+
+    public void addTripListener(TripListener listener) {
+        tripLogger.addTripListener(listener);
+    }
+
+    public void removeTripListener(TripListener listener) {
+        tripLogger.removeTripListener(listener);
+    }
+
+    public void recordTripCutShort() {
+        tripLogger.recordTripCutShort();
+    }
+
+    public void recordEarnings(double newEarnings) {
+        tripLogger.recordEarnings(newEarnings);
+    }
+
+    public void recordCosts(double newCosts) {
+        tripLogger.recordCosts(newCosts);
+    }
+
+    public List<TripRecord> getAllTrips() {
+        return tripLogger.getAllTrips();
+    }
+
+    public String getAction() {
+        return action.getClass().getSimpleName();
     }
 }

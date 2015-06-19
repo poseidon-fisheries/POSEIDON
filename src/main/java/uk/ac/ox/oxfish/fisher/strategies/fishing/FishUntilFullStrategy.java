@@ -14,6 +14,7 @@ public class FishUntilFullStrategy implements FishingStrategy {
 
     private double minimumPercentageFull;
 
+    private final static double EPSILON = .01;
 
     public FishUntilFullStrategy(double minimumPercentageFull) {
         this.minimumPercentageFull = minimumPercentageFull;
@@ -31,7 +32,7 @@ public class FishUntilFullStrategy implements FishingStrategy {
     @Override
     public boolean shouldFish(
             Fisher fisher, MersenneTwisterFast random, FishState model) {
-        return fisher.getPoundsCarried() < fisher.getMaximumLoad() * minimumPercentageFull;
+        return fisher.getPoundsCarried() + EPSILON < fisher.getMaximumLoad() * minimumPercentageFull  ;
     }
 
     public double getMinimumPercentageFull() {

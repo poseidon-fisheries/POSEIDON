@@ -3,25 +3,20 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
+import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
-public class HillClimberDestinationStrategyTest {
+public class YearlyIterativeDestinationStrategyTest {
 
 
     @Test
@@ -33,7 +28,7 @@ public class HillClimberDestinationStrategyTest {
         NauticalMap map = fishState.getMap();
         final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(
                 map.getSeaTile(50, 50));
-        final HillClimberDestinationStrategy hill = new HillClimberDestinationStrategy(
+        final YearlyIterativeDestinationStrategy hill = new YearlyIterativeDestinationStrategy(
                 delegate, map, new MersenneTwisterFast());
 
         //mock fisher enough to fool delegate
@@ -51,7 +46,7 @@ public class HillClimberDestinationStrategyTest {
 
 
         //step the hill-climber
-        hill.setMaxStepSize(1);
+        ((HillClimbingMovement)hill.getAlgorithm()).setMaxStepSize(1);
         hill.chooseDestination(fisher,fisher.getRandom(),fishState,new Arriving()); //feed it the fisher
         //give it 1000 years!
         for(int i=0; i<1000; i++)

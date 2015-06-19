@@ -47,7 +47,8 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             String elementName, Map<String, String> attributes, SwingMetawidget metawidget) {
 
         final Class<?> actualClass = WidgetBuilderUtils.getActualClassOrType(attributes, String.class);
-
+        if(actualClass == null)
+            return null;
 
         try {
             if (DataSet.class.isAssignableFrom(actualClass)) {
