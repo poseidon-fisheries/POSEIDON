@@ -14,7 +14,7 @@ public class FishUntilFullStrategy implements FishingStrategy {
 
     private double minimumPercentageFull;
 
-    private final static double EPSILON = .01;
+    private final static double EPSILON = .001;
 
     public FishUntilFullStrategy(double minimumPercentageFull) {
         this.minimumPercentageFull = minimumPercentageFull;

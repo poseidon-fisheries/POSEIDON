@@ -19,7 +19,7 @@ public class AtPort implements Action {
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation)
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft)
     {
 
         if(regulation.allowedAtSea(agent, model)
@@ -29,10 +29,10 @@ public class AtPort implements Action {
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
             agent.undock();
-            return new ActionResult(new Moving(),true);
+            return new ActionResult(new Moving(),hoursLeft);
         }
         else //if you don't want to leave port, stay home
-            return new ActionResult(this,false);
+            return new ActionResult(this,0d);
 
 
     }

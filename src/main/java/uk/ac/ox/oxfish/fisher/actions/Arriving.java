@@ -19,24 +19,28 @@ public class Arriving implements Action{
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation) {
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation,double hoursLeft) {
         assert agent.isAtDestination();
 
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
-            return new ActionResult(new Docking(),true);
+            return new ActionResult(new Docking(),hoursLeft);
 
         if(regulation.canFishHere(agent,agent.getLocation(), model)
                 &&
                 agent.shouldIFish(model)) //if you want to fish
-            return new ActionResult(new Fishing(),true);
-
-
-
-        //adapt if needed
-        agent.updateDestination(model,this);
-        if(agent.getDestination().equals(agent.getLocation()))
-            return new ActionResult(new Arriving(), false);
+            return new ActionResult(new Fishing(),hoursLeft);
         else
-            return new ActionResult(new Moving(),true);
+        {
+            //adapt if needed
+            agent.updateDestination(model,this);
+            //we can't fish but we don't want to move either, stay here then!
+            if(agent.getDestination().equals(agent.getLocation()))
+                return new ActionResult(new Arriving(), 0d);
+            else
+                return new ActionResult(new Moving(),hoursLeft);
+        }
+
+
+
     }
 }

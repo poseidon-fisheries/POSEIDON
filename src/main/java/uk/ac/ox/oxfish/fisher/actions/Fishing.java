@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 public class Fishing implements Action
 {
 
+
     /**
      * If you are at destination, and the destination is a sea tile then use the gear to fish
      *
@@ -21,17 +22,20 @@ public class Fishing implements Action
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation) {
-
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
         Preconditions.checkArgument(agent.isAtDestination()); //you arrived
         Preconditions.checkArgument(agent.getLocation().getAltitude() <= 0); //you are at sea
         Preconditions.checkState(regulation.canFishHere(agent,agent.getLocation(), model)); //i should be allowed to fish here!
         //fish!
-        agent.fishHere(model.getBiology());
+        if(hoursLeft >= 1)
+            agent.fishHere(model.getBiology(), 1 );
+        else
+            agent.fishHere(model.getBiology(),hoursLeft);
         model.recordFishing(agent.getLocation());
 
         //go back to "arrived" state
-        return new ActionResult(new Arriving(),false);
+        return new ActionResult(new Arriving(),Math.max(0,hoursLeft-1));    }
 
-    }
+
+
 }

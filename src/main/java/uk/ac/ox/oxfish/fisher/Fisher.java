@@ -27,12 +27,9 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import javax.xml.crypto.Data;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The boat catching all that delicious fish.
@@ -232,12 +229,18 @@ public class Fisher implements Steppable, Startable{
         boat.newStep();
 
         //run the state machine
+        double hoursLeft = model.getHoursPerStep();
         while(true)
         {
-            ActionResult result = action.act(model, this, regulation);
+            ActionResult result = action.act(model, this, regulation,hoursLeft);
             action = result.getNextState();
-            if(!result.isActAgainThisTurn())
+            hoursLeft = result.getHoursLeft();
+            //should be rounded anyway
+            if(hoursLeft <= 0)
+            {
+                assert  Math.abs(hoursLeft)<.001; //shouldn't be negative!
                 break;
+            }
         }
 
         //if you are not at home
@@ -295,7 +298,8 @@ public class Fisher implements Steppable, Startable{
         location = newPosition;
         map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
 
-        Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep());
+        //this condition doesn't hold anymore because time travelled is "conserved" between steps
+     //   Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep(), boat.getHoursTravelledToday() +  " and ");
         Preconditions.checkState(newPosition == location);
     }
 
@@ -447,11 +451,12 @@ public class Fisher implements Steppable, Startable{
     /**
      * tell the fisher to use its gear to fish at current location. It stores everything in the hold
      * @param modelBiology the global biology object
+     * @param hoursSpentFishing
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Catch fishHere(GlobalBiology modelBiology) {
+    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing) {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
-        Catch catchOfTheDay = gear.fish(this, location, modelBiology);
+        Catch catchOfTheDay = gear.fish(this, location,hoursSpentFishing , modelBiology);
         regulation.reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
         return catchOfTheDay;

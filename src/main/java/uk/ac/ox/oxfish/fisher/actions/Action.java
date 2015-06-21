@@ -16,9 +16,10 @@ public interface Action {
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
      * @param regulation the regulation governing the agent
+     * @param hoursLeft how much time is left (in hours) to act in this step
      * @return the next action to take and whether or not to take it now
      */
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation);
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft);
 
 }
 

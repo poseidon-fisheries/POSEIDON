@@ -36,7 +36,7 @@ public class RegulationTest {
 
         AtPort port = new AtPort();
         when(fisher.shouldFisherLeavePort(any())).thenReturn(true); //the fisher wants to go out!
-        ActionResult act = port.act(mock(FishState.class), fisher, regulation);
+        ActionResult act = port.act(mock(FishState.class), fisher, regulation,1);
 
         //must be still at port!
         assertTrue(act.getNextState() instanceof AtPort);

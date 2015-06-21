@@ -34,8 +34,8 @@ public class FishingTest {
 
         Fisher agent = mock(Fisher.class);
         when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1));
-        fishing.act(mock(FishState.class), agent, new Anarchy() );
-        verify(agent).fishHere(any());
+        fishing.act(mock(FishState.class), agent, new Anarchy(),1d );
+        verify(agent).fishHere(any(),anyDouble() );
     }
 
 
@@ -43,6 +43,7 @@ public class FishingTest {
     public void integrationTest() throws Exception {
 
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map();
+        when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
         Specie specie = new Specie("pippo");
@@ -52,11 +53,11 @@ public class FishingTest {
         Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class)  );
 
         Gear gear = mock(Gear.class);
-        when(gear.fish(any(),any(),any())).thenReturn(new Catch(specie, 50.0, biology));
+        when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(specie, 50.0, biology));
         Fisher fisher = new Fisher(port, new MersenneTwisterFast(),
                                    new AnarchyFactory().apply(fishState),
                                    new FixedProbabilityDepartingStrategy(1.0),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 0)),
+                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishingStrategy() {
                                        @Override
                                        public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
@@ -74,12 +75,15 @@ public class FishingTest {
 
                                        }
                                    },
-                                   new Boat(100.0),
+                                   new Boat(1.0),
                                    new Hold(100.0, 1),
                                    gear);
         fisher.step(fishState);
+        assertEquals(0,fisher.getPoundsCarried(),.001);
+
 
         //should have fished 50 pounds
+        fisher.step(fishState);
         assertEquals(50.0,fisher.getPoundsCarried(),.001);
 
         //step again and it will fish 50 more!
@@ -89,7 +93,7 @@ public class FishingTest {
         //fish again does nothing because it's full
         fisher.step(fishState);
         assertEquals(100.0, fisher.getPoundsCarried(), .001);
-        verify(gear,times(3)).fish(any(),any(),any());
+        verify(gear,times(3)).fish(any(),any(),anyDouble(), any());
 
 
     }

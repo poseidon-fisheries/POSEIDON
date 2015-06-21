@@ -28,7 +28,7 @@ public class OneSpecieGearTest {
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where, biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
         assertEquals(fishCaught.getPoundsCaught(first), 0, .001);
         assertEquals(fishCaught.getPoundsCaught(second), 0, .001);
@@ -49,7 +49,7 @@ public class OneSpecieGearTest {
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where, biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
         assertEquals(fishCaught.getPoundsCaught(first), 50, .001);
         assertEquals(fishCaught.getPoundsCaught(second), 0, .001);
@@ -72,7 +72,7 @@ public class OneSpecieGearTest {
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where, biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
         assertEquals(fishCaught.getPoundsCaught(first), 0, .001);
         assertEquals(fishCaught.getPoundsCaught(second), 0, .001);

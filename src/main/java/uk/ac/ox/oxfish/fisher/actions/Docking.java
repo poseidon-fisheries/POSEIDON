@@ -26,7 +26,7 @@ public class Docking implements Action{
      */
     @Override
     public ActionResult act(
-            FishState model, Fisher agent, Regulation regulation)
+            FishState model, Fisher agent, Regulation regulation, double hoursLeft)
     {
 
         Port port = agent.getHomePort();
@@ -58,6 +58,6 @@ public class Docking implements Action{
         assert port.isDocked(agent); //shouldn't have docked already!
         assert agent.getPoundsCarried() ==  0.0;
         //now stay at port
-        return new ActionResult(new AtPort(),false);
+        return new ActionResult(new AtPort(),0d);
     }
 }

@@ -10,7 +10,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  */
 public interface Gear {
 
-    public Catch fish(Fisher fisher,
-                      SeaTile where,
-                      GlobalBiology modelBiology);
+    public Catch fish(
+            Fisher fisher,
+            SeaTile where,
+            double hoursSpentFishing, GlobalBiology modelBiology);
 }

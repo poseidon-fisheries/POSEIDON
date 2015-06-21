@@ -54,5 +54,11 @@ public class FishUntilFullStrategyTest {
         assertTrue(
                 strategy.shouldFish(fisher,new MersenneTwisterFast(),mock(FishState.class))
         );
+
+        //the threshold is satisfied even if the pounds carried are very slightly less(.001%) than the correct
+        //minimum
+        strategy.setMinimumPercentageFull(100d);
+        when(fisher.getPoundsCarried()).thenReturn(99.999d);
+        when(fisher.getMaximumLoad()).thenReturn(100d);
     }
 }

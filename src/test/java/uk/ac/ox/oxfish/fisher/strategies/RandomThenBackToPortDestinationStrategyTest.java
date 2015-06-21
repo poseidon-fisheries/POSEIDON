@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.RandomThenBackToPortDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -142,7 +143,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         grid2D.field[1][1] = new SeaTile(1,1,100);
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
-                                          new EquirectangularDistance(0.0,1));
+                                          new CartesianDistance(1));
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(map);
         when(model.getStepsPerDay()).thenReturn(1);

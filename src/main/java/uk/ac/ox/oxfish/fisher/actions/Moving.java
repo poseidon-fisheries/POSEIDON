@@ -16,6 +16,17 @@ public class Moving implements Action
 {
 
 
+    /**
+     * if you were moving halfway through 2 cells, here you keep record, otherwise it stays at -1
+     */
+    private double hoursRemainedFromBefore = -1;
+
+    public Moving(double timeAlreadyTravelling) {
+        this.hoursRemainedFromBefore = timeAlreadyTravelling;
+    }
+
+    public Moving() {
+    }
 
     /**
      * Do something and returns a result which is the next state and whether or not it should be run on the same turn
@@ -26,17 +37,26 @@ public class Moving implements Action
      * @return the next action to take and whether or not to take it now
      */
     @Override
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation) {
+    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
+
+        //it would be very weird to accumulate a full day!
+        assert hoursRemainedFromBefore < 24;
 
         //adapt if needed
         agent.updateDestination(model,this);
 
+        /**
+         * we have arrived!
+         */
         if(agent.getDestination().equals(agent.getLocation()))
-            return new ActionResult(new Arriving(),true);
+            return new ActionResult(new Arriving(),hoursLeft);
 
         Deque<SeaTile> route = getRoute(model.getMap(),agent.getLocation(),agent.getDestination());
         //while there are still places to go
         NauticalMap map = model.getMap();
+
+        if(hoursRemainedFromBefore > 0)
+            hoursLeft+=hoursRemainedFromBefore;
 
         while(!route.isEmpty())
         {
@@ -44,18 +64,21 @@ public class Moving implements Action
 
             double distance = map.distance(agent.getLocation(),step);
             //if you have time move
-            if(agent.totalTravelTimeAfterAddingThisSegment(distance) <= model.getHoursPerStep())
+            final double hoursForThisStep = agent.totalTravelTimeAfterAddingThisSegment(distance);
+
+
+            if(hoursForThisStep <= hoursLeft)
             {
                 agent.move(step, map,model);
                 assert agent.getLocation().equals(step);
                 if(step.equals(agent.getDestination()))
-                    return new ActionResult(new Arriving(),true);
+                    return new ActionResult(new Arriving(),hoursLeft-hoursForThisStep);
                 else
-                    return new ActionResult(new Moving(),false);
+                    return new ActionResult(new Moving(),hoursLeft-hoursForThisStep);
             }
            //too far, try closer
         }
-        return new ActionResult(new Moving(),false);
+        return new ActionResult(new Moving(hoursLeft),0);
 
 
 

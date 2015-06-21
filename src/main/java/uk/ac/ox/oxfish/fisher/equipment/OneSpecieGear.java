@@ -26,13 +26,13 @@ public class OneSpecieGear implements Gear {
      * catches a fixed proportion of the targeted specie and nothing of all the others
      * @param fisher the fisher
      * @param where where the fisher is fishing
-     * @param modelBiology the biology (list of available species)
-     * @return the catch
+     * @param hoursSpentFishing
+     *@param modelBiology the biology (list of available species)  @return the catch
      */
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, GlobalBiology modelBiology) {
-        double poundsCaught = proportionCaught * where.getBiomass(targetedSpecie);
+            Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
+        double poundsCaught = hoursSpentFishing * proportionCaught * where.getBiomass(targetedSpecie);
         assert  poundsCaught >=0;
         if(poundsCaught> 0)
             where.reactToThisAmountOfBiomassBeingFished(targetedSpecie,poundsCaught);
