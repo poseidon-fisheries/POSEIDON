@@ -16,7 +16,9 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -24,6 +26,8 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -154,13 +158,16 @@ public class NauticalMap implements Startable
     /**
      * goes through all seatiles and calls the initialize function to create/assign a LocalBiology to each SeaTile
      * @param initializer the local biology factory
+     * @param random the randomizer
+     * @param biology the biology
      */
-    public void initializeBiology(Function<SeaTile,LocalBiology> initializer)
+    public void initializeBiology(BiologyInitializer initializer,
+                                  MersenneTwisterFast random, GlobalBiology biology)
     {
         for(Object element : rasterBackingGrid.elements())
         {
             SeaTile tile = (SeaTile) element; //cast
-            tile.setBiology(initializer.apply(tile)); //put new biology in
+            tile.setBiology(initializer.generate(biology, tile, random, getHeight(), getWidth())); //put new biology in
         }
 
     }
@@ -184,6 +191,19 @@ public class NauticalMap implements Startable
                         fishedMap.field[i][j] = 0;
             }
         }, StepOrder.DATA_RESET);
+
+        //start all tiles
+        for(Object element : rasterBackingGrid.elements())
+        {
+            SeaTile tile = (SeaTile) element; //cast
+            tile.start(model);
+        }
+
+    }
+
+    public Bag getAllSeaTiles()
+    {
+        return rasterBackingGrid.elements();
     }
 
     /**
@@ -192,6 +212,14 @@ public class NauticalMap implements Startable
     @Override
     public void turnOff() {
         receipt.stop();
+
+        //turn off all tiles
+        //start all tiles
+        for(Object element : rasterBackingGrid.elements())
+        {
+            SeaTile tile = (SeaTile) element; //cast
+            tile.turnOff();
+        }
     }
 
     /**
@@ -277,6 +305,14 @@ public class NauticalMap implements Startable
         return distance.distance(start, end);
     }
 
+
+    public Bag getMooreNeighbors(SeaTile tile, int neighborhoodSize)
+    {
+        Bag neighbors = new Bag();
+        rasterBackingGrid.getMooreNeighbors(tile.getGridX(),tile.getGridY(),neighborhoodSize,
+                                            Grid2D.BOUNDED,false,neighbors,null,null);
+        return neighbors;
+    }
 
     /**
      * Given a port, sets it on the map but first check that:

@@ -3,6 +3,8 @@ package uk.ac.ox.oxfish.geography;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 
 /**
  * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected or not
@@ -11,7 +13,7 @@ import uk.ac.ox.oxfish.biology.Specie;
  *
  * Created by carrknight on 4/2/15.
  */
-public class SeaTile {
+public class SeaTile implements Startable{
 
 
     private final int gridX;
@@ -68,6 +70,10 @@ public class SeaTile {
     }
 
 
+    public LocalBiology getBiology() {
+        return biology;
+    }
+
     /**
      * set the biology object. Without there is no biomass!
      * @param biology the local biology
@@ -102,5 +108,22 @@ public class SeaTile {
                 "," + gridY +
                 " altitude=" + altitude +
                 " bio = " + biology;
+    }
+
+
+    /**
+     * starts local biology
+     */
+    @Override
+    public void start(FishState model) {
+        biology.start(model);
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        biology.turnOff();
     }
 }

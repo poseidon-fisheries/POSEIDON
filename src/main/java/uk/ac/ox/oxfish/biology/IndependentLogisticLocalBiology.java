@@ -230,5 +230,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
     }
 
 
-
+    public double[] getCurrentBiomass() {
+        return currentBiomass;
+    }
 }

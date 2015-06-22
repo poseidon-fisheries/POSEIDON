@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.metawidget.inspector.annotation.UiHidden;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -65,6 +66,7 @@ public class Fisher implements Steppable, Startable{
     /**
      * randomizer
      */
+    @UiHidden
     private final MersenneTwisterFast random;
 
     /**

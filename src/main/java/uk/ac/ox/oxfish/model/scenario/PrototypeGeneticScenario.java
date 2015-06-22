@@ -138,9 +138,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
 
-    public void setMinBiomass(int minBiomass) {
-        delegate.setMinBiomass(minBiomass);
-    }
 
 
 
@@ -166,21 +163,13 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setGridSizeInKm(gridSizeInKm);
     }
 
-    public void setBiologySmoothing(int biologySmoothing) {
-        delegate.setBiologySmoothing(biologySmoothing);
-    }
 
-    public int getMinBiomass() {
-        return delegate.getMinBiomass();
-    }
 
     public DoubleParameter getFishingEfficiency() {
         return delegate.getFishingEfficiency();
     }
 
-    public Function<MersenneTwisterFast, Consumer<NauticalMap>> getBiologySmootherMaker() {
-        return delegate.getBiologySmootherMaker();
-    }
+
 
     public void setSpeedInKmh(DoubleParameter speedInKmh) {
         delegate.setSpeedInKmh(speedInKmh);
@@ -194,14 +183,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setFishers(fishers);
     }
 
-    public Function<SeaTile, LocalBiology> getBiologyInitializer() {
-        return delegate.getBiologyInitializer();
-    }
-
-    public void setBiologySmootherMaker(
-            Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker) {
-        delegate.setBiologySmootherMaker(biologySmootherMaker);
-    }
 
     public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return delegate.getDepartingStrategy();
@@ -248,9 +229,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         return delegate.getPorts();
     }
 
-    public int getBiologySmoothing() {
-        return delegate.getBiologySmoothing();
-    }
 
     public void setDepartingStrategy(
             StrategyFactory<? extends DepartingStrategy> departingStrategy) {
@@ -258,13 +236,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
     }
 
 
-    public int getMaxBiomass() {
-        return delegate.getMaxBiomass();
-    }
-
-    public void setMaxBiomass(int maxBiomass) {
-        delegate.setMaxBiomass(maxBiomass);
-    }
 
     public double getGridSizeInKm() {
         return delegate.getGridSizeInKm();

@@ -8,7 +8,9 @@ import sim.field.grid.Grid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
@@ -170,13 +172,13 @@ public class NauticalMapFactory {
             int coastalRoughness,
             MersenneTwisterFast random,
             int depthSmoothing,
-            Function<SeaTile, LocalBiology> biologyInitializer,
-            Consumer<NauticalMap> biologySmoother){
+            BiologyInitializer biologyInitializer,
+            GlobalBiology biology, FishState model){
 
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
 
-        //map.initializeBiology(randomConstantBiology(random,minBiomass,maxBiomass));;
-        map.initializeBiology(biologyInitializer);;
+        //map.initializeBiology(RandomConstantBiologyInitializer(random,minBiomass,maxBiomass));;
+        map.initializeBiology(biologyInitializer,random ,biology );;
         /***
          *      ___                _   _      ___ _     _
          *     / __|_ __  ___  ___| |_| |_   | _ |_)___| |___  __ _ _  _
@@ -184,7 +186,7 @@ public class NauticalMapFactory {
          *     |___/_|_|_\___/\___/\__|_||_| |___/_\___/_\___/\__, |\_, |
          *                                                    |___/ |__/
          */
-        biologySmoother.accept(map);
+       biologyInitializer.processMap(biology,map,random,model );
 
         return map;
 
@@ -295,47 +297,9 @@ public class NauticalMapFactory {
 
 
 
- /*   public GeomVectorField addCities(GeomGridField rasterBathymetry, String cityResources)
-    {
-
-        GeomVectorField cities = GISReaders.readShapeAndMergeWithRaster(rasterBathymetry,cityResources);
-        //now transform the MasonGeometries into Cities
-        Envelope savedMBR = new Envelope(cities.getMBR());
-        Bag oldGeometries = new Bag(cities.getGeometries());
-        cities.getGeometries().clear();
-        for(Object old : oldGeometries)
-        {
-            MasonGeometry geometry = (MasonGeometry) old;
-
-            cities.addGeometry(new City(geometry.getGeometry(),geometry.getStringAttribute("AREANAME"),
-                    geometry.getIntegerAttribute("POP2000")));
-        }
-
-        return cities;
-
-    }
-    */
 
 
-    /**
-     * confusing? A function that returns an initialization function
-     * @param random randomizer
-     * @param min minimum biomass
-     * @param max maximum biomass
-     * @return
-     */
-    public static Function<SeaTile,LocalBiology> randomConstantBiology(MersenneTwisterFast random,
-                                                                       int min, int max)
-    {
-        assert max > min;
 
-        return seaTile -> {
-            if (seaTile.getAltitude() > 0)
-                return new EmptyLocalBiology();
-            else
-                return new ConstantLocalBiology(random.nextInt(max - min) + min);
-        };
-    }
 
 
     public static Function<SeaTile,LocalBiology> randomMultipleSpecies(MersenneTwisterFast random,
@@ -356,15 +320,4 @@ public class NauticalMapFactory {
 
     }
 
-    public static Function<SeaTile,LocalBiology> fromLeftToRightBiology(int max,int width)
-    {
-        assert  width > 0;
-
-        return seaTile -> {
-            if (seaTile.getAltitude() > 0)
-                return new EmptyLocalBiology();
-            else
-                return new ConstantLocalBiology(max*Math.pow((1-seaTile.getGridX()/(double)width),2));
-        };
-    }
 }

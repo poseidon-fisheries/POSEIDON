@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.model.FishState;
+
 /**
  * A local biology where multiple species exist. Much like ConstantLocalBiology they do not change their
  * total biomass even after being fished out
@@ -29,6 +31,23 @@ public class ConstantHeterogeneousLocalBiology implements LocalBiology {
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
+
+    }
+
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
 
     }
 }

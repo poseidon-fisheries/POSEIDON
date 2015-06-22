@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.utility;
 
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
@@ -34,6 +36,8 @@ public class StrategyFactories {
         NAMES_MAP.put(FishingStrategy.class, FishingStrategies.NAMES);
         CONSTRUCTOR_MAP.put(Regulation.class, Regulations.CONSTRUCTORS);
         NAMES_MAP.put(Regulation.class, Regulations.NAMES);
+        CONSTRUCTOR_MAP.put(BiologyInitializer.class, BiologyInitializers.CONSTRUCTORS);
+        NAMES_MAP.put(BiologyInitializer.class, BiologyInitializers.NAMES);
 
 
     }

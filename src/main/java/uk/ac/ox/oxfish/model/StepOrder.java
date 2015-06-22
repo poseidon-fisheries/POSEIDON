@@ -4,6 +4,7 @@ package uk.ac.ox.oxfish.model;
 public enum StepOrder {
 
 
+    DAWN,
 
     /**
      * fisher act

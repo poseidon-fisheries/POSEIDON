@@ -2,8 +2,9 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -18,7 +19,6 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
@@ -30,8 +30,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -58,18 +56,6 @@ public class PrototypeScenario implements Scenario {
     private int depthSmoothing = 1000000;
 
     /**
-     * how many rounds of biology smoothing to do
-     */
-    private int biologySmoothing = 1000000;
-    /**
-     * random minimum biomass pre-smoothing
-     */
-    private int minBiomass = 10;
-    /**
-     * random maximum biomass pre-smoothing
-     */
-    private int maxBiomass = 5000;
-    /**
      * number of ports
      */
     private int ports = 1;
@@ -79,9 +65,10 @@ public class PrototypeScenario implements Scenario {
     private int width = 50;
 
 
-    private final Function<SeaTile, LocalBiology> biologyInitializer =
-            NauticalMapFactory.fromLeftToRightBiology(
-            maxBiomass, width);
+
+    private StrategyFactory<? extends BiologyInitializer> biologyInitializer =
+            new IndependentLogisticFactory();
+
     /**
      * map height
      */
@@ -132,10 +119,6 @@ public class PrototypeScenario implements Scenario {
 
     private StrategyFactory<? extends Regulation> regulation =  new FishingSeasonFactory(300,true);
 
-    private Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker =
-            NauticalMapFactory.smoothConstantBiology(
-                    biologySmoothing,
-                    width, height);;
 
 
     public PrototypeScenario() {
@@ -160,8 +143,9 @@ public class PrototypeScenario implements Scenario {
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    random,
                                                                                    depthSmoothing,
-                                                                                   biologyInitializer,
-                                                                                   biologySmootherMaker.apply(random));
+                                                                                   biologyInitializer.apply(model),
+                                                                                   biology,
+                                                                                   model);
         map.setDistance(new CartesianDistance(gridSizeInKm));
 
 
@@ -234,29 +218,7 @@ public class PrototypeScenario implements Scenario {
         this.depthSmoothing = depthSmoothing;
     }
 
-    public int getBiologySmoothing() {
-        return biologySmoothing;
-    }
 
-    public void setBiologySmoothing(int biologySmoothing) {
-        this.biologySmoothing = biologySmoothing;
-    }
-
-    public int getMinBiomass() {
-        return minBiomass;
-    }
-
-    public void setMinBiomass(int minBiomass) {
-        this.minBiomass = minBiomass;
-    }
-
-    public int getMaxBiomass() {
-        return maxBiomass;
-    }
-
-    public void setMaxBiomass(int maxBiomass) {
-        this.maxBiomass = maxBiomass;
-    }
 
     public int getPorts() {
         return ports;
@@ -324,18 +286,6 @@ public class PrototypeScenario implements Scenario {
         this.regulation = regulation;
     }
 
-    public Function<SeaTile, LocalBiology> getBiologyInitializer() {
-        return biologyInitializer;
-    }
-
-    public Function<MersenneTwisterFast, Consumer<NauticalMap>> getBiologySmootherMaker() {
-        return biologySmootherMaker;
-    }
-
-    public void setBiologySmootherMaker(
-            Function<MersenneTwisterFast, Consumer<NauticalMap>> biologySmootherMaker) {
-        this.biologySmootherMaker = biologySmootherMaker;
-    }
 
     public int getNumberOfSpecies() {
         return numberOfSpecies;
@@ -377,5 +327,14 @@ public class PrototypeScenario implements Scenario {
     public void setDestinationStrategy(
             StrategyFactory<? extends DestinationStrategy> destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
+    }
+
+    public StrategyFactory<? extends BiologyInitializer> getBiologyInitializer() {
+        return biologyInitializer;
+    }
+
+    public void setBiologyInitializer(
+            StrategyFactory<? extends BiologyInitializer> biologyInitializer) {
+        this.biologyInitializer = biologyInitializer;
     }
 }

@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.model.Startable;
+
 import java.util.HashMap;
 
 /**
@@ -8,7 +10,7 @@ import java.util.HashMap;
  * information
  * Created by carrknight on 4/11/15.
  */
-public interface LocalBiology
+public interface LocalBiology extends Startable
 {
 
 

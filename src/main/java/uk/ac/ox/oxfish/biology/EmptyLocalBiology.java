@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.model.FishState;
+
 /**
  * Just a biology that has 0 biomass of everything
  * Created by carrknight on 4/11/15.
@@ -27,5 +29,21 @@ public class EmptyLocalBiology implements LocalBiology
     @Override
     public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
         throw new IllegalStateException("It's impossible to take biomass from the empty biology");
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
+
     }
 }
