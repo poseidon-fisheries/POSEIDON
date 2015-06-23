@@ -456,7 +456,7 @@ public class Fisher implements Steppable, Startable{
     /**
      * tell the fisher to use its gear to fish at current location. It stores everything in the hold
      * @param modelBiology the global biology object
-     * @param hoursSpentFishing
+     * @param hoursSpentFishing hours spent on this activity
      * @return the fish caught and stored (barring overcapacity)
      */
     public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing) {

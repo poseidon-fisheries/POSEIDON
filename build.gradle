@@ -1,5 +1,9 @@
-apply plugin: 'java'
-apply plugin: 'application'
+plugins {
+    id 'java'
+    id 'application'
+    id "us.kirchmeier.capsule" version "1.0-rc1"
+
+}
 
 mainClassName = 'Main'
 
@@ -47,6 +51,8 @@ dependencies
     //testing:
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-all:1.9.5"
+
+
 }
 
 
@@ -57,6 +63,11 @@ test{
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
+}
+
+
+task fatJar(type: FatCapsule) {
+    applicationClass 'Main'
 }
 
 

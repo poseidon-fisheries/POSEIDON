@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
-import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -13,9 +13,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -23,11 +23,12 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,10 +43,6 @@ public class PrototypeScenario implements Scenario {
      */
     private int numberOfSpecies = 1;
 
-    /**
-     * market prices for each species
-     */
-    private double[] marketPrices = new double[]{10.0};
     /**
      * higher the more the coast gets jagged
      */
@@ -67,7 +64,7 @@ public class PrototypeScenario implements Scenario {
 
 
     private StrategyFactory<? extends BiologyInitializer> biologyInitializer =
-            new IndependentLogisticFactory();
+            new DiffusingLogisticFactory();
 
     /**
      * map height
@@ -77,7 +74,7 @@ public class PrototypeScenario implements Scenario {
     /**
      * the number of fishers
      */
-    private int fishers = 50;
+    private int fishers = 300;
 
 
 
@@ -105,19 +102,22 @@ public class PrototypeScenario implements Scenario {
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DepartingStrategy> departingStrategy = new FixedProbabilityDepartingFactory();
+    private StrategyFactory<? extends DepartingStrategy> departingStrategy =
+            new FixedProbabilityDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DestinationStrategy> destinationStrategy = new RandomFavoriteDestinationFactory();
+    private StrategyFactory<? extends DestinationStrategy> destinationStrategy =
+            new PerTripIterativeDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
-    private StrategyFactory<? extends FishingStrategy> fishingStrategy = new FishUntilFullFactory();
+    private StrategyFactory<? extends FishingStrategy> fishingStrategy =
+            new MaximumStepsFactory();
 
 
-    private StrategyFactory<? extends Regulation> regulation =  new FishingSeasonFactory(300,true);
+    private StrategyFactory<? extends Regulation> regulation =  new AnarchyFactory();
 
 
 
@@ -145,15 +145,21 @@ public class PrototypeScenario implements Scenario {
                                                                                    depthSmoothing,
                                                                                    biologyInitializer.apply(model),
                                                                                    biology,
-                                                                                   model);
+                                                                                   model, width, height);
         map.setDistance(new CartesianDistance(gridSizeInKm));
 
 
         //general biology
         //create fixed price market
         Markets markets = new Markets(biology);
+        /*
+      market prices for each species
+     */
+        double[] marketPrices = new double[biology.getSize()];
+        Arrays.fill(marketPrices,10.0);
+
         for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie,marketPrices[specie.getIndex()]));
+            markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
 
         //create random ports, all sharing the same market
         NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, random);
@@ -337,4 +343,6 @@ public class PrototypeScenario implements Scenario {
             StrategyFactory<? extends BiologyInitializer> biologyInitializer) {
         this.biologyInitializer = biologyInitializer;
     }
+
+
 }

@@ -67,16 +67,16 @@ public class NauticalMapFactory {
     public static NauticalMap prototypeMap(
             int coastalRoughness,
             MersenneTwisterFast random,
-            int depthSmoothing)
+            int depthSmoothing, final int width, final int height)
     {
 
         //build the grid
-        ObjectGrid2D baseGrid =  new ObjectGrid2D(50, 50);
+        ObjectGrid2D baseGrid =  new ObjectGrid2D(width, height);
 
         //the 10 rightmost patches are land, the rest is sea
-        for(int x=0; x< 50; x++)
-            for(int y=0; y< 50; y++)
-                baseGrid.field[x][y] = x <40 ?
+        for(int x=0; x< width; x++)
+            for(int y=0; y< height; y++)
+                baseGrid.field[x][y] = x <width-10 ?
                         new SeaTile(x,y,-random.nextInt(5000)) :
                         new SeaTile(x,y,2000);
         /***
@@ -90,8 +90,8 @@ public class NauticalMapFactory {
             //now go roughen up the coast
             List<SeaTile> toFlip = new LinkedList<>();
             //go through all the tiles
-            for (int x = 0; x < 50; x++)
-                for (int y = 0; y < 50; y++) {
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++) {
                     SeaTile tile = (SeaTile) baseGrid.field[x][y];
                     if (tile.getAltitude() < 0)
                         continue; //if it's ocean, don't bother
@@ -128,11 +128,11 @@ public class NauticalMapFactory {
 
         for(int i=0; i<depthSmoothing; i++)
         {
-            int x = random.nextInt(50);
-            int y = random.nextInt(50);
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
             SeaTile toChange = (SeaTile) baseGrid.get(x,y);
-            x += random.nextInt(3)-1; x= Math.max(0,x); x = Math.min(x,49);
-            y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,49);
+            x += random.nextInt(3)-1; x= Math.max(0,x); x = Math.min(x,width-1);
+            y += random.nextInt(3)-1; y= Math.max(0, y); y = Math.min(y,height-1);
             SeaTile fixed = (SeaTile) baseGrid.get(x,y);
             double newAltitude = toChange.getAltitude() +
                     (random.nextDouble()*.04) *
@@ -173,9 +173,11 @@ public class NauticalMapFactory {
             MersenneTwisterFast random,
             int depthSmoothing,
             BiologyInitializer biologyInitializer,
-            GlobalBiology biology, FishState model){
+            GlobalBiology biology, FishState model,
+            final int width,
+            final int height){
 
-        NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing);
+        NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing, width, height);
 
         //map.initializeBiology(RandomConstantBiologyInitializer(random,minBiomass,maxBiomass));;
         map.initializeBiology(biologyInitializer,random ,biology );;
