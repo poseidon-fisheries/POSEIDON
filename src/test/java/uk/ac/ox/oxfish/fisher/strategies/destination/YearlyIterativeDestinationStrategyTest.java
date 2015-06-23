@@ -47,7 +47,7 @@ public class YearlyIterativeDestinationStrategyTest {
 
         //step the hill-climber
         ((HillClimbingMovement)hill.getAlgorithm()).setMaxStepSize(1);
-        hill.chooseDestination(fisher,fisher.getRandom(),fishState,new Arriving()); //feed it the fisher
+        hill.chooseDestination(fisher,fisher.grabRandomizer(),fishState,new Arriving()); //feed it the fisher
         //give it 1000 years!
         for(int i=0; i<1000; i++)
             hill.step(fishState);

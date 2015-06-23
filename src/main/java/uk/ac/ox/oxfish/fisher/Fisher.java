@@ -251,7 +251,10 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-    public MersenneTwisterFast getRandom() {
+    /**
+     * weird name to avoid beans
+     */
+    public MersenneTwisterFast grabRandomizer() {
         return random;
     }
 

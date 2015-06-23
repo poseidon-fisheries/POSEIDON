@@ -18,7 +18,7 @@ public class FixedProbabilityDepartingStrategyTest {
 
         FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0);
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.getRandom()).thenReturn(random);
+        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
 
         for(int i=0; i<50;i++)
             assertTrue(always.shouldFisherLeavePort(fisher, null));
@@ -30,7 +30,7 @@ public class FixedProbabilityDepartingStrategyTest {
 
         FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0);
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.getRandom()).thenReturn(random);
+        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
 
         for(int i=0; i<50;i++)
             assertFalse(never.shouldFisherLeavePort(fisher, null));
@@ -43,7 +43,7 @@ public class FixedProbabilityDepartingStrategyTest {
     {
         FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5);
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.getRandom()).thenReturn(random);
+        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
 
         int departures = 0;
         for(int i=0; i<50;i++)

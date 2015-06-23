@@ -146,7 +146,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
                 final Fisher fisher = fisherGenotypePair.getFirst();
 
                 if(seaTile.getAltitude() >0) //if you are on land, go at random{
-                    seaTile = map.getRandomBelowWaterLineSeaTile(fisher.getRandom());
+                    seaTile = map.getRandomBelowWaterLineSeaTile(fisher.grabRandomizer());
 
                 fisher.setDestinationStrategy(new FavoriteDestinationStrategy(seaTile));
 

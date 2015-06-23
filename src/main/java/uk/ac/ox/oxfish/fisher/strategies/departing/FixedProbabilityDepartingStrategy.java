@@ -1,13 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
-import org.jenetics.util.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
-
-import java.util.function.Function;
 
 /**
  * A simple strategy for departure where the fisher decides to get out of port at random with fixed probability
@@ -43,7 +38,7 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
      */
     @Override
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model) {
-        return fisher.getRandom().nextBoolean(probabilityToLeavePort);
+        return fisher.grabRandomizer().nextBoolean(probabilityToLeavePort);
     }
 
 

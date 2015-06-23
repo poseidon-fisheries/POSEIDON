@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.utility.maximization;
 
 import ec.util.MersenneTwisterFast;
+import org.metawidget.inspector.annotation.UiHidden;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -14,6 +15,7 @@ public class HillClimbingMovement implements IterativeMovement {
 
     private final NauticalMap map;
 
+    @UiHidden
     private final MersenneTwisterFast random;
 
     /**

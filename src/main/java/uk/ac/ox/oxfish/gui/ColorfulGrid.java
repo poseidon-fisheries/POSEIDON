@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.gui;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.metawidget.inspector.annotation.UiHidden;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
@@ -37,6 +38,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     private int maxBiomass = 4100;
 
+    @UiHidden
     private MersenneTwisterFast random;
 
     public ColorfulGrid(MersenneTwisterFast random)
