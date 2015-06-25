@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.List;
 
@@ -48,6 +47,8 @@ public class Fisher implements Steppable, Startable{
      *       \_/\__,_|_| |_\__,_|_.__/_\___/__/
      *
      */
+
+    private final int fisherID;
 
     /**
      * the location of the port!
@@ -105,7 +106,7 @@ public class Fisher implements Steppable, Startable{
     /**
      * the cash owned by the firm
      */
-    private double cash = 0;
+    private double bankBalance = 0;
 
     /***
      *      ___           _                    _
@@ -163,6 +164,7 @@ public class Fisher implements Steppable, Startable{
 
 
     public Fisher(
+            int id,
             Port homePort, MersenneTwisterFast random,
             Regulation regulation,
             //strategies:
@@ -170,6 +172,7 @@ public class Fisher implements Steppable, Startable{
             DestinationStrategy destinationStrategy, FishingStrategy fishingStrategy,
             //equipment:
             Boat boat, Hold hold, Gear gear) {
+        this.fisherID = id;
         this.homePort = homePort; this.random = random;
         this.location = homePort.getLocation();
         this.destination = homePort.getLocation();
@@ -431,7 +434,7 @@ public class Fisher implements Steppable, Startable{
      * @return pounds carried
      */
     public double getPoundsCarried() {
-        return hold.getPoundsCarried();
+        return hold.getTonnesCarried();
     }
 
     /**
@@ -505,19 +508,19 @@ public class Fisher implements Steppable, Startable{
         return yearlyDataGatherer.getLatestObservation(columnName);
     }
 
-    public double getCash(){
-        return cash;
+    public double getBankBalance(){
+        return bankBalance;
     };
 
     public void earn(double moneyEarned)
     {
-        cash += moneyEarned;
+        bankBalance += moneyEarned;
         tripLogger.recordEarnings(moneyEarned);
     }
 
     public void spend(double moneySpent)
     {
-        cash -=moneySpent;
+        bankBalance -=moneySpent;
         tripLogger.recordCosts(moneySpent);
 
     }
@@ -558,5 +561,10 @@ public class Fisher implements Steppable, Startable{
 
     public String getAction() {
         return action.getClass().getSimpleName();
+    }
+
+    @Override
+    public String toString() {
+        return "Fisher " + fisherID;
     }
 }

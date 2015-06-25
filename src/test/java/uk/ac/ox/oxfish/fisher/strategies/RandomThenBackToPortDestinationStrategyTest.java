@@ -45,10 +45,11 @@ public class RandomThenBackToPortDestinationStrategyTest {
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = new Fisher(port,random,
-                                   new Anarchy(), mock(DepartingStrategy.class),
-                                   mock(DestinationStrategy.class),
-                                   mock(FishingStrategy.class), mock(Boat.class),mock(Hold.class),mock(Gear.class) );
+        Fisher fisher = new Fisher(0, port,
+                                     random, new Anarchy(),
+                                     mock(DepartingStrategy.class),
+                                     mock(DestinationStrategy.class), mock(FishingStrategy.class), mock(Boat.class),
+                                     mock(Hold.class), mock(Gear.class));
 
 
         //choose 100 times

@@ -1,11 +1,9 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.market.Markets;
 
-import java.util.List;
 
 /**
  * All the objects that I expect were created by a Scenario

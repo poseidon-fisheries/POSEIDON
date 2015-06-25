@@ -40,6 +40,9 @@ dependencies
     //mason libraries. They aren't on maven so we have to lug their jars around
     compile fileTree(dir: 'libs/mason', include: '*.jar')
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
+    //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
+    compile fileTree(dir: 'libs/osmose', include: '*.jar')
+
     //guava. Useful for PreConditions and sometimes specialized collections
     compile "com.google.guava:guava:18.0"
     //shiny new genetic algorithm library. So far very unimpressive. Might switch back to watchmaker

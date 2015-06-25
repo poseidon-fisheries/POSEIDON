@@ -1,10 +1,9 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
+import fr.ird.osmose.OsmoseSimulation;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
-import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -16,9 +15,9 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
-import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.osmose.OsmoseMapMaker;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
@@ -33,55 +32,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
- * Created by carrknight on 4/20/15.
+ * Created by carrknight on 6/25/15.
  */
-public class PrototypeScenario implements Scenario {
+public class OsmosePrototype implements Scenario {
 
-    /**
-     * number of species
-     */
-    private int numberOfSpecies = 1;
+    private int buninLength = 100;
 
-    /**
-     * higher the more the coast gets jagged
-     */
-    private int coastalRoughness = 4;
-    /**
-     * how many rounds of depth smoothing to do
-     */
-    private int depthSmoothing = 1000000;
+    private String osmoseConfigurationFile = "/home/carrknight/code/osmose-v3u2_src/config/osm_all-parameters.csv";
 
-    /**
-     * number of ports
-     */
+    private double gridSizeInKm = 5;
     private int ports = 1;
-    /**
-     * map width
-     */
-    private int width = 50;
 
 
-
-    private StrategyFactory<? extends BiologyInitializer> biologyInitializer =
-            new DiffusingLogisticFactory();
-
-    /**
-     * map height
-     */
-    private int height =50;
-
-    /**
-     * the number of fishers
-     */
-    private int fishers = 300;
-
-
-
-    /**
-     * Uses Caartesian distance
-     */
-    private double gridSizeInKm = 10;
 
     /**
      * boat speed
@@ -119,12 +81,7 @@ public class PrototypeScenario implements Scenario {
 
     private StrategyFactory<? extends Regulation> regulation =  new AnarchyFactory();
 
-
-
-    public PrototypeScenario() {
-    }
-
-
+    private int fishers = 50;
 
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
@@ -136,17 +93,18 @@ public class PrototypeScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
 
-        MersenneTwisterFast random = model.random;
+        final OsmoseSimulation osmoseSimulation = OsmoseSimulation.startUpOSMOSESimulationWithBurnIn(buninLength,
+                                                                                                     osmoseConfigurationFile);
 
-        GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
+        Specie[] species = new Specie[osmoseSimulation.getNumberOfSpecies()];
+        for(int i=0; i<species.length; i++)
+            species[i] = new Specie(osmoseSimulation.getSpecies(i).getName());
 
-        NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
-                                                                                   random,
-                                                                                   depthSmoothing,
-                                                                                   biologyInitializer.apply(model),
-                                                                                   biology,
-                                                                                   model, width, height);
-        map.setDistance(new CartesianDistance(gridSizeInKm));
+        GlobalBiology biology = new GlobalBiology(species);
+
+
+        NauticalMap map = OsmoseMapMaker.buildMap(osmoseSimulation, gridSizeInKm);
+
 
 
         //general biology
@@ -156,20 +114,21 @@ public class PrototypeScenario implements Scenario {
       market prices for each species
      */
         double[] marketPrices = new double[biology.getSize()];
-        Arrays.fill(marketPrices,10.0);
+        Arrays.fill(marketPrices, 10.0);
 
         for(Specie specie : biology.getSpecies())
             markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, random);
-
-
-
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, model.random);
 
 
         return new ScenarioEssentials(biology,map,markets);
+
+
     }
+
+
 
 
     /**
@@ -187,7 +146,7 @@ public class PrototypeScenario implements Scenario {
         final MersenneTwisterFast random = model.random;
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
-        for(int i=0;i<fishers;i++)
+        for(int i=0;i< fishers;i++)
         {
             Port port = ports[random.nextInt(ports.length)];
             DepartingStrategy departing = departingStrategy.apply(model);
@@ -195,67 +154,28 @@ public class PrototypeScenario implements Scenario {
             double capacity = holdSize.apply(random);
             double efficiency =fishingEfficiency.apply(random);
             fisherList.add(new Fisher(i, port,
-                                        random,
-                                        regulation.apply(model),
-                                        departing,
-                                        destinationStrategy.apply(model),
-                                        fishingStrategy.apply(model),
-                                        new Boat(10,10,speed),
-                                        new Hold(capacity, biology.getSize()),
-                                        new FixedProportionGear(efficiency)));
+                                      random,
+                                      regulation.apply(model),
+                                      departing,
+                                      destinationStrategy.apply(model),
+                                      fishingStrategy.apply(model),
+                                      new Boat(10,10,speed),
+                                      new Hold(capacity, biology.getSize()),
+                                      new FixedProportionGear(efficiency)));
         }
 
         return fisherList;
-    }
 
-    public int getCoastalRoughness() {
-        return coastalRoughness;
-    }
 
-    public void setCoastalRoughness(int coastalRoughness) {
-        this.coastalRoughness = coastalRoughness;
-    }
-
-    public int getDepthSmoothing() {
-        return depthSmoothing;
-    }
-
-    public void setDepthSmoothing(int depthSmoothing) {
-        this.depthSmoothing = depthSmoothing;
     }
 
 
-
-    public int getPorts() {
-        return ports;
+    public int getBuninLength() {
+        return buninLength;
     }
 
-    public void setPorts(int ports) {
-        this.ports = ports;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getFishers() {
-        return fishers;
-    }
-
-    public void setFishers(int fishers) {
-        this.fishers = fishers;
+    public String getOsmoseConfigurationFile() {
+        return osmoseConfigurationFile;
     }
 
     public double getGridSizeInKm() {
@@ -266,12 +186,28 @@ public class PrototypeScenario implements Scenario {
         this.gridSizeInKm = gridSizeInKm;
     }
 
+    public int getPorts() {
+        return ports;
+    }
+
+    public void setPorts(int ports) {
+        this.ports = ports;
+    }
+
     public DoubleParameter getSpeedInKmh() {
         return speedInKmh;
     }
 
     public void setSpeedInKmh(DoubleParameter speedInKmh) {
         this.speedInKmh = speedInKmh;
+    }
+
+    public DoubleParameter getHoldSize() {
+        return holdSize;
+    }
+
+    public void setHoldSize(DoubleParameter holdSize) {
+        this.holdSize = holdSize;
     }
 
     public DoubleParameter getFishingEfficiency() {
@@ -281,23 +217,6 @@ public class PrototypeScenario implements Scenario {
     public void setFishingEfficiency(DoubleParameter fishingEfficiency) {
         this.fishingEfficiency = fishingEfficiency;
     }
-
-
-    public StrategyFactory<? extends Regulation> getRegulation() {
-        return regulation;
-    }
-
-    public void setRegulation(
-            StrategyFactory<? extends Regulation> regulation) {
-        this.regulation = regulation;
-    }
-
-
-    public int getNumberOfSpecies() {
-        return numberOfSpecies;
-    }
-
-
 
     public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return departingStrategy;
@@ -317,15 +236,6 @@ public class PrototypeScenario implements Scenario {
         this.fishingStrategy = fishingStrategy;
     }
 
-
-    public DoubleParameter getHoldSize() {
-        return holdSize;
-    }
-
-    public void setHoldSize(DoubleParameter holdSize) {
-        this.holdSize = holdSize;
-    }
-
     public StrategyFactory<? extends DestinationStrategy> getDestinationStrategy() {
         return destinationStrategy;
     }
@@ -335,14 +245,28 @@ public class PrototypeScenario implements Scenario {
         this.destinationStrategy = destinationStrategy;
     }
 
-    public StrategyFactory<? extends BiologyInitializer> getBiologyInitializer() {
-        return biologyInitializer;
+    public StrategyFactory<? extends Regulation> getRegulation() {
+        return regulation;
     }
 
-    public void setBiologyInitializer(
-            StrategyFactory<? extends BiologyInitializer> biologyInitializer) {
-        this.biologyInitializer = biologyInitializer;
+    public void setRegulation(
+            StrategyFactory<? extends Regulation> regulation) {
+        this.regulation = regulation;
     }
 
+    public int getFishers() {
+        return fishers;
+    }
 
+    public void setFishers(int fishers) {
+        this.fishers = fishers;
+    }
+
+    public void setBuninLength(int buninLength) {
+        this.buninLength = buninLength;
+    }
+
+    public void setOsmoseConfigurationFile(String osmoseConfigurationFile) {
+        this.osmoseConfigurationFile = osmoseConfigurationFile;
+    }
 }

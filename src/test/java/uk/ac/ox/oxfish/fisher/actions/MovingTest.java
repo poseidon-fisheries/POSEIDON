@@ -1,17 +1,13 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
 import ec.util.MersenneTwisterFast;
-import junit.framework.Assert;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
@@ -53,30 +49,30 @@ public class MovingTest
         //but it only goes at 1km per hour
         //so it should take 3 steps
         Gear gear = mock(Gear.class);
-        Fisher fisher = new Fisher(port, new MersenneTwisterFast(),
-                                   new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                   new FishingStrategy() {
-                                       @Override
-                                       public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
-                                                                 FishState model) {
-                                           return true;
-                                       }
+        Fisher fisher = new Fisher(0, port,
+                                     new MersenneTwisterFast(),
+                                     new AnarchyFactory().apply(fishState),
+                                     new FixedProbabilityDepartingStrategy(1.0),
+                                     new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+                                     new FishingStrategy() {
+                                         @Override
+                                         public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
+                                                                   FishState model) {
+                                             return true;
+                                         }
 
-                                       @Override
-                                       public void start(FishState model) {
+                                         @Override
+                                         public void start(FishState model) {
 
-                                       }
+                                         }
 
-                                       @Override
-                                       public void turnOff() {
+                                         @Override
+                                         public void turnOff() {
 
-                                       }
-                                   },
-                                   new Boat(1),
-                                   new Hold(100.0, 1),
-                                   gear);
+                                         }
+                                     },
+                                     new Boat(1,1,1),
+                                     new Hold(100.0, 1), gear);
         //starts at port!
         assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
 
@@ -145,10 +141,11 @@ public class MovingTest
         DestinationStrategy strategy = mock(DestinationStrategy.class);
         when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2, 0));
 
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast(),
-                                   new Anarchy(), mock(DepartingStrategy.class),
-                                   strategy,
-                                   mock(FishingStrategy.class), new Boat(0.1),mock(Hold.class),mock(Gear.class) );
+        Fisher fisher = new Fisher(0, port,
+                                     new MersenneTwisterFast(), new Anarchy(),
+                                     mock(DepartingStrategy.class),
+                                     strategy, mock(FishingStrategy.class), new Boat(0.1,1,1), mock(Hold.class),
+                                     mock(Gear.class));
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher, new Anarchy(),24);
@@ -169,8 +166,9 @@ public class MovingTest
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast(), new Anarchy(), null, strategy, mock(FishingStrategy.class), new Boat(0.1),
-                                   mock(Hold.class),mock(Gear.class));
+        Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(), null, strategy,
+                                     mock(FishingStrategy.class),
+                                     new Boat(0.1,1,1), mock(Hold.class), mock(Gear.class));
 
 
         //should move and spend 20 hours doing so

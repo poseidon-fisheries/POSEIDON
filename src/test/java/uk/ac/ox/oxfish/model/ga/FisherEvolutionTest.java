@@ -43,14 +43,14 @@ public class FisherEvolutionTest {
         LinkedList<Fisher> fishers = new LinkedList<>();
         when(model.getFishers()).thenReturn(fishers);
         for(int i=0; i<100; i++)
-            fishers.add(new Fisher(mock(Port.class),random,
-                                   new Anarchy(),
-                                   new FixedProbabilityDepartingStrategy(random.nextDouble()),
-                                   mock(DestinationStrategy.class),
-                                   mock(FishingStrategy.class),
-                                   mock(Boat.class),
-                                   mock(Hold.class), mock(Gear.class)
-                                   ));
+            fishers.add(new Fisher(i, mock(Port.class),
+                                     random,
+                                     new Anarchy(),
+                                     new FixedProbabilityDepartingStrategy(random.nextDouble()),
+                                     mock(DestinationStrategy.class),
+                                     mock(FishingStrategy.class),
+                                     mock(Boat.class), mock(Hold.class),
+                                     mock(Gear.class)));
 
         DoubleGene gene = DoubleGene.of(0.5,0,1);
 

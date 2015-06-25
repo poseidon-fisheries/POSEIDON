@@ -13,7 +13,7 @@ public class BoatTest {
     @Test
     public void storesCorrectly() throws Exception {
 
-        Boat slowBoat = new Boat(5.0);
+        Boat slowBoat = new Boat(5.0,1,1);
         assertEquals(2,slowBoat.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(10),.001); // 10 kilometers in 2 hours
         assertEquals(2,slowBoat.totalTravelTimeAfterAddingThisSegment(10),.001); // 10 kilometers in 2 hours
         slowBoat.recordTravel(10);

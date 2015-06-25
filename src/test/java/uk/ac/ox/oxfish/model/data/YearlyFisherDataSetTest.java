@@ -17,14 +17,14 @@ public class YearlyFisherDataSetTest {
 
         YearlyFisherDataSet yearlyGatherer = new YearlyFisherDataSet();
         Fisher fisher = mock(Fisher.class);
-        when(fisher.getCash()).thenReturn(0d);
+        when(fisher.getBankBalance()).thenReturn(0d);
         yearlyGatherer.start(mock(FishState.class), fisher);
 
-        when(fisher.getCash()).thenReturn(1d);
+        when(fisher.getBankBalance()).thenReturn(1d);
         yearlyGatherer.step(mock(FishState.class));
-        when(fisher.getCash()).thenReturn(2d);
+        when(fisher.getBankBalance()).thenReturn(2d);
         yearlyGatherer.step(mock(FishState.class));
-        when(fisher.getCash()).thenReturn(3d);
+        when(fisher.getBankBalance()).thenReturn(3d);
         yearlyGatherer.step(mock(FishState.class));
         assertEquals(1d, yearlyGatherer.getDataView().get("CASH").get(0), .0001);
         assertEquals(2d, yearlyGatherer.getDataView().get("CASH").get(1), .0001);

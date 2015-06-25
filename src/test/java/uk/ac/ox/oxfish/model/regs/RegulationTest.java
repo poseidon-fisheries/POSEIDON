@@ -60,13 +60,13 @@ public class RegulationTest {
 
         Regulation regs = mock(Regulation.class);
 
-        Fisher fisher = new Fisher(port,new MersenneTwisterFast(),regs,
-                                   mock(DepartingStrategy.class),
-                                   destination,
-                                   mock(FishingStrategy.class),
-                                   mock(Boat.class),
-                                   mock(Hold.class),
-                                   mock(Gear.class));
+        Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(),
+                                     regs,
+                                     mock(DepartingStrategy.class),
+                                     destination,
+                                     mock(FishingStrategy.class),
+                                     mock(Boat.class),
+                                     mock(Hold.class), mock(Gear.class));
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);
         fisher.updateDestination(model,mock(Action.class));

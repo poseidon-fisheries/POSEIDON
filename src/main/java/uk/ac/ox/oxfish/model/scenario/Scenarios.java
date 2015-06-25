@@ -24,6 +24,10 @@ public class Scenarios {
     {
         SCENARIOS.put("Prototype",new PrototypeScenario());
         DESCRIPTIONS.put("Prototype", "A randomly generated west-coast with exponentially more fish the deeper the sea");
+        SCENARIOS.put("OSMOSE Prototype",new OsmosePrototype());
+        DESCRIPTIONS.put("OSMOSE Prototype", "The model running on the basic osmose configurations");
+
+
         SCENARIOS.put("Genetic Algorithm Prototype", new GeneticLocationScenario());
         DESCRIPTIONS.put("Genetic Algorithm Prototype",
                          "The Prototype scenario where agents choose the location they fish through a genetic algorithm");

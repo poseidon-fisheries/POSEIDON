@@ -54,30 +54,30 @@ public class FishingTest {
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(specie, 50.0, biology));
-        Fisher fisher = new Fisher(port, new MersenneTwisterFast(),
-                                   new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0),
-                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                   new FishingStrategy() {
-                                       @Override
-                                       public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
-                                                                 FishState model) {
-                                           return true;
-                                       }
+        Fisher fisher = new Fisher(0, port,
+                                     new MersenneTwisterFast(),
+                                     new AnarchyFactory().apply(fishState),
+                                     new FixedProbabilityDepartingStrategy(1.0),
+                                     new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+                                     new FishingStrategy() {
+                                         @Override
+                                         public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
+                                                                   FishState model) {
+                                             return true;
+                                         }
 
-                                       @Override
-                                       public void start(FishState model) {
+                                         @Override
+                                         public void start(FishState model) {
 
-                                       }
+                                         }
 
-                                       @Override
-                                       public void turnOff() {
+                                         @Override
+                                         public void turnOff() {
 
-                                       }
-                                   },
-                                   new Boat(1.0),
-                                   new Hold(100.0, 1),
-                                   gear);
+                                         }
+                                     },
+                                     new Boat(1.0,1,1),
+                                     new Hold(100.0, 1), gear);
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);
 
