@@ -6,10 +6,13 @@ import fr.ird.osmose.OsmoseSimulation;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.LinkedList;
 
 /**
  * An object that takes care of coordinating and stepping OSMOSE biology within the FishState schedule
@@ -38,6 +41,8 @@ public class OsmoseStepper implements Startable,Steppable{
     private final OsmoseSimulation osmoseSimulation;
 
     private double stepsLeft = 0;
+
+    private final LinkedList<LocalOsmoseBiology> toReset = new LinkedList<>();
 
     /**
      * the stoppable receipt
@@ -87,6 +92,7 @@ public class OsmoseStepper implements Startable,Steppable{
             System.out.print("OSMOSE step!");
             osmoseSimulation.oneStep();
             stepsLeft=stepRatio; //reset
+            toReset.forEach(LocalOsmoseBiology::osmoseStep);
         }
 
 
@@ -107,5 +113,9 @@ public class OsmoseStepper implements Startable,Steppable{
 
     public int getStepsPerYearInFishState() {
         return stepsPerYearInFishState;
+    }
+
+    public LinkedList<LocalOsmoseBiology> getToReset() {
+        return toReset;
     }
 }

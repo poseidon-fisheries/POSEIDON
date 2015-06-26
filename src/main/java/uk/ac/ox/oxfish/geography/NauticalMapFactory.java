@@ -110,7 +110,7 @@ public class NauticalMapFactory {
                 }
             //remove all the marked land tiles and turn them into ocean
             for (SeaTile toRemove : toFlip) {
-                assert toRemove.getAltitude() > 0; //should be removing land!
+                assert toRemove.getAltitude() >= 0; //should be removing land!
                 SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000));
                 assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
                 baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;

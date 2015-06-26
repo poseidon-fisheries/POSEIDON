@@ -37,7 +37,9 @@ public class Arriving implements Action{
             if(agent.getDestination().equals(agent.getLocation()))
                 return new ActionResult(new Arriving(), 0d);
             else
-                return new ActionResult(new Moving(),hoursLeft);
+            {
+                return new ActionResult(new Moving(), hoursLeft);
+            }
         }
 
 

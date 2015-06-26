@@ -64,8 +64,6 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
         //we were going to port already
         if(fisher.getLocation().equals(favoriteSpot))
         {
-            assert currentAction instanceof Arriving; //this should have been called by "arrived"
-
             //go back home
             return fisher.getHomePort().getLocation();
         }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * The inventory object of the ship. It has a maximum capacity. Any fish caught after reaching capacity is thrown overboard
@@ -52,13 +53,15 @@ public class Hold {
         assert consistencyCheck();
         if(tonnesCarried > maximumLoad)
             throwOverboard();
-        assert tonnesCarried <=maximumLoad;
+        assert  maximumLoad >= tonnesCarried || Math.abs(maximumLoad-tonnesCarried) <= FishStateUtilities.EPSILON;
     }
 
     /**
      * call this if you have loaded more than what you can carry. throws overboard catch proportionally
      */
     private void throwOverboard() {
+
+
 
         assert tonnesCarried > maximumLoad;
         double proportionToKeep = 1.0 / getPercentageFilled();
@@ -67,6 +70,7 @@ public class Hold {
         for(int i=0;i< fishHold.length; i++)
         {
             fishHold[i] *= proportionToKeep;
+
             tonnesCarried += fishHold[i];
         }
     }
@@ -94,7 +98,7 @@ public class Hold {
        double sum = 0;
        for(double pounds : fishHold)
            sum+=pounds;
-       return  sum == tonnesCarried;
+       return  Math.abs(tonnesCarried-sum) < FishStateUtilities.EPSILON;
    }
 
     public Catch  unload()

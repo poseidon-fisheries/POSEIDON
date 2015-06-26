@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * A test gear that only catches one specie and always a fixed proportion of what is available where the fishing takes place!
@@ -32,7 +33,7 @@ public class OneSpecieGear implements Gear {
     @Override
     public Catch fish(
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
-        double poundsCaught = hoursSpentFishing * proportionCaught * where.getBiomass(targetedSpecie);
+        double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(targetedSpecie),2);
         assert  poundsCaught >=0;
         if(poundsCaught> 0)
             where.reactToThisAmountOfBiomassBeingFished(targetedSpecie,poundsCaught);

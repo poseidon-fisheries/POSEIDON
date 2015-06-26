@@ -1,12 +1,12 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
+import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.Cell;
 import fr.ird.osmose.OsmoseSimulation;
 import fr.ird.osmose.grid.IGrid;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.geography.*;
 
 /**
@@ -17,8 +17,10 @@ public class OsmoseMapMaker{
 
 
 
-    public static NauticalMap buildMap(OsmoseSimulation simulation,
-                                final double gridCellSizeInKm)
+    public static NauticalMap buildMap(
+            OsmoseSimulation simulation,
+            final double gridCellSizeInKm,
+            OsmoseStepper stepper, MersenneTwisterFast random)
     {
 
 
@@ -37,7 +39,13 @@ public class OsmoseMapMaker{
                 final SeaTile seaTile = cell.isLand() ?
                         new SeaTile(x, y, 20) :
                         new SeaTile(x, y, -20);
-                seaTile.setBiology(new LocalOsmoseBiology(x,y,simulation.getCounter().getBiomass(x,y)));
+                final LocalOsmoseBiology biology = new LocalOsmoseBiology(simulation.getMortality(),
+                                                                          simulation.getCounter().getBiomass(x, y),
+                                                                          simulation.getNumberOfSpecies(),
+                                                                          random
+                                                                          );
+                stepper.getToReset().add(biology);
+                seaTile.setBiology(biology);
                 baseGrid.field[x][y] = seaTile;
             }
 

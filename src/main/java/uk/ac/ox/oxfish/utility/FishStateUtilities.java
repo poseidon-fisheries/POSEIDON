@@ -9,6 +9,8 @@ import java.math.RoundingMode;
  */
 public class FishStateUtilities {
 
+    public static final double EPSILON = .01;
+
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 

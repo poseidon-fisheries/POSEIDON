@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.OsmoseSimulation;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -10,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.OneSpecieGear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -47,7 +47,6 @@ public class OsmosePrototype implements Scenario {
 
     private double gridSizeInKm = 5;
     private int ports = 1;
-
 
 
     /**
@@ -107,8 +106,8 @@ public class OsmosePrototype implements Scenario {
 
         GlobalBiology biology = new GlobalBiology(species);
 
-
-        NauticalMap map = OsmoseMapMaker.buildMap(osmoseSimulation, gridSizeInKm);
+        final OsmoseStepper stepper = new OsmoseStepper(model.getStepsPerDay() * 365, osmoseSimulation, model.random);
+        NauticalMap map = OsmoseMapMaker.buildMap(osmoseSimulation, gridSizeInKm,stepper,model.random );
 
 
 
@@ -119,7 +118,8 @@ public class OsmosePrototype implements Scenario {
       market prices for each species
      */
         double[] marketPrices = new double[biology.getSize()];
-        Arrays.fill(marketPrices, 10.0);
+        Arrays.fill(marketPrices, 1.0);
+
 
         for(Specie specie : biology.getSpecies())
             markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
@@ -128,7 +128,7 @@ public class OsmosePrototype implements Scenario {
         NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, model.random);
 
 
-        model.registerStartable(new OsmoseStepper(model.getStepsPerDay()*365,osmoseSimulation,model.random));
+        model.registerStartable(stepper);
 
         return new ScenarioEssentials(biology,map,markets);
 
@@ -168,7 +168,7 @@ public class OsmosePrototype implements Scenario {
                                       fishingStrategy.apply(model),
                                       new Boat(10,10,speed),
                                       new Hold(capacity, biology.getSize()),
-                                      new FixedProportionGear(efficiency)));
+                                      new OneSpecieGear(biology.getSpecie(0),.001)));
         }
 
         return fisherList;

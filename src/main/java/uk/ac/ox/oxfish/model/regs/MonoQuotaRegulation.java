@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * Fixed biomass quota (no species difference) after which the season stops till the end of the year.
@@ -18,7 +19,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 public class MonoQuotaRegulation implements Regulation, Steppable {
 
 
-    public static final double EPSILON = .1;
     /**
      * how much biomass in total can be caught each year
      */
@@ -42,7 +42,7 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
     }
 
     private boolean isFishingStillAllowed(){
-        return quotaRemaining > EPSILON;
+        return quotaRemaining > FishStateUtilities.EPSILON;
     }
 
 
