@@ -27,30 +27,30 @@ public class ImmediateBinder implements WidgetProcessor<JComponent, SwingMetawid
     public JComponent processWidget(
             JComponent jComponent, String s, Map<String, String> map, final SwingMetawidget metawidget) {
         if(jComponent instanceof JSpinner)
-            ((JSpinner)jComponent).addChangeListener(e -> writeToObject(metawidget));
+            ((JSpinner)jComponent).addChangeListener(e -> writeToObject(metawidget, true));
 
 
 
         if(jComponent instanceof JCheckBox)
-            ((JCheckBox)jComponent).addItemListener(e -> writeToObject(metawidget));
+            ((JCheckBox)jComponent).addItemListener(e -> writeToObject(metawidget, true));
 
         if(jComponent instanceof JTextComponent)
             ((JTextComponent)jComponent).getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void insertUpdate(DocumentEvent e) {
-                    writeToObject(metawidget);
+                    //this apparently is fonts and other stuff, not that useful!
+                    writeToObject(metawidget, false);
 
                 }
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
-                    writeToObject(metawidget);
-
+                    writeToObject(metawidget, false);
                 }
 
                 @Override
                 public void changedUpdate(DocumentEvent e) {
-                    writeToObject(metawidget);
+                    writeToObject(metawidget, false);
 
                 }
             });
@@ -60,9 +60,10 @@ public class ImmediateBinder implements WidgetProcessor<JComponent, SwingMetawid
         return jComponent;
     }
 
-    public void writeToObject(SwingMetawidget metawidget) {
+    public void writeToObject(SwingMetawidget metawidget, boolean rebind) {
         metawidget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).save( metawidget );
-        metawidget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).rebind( metawidget.getToInspect(),metawidget );
+        if(rebind)
+            metawidget.getWidgetProcessor( BeanUtilsBindingProcessor.class ).rebind( metawidget.getToInspect(),metawidget );
     }
 
 

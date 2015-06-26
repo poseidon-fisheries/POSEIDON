@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.OsmoseSimulation;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -18,6 +19,7 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseMapMaker;
+import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
@@ -32,11 +34,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This scenario uses standard osmose configuration and populate with simple agents. It's mostly a way to test how
+ * osmose and this ABM would act together
  * Created by carrknight on 6/25/15.
  */
 public class OsmosePrototype implements Scenario {
 
     private int buninLength = 100;
+
 
     private String osmoseConfigurationFile = "/home/carrknight/code/osmose-v3u2_src/config/osm_all-parameters.csv";
 
@@ -123,6 +128,8 @@ public class OsmosePrototype implements Scenario {
         NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, model.random);
 
 
+        model.registerStartable(new OsmoseStepper(model.getStepsPerDay()*365,osmoseSimulation,model.random));
+
         return new ScenarioEssentials(biology,map,markets);
 
 
@@ -174,9 +181,6 @@ public class OsmosePrototype implements Scenario {
         return buninLength;
     }
 
-    public String getOsmoseConfigurationFile() {
-        return osmoseConfigurationFile;
-    }
 
     public double getGridSizeInKm() {
         return gridSizeInKm;
@@ -264,6 +268,11 @@ public class OsmosePrototype implements Scenario {
 
     public void setBuninLength(int buninLength) {
         this.buninLength = buninLength;
+    }
+
+
+    public String getOsmoseConfigurationFile() {
+        return osmoseConfigurationFile;
     }
 
     public void setOsmoseConfigurationFile(String osmoseConfigurationFile) {

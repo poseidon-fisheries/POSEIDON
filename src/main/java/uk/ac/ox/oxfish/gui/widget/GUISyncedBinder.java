@@ -18,9 +18,9 @@ public class GUISyncedBinder extends ImmediateBinder
     }
 
     @Override
-    public void writeToObject(SwingMetawidget metawidget) {
+    public void writeToObject(SwingMetawidget metawidget, boolean rebind) {
         synchronized(gui.state.schedule) {
-            super.writeToObject(metawidget);
+            super.writeToObject(metawidget, rebind);
         }
     }
 }
