@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -43,7 +44,7 @@ public class OsmosePrototype implements Scenario {
     private int buninLength = 100;
 
 
-    private String osmoseConfigurationFile = "/home/carrknight/code/osmose-v3u2_src/config/osm_all-parameters.csv";
+    private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath("inputs/osmose/prototype/osm_all-parameters.csv");
 
     private double gridSizeInKm = 5;
     private int ports = 1;
@@ -92,7 +93,7 @@ public class OsmosePrototype implements Scenario {
      * essential objects for the model to take place
      *
      * @param model the model
-     * @return a scenario-result object containing the map, the list of agents and the biology object
+     * @return a scenario-resulredt object containing the map, the list of agents and the biology object
      */
     @Override
     public ScenarioEssentials start(FishState model) {
@@ -168,7 +169,7 @@ public class OsmosePrototype implements Scenario {
                                       fishingStrategy.apply(model),
                                       new Boat(10,10,speed),
                                       new Hold(capacity, biology.getSize()),
-                                      new OneSpecieGear(biology.getSpecie(0),.001)));
+                                      new OneSpecieGear(biology.getSpecie(0),efficiency)));
         }
 
         return fisherList;

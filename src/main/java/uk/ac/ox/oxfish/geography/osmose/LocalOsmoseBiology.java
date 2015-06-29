@@ -71,7 +71,7 @@ public class LocalOsmoseBiology implements LocalBiology
         double biomassAvailable = counter.getBiomass(specie.getIndex())-
                 biomassAlreadyFished[specie.getIndex()] ;
         //you can't fish MORE than what is available right now
-        Preconditions.checkArgument(biomassAvailable-biomassFished>FishStateUtilities.EPSILON,
+        Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
                                     "can't fish this much!");
 
         //get all the schools of fish that belong to this specie
@@ -147,5 +147,16 @@ public class LocalOsmoseBiology implements LocalBiology
     public void osmoseStep(){
         Arrays.fill(biomassAlreadyFished,0d);
         biomassFishedFromSchool.clear();
+    }
+
+    @Override
+    public String toString() {
+
+        double[] toPrint = new double[biomassAlreadyFished.length];
+        for(int i =0; i<toPrint.length; i++ )
+            toPrint[i] = counter.getBiomass(i) - biomassAlreadyFished[i];
+
+        return Arrays.toString(toPrint);
+
     }
 }

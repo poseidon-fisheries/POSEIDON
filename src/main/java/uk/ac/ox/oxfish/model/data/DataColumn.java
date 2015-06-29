@@ -75,6 +75,14 @@ public class DataColumn implements Iterable<Double>{
         return data.iterator();
     }
 
+
+    /**
+     * @since 1.6
+     */
+    public Iterator<Double> descendingIterator() {
+        return data.descendingIterator();
+    }
+
     /**
      */
     @Override

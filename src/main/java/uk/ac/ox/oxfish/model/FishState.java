@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.data.FishStateYearlyDataSet;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -43,6 +44,8 @@ public class FishState  extends SimState{
     private List<Startable> toStart;
 
     private final FishStateDailyDataSet dailyDataSet = new FishStateDailyDataSet();
+
+    private final FishStateYearlyDataSet yearlyDataSet = new FishStateYearlyDataSet(dailyDataSet);
 
 
 
@@ -118,6 +121,7 @@ public class FishState  extends SimState{
         for(Startable startable : toStart)
                 startable.start(this);
         dailyDataSet.start(this,this);
+        yearlyDataSet.start(this,this);
         started=true;
 
 
@@ -275,6 +279,19 @@ public class FishState  extends SimState{
         return map.getFishedMap();
     }
 
+    public List<Market> getAllMarketsForThisSpecie(Specie specie)
+    {
+        List<Market> toAggregate = new LinkedList<>();
+        //now get for each port, its markets
+        for (Port port : getPorts())
+        {
+            final Market market = port.getMarket(specie);
+            if (market != null)
+                toAggregate.add(market);
+        }
+
+        return toAggregate;
+    }
 
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -286,5 +303,9 @@ public class FishState  extends SimState{
 
     public FishStateDailyDataSet getDailyDataSet() {
         return dailyDataSet;
+    }
+
+    public FishStateYearlyDataSet getYearlyDataSet() {
+        return yearlyDataSet;
     }
 }

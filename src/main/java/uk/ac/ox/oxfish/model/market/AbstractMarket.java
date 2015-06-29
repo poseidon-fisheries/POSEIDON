@@ -55,9 +55,11 @@ public abstract class AbstractMarket implements Market {
         //start the data-set where we are going to store the history of the counter
         dailyObservations.start(state,this);
         //the gatherers reset the counters as a side effect
-        dailyObservations.registerGather(EARNINGS_COLUMN_NAME, market -> dailyCounter.getColumn(EARNINGS_COLUMN_NAME), Double.NaN);
+        dailyObservations.registerGatherer(EARNINGS_COLUMN_NAME, market -> dailyCounter.getColumn(EARNINGS_COLUMN_NAME),
+                                           Double.NaN);
 
-        dailyObservations.registerGather(LANDINGS_COLUMN_NAME, market -> dailyCounter.getColumn(LANDINGS_COLUMN_NAME),Double.NaN);
+        dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, market -> dailyCounter.getColumn(LANDINGS_COLUMN_NAME),
+                                           Double.NaN);
 
         started = true;
 

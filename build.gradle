@@ -70,6 +70,7 @@ task wrapper(type: Wrapper) {
 
 
 task fatJar(type: FatCapsule) {
+    archiveName = "oxfish_executable.jar"
     applicationClass 'Main'
 }
 

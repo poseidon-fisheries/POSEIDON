@@ -46,7 +46,6 @@ public class FishGUI extends GUIState{
     private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
     private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
-    private final JPanel aggregateData = new JPanel();
 
 
     /**
@@ -78,7 +77,7 @@ public class FishGUI extends GUIState{
     @Override
     public void init(Controller controller) {
         super.init(controller);
-        
+
 
         //create the display2d
         display2D = new Display2D(WIDTH, HEIGHT,this);
@@ -120,7 +119,7 @@ public class FishGUI extends GUIState{
             @Override
             public void step(SimState simState) {
                 SwingUtilities.invokeLater(() -> timeLabel.setText("Year: " +state.getYear() + " day: " +
-                                          state.getDayOfTheYear() + " hour: " + state.getHour()));
+                                                                           state.getDayOfTheYear() + " hour: " + state.getHour()));
 
             }
         });
@@ -171,7 +170,11 @@ public class FishGUI extends GUIState{
 
 
         //build aggregate data
-        ((Console)controller).getTabPane().add("Aggregate Data",new MetaInspector(new FishStateProxy(state), self) );
+        ScrollPane pane = new ScrollPane();
+        pane.add(new MetaInspector(new FishStateProxy(state), self) );
+
+        ((Console) controller).getTabPane().add("Aggregate Data",pane );
+
 
 
 

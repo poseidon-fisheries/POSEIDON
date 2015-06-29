@@ -32,17 +32,18 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
     @Override
     public void start(FishState state, Fisher observed) {
         //CASH
-        registerGather(CASH_COLUMN, Fisher::getBankBalance,Double.NaN);
+        registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
 
-        registerGather(CASH_FLOW_COLUMN, new Function<Fisher, Double>() {
+        registerGatherer(CASH_FLOW_COLUMN, new Function<Fisher, Double>() {
             double oldCash = observed.getBankBalance();
+
             @Override
             public Double apply(Fisher fisher) {
                 double flow = fisher.getBankBalance() - oldCash;
                 oldCash = fisher.getBankBalance();
                 return flow;
             }
-        },Double.NaN);
+        }, Double.NaN);
 
         super.start(state, observed);
 

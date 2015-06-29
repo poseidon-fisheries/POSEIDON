@@ -206,6 +206,11 @@ public class NauticalMap implements Startable
         return rasterBackingGrid.elements();
     }
 
+    public List<SeaTile> getAllSeaTilesAsList()
+    {
+        return new LinkedList<>(rasterBackingGrid.elements());
+    }
+
     /**
      * tell the startable to turnoff,
      */
