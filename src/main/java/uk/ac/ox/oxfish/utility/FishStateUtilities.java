@@ -58,7 +58,7 @@ public class FishStateUtilities {
                 if (file.exists())
                     return file.getAbsolutePath();
             }
-        } catch (MalformedURLException | URISyntaxException ignored) {
+        } catch (MalformedURLException | SecurityException |  URISyntaxException ignored) {
         }
 
         //finally you can just try to look for the jar file

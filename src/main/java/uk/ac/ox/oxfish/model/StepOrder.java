@@ -34,5 +34,8 @@ public enum StepOrder {
      */
     DATA_RESET,
 
+    /**
+     * exogenous forces that act when the model has stepped can be used here (a simple GA algorithm for example)
+     */
     AFTER_DATA;
 }

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +45,8 @@ public class OsmosePrototype implements Scenario {
     private int buninLength = 100;
 
 
-    private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath("inputs/osmose/prototype/osm_all-parameters.csv");
+    private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath(
+            Paths.get("inputs","osmose","prototype","osm_all-parameters.csv").toString());
 
     private double gridSizeInKm = 5;
     private int ports = 1;

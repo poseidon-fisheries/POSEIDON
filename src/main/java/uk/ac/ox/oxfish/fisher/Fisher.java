@@ -316,16 +316,20 @@ public class Fisher implements Steppable, Startable{
      */
     public void undock() {
         assert this.stepsAtSea == 0;
-        assert this.getLocation().equals(homePort.getLocation());
+        assert isAtPort();
         homePort.depart(this);
         tripLogger.newTrip();
+    }
+
+    public boolean isAtPort() {
+        return this.getLocation().equals(homePort.getLocation());
     }
 
     /**
      * anchors at home-port and sets the trip to "over"
      */
     public void dock(){
-        assert this.getLocation().equals(homePort.getLocation());
+        assert isAtPort();
         homePort.dock(this);
         tripLogger.finishTrip(stepsAtSea);
 

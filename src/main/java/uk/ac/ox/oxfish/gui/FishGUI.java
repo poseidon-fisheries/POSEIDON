@@ -118,8 +118,7 @@ public class FishGUI extends GUIState{
         scheduleRepeatingImmediatelyAfter(new Steppable() {
             @Override
             public void step(SimState simState) {
-                SwingUtilities.invokeLater(() -> timeLabel.setText("Year: " +state.getYear() + " day: " +
-                                                                           state.getDayOfTheYear() + " hour: " + state.getHour()));
+                SwingUtilities.invokeLater(() -> timeLabel.setText(state.timeString()));
 
             }
         });

@@ -1,19 +1,23 @@
+import com.esotericsoftware.minlog.Log;
 import sim.display.Console;
 import sim.engine.Schedule;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateLogger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 class Main{
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws IOException {
+
 
 
         JDialog scenarioSelection = new JDialog((JFrame)null,true);
@@ -39,6 +43,10 @@ class Main{
 
 
         FishState state = new FishState(System.currentTimeMillis());
+        Log.set(Log.LEVEL_NONE);
+        Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
+
+
         state.setScenario(scenarioSelector.getScenario());
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);

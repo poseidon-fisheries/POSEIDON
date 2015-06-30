@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -14,6 +16,8 @@ import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.esotericsoftware.minlog.Log.trace;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -151,14 +155,30 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
                     mapToDouble(TripRecord::getProfitPerStep).sum();
             currentProfits /= recordedTrips.size();
 
+            //log
+            trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
+
             delegate.setFavoriteSpot(
                     algorithm.adapt(previousLocation,current,previousProfits,currentProfits)
             );
+            trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
+
 
             previousLocation = current;
             previousProfits = currentProfits;
             recordedTrips.clear();
         }
+    }
+
+    /**
+     * forces the strategy to choose a different destination. will throw an exception if the fisher is not at port
+     * @param newDestination new destination to go to
+     */
+    public void forceDestination(SeaTile newDestination)
+    {
+        Preconditions.checkState(fisher.isAtPort(), "Changing destination out of port might ruin Trip Record");
+        Preconditions.checkState(recordedTrips.isEmpty(), "Changing destination while some record trips exist is not something I planned for");
+        delegate.setFavoriteSpot(newDestination);
     }
 
     public int getTripsPerDecision() {
@@ -183,5 +203,19 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
 
     public SeaTile getPreviousLocation() {
         return previousLocation;
+    }
+
+    /**
+     * How many trips are recorded for the current location
+     */
+    public int tripsCurrentlyInMemory() {
+        return recordedTrips.size();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("fisher", fisher)
+                .toString();
     }
 }

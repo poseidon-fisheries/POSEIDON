@@ -35,12 +35,12 @@ public class OsmoseMapMaker{
         //the 10 rightmost patches are land, the rest is sea
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {
-                final Cell cell = osmoseMap.getCell(x, y);
+                final Cell cell = osmoseMap.getCell(x, height-y-1);
                 final SeaTile seaTile = cell.isLand() ?
                         new SeaTile(x, y, 20) :
                         new SeaTile(x, y, -20);
                 final LocalOsmoseBiology biology = new LocalOsmoseBiology(simulation.getMortality(),
-                                                                          simulation.getCounter().getBiomass(x, y),
+                                                                          simulation.getCounter().getBiomass(x, height-y-1),
                                                                           simulation.getNumberOfSpecies(),
                                                                           random
                                                                           );

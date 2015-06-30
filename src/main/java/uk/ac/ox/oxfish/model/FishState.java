@@ -308,4 +308,9 @@ public class FishState  extends SimState{
     public FishStateYearlyDataSet getYearlyDataSet() {
         return yearlyDataSet;
     }
+
+    public String timeString()
+    {
+        return "Year: " + getYear() + " day: " + getDayOfTheYear() + " hour: " + getHour();
+    }
 }
