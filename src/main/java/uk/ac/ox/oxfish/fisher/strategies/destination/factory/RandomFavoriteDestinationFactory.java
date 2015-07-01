@@ -4,9 +4,9 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-public class RandomFavoriteDestinationFactory implements StrategyFactory<FavoriteDestinationStrategy>
+public class RandomFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy>
 {
 
     @Override

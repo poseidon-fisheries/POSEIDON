@@ -1,23 +1,20 @@
 package uk.ac.ox.oxfish.gui.widget;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import org.metawidget.inspector.composite.CompositeInspector;
 import org.metawidget.inspector.composite.CompositeInspectorConfig;
 import org.metawidget.inspector.propertytype.PropertyTypeInspector;
-import org.w3c.dom.Element;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FixedFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
  * Created by carrknight on 5/29/15.
  */
-public class StrategyFactoryInspectorTest {
+public class AlgorithmFactoryInspectorTest {
 
 
     @Test
@@ -57,7 +54,7 @@ class ToSerialize
     /**
      * a factory
      */
-    StrategyFactory<? extends DestinationStrategy> firstFactory = new RandomFavoriteDestinationFactory();
+    AlgorithmFactory<? extends DestinationStrategy> firstFactory = new RandomFavoriteDestinationFactory();
 
     public int getRedHerring() {
         return redHerring;
@@ -67,12 +64,12 @@ class ToSerialize
         this.redHerring = redHerring;
     }
 
-    public StrategyFactory<? extends DestinationStrategy> getFirstFactory() {
+    public AlgorithmFactory<? extends DestinationStrategy> getFirstFactory() {
         return firstFactory;
     }
 
     public void setFirstFactory(
-            StrategyFactory<? extends DestinationStrategy> firstFactory) {
+            AlgorithmFactory<? extends DestinationStrategy> firstFactory) {
         this.firstFactory = firstFactory;
     }
 }
@@ -87,7 +84,7 @@ class ToSerialize2
     /**
      * a customized factory
      */
-    StrategyFactory<? extends DestinationStrategy> firstFactory = new FixedFavoriteDestinationFactory();
+    AlgorithmFactory<? extends DestinationStrategy> firstFactory = new FixedFavoriteDestinationFactory();
 
     public int getRedHerring() {
         return redHerring;
@@ -97,12 +94,12 @@ class ToSerialize2
         this.redHerring = redHerring;
     }
 
-    public StrategyFactory<? extends DestinationStrategy> getFirstFactory() {
+    public AlgorithmFactory<? extends DestinationStrategy> getFirstFactory() {
         return firstFactory;
     }
 
     public void setFirstFactory(
-            StrategyFactory<? extends DestinationStrategy> firstFactory) {
+            AlgorithmFactory<? extends DestinationStrategy> firstFactory) {
         this.firstFactory = firstFactory;
     }
 }

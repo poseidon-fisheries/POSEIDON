@@ -145,7 +145,7 @@ public class MovingTest
                                      new MersenneTwisterFast(), new Anarchy(),
                                      mock(DepartingStrategy.class),
                                      strategy, mock(FishingStrategy.class), new Boat(0.1,1,1), mock(Hold.class),
-                                     mock(Gear.class));
+                                     mock(Gear.class) );
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher, new Anarchy(),24);
@@ -168,7 +168,7 @@ public class MovingTest
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(), null, strategy,
                                      mock(FishingStrategy.class),
-                                     new Boat(0.1,1,1), mock(Hold.class), mock(Gear.class));
+                                     new Boat(0.1,1,1), mock(Hold.class), mock(Gear.class) );
 
 
         //should move and spend 20 hours doing so

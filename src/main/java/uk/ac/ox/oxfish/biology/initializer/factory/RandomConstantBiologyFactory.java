@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import uk.ac.ox.oxfish.biology.initializer.RandomConstantBiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates a RandomConstantBiologyInitializer
  * Created by carrknight on 6/22/15.
  */
-public class RandomConstantBiologyFactory implements StrategyFactory<RandomConstantBiologyInitializer> {
+public class RandomConstantBiologyFactory implements AlgorithmFactory<RandomConstantBiologyInitializer> {
 
 
 

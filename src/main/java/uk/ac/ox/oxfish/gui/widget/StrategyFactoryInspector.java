@@ -3,12 +3,13 @@ package uk.ac.ox.oxfish.gui.widget;
 import org.metawidget.inspector.impl.BaseObjectInspector;
 import org.metawidget.inspector.impl.propertystyle.Property;
 import org.metawidget.util.CollectionUtils;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Map;
 
 /**
- * The "MetaInspector" (in the metawidget sense, not the mason sense) that looks for StrategyFactories.
+ * The "MetaInspector" (in the metawidget sense, not the mason sense) that looks for AlgorithmFactories.
  * If it finds one it adds a "factory" attribute to the element
  * Created by carrknight on 5/29/15.
  */
@@ -38,12 +39,12 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
         if(property.isWritable()) {
             try {
                 final Class<?> propertyClass = Class.forName(property.getType());
-                if (StrategyFactory.class.isAssignableFrom(propertyClass)) {
+                if (AlgorithmFactory.class.isAssignableFrom(propertyClass)) {
                     //it is a strategy factory!
                     //now most of the time it should be something like factory<? extends x>
                     //with getGenericType() we get ? extends x, but we want only x
                     //so we split and take last
-                    final String[] splitType = property.getGenericType().split(" ");
+                    final String[] splitType = FishStateUtilities.removeParentheses(property.getGenericType()).split(" ");
                     //store it as attribute factory_strategy="x" which we will use to build widgets on
                     attributes.put("factory_strategy", splitType[splitType.length - 1]);
                 }

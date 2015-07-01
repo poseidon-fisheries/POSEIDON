@@ -10,7 +10,7 @@ import java.util.function.Function;
  *
  * Created by carrknight on 5/27/15.
  */
-public interface StrategyFactory<T> extends Function<FishState,T>
+public interface AlgorithmFactory<T> extends Function<FishState,T>
 {
 
 

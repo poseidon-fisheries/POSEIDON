@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility;
 
+import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -8,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategi
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 
@@ -19,13 +21,13 @@ import java.util.function.Supplier;
  * Just a way to link a class to its constructor map
  * Created by carrknight on 5/29/15.
  */
-public class StrategyFactories {
+public class AlgorithmFactories {
 
 
-    //notice the <? extends StrategyFactory>. It's the need for hacks like these that explains why so many engineers
+    //notice the <? extends AlgorithmFactory>. It's the need for hacks like these that explains why so many engineers
     //join terrorist organizations.mason
-    public static final Map<Class,Map<String,? extends Supplier<? extends StrategyFactory<?>>>> CONSTRUCTOR_MAP = new HashMap<>();
-    public static final Map<Class,Map<? extends Class<? extends StrategyFactory>,String>> NAMES_MAP = new HashMap<>();
+    public static final Map<Class,Map<String,? extends Supplier<? extends AlgorithmFactory<?>>>> CONSTRUCTOR_MAP = new HashMap<>();
+    public static final Map<Class,Map<? extends Class<? extends AlgorithmFactory>,String>> NAMES_MAP = new HashMap<>();
     static
     {
         CONSTRUCTOR_MAP.put(DepartingStrategy.class, DepartingStrategies.CONSTRUCTORS);
@@ -38,6 +40,8 @@ public class StrategyFactories {
         NAMES_MAP.put(Regulation.class, Regulations.NAMES);
         CONSTRUCTOR_MAP.put(BiologyInitializer.class, BiologyInitializers.CONSTRUCTORS);
         NAMES_MAP.put(BiologyInitializer.class, BiologyInitializers.NAMES);
+        CONSTRUCTOR_MAP.put(DirectedGraph.class, NetworkBuilders.CONSTRUCTORS);
+        NAMES_MAP.put(DirectedGraph.class, NetworkBuilders.NAMES);
 
 
     }

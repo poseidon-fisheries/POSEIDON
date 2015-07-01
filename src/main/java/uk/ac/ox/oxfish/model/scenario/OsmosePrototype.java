@@ -1,13 +1,13 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import fr.ird.osmose.OsmoseSimulation;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.OneSpecieGear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -23,17 +23,20 @@ import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.network.BarabasiAlbertBuilder;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.network.FriendshipEdge;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This scenario uses standard osmose configuration and populate with simple agents. It's mostly a way to test how
@@ -71,22 +74,25 @@ public class OsmosePrototype implements Scenario {
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DepartingStrategy> departingStrategy =
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
             new FixedProbabilityDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DestinationStrategy> destinationStrategy =
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
             new PerTripIterativeDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
-    private StrategyFactory<? extends FishingStrategy> fishingStrategy =
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
             new MaximumStepsFactory();
 
 
-    private StrategyFactory<? extends Regulation> regulation =  new AnarchyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation =  new AnarchyFactory();
+
+    private AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>> networkBuilder =
+            new EquidegreeBuilder();
 
     private int fishers = 50;
 
@@ -148,7 +154,7 @@ public class OsmosePrototype implements Scenario {
      * @return a list of agents
      */
     @Override
-    public List<Fisher> populateModel(FishState model) {
+    public ScenarioPopulation populateModel(FishState model) {
 
         LinkedList<Fisher> fisherList = new LinkedList<>();
         final NauticalMap map = model.getMap();
@@ -174,7 +180,9 @@ public class OsmosePrototype implements Scenario {
                                       new OneSpecieGear(biology.getSpecie(0),efficiency)));
         }
 
-        return fisherList;
+        SocialNetwork network = new SocialNetwork(networkBuilder);
+
+        return new ScenarioPopulation(fisherList,network);
 
 
     }
@@ -225,39 +233,39 @@ public class OsmosePrototype implements Scenario {
         this.fishingEfficiency = fishingEfficiency;
     }
 
-    public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
+    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return departingStrategy;
     }
 
     public void setDepartingStrategy(
-            StrategyFactory<? extends DepartingStrategy> departingStrategy) {
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
         this.departingStrategy = departingStrategy;
     }
 
-    public StrategyFactory<? extends FishingStrategy> getFishingStrategy() {
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
         return fishingStrategy;
     }
 
     public void setFishingStrategy(
-            StrategyFactory<? extends FishingStrategy> fishingStrategy) {
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
         this.fishingStrategy = fishingStrategy;
     }
 
-    public StrategyFactory<? extends DestinationStrategy> getDestinationStrategy() {
+    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
         return destinationStrategy;
     }
 
     public void setDestinationStrategy(
-            StrategyFactory<? extends DestinationStrategy> destinationStrategy) {
+            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
     }
 
-    public StrategyFactory<? extends Regulation> getRegulation() {
+    public AlgorithmFactory<? extends Regulation> getRegulation() {
         return regulation;
     }
 
     public void setRegulation(
-            StrategyFactory<? extends Regulation> regulation) {
+            AlgorithmFactory<? extends Regulation> regulation) {
         this.regulation = regulation;
     }
 
@@ -280,5 +288,14 @@ public class OsmosePrototype implements Scenario {
 
     public void setOsmoseConfigurationFile(String osmoseConfigurationFile) {
         this.osmoseConfigurationFile = osmoseConfigurationFile;
+    }
+
+    public AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> getNetworkBuilder() {
+        return networkBuilder;
+    }
+
+    public void setNetworkBuilder(
+            AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkBuilder) {
+        this.networkBuilder = networkBuilder;
     }
 }

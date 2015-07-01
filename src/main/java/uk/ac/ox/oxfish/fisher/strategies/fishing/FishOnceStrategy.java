@@ -2,9 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
 
 /**
  * Fish only if the hold is empty, then just go back home

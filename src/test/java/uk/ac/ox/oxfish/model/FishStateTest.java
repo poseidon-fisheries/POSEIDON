@@ -5,8 +5,10 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
+import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 
 import java.util.HashSet;
 
@@ -26,6 +28,9 @@ public class FishStateTest {
         ScenarioEssentials result = mock(ScenarioEssentials.class);
         when(result.getBiology()).thenReturn(mock(GlobalBiology.class));
         when(scenario.start(state)).thenReturn(result);
+        final ScenarioPopulation mock = mock(ScenarioPopulation.class);
+        when(mock.getNetwork()).thenReturn(mock(SocialNetwork.class));
+        when(scenario.populateModel(state)).thenReturn(mock);
         NauticalMap map = mock(NauticalMap.class); when(result.getMap()).thenReturn(map);
         when(map.getPorts()).thenReturn(new HashSet<Port>());
 

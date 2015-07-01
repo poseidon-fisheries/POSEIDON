@@ -4,9 +4,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.RandomConstantBiologyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,12 +20,12 @@ public class BiologyInitializers {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<StrategyFactory<? extends BiologyInitializer>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends BiologyInitializer>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends StrategyFactory>,String> NAMES =
+    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
             new LinkedHashMap<>();
     static{
         CONSTRUCTORS.put("Independent Logistic",

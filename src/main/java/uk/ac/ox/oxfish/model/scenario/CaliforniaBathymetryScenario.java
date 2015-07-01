@@ -1,14 +1,13 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Reads the bathymetry file of california and for now not much else.
@@ -46,7 +45,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
      * @return a list of agents
      */
     @Override
-    public List<Fisher> populateModel(FishState model) {
-        return new ArrayList<>();
+    public ScenarioPopulation populateModel(FishState model) {
+
+
+        return new ScenarioPopulation(new ArrayList<>(),new SocialNetwork(new EmptyNetworkBuilder()));
     }
 }

@@ -20,11 +20,11 @@ public class TripLoggerTest
         logger.start(mock(FishState.class));
 
         assertNull(logger.getCurrentTrip());
-        assertEquals(logger.getAllTrips().size(),0);
+        assertEquals(logger.getFinishedTrips().size(),0);
         //create a new trip, now there is a current trip, but it's not in the history
         logger.newTrip();
         assertNotNull(logger.getCurrentTrip());
-        assertEquals(logger.getAllTrips().size(),0);
+        assertEquals(logger.getFinishedTrips().size(),0);
 
         logger.recordEarnings(100);
         logger.recordCosts(200);
@@ -32,7 +32,7 @@ public class TripLoggerTest
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
         assertEquals(logger.getCurrentTrip().getProfitPerStep(),-10,.001);
-        assertEquals(logger.getAllTrips().size(),1);
+        assertEquals(logger.getFinishedTrips().size(),1);
 
 
     }

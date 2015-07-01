@@ -4,12 +4,12 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
  * this factory gets its own class because it has setters and getters which can be found through reflection
  */
-public class FixedFavoriteDestinationFactory implements StrategyFactory<FavoriteDestinationStrategy>
+public class FixedFavoriteDestinationFactory implements AlgorithmFactory<FavoriteDestinationStrategy>
 {
 
     /**

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,12 +16,12 @@ public class DepartingStrategies {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<StrategyFactory<? extends DepartingStrategy>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends DepartingStrategy>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends StrategyFactory>,String> NAMES =
+    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
             new LinkedHashMap<>();
     static{
         CONSTRUCTORS.put("Fixed Probability",

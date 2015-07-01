@@ -3,13 +3,11 @@ package uk.ac.ox.oxfish.gui.widget;
 import org.metawidget.inspector.impl.BaseObjectInspector;
 import org.metawidget.inspector.impl.propertystyle.Property;
 import org.metawidget.util.CollectionUtils;
-import uk.ac.ox.oxfish.utility.StrategyFactories;
+import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Marks down all the properties who are strategies. Useful for postprocessing
@@ -43,7 +41,7 @@ public class StrategyInspector extends BaseObjectInspector
                 //get property class
                 final Class<?> propertyClass = Class.forName(property.getType());
                 //strategy classes
-                final Set<Class> strategyClasses = StrategyFactories.CONSTRUCTOR_MAP.keySet();
+                final Set<Class> strategyClasses = AlgorithmFactories.CONSTRUCTOR_MAP.keySet();
                 final Optional<Class> superclass = strategyClasses.stream().filter(
                         aclass -> aclass.isAssignableFrom(propertyClass)).findFirst();
                 superclass.ifPresent(aClass -> attributes.put(KEY, aClass.getName()));

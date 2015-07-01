@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FixedProbabilityDepartingFactory implements StrategyFactory<FixedProbabilityDepartingStrategy>
+public class FixedProbabilityDepartingFactory implements AlgorithmFactory<FixedProbabilityDepartingStrategy>
 {
     private DoubleParameter probabilityToLeavePort= new FixedDoubleParameter(1);
 

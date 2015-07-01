@@ -24,7 +24,7 @@ public interface Scenario {
      * @param model the model
      * @return a list of agents
      */
-    public List<Fisher> populateModel(FishState model);
+    public ScenarioPopulation populateModel(FishState model);
 
 
 

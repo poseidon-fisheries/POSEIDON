@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumStepsStrategy;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The factory of MaximumStepsStrategy. For the factory instead of focusing on steps I focus on days
  * Created by carrknight on 6/23/15.
  */
-public class MaximumStepsFactory implements StrategyFactory<MaximumStepsStrategy>
+public class MaximumStepsFactory implements AlgorithmFactory<MaximumStepsStrategy>
 {
 
     /**

@@ -2,14 +2,14 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * Creates fishing seasons of any amount
  */
-public class FishingSeasonFactory implements StrategyFactory<FishingSeason>
+public class FishingSeasonFactory implements AlgorithmFactory<FishingSeason>
 {
 
     /**

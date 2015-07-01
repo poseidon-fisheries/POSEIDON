@@ -1,20 +1,18 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import ec.util.MersenneTwisterFast;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.ga.FisherEvolution;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.List;
@@ -61,8 +59,8 @@ public abstract class PrototypeGeneticScenario implements Scenario {
      * @return a list of agents
      */
     @Override
-    public List<Fisher> populateModel(FishState model) {
-        List<Fisher> fishers = delegate.populateModel(model);
+    public ScenarioPopulation populateModel(FishState model) {
+        List<Fisher> fishers = delegate.populateModel(model).getPopulation();
 
 
 
@@ -79,8 +77,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
         //set it up
         model.registerStartable(evolution);
-        return fishers;
-
+        return new ScenarioPopulation(fishers,new SocialNetwork(new EmptyNetworkBuilder()));
     }
 
     /**
@@ -124,11 +121,11 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
     public void setRegulation(
-            StrategyFactory<? extends Regulation> regulation) {
+            AlgorithmFactory<? extends Regulation> regulation) {
         delegate.setRegulation(regulation);
     }
 
-    public StrategyFactory<? extends Regulation> getRegulation() {
+    public AlgorithmFactory<? extends Regulation> getRegulation() {
         return delegate.getRegulation();
     }
 
@@ -184,7 +181,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
     }
 
 
-    public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
+    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return delegate.getDepartingStrategy();
     }
 
@@ -201,7 +198,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
     }
 
     public void setFishingStrategy(
-            StrategyFactory<? extends FishingStrategy> fishingStrategy) {
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
         delegate.setFishingStrategy(fishingStrategy);
     }
 
@@ -217,7 +214,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setCoastalRoughness(coastalRoughness);
     }
 
-    public StrategyFactory<? extends FishingStrategy> getFishingStrategy() {
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
         return delegate.getFishingStrategy();
     }
 
@@ -231,7 +228,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
     public void setDepartingStrategy(
-            StrategyFactory<? extends DepartingStrategy> departingStrategy) {
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
         delegate.setDepartingStrategy(departingStrategy);
     }
 

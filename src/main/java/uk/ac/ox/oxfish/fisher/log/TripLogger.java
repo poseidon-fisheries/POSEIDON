@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.log;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -21,7 +20,7 @@ public class TripLogger implements Startable
     /**
      * trips trips trips
      */
-    private final LinkedList<TripRecord> allTrips = new LinkedList<>();
+    private final LinkedList<TripRecord> finishedTrips = new LinkedList<>();
 
     /**
      * whatever needs to be notified that a trip is complete
@@ -72,7 +71,7 @@ public class TripLogger implements Startable
         //complete the trip
         currentTrip.completeTrip(stepsAtSea);
         //add it to the historical record
-        allTrips.add(currentTrip);
+        finishedTrips.add(currentTrip);
         //tell the listeners
         for(TripListener listener : listeners)
             listener.reactToFinishedTrip(currentTrip);
@@ -95,7 +94,7 @@ public class TripLogger implements Startable
         currentTrip.recordTripCutShort();
     }
 
-    public List<TripRecord> getAllTrips() {
-        return Collections.unmodifiableList(allTrips);
+    public List<TripRecord> getFinishedTrips() {
+        return Collections.unmodifiableList(finishedTrips);
     }
 }

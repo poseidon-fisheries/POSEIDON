@@ -1,8 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,10 +23,10 @@ public class Regulations
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<StrategyFactory<? extends Regulation>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends Regulation>>> CONSTRUCTORS =
             new LinkedHashMap<>();
 
-    public static final Map<Class<? extends StrategyFactory>,String> NAMES =
+    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
             new LinkedHashMap<>();
 
     static

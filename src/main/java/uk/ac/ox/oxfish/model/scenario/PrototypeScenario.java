@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -22,15 +23,17 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.network.FriendshipEdge;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -63,7 +66,7 @@ public class PrototypeScenario implements Scenario {
 
 
 
-    private StrategyFactory<? extends BiologyInitializer> biologyInitializer =
+    private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer =
             new DiffusingLogisticFactory();
 
     /**
@@ -102,23 +105,26 @@ public class PrototypeScenario implements Scenario {
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DepartingStrategy> departingStrategy =
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
             new FixedProbabilityDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
-    private StrategyFactory<? extends DestinationStrategy> destinationStrategy =
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
             new PerTripIterativeDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
-    private StrategyFactory<? extends FishingStrategy> fishingStrategy =
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
             new MaximumStepsFactory();
 
 
-    private StrategyFactory<? extends Regulation> regulation =  new AnarchyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation =  new AnarchyFactory();
 
+
+    private AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>> networkBuilder =
+            new EquidegreeBuilder();
 
 
     public PrototypeScenario() {
@@ -179,7 +185,7 @@ public class PrototypeScenario implements Scenario {
      * @return a list of agents
      */
     @Override
-    public List<Fisher> populateModel(FishState model) {
+    public ScenarioPopulation populateModel(FishState model) {
 
         LinkedList<Fisher> fisherList = new LinkedList<>();
         final NauticalMap map = model.getMap();
@@ -205,7 +211,7 @@ public class PrototypeScenario implements Scenario {
                                         new FixedProportionGear(efficiency)));
         }
 
-        return fisherList;
+        return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 
     public int getCoastalRoughness() {
@@ -283,12 +289,12 @@ public class PrototypeScenario implements Scenario {
     }
 
 
-    public StrategyFactory<? extends Regulation> getRegulation() {
+    public AlgorithmFactory<? extends Regulation> getRegulation() {
         return regulation;
     }
 
     public void setRegulation(
-            StrategyFactory<? extends Regulation> regulation) {
+            AlgorithmFactory<? extends Regulation> regulation) {
         this.regulation = regulation;
     }
 
@@ -299,21 +305,21 @@ public class PrototypeScenario implements Scenario {
 
 
 
-    public StrategyFactory<? extends DepartingStrategy> getDepartingStrategy() {
+    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
         return departingStrategy;
     }
 
     public void setDepartingStrategy(
-            StrategyFactory<? extends DepartingStrategy> departingStrategy) {
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
         this.departingStrategy = departingStrategy;
     }
 
-    public StrategyFactory<? extends FishingStrategy> getFishingStrategy() {
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
         return fishingStrategy;
     }
 
     public void setFishingStrategy(
-            StrategyFactory<? extends FishingStrategy> fishingStrategy) {
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
         this.fishingStrategy = fishingStrategy;
     }
 
@@ -326,23 +332,31 @@ public class PrototypeScenario implements Scenario {
         this.holdSize = holdSize;
     }
 
-    public StrategyFactory<? extends DestinationStrategy> getDestinationStrategy() {
+    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
         return destinationStrategy;
     }
 
     public void setDestinationStrategy(
-            StrategyFactory<? extends DestinationStrategy> destinationStrategy) {
+            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
         this.destinationStrategy = destinationStrategy;
     }
 
-    public StrategyFactory<? extends BiologyInitializer> getBiologyInitializer() {
+    public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
         return biologyInitializer;
     }
 
     public void setBiologyInitializer(
-            StrategyFactory<? extends BiologyInitializer> biologyInitializer) {
+            AlgorithmFactory<? extends BiologyInitializer> biologyInitializer) {
         this.biologyInitializer = biologyInitializer;
     }
 
 
+    public AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> getNetworkBuilder() {
+        return networkBuilder;
+    }
+
+    public void setNetworkBuilder(
+            AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkBuilder) {
+        this.networkBuilder = networkBuilder;
+    }
 }

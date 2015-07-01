@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates a separate mono-quota regulation object each time it is called. This way each quota acts independently
  * Created by carrknight on 6/14/15.
  */
-public class ITQMonoFactory implements StrategyFactory<MonoQuotaRegulation>
+public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 {
 
 

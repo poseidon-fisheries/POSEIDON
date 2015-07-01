@@ -1,6 +1,11 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * Holds summary statistics of a trip, specifically how much money was made and how much was spent.
@@ -35,6 +40,11 @@ public class TripRecord {
      */
     private double totalCosts = 0;
 
+    /**
+     * the places where fishing occured
+     */
+    private final Set<SeaTile> tilesFished = new HashSet<>();
+
 
     public TripRecord()
     {
@@ -45,6 +55,14 @@ public class TripRecord {
     {
         Preconditions.checkState(!completed);
         totalEarnings += newEarnings;
+    }
+
+
+    public void recordFishing(FishingRecord record)
+    {
+
+        tilesFished.add(record.getTileFished());
+
     }
 
     public void recordCosts(double newCosts)
@@ -79,5 +97,9 @@ public class TripRecord {
 
     public boolean isCompleted() {
         return completed;
+    }
+
+    public Set<SeaTile> getTilesFished() {
+        return tilesFished;
     }
 }

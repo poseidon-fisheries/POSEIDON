@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -18,10 +18,10 @@ public class DestinationStrategies
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,Supplier<StrategyFactory<? extends DestinationStrategy>>> CONSTRUCTORS =
+    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS =
             new LinkedHashMap<>();
 
-    public static final LinkedHashMap<Class<? extends StrategyFactory>,String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
 
     static{
         CONSTRUCTORS.put("Random Favorite",

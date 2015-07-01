@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.log;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -34,20 +35,26 @@ public class FishingRecord
     final private Catch fishCaught;
 
     /**
+     * the agent that did the fishing
+     */
+    final private Fisher fisher;
+
+    /**
      * the time-step when the fishing occurred
      */
     final private int step;
 
 
     public FishingRecord(
-            double hoursSpentFishing, Gear gearUsed, SeaTile tileFished, Catch fishCaught, int step) {
+            double hoursSpentFishing, Gear gearUsed, SeaTile tileFished, Catch fishCaught,
+            Fisher fisher, int step) {
         this.hoursSpentFishing = hoursSpentFishing;
         this.gearUsed = gearUsed;
         this.tileFished = tileFished;
         this.fishCaught = fishCaught;
+        this.fisher = fisher;
         this.step = step;
     }
-
 
     public double getHoursSpentFishing() {
         return hoursSpentFishing;
@@ -67,5 +74,9 @@ public class FishingRecord
 
     public int getStep() {
         return step;
+    }
+
+    public Fisher getFisher() {
+        return fisher;
     }
 }

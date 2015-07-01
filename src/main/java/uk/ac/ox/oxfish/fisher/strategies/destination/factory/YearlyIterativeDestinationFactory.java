@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.destination.YearlyIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * factory that creates an hill-climber strategy with a random starting point
  */
-public class YearlyIterativeDestinationFactory implements StrategyFactory<YearlyIterativeDestinationStrategy>
+public class YearlyIterativeDestinationFactory implements AlgorithmFactory<YearlyIterativeDestinationStrategy>
 {
 
     DoubleParameter stepSize = new FixedDoubleParameter(5d);

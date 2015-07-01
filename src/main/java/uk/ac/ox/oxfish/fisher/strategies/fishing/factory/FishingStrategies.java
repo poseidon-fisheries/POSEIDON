@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishOnceStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -15,10 +13,10 @@ import java.util.function.Supplier;
 public class FishingStrategies {
 
     public static final LinkedHashMap<String,
-            Supplier<StrategyFactory<? extends FishingStrategy>>> CONSTRUCTORS =
+            Supplier<AlgorithmFactory<? extends FishingStrategy>>> CONSTRUCTORS =
             new LinkedHashMap<>();
 
-    public static final LinkedHashMap<Class<? extends StrategyFactory>,String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
 
     static {
 

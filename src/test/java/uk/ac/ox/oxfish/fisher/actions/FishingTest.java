@@ -35,7 +35,7 @@ public class FishingTest {
         Fisher agent = mock(Fisher.class);
         when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1));
         fishing.act(mock(FishState.class), agent, new Anarchy(),1d );
-        verify(agent).fishHere(any(),anyDouble() );
+        verify(agent).fishHere(any(),anyDouble(),any() );
     }
 
 
@@ -77,7 +77,7 @@ public class FishingTest {
                                          }
                                      },
                                      new Boat(1.0,1,1),
-                                     new Hold(100.0, 1), gear);
+                                     new Hold(100.0, 1), gear );
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);
 

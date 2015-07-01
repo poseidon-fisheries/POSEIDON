@@ -3,16 +3,14 @@ package uk.ac.ox.oxfish.gui.widget;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.widgetprocessor.iface.WidgetProcessor;
-import uk.ac.ox.oxfish.utility.StrategyFactories;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactories;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -49,8 +47,8 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 //find it what are you building
                 Class strategyClass = Class.forName(attributes.get("factory_strategy"));
                 //get list of constructors
-                Map<String,? extends Supplier<? extends StrategyFactory>> constructors = StrategyFactories.CONSTRUCTOR_MAP.get(strategyClass);
-                Map<? extends Class<? extends StrategyFactory>,String> names = StrategyFactories.NAMES_MAP.get(strategyClass);
+                Map<String,? extends Supplier<? extends AlgorithmFactory>> constructors = AlgorithmFactories.CONSTRUCTOR_MAP.get(strategyClass);
+                Map<? extends Class<? extends AlgorithmFactory>,String> names = AlgorithmFactories.NAMES_MAP.get(strategyClass);
 
                 final Object beingInspected = metawidget.getToInspect();
                 final String fieldName = attributes.get("name");

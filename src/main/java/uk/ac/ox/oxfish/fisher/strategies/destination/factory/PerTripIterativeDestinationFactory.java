@@ -3,10 +3,9 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.YearlyIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.StrategyFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -15,7 +14,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * creates a per-trip iterative destination strategy
  * Created by carrknight on 6/19/15.
  */
-public class PerTripIterativeDestinationFactory implements StrategyFactory<PerTripIterativeDestinationStrategy>
+public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
 {
 
     DoubleParameter tripsPerDecision = new FixedDoubleParameter(1d);

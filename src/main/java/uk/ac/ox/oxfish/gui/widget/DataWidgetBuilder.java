@@ -212,39 +212,4 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
     }
 
 
-    //stolen from: http://stackoverflow.com/a/19136617/975904
-    private String removeParentheses(String toClean)
-    {
-        int open = 0;
-        int closed = 0;
-        boolean changed = true;
-        int startIndex = 0, openIndex = -1, closeIndex = -1;
-
-        while (changed) {
-            changed = false;
-            for (int a = startIndex; a < toClean.length(); a++) {
-                if (toClean.charAt(a) == '<') {
-                    open++;
-                    if (open == 1) {
-                        openIndex = a;
-                    }
-                } else if (toClean.charAt(a) == '>') {
-                    closed++;
-                    if (open == closed) {
-                        closeIndex = a;
-                        toClean = toClean.substring(0, openIndex)
-                                + toClean.substring(closeIndex + 1);
-                        changed = true;
-                        break;
-                    }
-                } else {
-                    if (open == 0)
-                        startIndex++;
-                }
-            }
-        }
-        return toClean;
-    }
-
-
 }

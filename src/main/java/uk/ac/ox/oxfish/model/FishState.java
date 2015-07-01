@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -17,6 +18,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.FishStateYearlyDataSet;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.*;
 
@@ -58,6 +60,11 @@ public class FishState  extends SimState{
      * x steps equal 1 day
      */
     final private int stepsPerDay;
+
+    /**
+     * the social network
+     */
+    private SocialNetwork socialNetwork;
 
     public int getStepsPerDay() {
         return stepsPerDay;
@@ -107,7 +114,10 @@ public class FishState  extends SimState{
         biology = initialization.getBiology();
 
 
-        fishers = scenario.populateModel(this);
+        final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
+        fishers = scenarioPopulation.getPopulation();
+        socialNetwork = scenarioPopulation.getNetwork();
+        socialNetwork.populate(this);
 
         map.start(this);
         //start the fishers
@@ -312,5 +322,18 @@ public class FishState  extends SimState{
     public String timeString()
     {
         return "Year: " + getYear() + " day: " + getDayOfTheYear() + " hour: " + getHour();
+    }
+
+    public int getStep() {
+        return (int) Math.round(schedule.getTime());
+    }
+
+    public MersenneTwisterFast getRandom()
+    {
+        return random;
+    }
+
+    public SocialNetwork getSocialNetwork() {
+        return socialNetwork;
     }
 }

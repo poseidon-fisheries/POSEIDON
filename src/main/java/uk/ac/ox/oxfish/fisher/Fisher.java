@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.EvictingQueue;
 import ec.util.MersenneTwisterFast;
 import org.metawidget.inspector.annotation.UiHidden;
 import sim.engine.SimState;
@@ -15,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripLogger;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -27,9 +29,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.DataSet;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.List;
+import java.util.Queue;
 
 /**
  * The boat catching all that delicious fish.
@@ -100,13 +104,18 @@ public class Fisher implements Steppable, Startable{
     /**
      * stores trip information
      */
-    private TripLogger tripLogger = new TripLogger();
+    private final TripLogger tripLogger = new TripLogger();
+
+    private final Queue<FishingRecord> fishingLog = EvictingQueue.create(10);
 
 
     /**
      * the cash owned by the firm
      */
     private double bankBalance = 0;
+
+    private SocialNetwork network;
+
 
     /***
      *      ___           _                    _
@@ -163,6 +172,19 @@ public class Fisher implements Steppable, Startable{
     private Stoppable receipt;
 
 
+    /**
+     * Creates a fisher by giving it all its sub-components
+     * @param id the id-number of the fisher
+     * @param homePort the home port
+     * @param random a randomizer
+     * @param regulation the rules the fisher follows
+     * @param departingStrategy how the fisher decides how to leave the port
+     * @param destinationStrategy how the fisher decides where to go
+     * @param fishingStrategy how the fisher decides how much to fish
+     * @param boat the boat the fisher uses
+     * @param hold the space available to load fish
+     * @param gear what is used for fishing
+\     */
     public Fisher(
             int id,
             Port homePort, MersenneTwisterFast random,
@@ -201,6 +223,7 @@ public class Fisher implements Steppable, Startable{
     {
 
         this.state = state;
+        this.network = state.getSocialNetwork();
         receipt = state.schedule.scheduleRepeating(this);
         yearlyDataGatherer.start(state,this);
         tripLogger.start(state);
@@ -464,13 +487,21 @@ public class Fisher implements Steppable, Startable{
      * tell the fisher to use its gear to fish at current location. It stores everything in the hold
      * @param modelBiology the global biology object
      * @param hoursSpentFishing hours spent on this activity
+     * @param state
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing) {
+    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state) {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
         Catch catchOfTheDay = gear.fish(this, location,hoursSpentFishing , modelBiology);
         regulation.reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
+
+        //record it
+        FishingRecord record = new FishingRecord(hoursSpentFishing,gear,location,catchOfTheDay,this,
+                                                 state.getStep());
+        getCurrentTrip().recordFishing(record);
+        fishingLog.add(record);
+
         return catchOfTheDay;
     }
 
@@ -560,7 +591,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public List<TripRecord> getAllTrips() {
-        return tripLogger.getAllTrips();
+        return tripLogger.getFinishedTrips();
     }
 
     public String getAction() {
