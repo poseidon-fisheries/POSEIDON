@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.utility.maximization;
 
 import ec.util.MersenneTwisterFast;
 import org.metawidget.inspector.annotation.UiHidden;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -59,7 +60,7 @@ public class HillClimbingMovement implements IterativeMovement {
 
     @Override
     public SeaTile adapt(
-            SeaTile previous, SeaTile current, double previousFitness, double newFitness)
+            Fisher fisher, SeaTile previous, SeaTile current, double previousFitness, double newFitness)
     {
 
         //if you didn't move before (or you are stuck) you don't have a gradient yet so just try a new step

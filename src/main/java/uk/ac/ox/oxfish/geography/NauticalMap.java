@@ -18,6 +18,7 @@ import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -172,6 +174,14 @@ public class NauticalMap implements Startable
 
     }
 
+
+    public double getTotalBiology(Specie specie)
+    {
+        return getAllSeaTilesAsList().stream().mapToDouble(value -> value.getBiomass(specie)).sum();
+    }
+
+
+
     /**
      * proof that you were started
      */
@@ -229,7 +239,7 @@ public class NauticalMap implements Startable
 
     /**
      * this is called at initialization but can be called again if there is a change in MPAs. It basically checks
-     * for each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it is set to the tile.
+     * for each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it is set to the tile.Bio
      */
     public void recomputeTilesMPA() {
         //todo this works but make a test to be sure

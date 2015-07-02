@@ -25,6 +25,7 @@ public interface LocalBiology extends Startable
     public Double getBiomass(Specie specie);
 
 
+
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      * @param specie the specie fished

@@ -22,6 +22,8 @@ public class TripLogger implements Startable
      */
     private final LinkedList<TripRecord> finishedTrips = new LinkedList<>();
 
+    private TripRecord lastFinishedTrip = null;
+
     /**
      * whatever needs to be notified that a trip is complete
      */
@@ -72,6 +74,7 @@ public class TripLogger implements Startable
         currentTrip.completeTrip(stepsAtSea);
         //add it to the historical record
         finishedTrips.add(currentTrip);
+        lastFinishedTrip = currentTrip;
         //tell the listeners
         for(TripListener listener : listeners)
             listener.reactToFinishedTrip(currentTrip);
@@ -96,5 +99,9 @@ public class TripLogger implements Startable
 
     public List<TripRecord> getFinishedTrips() {
         return Collections.unmodifiableList(finishedTrips);
+    }
+
+    public TripRecord getLastFinishedTrip() {
+        return lastFinishedTrip;
     }
 }

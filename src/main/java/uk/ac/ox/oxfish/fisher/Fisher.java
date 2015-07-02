@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
@@ -602,4 +603,28 @@ public class Fisher implements Steppable, Startable{
     public String toString() {
         return "Fisher " + fisherID;
     }
+
+    /**
+     * return all neighbors of this agent in the social network ignoring the direction of the edges
+     */
+    public Collection<Fisher> getAllFriends()
+    {
+        return network.getAllNeighbors(this);
+    }
+
+    /**
+     * return all neighbors of this agent where there a directed edge from this fisher to his neighbors
+     * @return a collection of agents
+     */
+    public Collection<Fisher> getDirectedFriends()
+    {
+        return network.getDirectedNeighbors(this);
+    }
+
+    public TripRecord getLastFinishedTrip() {
+        return tripLogger.getLastFinishedTrip();
+    }
+
+
+
 }

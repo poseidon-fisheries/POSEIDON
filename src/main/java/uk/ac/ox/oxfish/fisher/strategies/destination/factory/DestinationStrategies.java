@@ -40,6 +40,9 @@ public class DestinationStrategies
         CONSTRUCTORS.put("Per Trip Iterative",
                          PerTripIterativeDestinationFactory::new);
         NAMES.put(PerTripIterativeDestinationFactory.class,"Per Trip Iterative");
+        CONSTRUCTORS.put("Imitator-Explorator",
+                         PerTripImitativeDestinationFactory::new);
+        NAMES.put(PerTripImitativeDestinationFactory.class,"Imitator-Explorator");
 
     }
 

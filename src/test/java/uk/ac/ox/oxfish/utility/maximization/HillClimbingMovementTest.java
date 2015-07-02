@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.utility.maximization;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -28,9 +29,9 @@ public class HillClimbingMovementTest {
 
         //if new is better than old, go random
         HillClimbingMovement algo = new HillClimbingMovement(map,random);
-        assertEquals(newTile,algo.adapt(old,current,0,100));
+        assertEquals(newTile,algo.adapt(mock(Fisher.class), old, current, 0, 100));
         //if old is better than new, go back to new
-        assertEquals(old,algo.adapt(old,current,0,-100));
+        assertEquals(old,algo.adapt(mock(Fisher.class), old, current, 0, -100));
 
 
     }

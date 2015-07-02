@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -159,7 +158,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
             trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
 
             delegate.setFavoriteSpot(
-                    algorithm.adapt(previousLocation,current,previousProfits,currentProfits)
+                    algorithm.adapt(fisher, previousLocation, current, previousProfits, currentProfits)
             );
             trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
 

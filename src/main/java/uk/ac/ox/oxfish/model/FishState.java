@@ -265,6 +265,11 @@ public class FishState  extends SimState{
         return null;
     }
 
+    public double getTotalBiomass(Specie specie)
+    {
+        return map.getTotalBiology(specie);
+    }
+
     /**
      * if the model hasn't started, register this object to be started when the model is. Otherwise start it now
      * @param startable the object to start
