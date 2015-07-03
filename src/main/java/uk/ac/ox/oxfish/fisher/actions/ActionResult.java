@@ -15,7 +15,7 @@ public class ActionResult
 
     public ActionResult(Action nextState, double hoursLeft) {
         this.nextState = nextState;
-        this.hoursLeft = FishStateUtilities.round(hoursLeft,2);
+        this.hoursLeft = FishStateUtilities.round(hoursLeft);
     }
 
     public Action getNextState() {

@@ -155,12 +155,12 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
             currentProfits /= recordedTrips.size();
 
             //log
-            trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
+ //           trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
 
             delegate.setFavoriteSpot(
                     algorithm.adapt(fisher, previousLocation, current, previousProfits, currentProfits)
             );
-            trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
+//            trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
 
 
             previousLocation = current;

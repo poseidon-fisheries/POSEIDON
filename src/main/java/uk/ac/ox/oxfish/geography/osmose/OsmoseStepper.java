@@ -6,7 +6,6 @@ import fr.ird.osmose.OsmoseSimulation;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -85,7 +84,7 @@ public class OsmoseStepper implements Startable,Steppable{
     public void step(SimState simState)
     {
         stepsLeft--;
-        stepsLeft = FishStateUtilities.round(stepsLeft,2);
+        stepsLeft = FishStateUtilities.round(stepsLeft);
         //notice the dithering when steps don't match really well
         if(stepsLeft<=0 || (stepsLeft < 1 && random.nextBoolean(1-stepsLeft)))
         {

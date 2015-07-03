@@ -20,17 +20,17 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
     /**
      * the current amount of biomass in this spot
      */
-    private double[] currentBiomass;
+    private Double[] currentBiomass;
 
     /**
      * the maximum amount of biomass
      */
-    private double[] carryingCapacity;
+    private Double[] carryingCapacity;
 
     /**
      * the uninpeded growth rate of each species
      */
-    private double[] malthusianParameter;
+    private Double[] malthusianParameter;
 
     /**
      * initialize the local biology
@@ -38,8 +38,8 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      * @param carryingCapacity the maximum amount of fish
      * @param malthusianParameter the unconstrained growth rate of each species
      */
-    public IndependentLogisticLocalBiology(double[] currentBiomass, double[] carryingCapacity,
-                                           double[] malthusianParameter) {
+    public IndependentLogisticLocalBiology(Double[] currentBiomass, Double[] carryingCapacity,
+                                           Double[] malthusianParameter) {
         Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
         Preconditions.checkArgument(currentBiomass.length==malthusianParameter.length);
 
@@ -70,7 +70,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      * @param specie the specie
      * @return the carrying capacity for this specie at this location
      */
-    public double getCarryingCapacity(Specie specie)
+    public Double getCarryingCapacity(Specie specie)
     {
         final int index = specie.getIndex();
         if(index>=this.carryingCapacity.length)
@@ -85,7 +85,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      * @param specie the specie
      * @return the unconstrained growth rate.
      */
-    public double getMalthusianParameter(Specie specie)
+    public Double getMalthusianParameter(Specie specie)
     {
         final int index = specie.getIndex();
         if(index>=this.malthusianParameter.length)
@@ -223,14 +223,22 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      */
     private void growArrays(int newSize)
     {
-        assert currentBiomass.length < newSize;
+        final int oldSize = currentBiomass.length;
+        assert oldSize < newSize;
         currentBiomass = Arrays.copyOf(currentBiomass,newSize);
         malthusianParameter = Arrays.copyOf(malthusianParameter,newSize);
         carryingCapacity = Arrays.copyOf(carryingCapacity,newSize);
+        //fill them
+        for(int i=oldSize; i<newSize; i++)
+        {
+            currentBiomass[i]=0d;
+            malthusianParameter[i]=0d;
+            carryingCapacity[i]=0d;
+        }
     }
 
 
-    public double[] getCurrentBiomass() {
+    public Double[] getCurrentBiomass() {
         return currentBiomass;
     }
 }

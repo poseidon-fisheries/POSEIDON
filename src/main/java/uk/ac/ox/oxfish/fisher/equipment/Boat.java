@@ -39,8 +39,8 @@ public class Boat {
         Preconditions.checkArgument(boatWidth > 0, "width must be positive > 0");
 
         this.boatSpeedInKph = boatSpeedInKph;
-        this.boatLenght = FishStateUtilities.round(boatLenght,2);
-        this.boatWidth =  FishStateUtilities.round(boatWidth,2);
+        this.boatLenght = FishStateUtilities.round(boatLenght);
+        this.boatWidth =  FishStateUtilities.round(boatWidth);
     }
 
     /**

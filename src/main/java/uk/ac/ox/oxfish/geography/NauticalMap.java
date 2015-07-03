@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
@@ -321,12 +323,35 @@ public class NauticalMap implements Startable
     }
 
 
+    /**
+     * computing neighborhoods is actually a very expensive computational process so we store here all the
+     * neighborhood we found for each tile and neighborhood size so we compute them but once
+     */
+    public Table<SeaTile,Integer,Bag> alreadyComputedNeighbors = HashBasedTable.create();
+
+
+
     public Bag getMooreNeighbors(SeaTile tile, int neighborhoodSize)
     {
-        Bag neighbors = new Bag();
-        rasterBackingGrid.getMooreNeighbors(tile.getGridX(),tile.getGridY(),neighborhoodSize,
-                                            Grid2D.BOUNDED,false,neighbors,null,null);
+        Bag neighbors;
+        neighbors = alreadyComputedNeighbors.get(tile, neighborhoodSize);
+        if(neighbors == null) {
+            neighbors = new Bag();
+            rasterBackingGrid.getMooreNeighbors(tile.getGridX(), tile.getGridY(), neighborhoodSize,
+                                                Grid2D.BOUNDED, false, neighbors, null, null);
+            alreadyComputedNeighbors.put(tile,neighborhoodSize,neighbors);
+        }
         return neighbors;
+    }
+
+    /**
+     * tell the map some seatile has changed (not in its inner workings but really swapped out with a new seatile object).
+     * Forgets all precomputed neighborhoods and recomputes MPAs
+     */
+    public void reactToSeaTileChange()
+    {
+        recomputeTilesMPA();
+        alreadyComputedNeighbors.clear();
     }
 
     /**

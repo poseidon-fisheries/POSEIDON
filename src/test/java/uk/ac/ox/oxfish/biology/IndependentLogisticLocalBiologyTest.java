@@ -13,7 +13,7 @@ public class IndependentLogisticLocalBiologyTest
     public void logisticGrowthWorks() throws Exception {
 
         IndependentLogisticLocalBiology bio = new IndependentLogisticLocalBiology(
-                new double[]{100,200}, new double[]{100,400}, new double[]{.5,.5}
+                new Double[]{100d,200d}, new Double[]{100d,400d}, new Double[]{.5,.5}
         );
         Specie specie0 = new Specie("0"); specie0.setIndex(0);
         Specie specie1 = new Specie("1"); specie1.setIndex(1);
@@ -43,7 +43,7 @@ public class IndependentLogisticLocalBiologyTest
 
         //starts with only specie0
         IndependentLogisticLocalBiology bio = new IndependentLogisticLocalBiology(
-                new double[]{100}, new double[]{100}, new double[]{.5}
+                new Double[]{100d}, new Double[]{100d}, new Double[]{.5d}
         );
         Specie specie0 = new Specie("0"); specie0.setIndex(0);
         Specie specie2 = new Specie("2"); specie2.setIndex(2);
@@ -59,6 +59,7 @@ public class IndependentLogisticLocalBiologyTest
         bio.setCarryingCapacity(specie2, 100);
         bio.setCurrentBiomass(specie2, 50);
         bio.setMalthusianParameter(specie2, .5);
+        assertEquals(100, bio.getBiomass(specie0), .1);
 
         //added specie will work
         bio.step(mock(FishState.class));

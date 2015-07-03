@@ -16,11 +16,11 @@ import java.util.Arrays;
 public class IndependentLogisticInitializer implements BiologyInitializer {
 
 
-    private final double carryingCapacity;
+    private final Double carryingCapacity;
 
-    private final double minSteepness;
+    private final Double minSteepness;
 
-    private final double maxSteepness;
+    private final Double maxSteepness;
 
 
     public IndependentLogisticInitializer(double carryingCapacity, double minSteepness, double maxSteepness)
@@ -49,10 +49,10 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
         else
         {
             int species = biology.getSize();
-            double[] carryingCapacities = new double[species];
+            Double[] carryingCapacities = new Double[species];
             Arrays.fill(carryingCapacities,carryingCapacity);
-            double[] currentCapacities = new double[species];
-            double[] malthusians = new double[species];
+            Double[] currentCapacities = new Double[species];
+            Double[] malthusians = new Double[species];
             for(int i=0; i<currentCapacities.length; i++)
             {
                 currentCapacities[i] = random.nextDouble(true, true) * carryingCapacity;
