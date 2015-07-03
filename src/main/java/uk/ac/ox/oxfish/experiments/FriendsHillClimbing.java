@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish;
+package uk.ac.ox.oxfish.experiments;
 
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
  * Here I store what I did in order to produce documents and such
  * Created by carrknight on 7/2/15.
  */
-public class Simulations
+public class FriendsHillClimbing
 {
 
     public static void testThatFriendsAreGood()
