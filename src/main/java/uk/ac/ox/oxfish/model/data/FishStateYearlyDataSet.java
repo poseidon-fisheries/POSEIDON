@@ -39,7 +39,6 @@ public class FishStateYearlyDataSet extends DataSet<FishState>
         {
             final String earnings =  specie + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
             final String landings = specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
-            final String biomass = "Biomass " + specie.getName();
             registerGatherer(landings,
                              columnSummer(originalGatherer.getColumn(
                                      landings))
@@ -49,14 +48,17 @@ public class FishStateYearlyDataSet extends DataSet<FishState>
                                      earnings))
                     , Double.NaN);
 
+
+
+
+        }
+
+        for(Specie specie : observed.getSpecies())
+        {
+            final String biomass = "Biomass " + specie.getName();
             registerGatherer(biomass,
-                             columnSummer(originalGatherer.getColumn(
-                                     biomass))
+                             state1 -> originalGatherer.getLatestObservation(biomass)
                     , Double.NaN);
-
-
-
-
         }
 
     }

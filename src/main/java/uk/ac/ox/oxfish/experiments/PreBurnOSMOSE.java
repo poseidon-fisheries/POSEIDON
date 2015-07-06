@@ -15,9 +15,10 @@ import java.io.File;
 public class PreBurnOSMOSE {
 
 
-
-
-    public static void main(String[] args)
+    /**
+     * generated 1000 random starting point for the gulf of mexico setup
+     */
+    public static void WFS(String[] args)
     {
 
 
@@ -38,6 +39,45 @@ public class PreBurnOSMOSE {
             state.start();
 
             File file = new File(output);
+            File renamedTo = new File(outputDir + "start" + i + ".nc");
+            Preconditions.checkState(file.exists());
+            Preconditions.checkState(!renamedTo.exists());
+            final boolean renamedCorrectly = file.renameTo(renamedTo);
+            Preconditions.checkState(!file.exists());
+            Preconditions.checkState(renamedTo.exists());
+            Preconditions.checkState(renamedCorrectly);
+            ;
+
+
+        }
+
+
+    }
+    /**
+     * generated 1000 random starting point for the default OSMOSE scenario
+     */
+    public static void main(String[] args)
+    {
+
+
+        //because i am planning on running this once I am just going to hard-code this in.
+        String configurationLocation =  "/home/carrknight/code/osmose-v3u2_src/config/burnin.csv";
+        final String outputDir = "/home/carrknight/code/osmose-v3u2_src/config/output/restart/";
+        String output = outputDir + "osm_snapshot_step2799.nc.0";
+
+        for(int i=0; i<1000; i++)
+        {
+            OsmosePrototype scenario = new OsmosePrototype();
+            scenario.setFishers(0); //no fishers
+            scenario.setNetworkBuilder(new EmptyNetworkBuilder()); //no social network
+            scenario.setBuninLength(114*25);
+            scenario.setOsmoseConfigurationFile(configurationLocation);
+            FishState state = new FishState(i);
+            state.setScenario(scenario);
+            state.start();
+
+            File file = new File(output);
+            System.out.println(output);
             File renamedTo = new File(outputDir + "start" + i + ".nc");
             Preconditions.checkState(file.exists());
             Preconditions.checkState(!renamedTo.exists());

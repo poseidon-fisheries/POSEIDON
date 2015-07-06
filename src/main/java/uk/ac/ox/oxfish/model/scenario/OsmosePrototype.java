@@ -34,9 +34,17 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * This scenario uses standard osmose configuration and populate with simple agents. It's mostly a way to test how
@@ -50,6 +58,16 @@ public class OsmosePrototype implements Scenario {
 
     private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath(
             Paths.get("inputs","osmose","prototype","osm_all-parameters.csv").toString());
+
+
+
+    private boolean preInitializedConfiguration =false;
+
+    private String preInitializedConfigurationDirectory =
+            "/home/carrknight/code/config_OSMOSE-WFS_v3u2/randomStarts"
+            ;
+
+
 
     private double gridSizeInKm = 5;
     private int ports = 1;
@@ -105,10 +123,26 @@ public class OsmosePrototype implements Scenario {
      */
     @Override
     public ScenarioEssentials start(FishState model) {
+        OsmoseSimulation osmoseSimulation=null;
 
-        final OsmoseSimulation osmoseSimulation = OsmoseSimulation.startUpOSMOSESimulationWithBurnIn(buninLength,
-                                                                                                     osmoseConfigurationFile);
+        try {
+            if(!preInitializedConfiguration)
+                osmoseSimulation = OsmoseSimulation.startUpOSMOSESimulationWithBurnIn(buninLength,
+                                                                                      osmoseConfigurationFile);
+            else
+            {
+                ArrayList<Path> fileList = new ArrayList<>();
+                Files.walk(Paths.get(preInitializedConfigurationDirectory)).filter(
+                        path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(".nc")
+                ).forEach(fileList::add);
 
+                osmoseSimulation = OsmoseSimulation.startupOSMOSEWithRestartFile(12,osmoseConfigurationFile,
+                                                                                 fileList.get(model.getRandom().nextInt(fileList.size())).toString());
+            }
+
+        } catch (IOException e) {
+            throw  new IllegalArgumentException("Can't instantiate OSMOSE!");
+        }
         Specie[] species = new Specie[osmoseSimulation.getNumberOfSpecies()];
         for(int i=0; i<species.length; i++)
             species[i] = new Specie(osmoseSimulation.getSpecies(i).getName());
@@ -297,5 +331,21 @@ public class OsmosePrototype implements Scenario {
     public void setNetworkBuilder(
             AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkBuilder) {
         this.networkBuilder = networkBuilder;
+    }
+
+    public boolean isPreInitializedConfiguration() {
+        return preInitializedConfiguration;
+    }
+
+    public void setPreInitializedConfiguration(boolean preInitializedConfiguration) {
+        this.preInitializedConfiguration = preInitializedConfiguration;
+    }
+
+    public String getPreInitializedConfigurationDirectory() {
+        return preInitializedConfigurationDirectory;
+    }
+
+    public void setPreInitializedConfigurationDirectory(String preInitializedConfigurationDirectory) {
+        this.preInitializedConfigurationDirectory = preInitializedConfigurationDirectory;
     }
 }

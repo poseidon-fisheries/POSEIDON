@@ -137,7 +137,7 @@ public class DataSet<T> implements Steppable
     }
 
 
-    public double getLatestObservation(String columnName)
+    public Double getLatestObservation(String columnName)
     {
         return data.get(columnName).getLatest();
     }
