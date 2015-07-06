@@ -132,7 +132,7 @@ public class OsmosePrototype implements Scenario {
             else
             {
                 ArrayList<Path> fileList = new ArrayList<>();
-                Files.walk(Paths.get(preInitializedConfigurationDirectory)).filter(
+                Files.walk(Paths.get(preInitializedConfigurationDirectory),1).filter(
                         path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(".nc")
                 ).forEach(fileList::add);
 
