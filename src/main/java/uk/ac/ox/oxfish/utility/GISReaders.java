@@ -7,9 +7,12 @@ import sim.io.geo.ArcInfoASCGridImporter;
 import sim.io.geo.ShapeFileImporter;
 import sim.util.geo.MasonGeometry;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 /**
  * simple utility function to read ASC and return the grid
@@ -21,12 +24,17 @@ public class GISReaders {
 
     public  static GeomGridField readRaster(String resourceName) {
         URL resource = GISReaders.class.getClassLoader().getResource(resourceName);
-        if(resource == null)
-            throw new NullPointerException("Resource is null");
+        File input = null;
+        if(resource!= null)
+            input = new File(resource.getFile());
+        if(resource == null || !input.exists())
+            //it's not a resource, maybe it's an external file
+            input = Paths.get(resourceName).toFile();
+
 
         FileInputStream inputStream;
         try {
-            inputStream = new FileInputStream(resource.getFile());
+            inputStream = new FileInputStream(input);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -74,15 +82,19 @@ public class GISReaders {
 
     private static GeomVectorField readShapeFile(String filename) {
         URL resource = GISReaders.class.getClassLoader().getResource(filename);
-        if(resource == null)
-            throw new NullPointerException("Resource is null");
+        File input = null;
+        if(resource!= null)
+            input = new File(resource.getFile());
+        if(resource == null || !input.exists())
+            //it's not a resource, maybe it's an external file
+            input = Paths.get(filename).toFile();
 
         GeomVectorField vectorField = new GeomVectorField();
 
         //read it in!
         try {
-            ShapeFileImporter.read(resource, vectorField);
-        } catch (FileNotFoundException e) {
+            ShapeFileImporter.read(input.toURI().toURL(), vectorField);
+        } catch (FileNotFoundException | MalformedURLException e) {
             e.printStackTrace();
         }
         return vectorField;

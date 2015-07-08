@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.geography;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -52,7 +54,7 @@ public class NauticalMapFactory {
             mpaVectorField = new GeomVectorField();
 
         EquirectangularDistance distance = new EquirectangularDistance(temporaryField.toXCoord(0.5),
-                temporaryField.getPixelHeight());
+                                                                       temporaryField.getPixelHeight());
 
         return new NauticalMap(rasterBathymetry,mpaVectorField,distance);
 
@@ -144,7 +146,7 @@ public class NauticalMapFactory {
 
             //put the new one in!
             baseGrid.set(toChange.getGridX(),toChange.getGridY(),
-                    new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude));
+                         new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude));
 
 
         }
@@ -188,7 +190,7 @@ public class NauticalMapFactory {
          *     |___/_|_|_\___/\___/\__|_||_| |___/_\___/_\___/\__, |\_, |
          *                                                    |___/ |__/
          */
-       biologyInitializer.processMap(biology,map,random,model );
+        biologyInitializer.processMap(biology,map,random,model );
 
         return map;
 
@@ -320,6 +322,50 @@ public class NauticalMapFactory {
             }
         };
 
+    }
+
+
+    public static Map<SeaTile,double[]> getSpeciesForEachCellFromData(Map<Specie,String> filenamesForSpecie,
+                                                                      NauticalMap map)
+    {
+        //number of species
+        int species = filenamesForSpecie.keySet().size();
+        //list of all the tiles
+        final List<SeaTile> tiles = map.getAllSeaTilesAsList();
+        //altitude map
+        final GeomGridField bathymetry = map.getRasterBathymetry();
+        //map of results to return
+        Map<SeaTile,double[]> toReturn = new HashMap<>();
+
+        //we go for each specie/file since that's probably the largest thing to keep in memory
+        for(Map.Entry<Specie,String> file : filenamesForSpecie.entrySet())
+        {
+            final GeomGridField biomass = GISReaders.readRaster(file.getValue());
+
+            for(SeaTile tile : tiles)
+            {
+                //allocate memory
+                toReturn.putIfAbsent(tile,new double[species]);
+                //get the coordinates of the seatile
+                final Point tileCoordinate = bathymetry.toPoint(tile.getGridX(), tile.getGridY());
+                //find which biomass grid it corresponds to
+                int biomassX = biomass.toXCoord(tileCoordinate);
+                int biomassY = biomass.toYCoord(tileCoordinate);
+                //get it!
+                final DoubleGrid2D grid = (DoubleGrid2D) biomass.getGrid();
+                //as long as you are in the grid boundaries
+                if(biomassY >= 0 && biomassY < biomass.getGridHeight()
+                        &&
+                        biomassX >= 0 && biomassX < biomass.getGridWidth()) {
+                    final double tons = grid.get(biomassX, biomassY);
+                    if(tons >=0 && Double.isFinite(tons)) //negative means no observation
+                        toReturn.get(tile)[file.getKey().getIndex()]=tons+1;
+                }
+
+            }
+        }
+
+        return toReturn;
     }
 
 }

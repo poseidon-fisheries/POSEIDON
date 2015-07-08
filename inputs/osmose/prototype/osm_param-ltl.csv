@@ -1,0 +1,30 @@
+# LTL forcing
+ltl.java.classname;fr.ird.osmose.ltl.LTLFastForcing
+ltl.netcdf.file;osm_ltlbiomass_integrated.nc
+ltl.nstep;24
+
+# LTL groups
+plankton.accessibility2fish.plk0;0.0530
+plankton.accessibility2fish.plk1;0.00327
+plankton.accessibility2fish.plk2;0.0111
+plankton.accessibility2fish.plk3;0.108
+plankton.conversion2tons.plk0;0.72
+plankton.conversion2tons.plk1;0.72
+plankton.conversion2tons.plk2;0.675
+plankton.conversion2tons.plk3;1
+plankton.name.plk0;Dinoflagellates
+plankton.name.plk1;Diatoms
+plankton.name.plk2;Ciliates
+plankton.name.plk3;Copepods
+plankton.size.max.plk0;0.002
+plankton.size.max.plk1;0.02
+plankton.size.max.plk2;0.02
+plankton.size.max.plk3;0.3
+plankton.size.min.plk0;0.0002
+plankton.size.min.plk1;0.002
+plankton.size.min.plk2;0.002
+plankton.size.min.plk3;0.02
+plankton.TL.plk0;1
+plankton.TL.plk1;1
+plankton.TL.plk2;2
+plankton.TL.plk3;2.5

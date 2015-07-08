@@ -61,11 +61,13 @@ public class OsmosePrototype implements Scenario {
 
 
 
-    private boolean preInitializedConfiguration =false;
+    private boolean preInitializedConfiguration =true;
 
     private String preInitializedConfigurationDirectory =
-            "/home/carrknight/code/config_OSMOSE-WFS_v3u2/randomStarts"
-            ;
+            FishStateUtilities.getAbsolutePath(
+                    Paths.get("inputs", "osmose", "prototype", "restart").toString()
+            );
+
 
 
 
@@ -132,7 +134,7 @@ public class OsmosePrototype implements Scenario {
             else
             {
                 ArrayList<Path> fileList = new ArrayList<>();
-                Files.walk(Paths.get(preInitializedConfigurationDirectory),1).filter(
+                Files.walk(Paths.get(preInitializedConfigurationDirectory), 1).filter(
                         path -> Files.isRegularFile(path) && path.getFileName().toString().endsWith(".nc")
                 ).forEach(fileList::add);
 

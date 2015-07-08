@@ -104,3 +104,5 @@ gdalwarp(srcfile = "/home/carrknight/Dropbox/OC Systems-Based Fisheries Manageme
 src_dataset<-readGDAL("/home/carrknight/rocktest.tif")
 proj4string(src_dataset)
 plot(raster(src_dataset))
+rasterizedFish<-raster(src_dataset)
+writeRaster(rasterizedFish, filename="/home/carrknight/rocktest.asc", format = "ascii", datatype='FLT4S', overwrite=TRUE) 
