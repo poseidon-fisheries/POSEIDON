@@ -1,9 +1,7 @@
 library(rgdal)
 library(maptools)
 
-#read the mpa
-data.shape<-readOGR(dsn="/home/carrknight/code/oxfish/src/main/resources/cssr_mpa/",layer="CCSR_MarineProtectedAreas")
-plot(data.shape)
+
 
 
 #read the raster
@@ -17,10 +15,11 @@ x <- new("GDALReadOnlyDataset", path)
 getDriver(x)
 getDriverLongName(getDriver(x))
 xx<-asSGDF_GROD(x)
-
-
 r<-raster(xx)
 plot(r)
+#read the mpa
+data.shape<-readOGR(dsn="/home/carrknight/code/oxfish/src/main/resources/cssr_mpa/",layer="CCSR_MarineProtectedAreas")
+plot(data.shape)
 plot(data.shape,add=TRUE) #can't see it because
 #the projections are wrong
 proj4string(xx)
@@ -31,13 +30,6 @@ data.shape<-spTransform(data.shape,CRS("+proj=longlat +datum=WGS84 +no_defs +ell
 plot(r)
 plot(data.shape,add=TRUE)
 
-
-#cities
-data.shape2<-readOGR(dsn="/home/carrknight/Downloads/tmp/major/",layer="Major_US_Cities")
-data.shape2<-spTransform(data.shape2,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-#clip the cities
-data.shape2<-crop(data.shape2,extent(r))
-plot(data.shape2,add=TRUE)
 
 
 
@@ -60,6 +52,13 @@ writeOGR(data.shape,dsn = "/home/carrknight/code/oxfish/src/main/resources/ncssr
 
 
 
+
+#cities
+data.shape2<-readOGR(dsn="/home/carrknight/Downloads/tmp/major/",layer="Major_US_Cities")
+data.shape2<-spTransform(data.shape2,CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+#clip the cities
+data.shape2<-crop(data.shape2,extent(r))
+plot(data.shape2,add=TRUE)
 
 #CITIES
 plot(r)
@@ -97,12 +96,17 @@ plot(tiff)
 # ellipses: wgs 1984
 
 library(gdalUtils)
-gdalwarp(srcfile = "/home/carrknight/Dropbox/OC Systems-Based Fisheries Management/ABM1 development/Parameters & logic/Spatial Ecological Data/shp/NCCOS Darkblotched rockfish Abundance1.tif",
-         dstfile= "/home/carrknight/rocktest.tif"
+gdalwarp(srcfile = "/home/carrknight/gdrive/forErnesto/Pacific EFH data/Modeled Species/NCCOS Dover sole Abundance1.tif",
+         dstfile= "/home/carrknight/sole.tif"
          ,t_srs="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0",
          verbose=TRUE,output_Raster=TRUE)
-src_dataset<-readGDAL("/home/carrknight/rocktest.tif")
+src_dataset<-readGDAL("/home/carrknight/sole.tif")
 proj4string(src_dataset)
 plot(raster(src_dataset))
 rasterizedFish<-raster(src_dataset)
-writeRaster(rasterizedFish, filename="/home/carrknight/rocktest.asc", format = "ascii", datatype='FLT4S', overwrite=TRUE) 
+writeRaster(rasterizedFish, filename="/home/carrknight/soletest.asc", format = "ascii", datatype='FLT4S', overwrite=TRUE) 
+
+
+plot(rasterizedFish)
+
+#check the position of the MPAs relative to the fishing 

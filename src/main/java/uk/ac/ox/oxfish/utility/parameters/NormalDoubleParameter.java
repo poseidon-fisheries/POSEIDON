@@ -15,6 +15,9 @@ public class NormalDoubleParameter implements DoubleParameter {
 
     private double standardDeviation;
 
+    public NormalDoubleParameter() {
+    }
+
     public NormalDoubleParameter(double mean, double standardDeviation) {
         Preconditions.checkArgument(standardDeviation >=0);
         this.mean = mean;

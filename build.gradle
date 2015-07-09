@@ -59,6 +59,8 @@ dependencies
     compile 'net.sf.jung:jung-graph-impl:2.0.1'
     compile 'net.sf.jung:jung-algorithms:2.0.1'
 
+    //yaml parser, useful for reading configuration files
+    compile 'org.yaml:snakeyaml:1.15'
 
     //testing:
     testCompile "junit:junit:4.12"

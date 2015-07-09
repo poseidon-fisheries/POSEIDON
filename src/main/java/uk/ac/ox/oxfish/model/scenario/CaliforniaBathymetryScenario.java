@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -40,15 +41,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
         NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
-                FishStateUtilities.getAbsolutePath("inputs/california/california1000.asc"),
-                FishStateUtilities.getAbsolutePath("inputs/california/cssr_mpa/reprojected/mpa_central.shp"),
-                FishStateUtilities.getAbsolutePath("inputs/california/ncssr_mpa/reprojected/mpa_north.shp")
+                Paths.get("inputs", "california", "california1000.asc").toString(),
+                Paths.get("inputs", "california", "cssr_mpa", "reprojected","mpa_central.shp").toString(),
+                Paths.get("inputs", "california", "ncssr_mpa", "reprojected","mpa_north.shp").toString()
         );
 
         final GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
 
         final HashMap<Specie, String> biomassFiles = new HashMap<>();
-        biomassFiles.put(biology.getSpecie(0), FishStateUtilities.getAbsolutePath("inputs/california/soletest.asc"));
+        biomassFiles.put(biology.getSpecie(0), FishStateUtilities.getAbsolutePath(
+                Paths.get("inputs", "california", "soletest.asc").toString()));
         final Map<SeaTile, double[]> speciesForEachCellFromData = NauticalMapFactory.getSpeciesForEachCellFromData(
                 biomassFiles, map);
 

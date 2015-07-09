@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility.parameters;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -12,6 +13,9 @@ public class UniformDoubleParameter implements DoubleParameter {
     private double minimum;
 
     private double maximum;
+
+    public UniformDoubleParameter() {
+    }
 
     public UniformDoubleParameter(double minimum, double maximum) {
         this.minimum = minimum;
@@ -27,6 +31,7 @@ public class UniformDoubleParameter implements DoubleParameter {
      */
     @Override
     public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+        Preconditions.checkArgument(maximum >= minimum, "maximum is not bigger than minimum");
         return (maximum-minimum)*mersenneTwisterFast.nextDouble(true,true)+minimum;
     }
 

@@ -10,6 +10,8 @@ public class FixedDoubleParameter implements DoubleParameter {
 
     private double fixedValue;
 
+    public FixedDoubleParameter() {
+    }
 
     public FixedDoubleParameter(double fixedValue) {
         this.fixedValue = fixedValue;
