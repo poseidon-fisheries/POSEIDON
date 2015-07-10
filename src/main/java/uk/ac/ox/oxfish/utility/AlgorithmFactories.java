@@ -42,9 +42,24 @@ public class AlgorithmFactories {
         NAMES_MAP.put(BiologyInitializer.class, BiologyInitializers.NAMES);
         CONSTRUCTOR_MAP.put(DirectedGraph.class, NetworkBuilders.CONSTRUCTORS);
         NAMES_MAP.put(DirectedGraph.class, NetworkBuilders.NAMES);
-
-
     }
 
+
+    /**
+     * look up for any algorithm factory with a specific name, returning the first it finds
+     * @param name the name
+     * @return  the factory or null if there isn't any!
+     */
+    public static AlgorithmFactory lookup(String name)
+    {
+        for(Map<String,? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values())
+        {
+            final Supplier<? extends AlgorithmFactory<?>> supplier = map.get(name);
+            if(supplier != null)
+                return supplier.get();
+        }
+        System.err.println("failed to find constructor named: " + name);
+        return null;
+    }
 
 }
