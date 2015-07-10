@@ -14,21 +14,15 @@ import org.yaml.snakeyaml.representer.Representer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
-public class NavigableYAML {
+public class YamlSpike {
 
     @Test
     public void writeAndReadYaml() throws FileNotFoundException {
@@ -98,8 +92,6 @@ public class NavigableYAML {
         {
             final ConstructFixedValue constructor = new ConstructFixedValue();
             this.yamlConstructors.put(new Tag("!fixed"), constructor);
-            this.yamlMultiConstructors.put("tag:yaml.org,2002:uk.ac.ox.oxfish.utility.parameters.DoubleParameter",
-                                           constructor);
             this.yamlClassConstructors.put(NodeId.scalar,new ConstructorScalar() );
             this.yamlClassConstructors.put(NodeId.mapping, new ConstructFactory());
        //     this.yamlClassConstructors.put(NodeId.)
@@ -115,7 +107,7 @@ public class NavigableYAML {
                 else
                 //this might be an algorithm-factory with no beans
                     if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
-                        return AlgorithmFactories.lookup((String) constructScalar((ScalarNode) nnode));
+                        return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
                 else
                     return super.construct(nnode);
             }
@@ -163,7 +155,7 @@ public class NavigableYAML {
                         //the original construct failed, try just looking up the name
 
                         //hopefully it is written as a cogent map we can modify
-                        final AlgorithmFactory toReturn = AlgorithmFactories.lookup(
+                        final AlgorithmFactory toReturn = AlgorithmFactories.constructorLookup(
                                 ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
                         ((MappingNode) node).setValue(
                                 ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue());
@@ -256,7 +248,7 @@ public class NavigableYAML {
 
         final DiffusingLogisticFactory initializer = (DiffusingLogisticFactory) prototypeScenario.getBiologyInitializer();
         Assert.assertTrue(initializer.getCarryingCapacity() instanceof FixedDoubleParameter);
-        Assert.assertEquals(initializer.getMinSteepness(), 0.7, .0001);
+        Assert.assertEquals(((FixedDoubleParameter) initializer.getMinSteepness()).getFixedValue(), 0.7, .0001);
         Assert.assertEquals(((FixedDoubleParameter)initializer.getCarryingCapacity()).getFixedValue(),14.0,.0001);
 
 

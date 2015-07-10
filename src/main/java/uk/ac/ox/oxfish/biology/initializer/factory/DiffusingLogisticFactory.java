@@ -16,19 +16,19 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
 
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
-    private double minSteepness = 0.6;
+    private DoubleParameter minSteepness = new FixedDoubleParameter(0.6);
 
-    private double maxSteepness=0.8;
+    private DoubleParameter maxSteepness=new FixedDoubleParameter(0.8);
 
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
-    private double percentageLimitOnDailyMovement = 0.01;
+    private DoubleParameter percentageLimitOnDailyMovement =new FixedDoubleParameter(0.01);
 
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private double differentialPercentageToMove = 0.0005;
+    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.0005);
 
 
     /**
@@ -40,10 +40,10 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     @Override
     public DiffusingLogisticInitializer apply(FishState state) {
         return new DiffusingLogisticInitializer(carryingCapacity.apply(state.random),
-                                                minSteepness,
-                                                maxSteepness,
-                                                percentageLimitOnDailyMovement,
-                                                differentialPercentageToMove);
+                                                minSteepness.apply(state.random),
+                                                maxSteepness.apply(state.random),
+                                                percentageLimitOnDailyMovement.apply(state.random),
+                                                differentialPercentageToMove.apply(state.random));
     }
 
     public DoubleParameter getCarryingCapacity() {
@@ -54,35 +54,37 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
         this.carryingCapacity = carryingCapacity;
     }
 
-    public double getMinSteepness() {
+    public DoubleParameter getMinSteepness() {
         return minSteepness;
     }
 
-    public void setMinSteepness(double minSteepness) {
+    public void setMinSteepness(DoubleParameter minSteepness) {
         this.minSteepness = minSteepness;
     }
 
-    public double getMaxSteepness() {
+    public DoubleParameter getMaxSteepness() {
         return maxSteepness;
     }
 
-    public void setMaxSteepness(double maxSteepness) {
+    public void setMaxSteepness(DoubleParameter maxSteepness) {
         this.maxSteepness = maxSteepness;
     }
 
-    public double getPercentageLimitOnDailyMovement() {
+    public DoubleParameter getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;
     }
 
-    public void setPercentageLimitOnDailyMovement(double percentageLimitOnDailyMovement) {
+    public void setPercentageLimitOnDailyMovement(
+            DoubleParameter percentageLimitOnDailyMovement) {
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
-    public double getDifferentialPercentageToMove() {
+    public DoubleParameter getDifferentialPercentageToMove() {
         return differentialPercentageToMove;
     }
 
-    public void setDifferentialPercentageToMove(double differentialPercentageToMove) {
+    public void setDifferentialPercentageToMove(
+            DoubleParameter differentialPercentageToMove) {
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 }

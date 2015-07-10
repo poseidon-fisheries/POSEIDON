@@ -27,7 +27,7 @@ public class AlgorithmFactories {
     //notice the <? extends AlgorithmFactory>. It's the need for hacks like these that explains why so many engineers
     //join terrorist organizations
     public static final Map<Class,Map<String,? extends Supplier<? extends AlgorithmFactory<?>>>> CONSTRUCTOR_MAP = new HashMap<>();
-    public static final Map<Class,Map<? extends Class<? extends AlgorithmFactory>,String>> NAMES_MAP = new HashMap<>();
+    public static final Map<Class,Map<Class<? extends AlgorithmFactory>,String>> NAMES_MAP = new HashMap<>();
     static
     {
         CONSTRUCTOR_MAP.put(DepartingStrategy.class, DepartingStrategies.CONSTRUCTORS);
@@ -50,7 +50,7 @@ public class AlgorithmFactories {
      * @param name the name
      * @return  the factory or null if there isn't any!
      */
-    public static AlgorithmFactory lookup(String name)
+    public static AlgorithmFactory constructorLookup(String name)
     {
         for(Map<String,? extends Supplier<? extends AlgorithmFactory<?>>> map : CONSTRUCTOR_MAP.values())
         {
@@ -62,4 +62,20 @@ public class AlgorithmFactories {
         return null;
     }
 
+    /**
+     * look up the name of the algorithm factory that has this class
+     * @param factory the name
+     * @return  the factory or null if there isn't any!
+     */
+    public static String nameLookup(Class<? extends AlgorithmFactory<?>> factory)
+    {
+        for(Map<Class<? extends AlgorithmFactory>,String> map : NAMES_MAP.values())
+        {
+            final String name = map.get(factory);
+            if(name != null)
+                return name;
+        }
+        System.err.println("failed to find constructor: " + factory);
+        return null;
+    }
 }
