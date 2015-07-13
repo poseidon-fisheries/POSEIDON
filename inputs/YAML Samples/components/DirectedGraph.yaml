@@ -1,0 +1,9 @@
+No Network
+-------
+Barabasi-Albert:
+  edgesPerVertex: 2
+  parallelFriendshipsAllowed: true
+-------
+Equal Out Degree:
+  degree: 2
+-------

@@ -1,0 +1,32 @@
+Prototype:
+  biologyInitializer:
+    Diffusing Logistic:
+      carryingCapacity: '5000.0'
+      differentialPercentageToMove: '5.0E-4'
+      maxSteepness: '0.8'
+      minSteepness: '0.6'
+      percentageLimitOnDailyMovement: '0.01'
+  coastalRoughness: 4
+  departingStrategy:
+    Fixed Probability:
+      probabilityToLeavePort: '1.0'
+  depthSmoothing: 1000000
+  destinationStrategy:
+    Per Trip Iterative:
+      stepSize: '5.0'
+      tripsPerDecision: '1.0'
+  fishers: 300
+  fishingEfficiency: '0.01'
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '10.0'
+  gridSizeInKm: 10.0
+  height: 50
+  holdSize: '100.0'
+  networkBuilder:
+    Equal Out Degree:
+      degree: 2
+  ports: 1
+  regulation: Anarchy
+  speedInKmh: '5.0'
+  width: 50

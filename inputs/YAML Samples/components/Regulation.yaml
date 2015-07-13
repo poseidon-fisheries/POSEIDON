@@ -1,0 +1,14 @@
+Anarchy
+-------
+Fishing Season:
+  respectMPA: true
+  seasonLength: '200.0'
+-------
+MPA Only
+-------
+Mono-TAC:
+  quota: '1000.0'
+-------
+Mono-ITQ:
+  individualQuota: '1000.0'
+-------

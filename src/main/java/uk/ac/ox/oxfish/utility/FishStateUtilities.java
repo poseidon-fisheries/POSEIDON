@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 
 /**
@@ -35,6 +36,8 @@ public class FishStateUtilities {
      * @return the absolute path
      */
     public static String getAbsolutePath(String relativePath) {
+
+        relativePath = relativePath.replaceAll("\"","");
 
         //first try user dir (where java is called)
         String classPath = System.getProperty("user.dir");

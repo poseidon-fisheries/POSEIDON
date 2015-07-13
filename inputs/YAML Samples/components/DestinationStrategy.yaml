@@ -1,0 +1,20 @@
+Random Favorite
+-------
+Fixed Favorite:
+  x: 0
+  y: 0
+-------
+Always Random
+-------
+Yearly HillClimber:
+  stepSize: '5.0'
+-------
+Per Trip Iterative:
+  stepSize: '5.0'
+  tripsPerDecision: '1.0'
+-------
+Imitator-Explorator:
+  explorationProbability: '0.8'
+  ignoreEdgeDirection: true
+  stepSize: '5.0'
+-------

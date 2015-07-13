@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -71,6 +73,34 @@ public class YamlConstructor extends  Constructor {
                         return toReturn;
                     }
                 }
+                //try a similar approach for scenarios
+                if(Scenario.class.isAssignableFrom(node.getType()))
+                {
+                    try{
+                        //might have been written correctly as it is!
+                        return super.construct(node);
+                    }
+                    catch (YAMLException e)
+                    {
+                        //this either means it's badly written somehow or more likely it's written in a "prettyfied" style
+
+                        //grab first element, ought to be the name of the scenario
+                        final  Scenario scenario = Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+
+                        //now we can deal with filling it through beans
+                        //first allocate subnodes correctly
+                        ((MappingNode) node).setValue(
+                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        //set type correctly
+                        node.setType(scenario.getClass());
+                        constructJavaBean2ndStep((MappingNode) node,scenario);
+                        return scenario;
+
+
+                    }
+                }
+
+
                 else
                     return super.construct(node);
             }

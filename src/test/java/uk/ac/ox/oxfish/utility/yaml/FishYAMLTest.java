@@ -3,7 +3,13 @@ package uk.ac.ox.oxfish.utility.yaml;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.Regulations;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -106,12 +112,24 @@ public class FishYAMLTest {
     @Test
     public void writePrettilyAllSortsOfScenarios()
     {
-        Scenario scenario = new PrototypeScenario();
+        PrototypeScenario scenario = new PrototypeScenario();
+        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxSteepness(new FixedDoubleParameter(.9));
+        scenario.setRegulation(Regulations.CONSTRUCTORS.get("MPA Only").get());
         FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
-        System.out.println(dumped);
-        Scenario scenario2 = (Scenario) yaml.load(dumped);
+        //load back! Notice that because it's made "pretty" I still have to call loadAs
+        Scenario scenario2 = (Scenario) yaml.loadAs(dumped, Scenario.class);
         Assert.assertTrue(scenario2 instanceof PrototypeScenario);
 
+        //make sure it remembers that the regulations have changed
+        Assert.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
+        //make sure three recursions in this is still correct.
+        Assert.assertEquals(
+                ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getMaxSteepness()).getFixedValue(),.9,.0001);
+
+
+        //final test, if I redump you, it'll be exactly like before
+        String dump2 = yaml.dump(scenario2);
+        Assert.assertEquals(dumped,dump2);
     }
 }

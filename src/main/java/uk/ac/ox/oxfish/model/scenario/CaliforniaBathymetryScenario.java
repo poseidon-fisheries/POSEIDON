@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class CaliforniaBathymetryScenario implements Scenario {
 
-    final private int numberOfSpecies;
+    private int numberOfSpecies;
 
 
     public CaliforniaBathymetryScenario(int numberOfSpecies) {
@@ -83,4 +83,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
         return new ScenarioPopulation(new ArrayList<>(),new SocialNetwork(new EmptyNetworkBuilder()));
     }
+
+
+    public int getNumberOfSpecies() {
+        return numberOfSpecies;
+    }
+
+    public void setNumberOfSpecies(int numberOfSpecies) {
+        this.numberOfSpecies = numberOfSpecies;
+    }
 }
+
+
+

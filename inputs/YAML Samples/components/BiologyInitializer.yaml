@@ -1,0 +1,21 @@
+Independent Logistic:
+  carryingCapacity: '5000.0'
+  maxSteepness: 0.8
+  minSteepness: 0.6
+-------
+Diffusing Logistic:
+  carryingCapacity: '5000.0'
+  differentialPercentageToMove: '5.0E-4'
+  maxSteepness: '0.8'
+  minSteepness: '0.6'
+  percentageLimitOnDailyMovement: '0.01'
+-------
+From Left To Right Fixed:
+  biologySmoothingIndex: '1000000.0'
+  maximumBiomass: '5000.0'
+-------
+Random Smoothed and Fixed:
+  biologySmoothingIndex: '1000000.0'
+  maxBiomass: 5000.0
+  minBiomass: 0.0
+-------

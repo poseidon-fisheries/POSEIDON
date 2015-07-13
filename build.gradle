@@ -75,15 +75,26 @@ test{
     maxParallelForks = Math.max(Runtime.runtime.availableProcessors() -1,1)
 }
 
+//this just mentions what the gradle version for the "wrapper" gradlew ought to be
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
 
+//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
+//distributed
 task fatJar(type: FatCapsule) {
     archiveName = "oxfish_executable.jar"
     applicationClass 'Main'
 }
+
+//this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
+task buildSampleFiles(type: JavaExec){
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
+}
+
+
 
 
 test {

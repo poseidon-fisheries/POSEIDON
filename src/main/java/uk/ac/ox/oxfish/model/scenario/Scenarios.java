@@ -1,5 +1,8 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
@@ -13,7 +16,7 @@ public class Scenarios {
     /**
      * list of all the scenarios. Useful for instantiating them
      */
-    final public static LinkedHashMap<String, Scenario> SCENARIOS = new LinkedHashMap<>();
+    final public static BiMap<String, Scenario> SCENARIOS = HashBiMap.create(4);
 
     /**
      * A quick description of each scenario available.
