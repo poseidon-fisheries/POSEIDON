@@ -14,6 +14,8 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -67,7 +69,7 @@ public class AlgorithmFactories {
      * @param factory the name
      * @return  the factory or null if there isn't any!
      */
-    public static String nameLookup(Class<? extends AlgorithmFactory<?>> factory)
+    public static String nameLookup(Class<? extends AlgorithmFactory> factory)
     {
         for(Map<Class<? extends AlgorithmFactory>,String> map : NAMES_MAP.values())
         {
@@ -77,5 +79,16 @@ public class AlgorithmFactories {
         }
         System.err.println("failed to find constructor: " + factory);
         return null;
+    }
+
+    /**
+     * returns a list with all the factories available in the constructor Maps
+     */
+    public static List<Class<? extends AlgorithmFactory>> getAllAlgorithmFactories()
+    {
+        List<Class<? extends AlgorithmFactory>> classes = new LinkedList<>();
+        for(Map<Class<? extends AlgorithmFactory>,String> names : NAMES_MAP.values())
+            classes.addAll(names.keySet());
+        return classes;
     }
 }

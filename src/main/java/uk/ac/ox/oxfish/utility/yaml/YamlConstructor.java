@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
+import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
@@ -7,6 +8,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
@@ -29,7 +32,7 @@ public class YamlConstructor extends  Constructor {
                 //if the field you are trying to fill is a double parameter
                 if(nnode.getType().equals(DoubleParameter.class))
                     //then a simple scalar must be a fixed double parameter. Build it
-                    return new FixedDoubleParameter((Double.parseDouble((String) constructScalar((ScalarNode) nnode))));
+                    return doubleParameterSplit((ScalarNode) nnode);
                 else
                     //it's also possible that the scalar is an algorithm factory without any settable field
                     //this is rare which means that factories are represented as maps, but this might be one of the simple
@@ -76,6 +79,25 @@ public class YamlConstructor extends  Constructor {
 
 
 
+
+    private DoubleParameter doubleParameterSplit(ScalarNode node)
+    {
+
+        //get it as a string
+        String nodeContent = (String) constructScalar( (ScalarNode)node);
+        //trim and split
+        final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
+        if(split.length == 1)
+            //fixed
+        return new FixedDoubleParameter(Double.parseDouble(split[0]));
+
+        if(split[0].toLowerCase().equals("normal"))
+            return new NormalDoubleParameter(Double.parseDouble(split[1]),Double.parseDouble(split[2]));
+
+        Preconditions.checkArgument(split[0].toLowerCase().equals("uniform"), "The parameter given is neither fixed not normal nor uniform, what is " + nodeContent + " ?");
+        return new UniformDoubleParameter(Double.parseDouble(split[1]),Double.parseDouble(split[2]));
+
+    }
 
 
 
