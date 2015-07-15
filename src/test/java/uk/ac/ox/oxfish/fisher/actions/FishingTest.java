@@ -6,10 +6,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
@@ -42,7 +39,7 @@ public class FishingTest {
     @Test
     public void integrationTest() throws Exception {
 
-        FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map();
+        FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(1);
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
@@ -50,7 +47,7 @@ public class FishingTest {
         GlobalBiology biology = new GlobalBiology(specie);
         when(fishState.getBiology()).thenReturn(biology);
 
-        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class)  );
+        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class), 0);
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(specie, 50.0, biology));
@@ -76,7 +73,7 @@ public class FishingTest {
 
                                          }
                                      },
-                                     new Boat(1.0,1,1),
+                                   new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
                                      new Hold(100.0, 1), gear );
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);

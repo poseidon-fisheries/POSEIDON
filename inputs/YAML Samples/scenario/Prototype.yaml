@@ -15,14 +15,17 @@ Prototype:
     Per Trip Iterative:
       stepSize: '5.0'
       tripsPerDecision: '1.0'
+  engineWeight: normal 100.0 10.0
   fishers: 300
   fishingEfficiency: '0.01'
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '10.0'
+  fuelTankSize: '10000.0'
   gridSizeInKm: 10.0
   height: 50
   holdSize: '100.0'
+  literPerKilometer: '1.0'
   networkBuilder:
     Equal Out Degree:
       degree: 2

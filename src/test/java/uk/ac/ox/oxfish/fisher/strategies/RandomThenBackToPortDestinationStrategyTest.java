@@ -36,12 +36,12 @@ public class RandomThenBackToPortDestinationStrategyTest {
     public void neverPicksLand() throws Exception {
 
 
-        FishState model = generateSimple2x2Map();
+        FishState model = generateSimple2x2Map(1);
         NauticalMap map = model.getMap();
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1), mock(Markets.class)  );
+        Port port = new Port(map.getSeaTile(1, 1), mock(Markets.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
@@ -70,12 +70,12 @@ public class RandomThenBackToPortDestinationStrategyTest {
     public void keepsGoing() throws Exception {
 
 
-        FishState model = generateSimple2x2Map();
+        FishState model = generateSimple2x2Map(1);
         NauticalMap map = model.getMap();
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class)  );
+        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
@@ -106,12 +106,12 @@ public class RandomThenBackToPortDestinationStrategyTest {
     public void goBack() throws Exception {
 
 
-        FishState model = generateSimple2x2Map();
+        FishState model = generateSimple2x2Map(1);
         NauticalMap map = model.getMap();
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class)  );
+        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
@@ -135,7 +135,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
 
 
     }
-    public static FishState generateSimple2x2Map() {
+    public static FishState generateSimple2x2Map(final int distancePerCell) {
         ObjectGrid2D grid2D = new ObjectGrid2D(2,2);
         //2x2, first column sea, second  column land
         grid2D.field[0][0] = new SeaTile(0,0,-100);
@@ -147,7 +147,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
                                           new CartesianDistance(1));
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(map);
-        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getStepsPerDay()).thenReturn(distancePerCell);
         when(model.getHoursPerStep()).thenReturn(24d);
         return model;
     }

@@ -18,6 +18,7 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
 
     public static final String CASH_COLUMN = "CASH";
     public static final String CASH_FLOW_COLUMN = "NET_CASH_FLOW";
+    public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
 
     public YearlyFisherDataSet() {
         super(IntervalPolicy.EVERY_YEAR);
@@ -44,6 +45,10 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
                 return flow;
             }
         }, Double.NaN);
+
+
+        registerGatherer(FUEL_CONSUMPTION,
+                         fisher -> observed.getYearlyCounterColumn(FUEL_CONSUMPTION),Double.NaN);
 
         super.start(state, observed);
 

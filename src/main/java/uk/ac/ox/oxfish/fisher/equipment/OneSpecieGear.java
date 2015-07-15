@@ -39,4 +39,17 @@ public class OneSpecieGear implements Gear {
             where.reactToThisAmountOfBiomassBeingFished(targetedSpecie,poundsCaught);
         return new Catch(targetedSpecie, poundsCaught,modelBiology);
     }
+
+
+    /**
+     * get how much gas is consumed by fishing a spot with this gear
+     *
+     * @param fisher the dude fishing
+     * @param boat
+     * @param where  the location being fished  @return liters of gas consumed for every hour spent fishing
+     */
+    @Override
+    public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
+        return 0;
+    }
 }

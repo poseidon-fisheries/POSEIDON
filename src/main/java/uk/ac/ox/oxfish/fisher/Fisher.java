@@ -23,15 +23,20 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Counter;
 import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import java.time.Year;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
@@ -95,6 +100,8 @@ public class Fisher implements Steppable, Startable{
      */
     private final YearlyFisherDataSet yearlyDataGatherer = new YearlyFisherDataSet();
 
+    private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
+
 
     /**
      * a link to the model. Got when start() is called. It's not used or shared except when a new strategy is plugged in
@@ -117,6 +124,12 @@ public class Fisher implements Steppable, Startable{
 
     private SocialNetwork network;
 
+
+    /**
+     * when this flag is on, the agent believes that it MUST return home or it will run out of fuel. All other usual
+     * decisions about destination are ignored.
+     */
+    private boolean fuelEmergencyOverride = false;
 
     /***
      *      ___           _                    _
@@ -208,6 +221,7 @@ public class Fisher implements Steppable, Startable{
         this.gear = gear;
         this.fishingStrategy = fishingStrategy;
         this.regulation = regulation;
+        this.yearlyCounter.addColumn(YearlyFisherDataSet.FUEL_CONSUMPTION);
     }
 
 
@@ -225,8 +239,8 @@ public class Fisher implements Steppable, Startable{
 
         this.state = state;
         this.network = state.getSocialNetwork();
-        receipt = state.schedule.scheduleRepeating(this);
-        yearlyDataGatherer.start(state,this);
+        receipt = state.scheduleEveryStep(this, StepOrder.FISHER_PHASE);
+        yearlyDataGatherer.start(state, this);
         tripLogger.start(state);
 
         //start the strategies
@@ -261,6 +275,7 @@ public class Fisher implements Steppable, Startable{
         double hoursLeft = model.getHoursPerStep();
         while(true)
         {
+            updateFuelEmergencyFlag(model.getMap());
             ActionResult result = action.act(model, this, regulation,hoursLeft);
             action = result.getNextState();
             hoursLeft = result.getHoursLeft();
@@ -273,8 +288,11 @@ public class Fisher implements Steppable, Startable{
         }
 
         //if you are not at home
-        if(!location.equals(getHomePort().getLocation()))
+        if(!getHomePort().isDocked(this))
+        {
+
             stepsAtSea++;
+        }
 
     }
 
@@ -327,12 +345,22 @@ public class Fisher implements Steppable, Startable{
         Preconditions.checkArgument(newPosition != location); //i am not already here!
         double distanceTravelled = map.distance(location, newPosition);
         boat.recordTravel(distanceTravelled); //tell the boat
+        //consume gas!
+        consumeFuel(boat.expectedFuelConsumption(distanceTravelled));
+        //arrive at new position
         location = newPosition;
         map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
 
         //this condition doesn't hold anymore because time travelled is "conserved" between steps
      //   Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep(), boat.getHoursTravelledToday() +  " and ");
         Preconditions.checkState(newPosition == location);
+    }
+
+
+    public void consumeFuel(double litersConsumed)
+    {
+        boat.consumeFuel(litersConsumed);
+        yearlyCounter.count(YearlyFisherDataSet.FUEL_CONSUMPTION, litersConsumed);
     }
 
     /**
@@ -355,6 +383,12 @@ public class Fisher implements Steppable, Startable{
     public void dock(){
         assert isAtPort();
         homePort.dock(this);
+        //when you dock you also refill
+        final double litersBought = boat.refill();
+        fuelEmergencyOverride = false;
+        //now pay for it
+        spend(litersBought*homePort.getGasPricePerLiter());
+
         tripLogger.finishTrip(stepsAtSea);
 
         stepsAtSea = 0;
@@ -377,11 +411,25 @@ public class Fisher implements Steppable, Startable{
      * */
     public void updateDestination(FishState model, Action currentAction) {
 
-        if(!regulation.allowedAtSea(this, model))
+
+        //if you are not allowed at sea or you are running out of gas, go home
+        if(!regulation.allowedAtSea(this, model) || fuelEmergencyOverride)
             destination = homePort.getLocation();
         else
             destination =  destinationStrategy.chooseDestination(this, random, model, currentAction);
         Preconditions.checkNotNull(destination, "Destination can never be null!");
+    }
+
+    /**
+     * called to check if there is so little fuel we must go back home
+     */
+    private void updateFuelEmergencyFlag(NauticalMap map)
+    {
+
+        if(!fuelEmergencyOverride)
+            fuelEmergencyOverride = ! boat.isFuelEnoughForTrip(map.distance(location,getHomePort().getLocation()),1.05);
+
+
     }
 
     public void setBoat(Boat boat) {
@@ -434,7 +482,7 @@ public class Fisher implements Steppable, Startable{
 
     public boolean shouldIFish(FishState state)
     {
-        return fishingStrategy.shouldFish(this,random,state);
+        return !fuelEmergencyOverride && fishingStrategy.shouldFish(this,random,state);
 
     }
 
@@ -493,9 +541,15 @@ public class Fisher implements Steppable, Startable{
      */
     public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state) {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
+
+        //catch fish and load it
         Catch catchOfTheDay = gear.fish(this, location,hoursSpentFishing , modelBiology);
         regulation.reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
+
+        //consume gas
+        final double litersBurned = gear.getFuelConsumptionPerHourOfFishing(this, getBoat(), location) * hoursSpentFishing;
+        consumeFuel(litersBurned);
 
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,gear,location,catchOfTheDay,this,
@@ -563,6 +617,9 @@ public class Fisher implements Steppable, Startable{
 
 
 
+
+
+
     public int getStepsAtSea() {
         return stepsAtSea;
     }
@@ -625,6 +682,15 @@ public class Fisher implements Steppable, Startable{
         return tripLogger.getLastFinishedTrip();
     }
 
+    public double getYearlyCounterColumn(String columnName) {
+        return yearlyCounter.getColumn(columnName);
+    }
 
+    public boolean isFuelEmergencyOverride() {
+        return fuelEmergencyOverride;
+    }
 
+    public double getFuelLeft() {
+        return boat.getLitersOfFuelInTank();
+    }
 }

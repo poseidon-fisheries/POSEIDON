@@ -44,7 +44,7 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 
-        if (seaTile.getAltitude() > 0)
+        if (seaTile.getAltitude() >= 0)
             return new EmptyLocalBiology();
         else
         {

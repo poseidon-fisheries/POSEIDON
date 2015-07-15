@@ -25,16 +25,22 @@ public class Port {
     private final SeaTile location;
 
 
+    /**
+     * how much does gas cost per liter at this port
+     */
+    private double gasPricePerLiter;
+
 
     /**
      *  the markets available at this port
      */
     private final Markets markets;
 
-    public Port(SeaTile location, Markets markets)
+    public Port(SeaTile location, Markets markets, double gasPricePerLiter)
     {
         this.location = location;
         this.markets = markets;
+        this.gasPricePerLiter = gasPricePerLiter;
         fishersHere = new HashSet<>();
     }
 
@@ -99,5 +105,13 @@ public class Port {
 
     public Market getMarket(Specie specie) {
         return markets.getMarket(specie);
+    }
+
+    public double getGasPricePerLiter() {
+        return gasPricePerLiter;
+    }
+
+    public void setGasPricePerLiter(double gasPricePerLiter) {
+        this.gasPricePerLiter = gasPricePerLiter;
     }
 }

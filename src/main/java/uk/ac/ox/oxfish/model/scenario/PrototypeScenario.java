@@ -8,9 +8,7 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.FixedProportionGear;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -31,6 +29,7 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -101,6 +100,13 @@ public class PrototypeScenario implements Scenario {
      */
     private DoubleParameter fishingEfficiency = new FixedDoubleParameter(.01);
 
+
+    private DoubleParameter engineWeight = new NormalDoubleParameter(100,10);
+
+    private DoubleParameter fuelTankSize = new FixedDoubleParameter(10000);
+
+
+    private DoubleParameter literPerKilometer = new FixedDoubleParameter(1);
 
     /**
      * factory to produce departing strategy
@@ -197,16 +203,21 @@ public class PrototypeScenario implements Scenario {
         {
             Port port = ports[random.nextInt(ports.length)];
             DepartingStrategy departing = departingStrategy.apply(model);
-            double speed = speedInKmh.apply(random);
-            double capacity = holdSize.apply(random);
-            double efficiency =fishingEfficiency.apply(random);
+            final double speed = speedInKmh.apply(random);
+            final double capacity = holdSize.apply(random);
+            final double efficiency =fishingEfficiency.apply(random);
+            final double engineWeight = this.engineWeight.apply(random);
+            final double literPerKilometer = this.literPerKilometer.apply(random);
+            final double  fuelCapacity = this.fuelTankSize.apply(random);
+
             fisherList.add(new Fisher(i, port,
                                         random,
                                         regulation.apply(model),
                                         departing,
                                         destinationStrategy.apply(model),
                                         fishingStrategy.apply(model),
-                                        new Boat(10,10,speed),
+                                        new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
+                                                 new FuelTank(fuelCapacity)),
                                         new Hold(capacity, biology.getSize()),
                                         new FixedProportionGear(efficiency)));
         }
@@ -358,5 +369,29 @@ public class PrototypeScenario implements Scenario {
     public void setNetworkBuilder(
             AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkBuilder) {
         this.networkBuilder = networkBuilder;
+    }
+
+    public DoubleParameter getEngineWeight() {
+        return engineWeight;
+    }
+
+    public void setEngineWeight(DoubleParameter engineWeight) {
+        this.engineWeight = engineWeight;
+    }
+
+    public DoubleParameter getFuelTankSize() {
+        return fuelTankSize;
+    }
+
+    public void setFuelTankSize(DoubleParameter fuelTankSize) {
+        this.fuelTankSize = fuelTankSize;
+    }
+
+    public DoubleParameter getLiterPerKilometer() {
+        return literPerKilometer;
+    }
+
+    public void setLiterPerKilometer(DoubleParameter literPerKilometer) {
+        this.literPerKilometer = literPerKilometer;
     }
 }

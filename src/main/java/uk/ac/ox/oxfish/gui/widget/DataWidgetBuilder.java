@@ -52,7 +52,6 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
         try {
             if (DataSet.class.isAssignableFrom(actualClass)) {
-                System.out.println("it's a dataset!'");
                 //create panel
                 //todo figure out to make this nested
 
@@ -74,7 +73,6 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             if (Collection.class.isAssignableFrom(actualClass) && parametrizedType != null) {
                 final Class<?> type = Class.forName(parametrizedType);
                 if(DataSet.class.isAssignableFrom(type)) {
-                    System.out.println("it's a collection of datasets!");
                     final Collection<DataSet> datasets = (Collection<DataSet>) PropertyUtils.getNestedProperty(
                             metawidget.getToInspect(),
                             attributes.get("name"));

@@ -31,7 +31,6 @@ public class MetaInspector extends Inspector
     public MetaInspector(Object toInspect, FishGUI gui) {
         this.toInspect = toInspect;
 
-        System.out.print("inspecting: " + toInspect);
 
         STANDARD_WIDGET_SETUP(widget, gui);
 

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomGridField;
@@ -293,7 +292,7 @@ public class NauticalMapFactory {
 
         Collections.shuffle(candidateTiles,new Random(random.nextLong()));
         for(int i=0; i<ports; i++) {
-            Port port = new Port(candidateTiles.get(i),marketFactory.apply(candidateTiles.get(i)) );
+            Port port = new Port(candidateTiles.get(i),marketFactory.apply(candidateTiles.get(i)), 0);
             map.addPort(port);
         }
 

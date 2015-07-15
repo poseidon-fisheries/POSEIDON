@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -57,15 +58,18 @@ public class RegulationTest {
         SeaTile destinationTile = mock(SeaTile.class);
         when(destination.chooseDestination(any(),any(),any(),any())).thenReturn(destinationTile);
         FishState model = mock(FishState.class);
+        when(model.getMap()).thenReturn(mock(NauticalMap.class));
 
         Regulation regs = mock(Regulation.class);
 
+        final Boat mock = mock(Boat.class);
+        when(mock.isFuelEnoughForTrip(anyDouble(),anyDouble())).thenReturn(true);
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(),
                                      regs,
                                      mock(DepartingStrategy.class),
                                      destination,
                                      mock(FishingStrategy.class),
-                                     mock(Boat.class),
+                                   mock,
                                      mock(Hold.class), mock(Gear.class) );
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);

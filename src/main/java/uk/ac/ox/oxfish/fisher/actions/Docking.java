@@ -47,10 +47,10 @@ public class Docking implements Action{
             assert  biomass>=0;
             if(biomass>0)
                 //this should take care of everything
-                markets.getMarket(specie).sellFish(biomass,agent, regulation,model);
+                markets.sellFish(specie,biomass,agent, regulation,model);
         }
 
-        //anchor
+        //anchor/refill
         agent.dock();
 
         assert agent.getLocation().equals(port.getLocation());

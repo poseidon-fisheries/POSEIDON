@@ -57,7 +57,7 @@ public class ScenarioSelector extends JPanel implements ActionListener
         }
         scenarioGroup.clearSelection();
         //now force the first one to be selected
-        buttons.getFirst().doClick();
+        buttons.getLast().doClick();
 
 
 

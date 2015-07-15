@@ -10,21 +10,29 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  */
 public class Boat {
 
-    /**
-     * speed of the boat in knots
-     */
-    private final double boatSpeedInKph;
+
 
 
     /**
      * the length of the boat, in meters
      */
-    private final double boatLenght;
+    private final double length;
 
     /**
      * the width of the boat, in meters
      */
-    private final double boatWidth;
+    private final double width;
+
+
+    /**
+     * the engine: holding speed and weight and efficiency
+     */
+    private final Engine engine;
+
+    /**
+     * fuel counter
+     */
+    private final FuelTank tank;
 
 
 
@@ -33,14 +41,14 @@ public class Boat {
      */
     private double hoursTravelledToday = 0;
 
-    public Boat(double boatSpeedInKph, double boatLenght, double boatWidth) {
-        Preconditions.checkArgument(boatSpeedInKph > 0, "speed must be positive > 0");
-        Preconditions.checkArgument(boatLenght > 0, "length must be positive > 0");
-        Preconditions.checkArgument(boatWidth > 0, "width must be positive > 0");
+    public Boat(double length, double width, Engine engine, FuelTank tank) {
+        Preconditions.checkArgument(length > 0, "length must be positive > 0");
+        Preconditions.checkArgument(width > 0, "width must be positive > 0");
 
-        this.boatSpeedInKph = boatSpeedInKph;
-        this.boatLenght = FishStateUtilities.round(boatLenght);
-        this.boatWidth =  FishStateUtilities.round(boatWidth);
+        this.length = FishStateUtilities.round(length);
+        this.width =  FishStateUtilities.round(width);
+        this.engine = engine;
+        this.tank = tank;
     }
 
     /**
@@ -59,7 +67,7 @@ public class Boat {
     public double hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(double kilometersToTravel)
     {
         Preconditions.checkArgument(kilometersToTravel > 0);
-        return kilometersToTravel/ boatSpeedInKph;
+        return kilometersToTravel/ engine.getSpeedInKph();
     }
 
 
@@ -90,11 +98,70 @@ public class Boat {
         return hoursTravelledToday;
     }
 
-    public double getBoatLenght() {
-        return boatLenght;
+    public double getLength() {
+        return length;
     }
 
-    public double getBoatWidth() {
-        return boatWidth;
+    public double getWidth() {
+        return width;
+    }
+
+
+    public double getFuelCapacityInLiters() {
+        return tank.getFuelCapacityInLiters();
+    }
+
+    public void consumeFuel(double litersOfGasConsumed) {
+        tank.consume(litersOfGasConsumed);
+    }
+
+
+    /**
+     * liters of gas consumed for travelling that distance
+     * @param kmTravelled distance travelled
+     * @return liters of gas
+     */
+    public double expectedFuelConsumption(double kmTravelled)
+    {
+        return engine.getGasConsumptionPerKm(kmTravelled);
+
+    }
+
+
+    /**
+     * is there enough fuel in the tank for the trip home?
+     * @param lengthInKm length of the trip in kilometer
+     * @param margin margin of error. If 1, it just checks if there is just enough fuel in the tank to make the trip.
+     *               1.05 would mean that it returns false if there is just enough fuel to make the trip but not 5% more.
+     *               Anything less than 1 throws an exception
+     * @return true if there is enough fuel in the tank to travel trip*margin kilometers
+     */
+    public boolean isFuelEnoughForTrip(double lengthInKm, double margin)
+    {
+
+        Preconditions.checkArgument(margin >= 1);
+        return expectedFuelConsumption(lengthInKm*margin) <= tank.getLitersOfFuelInTank();
+
+    }
+
+    /**
+     * fill the tank to the brim.
+     * @return how much gas had to be put in
+     */
+    public double refill() {
+        return tank.refill();
+    }
+
+    public double getLitersOfFuelInTank() {
+        return tank.getLitersOfFuelInTank();
+    }
+
+    public double getWeightInKg() {
+        return engine.getWeightInKg();
+    }
+
+
+    public double getEfficiencyAsLitersPerKm() {
+        return engine.getEfficiencyAsLitersPerKm();
     }
 }

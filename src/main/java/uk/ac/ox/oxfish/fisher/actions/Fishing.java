@@ -31,6 +31,7 @@ public class Fishing implements Action
             agent.fishHere(model.getBiology(), 1, model);
         else
             agent.fishHere(model.getBiology(),hoursLeft, model);
+        //consume fuel
         model.recordFishing(agent.getLocation());
 
         //go back to "arrived" state

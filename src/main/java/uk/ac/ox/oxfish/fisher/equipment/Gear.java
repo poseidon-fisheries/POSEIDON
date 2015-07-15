@@ -14,4 +14,14 @@ public interface Gear {
             Fisher fisher,
             SeaTile where,
             double hoursSpentFishing, GlobalBiology modelBiology);
+
+    /**
+     * get how much gas is consumed by fishing a spot with this gear
+     * @param fisher  the dude fishing
+     * @param where the location being fished
+     * @return liters of gas consumed for every hour spent fishing
+     */
+    public double getFuelConsumptionPerHourOfFishing(Fisher fisher,
+                                                     Boat boat,
+                                                     SeaTile where);
 }

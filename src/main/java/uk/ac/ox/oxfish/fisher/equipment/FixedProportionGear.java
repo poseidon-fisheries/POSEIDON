@@ -41,4 +41,16 @@ public class FixedProportionGear implements Gear
     public String toString() {
         return "fixed efficiency: " + proportionFished ;
     }
+
+    /**
+     * get how much gas is consumed by fishing a spot with this gear
+     *
+     * @param fisher the dude fishing
+     * @param boat
+     * @param where  the location being fished  @return liters of gas consumed for every hour spent fishing
+     */
+    @Override
+    public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
+        return 0;
+    }
 }
