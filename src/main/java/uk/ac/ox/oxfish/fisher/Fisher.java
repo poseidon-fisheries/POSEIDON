@@ -241,6 +241,7 @@ public class Fisher implements Steppable, Startable{
         this.network = state.getSocialNetwork();
         receipt = state.scheduleEveryStep(this, StepOrder.FISHER_PHASE);
         yearlyDataGatherer.start(state, this);
+        yearlyCounter.start(state);
         tripLogger.start(state);
 
         //start the strategies
