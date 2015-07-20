@@ -86,6 +86,11 @@ task wrapper(type: Wrapper) {
 task fatJar(type: FatCapsule) {
     archiveName = "oxfish_executable.jar"
     applicationClass 'Main'
+
+    capsuleManifest {
+        minJavaVersion = '1.8.0'
+        minUpdateVersion =  ['1.8.0':'31']
+    }
 }
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder

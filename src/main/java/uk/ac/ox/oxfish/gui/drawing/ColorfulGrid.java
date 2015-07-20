@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.gui;
+package uk.ac.ox.oxfish.gui.drawing;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
@@ -9,6 +9,7 @@ import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
 import java.util.HashMap;

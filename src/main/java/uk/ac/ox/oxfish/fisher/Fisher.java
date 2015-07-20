@@ -44,7 +44,7 @@ import java.util.Queue;
 /**
  * The boat catching all that delicious fish.
  * At its core it is a discrete-state automata: the Action class represents a possible state and the fisher can go through
- * one or more of them in a turn. <br>
+ * each of them in a turn. <br>
  * Strategies are instead the fisher way to deal with decision points (should I go fish or not? Where do I go?)
  * Created by carrknight on 4/2/15.
  */

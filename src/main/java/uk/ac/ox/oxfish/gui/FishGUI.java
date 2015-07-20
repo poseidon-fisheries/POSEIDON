@@ -16,6 +16,10 @@ import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.util.gui.SimpleColorMap;
+import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
+import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
+import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
+import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
@@ -34,6 +38,8 @@ public class FishGUI extends GUIState{
     private JFrame displayFrame;
 
     private final ColorfulGrid myPortrayal;
+    private CoordinateTransformer transformer;
+
 
     private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
 
@@ -93,6 +99,7 @@ public class FishGUI extends GUIState{
 
 
 
+
     }
 
     /**
@@ -101,6 +108,8 @@ public class FishGUI extends GUIState{
     @Override
     public void start() {
         super.start();
+
+
 
         displayFrame.setVisible(true);
 
@@ -170,10 +179,22 @@ public class FishGUI extends GUIState{
 
         //build aggregate data
         ScrollPane pane = new ScrollPane();
-        pane.add(new MetaInspector(new FishStateProxy(state), self) );
+        pane.add(new MetaInspector(new FishStateProxy(state), self));
 
-        ((Console) controller).getTabPane().add("Aggregate Data",pane );
+        ((Console) controller).getTabPane().add("Aggregate Data", pane);
 
+
+
+
+        //mpa drawer
+        transformer = new CoordinateTransformer(display2D, ((FishState) state).getMap());
+
+        MPADrawer drawer = new MPADrawer(display2D, transformer, ((FishState) state).getMap(),
+                                         myPortrayal, this);
+
+
+        ((Console) controller).getTabPane().add("Regulations",new RegulationTab(this,drawer) );
+        //drawer.attach();
 
 
 

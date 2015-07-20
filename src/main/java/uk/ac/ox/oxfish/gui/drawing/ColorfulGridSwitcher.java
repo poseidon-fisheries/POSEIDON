@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.gui;
+package uk.ac.ox.oxfish.gui.drawing;
 
 import sim.display.Display2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -40,7 +40,8 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
 
         addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e)
+            {
                 Specie selected = speciesMap.get(reference.getSelectedItem());
                 toModify.setSelectedSpecie(selected);
                 toRefresh.repaint();

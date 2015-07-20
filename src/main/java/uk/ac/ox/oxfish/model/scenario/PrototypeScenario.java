@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -126,7 +127,7 @@ public class PrototypeScenario implements Scenario {
             new MaximumStepsFactory();
 
 
-    private AlgorithmFactory<? extends Regulation> regulation =  new AnarchyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
 
 
     private AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>> networkBuilder =
