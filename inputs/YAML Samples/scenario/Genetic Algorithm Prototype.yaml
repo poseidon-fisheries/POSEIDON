@@ -13,6 +13,6 @@ Genetic Algorithm Prototype:
   height: 50
   holdSize: '100.0'
   ports: 1
-  regulation: Anarchy
+  regulation: MPA Only
   speedInKmh: '5.0'
   width: 50

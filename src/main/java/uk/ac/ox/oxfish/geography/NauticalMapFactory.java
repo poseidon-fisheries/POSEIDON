@@ -157,7 +157,26 @@ public class NauticalMapFactory {
 
 
         GeomGridField bathymetry = new GeomGridField(baseGrid);
-        GeomVectorField mpas = new GeomVectorField(); //empty MPAs
+        GeomVectorField mpas = new GeomVectorField(baseGrid.getWidth(),baseGrid.getHeight()); //empty MPAs
+
+        //expand MBR to cointan all the cells
+        Point coordinates = bathymetry.toPoint(width-1, height-1);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
+        coordinates = bathymetry.toPoint(width-1, 0);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
+        coordinates = bathymetry.toPoint(0, 0);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(),coordinates.getY());
+        coordinates = bathymetry.toPoint(0, height-1);
+        bathymetry.getMBR().expandToInclude(coordinates.getX(), coordinates.getY());
+
+        //expand it a little further
+        bathymetry.getMBR().expandToInclude(bathymetry.getMBR().getMaxX()-bathymetry.getPixelWidth()/2,
+                                            bathymetry.getMBR().getMaxY()-bathymetry.getPixelHeight()/2);
+        bathymetry.getMBR().expandToInclude(bathymetry.getMBR().getMinX()-bathymetry.getPixelWidth()/2,
+                                            bathymetry.getMBR().getMinY()-bathymetry.getPixelHeight()/2);
+
+        mpas.setMBR(bathymetry.getMBR());
+
         Distance distance = new EquirectangularDistance(0,1);
         return new NauticalMap(bathymetry,mpas,distance);
 

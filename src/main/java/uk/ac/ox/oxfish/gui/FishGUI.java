@@ -41,7 +41,7 @@ public class FishGUI extends GUIState{
     private CoordinateTransformer transformer;
 
 
-    private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(true);
+    private final GeomVectorFieldPortrayal mpaPortrayal = new GeomVectorFieldPortrayal(false);
 
     private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
     private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();

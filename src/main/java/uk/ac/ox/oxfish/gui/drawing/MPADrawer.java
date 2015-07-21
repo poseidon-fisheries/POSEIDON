@@ -20,6 +20,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Arrays;
 
 /**
  * Drawing mpas over the display2D: useful for a little bit of interaction. The basic drawing of the rectangle I adapted from:
@@ -31,11 +32,10 @@ public class MPADrawer implements MouseListener, MouseMotionListener
 {
 
 
-
-    private boolean isNewRectangle = false;
     private boolean hasDragged = false;
     private int startX = 0; private int startY;
     private int endX = 0; private int endY;
+    private boolean attached = false;
 
 
     private final Display2D fishDisplay;
@@ -59,20 +59,6 @@ public class MPADrawer implements MouseListener, MouseMotionListener
         bathymetryPortrayal = mapPortrayal;
         this.scheduler = scheduler;
 
-        JPanel selectionPanel = new JPanel(){
-            @Override
-            public void paint(Graphics g) {
-                if(hasDragged)
-                    g.drawRect(
-                            Math.min(startX, endX),
-                            Math.min(startY, endY),
-                            Math.abs(startX - endX), Math.abs(startY - endY));
-            }
-        };
-        selectionPanel.setOpaque(true);
-        selectionPanel.setSize(fishDisplay.getSize());
-        fishDisplay.add(selectionPanel,0);
-
 
     }
 
@@ -82,16 +68,25 @@ public class MPADrawer implements MouseListener, MouseMotionListener
         //  final MouseListener[] mouseListeners = fishDisplay.getMouseListeners();
         //   for(MouseListener listener : mouseListeners)
 
-        fishDisplay.insideDisplay.addMouseListener(this);
-        fishDisplay.insideDisplay.addMouseMotionListener(this);
+        if(!attached)
+        {
+            attached = true;
+            fishDisplay.insideDisplay.addMouseListener(this);
+            fishDisplay.insideDisplay.addMouseMotionListener(this);
 
+        }
 
     }
 
     public void detach()
     {
-        fishDisplay.insideDisplay.removeMouseListener(this);
-        fishDisplay.insideDisplay.removeMouseMotionListener(this);
+        if(attached)
+        {
+            attached = false;
+            fishDisplay.insideDisplay.removeMouseListener(this);
+            fishDisplay.insideDisplay.removeMouseMotionListener(this);
+
+        }
     }
 
 
@@ -106,6 +101,13 @@ public class MPADrawer implements MouseListener, MouseMotionListener
 
 
         fishDisplay.repaint();
+        final int[] displacements = computeDisplacements();
+        System.out.println(Arrays.toString(displacements));
+        System.out.println("converted: " + transformer.guiToGridPosition(e.getX(), e.getY()));
+        System.out.println("transformed: " +transformer.guiToGridPosition(e.getX() + displacements[0],
+                                                         e.getY() + displacements[1]));
+        System.out.println(e.getX() + " --- " + e.getY());
+        System.out.println("----------------------------------------------");
     }
 
     /**
@@ -115,10 +117,12 @@ public class MPADrawer implements MouseListener, MouseMotionListener
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        isNewRectangle = true;
         hasDragged=false;
-        startX = e.getX(); //do I need to add offset?
-        startY = e.getY(); //do I need to add offset?
+        int[] displacements = computeDisplacements();
+
+        startX = e.getX() + displacements[0];
+        startY = e.getY() + displacements[1];
+
         fishDisplay.repaint();
     }
 
@@ -141,12 +145,14 @@ public class MPADrawer implements MouseListener, MouseMotionListener
 
             final Point startPoint = transformer.guiToJTSPoint(startX, startY);
             final Point endPoint = transformer.guiToJTSPoint(endX, endY);
-            double lowerLeftX = Math.min(startPoint.getX(), endPoint.getX());
-            double lowerLeftY = Math.min(startPoint.getY(), endPoint.getY());
+            //notice the - cellSize; the fact is that coordinates represent the center of the sea-tile while you want
+            //the MPA rectangle to start from the lower left
+            double lowerLeftX = Math.min(startPoint.getX(), endPoint.getX()) - transformer.getCellWidthInJTS()/2;
+            double lowerLeftY = Math.min(startPoint.getY(), endPoint.getY()) - transformer.getCellHeightInJTS()/2;
 
             geometryFactory.setBase(new Coordinate(lowerLeftX, lowerLeftY));
-            geometryFactory.setHeight(Math.abs(startPoint.getY() - endPoint.getY()));
-            geometryFactory.setWidth(Math.abs(startPoint.getX() - endPoint.getX()));
+            geometryFactory.setHeight(Math.abs(startPoint.getY() - endPoint.getY()) + transformer.getCellWidthInJTS());
+            geometryFactory.setWidth(Math.abs(startPoint.getX() - endPoint.getX()) + transformer.getCellHeightInJTS() );
 
             final Polygon rectangle = geometryFactory.createRectangle();
             System.out.println(rectangle);
@@ -188,12 +194,36 @@ public class MPADrawer implements MouseListener, MouseMotionListener
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-        endX = e.getX();
-        endY = e.getY();
+
+        //these are basically a way to adapt when the model displayed is smaller than the display size
+        //in which case mason centers it weirdly in the middle
+        int[] displacements = computeDisplacements();
+
+
+        endX = e.getX() + displacements[0];
+        endY = e.getY() + displacements[1];
         hasDragged=true;
-        isNewRectangle = true;
         fishDisplay.repaint();
 
+    }
+
+    /**
+     * if the containing inside display is larger than the grid to be displayed then MASON centers it. Unfortunately it
+     * doesn't let me see what the values are for the centering so I need to recompute it here at every click
+     * @return
+     */
+    private int[] computeDisplacements() {
+        int[] displacements = new int[2];
+
+
+        displacements[0] = fishDisplay.insideDisplay.width < fishDisplay.insideDisplay.getWidth()/fishDisplay.getScale() ?
+                (int) ((fishDisplay.insideDisplay.width - fishDisplay.insideDisplay.getWidth()/fishDisplay.getScale()) / (2/fishDisplay.getScale())) : 0;
+
+        displacements[1] = fishDisplay.insideDisplay.height < fishDisplay.insideDisplay.getHeight()/fishDisplay.getScale() ?
+                (int) ((fishDisplay.insideDisplay.height - fishDisplay.insideDisplay.getHeight()/fishDisplay.getScale()) / (2/fishDisplay.getScale())) : 0;
+
+
+        return displacements;
     }
 
     /**
@@ -213,8 +243,9 @@ public class MPADrawer implements MouseListener, MouseMotionListener
      */
     @Override
     public void mouseExited(MouseEvent e) {
-        endX = e.getX();
-        endY = e.getY();
+        int[] displacements = computeDisplacements();
+        endX = e.getX() + displacements[0];
+        endY = e.getY() + displacements[1];
 
     }
 

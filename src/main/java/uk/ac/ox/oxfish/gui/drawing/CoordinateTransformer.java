@@ -108,6 +108,23 @@ public class CoordinateTransformer
         return map.getRasterBathymetry().toPoint(int2D.getX(),int2D.getY());
     }
 
+
+    /**
+     * return how much in JTS ( the continuous space chart that GeoMason projects the real world coordinates)
+     * a cell is wide
+     * @return
+     */
+    public int getCellWidthInJTS()
+    {
+        return (int) map.getRasterBathymetry().getPixelWidth();
+    }
+
+    public int getCellHeightInJTS()
+    {
+        return (int) map.getRasterBathymetry().getPixelHeight();
+
+    }
+
 }
 
 

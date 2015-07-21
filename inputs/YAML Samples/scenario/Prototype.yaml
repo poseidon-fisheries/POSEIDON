@@ -30,6 +30,6 @@ Prototype:
     Equal Out Degree:
       degree: 2
   ports: 1
-  regulation: Anarchy
+  regulation: MPA Only
   speedInKmh: '5.0'
   width: 50
