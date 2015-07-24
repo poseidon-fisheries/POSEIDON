@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
+import sim.util.Bag;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -27,10 +28,14 @@ public class GUILessMain
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
         state.start();
-        for(int i=0; i<1000; i++) {
+        long time = System.currentTimeMillis();
+        while(state.getYear() <20)
+        {
             state.schedule.step(state);
-            System.out.println(state.timeString() + " -- " + scenario.getClass().getSimpleName());
+          //  System.out.println(state.timeString() + " -- " + scenario.getClass().getSimpleName());
         }
+        System.out.println("speed: " + (System.currentTimeMillis()-time)/1000d);
+
 
     }
 

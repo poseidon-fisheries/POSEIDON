@@ -694,4 +694,8 @@ public class Fisher implements Steppable, Startable{
     public double getFuelLeft() {
         return boat.getLitersOfFuelInTank();
     }
+
+    public int getID() {
+        return fisherID;
+    }
 }
