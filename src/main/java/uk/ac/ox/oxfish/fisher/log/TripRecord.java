@@ -3,10 +3,7 @@ package uk.ac.ox.oxfish.fisher.log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Holds summary statistics of a trip, specifically how much money was made and how much was spent.
@@ -44,7 +41,7 @@ public class TripRecord {
     /**
      * the places where fishing occured
      */
-    private final Set<SeaTile> tilesFished = new HashSet<>();
+    private final HashMap<SeaTile,Integer> tilesFished = new HashMap<>();
 
 
     public TripRecord()
@@ -62,7 +59,8 @@ public class TripRecord {
     public void recordFishing(FishingRecord record)
     {
 
-        tilesFished.add(record.getTileFished());
+        Integer timesFished = tilesFished.getOrDefault(record.getTileFished(), 0);
+        tilesFished.put(record.getTileFished(),timesFished+1);
 
     }
 
@@ -101,6 +99,13 @@ public class TripRecord {
     }
 
     public Set<SeaTile> getTilesFished() {
-        return tilesFished;
+        return tilesFished.keySet();
+    }
+
+    public SeaTile getMostFishedTileInTrip()
+    {
+
+        return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
+
     }
 }

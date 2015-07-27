@@ -29,9 +29,9 @@ public class HillClimbingMovementTest {
 
         //if new is better than old, go random
         HillClimbingMovement algo = new HillClimbingMovement(map,random);
-        assertEquals(newTile,algo.adapt(mock(Fisher.class), old, current, 0, 100));
+        assertEquals(newTile,algo.adapt(mock(Fisher.class),mock(NauticalMap.class) , old, current, 0, 100));
         //if old is better than new, go back to new
-        assertEquals(old,algo.adapt(mock(Fisher.class), old, current, 0, -100));
+        assertEquals(old,algo.adapt(mock(Fisher.class),mock(NauticalMap.class) , old, current, 0, -100));
 
 
     }

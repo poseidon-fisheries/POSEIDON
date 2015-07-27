@@ -71,6 +71,13 @@ public interface Market extends Startable {
 
 
     /**
+     * how much would this fisher make by selling this amount of biomass?
+     * @param biomass weight of fish sold
+     * @return the biomass
+     */
+    public double expectedRevenueFromSellingThisBiomass(double biomass,Fisher fisher, Regulation regulation);
+
+    /**
      * specie this market relates to
      * @return
      */

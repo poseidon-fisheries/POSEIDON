@@ -45,4 +45,17 @@ public class FixedPriceMarket extends AbstractMarket {
         return Market.defaultMarketTransaction(biomass, fisher, regulation, state,
                                                biomassTraded -> biomassTraded *price,getSpecie());
     }
+
+    /**
+     * how much would this fisher make by selling this amount of biomass?
+     *
+     * @param biomass    weight of fish sold
+     * @param fisher
+     * @param regulation @return the biomass
+     */
+    @Override
+    public double expectedRevenueFromSellingThisBiomass(
+            double biomass, Fisher fisher, Regulation regulation) {
+        return biomass * price;
+    }
 }

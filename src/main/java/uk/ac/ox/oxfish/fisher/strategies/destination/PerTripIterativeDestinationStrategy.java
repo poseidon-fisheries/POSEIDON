@@ -65,6 +65,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
      */
     private Fisher fisher;
 
+    private NauticalMap map;
+
 
     public PerTripIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate, IterativeMovement algorithm) {
@@ -116,6 +118,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
         if(this.fisher == null)
         {
             this.fisher = fisher;
+            this.map = model.getMap();
             //and start listening!
             fisher.addTripListener(this);
         }
@@ -158,7 +161,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
  //           trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
 
             delegate.setFavoriteSpot(
-                    algorithm.adapt(fisher, previousLocation, current, previousProfits, currentProfits)
+                    algorithm.adapt(fisher,map , previousLocation, current, previousProfits, currentProfits)
             );
 //            trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
 

@@ -48,28 +48,22 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
                 explorationProbability.apply(random),
                 ignoreEdgeDirection,
                 random,
-                new Function<Fisher, Double>() {
-                    @Override
-                    public Double apply(Fisher fisher) {
-                        final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                        if (lastFinishedTrip == null || lastFinishedTrip.isCutShort())
-                            return Double.NaN;
-                        else {
-                            assert lastFinishedTrip.isCompleted();
-                            return lastFinishedTrip.getProfitPerStep();
-                        }
+                fisher -> {
+                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                    if (lastFinishedTrip == null || lastFinishedTrip.isCutShort())
+                        return Double.NaN;
+                    else {
+                        assert lastFinishedTrip.isCompleted();
+                        return lastFinishedTrip.getProfitPerStep();
                     }
                 },
-                new Function<Fisher, SeaTile>() {
-                    @Override
-                    public SeaTile apply(Fisher fisher) {
-                        final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                        if (lastFinishedTrip == null || lastFinishedTrip.getTilesFished().isEmpty())
-                            return null;
-                        else {
-                            assert lastFinishedTrip.isCompleted();
-                            return lastFinishedTrip.getTilesFished().iterator().next();
-                        }
+                fisher -> {
+                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                    if (lastFinishedTrip == null || lastFinishedTrip.getTilesFished().isEmpty())
+                        return null;
+                    else {
+                        assert lastFinishedTrip.isCompleted();
+                        return lastFinishedTrip.getTilesFished().iterator().next();
                     }
                 }
         );

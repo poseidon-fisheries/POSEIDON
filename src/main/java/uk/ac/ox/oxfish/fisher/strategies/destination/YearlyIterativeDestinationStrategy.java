@@ -129,7 +129,8 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy, 
         assert Double.isFinite(currentCashFlow);
 
         //adapt!
-        delegate.setFavoriteSpot(algorithm.adapt(fisher, previousLocation, current, previousYearCashFlow, currentCashFlow));
+        delegate.setFavoriteSpot(algorithm.adapt(fisher, ((FishState) simState).getMap(), previousLocation, current, previousYearCashFlow,
+                                                 currentCashFlow));
 
         //record
         previousLocation = current;

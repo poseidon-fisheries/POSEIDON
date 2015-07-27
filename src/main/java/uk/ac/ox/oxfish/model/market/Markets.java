@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -40,6 +41,20 @@ public class Markets {
     {
         return marketList[specie.getIndex()].sellFish(biomass,fisher,regulation,state);
 
+    }
+
+
+    public double estimateTotalValue(Catch fishingCatch, Fisher fisher, Regulation regulation)
+    {
+        double total = 0;
+        for(int i=0; i<marketList.length; i++)
+        {
+            double specieCatch =  fishingCatch.getPoundsCaught(i);
+            if(specieCatch > 0)
+                total += specieCatch * marketList[i].expectedRevenueFromSellingThisBiomass(specieCatch,fisher,regulation);
+        }
+        assert  total>=0;
+        return total;
     }
 
     public Collection<Market> asList()

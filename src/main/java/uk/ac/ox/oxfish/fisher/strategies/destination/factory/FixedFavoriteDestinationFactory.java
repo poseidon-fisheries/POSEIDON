@@ -41,7 +41,6 @@ public class FixedFavoriteDestinationFactory implements AlgorithmFactory<Favorit
     @Override
     public FavoriteDestinationStrategy apply(FishState state) {
 
-        MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
         return new FavoriteDestinationStrategy(map.getSeaTile(x,y));
 

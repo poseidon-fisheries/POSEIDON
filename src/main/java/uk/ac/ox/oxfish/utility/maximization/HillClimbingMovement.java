@@ -60,7 +60,8 @@ public class HillClimbingMovement implements IterativeMovement {
 
     @Override
     public SeaTile adapt(
-            Fisher fisher, SeaTile previous, SeaTile current, double previousFitness, double newFitness)
+            Fisher fisher, NauticalMap map, SeaTile previous, SeaTile current, double previousFitness,
+            double newFitness)
     {
 
         //if you didn't move before (or you are stuck) you don't have a gradient yet so just try a new step

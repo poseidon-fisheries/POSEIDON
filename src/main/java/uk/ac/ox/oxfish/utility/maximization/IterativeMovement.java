@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.utility.maximization;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
@@ -14,13 +15,15 @@ public interface IterativeMovement
      * decide a new tile to move to given the current and previous step and their fitness
      *
      * @param fisher the fisher doing the maximization
-     * @param previous the sea-tile tried before this one. Could be null
+     * @param map the map over which the fishers move
+     *@param previous the sea-tile tried before this one. Could be null
      * @param current the sea-tile just tried
      * @param previousFitness the fitness value associated with the old sea-tile, could be NaN
-     * @param newFitness the fitness value associated with the current tile
-     * @return a new sea-tile to try
+     * @param newFitness the fitness value associated with the current tile     @return a new sea-tile to try
      */
-    SeaTile adapt(Fisher fisher, SeaTile previous, SeaTile current, double previousFitness, double newFitness);
+    SeaTile adapt(
+            Fisher fisher, NauticalMap map, SeaTile previous, SeaTile current, double previousFitness,
+            double newFitness);
 
 
 }

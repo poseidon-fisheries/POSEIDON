@@ -1,17 +1,14 @@
 package uk.ac.ox.oxfish.utility.maximization;
 
 import ec.util.MersenneTwisterFast;
-import junit.framework.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -47,9 +44,9 @@ public class ExplorationOrImitationMovementTest
                 locations::get
         );
 
-        final SeaTile newObjective = test.adapt(optimizer, mock(SeaTile.class), mock(SeaTile.class), 15, 10);
+        final SeaTile newObjective = test.adapt(optimizer,mock(NauticalMap.class) , mock(SeaTile.class), mock(SeaTile.class), 15, 10);
         //it should have not explored!
-        verify(delegate,never()).adapt(any(),any(),any(),anyDouble(),anyDouble());
+        verify(delegate,never()).adapt(any(),any() , any(), any(), anyDouble(), anyDouble());
         //should have copied friend 1
         assertEquals(newObjective, locations.get(friend1));
 
@@ -74,7 +71,7 @@ public class ExplorationOrImitationMovementTest
 
         IterativeMovement delegate = mock(IterativeMovement.class);
         final SeaTile explored = mock(SeaTile.class);
-        when(delegate.adapt(any(),any(),any(),anyDouble(),anyDouble())).thenReturn(explored);
+        when(delegate.adapt(any(), any(), any(), any(), anyDouble(), anyDouble())).thenReturn(explored);
         //imitate best friend
         ExplorationOrImitationMovement test = new ExplorationOrImitationMovement(
                 delegate,
@@ -85,9 +82,9 @@ public class ExplorationOrImitationMovementTest
                 locations::get
         );
 
-        final SeaTile newObjective = test.adapt(optimizer, mock(SeaTile.class), mock(SeaTile.class), 10,15);
+        final SeaTile newObjective = test.adapt(optimizer,mock(NauticalMap.class) , mock(SeaTile.class), mock(SeaTile.class), 10, 16);
         //it should have not explored!
-        verify(delegate,times(1)).adapt(any(),any(),any(),anyDouble(),anyDouble());
+        verify(delegate,times(1)).adapt(any(),any() , any(), any(), anyDouble(), anyDouble());
         assertEquals(newObjective, explored);
 
 
@@ -111,7 +108,7 @@ public class ExplorationOrImitationMovementTest
 
         IterativeMovement delegate = mock(IterativeMovement.class);
         final SeaTile explored = mock(SeaTile.class);
-        when(delegate.adapt(any(),any(),any(),anyDouble(),anyDouble())).thenReturn(explored);
+        when(delegate.adapt(any(),any() , any(), any(), anyDouble(), anyDouble())).thenReturn(explored);
         //imitate best friend
         ExplorationOrImitationMovement test = new ExplorationOrImitationMovement(
                 delegate,
@@ -122,9 +119,9 @@ public class ExplorationOrImitationMovementTest
                 locations::get
         );
 
-        final SeaTile newObjective = test.adapt(optimizer, mock(SeaTile.class), mock(SeaTile.class), 15, 10);
+        final SeaTile newObjective = test.adapt(optimizer,mock(NauticalMap.class) , mock(SeaTile.class), mock(SeaTile.class), 15, 10);
         //it should have not explored!
-        verify(delegate,times(1)).adapt(any(),any(),any(),anyDouble(),anyDouble());
+        verify(delegate,times(1)).adapt(any(),any() , any(), any(), anyDouble(), anyDouble());
         assertEquals(newObjective, explored);
 
 

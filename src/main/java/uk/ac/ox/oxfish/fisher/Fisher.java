@@ -16,10 +16,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.log.FishingRecord;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripLogger;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -38,6 +35,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.time.Year;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Queue;
 
@@ -102,6 +100,9 @@ public class Fisher implements Steppable, Startable{
 
     private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
 
+    private final LocationMemories<Catch> catchMemories = new LocationMemories<>(.99,30,2);
+
+    private final LocationMemories<TripRecord> tripMemories = new LocationMemories<>(.99,30,2);
 
     /**
      * a link to the model. Got when start() is called. It's not used or shared except when a new strategy is plugged in
@@ -240,9 +241,22 @@ public class Fisher implements Steppable, Startable{
         this.state = state;
         this.network = state.getSocialNetwork();
         receipt = state.scheduleEveryStep(this, StepOrder.FISHER_PHASE);
+
+        //start datas
         yearlyDataGatherer.start(state, this);
         yearlyCounter.start(state);
         tripLogger.start(state);
+        catchMemories.start(state);
+        tripMemories.start(state);
+        //trip memories need to listen to trip logger
+        tripLogger.addTripListener(new TripListener() {
+            @Override
+            public void reactToFinishedTrip(TripRecord record) {
+                tripMemories.memorize(record,record.getMostFishedTileInTrip());
+            }
+        });
+
+
 
         //start the strategies
         destinationStrategy.start(state);
@@ -258,6 +272,8 @@ public class Fisher implements Steppable, Startable{
         receipt.stop();
         yearlyDataGatherer.stop();
         tripLogger.turnOff();
+        catchMemories.turnOff();
+        tripMemories.turnOff();
 
         //start the strategies
         destinationStrategy.turnOff();
@@ -390,6 +406,7 @@ public class Fisher implements Steppable, Startable{
         //now pay for it
         spend(litersBought*homePort.getGasPricePerLiter());
 
+        //finish trip!
         tripLogger.finishTrip(stepsAtSea);
 
         stepsAtSea = 0;
@@ -543,8 +560,16 @@ public class Fisher implements Steppable, Startable{
     public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state) {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
 
-        //catch fish and load it
+        //catch fish
         Catch catchOfTheDay = gear.fish(this, location,hoursSpentFishing , modelBiology);
+
+        //record it
+        FishingRecord record = new FishingRecord(hoursSpentFishing,gear,location,catchOfTheDay,this,
+                                                 state.getStep());
+        getCurrentTrip().recordFishing(record);
+        catchMemories.memorize(catchOfTheDay,location);
+
+        //now let regulations and hold deal with it
         regulation.reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
 
@@ -552,11 +577,7 @@ public class Fisher implements Steppable, Startable{
         final double litersBurned = gear.getFuelConsumptionPerHourOfFishing(this, getBoat(), location) * hoursSpentFishing;
         consumeFuel(litersBurned);
 
-        //record it
-        FishingRecord record = new FishingRecord(hoursSpentFishing,gear,location,catchOfTheDay,this,
-                                                 state.getStep());
-        getCurrentTrip().recordFishing(record);
-        fishingLog.add(record);
+
 
         return catchOfTheDay;
     }
@@ -698,4 +719,25 @@ public class Fisher implements Steppable, Startable{
     public int getID() {
         return fisherID;
     }
+
+
+    /**
+     * Ask the fisher what is the best tile with respect to catches made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForCatchesRemembered(
+            Comparator<LocationMemory<Catch>> comparator) {
+        return catchMemories.getBestFishingSpotInMemory(comparator);
+    }
+
+    /**
+     * Ask the fisher what is the best tile with respect to trips made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForTripsRemembered(
+            Comparator<LocationMemory<TripRecord>> comparator) {
+        return tripMemories.getBestFishingSpotInMemory(comparator);
+    }
+
+
 }
