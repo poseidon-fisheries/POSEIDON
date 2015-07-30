@@ -32,8 +32,7 @@ public class FishYAMLTest {
                 "  Diffusing Logistic:\n"+
                 "    carryingCapacity: 14.0\n" +
                 "    differentialPercentageToMove: 5.0E-4\n" +
-                "    maxSteepness: 0.8\n" +
-                "    minSteepness: 0.7\n" +
+                "    steepness: 0.7\n" +
                 "    percentageLimitOnDailyMovement: uniform '0.001 0.01'\n" +
                 "coastalRoughness: 4\n" +
                 "departingStrategy:\n" +
@@ -47,7 +46,7 @@ public class FishYAMLTest {
                 "  tripsPerDecision: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "    fixedValue: 1.0\n" +
                 "fishers: 1234\n" +
-                "fishingEfficiency: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
+                "catchabilityMean: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "  fixedValue: 0.01\n" +
                 "fishingStrategy: !!uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory\n" +
                 "  daysAtSea: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
@@ -78,7 +77,7 @@ public class FishYAMLTest {
         Assert.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
         Assert.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getFixedValue(),14.0,.001);
         //reads normal doubles correctly
-        Assert.assertEquals(((FixedDoubleParameter) factory.getMinSteepness()).getFixedValue(), .7, .0001);
+        Assert.assertEquals(((FixedDoubleParameter) factory.getSteepness()).getFixedValue(), .7, .0001);
         //reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
         Assert.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
 
@@ -90,14 +89,14 @@ public class FishYAMLTest {
 
         DiffusingLogisticFactory factory = new DiffusingLogisticFactory();
         factory.setCarryingCapacity(new NormalDoubleParameter(10000, 10));
-        factory.setMaxSteepness(new UniformDoubleParameter(0, 10));
+        factory.setSteepness(new UniformDoubleParameter(0, 10));
         factory.setDifferentialPercentageToMove(new FixedDoubleParameter(.001));
         FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(factory);
         System.out.println(dumped);
 
         //test pretty printing
-        Assert.assertTrue(dumped.contains("maxSteepness: uniform 0.0 10.0"));
+        Assert.assertTrue(dumped.contains("steepness: uniform 0.0 10.0"));
         Assert.assertTrue(dumped.contains("carryingCapacity: normal 10000.0 10.0"));
 
         //now read it back! (notice that I need to do "loadAs" because when writing prettily the factory gets written
@@ -113,7 +112,7 @@ public class FishYAMLTest {
     public void writePrettilyAllSortsOfScenarios()
     {
         PrototypeScenario scenario = new PrototypeScenario();
-        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxSteepness(new FixedDoubleParameter(.9));
+        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setSteepness(new FixedDoubleParameter(.9));
         scenario.setRegulation(Regulations.CONSTRUCTORS.get("MPA Only").get());
         FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
@@ -125,7 +124,7 @@ public class FishYAMLTest {
         Assert.assertTrue(((PrototypeScenario) scenario2).getRegulation() instanceof ProtectedAreasOnlyFactory);
         //make sure three recursions in this is still correct.
         Assert.assertEquals(
-                ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getMaxSteepness()).getFixedValue(),.9,.0001);
+                ((FixedDoubleParameter) ((DiffusingLogisticFactory) ((PrototypeScenario) scenario2).getBiologyInitializer()).getSteepness()).getFixedValue(),.9,.0001);
 
 
         //final test, if I redump you, it'll be exactly like before

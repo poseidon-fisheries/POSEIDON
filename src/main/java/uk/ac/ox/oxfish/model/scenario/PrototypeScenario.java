@@ -9,6 +9,8 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
+import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -25,7 +27,6 @@ import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -84,7 +85,7 @@ public class PrototypeScenario implements Scenario {
     /**
      * Uses Caartesian distance
      */
-    private double gridSizeInKm = 10;
+    private double gridSizeInKm = 1;
 
     /**
      * boat speed
@@ -99,15 +100,19 @@ public class PrototypeScenario implements Scenario {
     /**
      * efficiency
      */
-    private DoubleParameter fishingEfficiency = new FixedDoubleParameter(.01);
+    private DoubleParameter catchabilityMean = new FixedDoubleParameter(0.01);
+
+    private DoubleParameter catchabilityDeviation = new FixedDoubleParameter(0);
+
+    private DoubleParameter thrawlingSpeed = new FixedDoubleParameter(5);
 
 
     private DoubleParameter engineWeight = new NormalDoubleParameter(100,10);
 
-    private DoubleParameter fuelTankSize = new FixedDoubleParameter(10000);
+    private DoubleParameter fuelTankSize = new FixedDoubleParameter(100000);
 
 
-    private DoubleParameter literPerKilometer = new FixedDoubleParameter(1);
+    private DoubleParameter literPerKilometer = new FixedDoubleParameter(10);
 
     /**
      * factory to produce departing strategy
@@ -206,7 +211,6 @@ public class PrototypeScenario implements Scenario {
             DepartingStrategy departing = departingStrategy.apply(model);
             final double speed = speedInKmh.apply(random);
             final double capacity = holdSize.apply(random);
-            final double efficiency =fishingEfficiency.apply(random);
             final double engineWeight = this.engineWeight.apply(random);
             final double literPerKilometer = this.literPerKilometer.apply(random);
             final double  fuelCapacity = this.fuelTankSize.apply(random);
@@ -220,7 +224,9 @@ public class PrototypeScenario implements Scenario {
                                         new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
                                                  new FuelTank(fuelCapacity)),
                                         new Hold(capacity, biology.getSize()),
-                                        new FixedProportionGear(efficiency)));
+                                        new RandomCatchabilityThrawl(new double[]{catchabilityMean.apply(random)},
+                                                                     new double[]{catchabilityDeviation.apply(random)},
+                                                                     thrawlingSpeed.apply(random))));
         }
 
         return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
@@ -292,12 +298,12 @@ public class PrototypeScenario implements Scenario {
         this.speedInKmh = speedInKmh;
     }
 
-    public DoubleParameter getFishingEfficiency() {
-        return fishingEfficiency;
+    public DoubleParameter getCatchabilityMean() {
+        return catchabilityMean;
     }
 
-    public void setFishingEfficiency(DoubleParameter fishingEfficiency) {
-        this.fishingEfficiency = fishingEfficiency;
+    public void setCatchabilityMean(DoubleParameter catchabilityMean) {
+        this.catchabilityMean = catchabilityMean;
     }
 
 
@@ -394,5 +400,21 @@ public class PrototypeScenario implements Scenario {
 
     public void setLiterPerKilometer(DoubleParameter literPerKilometer) {
         this.literPerKilometer = literPerKilometer;
+    }
+
+    public DoubleParameter getCatchabilityDeviation() {
+        return catchabilityDeviation;
+    }
+
+    public void setCatchabilityDeviation(DoubleParameter catchabilityDeviation) {
+        this.catchabilityDeviation = catchabilityDeviation;
+    }
+
+    public DoubleParameter getThrawlingSpeed() {
+        return thrawlingSpeed;
+    }
+
+    public void setThrawlingSpeed(DoubleParameter thrawlingSpeed) {
+        this.thrawlingSpeed = thrawlingSpeed;
     }
 }

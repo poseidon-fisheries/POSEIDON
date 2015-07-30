@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * Creates a DiffusingLogisticInitializer
@@ -16,9 +17,8 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
 
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
-    private DoubleParameter minSteepness = new FixedDoubleParameter(0.6);
+    private DoubleParameter steepness = new FixedDoubleParameter(0.4);
 
-    private DoubleParameter maxSteepness=new FixedDoubleParameter(0.8);
 
     /**
      * fixes a limit on how much biomass can leave the sea-tile
@@ -39,9 +39,8 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
      */
     @Override
     public DiffusingLogisticInitializer apply(FishState state) {
-        return new DiffusingLogisticInitializer(carryingCapacity.apply(state.random),
-                                                minSteepness.apply(state.random),
-                                                maxSteepness.apply(state.random),
+        return new DiffusingLogisticInitializer(carryingCapacity,
+                                                steepness,
                                                 percentageLimitOnDailyMovement.apply(state.random),
                                                 differentialPercentageToMove.apply(state.random));
     }
@@ -54,20 +53,13 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
         this.carryingCapacity = carryingCapacity;
     }
 
-    public DoubleParameter getMinSteepness() {
-        return minSteepness;
+
+    public DoubleParameter getSteepness() {
+        return steepness;
     }
 
-    public void setMinSteepness(DoubleParameter minSteepness) {
-        this.minSteepness = minSteepness;
-    }
-
-    public DoubleParameter getMaxSteepness() {
-        return maxSteepness;
-    }
-
-    public void setMaxSteepness(DoubleParameter maxSteepness) {
-        this.maxSteepness = maxSteepness;
+    public void setSteepness(DoubleParameter steepness) {
+        this.steepness = steepness;
     }
 
     public DoubleParameter getPercentageLimitOnDailyMovement() {

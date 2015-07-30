@@ -15,9 +15,8 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
 {
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
-    private double minSteepness = 0.6;
+    private DoubleParameter steepness = new FixedDoubleParameter(0.4);
 
-    private double maxSteepness=0.8;
 
 
     /**
@@ -28,8 +27,8 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
      */
     @Override
     public BiologyInitializer apply(FishState state) {
-        return new IndependentLogisticInitializer(carryingCapacity.apply(state.random),
-                                                  minSteepness,maxSteepness);
+        return new IndependentLogisticInitializer(carryingCapacity,
+                                                  steepness);
     }
 
     public DoubleParameter getCarryingCapacity() {
@@ -40,19 +39,12 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
         this.carryingCapacity = carryingCapacity;
     }
 
-    public double getMinSteepness() {
-        return minSteepness;
+
+    public DoubleParameter getSteepness() {
+        return steepness;
     }
 
-    public void setMinSteepness(double minSteepness) {
-        this.minSteepness = minSteepness;
-    }
-
-    public double getMaxSteepness() {
-        return maxSteepness;
-    }
-
-    public void setMaxSteepness(double maxSteepness) {
-        this.maxSteepness = maxSteepness;
+    public void setSteepness(DoubleParameter steepness) {
+        this.steepness = steepness;
     }
 }

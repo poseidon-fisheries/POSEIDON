@@ -14,13 +14,12 @@ import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -33,7 +32,6 @@ import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import java.time.Year;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -100,9 +98,9 @@ public class Fisher implements Steppable, Startable{
 
     private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
 
-    private final LocationMemories<Catch> catchMemories = new LocationMemories<>(.99,30,2);
+    private final LocationMemories<Catch> catchMemories = new LocationMemories<>(.99,300,2);
 
-    private final LocationMemories<TripRecord> tripMemories = new LocationMemories<>(.99,30,2);
+    private final LocationMemories<TripRecord> tripMemories = new LocationMemories<>(.99,300,2);
 
     /**
      * a link to the model. Got when start() is called. It's not used or shared except when a new strategy is plugged in
@@ -252,7 +250,9 @@ public class Fisher implements Steppable, Startable{
         tripLogger.addTripListener(new TripListener() {
             @Override
             public void reactToFinishedTrip(TripRecord record) {
-                tripMemories.memorize(record,record.getMostFishedTileInTrip());
+                SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
+                if(mostFishedTileInTrip != null)
+                    tripMemories.memorize(record, mostFishedTileInTrip);
             }
         });
 

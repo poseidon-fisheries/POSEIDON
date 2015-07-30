@@ -43,6 +43,9 @@ public class DestinationStrategies
         CONSTRUCTORS.put("Imitator-Explorator",
                          PerTripImitativeDestinationFactory::new);
         NAMES.put(PerTripImitativeDestinationFactory.class,"Imitator-Explorator");
+        CONSTRUCTORS.put("PSO",
+                         PerTripParticleSwarmFactory::new);
+        NAMES.put(PerTripParticleSwarmFactory.class,"PSO");
 
     }
 

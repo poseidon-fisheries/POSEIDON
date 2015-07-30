@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
 
@@ -16,18 +17,15 @@ import java.util.Arrays;
 public class IndependentLogisticInitializer implements BiologyInitializer {
 
 
-    private final Double carryingCapacity;
+    private final DoubleParameter carryingCapacity;
 
-    private final Double minSteepness;
-
-    private final Double maxSteepness;
+    private final DoubleParameter steepness;
 
 
-    public IndependentLogisticInitializer(double carryingCapacity, double minSteepness, double maxSteepness)
-    {
+    public IndependentLogisticInitializer(
+            DoubleParameter carryingCapacity, DoubleParameter steepness) {
         this.carryingCapacity = carryingCapacity;
-        this.minSteepness = minSteepness;
-        this.maxSteepness = maxSteepness;
+        this.steepness = steepness;
     }
 
     /**
@@ -50,13 +48,14 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
         {
             int species = biology.getSize();
             Double[] carryingCapacities = new Double[species];
-            Arrays.fill(carryingCapacities,carryingCapacity);
+            Double tileCarryingCapacity = carryingCapacity.apply(random);
+            Arrays.fill(carryingCapacities, tileCarryingCapacity);
             Double[] currentCapacities = new Double[species];
             Double[] malthusians = new Double[species];
             for(int i=0; i<currentCapacities.length; i++)
             {
-                currentCapacities[i] = random.nextDouble(true, true) * carryingCapacity;
-                malthusians[i] = random.nextDouble(true,true) *(maxSteepness-minSteepness) + minSteepness;
+                currentCapacities[i] = random.nextDouble(true, true) * tileCarryingCapacity;
+                malthusians[i] =  steepness.apply(random);
             }
             return new IndependentLogisticLocalBiology(currentCapacities,carryingCapacities,malthusians);
         }
@@ -77,16 +76,11 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
 
     }
 
+    public DoubleParameter getSteepness() {
+        return steepness;
+    }
 
-    public double getCarryingCapacity() {
+    public DoubleParameter getCarryingCapacity() {
         return carryingCapacity;
-    }
-
-    public double getMinSteepness() {
-        return minSteepness;
-    }
-
-    public double getMaxSteepness() {
-        return maxSteepness;
     }
 }

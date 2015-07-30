@@ -42,7 +42,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         departingStrategy.setProbabilityToLeavePort(new FixedDoubleParameter(1));
         scenario.setDepartingStrategy(departingStrategy);
         //fixed low efficiency
-        scenario.setFishingEfficiency(new FixedDoubleParameter(.01));
+        scenario.setCatchabilityMean(new FixedDoubleParameter(.01));
 
         scenario.setRegulation(new ProtectedAreasOnlyFactory());
       //  scenario.setRegulation(new MonoQuotaRegulation(10*scenario.getFishers(),model));

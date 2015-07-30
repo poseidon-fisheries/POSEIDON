@@ -105,6 +105,8 @@ public class TripRecord {
     public SeaTile getMostFishedTileInTrip()
     {
 
+        if(tilesFished.size() == 0)
+            return null;
         return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
 
     }

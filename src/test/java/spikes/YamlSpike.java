@@ -196,8 +196,7 @@ public class YamlSpike {
                 yaml.load("!!uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory\n" +
                                               "carryingCapacity: 12.0\n" +
                                               "differentialPercentageToMove: 5.0E-4\n" +
-                                              "maxSteepness: 0.8\n" +
-                                              "minSteepness: 0.6\n" +
+                                              "steepness: 0.8\n" +
                                               "percentageLimitOnDailyMovement: 0.01");
         //carrying capacity ought to be 12.0 Fixed carrying capacity
         Assert.assertTrue(initializerLoaded.getCarryingCapacity() instanceof FixedDoubleParameter);
@@ -211,8 +210,7 @@ public class YamlSpike {
                                   "  Diffusing Logistic:\n"+
                                   "    carryingCapacity: 14.0\n" +
                                   "    differentialPercentageToMove: 5.0E-4\n" +
-                                  "    maxSteepness: 0.8\n" +
-                                  "    minSteepness: 0.7\n" +
+                                  "    steepness: 0.7\n" +
                                   "    percentageLimitOnDailyMovement: 0.01\n" +
                                   "coastalRoughness: 4\n" +
                                   "departingStrategy:\n" +
@@ -226,7 +224,7 @@ public class YamlSpike {
                                   "  tripsPerDecision: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                                   "    fixedValue: 1.0\n" +
                                   "fishers: 1234\n" +
-                                  "fishingEfficiency: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
+                                  "catchabilityMean: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                                   "  fixedValue: 0.01\n" +
                                   "fishingStrategy: !!uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory\n" +
                                   "  daysAtSea: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
@@ -248,7 +246,7 @@ public class YamlSpike {
 
         final DiffusingLogisticFactory initializer = (DiffusingLogisticFactory) prototypeScenario.getBiologyInitializer();
         Assert.assertTrue(initializer.getCarryingCapacity() instanceof FixedDoubleParameter);
-        Assert.assertEquals(((FixedDoubleParameter) initializer.getMinSteepness()).getFixedValue(), 0.7, .0001);
+        Assert.assertEquals(((FixedDoubleParameter) initializer.getSteepness()).getFixedValue(), 0.7, .0001);
         Assert.assertEquals(((FixedDoubleParameter)initializer.getCarryingCapacity()).getFixedValue(),14.0,.0001);
 
 

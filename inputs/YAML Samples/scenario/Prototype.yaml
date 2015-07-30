@@ -17,7 +17,7 @@ Prototype:
       tripsPerDecision: '1.0'
   engineWeight: normal 100.0 10.0
   fishers: 300
-  fishingEfficiency: '0.01'
+  catchabilityMean: '0.01'
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '10.0'

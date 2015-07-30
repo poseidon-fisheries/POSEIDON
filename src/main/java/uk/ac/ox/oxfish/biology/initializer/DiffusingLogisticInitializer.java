@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,15 +45,15 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
 
 
     public DiffusingLogisticInitializer(
-            double carryingCapacity, double minSteepness, double maxSteepness, double percentageLimitOnDailyMovement,
+            DoubleParameter carryingCapacity, DoubleParameter steepness, double percentageLimitOnDailyMovement,
             double differentialPercentageToMove) {
-        super(carryingCapacity, minSteepness, maxSteepness);
+        super(carryingCapacity,steepness);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
 
     /**
-     * ignored
+     * Call the independent logistic initializer but add a steppable to call to smooth fish around
      *  @param biology the global biology instance
      * @param map     the map which by now should have all the tiles in place
      * @param random  mersenne randomizer
