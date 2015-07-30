@@ -1,9 +1,5 @@
 package uk.ac.ox.oxfish.gui;
 
-import javafx.scene.control.TabPane;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;

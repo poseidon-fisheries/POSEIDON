@@ -3,11 +3,8 @@ package uk.ac.ox.oxfish.geography.osmose;
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.OsmoseSimulation;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.OsmosePrototype;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 

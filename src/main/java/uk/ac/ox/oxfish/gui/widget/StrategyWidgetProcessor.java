@@ -4,8 +4,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.widgetprocessor.iface.WidgetProcessor;
 import sim.display.GUIState;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameters;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

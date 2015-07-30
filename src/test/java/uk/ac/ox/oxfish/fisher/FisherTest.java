@@ -66,22 +66,22 @@ public class FisherTest {
         fishmarket.start(mock(FishState.class));
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(),1);
+        assertEquals(fisher.getHoursAtSea(),1,.001);
         TripRecord record = fisher.getCurrentTrip();
         assertEquals(0, fisher.getPoundsCarried(), .001);
 
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 2);
+        assertEquals(fisher.getHoursAtSea(), 2,.001);
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 3);
+        assertEquals(fisher.getHoursAtSea(), 3,.001);
         //ready to go home
         assertEquals(2.0, fisher.getPoundsCarried(), .001);
 
         //home now
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 4);
+        assertEquals(fisher.getHoursAtSea(), 4,.001);
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 0);
+        assertEquals(fisher.getHoursAtSea(), 0,.001);
         assertEquals(0.0, fisher.getPoundsCarried(), .001);
 
         assertEquals(record.isCutShort(), false);
@@ -89,7 +89,7 @@ public class FisherTest {
         //2 steps fishing, 9  liters each, 10$ per liter
         //--->
         //380$ of costs per step
-        assertEquals(record.getProfitPerStep(), (23*2 - 10.0 * 10 * 2 - 2 * 10 * 9)/4,.001);
+        assertEquals(record.getProfitPerHour(), (23*2 - 10.0 * 10 * 2 - 2 * 10 * 9)/4,.001);
 
 
     }
@@ -139,7 +139,7 @@ public class FisherTest {
         fishmarket.start(mock(FishState.class));
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 1);
+        assertEquals(fisher.getHoursAtSea(), 1,.001);
         assertEquals(fisher.getFuelLeft(), 20.0, 0.0);
         //step it again, it should fish a bit
         fisher.step(fishState);
@@ -150,7 +150,7 @@ public class FisherTest {
         assertEquals(fisher.getFuelLeft(), 0.0, 0.0);
         assertTrue(fisher.isFuelEmergencyOverride());
         fisher.step(fishState);
-        assertEquals(fisher.getStepsAtSea(), 0);
+        assertEquals(fisher.getHoursAtSea(), 0,.001);
         assertEquals(fisher.getFuelLeft(), 30.0, 0.0);
 
 

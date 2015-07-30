@@ -1,12 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import org.jenetics.util.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-
-import java.util.LinkedHashMap;
-import java.util.function.Supplier;
 
 /**
  * The strategy used by the fisher to decide whether to leave port or not

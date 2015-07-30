@@ -4,7 +4,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import java.util.LinkedHashMap;
-import java.util.function.Supplier;
 
 /**
  * contains the scenario masterlist

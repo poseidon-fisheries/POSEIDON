@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  */
 public interface Gear {
 
-    public Catch fish(
+    Catch fish(
             Fisher fisher,
             SeaTile where,
             double hoursSpentFishing, GlobalBiology modelBiology);
@@ -23,7 +23,8 @@ public interface Gear {
      * @param where the location being fished
      * @return liters of gas consumed for every hour spent fishing
      */
-    public double getFuelConsumptionPerHourOfFishing(Fisher fisher,
-                                                     Boat boat,
-                                                     SeaTile where);
+    double getFuelConsumptionPerHourOfFishing(
+            Fisher fisher,
+            Boat boat,
+            SeaTile where);
 }

@@ -38,8 +38,8 @@ public class ParticleSwarmMovement implements ImitativeMovement, IterativeMoveme
      */
     private final float inertia;
 
-    private final Comparator<LocationMemory<TripRecord>> memoryComparator = (o1, o2) -> Double.compare(o1.getInformation().getProfitPerStep(),
-                                                                                                       o2.getInformation().getProfitPerStep());;
+    private final Comparator<LocationMemory<TripRecord>> memoryComparator = (o1, o2) -> Double.compare(o1.getInformation().getProfitPerHour(),
+                                                                                                       o2.getInformation().getProfitPerHour());
 
 
     public ParticleSwarmMovement(

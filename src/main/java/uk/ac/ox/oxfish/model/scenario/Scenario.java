@@ -1,9 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.List;
 
 /**
  * A scenario is a set of commands called to initialize the model
@@ -16,7 +13,7 @@ public interface Scenario {
      * @param model the model
      * @return a scenario-result object containing the map, the list of agents and the biology object
      */
-    public ScenarioEssentials start(FishState model);
+    ScenarioEssentials start(FishState model);
 
 
     /**
@@ -24,7 +21,7 @@ public interface Scenario {
      * @param model the model
      * @return a list of agents
      */
-    public ScenarioPopulation populateModel(FishState model);
+    ScenarioPopulation populateModel(FishState model);
 
 
 

@@ -1,11 +1,6 @@
 package uk.ac.ox.oxfish.gui;
 
-import uk.ac.ox.oxfish.gui.widget.ScenarioJComponent;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
 import javax.swing.*;
-
-import static org.junit.Assert.*;
 
 
 public class ScenarioSelectorSpike {

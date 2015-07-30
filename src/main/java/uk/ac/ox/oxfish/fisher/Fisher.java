@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
@@ -87,9 +88,9 @@ public class Fisher implements Steppable, Startable{
     private Action action;
 
     /**
-     * time spent at sea
+     * hours spent away from port
      */
-    private int stepsAtSea = 0;
+    private double hoursAtSea = 0;
 
     /**
      * the data gatherer that fires once a year
@@ -251,7 +252,7 @@ public class Fisher implements Steppable, Startable{
             @Override
             public void reactToFinishedTrip(TripRecord record) {
                 SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
-                if(mostFishedTileInTrip != null)
+                if (mostFishedTileInTrip != null)
                     tripMemories.memorize(record, mostFishedTileInTrip);
             }
         });
@@ -292,11 +293,22 @@ public class Fisher implements Steppable, Startable{
         double hoursLeft = model.getHoursPerStep();
         while(true)
         {
+            //pre-action accounting
             updateFuelEmergencyFlag(model.getMap());
+            double hoursLeftBeforeAction = hoursLeft;
+
+            //take an action
             ActionResult result = action.act(model, this, regulation,hoursLeft);
-            action = result.getNextState();
             hoursLeft = result.getHoursLeft();
-            //should be rounded anyway
+            //if you have been moving or you were staying still somewhere away from port
+            if(action instanceof Moving || !isAtPort())
+                increaseHoursAtSea(hoursLeftBeforeAction-hoursLeft);
+
+            //set up next action
+            action = result.getNextState();
+
+
+            //if you are out of time, continue tomorrow
             if(hoursLeft <= 0)
             {
                 assert  Math.abs(hoursLeft)<.001; //shouldn't be negative!
@@ -304,12 +316,7 @@ public class Fisher implements Steppable, Startable{
             }
         }
 
-        //if you are not at home
-        if(!getHomePort().isDocked(this))
-        {
 
-            stepsAtSea++;
-        }
 
     }
 
@@ -384,7 +391,7 @@ public class Fisher implements Steppable, Startable{
      * departs
      */
     public void undock() {
-        assert this.stepsAtSea == 0;
+        assert this.hoursAtSea == 0;
         assert isAtPort();
         homePort.depart(this);
         tripLogger.newTrip();
@@ -407,9 +414,9 @@ public class Fisher implements Steppable, Startable{
         spend(litersBought*homePort.getGasPricePerLiter());
 
         //finish trip!
-        tripLogger.finishTrip(stepsAtSea);
+        tripLogger.finishTrip(hoursAtSea);
 
-        stepsAtSea = 0;
+        hoursAtSea = 0;
     }
 
     /**
@@ -622,7 +629,7 @@ public class Fisher implements Steppable, Startable{
 
     public double getBankBalance(){
         return bankBalance;
-    };
+    }
 
     public void earn(double moneyEarned)
     {
@@ -641,10 +648,6 @@ public class Fisher implements Steppable, Startable{
 
 
 
-
-    public int getStepsAtSea() {
-        return stepsAtSea;
-    }
 
     public TripRecord getCurrentTrip() {
         return tripLogger.getCurrentTrip();
@@ -740,4 +743,13 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    public double getHoursAtSea() {
+        return hoursAtSea;
+    }
+
+    private void increaseHoursAtSea(double hoursIncrease)
+    {
+        Preconditions.checkArgument(hoursIncrease >= 0);
+        hoursAtSea += hoursIncrease;
+    }
 }

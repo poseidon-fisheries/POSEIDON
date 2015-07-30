@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.utility;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;

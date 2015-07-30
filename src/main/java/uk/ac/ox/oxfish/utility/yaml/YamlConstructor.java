@@ -114,7 +114,7 @@ public class YamlConstructor extends  Constructor {
     {
 
         //get it as a string
-        String nodeContent = (String) constructScalar( (ScalarNode)node);
+        String nodeContent = (String) constructScalar(node);
         //trim and split
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
         if(split.length == 1)

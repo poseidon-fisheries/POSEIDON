@@ -1,14 +1,10 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.introspector.FieldProperty;
-import org.yaml.snakeyaml.introspector.GenericProperty;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.*;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -77,7 +73,7 @@ public class YamlRepresenter extends Representer
 
                         //otherwise print as map
                         //first prepare the "value" which is just a node map representing our properties
-                        List<NodeTuple> value = new ArrayList<NodeTuple>(properties.size());
+                        List<NodeTuple> value = new ArrayList<>(properties.size());
                         //tag yourself as MAP, which means there will be no visible tag but just "name":
                         Tag tag = Tag.MAP;
                         //create the holding node
@@ -122,7 +118,7 @@ public class YamlRepresenter extends Representer
                                                   else {
                                                       //otherwise print as map
                                                       //first prepare the "value" which is just a node map representing our properties
-                                                      List<NodeTuple> value = new ArrayList<NodeTuple>(
+                                                      List<NodeTuple> value = new ArrayList<>(
                                                               properties.size());
                                                       //tag yourself as MAP, which means there will be no visible tag but just "name":
                                                       Tag tag = Tag.MAP;

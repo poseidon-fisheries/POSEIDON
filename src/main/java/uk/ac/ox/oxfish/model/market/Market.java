@@ -26,8 +26,9 @@ public interface Market extends Startable {
      * @param regulation the regulation object the seller abides to
      * @param state the model
      */
-    public TradeInfo sellFish(double biomass, Fisher fisher,
-                         Regulation regulation, FishState state);
+    TradeInfo sellFish(
+            double biomass, Fisher fisher,
+            Regulation regulation, FishState state);
 
 
     /**
@@ -43,7 +44,7 @@ public interface Market extends Startable {
      * @param biomassToRevenue a function to find out how much money does the biomass sold actually command
      * @return biomass actually sold
      */
-    static public TradeInfo defaultMarketTransaction(
+    static TradeInfo defaultMarketTransaction(
             double biomass, Fisher fisher, Regulation regulation,
             FishState state, Function<Double, Double> biomassToRevenue, Specie specie
     )
@@ -75,19 +76,19 @@ public interface Market extends Startable {
      * @param biomass weight of fish sold
      * @return the biomass
      */
-    public double expectedRevenueFromSellingThisBiomass(double biomass,Fisher fisher, Regulation regulation);
+    double expectedRevenueFromSellingThisBiomass(double biomass, Fisher fisher, Regulation regulation);
 
     /**
      * specie this market relates to
      * @return
      */
-    public Specie getSpecie();
+    Specie getSpecie();
 
     /**
      * get the daily data of this market
      * @return
      */
-    public DataSet<Market> getData();
+    DataSet<Market> getData();
 
 
 }

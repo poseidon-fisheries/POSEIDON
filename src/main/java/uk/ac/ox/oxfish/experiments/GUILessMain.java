@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.experiments;
 
-import sim.util.Bag;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;

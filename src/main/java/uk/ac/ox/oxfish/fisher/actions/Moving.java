@@ -19,10 +19,10 @@ public class Moving implements Action
     /**
      * if you were moving halfway through 2 cells, here you keep record, otherwise it stays at -1
      */
-    private double hoursRemainedFromBefore = -1;
+    private double accruedHours = -1;
 
     public Moving(double timeAlreadyTravelling) {
-        this.hoursRemainedFromBefore = timeAlreadyTravelling;
+        this.accruedHours = timeAlreadyTravelling;
     }
 
     public Moving() {
@@ -40,7 +40,7 @@ public class Moving implements Action
     public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
 
         //it would be very weird to accumulate a full day!
-        assert hoursRemainedFromBefore < 24;
+        assert accruedHours < 24;
 
         //adapt if needed
         agent.updateDestination(model,this);
@@ -55,8 +55,8 @@ public class Moving implements Action
         //while there are still places to go
         NauticalMap map = model.getMap();
 
-        if(hoursRemainedFromBefore > 0)
-            hoursLeft+=hoursRemainedFromBefore;
+        if(accruedHours > 0)
+            hoursLeft+= accruedHours;
 
         while(!route.isEmpty())
         {
@@ -64,12 +64,13 @@ public class Moving implements Action
 
             double distance = map.distance(agent.getLocation(),step);
             //if you have time move
-            final double hoursForThisStep = agent.totalTravelTimeAfterAddingThisSegment(distance);
+            final double hoursForThisStep = agent.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distance);
 
 
             if(hoursForThisStep <= hoursLeft)
             {
                 agent.move(step, map,model);
+
                 assert agent.getLocation().equals(step);
                 if(step.equals(agent.getDestination()))
                     return new ActionResult(new Arriving(),hoursLeft-hoursForThisStep);

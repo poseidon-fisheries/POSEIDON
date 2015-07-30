@@ -16,6 +16,9 @@ public interface BiologyInitializer
 {
 
 
+
+
+
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
      * @param biology the global biology (species' list) object
@@ -38,5 +41,8 @@ public interface BiologyInitializer
      *              than using getters
      */
     void processMap(GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model);
+
+
+    int getNumberOfSpecies();
 
 }

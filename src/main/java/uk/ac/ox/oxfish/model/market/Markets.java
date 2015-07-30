@@ -57,8 +57,10 @@ public class Markets {
         return total;
     }
 
-    public Collection<Market> asList()
+    public Collection<Market> getMarkets()
     {
         return Arrays.asList(marketList);
     }
+
+
 }

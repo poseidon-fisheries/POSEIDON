@@ -114,7 +114,7 @@ public class LocalOsmoseBiology implements LocalBiology
             //with the school
             biomassFishedFromSchool.put(school,schoolEarlierDepletion+fishedHere);
             //with the OSMOSE module
-            mortality.incrementCatches(school,fishedHere);;
+            mortality.incrementCatches(school,fishedHere);
 
         }
 

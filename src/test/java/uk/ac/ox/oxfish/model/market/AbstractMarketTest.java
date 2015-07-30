@@ -1,9 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
-import junit.framework.Assert;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Specie;

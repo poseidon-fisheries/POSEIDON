@@ -3,12 +3,9 @@ package uk.ac.ox.oxfish.utility;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 
 /**

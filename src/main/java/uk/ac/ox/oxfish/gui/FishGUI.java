@@ -116,7 +116,7 @@ public class FishGUI extends GUIState{
         final FishGUI self = this;
         FishState state = (FishState) this.state;
 
-        //so the console label is a pain in the ass so we need to really use the wrecking ball to modify the way
+        //the console label is a pain in the ass so we need to really use a wrecking ball to modify the way
         //the label is used
         final Box timeBox = (Box) ((Console) controller).getContentPane().getComponents()[0];
         while(timeBox.getComponents().length>3)
@@ -141,20 +141,12 @@ public class FishGUI extends GUIState{
         cities.setField(state.getCities());
         cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
         //fishing hotspots
+        state.getMap().guiStart(state);
         fishingHotspots.setField(state.getFishedMap());
         fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size()+100, new Color(0, 0, 0, 0), Color.RED));
         //reset your color map every year
-        state.scheduleEveryYear(simState -> {
-            final IntGrid2D fishedMap = state.getFishedMap();
-            int max = 0;
-            for(int i=0; i<fishedMap.field.length; i++)
-                max = Math.max(Ints.max(fishedMap.field[i]),max);
+        fishingHotspots.setMap(new SimpleColorMap(0,state.getFishers().size()/2, new Color(0, 0, 0, 0), Color.RED));
 
-            final int finalMax = max;
-            scheduleImmediatelyAfter(
-                    simState1 -> fishingHotspots.setMap(new SimpleColorMap(0, (finalMax+1) *1.05, new Color(0, 0, 0, 0), Color.RED)));
-
-        }, StepOrder.BIOLOGY_PHASE);
         //boats
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon)
@@ -168,7 +160,13 @@ public class FishGUI extends GUIState{
 
         //ports
         ports.setField(state.getPortGrid());
-        ports.setPortrayalForAll(new ImagePortrayal2D(portIcon));
+        ports.setPortrayalForAll(new ImagePortrayal2D(portIcon)        {
+            @Override
+            public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
+                return wrapper == null?null:
+                        new MetaInspector(wrapper.getObject(),self);
+            }
+        });
 
         ((JComponent) display2D.getComponent(0)).add(
                 new ColorfulGridSwitcher(myPortrayal,state.getBiology(), display2D));
@@ -187,9 +185,9 @@ public class FishGUI extends GUIState{
 
 
         //mpa drawer
-        transformer = new CoordinateTransformer(display2D, ((FishState) state).getMap());
+        transformer = new CoordinateTransformer(display2D, state.getMap());
 
-        MPADrawer drawer = new MPADrawer(display2D, transformer, ((FishState) state).getMap(),
+        MPADrawer drawer = new MPADrawer(display2D, transformer, state.getMap(),
                                          myPortrayal, this);
 
 

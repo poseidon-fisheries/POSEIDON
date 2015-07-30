@@ -8,16 +8,16 @@ import uk.ac.ox.oxfish.model.FishState;
  * The Fisher keep fishing until full or until a limit number of days have passed
  * Created by carrknight on 6/23/15.
  */
-public class MaximumStepsStrategy implements FishingStrategy
+public class MaximumDaysStrategy implements FishingStrategy
 {
 
 
     private final FishUntilFullStrategy delegate = new FishUntilFullStrategy(1d);
 
-    private final int numberOfStepsBeforeGoingHome;
+    private final int daysBeforeGoingHome;
 
-    public MaximumStepsStrategy(int numberOfStepsBeforeGoingHome) {
-        this.numberOfStepsBeforeGoingHome = numberOfStepsBeforeGoingHome;
+    public MaximumDaysStrategy(int daysBeforeGoingHome) {
+        this.daysBeforeGoingHome = daysBeforeGoingHome;
     }
 
     /**
@@ -32,7 +32,7 @@ public class MaximumStepsStrategy implements FishingStrategy
     @Override
     public boolean shouldFish(
             Fisher fisher, MersenneTwisterFast random, FishState model) {
-        return delegate.shouldFish(fisher, random, model) && fisher.getStepsAtSea() <= numberOfStepsBeforeGoingHome;
+        return delegate.shouldFish(fisher, random, model) && fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome;
     }
 
     /**

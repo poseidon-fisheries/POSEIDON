@@ -9,12 +9,11 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
-import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
@@ -78,14 +77,14 @@ public class PrototypeScenario implements Scenario {
     /**
      * the number of fishers
      */
-    private int fishers = 300;
+    private int fishers = 100;
 
 
 
     /**
      * Uses Caartesian distance
      */
-    private double gridSizeInKm = 1;
+    private double gridCellSizeInKm = 10;
 
     /**
      * boat speed
@@ -114,6 +113,8 @@ public class PrototypeScenario implements Scenario {
 
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(10);
 
+
+    private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0);
     /**
      * factory to produce departing strategy
      */
@@ -124,7 +125,7 @@ public class PrototypeScenario implements Scenario {
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripIterativeDestinationFactory();
+            new PerTripImitativeDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
@@ -156,15 +157,16 @@ public class PrototypeScenario implements Scenario {
 
         MersenneTwisterFast random = model.random;
 
-        GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
+        BiologyInitializer initializer = biologyInitializer.apply(model);
+        GlobalBiology biology = GlobalBiology.genericListOfSpecies(initializer.getNumberOfSpecies());
 
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    random,
                                                                                    depthSmoothing,
-                                                                                   biologyInitializer.apply(model),
+                                                                                   initializer,
                                                                                    biology,
                                                                                    model, width, height);
-        map.setDistance(new CartesianDistance(gridSizeInKm));
+        map.setDistance(new CartesianDistance(gridCellSizeInKm));
 
 
         //general biology
@@ -205,6 +207,9 @@ public class PrototypeScenario implements Scenario {
         final MersenneTwisterFast random = model.random;
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
+        for(Port port : ports)
+            port.setGasPricePerLiter(gasPricePerLiter.apply(random));
+
         for(int i=0;i<fishers;i++)
         {
             Port port = ports[random.nextInt(ports.length)];
@@ -282,12 +287,12 @@ public class PrototypeScenario implements Scenario {
         this.fishers = fishers;
     }
 
-    public double getGridSizeInKm() {
-        return gridSizeInKm;
+    public double getGridCellSizeInKm() {
+        return gridCellSizeInKm;
     }
 
-    public void setGridSizeInKm(double gridSizeInKm) {
-        this.gridSizeInKm = gridSizeInKm;
+    public void setGridCellSizeInKm(double gridCellSizeInKm) {
+        this.gridCellSizeInKm = gridCellSizeInKm;
     }
 
     public DoubleParameter getSpeedInKmh() {
@@ -416,5 +421,13 @@ public class PrototypeScenario implements Scenario {
 
     public void setThrawlingSpeed(DoubleParameter thrawlingSpeed) {
         this.thrawlingSpeed = thrawlingSpeed;
+    }
+
+    public DoubleParameter getGasPricePerLiter() {
+        return gasPricePerLiter;
+    }
+
+    public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
+        this.gasPricePerLiter = gasPricePerLiter;
     }
 }

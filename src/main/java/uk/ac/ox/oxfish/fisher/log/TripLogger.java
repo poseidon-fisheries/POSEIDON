@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.log;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -68,10 +69,14 @@ public class TripLogger implements Startable
     /**
      * log the trip is over
      */
-    public void finishTrip(int stepsAtSea)
+    public void finishTrip(double hoursAtSea)
     {
+
+        //it must have taken more than 0 hours to do a trip
+        Preconditions.checkArgument(hoursAtSea > 0);
+
         //complete the trip
-        currentTrip.completeTrip(stepsAtSea);
+        currentTrip.completeTrip(hoursAtSea);
         //add it to the historical record
         finishedTrips.add(currentTrip);
         lastFinishedTrip = currentTrip;

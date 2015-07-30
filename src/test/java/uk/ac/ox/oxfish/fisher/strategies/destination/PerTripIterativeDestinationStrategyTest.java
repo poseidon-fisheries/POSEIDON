@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ public class PerTripIterativeDestinationStrategyTest {
             when(record.isCompleted()).thenReturn(true);
             when(record.isCutShort()).thenReturn(true);
             final SeaTile favoriteSpot = delegate.getFavoriteSpot();
-            when(record.getProfitPerStep()).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
+            when(record.getProfitPerHour()).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             hill.reactToFinishedTrip(record);
 
         }

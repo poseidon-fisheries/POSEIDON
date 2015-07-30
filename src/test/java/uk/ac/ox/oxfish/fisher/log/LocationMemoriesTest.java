@@ -5,8 +5,6 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.function.Function;
-
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +23,7 @@ public class LocationMemoriesTest {
         /**
          * forgetting probability 100%!
          */
-        LocationMemories<String> memories = new LocationMemories<String>(1, 10,0);
+        LocationMemories<String> memories = new LocationMemories<>(1, 10, 0);
 
         //remember something
         SeaTile spot = mock(SeaTile.class);
@@ -57,7 +55,7 @@ public class LocationMemoriesTest {
         /**
          * forgetting probability 100%! but doesn't forget because it requires at least 1 element in memory
          */
-        LocationMemories<String> memories = new LocationMemories<String>(1, 5,1);
+        LocationMemories<String> memories = new LocationMemories<>(1, 5, 1);
 
         //remember something
         SeaTile spot = mock(SeaTile.class);

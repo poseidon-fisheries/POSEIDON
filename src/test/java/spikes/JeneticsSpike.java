@@ -6,8 +6,6 @@ import org.jenetics.engine.EvolutionResult;
 import org.jenetics.util.CharSeq;
 import org.jenetics.util.Factory;
 
-import static org.jenetics.engine.EvolutionResult.toBestPhenotype;
-
 
 public class JeneticsSpike {
     private static final String TARGET_STRING = "jenetics";

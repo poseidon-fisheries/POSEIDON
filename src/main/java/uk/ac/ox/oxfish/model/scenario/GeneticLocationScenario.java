@@ -48,7 +48,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
       //  scenario.setRegulation(new MonoQuotaRegulation(10*scenario.getFishers(),model));
 
 
-        scenario.setGridSizeInKm(5);
+        scenario.setGridCellSizeInKm(5);
 
         return scenario;
     }

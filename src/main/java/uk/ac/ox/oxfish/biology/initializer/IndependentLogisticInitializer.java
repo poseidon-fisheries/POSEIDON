@@ -59,7 +59,7 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
             }
             return new IndependentLogisticLocalBiology(currentCapacities,carryingCapacities,malthusians);
         }
-    };
+    }
 
     /**
      * ignored
@@ -82,5 +82,10 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
 
     public DoubleParameter getCarryingCapacity() {
         return carryingCapacity;
+    }
+
+    @Override
+    public int getNumberOfSpecies() {
+        return 1;
     }
 }

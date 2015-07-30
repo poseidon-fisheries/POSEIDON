@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.utility.parameters;
 import ec.util.MersenneTwisterFast;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Strategy/Scenario factories sometimes get called multiple times and often we'd like each time they are called to return

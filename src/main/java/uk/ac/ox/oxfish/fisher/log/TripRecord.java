@@ -15,7 +15,7 @@ public class TripRecord {
     /**
      * how long did the trip take
      */
-    private int  durationInStep = 0;
+    private double durationInHours = 0;
 
 
     /**
@@ -75,9 +75,9 @@ public class TripRecord {
         cutShort = true;
     }
 
-    public void completeTrip(int durationInStep)
+    public void completeTrip(double durationInHours)
     {
-        this.durationInStep = durationInStep;
+        this.durationInHours = durationInHours;
         completed = true;
     }
 
@@ -85,9 +85,11 @@ public class TripRecord {
      * return profit/step; an easy way to compare trip records
      * @return profits/days
      */
-    public double getProfitPerStep()
+    public double getProfitPerHour()
     {
-        return (totalEarnings - totalCosts) / durationInStep;
+
+        Preconditions.checkArgument(durationInHours > 0);
+        return (totalEarnings - totalCosts) / durationInHours;
     }
 
     public boolean isCutShort() {

@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.imitation.ParticleSwarmMovement;
 import uk.ac.ox.oxfish.utility.maximization.ExplorationOrImitationMovement;
-import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -64,7 +63,7 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
                         return Double.NaN;
                     else {
                         assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getProfitPerStep();
+                        return lastFinishedTrip.getProfitPerHour();
                     }
                 },
                 fisher -> {

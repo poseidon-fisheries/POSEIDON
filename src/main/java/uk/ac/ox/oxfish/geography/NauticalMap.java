@@ -11,15 +11,10 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.Grid2D;
-import sim.field.grid.IntGrid2D;
-import sim.field.grid.ObjectGrid2D;
-import sim.field.grid.SparseGrid2D;
+import sim.field.grid.*;
 import sim.util.Bag;
-import sim.util.Int2D;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,8 +26,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -91,7 +84,7 @@ public class NauticalMap implements Startable
     /**
      * a map holding
      */
-    private IntGrid2D fishedMap;
+    private DoubleGrid2D fishedMap;
 
     /**
      * todo move to parameter list
@@ -126,7 +119,7 @@ public class NauticalMap implements Startable
         ports = new HashSet<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
-        fishedMap = new IntGrid2D(getWidth(),getHeight());
+        fishedMap = new DoubleGrid2D(getWidth(),getHeight());
     }
 
     public int getHeight() {
@@ -193,16 +186,7 @@ public class NauticalMap implements Startable
     @Override
     public void start(FishState model) {
         Preconditions.checkArgument(receipt == null, "already started, love");
-        //reset fished map count
-        receipt =
-        model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                for(int i=0;i<getWidth();i++)
-                    for(int j=0; j<getHeight();j++)
-                        fishedMap.field[i][j] = 0;
-            }
-        }, StepOrder.DATA_RESET);
+
 
         //start all tiles
         for(Object element : rasterBackingGrid.elements())
@@ -213,6 +197,24 @@ public class NauticalMap implements Startable
 
     }
 
+
+    /**
+     * start the resetting of fish-hotspots; pointless if you have no gui
+     * @param model
+     */
+    public void guiStart(FishState model)
+    {
+        Preconditions.checkArgument(receipt==null);
+        //reset fished map count
+        receipt =
+                model.scheduleEveryDay(new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+
+                        fishedMap.multiply(.8);
+                    }
+                }, StepOrder.DATA_RESET);
+    }
     public Bag getAllSeaTiles()
     {
         return rasterBackingGrid.elements();
@@ -228,7 +230,8 @@ public class NauticalMap implements Startable
      */
     @Override
     public void turnOff() {
-        receipt.stop();
+        if(receipt!=null)
+            receipt.stop();
 
         //turn off all tiles
         //start all tiles
@@ -410,12 +413,13 @@ public class NauticalMap implements Startable
     }
 
     /**
-     * record the fact that somebody fished somewhere
+     * record the fact that somebody fished somewhere (ignored if there is no gui)
      * @param tile where it has been fished
      */
     public void recordFishing(SeaTile tile)
     {
-        fishedMap.field[tile.getGridX()][tile.getGridY()]++;
+        if(receipt != null)
+            fishedMap.field[tile.getGridX()][tile.getGridY()]++;
     }
 
     public SparseGrid2D getFisherGrid() {
@@ -439,7 +443,7 @@ public class NauticalMap implements Startable
         return toReturn;
     }
 
-    public IntGrid2D getFishedMap() {
+    public DoubleGrid2D getFishedMap() {
         return fishedMap;
     }
 }

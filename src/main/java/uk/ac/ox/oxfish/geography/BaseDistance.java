@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.geography;
 
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * The "skeletal" distance; delegate seatile distance to grid distance.
  * Created by carrknight on 4/10/15.

@@ -3,8 +3,6 @@ package uk.ac.ox.oxfish.geography;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Equirectangular!
  * Created by carrknight on 4/10/15.

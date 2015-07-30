@@ -129,4 +129,9 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
         }
         return toKeep;
     }
+
+    @Override
+    public int getNumberOfSpecies() {
+        return 1;
+    }
 }

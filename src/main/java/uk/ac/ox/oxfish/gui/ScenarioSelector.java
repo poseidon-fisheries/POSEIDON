@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.gui;
 
-import javafx.scene.control.RadioButton;
 import uk.ac.ox.oxfish.gui.widget.ScenarioJComponent;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;

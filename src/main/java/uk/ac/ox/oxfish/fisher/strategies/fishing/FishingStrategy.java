@@ -19,7 +19,7 @@ public interface FishingStrategy extends Startable{
      * @param model the model itself
      * @return true if the fisher should fish here, false otherwise
      */
-    public boolean shouldFish(Fisher fisher, MersenneTwisterFast random, FishState model);
+    boolean shouldFish(Fisher fisher, MersenneTwisterFast random, FishState model);
 
 
 

@@ -157,7 +157,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
     public void setGridSizeInKm(double gridSizeInKm) {
-        delegate.setGridSizeInKm(gridSizeInKm);
+        delegate.setGridCellSizeInKm(gridSizeInKm);
     }
 
 
@@ -235,7 +235,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
     public double getGridSizeInKm() {
-        return delegate.getGridSizeInKm();
+        return delegate.getGridCellSizeInKm();
     }
 
     public DoubleParameter getSpeedInKmh() {

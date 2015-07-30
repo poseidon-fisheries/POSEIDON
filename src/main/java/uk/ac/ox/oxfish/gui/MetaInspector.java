@@ -11,7 +11,6 @@ import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingPr
 import org.metawidget.swing.widgetprocessor.binding.beanutils.BeanUtilsBindingProcessorConfig;
 import org.metawidget.widgetbuilder.composite.CompositeWidgetBuilder;
 import org.metawidget.widgetbuilder.composite.CompositeWidgetBuilderConfig;
-import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import uk.ac.ox.oxfish.gui.widget.*;
 
@@ -72,7 +71,7 @@ public class MetaInspector extends Inspector
         //if you have a gui start with add the data widgets, so you can plot datasets on the fly
         if(toSyncAgainst != null)
         {
-            CompositeWidgetBuilder<JComponent, SwingMetawidget> composite = new CompositeWidgetBuilder<JComponent, SwingMetawidget>(
+            CompositeWidgetBuilder<JComponent, SwingMetawidget> composite = new CompositeWidgetBuilder<>(
                     new CompositeWidgetBuilderConfig<JComponent, SwingMetawidget>().
                             setWidgetBuilders(
                                     new DataWidgetBuilder(toSyncAgainst),

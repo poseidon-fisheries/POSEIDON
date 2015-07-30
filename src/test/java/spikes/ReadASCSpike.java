@@ -3,10 +3,8 @@ package spikes;
 import org.junit.Assert;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.DoubleGrid2D;
-import sim.field.grid.Grid2D;
 import sim.io.geo.ArcInfoASCGridImporter;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 

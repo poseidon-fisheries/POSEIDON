@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * A simple test to show that I can read shape files

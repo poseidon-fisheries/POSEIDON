@@ -2,12 +2,10 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.maximization.ExplorationOrImitationMovement;
@@ -15,8 +13,6 @@ import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.function.Function;
 
 /**
  * creates a trip strategy that has a chance of imitating friends rather than exploring
@@ -54,7 +50,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
                         return Double.NaN;
                     else {
                         assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getProfitPerStep();
+                        return lastFinishedTrip.getProfitPerHour();
                     }
                 },
                 fisher -> {

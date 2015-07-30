@@ -12,10 +12,10 @@ public interface Startable {
      * or just to percolate a reference to the model
      * @param model the model
      */
-    public void start(FishState model);
+    void start(FishState model);
 
     /**
      * tell the startable to turnoff,
      */
-    public void turnOff();
+    void turnOff();
 }

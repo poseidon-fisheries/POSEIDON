@@ -229,7 +229,7 @@ public class YamlSpike {
                                   "fishingStrategy: !!uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory\n" +
                                   "  daysAtSea: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                                   "    fixedValue: 10.0\n" +
-                                  "gridSizeInKm: 10.0\n" +
+                                  "gridCellSizeInKm: 10.0\n" +
                                   "height: 50\n" +
                                   "holdSize: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                                   "  fixedValue: 100.0\n" +

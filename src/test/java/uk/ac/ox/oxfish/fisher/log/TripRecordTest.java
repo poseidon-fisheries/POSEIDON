@@ -19,7 +19,7 @@ public class TripRecordTest {
         record.recordCosts(100);
         record.recordEarnings(200);
         record.completeTrip(10);
-        assertEquals(record.getProfitPerStep(),10,.001d);
+        assertEquals(record.getProfitPerHour(),10,.001d);
     }
 
 

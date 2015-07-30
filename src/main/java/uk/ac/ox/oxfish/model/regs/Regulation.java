@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.regs;
 
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -23,7 +22,7 @@ public interface Regulation
      * @param model a link to the model
      * @return true if the fisher can fish
      */
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
+    boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
 
     /**
      * how much of this specie biomass is sellable. Zero means it is unsellable
@@ -32,7 +31,7 @@ public interface Regulation
      * @param model a link to the model
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
-    public double maximumBiomassSellable(Fisher agent, Specie specie, FishState model);
+    double maximumBiomassSellable(Fisher agent, Specie specie, FishState model);
 
     /**
      * Can this fisher be at sea?
@@ -41,13 +40,13 @@ public interface Regulation
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
-    public boolean allowedAtSea(Fisher fisher, FishState model);
+    boolean allowedAtSea(Fisher fisher, FishState model);
 
     /**
      * tell the regulation object this much has been caught
      * @param fishCaught catch object
      */
-    public void reactToCatch(Catch fishCaught);
+    void reactToCatch(Catch fishCaught);
 
     /**
      * tell the regulation object this much of this specie has been sold
@@ -55,6 +54,6 @@ public interface Regulation
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
-    public void reactToSale(Specie specie, double biomass, double revenue);
+    void reactToSale(Specie specie, double biomass, double revenue);
 
 }

@@ -2,8 +2,6 @@ package uk.ac.ox.oxfish.biology;
 
 import uk.ac.ox.oxfish.model.Startable;
 
-import java.util.HashMap;
-
 /**
  * This is supposed to be a container of biological information we can attach to one or multiple sea tiles (because there
  * will probably be issues with data not having the same resolution as our model). For now it holds just local biomass
@@ -22,7 +20,7 @@ public interface LocalBiology extends Startable
      * @param specie  the specie you care about
      * @return the biomass of this specie
      */
-    public Double getBiomass(Specie specie);
+    Double getBiomass(Specie specie);
 
 
 
@@ -31,7 +29,7 @@ public interface LocalBiology extends Startable
      * @param specie the specie fished
      * @param biomassFished the biomass fished
      */
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished);
+    void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished);
 
 
 }

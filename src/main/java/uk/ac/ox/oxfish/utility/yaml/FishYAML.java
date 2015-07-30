@@ -2,13 +2,6 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A customized YAML reader to use with the model

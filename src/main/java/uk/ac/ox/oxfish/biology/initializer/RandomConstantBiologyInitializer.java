@@ -55,7 +55,7 @@ public class RandomConstantBiologyInitializer implements BiologyInitializer {
                 return new EmptyLocalBiology();
             else
                 return new ConstantLocalBiology(random.nextDouble()* (maxBiomass - minBiomass)+ minBiomass);
-        };
+        }
 
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
@@ -85,5 +85,10 @@ public class RandomConstantBiologyInitializer implements BiologyInitializer {
 
     public double getMaxBiomass() {
         return maxBiomass;
+    }
+
+    @Override
+    public int getNumberOfSpecies() {
+        return 1;
     }
 }

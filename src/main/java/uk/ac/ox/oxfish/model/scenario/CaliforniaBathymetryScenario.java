@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import org.jfree.util.ArrayUtilities;
-import org.metawidget.util.ArrayUtils;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;

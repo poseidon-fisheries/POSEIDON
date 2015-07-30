@@ -19,7 +19,7 @@ public interface Action {
      * @param hoursLeft how much time is left (in hours) to act in this step
      * @return the next action to take and whether or not to take it now
      */
-    public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft);
+    ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft);
 
 }
 

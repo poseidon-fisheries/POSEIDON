@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Specie;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.DataSet;
@@ -25,7 +24,7 @@ public class FishStateDailyDataSetTest {
 
         FishState state = mock(FishState.class);
         final NauticalMap map = mock(NauticalMap.class);
-        when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<SeaTile>());
+        when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<>());
         when(state.getMap()).thenReturn(map);
         Specie specie = new Specie("lalala");
         //1 specie

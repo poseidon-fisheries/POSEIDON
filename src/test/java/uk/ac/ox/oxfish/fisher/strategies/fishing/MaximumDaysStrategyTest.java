@@ -10,31 +10,31 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class MaximumStepsStrategyTest {
+public class MaximumDaysStrategyTest {
 
 
     @Test
     public void maximumSteps() throws Exception
     {
-        MaximumStepsStrategy steps =  new MaximumStepsStrategy(100);
+        MaximumDaysStrategy steps =  new MaximumDaysStrategy(100);
 
         //fish as long as it is BOTH not full and not being out for too long
         Fisher fisher = mock(Fisher.class);
         when(fisher.getMaximumLoad()).thenReturn(100d);
 
-        when(fisher.getStepsAtSea()).thenReturn(50);
+        when(fisher.getHoursAtSea()).thenReturn(50*24d);
         when(fisher.getPoundsCarried()).thenReturn(50d);
 
         //both are true
         assertTrue(steps.shouldFish(fisher,new MersenneTwisterFast(),mock(FishState.class)));
 
-        when(fisher.getStepsAtSea()).thenReturn(50);
+        when(fisher.getHoursAtSea()).thenReturn(50*24d);
         when(fisher.getPoundsCarried()).thenReturn(100d);
         //full, will be false
         assertFalse(steps.shouldFish(fisher, new MersenneTwisterFast(), mock(FishState.class)));
 
 
-        when(fisher.getStepsAtSea()).thenReturn(101);
+        when(fisher.getHoursAtSea()).thenReturn(101*24d);
         when(fisher.getPoundsCarried()).thenReturn(50d);
         //too late, will be false
         assertFalse(steps.shouldFish(fisher,new MersenneTwisterFast(),mock(FishState.class)));

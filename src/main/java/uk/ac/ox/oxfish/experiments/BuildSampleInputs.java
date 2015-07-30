@@ -8,10 +8,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.Map;
 import java.util.function.Supplier;
 

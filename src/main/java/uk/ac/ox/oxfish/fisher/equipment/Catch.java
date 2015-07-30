@@ -1,14 +1,8 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
 import com.google.common.base.Preconditions;
-import javafx.util.Pair;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
-
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 /**
  * Right now this is just a map specie--->pounds caught. It might in the future deal with age and other factors which is

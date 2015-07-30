@@ -200,7 +200,7 @@ public class NauticalMapFactory {
         NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing, width, height);
 
         //map.initializeBiology(RandomConstantBiologyInitializer(random,minBiomass,maxBiomass));;
-        map.initializeBiology(biologyInitializer,random ,biology );;
+        map.initializeBiology(biologyInitializer,random ,biology );
         /***
          *      ___                _   _      ___ _     _
          *     / __|_ __  ___  ___| |_| |_   | _ |_)___| |___  __ _ _  _

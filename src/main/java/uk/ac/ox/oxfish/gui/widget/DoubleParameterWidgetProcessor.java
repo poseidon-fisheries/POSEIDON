@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.gui.widget;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.widgetprocessor.iface.WidgetProcessor;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameters;
 
 import javax.swing.*;
@@ -80,7 +79,7 @@ public class DoubleParameterWidgetProcessor implements WidgetProcessor<JComponen
                                     attributes.get("name"),
                                     //the new value (table lookup)
                                     DoubleParameters.DOUBLE_PARAMETERS.get(
-                                            (String) parameterBox.getSelectedItem()).get());
+                                            parameterBox.getSelectedItem()).get());
 
                             //now update the gui
                             //for some reason rebind alone is not enough here (although it is strange because it works elsewhere for the same change)

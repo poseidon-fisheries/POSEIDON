@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.geography;
 
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * Common interface for all distance measures over a nautical chart
  * Created by carrknight on 4/10/15.
@@ -17,7 +15,7 @@ public interface Distance
      * @param endYGrid the ending y grid coordinate
      * @return kilometers between the two points
      */
-    public  double distance(int startXGrid, int startYGrid, int endXGrid, int endYGrid);
+    double distance(int startXGrid, int startYGrid, int endXGrid, int endYGrid);
 
     /**
      * the distance between two sea-tiles
@@ -25,7 +23,7 @@ public interface Distance
      * @param end ending sea-tile
      * @return kilometers between the two
      */
-    public  double distance(SeaTile start, SeaTile end);
+    double distance(SeaTile start, SeaTile end);
 
 
 

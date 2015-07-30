@@ -17,7 +17,7 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
 
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
-    private DoubleParameter steepness = new FixedDoubleParameter(0.4);
+    private DoubleParameter steepness = new UniformDoubleParameter(0.6,0.8);
 
 
     /**

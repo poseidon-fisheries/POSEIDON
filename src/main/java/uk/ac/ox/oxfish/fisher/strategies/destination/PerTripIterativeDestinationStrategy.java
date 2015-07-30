@@ -16,8 +16,6 @@ import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.esotericsoftware.minlog.Log.trace;
-
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
  * year this is done every x trips (x=1 by default). <br>
@@ -154,7 +152,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
             SeaTile current = delegate.getFavoriteSpot();
             //find average profits per step per trip
             double currentProfits = recordedTrips.stream().
-                    mapToDouble(TripRecord::getProfitPerStep).sum();
+                    mapToDouble(TripRecord::getProfitPerHour).sum();
             currentProfits /= recordedTrips.size();
 
             //log

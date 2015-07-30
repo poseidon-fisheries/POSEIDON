@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.algorithms.generators.random.BarabasiAlbertGenerator;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.graph.Graph;
-import org.apache.commons.collections15.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -40,13 +38,13 @@ public class BarabasiAlbertBuilder implements AlgorithmFactory<DirectedGraph<Fis
 
 
         BarabasiAlbertGenerator<Fisher,FriendshipEdge> generator =
-                new BarabasiAlbertGenerator<Fisher, FriendshipEdge>(DirectedSparseGraph::new,
-                                                                    fisherIterator::next,
-                                                                    FriendshipEdge::new,
-                                                                    edgesPerVertex,
-                                                                    edgesPerVertex,
-                                                                    state.getRandom().nextInt(),
-                                                                    new HashSet<>());
+                new BarabasiAlbertGenerator<>(DirectedSparseGraph::new,
+                                              fisherIterator::next,
+                                              FriendshipEdge::new,
+                                              edgesPerVertex,
+                                              edgesPerVertex,
+                                              state.getRandom().nextInt(),
+                                              new HashSet<>());
 
 
         final DirectedGraph<Fisher, FriendshipEdge> toReturn = (DirectedGraph<Fisher, FriendshipEdge>) generator.create();

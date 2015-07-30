@@ -1,20 +1,22 @@
 package uk.ac.ox.oxfish.gui.drawing;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.metawidget.inspector.annotation.UiHidden;
+import sim.display.GUIState;
+import sim.portrayal.Inspector;
+import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.gui.FishGUI;
+import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Basically a transformer that changes color mapping according to species.
@@ -97,4 +99,12 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     }
 
 
+    @Override
+    public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
+        if(wrapper == null) {
+            return null;
+        } else {
+            return new MetaInspector(wrapper.getObject(), ((FishGUI) state));
+        }
+    }
 }

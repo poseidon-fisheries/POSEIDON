@@ -32,7 +32,7 @@ public class FishStateTest {
         when(mock.getNetwork()).thenReturn(mock(SocialNetwork.class));
         when(scenario.populateModel(state)).thenReturn(mock);
         NauticalMap map = mock(NauticalMap.class); when(result.getMap()).thenReturn(map);
-        when(map.getPorts()).thenReturn(new HashSet<Port>());
+        when(map.getPorts()).thenReturn(new HashSet<>());
 
         state.setScenario(scenario);
         state.start();

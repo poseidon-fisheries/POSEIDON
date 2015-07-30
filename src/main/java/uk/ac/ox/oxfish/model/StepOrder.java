@@ -37,5 +37,5 @@ public enum StepOrder {
     /**
      * exogenous forces that act when the model has stepped can be used here (a simple GA algorithm for example)
      */
-    AFTER_DATA;
+    AFTER_DATA
 }

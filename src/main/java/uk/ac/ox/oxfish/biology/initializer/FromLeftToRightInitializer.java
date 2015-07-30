@@ -97,4 +97,9 @@ public class FromLeftToRightInitializer implements BiologyInitializer {
     public void setBiologySmoothingIndex(int biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
+
+    @Override
+    public int getNumberOfSpecies() {
+        return 1;
+    }
 }

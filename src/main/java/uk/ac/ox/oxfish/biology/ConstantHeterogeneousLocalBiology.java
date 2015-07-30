@@ -2,9 +2,6 @@ package uk.ac.ox.oxfish.biology;
 
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.Arrays;
-import java.util.stream.DoubleStream;
-
 /**
  * A local biology where multiple species exist. Much like ConstantLocalBiology they do not change their
  * total biomass even after being fished out

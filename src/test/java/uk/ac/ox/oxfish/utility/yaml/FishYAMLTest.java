@@ -3,13 +3,9 @@ package uk.ac.ox.oxfish.utility.yaml;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
-import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -51,7 +47,7 @@ public class FishYAMLTest {
                 "fishingStrategy: !!uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory\n" +
                 "  daysAtSea: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "    fixedValue: 10.0\n" +
-                "gridSizeInKm: 10.0\n" +
+                "gridCellSizeInKm: 10.0\n" +
                 "height: 50\n" +
                 "holdSize: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "  fixedValue: 100.0\n" +
@@ -117,7 +113,7 @@ public class FishYAMLTest {
         FishYAML yaml = new FishYAML();
         final String dumped = yaml.dump(scenario);
         //load back! Notice that because it's made "pretty" I still have to call loadAs
-        Scenario scenario2 = (Scenario) yaml.loadAs(dumped, Scenario.class);
+        Scenario scenario2 = yaml.loadAs(dumped, Scenario.class);
         Assert.assertTrue(scenario2 instanceof PrototypeScenario);
 
         //make sure it remembers that the regulations have changed

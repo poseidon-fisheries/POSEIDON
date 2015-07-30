@@ -46,7 +46,6 @@ public class PreBurnOSMOSE {
             Preconditions.checkState(!file.exists());
             Preconditions.checkState(renamedTo.exists());
             Preconditions.checkState(renamedCorrectly);
-            ;
 
 
         }
@@ -85,7 +84,6 @@ public class PreBurnOSMOSE {
             Preconditions.checkState(!file.exists());
             Preconditions.checkState(renamedTo.exists());
             Preconditions.checkState(renamedCorrectly);
-            ;
 
 
         }

@@ -4,8 +4,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
 import javax.swing.*;
 
-import static org.junit.Assert.*;
-
 /**
  * I might decide to make a full GUI test at some point, till then this is just a personal way
  * to check that things are correct

@@ -18,3 +18,11 @@ Imitator-Explorator:
   ignoreEdgeDirection: true
   stepSize: '5.0'
 -------
+PSO:
+  explorationProbability: '0.3'
+  explorationShockSize: '4.0'
+  friendWeight: uniform 0.5 1.0
+  ignoreEdgeDirection: true
+  inertia: uniform 0.3 0.8
+  memoryWeight: uniform 0.5 1.0
+-------

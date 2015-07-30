@@ -1,6 +1,5 @@
 import com.esotericsoftware.minlog.Log;
 import sim.display.Console;
-import sim.engine.Schedule;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
@@ -8,8 +7,6 @@ import uk.ac.ox.oxfish.utility.FishStateLogger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Paths;

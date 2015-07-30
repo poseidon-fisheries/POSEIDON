@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import ec.util.MersenneTwisterFast;
-import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;

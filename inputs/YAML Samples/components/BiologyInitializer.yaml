@@ -1,14 +1,12 @@
 Independent Logistic:
   carryingCapacity: '5000.0'
-  maxSteepness: 0.8
-  minSteepness: 0.6
+  steepness: '0.4'
 -------
 Diffusing Logistic:
   carryingCapacity: '5000.0'
   differentialPercentageToMove: '5.0E-4'
-  maxSteepness: '0.8'
-  minSteepness: '0.6'
   percentageLimitOnDailyMovement: '0.01'
+  steepness: uniform 0.6 0.8
 -------
 From Left To Right Fixed:
   biologySmoothingIndex: '1000000.0'

@@ -11,8 +11,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 
 public class OneSpecieGearTest {

@@ -7,6 +7,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
+import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -125,7 +126,7 @@ public class FishState  extends SimState{
                 fisher.start(this);
         //start the markets (for each port
         for(Port port : getPorts())
-            for(Market market : port.getMarkets().asList())
+            for(Market market : port.getMarkets().getMarkets())
                 market.start(this);
 
         for(Startable startable : toStart)
@@ -290,7 +291,7 @@ public class FishState  extends SimState{
         map.recordFishing(tile);
     }
 
-    public IntGrid2D getFishedMap() {
+    public DoubleGrid2D getFishedMap() {
         return map.getFishedMap();
     }
 

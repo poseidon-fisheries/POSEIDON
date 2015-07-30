@@ -3,15 +3,12 @@ package uk.ac.ox.oxfish.fisher.log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.market.Markets;
 
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * Basically a table holding for each sea-tile a specific memory (a trip, or a location or something else).
