@@ -88,7 +88,7 @@ public class TripRecord {
     public double getProfitPerHour()
     {
 
-        Preconditions.checkArgument(durationInHours > 0);
+        Preconditions.checkArgument(durationInHours > 0 == completed);
         return (totalEarnings - totalCosts) / durationInHours;
     }
 

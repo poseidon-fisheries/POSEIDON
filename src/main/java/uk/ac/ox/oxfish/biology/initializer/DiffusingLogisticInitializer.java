@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -47,7 +48,7 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
     public DiffusingLogisticInitializer(
             DoubleParameter carryingCapacity, DoubleParameter steepness, double percentageLimitOnDailyMovement,
             double differentialPercentageToMove) {
-        super(carryingCapacity,steepness);
+        super(carryingCapacity, steepness);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
     }
@@ -69,43 +70,44 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
         for(Object inBag : allSeaTiles)
         {
             final SeaTile tile = (SeaTile) inBag;
-            //every day
-            model.scheduleEveryDay(new Steppable() {
-                @Override
-                public void step(SimState simState) {
+            if(tile.getAltitude()<0)
+                //every day
+                model.scheduleEveryDay(new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
 
-                    //grab neighbors
-                    neighbors.putIfAbsent(tile,getUsefulNeighbors(tile,map));
-                    List<SeaTile> neighborList = neighbors.get(tile);
-                    //for each neighbor
-                    for(SeaTile neighbor : neighborList)
-                    {
-                        //for each specie
-                        for(int i=0; i<biology.getSize(); i++)
+                        //grab neighbors
+                        neighbors.putIfAbsent(tile,getUsefulNeighbors(tile,map));
+                        List<SeaTile> neighborList = neighbors.get(tile);
+                        //for each neighbor
+                        for(SeaTile neighbor : neighborList)
                         {
-                            //if here there are more than there
-                            final Specie specie = biology.getSpecie(i);
-                            double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
-                            if(differential > 0 )
+                            //for each specie
+                            for(int i=0; i<biology.getSize(); i++)
                             {
-                                //share!
-                                double movement =  Math.min(differentialPercentageToMove * differential,
-                                                            percentageLimitOnDailyMovement * tile.getBiomass(specie));
-                                IndependentLogisticLocalBiology here = (IndependentLogisticLocalBiology) tile.getBiology();
-                                IndependentLogisticLocalBiology there = (IndependentLogisticLocalBiology) neighbor.getBiology();
-                                here.getCurrentBiomass()[i]-=movement;
-                                assert here.getCurrentBiomass()[i] >= 0;
-                                there.getCurrentBiomass()[i]+=movement;
+                                //if here there are more than there
+                                final Specie specie = biology.getSpecie(i);
+                                double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
+                                if(differential > 0 )
+                                {
+                                    //share!
+                                    double movement =  Math.min(differentialPercentageToMove * differential,
+                                                                percentageLimitOnDailyMovement * tile.getBiomass(specie));
+                                    IndependentLogisticLocalBiology here = (IndependentLogisticLocalBiology) tile.getBiology();
+                                    IndependentLogisticLocalBiology there = (IndependentLogisticLocalBiology) neighbor.getBiology();
+                                    here.getCurrentBiomass()[i]-=movement;
+                                    assert here.getCurrentBiomass()[i] >= 0;
+                                    there.getCurrentBiomass()[i]+=movement;
 
+                                }
                             }
                         }
+
+
+
+
                     }
-
-
-
-
-                }
-            }, StepOrder.DAWN);
+                }, StepOrder.DAWN);
         }
     }
 
@@ -128,10 +130,5 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
             }
         }
         return toKeep;
-    }
-
-    @Override
-    public int getNumberOfSpecies() {
-        return 1;
     }
 }

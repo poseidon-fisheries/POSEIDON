@@ -16,6 +16,7 @@ import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.util.gui.SimpleColorMap;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
 import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
@@ -145,7 +146,7 @@ public class FishGUI extends GUIState{
         fishingHotspots.setField(state.getFishedMap());
         fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size()+100, new Color(0, 0, 0, 0), Color.RED));
         //reset your color map every year
-        fishingHotspots.setMap(new SimpleColorMap(0,state.getFishers().size()/2, new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size() / 2, new Color(0, 0, 0, 0), Color.RED));
 
         //boats
         boats.setField(state.getFisherGrid());
@@ -164,7 +165,7 @@ public class FishGUI extends GUIState{
             @Override
             public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
                 return wrapper == null?null:
-                        new MetaInspector(wrapper.getObject(),self);
+                        new MetaInspector(((Port) wrapper.getObject()),self);
             }
         });
 

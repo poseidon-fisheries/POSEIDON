@@ -172,9 +172,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setSpeedInKmh(speedInKmh);
     }
 
-    public int getNumberOfSpecies() {
-        return delegate.getNumberOfSpecies();
-    }
+
 
     public void setFishers(int fishers) {
         delegate.setFishers(fishers);

@@ -15,8 +15,7 @@ import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Basically a transformer that changes color mapping according to species.
@@ -34,6 +33,8 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     private final ColorMap depthColor = new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED);
 
+
+    private final Queue<Color> defaultFishColors = new LinkedList<>();
     /**
      * the specie currently selected, no selection means depth
      */
@@ -51,6 +52,8 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         setSelectedSpecie(null);
 
 
+        defaultFishColors.add(Color.RED);
+        defaultFishColors.add(Color.BLUE);
     }
 
     /**
@@ -90,7 +93,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
                                                          random.nextInt(256),
                                                          random.nextInt(256)));
                                                          */
-            colors.putIfAbsent(selectedSpecie, Color.RED);
+            colors.putIfAbsent(selectedSpecie, defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll());
             this.setMap(new SimpleColorMap(0, maxBiomass,Color.WHITE,
                                            colors.get(selectedSpecie)));
             this.setImmutableField(false);

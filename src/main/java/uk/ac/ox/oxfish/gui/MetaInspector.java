@@ -75,6 +75,7 @@ public class MetaInspector extends Inspector
                     new CompositeWidgetBuilderConfig<JComponent, SwingMetawidget>().
                             setWidgetBuilders(
                                     new DataWidgetBuilder(toSyncAgainst),
+                                    new MarketWidgetBuilder(toSyncAgainst),
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
                                     new SwingWidgetBuilder()

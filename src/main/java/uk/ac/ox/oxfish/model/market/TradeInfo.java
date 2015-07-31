@@ -20,7 +20,7 @@ public class TradeInfo {
         this.specie = specie;
         this.moneyExchanged = moneyExchanged;
         Preconditions.checkArgument(biomassTraded>=0);
-        Preconditions.checkArgument(moneyExchanged>=0);
+  //      Preconditions.checkArgument(moneyExchanged>=0); not true if it's a fine
     }
 
     public double getBiomassTraded() {

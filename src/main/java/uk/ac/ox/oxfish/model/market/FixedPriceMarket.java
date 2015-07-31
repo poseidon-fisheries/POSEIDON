@@ -19,14 +19,13 @@ public class FixedPriceMarket extends AbstractMarket {
     }
 
     public void setPrice(double price) {
-        Preconditions.checkArgument(price>=0);
+  //      Preconditions.checkArgument(price>=0); can be negative if it's a fine!
         this.price = price;
     }
 
 
     public FixedPriceMarket(Specie specie, double price) {
         super(specie);
-        Preconditions.checkArgument(price>=0);
         this.price = price;
     }
 

@@ -42,11 +42,6 @@ import java.util.LinkedList;
 public class PrototypeScenario implements Scenario {
 
     /**
-     * number of species
-     */
-    private int numberOfSpecies = 1;
-
-    /**
      * higher the more the coast gets jagged
      */
     private int coastalRoughness = 4;
@@ -178,6 +173,7 @@ public class PrototypeScenario implements Scenario {
         double[] marketPrices = new double[biology.getSize()];
         Arrays.fill(marketPrices,10.0);
 
+
         for(Specie specie : biology.getSpecies())
             markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
 
@@ -220,6 +216,13 @@ public class PrototypeScenario implements Scenario {
             final double literPerKilometer = this.literPerKilometer.apply(random);
             final double  fuelCapacity = this.fuelTankSize.apply(random);
 
+            double[] catchabilityMeanPerSpecie = new double[biology.getSize()];
+            double[] catchabilitySTD = new double[biology.getSize()];
+            for(int j=0; j<catchabilityMeanPerSpecie.length; j++)
+            {
+                catchabilityMeanPerSpecie[j] = catchabilityMean.apply(random);
+                catchabilitySTD[j] = catchabilityDeviation.apply(random);
+            }
             fisherList.add(new Fisher(i, port,
                                         random,
                                         regulation.apply(model),
@@ -229,8 +232,8 @@ public class PrototypeScenario implements Scenario {
                                         new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
                                                  new FuelTank(fuelCapacity)),
                                         new Hold(capacity, biology.getSize()),
-                                        new RandomCatchabilityThrawl(new double[]{catchabilityMean.apply(random)},
-                                                                     new double[]{catchabilityDeviation.apply(random)},
+                                        new RandomCatchabilityThrawl(catchabilityMeanPerSpecie,
+                                                                     catchabilitySTD,
                                                                      thrawlingSpeed.apply(random))));
         }
 
@@ -320,12 +323,6 @@ public class PrototypeScenario implements Scenario {
             AlgorithmFactory<? extends Regulation> regulation) {
         this.regulation = regulation;
     }
-
-
-    public int getNumberOfSpecies() {
-        return numberOfSpecies;
-    }
-
 
 
     public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {

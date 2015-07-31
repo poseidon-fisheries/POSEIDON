@@ -1,9 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
-import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.RandomConstantBiologyFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.*;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -44,6 +41,10 @@ public class BiologyInitializers {
         CONSTRUCTORS.put("Random Smoothed and Fixed",
                          RandomConstantBiologyFactory::new);
         NAMES.put(RandomConstantBiologyFactory.class,"Random Smoothed and Fixed");
+
+     CONSTRUCTORS.put("Half Bycatch",
+                         HalfBycatchFactory::new);
+        NAMES.put(HalfBycatchFactory.class,"Half Bycatch");
 
 
     }
