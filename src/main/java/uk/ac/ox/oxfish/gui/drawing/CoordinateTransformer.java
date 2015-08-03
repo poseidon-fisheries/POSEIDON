@@ -103,11 +103,20 @@ public class CoordinateTransformer
     public Point guiToJTSPoint(double guiX, double guiY)
     {
 
-        final Int2D int2D = guiToGridPosition(guiX, guiY);
-        return map.getRasterBathymetry().toPoint(int2D.getX(),int2D.getY());
+        return gridToJTSPoint(guiToGridPosition(guiX,guiY));
     }
 
 
+
+    public Point gridToJTSPoint(int x, int y)
+    {
+        return map.getRasterBathymetry().toPoint(x,y);
+    }
+
+    public Point gridToJTSPoint(Int2D gridPosition)
+    {
+        return gridToJTSPoint(gridPosition.getX(),gridPosition.getY());
+    }
     /**
      * return how much in JTS ( the continuous space chart that GeoMason projects the real world coordinates)
      * a cell is wide

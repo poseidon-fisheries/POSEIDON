@@ -131,8 +131,11 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
         //grow fish
         for(int i=0; i<currentBiomass.length; i++)
         {
-            currentBiomass[i]=Math.min(carryingCapacity[i], currentBiomass[i] + malthusianParameter[i] *
-                    (1d - currentBiomass[i] / carryingCapacity[i]) * currentBiomass[i]);
+            if(carryingCapacity[i] > 0) {
+                currentBiomass[i] = Math.min(carryingCapacity[i], currentBiomass[i] + malthusianParameter[i] *
+                        (1d - currentBiomass[i] / carryingCapacity[i]) * currentBiomass[i]);
+            }
+            assert currentBiomass[i] >=0;
         }
 
     }
@@ -145,7 +148,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      */
     public void setCarryingCapacity(Specie s, double newCarryingCapacity)
     {
-        Preconditions.checkArgument(newCarryingCapacity > 0, "new carrying capacity must be positive");
+        Preconditions.checkArgument(newCarryingCapacity >= 0, "new carrying capacity must be positive");
 
         final int index = s.getIndex();
         if(index >=currentBiomass.length)
@@ -153,6 +156,7 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
         carryingCapacity[index] = newCarryingCapacity;
         //don't let currentbiomass be above carryingCapacity
         currentBiomass[index] = Math.min(currentBiomass[index],newCarryingCapacity);
+        assert currentBiomass[index]>=0;
     }
 
 

@@ -200,13 +200,6 @@ public class FishState  extends SimState{
         return biology;
     }
 
-    public void setRegulationsForAllFishers(Regulation regulation)
-    {
-        for(Fisher fisher : fishers)
-            fisher.setRegulation(regulation);
-    }
-
-
 
     /**
      * what day of the year (from 1 to 365) is this?

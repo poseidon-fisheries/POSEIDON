@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
@@ -87,12 +88,16 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
                             {
                                 //if here there are more than there
                                 final Specie specie = biology.getSpecie(i);
+                                assert  tile.getBiomass(specie) >=0 ;
                                 double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
+                                differential = FishStateUtilities.round(differential);
                                 if(differential > 0 )
                                 {
                                     //share!
                                     double movement =  Math.min(differentialPercentageToMove * differential,
                                                                 percentageLimitOnDailyMovement * tile.getBiomass(specie));
+                                    assert movement >=0 : movement + " --- " +  differential + " ------ " + tile.getBiomass(specie) + " ------ " + FishStateUtilities.round(movement);
+                                    assert tile.getBiomass(specie) >= movement;
                                     IndependentLogisticLocalBiology here = (IndependentLogisticLocalBiology) tile.getBiology();
                                     IndependentLogisticLocalBiology there = (IndependentLogisticLocalBiology) neighbor.getBiology();
                                     here.getCurrentBiomass()[i]-=movement;
