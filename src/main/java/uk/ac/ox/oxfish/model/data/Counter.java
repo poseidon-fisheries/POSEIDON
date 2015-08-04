@@ -68,7 +68,7 @@ public class Counter implements Startable, Steppable
     }
 
     /**
-     * stop resetting
+     * turnOff resetting
      */
     @Override
     public void turnOff() {

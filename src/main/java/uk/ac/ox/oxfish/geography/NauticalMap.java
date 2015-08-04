@@ -437,7 +437,7 @@ public class NauticalMap implements Startable
 
             tries++;
             if(tries > 100000)
-                throw new RuntimeException("Tried 100000 time to get a random sea tile and failed. Maybe it's time to stop");
+                throw new RuntimeException("Tried 100000 time to get a random sea tile and failed. Maybe it's time to turnOff");
 
         }while (toReturn.getAltitude() > 0); //keep looking if you found something at sea
         return toReturn;

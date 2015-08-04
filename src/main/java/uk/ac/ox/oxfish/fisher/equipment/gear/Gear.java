@@ -27,4 +27,7 @@ public interface Gear {
             Fisher fisher,
             Boat boat,
             SeaTile where);
+
+
+    Gear cloneGear();
 }

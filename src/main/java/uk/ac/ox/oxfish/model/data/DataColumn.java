@@ -56,6 +56,11 @@ public class DataColumn implements Iterable<Double>{
         return data.get(index);
     }
 
+    public Double getDatumXDaysAgo(int daysAgo)
+    {
+        return data.get(data.size()-daysAgo-1);
+    }
+
     /**
      * Returns the number of elements in this list.
      *

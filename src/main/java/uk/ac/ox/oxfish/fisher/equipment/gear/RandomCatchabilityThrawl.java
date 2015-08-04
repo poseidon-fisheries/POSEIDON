@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,5 +72,24 @@ public class RandomCatchabilityThrawl implements Gear
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
         return boat.expectedFuelConsumption(thrawlSpeed);
+    }
+
+    public double[] getCatchabilityMeanPerSpecie() {
+        return catchabilityMeanPerSpecie;
+    }
+
+    public double[] getCatchabilityDeviationPerSpecie() {
+        return catchabilityDeviationPerSpecie;
+    }
+
+    @Override
+    public Gear cloneGear() {
+        return new RandomCatchabilityThrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
+                                     Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
+                                     thrawlSpeed);
+    }
+
+    public double getThrawlSpeed() {
+        return thrawlSpeed;
     }
 }

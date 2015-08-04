@@ -1,4 +1,6 @@
 import com.esotericsoftware.minlog.Log;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.resources.JFreeChartResources;
 import sim.display.Console;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;

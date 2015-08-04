@@ -244,6 +244,12 @@ public class FishState  extends SimState{
         return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay);
     }
 
+
+    public Stoppable scheduleEveryXDay(Steppable steppable, StepOrder order, int periodInDays)
+    {
+        return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay * periodInDays);
+    }
+
     public Stoppable schedulePerPolicy(Steppable steppable, StepOrder order, IntervalPolicy policy)
     {
         switch (policy){

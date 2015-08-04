@@ -22,6 +22,11 @@ public class FixedProportionGear implements Gear
     }
 
     @Override
+    public Gear cloneGear() {
+        return new FixedProportionGear(proportionFished);
+    }
+
+    @Override
     public Catch fish(
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
 

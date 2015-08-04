@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.EvictingQueue;
 import ec.util.MersenneTwisterFast;
+import org.jfree.chart.resources.JFreeChartResources;
 import org.metawidget.inspector.annotation.UiHidden;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -26,17 +26,13 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.Counter;
-import uk.ac.ox.oxfish.model.data.DataSet;
-import uk.ac.ox.oxfish.model.data.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
+import uk.ac.ox.oxfish.model.data.*;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * The boat catching all that delicious fish.
@@ -97,6 +93,11 @@ public class Fisher implements Steppable, Startable{
      */
     private final YearlyFisherDataSet yearlyDataGatherer = new YearlyFisherDataSet();
 
+    /**
+     * the data gatherer that fires every day
+     */
+    private final DailyFisherDataSet dailyFisherDataSet = new DailyFisherDataSet();
+
     private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
 
     private final LocationMemories<Catch> catchMemories = new LocationMemories<>(.99,300,2);
@@ -113,8 +114,6 @@ public class Fisher implements Steppable, Startable{
      * stores trip information
      */
     private final TripLogger tripLogger = new TripLogger();
-
-    private final Queue<FishingRecord> fishingLog = EvictingQueue.create(10);
 
 
     /**
@@ -181,7 +180,7 @@ public class Fisher implements Steppable, Startable{
     private FishingStrategy fishingStrategy;
 
     /**
-     * the stop switch to call when the fisher is turned off
+     * the turnOff switch to call when the fisher is turned off
      */
     private Stoppable receipt;
 
@@ -241,9 +240,11 @@ public class Fisher implements Steppable, Startable{
         this.network = state.getSocialNetwork();
         receipt = state.scheduleEveryStep(this, StepOrder.FISHER_PHASE);
 
+
         //start datas
         yearlyDataGatherer.start(state, this);
         yearlyCounter.start(state);
+        dailyFisherDataSet.start(state, this);
         tripLogger.start(state);
         catchMemories.start(state);
         tripMemories.start(state);
@@ -271,7 +272,8 @@ public class Fisher implements Steppable, Startable{
     @Override
     public void turnOff() {
         receipt.stop();
-        yearlyDataGatherer.stop();
+        yearlyDataGatherer.turnOff();
+        dailyFisherDataSet.turnOff();
         tripLogger.turnOff();
         catchMemories.turnOff();
         tripMemories.turnOff();
@@ -564,7 +566,8 @@ public class Fisher implements Steppable, Startable{
      * @param state
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state) {
+    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state)
+    {
         Preconditions.checkState(location.getAltitude() < 0, "can't fish on land!");
 
         //catch fish
@@ -618,6 +621,10 @@ public class Fisher implements Steppable, Startable{
     public DataSet getYearlyData() {
         return yearlyDataGatherer;
 
+    }
+
+    public DailyFisherDataSet getDailyData() {
+        return dailyFisherDataSet;
     }
 
     /**
@@ -752,4 +759,6 @@ public class Fisher implements Steppable, Startable{
         Preconditions.checkArgument(hoursIncrease >= 0);
         hoursAtSea += hoursIncrease;
     }
+
+
 }

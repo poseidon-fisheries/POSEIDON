@@ -35,7 +35,7 @@ public class FishingSeasonTest {
         when(model.getDayOfTheYear()).thenReturn(50);
         when(tile.isProtected()).thenReturn(true);
         assertFalse(season.canFishHere(fisher, tile, model));
-        //stop caring about mpas
+        //turnOff caring about mpas
         season = new FishingSeason(false,100);
         assertTrue(season.canFishHere(fisher, tile, model));
 

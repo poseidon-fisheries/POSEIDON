@@ -73,7 +73,7 @@ public class DataSet<T> implements Steppable
 
     }
 
-    public void stop()
+    public void turnOff()
     {
         receipt.stop();
     }

@@ -71,7 +71,7 @@ public abstract class AbstractMarket implements Market {
     @Override
     public void turnOff() {
         dailyCounter.turnOff();
-        dailyObservations.stop();
+        dailyObservations.turnOff();
     }
 
     /**

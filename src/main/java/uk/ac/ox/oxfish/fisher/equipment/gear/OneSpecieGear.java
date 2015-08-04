@@ -54,4 +54,9 @@ public class OneSpecieGear implements Gear {
     public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
         return 0;
     }
+
+    @Override
+    public Gear cloneGear() {
+        return new OneSpecieGear(targetedSpecie,proportionCaught);
+    }
 }

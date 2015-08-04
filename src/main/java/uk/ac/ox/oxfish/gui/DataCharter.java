@@ -124,7 +124,7 @@ public class DataCharter {
                 frame.pack();
                 //register with controller
                 gui.controller.registerFrame(frame);
-                //stop on dispose
+                //turnOff on dispose
                 frame.addWindowListener(new WindowListener() {
                     @Override
                     public void windowOpened(WindowEvent e) {

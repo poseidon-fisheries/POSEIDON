@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
+import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -34,6 +36,7 @@ import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -109,7 +112,7 @@ public class PrototypeScenario implements Scenario {
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(10);
 
 
-    private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0);
+    private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     /**
      * factory to produce departing strategy
      */
@@ -223,20 +226,53 @@ public class PrototypeScenario implements Scenario {
                 catchabilityMeanPerSpecie[j] = catchabilityMean.apply(random);
                 catchabilitySTD[j] = catchabilityDeviation.apply(random);
             }
-            fisherList.add(new Fisher(i, port,
-                                        random,
-                                        regulation.apply(model),
-                                        departing,
-                                        destinationStrategy.apply(model),
-                                        fishingStrategy.apply(model),
-                                        new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
-                                                 new FuelTank(fuelCapacity)),
-                                        new Hold(capacity, biology.getSize()),
-                                        new RandomCatchabilityThrawl(catchabilityMeanPerSpecie,
-                                                                     catchabilitySTD,
-                                                                     thrawlingSpeed.apply(random))));
+            RandomCatchabilityThrawl gear = new RandomCatchabilityThrawl(catchabilityMeanPerSpecie,
+                                                                         catchabilitySTD,
+                                                                         thrawlingSpeed.apply(random));
+            Fisher newFisher = new Fisher(i, port,
+                                  random,
+                                  regulation.apply(model),
+                                  departing,
+                                  destinationStrategy.apply(model),
+                                  fishingStrategy.apply(model),
+                                  new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
+                                           new FuelTank(fuelCapacity)),
+                                  new Hold(capacity, biology.getSize()),
+                                          gear);
+
+
+
+
+/*
+            GearImitationAnalysis analysis = new GearImitationAnalysis(60,0,.25,Arrays.asList(gear),
+                                                                       newFisher,new CashFlowObjective(60));
+
+            model.registerStartable(analysis);
+ */
+            fisherList.add(newFisher);
         }
 
+
+
+
+/*
+        model.getDailyDataSet().registerGatherer("Gear Efficiency", new Function<FishState, Double>() {
+            @Override
+            public Double apply(FishState state) {
+                double size =state.getFishers().size();
+                if(size == 0)
+                    return Double.NaN;
+                else
+                {
+                    double total = 0;
+                    for(Fisher fisher : state.getFishers())
+                        total+= ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
+                    return total/size;
+                }
+            }
+        },Double.NaN);
+
+*/
         return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 
