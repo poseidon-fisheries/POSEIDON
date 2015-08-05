@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.Function;
@@ -243,36 +244,17 @@ public class PrototypeScenario implements Scenario {
 
 
 
-/*
-            GearImitationAnalysis analysis = new GearImitationAnalysis(60,0,.25,Arrays.asList(gear),
-                                                                       newFisher,new CashFlowObjective(60));
 
-            model.registerStartable(analysis);
- */
+
+
             fisherList.add(newFisher);
         }
 
 
 
+     //   GearImitationAnalysis.attachGearAnalysisToEachFisher(fisherList,model,new ArrayList<>());
 
-/*
-        model.getDailyDataSet().registerGatherer("Gear Efficiency", new Function<FishState, Double>() {
-            @Override
-            public Double apply(FishState state) {
-                double size =state.getFishers().size();
-                if(size == 0)
-                    return Double.NaN;
-                else
-                {
-                    double total = 0;
-                    for(Fisher fisher : state.getFishers())
-                        total+= ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
-                    return total/size;
-                }
-            }
-        },Double.NaN);
 
-*/
         return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 

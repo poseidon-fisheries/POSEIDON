@@ -17,7 +17,7 @@ public class NetworkBuilders
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<? extends DirectedGraph<Fisher,FriendshipEdge>>>> CONSTRUCTORS =
+    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>>> CONSTRUCTORS =
             new LinkedHashMap<>();
 
     public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();

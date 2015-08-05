@@ -1,16 +1,16 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Run every period, check how are you doing, then check a friend. If he is doing better than you have a small probability
@@ -68,7 +68,7 @@ public class GearImitationAnalysis implements Startable
      * @param model the model
      */
     public void start(FishState model) {
-        stoppable = model.scheduleEveryXDay(simState -> analyze(fisher,fisher.grabRandomizer()), StepOrder.AFTER_DATA, period);
+        stoppable = model.scheduleEveryXDay(simState -> analyze(fisher.grabRandomizer()), StepOrder.AFTER_DATA, period);
     }
 
     /**
@@ -81,21 +81,21 @@ public class GearImitationAnalysis implements Startable
 
 
 
-    public void analyze(Fisher analyzed, MersenneTwisterFast random)
+    public void analyze(MersenneTwisterFast random)
     {
 
         //if randomizing, then randomize
         if(probabilityRandomizing > 0 && random.nextBoolean(probabilityRandomizing)) {
-            analyzed.setGear(gearAvailable.get(random.nextInt(gearAvailable.size())));
+            fisher.setGear(gearAvailable.get(random.nextInt(gearAvailable.size())));
             System.out.println("randomize!");
 
         }
         else if(probabilityImitating > 0 && random.nextBoolean(probabilityImitating))
         {
             //compute your fitness
-            double fitness = objective.computeCurrentFitness(analyzed);
+            double fitness = objective.computeCurrentFitness(fisher);
             //grab a friend
-            Object[] friends = analyzed.getDirectedFriends().toArray();
+            Object[] friends = fisher.getDirectedFriends().toArray();
             //if you have no friend, return
             if(friends.length == 0)
                 return;
@@ -105,10 +105,59 @@ public class GearImitationAnalysis implements Startable
             double friendFitness = objective.computeCurrentFitness(friend);
 
             //if it's better, grab his gear
-            if(Double.isFinite(fitness) && Double.isFinite(friendFitness) && friendFitness > fitness) {
-                analyzed.setGear(friend.getGear().cloneGear());
+            if(Double.isFinite(fitness) && Double.isFinite(friendFitness) && friendFitness > fitness)
+            {
+                fisher.setGear(friend.getGear().cloneGear());
             }
         }
 
+    }
+
+
+    public static void attachGearAnalysisToEachFisher(
+            List<Fisher> fishers, FishState model, final List<Gear> randomGear)
+    {
+        //add analysis
+        for(Fisher fisher : fishers)
+        {
+            GearImitationAnalysis analysis = new GearImitationAnalysis(60, 0, .25, randomGear,
+                                                                       fisher, new CashFlowObjective(60));
+
+            model.registerStartable(analysis);
+        }
+
+
+        model.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", new Function<FishState, Double>() {
+            @Override
+            public Double apply(FishState state) {
+                double size =state.getFishers().size();
+                if(size == 0)
+                    return Double.NaN;
+                else
+                {
+                    double total = 0;
+                    for(Fisher fisher : state.getFishers())
+                        total+= ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
+                    return total/size;
+                }
+            }
+        },Double.NaN);
+
+
+        model.getDailyDataSet().registerGatherer("Thrawling Efficiency", new Function<FishState, Double>() {
+            @Override
+            public Double apply(FishState state) {
+                double size =state.getFishers().size();
+                if(size == 0)
+                    return Double.NaN;
+                else
+                {
+                    double total = 0;
+                    for(Fisher fisher : state.getFishers())
+                        total+= ((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0];
+                    return total/size;
+                }
+            }
+        },Double.NaN);
     }
 }

@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 public class FixedProportionGear implements Gear
 {
 
-    final public double proportionFished;
+    final private double proportionFished;
 
     public FixedProportionGear(double proportionFished) {
         this.proportionFished = proportionFished;
@@ -59,5 +59,9 @@ public class FixedProportionGear implements Gear
     @Override
     public double getFuelConsumptionPerHourOfFishing(Fisher fisher, Boat boat, SeaTile where) {
         return 0;
+    }
+
+    public double getProportionFished() {
+        return proportionFished;
     }
 }
