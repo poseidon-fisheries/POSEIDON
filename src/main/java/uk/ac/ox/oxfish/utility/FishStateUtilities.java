@@ -1,12 +1,18 @@
 package uk.ac.ox.oxfish.utility;
 
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
+import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * Just a collector of all the utilities function i need
@@ -19,10 +25,13 @@ public class FishStateUtilities {
     private static final String JAR_NAME = "oxfish_executable.jar";
 
 
+
     public static double round(double value) {
 
         return (double)Math.round(value*100)/100;
     }
+
+
 
 
 
@@ -110,5 +119,26 @@ public class FishStateUtilities {
             }
         }
         return toClean;
+    }
+
+    public static <T> T imitateFriendAtRandom(
+            MersenneTwisterFast random, double fitness, T current, Collection<Fisher> friends,
+            ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
+        //get random friend
+        assert friends.size() >0;
+        int i = random.nextInt(friends.size());
+        Fisher friend = null;
+        for(Fisher fisher : friends)
+        {
+            friend = fisher;
+            if(i==0)
+                break;
+            i--;
+        }
+        double friendFitness = objectiveFunction.computeCurrentFitness(friend);
+        if(friendFitness > fitness && Double.isFinite(friendFitness))
+            return sensor.scan(friend);
+        else
+            return current;
     }
 }

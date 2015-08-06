@@ -8,9 +8,14 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.maximization.Actuator;
+import uk.ac.ox.oxfish.utility.maximization.ExplorationImitationExploitation;
+import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Run every period, check how are you doing, then check a friend. If he is doing better than you have a small probability
@@ -26,24 +31,10 @@ public class GearImitationAnalysis implements Startable
     private final int period;
 
     /**
-     * How do we compare ourselves and others
+     * the algorithm doing the exploration-imitation thing
      */
-    private ObjectiveFunction objective;
+    private final ExplorationImitationExploitation<Gear> algorithm;
 
-    /**
-     * probability of trying a random new gear
-     */
-    private final double probabilityRandomizing;
-
-    /**
-     * probability to copy a friend doing better
-     */
-    private final double probabilityImitating;
-
-    /**
-     * this is the list of gear that you can get when you randomize
-     */
-    private final List<Gear> gearAvailable;
 
     private final Fisher fisher;
 
@@ -52,13 +43,17 @@ public class GearImitationAnalysis implements Startable
 
     public GearImitationAnalysis(
             int period, double probabilityRandomizing, double probabilityImitating,
-            List<Gear> gearAvailable, Fisher fisher, ObjectiveFunction objective) {
+            List<Gear> gearAvailable, Fisher fisher, ObjectiveFunction<Fisher> objective) {
         this.period = period;
-        this.probabilityRandomizing = probabilityRandomizing;
-        this.probabilityImitating = probabilityImitating;
-        this.gearAvailable = gearAvailable;
+        algorithm = new ExplorationImitationExploitation<>(fisher1 -> true,
+                                                           new DiscreteRandomAlgorithm<Gear>(gearAvailable),
+                                                           (fisher1, change) -> fisher1.setGear(change.cloneGear()),
+                                                           Fisher::getGear,
+                                                           objective,probabilityRandomizing,probabilityImitating);
+
+
+
         this.fisher = fisher;
-        this.objective = objective;
     }
 
     /**
@@ -84,36 +79,17 @@ public class GearImitationAnalysis implements Startable
     public void analyze(MersenneTwisterFast random)
     {
 
-        //if randomizing, then randomize
-        if(probabilityRandomizing > 0 && random.nextBoolean(probabilityRandomizing)) {
-            fisher.setGear(gearAvailable.get(random.nextInt(gearAvailable.size())));
-            System.out.println("randomize!");
-
-        }
-        else if(probabilityImitating > 0 && random.nextBoolean(probabilityImitating))
-        {
-            //compute your fitness
-            double fitness = objective.computeCurrentFitness(fisher);
-            //grab a friend
-            Object[] friends = fisher.getDirectedFriends().toArray();
-            //if you have no friend, return
-            if(friends.length == 0)
-                return;
-
-            Fisher friend = (Fisher) friends[random.nextInt(friends.length)];
-            //compute your friend fitness
-            double friendFitness = objective.computeCurrentFitness(friend);
-
-            //if it's better, grab his gear
-            if(Double.isFinite(fitness) && Double.isFinite(friendFitness) && friendFitness > fitness)
-            {
-                fisher.setGear(friend.getGear().cloneGear());
-            }
-        }
+       algorithm.adapt(fisher,random);
 
     }
 
 
+    /**
+     * utility function to add the imitation analysis to every fisher in the group
+     * @param fishers
+     * @param model
+     * @param randomGear
+     */
     public static void attachGearAnalysisToEachFisher(
             List<Fisher> fishers, FishState model, final List<Gear> randomGear)
     {

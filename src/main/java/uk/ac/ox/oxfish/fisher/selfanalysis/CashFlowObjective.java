@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
  * The more money is gained in a fixed number of days, the better!
  * Created by carrknight on 8/4/15.
  */
-public class CashFlowObjective implements  ObjectiveFunction
+public class CashFlowObjective implements  ObjectiveFunction<Fisher>
 {
 
 

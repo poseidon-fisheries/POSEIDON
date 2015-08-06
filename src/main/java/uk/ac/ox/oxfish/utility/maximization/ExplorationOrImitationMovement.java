@@ -94,7 +94,7 @@ public class ExplorationOrImitationMovement implements IterativeMovement {
             Fisher fisher, NauticalMap map, SeaTile previous, SeaTile current, double previousFitness,
             double newFitness) {
 
-        //if we explore:
+        //if we randomize:
         if(random.nextBoolean(probabilityExploring))
             return delegate.adapt(fisher,map , previous, current, previousFitness, newFitness);
         else

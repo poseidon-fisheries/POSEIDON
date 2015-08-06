@@ -44,7 +44,8 @@ public class GearImitationAnalysisTest
 
 
         //objective function is better for best than for worst
-        ObjectiveFunction fitness = mock(ObjectiveFunction.class);
+        @SuppressWarnings("unchecked")
+        ObjectiveFunction<Fisher> fitness = mock(ObjectiveFunction.class);
         when(fitness.computeCurrentFitness(best)).thenReturn(1d);
         when(fitness.computeCurrentFitness(worst)).thenReturn(0d);
 
@@ -70,7 +71,7 @@ public class GearImitationAnalysisTest
     {
         List<Fisher> fishers = new LinkedList<>();
         List<GearImitationAnalysis> analyses = new LinkedList<>();
-        ObjectiveFunction function = new ObjectiveFunction() {
+        ObjectiveFunction function = new ObjectiveFunction<Fisher>() {
             @Override
             public double computeCurrentFitness(Fisher observed) {
                 return ((FixedProportionGear) observed.getGear()).getProportionFished();
