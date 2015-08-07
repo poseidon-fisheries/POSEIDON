@@ -219,10 +219,10 @@ public class YamlSpike {
                                   "      fixedValue: 1.0\n" +
                                   "depthSmoothing: 1000000\n" +
                                   "destinationStrategy: !!uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory\n" +
-                                  "  stepSize: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                                  "    fixedValue: 5.0\n" +
-                                  "  tripsPerDecision: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                                  "    fixedValue: 1.0\n" +
+                                          "  stayingStillProbability: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
+                                          "    fixedValue: 0.3\n" +
+                                  "  stepSize: 5.0\n" +
+
                                   "fishers: 1234\n" +
                                   "catchabilityMean: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                                   "  fixedValue: 0.01\n" +

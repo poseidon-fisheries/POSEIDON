@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestination
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -17,9 +18,10 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
 {
 
-    DoubleParameter tripsPerDecision = new FixedDoubleParameter(1d);
 
     DoubleParameter stepSize = new FixedDoubleParameter(5d);
+
+    DoubleParameter stayingStillProbability = new FixedDoubleParameter(0d);
 
     /**
      * Applies this function to the given argument.
@@ -30,16 +32,14 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
     @Override
     public PerTripIterativeDestinationStrategy apply(FishState state) {
 
-        MersenneTwisterFast random = state.random;
+        MersenneTwisterFast random = state.getRandom();
         NauticalMap map = state.getMap();
 
 
-        final HillClimbingMovement algorithm = new HillClimbingMovement(map, random);
-        algorithm.setMaxStepSize(stepSize.apply(state.random).intValue());
-        final PerTripIterativeDestinationStrategy toReturn = new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map, random), algorithm);
-        toReturn.setTripsPerDecision(tripsPerDecision.apply(state.random).intValue());
-        return toReturn;
+        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
+                                                                           20);
+        return new PerTripIterativeDestinationStrategy(
+                new FavoriteDestinationStrategy(map, random), algorithm,1d-stayingStillProbability.apply(random),0d);
 
     }
 
@@ -51,11 +51,12 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
         this.stepSize = stepSize;
     }
 
-    public DoubleParameter getTripsPerDecision() {
-        return tripsPerDecision;
+
+    public DoubleParameter getStayingStillProbability() {
+        return stayingStillProbability;
     }
 
-    public void setTripsPerDecision(DoubleParameter tripsPerDecision) {
-        this.tripsPerDecision = tripsPerDecision;
+    public void setStayingStillProbability(DoubleParameter stayingStillProbability) {
+        this.stayingStillProbability = stayingStillProbability;
     }
 }

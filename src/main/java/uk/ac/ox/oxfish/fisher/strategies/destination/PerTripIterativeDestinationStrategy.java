@@ -7,14 +7,15 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
-import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
+import uk.ac.ox.oxfish.utility.maximization.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -26,32 +27,17 @@ import java.util.List;
 public class PerTripIterativeDestinationStrategy implements DestinationStrategy,TripListener {
 
 
-    /**
-     * how many trips before we make our decision
-     */
-    private int  tripsPerDecision = 1;
 
-    /**
-     * what was the average profit per day for the previous sea-tile?
-     */
-    private double previousProfits = Double.NaN;
 
-    /**
-     * where did you try and fish earlier on?
-     */
-    private SeaTile previousLocation = null;
+
 
     /**
      * should we not study trips that were cut short?
      */
     private boolean ignoreFailedTrips = false;
 
-    /**
-     * a record of current trips taken.
-     */
-    final private List<TripRecord> recordedTrips = new LinkedList<>();
 
-    private IterativeMovement algorithm;
+    private ExplorationImitationExploitation<SeaTile> algorithm;
 
     /**
      * this strategy works by modifying the "favorite" destination of its delegate
@@ -63,21 +49,33 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
      */
     private Fisher fisher;
 
-    private NauticalMap map;
-
 
     public PerTripIterativeDestinationStrategy(
-            FavoriteDestinationStrategy delegate, IterativeMovement algorithm) {
+            FavoriteDestinationStrategy delegate,
+            ExplorationExploitationAlgorithm<SeaTile> algorithm,
+            double randomizationProbability,
+            double imitationProbability) {
         this.delegate = delegate;
-        this.algorithm = algorithm;
+        this.algorithm = new ExplorationImitationExploitation<SeaTile>(
+                fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
+                algorithm,
+                (fisher, change, model) -> delegate.setFavoriteSpot(change),
+                fisher1 -> {
+                    if(fisher1==fisher) //if we are sensing ourselves
+                        //override to delegate
+                        return delegate.getFavoriteSpot();
+                    else
+                    if(fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
+                            fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
+                        return  null;
+                    else
+                        return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                },
+                new HourlyProfitInTripFunction(),randomizationProbability, imitationProbability);
+
     }
 
-    public PerTripIterativeDestinationStrategy(
-            NauticalMap map, MersenneTwisterFast random)
-    {
-        this(new FavoriteDestinationStrategy(map,random),new HillClimbingMovement(map,random));
 
-    }
 
     /**
      * tell the startable to turnoff,
@@ -116,7 +114,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
         if(this.fisher == null)
         {
             this.fisher = fisher;
-            this.map = model.getMap();
+            algorithm.start(fisher,model);
             //and start listening!
             fisher.addTripListener(this);
         }
@@ -127,90 +125,23 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
         return delegate.chooseDestination(fisher,random,model,currentAction);
     }
 
-    public IterativeMovement getAlgorithm() {
-        return algorithm;
-    }
 
-    public void setAlgorithm(IterativeMovement algorithm) {
-        this.algorithm = algorithm;
-    }
 
 
     @Override
     public void reactToFinishedTrip(TripRecord record) {
         assert record.isCompleted();
-        //was the trip cancelled?
-        if(ignoreFailedTrips && record.isCutShort())
-            //if so, ignore it
-            return;
 
-        recordedTrips.add(record);
-        //if you have enough trips, time to try a new spot!
-        if(recordedTrips.size()>=tripsPerDecision)
-        {
-            assert recordedTrips.size() == tripsPerDecision;
-            SeaTile current = delegate.getFavoriteSpot();
-            //find average profits per step per trip
-            double currentProfits = recordedTrips.stream().
-                    mapToDouble(TripRecord::getProfitPerHour).sum();
-            currentProfits /= recordedTrips.size();
-
-            //log
- //           trace(this.toString(),"current profit: " + currentProfits + ", previous profits: " + previousProfits);
-
-            delegate.setFavoriteSpot(
-                    algorithm.adapt(fisher,map , previousLocation, current, previousProfits, currentProfits)
-            );
-//            trace(this.toString(),"current location " +current + ", new location, " + delegate.getFavoriteSpot() + ", previous location: " + previousLocation );
+        algorithm.adapt(fisher,fisher.grabRandomizer());
 
 
-            previousLocation = current;
-            previousProfits = currentProfits;
-            recordedTrips.clear();
-        }
     }
 
-    /**
-     * forces the strategy to choose a different destination. will throw an exception if the fisher is not at port
-     * @param newDestination new destination to go to
-     */
-    public void forceDestination(SeaTile newDestination)
-    {
-        Preconditions.checkState(fisher.isAtPort(), "Changing destination out of port might ruin Trip Record");
-        Preconditions.checkState(recordedTrips.isEmpty(), "Changing destination while some record trips exist is not something I planned for");
-        delegate.setFavoriteSpot(newDestination);
-    }
 
-    public int getTripsPerDecision() {
-        return tripsPerDecision;
-    }
-
-    public void setTripsPerDecision(int tripsPerDecision) {
-        this.tripsPerDecision = tripsPerDecision;
-    }
-
-    public boolean isIgnoreFailedTrips() {
-        return ignoreFailedTrips;
-    }
-
-    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
-        this.ignoreFailedTrips = ignoreFailedTrips;
-    }
-
-    public double getPreviousProfits() {
-        return previousProfits;
-    }
-
-    public SeaTile getPreviousLocation() {
-        return previousLocation;
-    }
 
     /**
      * How many trips are recorded for the current location
      */
-    public int tripsCurrentlyInMemory() {
-        return recordedTrips.size();
-    }
 
     @Override
     public String toString() {

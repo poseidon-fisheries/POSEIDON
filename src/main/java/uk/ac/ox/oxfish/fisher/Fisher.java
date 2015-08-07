@@ -680,7 +680,7 @@ public class Fisher implements Steppable, Startable{
         tripLogger.recordCosts(newCosts);
     }
 
-    public List<TripRecord> getAllTrips() {
+    public List<TripRecord> getFinishedTrips() {
         return tripLogger.getFinishedTrips();
     }
 
@@ -760,5 +760,10 @@ public class Fisher implements Steppable, Startable{
         hoursAtSea += hoursIncrease;
     }
 
+
+    public boolean isGoingToPort()
+    {
+        return getDestination().equals(getHomePort().getLocation());
+    }
 
 }

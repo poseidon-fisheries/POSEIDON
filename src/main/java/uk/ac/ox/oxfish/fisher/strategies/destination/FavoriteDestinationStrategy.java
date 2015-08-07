@@ -69,7 +69,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
         else
         {
             //if we are going to port, keep going
-            if(fisher.getDestination().equals(fisher.getHomePort().getLocation()) && !fisher.isAtDestination())
+            if(!fisher.isAtDestination() && fisher.isGoingToPort() )
                 return fisher.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot

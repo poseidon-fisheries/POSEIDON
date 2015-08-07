@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 /**
  * An hill=climber that tries a new step on "randomize", copy a friend in "imitate" and stays put in "exploit".
@@ -26,7 +25,7 @@ public abstract class BeamHillClimbing<T> implements  ExplorationExploitationAlg
 
 
     @Override
-    public void start(FishState model, Fisher agent) {
+    public void start(FishState model, Fisher agent, T initial) {
         this.model = model;
     }
 
@@ -36,7 +35,7 @@ public abstract class BeamHillClimbing<T> implements  ExplorationExploitationAlg
     @Override
     public T randomize(MersenneTwisterFast random, Fisher agent, double currentFitness, T current)
     {
-        return randomStep(model,random,agent,current);
+        return randomStep(this.model,random,agent,current);
     }
 
 
@@ -54,8 +53,8 @@ public abstract class BeamHillClimbing<T> implements  ExplorationExploitationAlg
 
     @Override
     public T judgeRandomization(
-            MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T current,
-            T previous) {
+            MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
+            T current) {
         if(previousFitness > currentFitness)
             return previous;
         else

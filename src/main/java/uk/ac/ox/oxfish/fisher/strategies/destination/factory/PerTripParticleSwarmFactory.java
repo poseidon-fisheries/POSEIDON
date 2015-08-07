@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.imitation.ParticleSwarmMovement;
 import uk.ac.ox.oxfish.utility.maximization.ExplorationOrImitationMovement;
 import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
+import uk.ac.ox.oxfish.utility.maximization.ParticleSwarmAlgorithm;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -24,8 +25,6 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
     private DoubleParameter explorationShockSize = new FixedDoubleParameter(4d);
 
     private DoubleParameter explorationProbability = new FixedDoubleParameter(.3d);
-
-    private boolean ignoreEdgeDirection = true;
 
 
     private DoubleParameter  memoryWeight = new UniformDoubleParameter(.5,1);
@@ -45,45 +44,26 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
     public PerTripIterativeDestinationStrategy apply(FishState state) {
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
-        ParticleSwarmMovement pso = new ParticleSwarmMovement(memoryWeight.apply(random).floatValue(),
-                                                              friendWeight.apply(random).floatValue(),
-                                                              explorationShockSize.apply(random).intValue(),
-                                                              random.nextFloat() * 2 * map.getWidth() - map.getWidth(),
-                                                              random.nextFloat() * 2 * map.getHeight() - map.getHeight(),
-                                                              inertia.apply(random).floatValue()
-                                                              );
-        IterativeMovement exploitation = new ExplorationOrImitationMovement(
-                pso,
-                explorationProbability.apply(random),
-                ignoreEdgeDirection,
-                random,
-                fisher -> {
-                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                    if (lastFinishedTrip == null || lastFinishedTrip.isCutShort())
-                        return Double.NaN;
-                    else {
-                        assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getProfitPerHour();
-                    }
-                },
-                fisher -> {
-                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                    if (lastFinishedTrip == null || lastFinishedTrip.getTilesFished().isEmpty())
-                        return null;
-                    else {
-                        assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getTilesFished().iterator().next();
-                    }
-                },
-                pso
-        );
 
-        final PerTripIterativeDestinationStrategy strategy = new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map,random),exploitation);
-        strategy.setTripsPerDecision(1);
-        return strategy;
+
+        return new PerTripIterativeDestinationStrategy(
+                new FavoriteDestinationStrategy(map,random),
+                ParticleSwarmAlgorithm.defaultSeatileParticleSwarm(inertia.apply(random).floatValue(),
+                                                                   memoryWeight.apply(random).floatValue(),
+                                                                   friendWeight.apply(random).floatValue(),
+                                                                   explorationShockSize.apply(random).floatValue(),
+                                                                   new DoubleParameter[]{
+                                                                           new UniformDoubleParameter(
+                                                                                   -map.getWidth() / 5,
+                                                                                   map.getWidth() / 5),
+                                                                           new UniformDoubleParameter(
+                                                                                   -map.getHeight() / 5,
+                                                                                   map.getHeight() / 5)},
+                                                                   random,map.getWidth(),map.getHeight()),
+                explorationProbability.apply(random),1);
 
     }
+
 
     public DoubleParameter getExplorationShockSize() {
         return explorationShockSize;
@@ -99,14 +79,6 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
 
     public void setExplorationProbability(DoubleParameter explorationProbability) {
         this.explorationProbability = explorationProbability;
-    }
-
-    public boolean isIgnoreEdgeDirection() {
-        return ignoreEdgeDirection;
-    }
-
-    public void setIgnoreEdgeDirection(boolean ignoreEdgeDirection) {
-        this.ignoreEdgeDirection = ignoreEdgeDirection;
     }
 
     public DoubleParameter getMemoryWeight() {

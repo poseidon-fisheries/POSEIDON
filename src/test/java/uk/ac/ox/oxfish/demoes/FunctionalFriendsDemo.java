@@ -25,12 +25,16 @@ public class FunctionalFriendsDemo {
         long seed = System.currentTimeMillis();
         int stepsAlone = stepsItTook(Double.NaN,0,3500, seed);
         int stepsWithFewFriends = stepsItTook(.9,3,3500, seed);
-        int stepsWithManyFriends = stepsItTook(.9,20,3500, seed);
+
+
 
 
         //the first is a little bit finicky. It would work better as an average of 5 runs, but it takes very long to perform
         Assert.assertTrue(stepsAlone + " ---- " + stepsWithFewFriends, stepsAlone > stepsWithFewFriends);
-        Assert.assertTrue(stepsWithFewFriends + " ---- " + stepsWithManyFriends, stepsWithManyFriends >  stepsWithFewFriends);
+
+        //now that I tuned it better having many friends is not a big issue
+        // int stepsWithManyFriends = stepsItTook(.9,40,3500, seed);
+        //Assert.assertTrue(stepsWithFewFriends + " ---- " + stepsWithManyFriends, stepsWithManyFriends >  stepsWithFewFriends);
 
 
     }

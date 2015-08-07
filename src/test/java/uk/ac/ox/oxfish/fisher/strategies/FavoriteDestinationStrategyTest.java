@@ -98,10 +98,10 @@ public class FavoriteDestinationStrategyTest {
 
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(portTile);
         when(fisher.getHomePort()).thenReturn(port);
+        when(fisher.isGoingToPort()).thenReturn(true);
 
-        when(fisher.getDestination()).thenReturn(portTile);
+
         when(fisher.getLocation()).thenReturn(transitTile);
-        when(fisher.isAtDestination()).thenReturn(false);
 
         FavoriteDestinationStrategy strategy = new FavoriteDestinationStrategy(favoriteTile);
         SeaTile destination = strategy.chooseDestination(fisher, new MersenneTwisterFast(),

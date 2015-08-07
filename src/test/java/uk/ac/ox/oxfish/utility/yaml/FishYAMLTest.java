@@ -36,11 +36,6 @@ public class FishYAMLTest {
                 "    probabilityToLeavePort: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "      fixedValue: 1.0\n" +
                 "depthSmoothing: 1000000\n" +
-                "destinationStrategy: !!uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory\n" +
-                "  stepSize: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "    fixedValue: 5.0\n" +
-                "  tripsPerDecision: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "    fixedValue: 1.0\n" +
                 "fishers: 1234\n" +
                 "catchabilityMean: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
                 "  fixedValue: 0.01\n" +

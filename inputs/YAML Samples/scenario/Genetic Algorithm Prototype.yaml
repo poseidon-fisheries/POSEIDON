@@ -9,10 +9,10 @@ Genetic Algorithm Prototype:
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '10.0'
-  gridSizeInKm: 1.0
-  height: 100
+  gridSizeInKm: 10.0
+  height: 50
   holdSize: '100.0'
   ports: 1
   regulation: MPA Only
   speedInKmh: '5.0'
-  width: 100
+  width: 50

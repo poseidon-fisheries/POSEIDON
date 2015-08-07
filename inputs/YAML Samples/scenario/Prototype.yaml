@@ -23,9 +23,9 @@ Prototype:
     Until Full With Day Limit:
       daysAtSea: '10.0'
   fuelTankSize: '100000.0'
-  gasPricePerLiter: '0.0'
-  gridCellSizeInKm: 1.0
-  height: 100
+  gasPricePerLiter: '0.01'
+  gridCellSizeInKm: 10.0
+  height: 50
   holdSize: '100.0'
   literPerKilometer: '10.0'
   networkBuilder:
@@ -35,4 +35,4 @@ Prototype:
   regulation: MPA Only
   speedInKmh: '5.0'
   thrawlingSpeed: '5.0'
-  width: 100
+  width: 50

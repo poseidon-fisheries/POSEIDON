@@ -24,7 +24,7 @@ public class DisfunctionalFriends {
 
         Assert.assertTrue(stepsAlone + " ---- " + stepsWithManyFriends, stepsAlone < stepsWithManyFriends);
 
-        //in fact with many friends you don't even clear all the map after 3500 days
+        //in fact with many friends you don't even clear all the map after 5000 days
         Assert.assertEquals(5000, stepsWithManyFriends);
     }
 

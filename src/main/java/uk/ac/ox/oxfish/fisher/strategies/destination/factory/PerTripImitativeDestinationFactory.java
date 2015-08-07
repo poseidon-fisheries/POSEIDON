@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestination
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.maximization.ExplorationOrImitationMovement;
 import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
@@ -15,7 +16,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
- * creates a trip strategy that has a chance of imitating friends rather than exploring
+ * creates a trip strategy that has imitates friends when not exploring
  */
 public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
 {
@@ -23,6 +24,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     private DoubleParameter stepSize = new FixedDoubleParameter(5d);
 
     private DoubleParameter explorationProbability = new FixedDoubleParameter(0.8d);
+
 
     private boolean ignoreEdgeDirection = true;
 
@@ -38,36 +40,13 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
-        IterativeMovement delegate = new HillClimbingMovement(map,random);
-        IterativeMovement exploitation = new ExplorationOrImitationMovement(
-                delegate,
-                explorationProbability.apply(random),
-                ignoreEdgeDirection,
-                random,
-                fisher -> {
-                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                    if (lastFinishedTrip == null || lastFinishedTrip.isCutShort())
-                        return Double.NaN;
-                    else {
-                        assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getProfitPerHour();
-                    }
-                },
-                fisher -> {
-                    final TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
-                    if (lastFinishedTrip == null || lastFinishedTrip.getTilesFished().isEmpty())
-                        return null;
-                    else {
-                        assert lastFinishedTrip.isCompleted();
-                        return lastFinishedTrip.getTilesFished().iterator().next();
-                    }
-                }
-        );
 
-        final PerTripIterativeDestinationStrategy strategy = new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map,random),exploitation);
-        strategy.setTripsPerDecision(1);
-        return strategy;
+
+        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
+                                                                              10);
+        return new PerTripIterativeDestinationStrategy(
+                new FavoriteDestinationStrategy(map, random), algorithm,explorationProbability.apply(random),1d);
+
 
     }
 

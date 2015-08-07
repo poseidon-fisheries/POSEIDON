@@ -3,7 +3,9 @@ package uk.ac.ox.oxfish.utility;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.maximization.ExplorationExploitationAlgorithm;
 import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.io.File;
@@ -136,9 +138,13 @@ public class FishStateUtilities {
             i--;
         }
         double friendFitness = objectiveFunction.computeCurrentFitness(friend);
-        if(friendFitness > fitness && Double.isFinite(friendFitness))
+
+        if(friendFitness > fitness && Double.isFinite(friendFitness) && Double.isFinite(fitness)) {
             return sensor.scan(friend);
+        }
         else
             return current;
     }
+
+
 }

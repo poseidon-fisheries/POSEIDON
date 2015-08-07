@@ -8,14 +8,10 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.maximization.Actuator;
 import uk.ac.ox.oxfish.utility.maximization.ExplorationImitationExploitation;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Run every period, check how are you doing, then check a friend. If he is doing better than you have a small probability
@@ -47,7 +43,7 @@ public class GearImitationAnalysis implements Startable
         this.period = period;
         algorithm = new ExplorationImitationExploitation<>(fisher1 -> true,
                                                            new DiscreteRandomAlgorithm<Gear>(gearAvailable),
-                                                           (fisher1, change) -> fisher1.setGear(change.cloneGear()),
+                                                           (fisher1, change,model) -> fisher1.setGear(change.cloneGear()),
                                                            Fisher::getGear,
                                                            objective,probabilityRandomizing,probabilityImitating);
 

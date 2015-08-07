@@ -60,13 +60,13 @@ public class DiscreteRandomAlgorithm<T> implements ExplorationExploitationAlgori
 
     @Override
     public T judgeRandomization(
-            MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T current,
-            T previous) {
+            MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
+            T current) {
         return current;
     }
 
     @Override
-    public void start(FishState model, Fisher agent) {
+    public void start(FishState model, Fisher agent, T initial) {
         //nothing, no need for a setup
     }
 }

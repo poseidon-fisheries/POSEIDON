@@ -17,3 +17,9 @@ Random Smoothed and Fixed:
   maxBiomass: 5000.0
   minBiomass: 0.0
 -------
+Half Bycatch:
+  carryingCapacity: '5000.0'
+  differentialPercentageToMove: '5.0E-4'
+  percentageLimitOnDailyMovement: '0.01'
+  steepness: uniform 0.6 0.8
+-------

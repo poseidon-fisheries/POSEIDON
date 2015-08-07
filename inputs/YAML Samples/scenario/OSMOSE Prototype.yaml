@@ -5,8 +5,8 @@ OSMOSE Prototype:
       probabilityToLeavePort: '1.0'
   destinationStrategy:
     Per Trip Iterative:
+      stayingStillProbability: '0.0'
       stepSize: '5.0'
-      tripsPerDecision: '1.0'
   engineWeight: normal 100.0 10.0
   fishers: 50
   fishingEfficiency: '0.01'

@@ -10,8 +10,8 @@ Yearly HillClimber:
   stepSize: '5.0'
 -------
 Per Trip Iterative:
+  stayingStillProbability: '0.0'
   stepSize: '5.0'
-  tripsPerDecision: '1.0'
 -------
 Imitator-Explorator:
   explorationProbability: '0.8'
@@ -22,7 +22,6 @@ PSO:
   explorationProbability: '0.3'
   explorationShockSize: '4.0'
   friendWeight: uniform 0.5 1.0
-  ignoreEdgeDirection: true
   inertia: uniform 0.3 0.8
   memoryWeight: uniform 0.5 1.0
 -------
