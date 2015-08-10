@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.utility;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.maximization.ExplorationExploitationAlgorithm;
 import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.io.File;
@@ -14,7 +12,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Just a collector of all the utilities function i need
@@ -144,6 +145,38 @@ public class FishStateUtilities {
         }
         else
             return current;
+    }
+
+
+    public static <T> T imitateBestFriend(MersenneTwisterFast random, double fitness,
+                                          T current, Collection<Fisher> friends,
+                                          ObjectiveFunction<Fisher> objectiveFunction,
+                                          Sensor<T> sensor)
+    {
+        final Optional<Map.Entry<Fisher, Double>> bestFriend = friends.stream().collect(
+                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
+                    @Override
+                    public Double apply(Fisher fisher) {
+                        return objectiveFunction.computeCurrentFitness(fisher);
+                    }
+                })).entrySet().stream().max(
+                Map.Entry.comparingByValue());
+
+        if(bestFriend.isPresent()) //if the best friend knows what he's doing
+        {
+            Double friendFitness = bestFriend.get().getValue();
+            if(friendFitness > fitness) {
+                T bestFriendDecision = sensor.scan(bestFriend.get().getKey());
+                if (bestFriendDecision != null)
+                    return bestFriendDecision;
+
+            }
+            return current;
+
+        }
+        else
+            return current;
+
     }
 
 

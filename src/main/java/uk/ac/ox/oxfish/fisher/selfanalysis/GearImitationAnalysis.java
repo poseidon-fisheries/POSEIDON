@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.maximization.ExplorationImitationExploitation;
+import uk.ac.ox.oxfish.utility.maximization.Adaptation;
 
 import java.util.List;
 import java.util.function.Function;
@@ -29,7 +29,7 @@ public class GearImitationAnalysis implements Startable
     /**
      * the algorithm doing the exploration-imitation thing
      */
-    private final ExplorationImitationExploitation<Gear> algorithm;
+    private final Adaptation<Gear> algorithm;
 
 
     private final Fisher fisher;
@@ -41,7 +41,7 @@ public class GearImitationAnalysis implements Startable
             int period, double probabilityRandomizing, double probabilityImitating,
             List<Gear> gearAvailable, Fisher fisher, ObjectiveFunction<Fisher> objective) {
         this.period = period;
-        algorithm = new ExplorationImitationExploitation<>(fisher1 -> true,
+        algorithm = new Adaptation<>(fisher1 -> true,
                                                            new DiscreteRandomAlgorithm<Gear>(gearAvailable),
                                                            (fisher1, change,model) -> fisher1.setGear(change.cloneGear()),
                                                            Fisher::getGear,

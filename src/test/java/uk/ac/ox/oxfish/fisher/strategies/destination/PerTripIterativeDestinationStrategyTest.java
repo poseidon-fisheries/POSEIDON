@@ -29,6 +29,7 @@ public class PerTripIterativeDestinationStrategyTest {
         NauticalMap map = fishState.getMap();
         MersenneTwisterFast random = new MersenneTwisterFast();
         when(fishState.getRandom()).thenReturn(random);
+        when(fishState.getMap()).thenReturn(map);
         final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(
                 map.getSeaTile(50, 50));
         final PerTripIterativeDestinationStrategy hill = new PerTripIterativeDestinationFactory().apply(fishState);
@@ -43,6 +44,7 @@ public class PerTripIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
         hill.start(fishState);
+        hill.getAlgorithm().start(fishState,fisher);
         SeaTile favoriteSpot=null;
         for(int i=0; i<1000; i++)
         {
@@ -52,7 +54,7 @@ public class PerTripIterativeDestinationStrategyTest {
             favoriteSpot = hill.chooseDestination(fisher,random,fishState,new Moving());
             when(record.getProfitPerHour()).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
-            hill.reactToFinishedTrip(record);
+            hill.getAlgorithm().adapt(fisher,random);
 
         }
 

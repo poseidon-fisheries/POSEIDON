@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
 
-    private final int maxStep;
+    private int maxStep;
 
     private final int attempts;
 
@@ -38,5 +38,17 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
         //stay where you are
         return current;
+    }
+
+    public int getAttempts() {
+        return attempts;
+    }
+
+    public int getMaxStep() {
+        return maxStep;
+    }
+
+    public void setMaxStep(int maxStep) {
+        this.maxStep = maxStep;
     }
 }

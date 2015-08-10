@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.DailyFisherDataSet;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +23,7 @@ public class CashFlowObjectiveTest
         DailyFisherDataSet data = new DailyFisherDataSet();
         data.start(mock(FishState.class),fisher);
         when(fisher.getDailyData()).thenReturn(data);
+        when(fisher.balanceXDaysAgo(anyInt())).thenCallRealMethod();
 
         for(int i=0; i<100; i++)
         {

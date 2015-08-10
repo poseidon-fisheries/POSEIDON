@@ -5,9 +5,7 @@ import org.junit.Test;
 
 import static uk.ac.ox.oxfish.demoes.FunctionalFriendsDemo.stepsItTook;
 
-/**
- * Created by carrknight on 8/3/15.
- */
+
 public class DisfunctionalFriends {
 
 

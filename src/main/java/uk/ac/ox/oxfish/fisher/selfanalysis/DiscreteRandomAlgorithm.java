@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
-import uk.ac.ox.oxfish.utility.maximization.ExplorationExploitationAlgorithm;
+import uk.ac.ox.oxfish.utility.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.Collection;
@@ -16,7 +16,7 @@ import java.util.function.Function;
  * A simple exploration-imitaiton-exploitation decision where the random part occurs by choosing from a list
  * Created by carrknight on 8/6/15.
  */
-public class DiscreteRandomAlgorithm<T> implements ExplorationExploitationAlgorithm<T>
+public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
 {
 
 

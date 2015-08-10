@@ -29,6 +29,9 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.*;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.maximization.Adaptation;
+import uk.ac.ox.oxfish.utility.maximization.AdaptationDailyScheduler;
+import uk.ac.ox.oxfish.utility.maximization.AdaptationPerTripScheduler;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -186,6 +189,22 @@ public class Fisher implements Steppable, Startable{
 
 
     /**
+     * collection of adaptation algorithms to fire every 2 months
+     */
+    private final AdaptationDailyScheduler bimonthlyAdaptation = new AdaptationDailyScheduler(60);
+
+    /**
+     * collection of adaptation algorithms to fire every 360  days
+     */
+    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(360);
+
+    /**
+     * collection of adaptation algorithms to fire every trip
+     */
+    private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
+
+
+    /**
      * Creates a fisher by giving it all its sub-components
      * @param id the id-number of the fisher
      * @param homePort the home port
@@ -264,6 +283,11 @@ public class Fisher implements Steppable, Startable{
         destinationStrategy.start(state);
         fishingStrategy.start(state);
         departingStrategy.start(state);
+
+        //start the adaptations
+        bimonthlyAdaptation.start(state,this);
+        yearlyAdaptation.start(state,this);
+        tripAdaptation.start(state,this);
     }
 
     /**
@@ -278,10 +302,15 @@ public class Fisher implements Steppable, Startable{
         catchMemories.turnOff();
         tripMemories.turnOff();
 
-        //start the strategies
+        //turn off the strategies
         destinationStrategy.turnOff();
         fishingStrategy.turnOff();
         departingStrategy.turnOff();
+
+        //turn off the adaptations
+        bimonthlyAdaptation.turnOff();
+        yearlyAdaptation.turnOff();
+        tripAdaptation.turnOff();
     }
 
     @Override
@@ -653,7 +682,27 @@ public class Fisher implements Steppable, Startable{
 
 
 
+    public double balanceXDaysAgo(int daysAgo)
+    {
+    //    Preconditions.checkArgument(dailyFisherDataSet.numberOfObservations() >daysAgo);
+        return getDailyData().getColumn(YearlyFisherDataSet.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+    }
 
+
+    public void registerYearlyAdaptation(Adaptation a)
+    {
+        yearlyAdaptation.registerAdaptation(a);
+    }
+
+    public void registerBiMonthlyAdaptation(Adaptation a)
+    {
+        bimonthlyAdaptation.registerAdaptation(a);
+    }
+
+    public void registerPerTripAdaptation(Adaptation a)
+    {
+        tripAdaptation.registerAdaptation(a);
+    }
 
 
     public TripRecord getCurrentTrip() {

@@ -19,7 +19,7 @@ import java.util.function.Function;
  * This requires to turn whatever T is into coordinates in space and then back into T
  * Created by carrknight on 8/7/15.
  */
-public class ParticleSwarmAlgorithm<T> implements ExplorationExploitationAlgorithm<T>
+public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
 {
 
     /**

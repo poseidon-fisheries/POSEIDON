@@ -14,7 +14,7 @@ import java.util.Collection;
  * It is abstract as it expects a method to randomize a new step
  * Created by carrknight on 8/6/15.
  */
-public abstract class BeamHillClimbing<T> implements  ExplorationExploitationAlgorithm<T>
+public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
 {
 
 
@@ -46,7 +46,7 @@ public abstract class BeamHillClimbing<T> implements  ExplorationExploitationAlg
     public T imitate(
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
-        return FishStateUtilities.imitateFriendAtRandom(random, fitness,
+        return FishStateUtilities.imitateBestFriend(random, fitness,
                                                         current, friends,
                                                         objectiveFunction, sensor);
     }

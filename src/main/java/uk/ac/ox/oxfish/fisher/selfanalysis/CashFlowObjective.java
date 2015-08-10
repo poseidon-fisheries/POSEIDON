@@ -40,8 +40,10 @@ public class CashFlowObjective implements  ObjectiveFunction<Fisher>
     }
 
     private double getCashInPast(Fisher observed, int daysAgo) {
+
+
         return observed.getDailyData().numberOfObservations() > daysAgo ?
-                observed.getDailyData().getColumn(CASH_COLUMN).getDatumXDaysAgo(daysAgo) : 0;
+                observed.balanceXDaysAgo(daysAgo) : 0;
     }
 
     /**

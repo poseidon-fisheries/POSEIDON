@@ -8,14 +8,9 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.maximization.*;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -24,7 +19,7 @@ import java.util.function.Predicate;
  *     new trips
  * Created by carrknight on 6/19/15.
  */
-public class PerTripIterativeDestinationStrategy implements DestinationStrategy,TripListener {
+public class PerTripIterativeDestinationStrategy implements DestinationStrategy {
 
 
 
@@ -37,7 +32,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
     private boolean ignoreFailedTrips = false;
 
 
-    private ExplorationImitationExploitation<SeaTile> algorithm;
+    private final Adaptation<SeaTile> algorithm;
 
     /**
      * this strategy works by modifying the "favorite" destination of its delegate
@@ -52,11 +47,11 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
 
     public PerTripIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate,
-            ExplorationExploitationAlgorithm<SeaTile> algorithm,
+            AdaptationAlgorithm<SeaTile> algorithm,
             double randomizationProbability,
             double imitationProbability) {
         this.delegate = delegate;
-        this.algorithm = new ExplorationImitationExploitation<SeaTile>(
+        this.algorithm = new Adaptation<SeaTile>(
                 fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
                 algorithm,
                 (fisher, change, model) -> delegate.setFavoriteSpot(change),
@@ -83,8 +78,6 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
     @Override
     public void turnOff() {
         delegate.turnOff();
-        if(fisher!=null)
-            fisher.removeTripListener(this);
     }
 
     /**
@@ -114,39 +107,17 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy,
         if(this.fisher == null)
         {
             this.fisher = fisher;
-            algorithm.start(fisher,model);
-            //and start listening!
-            fisher.addTripListener(this);
+            fisher.registerPerTripAdaptation(algorithm);
         }
         else
         {
             Preconditions.checkArgument(fisher==this.fisher);
         }
-        return delegate.chooseDestination(fisher,random,model,currentAction);
+        return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 
 
-
-
-    @Override
-    public void reactToFinishedTrip(TripRecord record) {
-        assert record.isCompleted();
-
-        algorithm.adapt(fisher,fisher.grabRandomizer());
-
-
-    }
-
-
-
-    /**
-     * How many trips are recorded for the current location
-     */
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("fisher", fisher)
-                .toString();
+    public Adaptation<SeaTile> getAlgorithm() {
+        return algorithm;
     }
 }

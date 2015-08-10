@@ -11,8 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * A "struct" that in practice describes a "variable" that can be
- * modified by the ExplorationExploitationAdapation class. There are always 3 possible actions:
+ * The algorithmic part of the adaptation routine of agents. There are always 3 possible actions:
  * <ul>
  *     <li> Randomization</li>
  *     <li> Imitation</li>
@@ -25,7 +24,7 @@ import java.util.function.Function;
  *
  * Created by carrknight on 8/6/15.
  */
-public interface ExplorationExploitationAlgorithm<T> {
+public interface AdaptationAlgorithm<T> {
 
 
 

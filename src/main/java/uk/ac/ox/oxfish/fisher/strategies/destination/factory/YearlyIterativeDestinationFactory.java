@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.YearlyIterativeDestinationS
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -27,10 +26,9 @@ public class YearlyIterativeDestinationFactory implements AlgorithmFactory<Yearl
         NauticalMap map = state.getMap();
 
 
-        final HillClimbingMovement algorithm = new HillClimbingMovement(map, random);
-        algorithm.setMaxStepSize(stepSize.apply(state.random).intValue());
         return new YearlyIterativeDestinationStrategy(new FavoriteDestinationStrategy(map,random),
-                                                      algorithm);
+                                                      stepSize.apply(random).intValue(),
+                                                      10);
 
     }
 

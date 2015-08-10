@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collection;
@@ -11,10 +12,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A general algorithm to perform exploration/imitaiton/exploitation decisions possibly of multiple variables
+ * A general algorithm to perform exploration/imitaiton/exploitation decisions possibly on a specific variable
  * Created by carrknight on 8/6/15.
  */
-public class ExplorationImitationExploitation<T> {
+public class Adaptation<T> implements FisherStartable {
 
 
     /**
@@ -33,7 +34,7 @@ public class ExplorationImitationExploitation<T> {
     /**
      * what the agent ought to do to adapt
      */
-    private final ExplorationExploitationAlgorithm<T> algorithm;
+    private final AdaptationAlgorithm<T> algorithm;
 
     /**
      * a class that assigns a new T to the fisher
@@ -71,9 +72,9 @@ public class ExplorationImitationExploitation<T> {
     private FishState model;
 
 
-    public ExplorationImitationExploitation(
+    public Adaptation(
             Predicate<Fisher> validator,
-            ExplorationExploitationAlgorithm<T> decision,
+            AdaptationAlgorithm<T> decision,
             Actuator<T> actuator,
             Sensor<T> sensor,
             ObjectiveFunction<Fisher> objective, double explorationProbability,
@@ -87,10 +88,10 @@ public class ExplorationImitationExploitation<T> {
         this.sensor = sensor;
     }
 
-    public ExplorationImitationExploitation(
+    public Adaptation(
             Predicate<Fisher> validator,
-            Function<Pair<Fisher,MersenneTwisterFast>,Collection<Fisher>> friendsExtractor,
-            ExplorationExploitationAlgorithm<T> decision,
+            Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor,
+            AdaptationAlgorithm<T> decision,
             Actuator<T> actuator,
             Sensor<T> sensor,
             ObjectiveFunction<Fisher> objective, double explorationProbability,
@@ -105,7 +106,7 @@ public class ExplorationImitationExploitation<T> {
         this.sensor = sensor;
     }
 
-    public void start(Fisher toAdapt,FishState state){
+    public void start(FishState state, Fisher toAdapt){
         this.model = state;
         algorithm.start(state, toAdapt,sensor.scan(toAdapt) );
     }
@@ -187,6 +188,11 @@ public class ExplorationImitationExploitation<T> {
     }
 
 
+    @Override
+    public void turnOff() {
+        //nothing really
+    }
+
     private void act(Fisher toAdapt,T newVariable)
     {
         if(newVariable != sensor.scan(toAdapt))
@@ -206,7 +212,7 @@ public class ExplorationImitationExploitation<T> {
         return validator;
     }
 
-    public ExplorationExploitationAlgorithm<T> getAlgorithm() {
+    public AdaptationAlgorithm<T> getAlgorithm() {
         return algorithm;
     }
 

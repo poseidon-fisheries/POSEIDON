@@ -1,15 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.imitation.ParticleSwarmMovement;
-import uk.ac.ox.oxfish.utility.maximization.ExplorationOrImitationMovement;
-import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
 import uk.ac.ox.oxfish.utility.maximization.ParticleSwarmAlgorithm;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;

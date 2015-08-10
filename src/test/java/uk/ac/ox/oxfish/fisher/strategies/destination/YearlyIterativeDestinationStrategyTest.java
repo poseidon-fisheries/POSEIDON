@@ -10,8 +10,9 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.DailyFisherDataSet;
+import uk.ac.ox.oxfish.model.data.DataColumn;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
-import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
 
 import static org.mockito.Mockito.*;
 
@@ -29,7 +30,7 @@ public class YearlyIterativeDestinationStrategyTest {
         final FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(
                 map.getSeaTile(50, 50));
         final YearlyIterativeDestinationStrategy hill = new YearlyIterativeDestinationStrategy(
-                delegate, map, new MersenneTwisterFast());
+                delegate, 1,10);
 
         //mock fisher enough to fool delegate
         Fisher fisher = mock(Fisher.class);
@@ -39,19 +40,31 @@ public class YearlyIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
 
+        DailyFisherDataSet data = mock(DailyFisherDataSet.class);
+        when(data.numberOfObservations()).thenReturn(8000);
+        when(fisher.getDailyData()).thenReturn(data);
+
+
+
+
         //cashflow is x+y
         doAnswer(invocation -> delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot().getGridY()).when(
-                fisher).getLatestYearlyObservation(YearlyFisherDataSet.CASH_FLOW_COLUMN);
+                fisher).getBankBalance();
 
 
 
         //step the hill-climber
-        ((HillClimbingMovement)hill.getAlgorithm()).setMaxStepSize(1);
-        hill.chooseDestination(fisher,fisher.grabRandomizer(),fishState,new Arriving()); //feed it the fisher
+        hill.chooseDestination(fisher, fisher.grabRandomizer(), fishState, new Arriving()); //feed it the fisher
+        hill.getAlgorithm().start(fishState, fisher);
+
         //give it 1000 years!
         for(int i=0; i<1000; i++)
-            hill.step(fishState);
+        {
+            double bankBalance = fisher.getBankBalance();
+            hill.getAlgorithm().adapt(fisher, new MersenneTwisterFast());
+            when(fisher.balanceXDaysAgo(360)).thenReturn(bankBalance);
 
+        }
         //should be very high
         System.out.print(delegate.getFavoriteSpot());
         Assert.assertTrue(delegate.getFavoriteSpot().getGridY() > 95);

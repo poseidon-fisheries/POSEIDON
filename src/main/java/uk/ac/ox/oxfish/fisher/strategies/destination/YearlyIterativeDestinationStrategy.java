@@ -5,20 +5,19 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
-import uk.ac.ox.oxfish.utility.maximization.HillClimbingMovement;
-import uk.ac.ox.oxfish.utility.maximization.IterativeMovement;
+import uk.ac.ox.oxfish.utility.maximization.*;
 
 /**
  * A strategy that every year iteratively tries a new sea-patch to fish on. It uses net cash-flow as a fitness value
  * to decide whether the new sea-patch is better than the one before
  * Created by carrknight on 6/17/15.
  */
-public class YearlyIterativeDestinationStrategy implements DestinationStrategy, Steppable
+public class YearlyIterativeDestinationStrategy implements DestinationStrategy
 {
 
 
@@ -26,6 +25,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy, 
      * this strategy works by modifying the "favorite" destination of its delegate
      */
     private final FavoriteDestinationStrategy delegate;
+    private final DefaultBeamHillClimbing adaptationAlgorithm;
 
     /**
      * the previous location tried
@@ -38,13 +38,12 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy, 
     private double previousYearCashFlow =  Double.NaN;
 
 
-    private IterativeMovement algorithm;
 
-    /**
-     * this gets set when chooseDestination is called the first time. I am assuming that it's called more than once a year
-     */
-    private Fisher fisher;
 
+
+
+    private final Adaptation<SeaTile> algorithm;
+    private Fisher agent;
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -56,34 +55,24 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy, 
     public void start(FishState model)
     {
         delegate.start(model);
-        model.scheduleEveryYear(this, StepOrder.AFTER_DATA);
     }
 
-    public YearlyIterativeDestinationStrategy(
-            FavoriteDestinationStrategy delegate, NauticalMap map, MersenneTwisterFast random)
-    {
-        this(delegate,new HillClimbingMovement(map,random));
-    }
 
     public YearlyIterativeDestinationStrategy(
-            FavoriteDestinationStrategy delegate, IterativeMovement algorithm)
+            FavoriteDestinationStrategy delegate, int stepSize, int attempts)
     {
         this.delegate = delegate;
-        this.algorithm = algorithm;
+        adaptationAlgorithm = new DefaultBeamHillClimbing(stepSize, attempts);
+        this.algorithm = new Adaptation<SeaTile>(
+                fisher -> fisher.getDailyData().numberOfObservations() > 360,
+                adaptationAlgorithm,
+                (fisher, change, model) -> delegate.setFavoriteSpot(change),
+                fisher -> delegate.getFavoriteSpot(),
+                new CashFlowObjective(360),
+                1d,0d);
     }
 
-    public YearlyIterativeDestinationStrategy(
-            NauticalMap map, MersenneTwisterFast random)
-    {
-        this(new FavoriteDestinationStrategy(map,random),map,random);
 
-    }
-
-    public YearlyIterativeDestinationStrategy(SeaTile tile, NauticalMap map, MersenneTwisterFast random)
-    {
-        this(new FavoriteDestinationStrategy(tile),map,random);
-
-    }
 
     /**
      * tell the startable to turnoff
@@ -97,68 +86,36 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy, 
      * decides where to go.
      *
      * @param fisher        the agent that needs to choose
-     * @param random        the randomizer. It probably comes from the fisher but I make explicit it might be needed
+     * @param random        the randomizer. It probably comes from the agent but I make explicit it might be needed
      * @param model         the model link
-     * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
+     * @param currentAction what action is the agent currently taking that prompted to check for destination   @return the destination
      */
     @Override
     public SeaTile chooseDestination(
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        if(this.fisher == null)
-            this.fisher = fisher;
-        assert this.fisher == fisher : "YearlyIterativeDestinationStrategy is a personal strategy and should not be shared";
+        if(this.agent == null) {
+            this.agent = fisher;
+            agent.registerYearlyAdaptation(algorithm);
+        }
+        assert this.agent == fisher : "YearlyIterativeDestinationStrategy is a personal strategy and should not be shared";
 
         return delegate.chooseDestination(fisher,random,model,currentAction);
     }
 
 
-
-
-    @Override
-    public void step(SimState simState) {
-        if(fisher == null)
-        {
-            assert false : "It seems impossible never to call a chooseDestination in a full year, but it might be possible" +
-                    "at some later date. Anyway no way we can optimize a ship that stays at port";
-            return;
-        }
-
-        SeaTile current = delegate.getFavoriteSpot();
-        final double currentCashFlow = fisher.getLatestYearlyObservation(YearlyFisherDataSet.CASH_FLOW_COLUMN);
-        assert current != null;
-        assert Double.isFinite(currentCashFlow);
-
-        //adapt!
-        delegate.setFavoriteSpot(algorithm.adapt(fisher, ((FishState) simState).getMap(), previousLocation, current, previousYearCashFlow,
-                                                 currentCashFlow));
-
-        //record
-        previousLocation = current;
-        previousYearCashFlow = currentCashFlow;
-
-
-
-
-
-
-
-
-    }
-
-
-    public IterativeMovement getAlgorithm() {
+    public Adaptation<SeaTile> getAlgorithm() {
         return algorithm;
     }
 
-    public void setAlgorithm(IterativeMovement algorithm) {
-        this.algorithm = algorithm;
+    public void setMaxStep(int maxStep) {
+        adaptationAlgorithm.setMaxStep(maxStep);
     }
 
-    public SeaTile getPreviousLocation() {
-        return previousLocation;
+    public int getMaxStep() {
+        return adaptationAlgorithm.getMaxStep();
     }
 
-    public double getPreviousYearCashFlow() {
-        return previousYearCashFlow;
+    public int getAttempts() {
+        return adaptationAlgorithm.getAttempts();
     }
 }
