@@ -1,12 +1,9 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -107,7 +104,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
         if(this.fisher == null)
         {
             this.fisher = fisher;
-            fisher.registerPerTripAdaptation(algorithm);
+            fisher.addPerTripAdaptation(algorithm);
         }
         else
         {

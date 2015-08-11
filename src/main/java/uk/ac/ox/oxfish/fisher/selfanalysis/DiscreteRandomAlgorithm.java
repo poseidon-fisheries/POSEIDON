@@ -58,11 +58,14 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
     }
 
 
+    /**
+     * returns null
+     */
     @Override
     public T judgeRandomization(
             MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
             T current) {
-        return current;
+        return null;
     }
 
     @Override

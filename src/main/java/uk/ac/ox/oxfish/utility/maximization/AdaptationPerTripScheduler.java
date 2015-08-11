@@ -53,6 +53,12 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
 
     }
 
+
+    public void removeAdaptation(Adaptation adaptation)
+    {
+        adaptations.remove(adaptation);
+    }
+
     @Override
     public void reactToFinishedTrip(TripRecord record)
     {

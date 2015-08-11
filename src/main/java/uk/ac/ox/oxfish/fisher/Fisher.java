@@ -689,19 +689,35 @@ public class Fisher implements Steppable, Startable{
     }
 
 
-    public void registerYearlyAdaptation(Adaptation a)
+    public void addYearlyAdaptation(Adaptation a)
     {
         yearlyAdaptation.registerAdaptation(a);
     }
 
-    public void registerBiMonthlyAdaptation(Adaptation a)
+    public void addBiMonthlyAdaptation(Adaptation a)
     {
         bimonthlyAdaptation.registerAdaptation(a);
     }
 
-    public void registerPerTripAdaptation(Adaptation a)
+    public void addPerTripAdaptation(Adaptation a)
     {
         tripAdaptation.registerAdaptation(a);
+    }
+
+
+    public void removeYearlyAdaptation(Adaptation a)
+    {
+        yearlyAdaptation.removeAdaptation(a);
+    }
+
+    public void removeBiMonthlyAdaptation(Adaptation a)
+    {
+        bimonthlyAdaptation.removeAdaptation(a);
+    }
+
+    public void removePerTripAdaptation(Adaptation a)
+    {
+        tripAdaptation.removeAdaptation(a);
     }
 
 
@@ -814,5 +830,23 @@ public class Fisher implements Steppable, Startable{
     {
         return getDestination().equals(getHomePort().getLocation());
     }
+
+
+    /**
+     * basically changes the size of the maximum load but takes care of transferring whatever we were holding to the
+     * new hold
+     * @param newHold
+     */
+    public void setHold(Hold newHold)
+    {
+
+        //unload old hold
+        Catch oldHaul = hold.unload();
+
+        hold = newHold;
+        //load the new hold
+        hold.load(oldHaul);
+    }
+
 
 }

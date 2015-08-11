@@ -22,12 +22,11 @@ import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.*;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -51,6 +50,7 @@ public class FishState  extends SimState{
     private final FishStateYearlyDataSet yearlyDataSet = new FishStateYearlyDataSet(dailyDataSet);
 
 
+    private final List<Pair<Fisher,FisherStartable>> fisherStartables = new LinkedList<>();
 
 
     private Scenario scenario = new GeneticLocationScenario();
@@ -129,8 +129,11 @@ public class FishState  extends SimState{
             for(Market market : port.getMarkets().getMarkets())
                 market.start(this);
 
+        //start everything else that required to be started
         for(Startable startable : toStart)
                 startable.start(this);
+        for( Pair<Fisher,FisherStartable> startable : fisherStartables)
+                startable.getSecond().start(this,startable.getFirst());
         dailyDataSet.start(this,this);
         yearlyDataSet.start(this,this);
         started=true;
@@ -280,6 +283,18 @@ public class FishState  extends SimState{
             startable.start(this);
         else
             toStart.add(startable);
+    }
+
+    /**
+     * if the model hasn't started, register this object to be started when the model is. Otherwise start it now
+     * @param startable the object to start
+     */
+    public void registerStartable(FisherStartable startable,Fisher fisher)
+    {
+        if(started)
+            startable.start(this,fisher);
+        else
+            fisherStartables.add(new Pair<>(fisher,startable));
     }
 
     /**

@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,12 +49,13 @@ public class GearImitationAnalysisTest
         when(fitness.computeCurrentFitness(worst)).thenReturn(0d);
 
         //100% imitating, 0% randomizing
-        GearImitationAnalysis bestAnalysis = new GearImitationAnalysis(100,0d,1d,new LinkedList<>(),best,fitness);
-        GearImitationAnalysis worstAnalysis = new GearImitationAnalysis(100,0d,1d,new LinkedList<>(),worst,fitness);
+        GearImitationAnalysis bestAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness);
+        GearImitationAnalysis worstAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness);
 
         //best should not switch gear. Worst should
-        bestAnalysis.analyze(new MersenneTwisterFast());
-        worstAnalysis.analyze(new MersenneTwisterFast());
+        bestAnalysis.getAlgorithm().adapt(best,new MersenneTwisterFast());
+        worstAnalysis.getAlgorithm().adapt(worst, new MersenneTwisterFast());
+
 
         verify(best,never()).setGear(any());
         verify(worst).setGear(bestGear);
@@ -71,7 +71,7 @@ public class GearImitationAnalysisTest
     {
         List<Fisher> fishers = new LinkedList<>();
         List<GearImitationAnalysis> analyses = new LinkedList<>();
-        ObjectiveFunction function = new ObjectiveFunction<Fisher>() {
+        ObjectiveFunction<Fisher> function = new ObjectiveFunction<Fisher>() {
             @Override
             public double computeCurrentFitness(Fisher observed) {
                 return ((FixedProportionGear) observed.getGear()).getProportionFished();
@@ -83,6 +83,8 @@ public class GearImitationAnalysisTest
             }
         };
 
+        FishState state = mock(FishState.class);
+
         //create the agents
         for(int i=0;i<100;i++)
         {
@@ -91,14 +93,14 @@ public class GearImitationAnalysisTest
                                        mock(Regulation.class),mock(DepartingStrategy.class),
                                        mock(DestinationStrategy.class),mock(FishingStrategy.class),
                                        mock(Boat.class),mock(Hold.class),gear);
-            GearImitationAnalysis analysis = new GearImitationAnalysis(1, 0d, 1d, new LinkedList<>(), fisher, function);
+            GearImitationAnalysis analysis = new GearImitationAnalysis(0d, 1d, new LinkedList<>(), function);
 
             fishers.add(fisher);
             analyses.add(analysis);
+            analysis.start(state,fisher);
         }
         //create the social network
         SocialNetwork network = new SocialNetwork(NetworkBuilders.CONSTRUCTORS.get("Equal Out Degree").get());
-        FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         when(state.getFishers()).thenReturn(fishers);
         when(state.getSocialNetwork()).thenReturn(network);
@@ -109,10 +111,7 @@ public class GearImitationAnalysisTest
         {
             fisher.start(state);
         }
-        for(GearImitationAnalysis analysis : analyses)
-        {
-            analysis.start(state);
-        }
+
 
 
         //pre average ought to be 49.5 (from 0 to 99)
@@ -131,7 +130,8 @@ public class GearImitationAnalysisTest
         for(int steps =0; steps<100;steps++)
         {
             for(GearImitationAnalysis analysis : analyses)
-                analysis.analyze(state.getRandom());
+                analysis.getAlgorithm().adapt(analysis.getFisher(),
+                                              state.getRandom());
         }
 
         //the average ought to be high, at least 90

@@ -38,8 +38,9 @@ public interface AdaptationAlgorithm<T> {
 
     /**
      * if you have explored in the previous step, this gets called to make you judge exploration (you might want to
-     * backtrack)
+     * backtrack). Return null if you don't want to backtrack and skip directly to another round of exploration-exploitation
      */
+
     T judgeRandomization(
             MersenneTwisterFast random, Fisher agent,
             double previousFitness, double currentFitness,

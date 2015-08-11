@@ -131,23 +131,31 @@ public class Adaptation<T> implements FisherStartable {
         //if you explored in the previous step
         if(explorationStart != null)
         {
+
+
+
+
             T decision = this.algorithm.judgeRandomization(random, toAdapt,
                                                            explorationStart.getSecond(),
                                                            fitness,
                                                            explorationStart.getFirst(),
                                                            current);
-            act(toAdapt, decision);
-
-            //if(decision == explorationStart.getFirst())
-              //  fitness=explorationStart.getSecond();
-            //current = decision;
-
 
             explorationStart = null;
 
 
-            //this return is somewhat fundamental
-            return;
+            if(decision != null)
+            {
+
+                act(toAdapt, decision);
+                return;
+            }
+
+
+
+
+
+
 
 
         }

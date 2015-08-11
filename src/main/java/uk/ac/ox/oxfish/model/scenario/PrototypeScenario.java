@@ -252,7 +252,7 @@ public class PrototypeScenario implements Scenario {
 
 
 
-     //   GearImitationAnalysis.attachGearAnalysisToEachFisher(fisherList,model,new ArrayList<>());
+     //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
 
 
         return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));

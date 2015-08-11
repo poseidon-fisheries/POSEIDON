@@ -71,6 +71,12 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
 
     }
 
+
+    public void removeAdaptation(Adaptation adaptation)
+    {
+        adaptations.remove(adaptation);
+    }
+
     @Override
     public void turnOff() {
         if(stoppable != null)

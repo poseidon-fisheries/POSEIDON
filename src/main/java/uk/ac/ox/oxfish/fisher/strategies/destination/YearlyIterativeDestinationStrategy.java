@@ -1,15 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
 import uk.ac.ox.oxfish.utility.maximization.*;
 
 /**
@@ -95,7 +91,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
         if(this.agent == null) {
             this.agent = fisher;
-            agent.registerYearlyAdaptation(algorithm);
+            agent.addYearlyAdaptation(algorithm);
         }
         assert this.agent == fisher : "YearlyIterativeDestinationStrategy is a personal strategy and should not be shared";
 

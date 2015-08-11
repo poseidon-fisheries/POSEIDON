@@ -158,7 +158,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
 
 
     /**
-     * never backtracks
+     * returns null
      */
     @Override
     public T judgeRandomization(
