@@ -31,8 +31,8 @@ public class AtPort implements Action {
             agent.undock();
             return new ActionResult(new Moving(),hoursLeft);
         }
-        else //if you don't want to leave port, stay home
-            return new ActionResult(this,0d);
+        else //you don't want to leave this hour, try again next hour
+            return new ActionResult(this,Math.max(0,hoursLeft-1));
 
 
     }

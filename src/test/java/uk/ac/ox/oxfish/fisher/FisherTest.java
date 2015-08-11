@@ -71,7 +71,7 @@ public class FisherTest {
         assertEquals(0, fisher.getPoundsCarried(), .001);
 
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 2,.001);
+        assertEquals(fisher.getHoursAtSea(), 2, .001);
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 3,.001);
         //ready to go home
@@ -79,7 +79,9 @@ public class FisherTest {
 
         //home now
         fisher.step(fishState);
-        assertEquals(fisher.getHoursAtSea(), 4,.001);
+        //don' let you go out again
+        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0));
+        assertEquals(fisher.getHoursAtSea(), 4, .001);
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 0,.001);
         assertEquals(0.0, fisher.getPoundsCarried(), .001);
@@ -147,6 +149,7 @@ public class FisherTest {
         assertEquals(fisher.getFuelLeft(), 10.0, 0.0);
         //and now emergency should kick in and you should go back home
         fisher.step(fishState);
+        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0));
         assertEquals(fisher.getFuelLeft(), 0.0, 0.0);
         assertTrue(fisher.isFuelEmergencyOverride());
         fisher.step(fishState);

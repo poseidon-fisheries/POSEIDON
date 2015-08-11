@@ -1,5 +1,6 @@
-package uk.ac.ox.oxfish.fisher.strategies.departing;
+package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;

@@ -6,7 +6,7 @@ import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;

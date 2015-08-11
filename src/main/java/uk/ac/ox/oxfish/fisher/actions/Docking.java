@@ -58,6 +58,6 @@ public class Docking implements Action{
         assert port.isDocked(agent); //shouldn't have docked already!
         assert agent.getPoundsCarried() ==  0.0;
         //now stay at port
-        return new ActionResult(new AtPort(),0d);
+        return new ActionResult(new AtPort(),hoursLeft);
     }
 }

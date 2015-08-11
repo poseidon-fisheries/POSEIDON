@@ -10,10 +10,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
-import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -34,10 +33,8 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.function.Function;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -118,7 +115,7 @@ public class PrototypeScenario implements Scenario {
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
-            new FixedProbabilityDepartingFactory();
+            new FixedRestTimeDepartingFactory();
 
     /**
      * factory to produce departing strategy

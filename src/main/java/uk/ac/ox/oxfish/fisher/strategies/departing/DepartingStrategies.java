@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -27,6 +29,9 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("Fixed Probability",
                          FixedProbabilityDepartingFactory::new);
         NAMES.put(FixedProbabilityDepartingFactory.class,"Fixed Probability");
+        CONSTRUCTORS.put("Fixed Rest",
+                         FixedRestTimeDepartingFactory::new);
+        NAMES.put(FixedRestTimeDepartingFactory.class,"Fixed Rest");
     }
 
     private DepartingStrategies() {}

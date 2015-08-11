@@ -91,6 +91,8 @@ public class Fisher implements Steppable, Startable{
      */
     private double hoursAtSea = 0;
 
+    private double hoursAtPort = 0;
+
     /**
      * the data gatherer that fires once a year
      */
@@ -216,7 +218,7 @@ public class Fisher implements Steppable, Startable{
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
      * @param gear what is used for fishing
-\     */
+    \     */
     public Fisher(
             int id,
             Port homePort, MersenneTwisterFast random,
@@ -334,6 +336,8 @@ public class Fisher implements Steppable, Startable{
             //if you have been moving or you were staying still somewhere away from port
             if(action instanceof Moving || !isAtPort())
                 increaseHoursAtSea(hoursLeftBeforeAction-hoursLeft);
+            else
+                increaseHoursAtPort(hoursLeftBeforeAction-hoursLeft);
 
             //set up next action
             action = result.getNextState();
@@ -407,7 +411,7 @@ public class Fisher implements Steppable, Startable{
         map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
 
         //this condition doesn't hold anymore because time travelled is "conserved" between steps
-     //   Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep(), boat.getHoursTravelledToday() +  " and ");
+        //   Preconditions.checkState(boat.getHoursTravelledToday() <= state.getHoursPerStep(), boat.getHoursTravelledToday() +  " and ");
         Preconditions.checkState(newPosition == location);
     }
 
@@ -426,6 +430,7 @@ public class Fisher implements Steppable, Startable{
         assert isAtPort();
         homePort.depart(this);
         tripLogger.newTrip();
+        hoursAtPort = 0;
     }
 
     public boolean isAtPort() {
@@ -437,6 +442,7 @@ public class Fisher implements Steppable, Startable{
      */
     public void dock(){
         assert isAtPort();
+        assert hoursAtPort == 0;
         homePort.dock(this);
         //when you dock you also refill
         final double litersBought = boat.refill();
@@ -684,7 +690,7 @@ public class Fisher implements Steppable, Startable{
 
     public double balanceXDaysAgo(int daysAgo)
     {
-    //    Preconditions.checkArgument(dailyFisherDataSet.numberOfObservations() >daysAgo);
+        //    Preconditions.checkArgument(dailyFisherDataSet.numberOfObservations() >daysAgo);
         return getDailyData().getColumn(YearlyFisherDataSet.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
     }
 
@@ -822,9 +828,19 @@ public class Fisher implements Steppable, Startable{
     private void increaseHoursAtSea(double hoursIncrease)
     {
         Preconditions.checkArgument(hoursIncrease >= 0);
+        Preconditions.checkArgument(hoursAtPort== 0);
         hoursAtSea += hoursIncrease;
     }
 
+
+    private void increaseHoursAtPort(double hoursIncrease)
+    {
+        if(hoursIncrease > 0) { //0 could be an "arriving at port" before docking. Ignore that one
+            Preconditions.checkArgument(hoursIncrease >= 0);
+            Preconditions.checkArgument(hoursAtSea == 0, action + " --- " + hoursIncrease);
+            hoursAtPort += hoursIncrease;
+        }
+    }
 
     public boolean isGoingToPort()
     {
@@ -849,4 +865,7 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    public double getHoursAtPort() {
+        return hoursAtPort;
+    }
 }

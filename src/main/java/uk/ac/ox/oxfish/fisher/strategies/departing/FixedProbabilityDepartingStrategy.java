@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
