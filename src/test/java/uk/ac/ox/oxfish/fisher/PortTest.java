@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -16,7 +16,7 @@ public class PortTest {
     public void registersCorrectly() throws Exception {
 
         SeaTile location = mock(SeaTile.class);
-        Port port = new Port(location,mock(Markets.class), 0);
+        Port port = new Port(location,mock(MarketMap.class), 0);
 
         Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
         Fisher two = mock(Fisher.class);when(two.getLocation()).thenReturn(location);
@@ -43,7 +43,7 @@ public class PortTest {
     {
         SeaTile location1 = mock(SeaTile.class);
         SeaTile location2 = mock(SeaTile.class);
-        Port port = new Port(location1,mock(Markets.class), 0);
+        Port port = new Port(location1,mock(MarketMap.class), 0);
 
         Fisher one = mock(Fisher.class);when(one.getLocation()).thenReturn(location2);
         //one is not sharing the sea-tile with port
@@ -55,7 +55,7 @@ public class PortTest {
     public void dockingTwiceIsNotAllowd()
     {
         SeaTile location = mock(SeaTile.class);
-        Port port = new Port(location,mock(Markets.class), 0);
+        Port port = new Port(location,mock(MarketMap.class), 0);
 
         Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
         port.dock(one);
@@ -66,7 +66,7 @@ public class PortTest {
     public void undockingWithoutBeingDockedIsNotAllowed()
     {
         SeaTile location = mock(SeaTile.class);
-        Port port = new Port(location,mock(Markets.class), 0);
+        Port port = new Port(location,mock(MarketMap.class), 0);
 
         Fisher one = mock(Fisher.class); when(one.getLocation()).thenReturn(location);
         port.depart(one);

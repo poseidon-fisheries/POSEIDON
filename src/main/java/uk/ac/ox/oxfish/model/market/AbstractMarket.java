@@ -21,10 +21,6 @@ public abstract class AbstractMarket implements Market {
 
     private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
 
-    /**
-     * specie to trade in
-     */
-    private final Specie specie;
 
     private final DataSet<Market> dailyObservations = new DataSet<>(IntervalPolicy.EVERY_DAY);
 
@@ -33,8 +29,8 @@ public abstract class AbstractMarket implements Market {
      */
     private boolean started = false;
 
-    public AbstractMarket(Specie specie) {
-        this.specie = specie;
+    public AbstractMarket() {
+
     }
 
     /**
@@ -83,8 +79,9 @@ public abstract class AbstractMarket implements Market {
      * @param state       the model
      */
     @Override
-    final public TradeInfo sellFish(double biomass, Fisher fisher, Regulation regulation, FishState state) {
-        TradeInfo receipt = sellFishImplementation(biomass,fisher, regulation,state);
+    final public TradeInfo sellFish(double biomass, Fisher fisher, Regulation regulation,
+                                    FishState state, Specie specie) {
+        TradeInfo receipt = sellFishImplementation(biomass,fisher, regulation,state,specie);
         recordTrade(receipt);
         return receipt;
     }
@@ -98,20 +95,17 @@ public abstract class AbstractMarket implements Market {
      * @return TradeInfo  results
      */
     protected abstract TradeInfo sellFishImplementation(double biomass, Fisher fisher,
-                                                        Regulation regulation, FishState state);
+                                                        Regulation regulation, FishState state,
+                                                        Specie specie);
 
 
     public void recordTrade(TradeInfo info)
     {
-        assert specie.equals(info.getSpecie());
         dailyCounter.count(EARNINGS_COLUMN_NAME,info.getMoneyExchanged());
         dailyCounter.count(LANDINGS_COLUMN_NAME, info.getBiomassTraded());
 
     }
 
-    public Specie getSpecie() {
-        return specie;
-    }
 
     public DataSet<Market> getData() {
         return dailyObservations;

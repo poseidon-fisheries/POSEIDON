@@ -26,7 +26,6 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
      */
     @Override
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model) {
-        Preconditions.checkArgument(fisher.getHoursAtPort() <= minimumHoursToWait+1, fisher.getHoursAtPort());
         return fisher.getHoursAtPort() >= minimumHoursToWait;
     }
 

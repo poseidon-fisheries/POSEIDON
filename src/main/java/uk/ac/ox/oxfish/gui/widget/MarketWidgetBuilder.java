@@ -7,14 +7,14 @@ import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
- * Grabs a Markets object and drill down into its components
+ * Grabs a MarketMap object and drill down into its components
  * Created by carrknight on 7/31/15.
  */
 public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidget>
@@ -34,7 +34,7 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
 
 
     /**
-     *  tries to build a list of market subwidgets for each market available in this Markets object
+     *  tries to build a list of market subwidgets for each market available in this MarketMap object
      */
     @Override
     public JComponent buildWidget(
@@ -42,11 +42,11 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
     {
 
         final Class<?> actualClass = WidgetBuilderUtils.getActualClassOrType(attributes, String.class);
-        //if it is a primitive or not a Markets we have no use for it
-        if(actualClass == null || !Markets.class.isAssignableFrom(actualClass))
+        //if it is a primitive or not a MarketMap we have no use for it
+        if(actualClass == null || !MarketMap.class.isAssignableFrom(actualClass))
             return null;
 
-        //it's a Markets
+        //it's a MarketMap
         try {
 
 
@@ -54,14 +54,14 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
             //nested address? no problem
             String address = path.length == 2? path[1] + "." + attributes.get("name") :
                     attributes.get("name");
-            Markets markets = ((Markets) PropertyUtils.getProperty(metawidget.getToInspect(),
+            MarketMap marketMap = ((MarketMap) PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                    address));
 
-            //get list of markets
+            //get list of marketMap
             JPanel container = new JPanel();
             container.setLayout(new BoxLayout(container,BoxLayout.Y_AXIS));
             //for each market, please create a new sub-inspector to deal with it
-            for(Market market : markets.getMarkets())
+            for(Market market : marketMap.getMarkets())
             {
                 container.add(new MetaInspector(market,gui));
                 container.add(new JSeparator(JSeparator.HORIZONTAL));

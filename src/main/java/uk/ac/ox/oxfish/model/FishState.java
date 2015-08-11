@@ -8,7 +8,6 @@ import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.DoubleGrid2D;
-import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
@@ -20,7 +19,6 @@ import uk.ac.ox.oxfish.model.data.FishStateYearlyDataSet;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.Pair;
 
@@ -126,7 +124,7 @@ public class FishState  extends SimState{
                 fisher.start(this);
         //start the markets (for each port
         for(Port port : getPorts())
-            for(Market market : port.getMarkets().getMarkets())
+            for(Market market : port.getMarketMap().getMarkets())
                 market.start(this);
 
         //start everything else that required to be started

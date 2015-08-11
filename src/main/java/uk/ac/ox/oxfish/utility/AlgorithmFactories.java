@@ -9,6 +9,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategi
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
@@ -44,6 +46,8 @@ public class AlgorithmFactories {
         NAMES_MAP.put(BiologyInitializer.class, BiologyInitializers.NAMES);
         CONSTRUCTOR_MAP.put(DirectedGraph.class, NetworkBuilders.CONSTRUCTORS);
         NAMES_MAP.put(DirectedGraph.class, NetworkBuilders.NAMES);
+        CONSTRUCTOR_MAP.put(Market.class, Markets.CONSTRUCTORS);
+        NAMES_MAP.put(Market.class, Markets.NAMES);
     }
 
 

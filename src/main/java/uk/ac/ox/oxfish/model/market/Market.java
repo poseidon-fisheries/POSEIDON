@@ -28,7 +28,8 @@ public interface Market extends Startable {
      */
     TradeInfo sellFish(
             double biomass, Fisher fisher,
-            Regulation regulation, FishState state);
+            Regulation regulation, FishState state,
+            Specie specie);
 
 
     /**
@@ -70,19 +71,6 @@ public interface Market extends Startable {
 
     }
 
-
-    /**
-     * how much would this fisher make by selling this amount of biomass?
-     * @param biomass weight of fish sold
-     * @return the biomass
-     */
-    double expectedRevenueFromSellingThisBiomass(double biomass, Fisher fisher, Regulation regulation);
-
-    /**
-     * specie this market relates to
-     * @return
-     */
-    Specie getSpecie();
 
     /**
      * get the daily data of this market

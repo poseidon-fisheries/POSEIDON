@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -22,7 +21,9 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -136,6 +137,8 @@ public class PrototypeScenario implements Scenario {
             new EquidegreeBuilder();
 
 
+    private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
+
     public PrototypeScenario() {
     }
 
@@ -167,25 +170,24 @@ public class PrototypeScenario implements Scenario {
 
         //general biology
         //create fixed price market
-        Markets markets = new Markets(biology);
+        MarketMap marketMap = new MarketMap(biology);
         /*
       market prices for each species
      */
-        double[] marketPrices = new double[biology.getSize()];
-        Arrays.fill(marketPrices,10.0);
+
 
 
         for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
+            marketMap.addMarket(specie,market.apply(model));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, random);
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, random);
 
 
 
 
 
-        return new ScenarioEssentials(biology,map,markets);
+        return new ScenarioEssentials(biology,map, marketMap);
     }
 
 
@@ -441,5 +443,14 @@ public class PrototypeScenario implements Scenario {
 
     public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
+    }
+
+
+    public AlgorithmFactory<? extends Market> getMarket() {
+        return market;
+    }
+
+    public void setMarket(AlgorithmFactory<? extends Market> market) {
+        this.market = market;
     }
 }

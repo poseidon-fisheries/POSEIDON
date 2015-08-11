@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
@@ -42,7 +42,7 @@ public class MovingTest
         //1 hour step
         when(fishState.getHoursPerStep()).thenReturn(1d);
         //fake port at 1,1
-        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class), 0);
+        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(MarketMap.class), 0);
 
         //create fisher, it wants to go to 0,1 from 1,1
         //but it only goes at 1km per hour

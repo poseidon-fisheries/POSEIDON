@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
@@ -47,7 +47,7 @@ public class FishingTest {
         GlobalBiology biology = new GlobalBiology(specie);
         when(fishState.getBiology()).thenReturn(biology);
 
-        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(Markets.class), 0);
+        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(MarketMap.class), 0);
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(specie, 50.0, biology));

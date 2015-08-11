@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.market;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -24,8 +23,7 @@ public class FixedPriceMarket extends AbstractMarket {
     }
 
 
-    public FixedPriceMarket(Specie specie, double price) {
-        super(specie);
+    public FixedPriceMarket(double price) {
         this.price = price;
     }
 
@@ -40,21 +38,10 @@ public class FixedPriceMarket extends AbstractMarket {
      */
     @Override
     protected TradeInfo sellFishImplementation(
-            double biomass, Fisher fisher, Regulation regulation, FishState state) {
+            double biomass, Fisher fisher, Regulation regulation, FishState state,
+            Specie specie) {
         return Market.defaultMarketTransaction(biomass, fisher, regulation, state,
-                                               biomassTraded -> biomassTraded *price,getSpecie());
+                                               biomassTraded -> biomassTraded *price,specie);
     }
 
-    /**
-     * how much would this fisher make by selling this amount of biomass?
-     *
-     * @param biomass    weight of fish sold
-     * @param fisher
-     * @param regulation @return the biomass
-     */
-    @Override
-    public double expectedRevenueFromSellingThisBiomass(
-            double biomass, Fisher fisher, Regulation regulation) {
-        return biomass * price;
-    }
 }

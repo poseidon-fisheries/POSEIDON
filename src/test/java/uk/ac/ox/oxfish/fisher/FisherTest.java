@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
 import static org.junit.Assert.*;
@@ -43,11 +43,11 @@ public class FisherTest {
         double kph = 1.0;
 
 
-        final Markets markets = new Markets(biology);
+        final MarketMap marketMap = new MarketMap(biology);
         final int pricePerFish = 23;
-        final FixedPriceMarket fishmarket = new FixedPriceMarket(specie, pricePerFish);
-        markets.addMarket(specie, fishmarket);
-        Port port = new Port(fishState.getMap().getSeaTile(1,1), markets, gasCostPerLiter);
+        final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
+        marketMap.addMarket(specie, fishmarket);
+        Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
@@ -115,11 +115,11 @@ public class FisherTest {
         double kph = 1.0;
 
 
-        final Markets markets = new Markets(biology);
+        final MarketMap marketMap = new MarketMap(biology);
         final int pricePerFish = 23;
-        final FixedPriceMarket fishmarket = new FixedPriceMarket(specie, pricePerFish);
-        markets.addMarket(specie, fishmarket);
-        Port port = new Port(fishState.getMap().getSeaTile(1,1), markets, gasCostPerLiter);
+        final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
+        marketMap.addMarket(specie, fishmarket);
+        Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day

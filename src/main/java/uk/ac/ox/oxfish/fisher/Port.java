@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.*;
 
@@ -34,12 +34,12 @@ public class Port {
     /**
      *  the markets available at this port
      */
-    private final Markets markets;
+    private final MarketMap marketMap;
 
-    public Port(SeaTile location, Markets markets, double gasPricePerLiter)
+    public Port(SeaTile location, MarketMap marketMap, double gasPricePerLiter)
     {
         this.location = location;
-        this.markets = markets;
+        this.marketMap = marketMap;
         this.gasPricePerLiter = gasPricePerLiter;
         fishersHere = new HashSet<>();
     }
@@ -99,12 +99,12 @@ public class Port {
         return "Port at " +location;
     }
 
-    public Markets getMarkets() {
-        return markets;
+    public MarketMap getMarketMap() {
+        return marketMap;
     }
 
     public Market getMarket(Specie specie) {
-        return markets.getMarket(specie);
+        return marketMap.getMarket(specie);
     }
 
     public double getGasPricePerLiter() {

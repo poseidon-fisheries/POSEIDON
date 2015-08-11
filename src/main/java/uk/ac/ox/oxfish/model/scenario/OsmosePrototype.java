@@ -21,7 +21,7 @@ import uk.ac.ox.oxfish.geography.osmose.OsmoseMapMaker;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -161,7 +161,7 @@ public class OsmosePrototype implements Scenario {
 
         //general biology
         //create fixed price market
-        Markets markets = new Markets(biology);
+        MarketMap marketMap = new MarketMap(biology);
         /*
       market prices for each species
      */
@@ -170,15 +170,15 @@ public class OsmosePrototype implements Scenario {
 
 
         for(Specie specie : biology.getSpecies())
-            markets.addMarket(specie,new FixedPriceMarket(specie, marketPrices[specie.getIndex()]));
+            marketMap.addMarket(specie,new FixedPriceMarket( marketPrices[specie.getIndex()]));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> markets, model.random);
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, model.random);
 
 
         model.registerStartable(stepper);
 
-        return new ScenarioEssentials(biology,map,markets);
+        return new ScenarioEssentials(biology,map, marketMap);
 
 
     }

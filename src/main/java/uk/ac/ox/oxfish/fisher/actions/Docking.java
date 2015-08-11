@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -40,14 +40,14 @@ public class Docking implements Action{
         Catch toSell = agent.unload();
         GlobalBiology biology = model.getBiology();
 
-        Markets markets =port.getMarkets();
+        MarketMap marketMap =port.getMarketMap();
         for(Specie specie : biology.getSpecies())
         {
             double biomass = toSell.getPoundsCaught(specie);
             assert  biomass>=0;
             if(biomass>0)
                 //this should take care of everything
-                markets.sellFish(specie,biomass,agent, regulation,model);
+                marketMap.sellFish(specie,biomass,agent, regulation,model);
         }
 
         //anchor/refill

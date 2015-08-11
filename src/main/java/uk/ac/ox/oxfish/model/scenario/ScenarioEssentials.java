@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 
 
 /**
@@ -14,14 +14,14 @@ public class ScenarioEssentials {
 
     private final NauticalMap map;
 
-    private final Markets markets;
+    private final MarketMap marketMap;
 
 
     public ScenarioEssentials(
-            GlobalBiology biology, NauticalMap map, Markets markets) {
+            GlobalBiology biology, NauticalMap map, MarketMap marketMap) {
         this.biology = biology;
         this.map = map;
-        this.markets = markets;
+        this.marketMap = marketMap;
     }
 
     public GlobalBiology getBiology() {
@@ -33,7 +33,7 @@ public class ScenarioEssentials {
     }
 
 
-    public Markets getMarkets() {
-        return markets;
+    public MarketMap getMarketMap() {
+        return marketMap;
     }
 }

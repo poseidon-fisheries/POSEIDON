@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
 import java.util.*;
@@ -275,7 +275,7 @@ public class NauticalMapFactory {
      * @param map
      */
     public static void addRandomPortsToMap(NauticalMap map,int ports,
-                                           Function<SeaTile,Markets> marketFactory,
+                                           Function<SeaTile,MarketMap> marketFactory,
                                            MersenneTwisterFast random){
         /***
          *        _      _    _   ___         _

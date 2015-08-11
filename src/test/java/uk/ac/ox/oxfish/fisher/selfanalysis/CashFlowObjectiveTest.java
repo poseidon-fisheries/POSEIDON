@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;

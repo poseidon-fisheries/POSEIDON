@@ -25,7 +25,7 @@ public class AbstractMarketTest {
 
         FishState model = mock(FishState.class);
         Specie test = new Specie("papapapap");
-        AbstractMarket market = new FixedPriceMarket(test,1.0);
+        AbstractMarket market = new FixedPriceMarket(1.0);
         List<Steppable> steppables = new LinkedList<>();
         doAnswer(invocation -> {
             steppables.add((Steppable) invocation.getArguments()[0]);

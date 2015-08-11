@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -66,7 +66,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             else
                 tile.getKey().setBiology(new EmptyLocalBiology());
         }
-        return new ScenarioEssentials(biology,map,new Markets(biology));
+        return new ScenarioEssentials(biology,map,new MarketMap(biology));
     }
 
     /**

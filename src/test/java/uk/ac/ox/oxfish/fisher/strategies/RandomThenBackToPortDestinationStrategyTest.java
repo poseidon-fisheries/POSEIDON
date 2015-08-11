@@ -21,7 +21,7 @@ import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Markets;
+import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 
 import static org.junit.Assert.*;
@@ -41,7 +41,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1), mock(Markets.class), 0);
+        Port port = new Port(map.getSeaTile(1, 1), mock(MarketMap.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
@@ -75,7 +75,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class), 0);
+        Port port = new Port(map.getSeaTile(1, 1),mock(MarketMap.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
@@ -111,7 +111,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
 
 
         //port at 1,1 corner
-        Port port = new Port(map.getSeaTile(1, 1),mock(Markets.class), 0);
+        Port port = new Port(map.getSeaTile(1, 1),mock(MarketMap.class), 0);
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
