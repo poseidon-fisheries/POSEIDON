@@ -17,6 +17,7 @@ public abstract class AbstractMarket implements Market {
 
     public static final String LANDINGS_COLUMN_NAME = "Landings";
     public static final String EARNINGS_COLUMN_NAME = "Earnings";
+    public static final String PRICE_COLUMN_NAME = "Marginal Price";
 
 
     private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
@@ -47,6 +48,7 @@ public abstract class AbstractMarket implements Market {
         dailyCounter.start(state);
         dailyCounter.addColumn(EARNINGS_COLUMN_NAME);
         dailyCounter.addColumn(LANDINGS_COLUMN_NAME);
+        dailyCounter.addColumn(PRICE_COLUMN_NAME);
 
         //start the data-set where we are going to store the history of the counter
         dailyObservations.start(state,this);
@@ -55,6 +57,9 @@ public abstract class AbstractMarket implements Market {
                                            Double.NaN);
 
         dailyObservations.registerGatherer(LANDINGS_COLUMN_NAME, market -> dailyCounter.getColumn(LANDINGS_COLUMN_NAME),
+                                           Double.NaN);
+
+        dailyObservations.registerGatherer(PRICE_COLUMN_NAME, Market::getMarginalPrice,
                                            Double.NaN);
 
         started = true;

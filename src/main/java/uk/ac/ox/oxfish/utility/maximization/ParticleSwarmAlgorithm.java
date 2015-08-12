@@ -113,7 +113,8 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                                                                 SeaTile variable,
                                                                 Fisher fisher,
                                                                 FishState model) {
-                                                            return new Float[]{(float) variable.getGridX(),
+                                                            return variable == null ? null :
+                                                                    new Float[]{(float) variable.getGridX(),
                                                                     (float) variable.getGridY()};
                                                         }
 
@@ -202,7 +203,10 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                                       objectiveFunction.computeCurrentFitness(o2));
             }
         });
-        Float[] socialCoordinates = bestFriend.isPresent() ?
+
+
+        Float[] socialCoordinates = bestFriend.isPresent() && objectiveFunction.computeCurrentFitness(agent)<
+                objectiveFunction.computeCurrentFitness(bestFriend.get())?
                 transformers.toCoordinates(getBestMemory.apply(bestFriend.get()),
                                            agent,model) :
                 null;
@@ -211,9 +215,9 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         {
             velocities[i] = velocities[i] * inertia;
             if(memoryCoordinates != null)
-                velocities[i]+= memoryWeight * memoryCoordinates[i];
+                velocities[i]+= memoryWeight * (memoryCoordinates[i]-currentCoordinates[i]);
             if(socialCoordinates != null)
-                velocities[i]+= socialWeight * socialCoordinates[i];
+                velocities[i]+= socialWeight * (socialCoordinates[i]-currentCoordinates[i]);
         }
 
         return move(agent);

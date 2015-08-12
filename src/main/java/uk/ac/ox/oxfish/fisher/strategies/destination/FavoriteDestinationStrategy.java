@@ -73,7 +73,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
                 return fisher.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot
-            assert  currentAction instanceof Moving || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock
+//            assert  currentAction instanceof Moving || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock
             return favoriteSpot;
         }
 

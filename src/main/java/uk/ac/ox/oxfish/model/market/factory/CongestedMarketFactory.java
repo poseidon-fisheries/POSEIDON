@@ -26,13 +26,16 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
     /**
      * by how much does price decrease in proportion to how much we are above biomass threshold. It's basically $/weight
      */
-    private DoubleParameter demandSlope = new FixedDoubleParameter(.0005);
+    private DoubleParameter demandSlope = new FixedDoubleParameter(.0001);
 
     /**
      * how much biomass for this fish gets consumed each day (and removed from the market)
      */
     private DoubleParameter dailyConsumption = new FixedDoubleParameter(8000);
 
+
+
+    private DoubleParameter consumptionPeriod = new FixedDoubleParameter(1);
 
 
 
@@ -47,7 +50,8 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
         return new CongestedMarket(acceptableBiomassThreshold.apply(state.getRandom()),
                                    maxPrice.apply(state.getRandom()),
                                    demandSlope.apply(state.getRandom()),
-                                   dailyConsumption.apply(state.getRandom()));
+                                   dailyConsumption.apply(state.getRandom()),
+                                   consumptionPeriod.apply(state.getRandom()).intValue());
     }
 
 
@@ -82,5 +86,13 @@ public class CongestedMarketFactory  implements AlgorithmFactory<CongestedMarket
 
     public void setDailyConsumption(DoubleParameter dailyConsumption) {
         this.dailyConsumption = dailyConsumption;
+    }
+
+    public DoubleParameter getConsumptionPeriod() {
+        return consumptionPeriod;
+    }
+
+    public void setConsumptionPeriod(DoubleParameter consumptionPeriod) {
+        this.consumptionPeriod = consumptionPeriod;
     }
 }

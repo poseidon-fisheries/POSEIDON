@@ -44,4 +44,14 @@ public class FixedPriceMarket extends AbstractMarket {
                                                biomassTraded -> biomassTraded *price,specie);
     }
 
+
+    /**
+     * how much do you intend to pay the next epsilon amount of biomass sold here
+     *
+     * @return price
+     */
+    @Override
+    public double getMarginalPrice() {
+        return price;
+    }
 }

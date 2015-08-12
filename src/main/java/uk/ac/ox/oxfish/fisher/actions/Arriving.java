@@ -27,7 +27,7 @@ public class Arriving implements Action{
 
         if(regulation.canFishHere(agent,agent.getLocation(), model)
                 &&
-                agent.shouldIFish(model)) //if you want to fish
+                agent.shouldIFish(model) ) //if you want to fish
             return new ActionResult(new Fishing(),hoursLeft);
         else
         {

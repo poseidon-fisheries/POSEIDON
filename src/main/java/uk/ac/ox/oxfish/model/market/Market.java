@@ -78,6 +78,11 @@ public interface Market extends Startable {
      */
     DataSet<Market> getData();
 
+    /**
+     * how much do you intend to pay the next epsilon amount of biomass sold here
+     * @return price
+     */
+    public double getMarginalPrice();
 
 
 

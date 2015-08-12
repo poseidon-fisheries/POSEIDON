@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.utility.maximization.*;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
- * year this is done every x trips (x=1 by default). <br>
+ * year this is done every trip <br>
  *     In terms of code this strategy doesn't actually step but instead listen to the fisher for
  *     new trips
  * Created by carrknight on 6/19/15.
@@ -51,7 +51,10 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
         this.algorithm = new Adaptation<SeaTile>(
                 fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
                 algorithm,
-                (fisher, change, model) -> delegate.setFavoriteSpot(change),
+                (fisher, change, model) -> {
+                    if(change.getAltitude() < 0) //ignores "go to land" commands
+                        delegate.setFavoriteSpot(change);
+                },
                 fisher1 -> {
                     if(fisher1==fisher) //if we are sensing ourselves
                         //override to delegate
