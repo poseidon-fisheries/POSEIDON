@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.maximization.Actuator;
@@ -129,31 +130,22 @@ public class GearImitationAnalysis implements FisherStartable
         for(Fisher fisher : fishers)
         {
 
-            Adaptation<Hold> holdAdaptation = new Adaptation<Hold>(new Predicate<Fisher>() {
-                @Override
-                public boolean test(Fisher fisher) {
-                    return true;
-                }
-            }, new BeamHillClimbing<Hold>() {
+            Adaptation<Hold> holdAdaptation = new Adaptation<Hold>(
+                    fisher1 -> true,
+                    new BeamHillClimbing<Hold>() {
                 @Override
                 public Hold randomStep(
                         FishState state, MersenneTwisterFast random, Fisher fisher, Hold current) {
                     return new Hold(fisher.getMaximumLoad() * (.8 + .4 * random.nextDouble()),
                                     species);
                 }
-            }, new Actuator<Hold>() {
-                @Override
-                public void apply(Fisher fisher, Hold change, FishState model) {
-                    fisher.setHold(change);
-                }
-            }, new Sensor<Hold>() {
-                @Override
-                public Hold scan(Fisher fisher) {
-                    //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
-                    return new Hold(fisher.getMaximumLoad(),species);
-                }
-            },new CashFlowObjective(60),.15,.6
-            );
+            }, (fisher1, change, model1) -> fisher1.setHold(change),
+                    fisher1 -> {
+                //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
+                return new Hold(fisher1.getMaximumLoad(),species);
+            },new CashFlowObjective(60),.15,.6);
+
+
 
             model.registerStartable(new FisherStartable() {
                 @Override
@@ -185,6 +177,51 @@ public class GearImitationAnalysis implements FisherStartable
             }
         },Double.NaN);
 
+
+
+    }
+
+
+    public static void attachGoingOutProbabilityToEveryone(List<Fisher> fishers,
+                                                      FishState model)
+    {
+        for(Fisher fisher : fishers)
+        {
+            Adaptation<FixedProbabilityDepartingStrategy> departingChance
+                    = new Adaptation<>(
+                    fisher1 -> true,
+                    new BeamHillClimbing<FixedProbabilityDepartingStrategy>() {
+                        @Override
+                        public FixedProbabilityDepartingStrategy randomStep(
+                                FishState state, MersenneTwisterFast random, Fisher fisher,
+                                FixedProbabilityDepartingStrategy current) {
+                            double probability = current.getProbabilityToLeavePort();
+                            probability = probability * (0.8 + 0.4 * random.nextDouble());
+                            probability = Math.min(Math.max(0, probability), 1);
+                            return new FixedProbabilityDepartingStrategy(probability);
+                        }
+                    },
+                    (fisher1, change, model1) -> fisher1.setDepartingStrategy(change),
+                    fisher1 -> ((FixedProbabilityDepartingStrategy) fisher1.getDepartingStrategy()),
+                    new CashFlowObjective(60),
+                    .2, .6
+            );
+            fisher.addBiMonthlyAdaptation(departingChance);
+
+
+        }
+        model.getDailyDataSet().registerGatherer("Probability to leave port", state1 -> {
+            double size = state1.getFishers().size();
+            if (size == 0)
+                return Double.NaN;
+            else {
+                double total = 0;
+                for (Fisher fisher1 : state1.getFishers())
+                    total += ((FixedProbabilityDepartingStrategy) fisher1.getDepartingStrategy()).
+                            getProbabilityToLeavePort();
+                return total / size;
+            }
+        }, Double.NaN);
 
 
     }

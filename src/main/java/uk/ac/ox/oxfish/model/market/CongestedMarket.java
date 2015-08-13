@@ -80,9 +80,9 @@ public class CongestedMarket extends AbstractMarket implements Steppable{
         super.start(state);
 
         if(consumptionPeriod==1)
-            stoppable = state.scheduleEveryDay(this, StepOrder.BIOLOGY_PHASE);
+            stoppable = state.scheduleEveryDay(this, StepOrder.DAWN);
         else
-            stoppable = state.scheduleEveryXDay(this,StepOrder.BIOLOGY_PHASE,consumptionPeriod);
+            stoppable = state.scheduleEveryXDay(this,StepOrder.DAWN,consumptionPeriod);
     }
 
 

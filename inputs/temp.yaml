@@ -7,8 +7,8 @@ Prototype:
   catchabilityMean: '0.01'
   coastalRoughness: 4
   departingStrategy:
-    Fixed Rest:
-      hoursBetweenEachDeparture: '12.0'
+    Fixed Probability:
+      probabilityToLeavePort: uniform 0.001 0.01
   depthSmoothing: 1000000
   destinationStrategy:
     Imitator-Explorator:
@@ -21,18 +21,17 @@ Prototype:
     Until Full With Day Limit:
       daysAtSea: '10.0'
   fuelTankSize: '100000.0'
-  gasPricePerLiter: '0'
+  gasPricePerLiter: '0.5'
   gridCellSizeInKm: 1.0
   height: 50
   holdSize: '100.0'
   literPerKilometer: '10.0'
   market:
     Congested Market:
-      acceptableBiomassThreshold: '5000.0'
-      dailyConsumption: '9000.0'
-      demandSlope: '0.00003'
+      acceptableBiomassThreshold: '0'
+      dailyConsumption: '800000.0'
+      demandSlope: '0.001'
       maxPrice: '10.0'
-      consumptionPeriod: '60'
   networkBuilder:
     Equal Out Degree:
       degree: 2
