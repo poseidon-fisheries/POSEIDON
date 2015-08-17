@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -16,10 +16,10 @@ import java.util.List;
  * aggregate landings and earnings by species
  * Created by carrknight on 6/16/15.
  */
-public class FishStateDailyDataSet extends DataSet<FishState> {
+public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
 
-    public FishStateDailyDataSet() {
+    public FishStateDailyTimeSeries() {
         super(IntervalPolicy.EVERY_DAY,StepOrder.AGGREGATE_DATA_GATHERING);
     }
 

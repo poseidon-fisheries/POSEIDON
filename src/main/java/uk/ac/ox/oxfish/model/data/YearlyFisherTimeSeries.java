@@ -12,7 +12,7 @@ import java.util.function.Function;
  *     <li> NET_CASH_FLOW</li>
  * </ul>
  */
-public class YearlyFisherDataSet extends DataSet<Fisher>
+public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
 {
 
 
@@ -20,7 +20,7 @@ public class YearlyFisherDataSet extends DataSet<Fisher>
     public static final String CASH_FLOW_COLUMN = "NET_CASH_FLOW";
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
 
-    public YearlyFisherDataSet() {
+    public YearlyFisherTimeSeries() {
         super(IntervalPolicy.EVERY_YEAR);
     }
 

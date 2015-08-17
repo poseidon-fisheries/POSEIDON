@@ -43,12 +43,9 @@ public class FishUntilFullStrategy implements FishingStrategy {
     }
 
 
-    /**
-     * ignored
-     */
     @Override
-    public void start(FishState model) {
-
+    public void start(FishState model, Fisher fisher) {
+        //ignored
     }
 
     /**

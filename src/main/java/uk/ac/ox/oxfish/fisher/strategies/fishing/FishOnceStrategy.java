@@ -24,13 +24,9 @@ public class FishOnceStrategy implements FishingStrategy {
         return fisher.getPoundsCarried() == 0;
     }
 
-
-    /**
-     * ignored
-     */
     @Override
-    public void start(FishState model) {
-
+    public void start(FishState model, Fisher fisher) {
+        //ignored
     }
 
     /**

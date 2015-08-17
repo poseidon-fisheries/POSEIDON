@@ -7,7 +7,7 @@ import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import uk.ac.ox.oxfish.gui.DataCharter;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.data.DataColumn;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
     }
 
     /**
-     * if the class is a DataSet, build a list of buttons
+     * if the class is a TimeSeries, build a list of buttons
      */
     @Override
     public JComponent buildWidget(
@@ -51,11 +51,11 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             return null;
 
         try {
-            if (DataSet.class.isAssignableFrom(actualClass)) {
+            if (TimeSeries.class.isAssignableFrom(actualClass)) {
                 //create panel
                 //todo figure out to make this nested
 
-                return buildDataSetPanel((DataSet) PropertyUtils.getNestedProperty(metawidget.getToInspect(),
+                return buildDataSetPanel((TimeSeries) PropertyUtils.getNestedProperty(metawidget.getToInspect(),
                                                                                    attributes.get("name")));
 
             }
@@ -72,14 +72,14 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             //if it is a collection
             if (Collection.class.isAssignableFrom(actualClass) && parametrizedType != null) {
                 final Class<?> type = Class.forName(parametrizedType);
-                if(DataSet.class.isAssignableFrom(type)) {
-                    final Collection<DataSet> datasets = (Collection<DataSet>) PropertyUtils.getNestedProperty(
+                if(TimeSeries.class.isAssignableFrom(type)) {
+                    final Collection<TimeSeries> datasets = (Collection<TimeSeries>) PropertyUtils.getNestedProperty(
                             metawidget.getToInspect(),
                             attributes.get("name"));
                     //return a common tabbed pane
                     JTabbedPane many = new JTabbedPane();
                     int i=0;
-                    for(DataSet d : datasets)
+                    for(TimeSeries d : datasets)
                         many.add("data :" + i++,buildDataSetPanel(d));
                     return many;
                 }
@@ -95,9 +95,9 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             //if it is a map
             if (Map.class.isAssignableFrom(actualClass) && parametrizedType != null) {
 
-                if(DataSet.class.isAssignableFrom(whatIsTheMapHolding(parametrizedType)))
+                if(TimeSeries.class.isAssignableFrom(whatIsTheMapHolding(parametrizedType)))
                 {
-                    final Map<?, DataSet> datasets = (Map<?, DataSet>) PropertyUtils.getNestedProperty(
+                    final Map<?, TimeSeries> datasets = (Map<?, TimeSeries>) PropertyUtils.getNestedProperty(
                             metawidget.getToInspect(),
                             attributes.get("name"));
 
@@ -122,16 +122,16 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                     String typeOfType = parametrizedType.substring(parametrizedType.indexOf("<"),
                                                                    parametrizedType.lastIndexOf(">") + 1);
                     //is that a valid map?
-                    if(DataSet.class.isAssignableFrom(whatIsTheMapHolding(typeOfType)))
+                    if(TimeSeries.class.isAssignableFrom(whatIsTheMapHolding(typeOfType)))
                     {
-                        final Map<?,Map<?, DataSet>> datasets = (Map<?,Map<?, DataSet>>) PropertyUtils.getNestedProperty(
+                        final Map<?,Map<?, TimeSeries>> datasets = (Map<?,Map<?, TimeSeries>>) PropertyUtils.getNestedProperty(
                                 metawidget.getToInspect(),
                                 attributes.get("name"));
 
                         //return a common tabbed pane
                         JTabbedPane many = new JTabbedPane();
                         int i=0;
-                        for(Map.Entry<?, Map<?,DataSet>> md : datasets.entrySet())
+                        for(Map.Entry<?, Map<?,TimeSeries>> md : datasets.entrySet())
                         {
                             many.add(buildMapTabbedPane(md.getValue()));
                         }
@@ -152,11 +152,11 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         return null;
     }
 
-    public JComponent buildMapTabbedPane(Map<?, DataSet> datasets) {
+    public JComponent buildMapTabbedPane(Map<?, TimeSeries> datasets) {
         //return a common tabbed pane
         JTabbedPane many = new JTabbedPane();
         int i=0;
-        for(Map.Entry<?, DataSet> d : datasets.entrySet())
+        for(Map.Entry<?, TimeSeries> d : datasets.entrySet())
         {
                 many.add(d.getKey().toString(),buildDataSetPanel(d.getValue()));
         }
@@ -186,7 +186,7 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         }
     }
 
-    public JPanel buildDataSetPanel(final DataSet<?> dataset) {
+    public JPanel buildDataSetPanel(final TimeSeries<?> dataset) {
         //grab the actual data
         //contains the key
 

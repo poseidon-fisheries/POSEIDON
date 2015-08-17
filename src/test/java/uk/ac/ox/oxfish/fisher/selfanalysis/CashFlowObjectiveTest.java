@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.selfanalysis;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DailyFisherDataSet;
+import uk.ac.ox.oxfish.model.data.DailyFisherTimeSeries;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyInt;
@@ -19,7 +19,7 @@ public class CashFlowObjectiveTest
         //let's do it every 6 days
         CashFlowObjective objective = new CashFlowObjective(6);
         Fisher fisher = mock(Fisher.class);
-        DailyFisherDataSet data = new DailyFisherDataSet(0);
+        DailyFisherTimeSeries data = new DailyFisherTimeSeries(0);
         data.start(mock(FishState.class),fisher);
         when(fisher.getDailyData()).thenReturn(data);
         when(fisher.balanceXDaysAgo(anyInt())).thenCallRealMethod();

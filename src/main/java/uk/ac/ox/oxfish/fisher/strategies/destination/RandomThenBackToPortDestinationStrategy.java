@@ -57,7 +57,7 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
 
     }
 

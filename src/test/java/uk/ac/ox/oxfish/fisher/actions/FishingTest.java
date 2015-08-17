@@ -64,7 +64,7 @@ public class FishingTest {
                                          }
 
                                          @Override
-                                         public void start(FishState model) {
+                                         public void start(FishState model,Fisher fisher) {
 
                                          }
 
@@ -75,6 +75,7 @@ public class FishingTest {
                                      },
                                    new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
                                      new Hold(100.0, 1), gear );
+        fisher.start(fishState);
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);
 

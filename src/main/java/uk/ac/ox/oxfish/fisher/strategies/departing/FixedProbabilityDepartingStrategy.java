@@ -26,8 +26,8 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
      * ignored
      */
     @Override
-    public void start(FishState model) {
-        //nothing happens
+    public void start(FishState model,Fisher fisher) {
+
     }
 
     /**

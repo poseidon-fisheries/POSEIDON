@@ -35,16 +35,10 @@ public class MaximumDaysStrategy implements FishingStrategy
         return delegate.shouldFish(fisher, random, model) && fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome;
     }
 
-    /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
-     */
-    @Override
-    public void start(FishState model) {
 
-        delegate.start(model);
+    @Override
+    public void start(FishState model, Fisher fisher) {
+        delegate.start(model,fisher);
     }
 
     /**

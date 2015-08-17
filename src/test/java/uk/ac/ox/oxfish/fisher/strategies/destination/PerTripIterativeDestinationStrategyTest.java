@@ -43,7 +43,7 @@ public class PerTripIterativeDestinationStrategyTest {
         when(port.getLocation()).thenReturn(mock(SeaTile.class));
         when(fisher.getHomePort()).thenReturn(port);
 
-        hill.start(fishState);
+        hill.start(fishState,fisher);
         hill.getAlgorithm().start(fishState,fisher);
         SeaTile favoriteSpot=null;
         for(int i=0; i<1000; i++)

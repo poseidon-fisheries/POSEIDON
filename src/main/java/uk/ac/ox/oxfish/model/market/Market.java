@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.function.Function;
@@ -76,7 +76,7 @@ public interface Market extends Startable {
      * get the daily data of this market
      * @return
      */
-    DataSet<Market> getData();
+    TimeSeries<Market> getData();
 
     /**
      * how much do you intend to pay the next epsilon amount of biomass sold here

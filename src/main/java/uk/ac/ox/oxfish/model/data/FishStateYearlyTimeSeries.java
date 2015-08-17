@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.data;
 
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FishStateDailyDataSet;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 
@@ -13,13 +13,13 @@ import java.util.function.Function;
  * Aggregate data, yearly. Mostly just sums up what the daily data-set discovered
  * Created by carrknight on 6/29/15.
  */
-public class FishStateYearlyDataSet extends DataSet<FishState>
+public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 {
 
-    private final FishStateDailyDataSet originalGatherer;
+    private final FishStateDailyTimeSeries originalGatherer;
 
-    public FishStateYearlyDataSet(
-            FishStateDailyDataSet originalGatherer) {
+    public FishStateYearlyTimeSeries(
+            FishStateDailyTimeSeries originalGatherer) {
         super(IntervalPolicy.EVERY_YEAR, StepOrder.AGGREGATE_DATA_GATHERING);
         this.originalGatherer = originalGatherer;
     }

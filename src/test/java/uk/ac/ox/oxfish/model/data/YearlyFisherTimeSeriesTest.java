@@ -9,13 +9,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class YearlyFisherDataSetTest {
+public class YearlyFisherTimeSeriesTest {
 
 
     @Test
     public void testCash() throws Exception {
 
-        YearlyFisherDataSet yearlyGatherer = new YearlyFisherDataSet();
+        YearlyFisherTimeSeries yearlyGatherer = new YearlyFisherTimeSeries();
         Fisher fisher = mock(Fisher.class);
         when(fisher.getBankBalance()).thenReturn(0d);
         yearlyGatherer.start(mock(FishState.class), fisher);

@@ -61,7 +61,7 @@ public class MovingTest
                                          }
 
                                          @Override
-                                         public void start(FishState model) {
+                                         public void start(FishState model,Fisher fisher) {
 
                                          }
 
@@ -72,6 +72,7 @@ public class MovingTest
                                      },
                                      new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
                                      new Hold(100.0, 1), gear);
+        fisher.start(mock(FishState.class));
         //starts at port!
         assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
 
@@ -151,6 +152,7 @@ public class MovingTest
 
                                    mock(Hold.class),
                                      mock(Gear.class) );
+        fisher.start(mock(FishState.class));
 
         //should move and spend 20 hours doing so
         move.act(simple, fisher, new Anarchy(),24);
@@ -171,11 +173,13 @@ public class MovingTest
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
-        Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(), null, strategy,
+        Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(),
+                mock(DepartingStrategy.class), strategy,
                                      mock(FishingStrategy.class),
                                    new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
                                    mock(Hold.class), mock(Gear.class) );
 
+        fisher.start(mock(FishState.class));
 
         //should move and spend 20 hours doing so
         move.act(simple,fisher,new Anarchy() ,24);

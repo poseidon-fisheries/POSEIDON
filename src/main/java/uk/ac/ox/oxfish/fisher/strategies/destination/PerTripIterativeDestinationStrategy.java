@@ -81,15 +81,14 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
     /**
-     * ignored
+     * starts a per-trip adaptation
      */
     @Override
-    public void start(FishState model)
-    {
-        delegate.start(model);
+    public void start(FishState model, Fisher fisher) {
+        delegate.start(model,fisher);
+        this.fisher=fisher;
+        fisher.addPerTripAdaptation(algorithm);
     }
-
-
 
 
 
@@ -104,15 +103,6 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     @Override
     public SeaTile chooseDestination(
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        if(this.fisher == null)
-        {
-            this.fisher = fisher;
-            fisher.addPerTripAdaptation(algorithm);
-        }
-        else
-        {
-            Preconditions.checkArgument(fisher==this.fisher);
-        }
         return delegate.chooseDestination(fisher, random, model, currentAction);
     }
 

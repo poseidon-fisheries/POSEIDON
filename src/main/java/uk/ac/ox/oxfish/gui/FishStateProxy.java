@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.gui;
 
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FishStateDailyDataSet;
-import uk.ac.ox.oxfish.model.data.FishStateYearlyDataSet;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.FishStateYearlyTimeSeries;
 
 /**
  * This is a lofty name for a simple class. Basically takes all the variables
@@ -12,20 +12,20 @@ import uk.ac.ox.oxfish.model.data.FishStateYearlyDataSet;
  */
 public class FishStateProxy {
 
-    private final FishStateDailyDataSet dailyDataSet;
+    private final FishStateDailyTimeSeries dailyDataSet;
 
-    private final FishStateYearlyDataSet yearlyDataSet;
+    private final FishStateYearlyTimeSeries yearlyDataSet;
 
     public FishStateProxy(FishState state) {
         dailyDataSet = state.getDailyDataSet();
         yearlyDataSet = state.getYearlyDataSet();
     }
 
-    public FishStateDailyDataSet getDailyDataSet() {
+    public FishStateDailyTimeSeries getDailyDataSet() {
         return dailyDataSet;
     }
 
-    public FishStateYearlyDataSet getYearlyDataSet() {
+    public FishStateYearlyTimeSeries getYearlyDataSet() {
         return yearlyDataSet;
     }
 }

@@ -1,20 +1,20 @@
 package uk.ac.ox.oxfish.model;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 
-public class DataSetTest {
+public class TimeSeriesTest {
 
 
     @Test
     public void gathersCorrectly() throws Exception {
 
-        DataSet<String> gatherer = new DataSet<String>(IntervalPolicy.EVERY_YEAR) {
+        TimeSeries<String> gatherer = new TimeSeries<String>(IntervalPolicy.EVERY_YEAR) {
         };
 
         FishState state = mock(FishState.class);

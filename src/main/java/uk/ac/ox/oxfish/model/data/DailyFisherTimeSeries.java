@@ -5,21 +5,19 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.function.Function;
-
 /**
  * Dataset for each fisher being updated once a day
  * Created by carrknight on 8/4/15.
  */
-public class DailyFisherDataSet extends DataSet<Fisher> {
+public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
 
 
-    public static final String CASH_COLUMN = YearlyFisherDataSet.CASH_COLUMN;
+    public static final String CASH_COLUMN = YearlyFisherTimeSeries.CASH_COLUMN;
 
     private MovingAverage<Double>[] monthlyAverageCatch;
     private MovingAverage<Double>[] monthlyAverageEarnings;
 
-    public DailyFisherDataSet(int numberOfSpecies) {
+    public DailyFisherTimeSeries(int numberOfSpecies) {
         super(IntervalPolicy.EVERY_DAY);
         monthlyAverageCatch = new MovingAverage[numberOfSpecies];
         monthlyAverageEarnings = new MovingAverage[numberOfSpecies];

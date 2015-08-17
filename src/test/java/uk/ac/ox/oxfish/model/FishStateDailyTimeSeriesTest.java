@@ -3,8 +3,7 @@ package uk.ac.ox.oxfish.model;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 
@@ -15,12 +14,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class FishStateDailyDataSetTest {
+public class FishStateDailyTimeSeriesTest {
 
     @Test
     public void testAggregation() throws Exception {
 
-        FishStateDailyDataSet dataSet = new FishStateDailyDataSet();
+        FishStateDailyTimeSeries dataSet = new FishStateDailyTimeSeries();
 
         FishState state = mock(FishState.class);
         final NauticalMap map = mock(NauticalMap.class);
@@ -31,12 +30,12 @@ public class FishStateDailyDataSetTest {
         when(state.getSpecies()).thenReturn(Collections.singletonList(specie));
 
         //===> aggregate over two markets
-        Market market1 = mock(Market.class); DataSet<Market> data1 = mock(DataSet.class);
+        Market market1 = mock(Market.class); TimeSeries<Market> data1 = mock(TimeSeries.class);
         when(data1.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-100d);
         when(data1.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(100d);
         when(market1.getData()).thenReturn(data1);
 
-        Market market2 = mock(Market.class); DataSet<Market> data2 = mock(DataSet.class);
+        Market market2 = mock(Market.class); TimeSeries<Market> data2 = mock(TimeSeries.class);
         when(data2.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-200d);
         when(data2.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(200d);
         when(market2.getData()).thenReturn(data2);

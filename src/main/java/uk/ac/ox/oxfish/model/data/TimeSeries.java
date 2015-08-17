@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Basically a map<String,Double> to collect data about an object of type T
  * Created by carrknight on 5/2/15.
  */
-public class DataSet<T> implements Steppable
+public class TimeSeries<T> implements Steppable
 {
     final private Map<String,DataColumn> data;
 
@@ -90,7 +90,7 @@ public class DataSet<T> implements Steppable
     }
 
 
-    public DataSet(IntervalPolicy policy, StepOrder stepOrder) {
+    public TimeSeries(IntervalPolicy policy, StepOrder stepOrder) {
         this.policy = policy;
         this.stepOrder = stepOrder;
         data = new LinkedHashMap<>();
@@ -98,7 +98,7 @@ public class DataSet<T> implements Steppable
         gatherers = new HashMap<>();
     }
 
-    public DataSet(IntervalPolicy policy) {
+    public TimeSeries(IntervalPolicy policy) {
        this(policy,StepOrder.INDIVIDUAL_DATA_GATHERING);
     }
 

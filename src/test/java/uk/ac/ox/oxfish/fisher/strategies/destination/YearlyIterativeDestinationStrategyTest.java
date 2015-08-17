@@ -10,9 +10,7 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DailyFisherDataSet;
-import uk.ac.ox.oxfish.model.data.DataColumn;
-import uk.ac.ox.oxfish.model.data.YearlyFisherDataSet;
+import uk.ac.ox.oxfish.model.data.DailyFisherTimeSeries;
 
 import static org.mockito.Mockito.*;
 
@@ -40,7 +38,7 @@ public class YearlyIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
 
-        DailyFisherDataSet data = mock(DailyFisherDataSet.class);
+        DailyFisherTimeSeries data = mock(DailyFisherTimeSeries.class);
         when(data.numberOfObservations()).thenReturn(8000);
         when(fisher.getDailyData()).thenReturn(data);
 

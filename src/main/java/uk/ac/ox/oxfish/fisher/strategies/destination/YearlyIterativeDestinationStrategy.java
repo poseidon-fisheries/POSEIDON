@@ -39,18 +39,15 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
 
 
     private final Adaptation<SeaTile> algorithm;
-    private Fisher agent;
+
 
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
+     * starts a per-trip adaptation
      */
     @Override
-    public void start(FishState model)
-    {
-        delegate.start(model);
+    public void start(FishState model, Fisher fisher) {
+        delegate.start(model,fisher);
+        fisher.addYearlyAdaptation(algorithm);
     }
 
 
@@ -89,12 +86,6 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
     @Override
     public SeaTile chooseDestination(
             Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        if(this.agent == null) {
-            this.agent = fisher;
-            agent.addYearlyAdaptation(algorithm);
-        }
-        assert this.agent == fisher : "YearlyIterativeDestinationStrategy is a personal strategy and should not be shared";
-
         return delegate.chooseDestination(fisher,random,model,currentAction);
     }
 

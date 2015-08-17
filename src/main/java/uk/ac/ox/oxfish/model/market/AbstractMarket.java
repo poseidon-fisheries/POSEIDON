@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Counter;
 import uk.ac.ox.oxfish.model.data.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.DataSet;
+import uk.ac.ox.oxfish.model.data.TimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -23,7 +23,7 @@ public abstract class AbstractMarket implements Market {
     private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
 
 
-    private final DataSet<Market> dailyObservations = new DataSet<>(IntervalPolicy.EVERY_DAY);
+    private final TimeSeries<Market> dailyObservations = new TimeSeries<>(IntervalPolicy.EVERY_DAY);
 
     /**
      * flag to avoid starting multiple times if start is called repeatedly
@@ -112,7 +112,7 @@ public abstract class AbstractMarket implements Market {
     }
 
 
-    public DataSet<Market> getData() {
+    public TimeSeries<Market> getData() {
         return dailyObservations;
     }
 }

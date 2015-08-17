@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.data;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FishStateDailyDataSet;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 
 import java.util.ListIterator;
 import java.util.function.Function;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class FishStateYearlyDataSetTest {
+public class FishStateYearlyTimeSeriesTest {
 
 
     @Test
@@ -22,7 +22,7 @@ public class FishStateYearlyDataSetTest {
         final ListIterator iterator = mock(ListIterator.class);
         when(column.descendingIterator()).thenReturn(iterator);
 
-        FishStateYearlyDataSet dataSet = new FishStateYearlyDataSet(mock(FishStateDailyDataSet.class));
+        FishStateYearlyTimeSeries dataSet = new FishStateYearlyTimeSeries(mock(FishStateDailyTimeSeries.class));
         final Function<FishState, Double> summer = dataSet.columnSummer(column);
         when(iterator.hasNext()).thenReturn(true);
         when(iterator.next()).thenReturn(5d);

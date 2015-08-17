@@ -20,7 +20,7 @@ public enum StepOrder {
     POLICY_UPDATE(true),
 
     /**
-     * data is stored in DataSet objects
+     * data is stored in TimeSeries objects
      */
     INDIVIDUAL_DATA_GATHERING(false),
 

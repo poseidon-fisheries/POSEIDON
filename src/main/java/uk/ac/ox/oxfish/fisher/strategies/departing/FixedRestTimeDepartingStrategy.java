@@ -32,8 +32,8 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
     /**
      */
     @Override
-    public void start(FishState model) {
-//nothing
+    public void start(FishState model,Fisher fisher) {
+
     }
 
     /**

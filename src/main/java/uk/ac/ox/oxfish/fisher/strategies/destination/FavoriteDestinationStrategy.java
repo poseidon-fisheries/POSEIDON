@@ -34,7 +34,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
      * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
 
     }
 
