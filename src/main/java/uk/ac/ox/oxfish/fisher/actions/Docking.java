@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -45,9 +46,12 @@ public class Docking implements Action{
         {
             double biomass = toSell.getPoundsCaught(specie);
             assert  biomass>=0;
-            if(biomass>0)
-                //this should take care of everything
-                marketMap.sellFish(specie,biomass,agent, regulation,model);
+            if(biomass>0) {
+                //this should take care of everything including transferring cash
+                TradeInfo tradeInfo = marketMap.sellFish(specie, biomass, agent, regulation, model);
+                //bean counting happens here:
+                agent.processTradeData(tradeInfo);
+            }
         }
 
         //anchor/refill

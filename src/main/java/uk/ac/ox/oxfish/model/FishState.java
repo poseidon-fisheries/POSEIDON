@@ -65,6 +65,12 @@ public class FishState  extends SimState{
      */
     private SocialNetwork socialNetwork;
 
+    /**
+     * aggregate steppables for phases where there is no need for randomization
+     */
+    Map<StepOrder,AggregateSteppable> aggregateYearlySteppables = new EnumMap<>(StepOrder.class);
+    Map<StepOrder,AggregateSteppable> aggregateDailySteppables = new EnumMap<>(StepOrder.class);
+
     public int getStepsPerDay() {
         return stepsPerDay;
     }
@@ -91,6 +97,12 @@ public class FishState  extends SimState{
         this.stepsPerDay = stepsPerDay;
         toStart = new LinkedList<>();
 
+        for(StepOrder order : StepOrder.values())
+            if(!order.isToRandomize()) {
+                aggregateYearlySteppables.put(order, new AggregateSteppable());
+                aggregateDailySteppables.put(order, new AggregateSteppable());
+            }
+
     }
 
 
@@ -102,6 +114,14 @@ public class FishState  extends SimState{
     @Override
     public void start() {
         super.start();
+
+        //schedule aggregate steppables
+        for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateYearlySteppables.entrySet()  )
+            schedule.scheduleRepeating(steppable.getValue(),steppable.getKey().ordinal(), stepsPerDay*365);
+        for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateDailySteppables.entrySet()  )
+            schedule.scheduleRepeating(steppable.getValue(),steppable.getKey().ordinal(), stepsPerDay);
+
+
 
         ScenarioEssentials initialization = scenario.start(this);
 
@@ -121,7 +141,7 @@ public class FishState  extends SimState{
         map.start(this);
         //start the fishers
         for(Fisher fisher : fishers)
-                fisher.start(this);
+            fisher.start(this);
         //start the markets (for each port
         for(Port port : getPorts())
             for(Market market : port.getMarketMap().getMarkets())
@@ -129,9 +149,9 @@ public class FishState  extends SimState{
 
         //start everything else that required to be started
         for(Startable startable : toStart)
-                startable.start(this);
+            startable.start(this);
         for( Pair<Fisher,FisherStartable> startable : fisherStartables)
-                startable.getSecond().start(this,startable.getFirst());
+            startable.getSecond().start(this,startable.getFirst());
         dailyDataSet.start(this,this);
         yearlyDataSet.start(this,this);
         started=true;
@@ -232,7 +252,10 @@ public class FishState  extends SimState{
 
     public Stoppable scheduleEveryYear(Steppable steppable, StepOrder order)
     {
-        return schedule.scheduleRepeating(steppable,order.ordinal(),365* stepsPerDay);
+        if(order.isToRandomize())
+            return schedule.scheduleRepeating(steppable,order.ordinal(),365* stepsPerDay);
+        else
+            return aggregateYearlySteppables.get(order).add(steppable);
     }
 
     public Stoppable scheduleEveryStep(Steppable steppable, StepOrder order)
@@ -242,7 +265,10 @@ public class FishState  extends SimState{
 
     public Stoppable scheduleEveryDay(Steppable steppable, StepOrder order)
     {
-        return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay);
+        if(order.isToRandomize())
+            return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay);
+        else
+            return aggregateDailySteppables.get(order).add(steppable);
     }
 
 
@@ -354,4 +380,5 @@ public class FishState  extends SimState{
     public SocialNetwork getSocialNetwork() {
         return socialNetwork;
     }
+
 }

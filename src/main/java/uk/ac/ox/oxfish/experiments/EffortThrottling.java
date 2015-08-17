@@ -138,7 +138,7 @@ public class EffortThrottling {
         state.start();
         GearImitationAnalysis.attachGoingOutProbabilityToEveryone(state.getFishers(), state);
 
-        state.getMap().guiStart(state);
+   //     state.getMap().guiStart(state);
         state.schedule.step(state);
         System.out.println("start: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 

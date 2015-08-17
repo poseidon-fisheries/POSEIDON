@@ -155,4 +155,8 @@ public class DataSet<T> implements Steppable
     public IntervalPolicy getPolicy() {
         return policy;
     }
+
+    protected T getObserved() {
+        return observed;
+    }
 }

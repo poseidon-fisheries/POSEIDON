@@ -16,6 +16,9 @@ import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
@@ -37,6 +40,7 @@ public class FisherTest {
         Specie specie = new Specie("pippo");
         GlobalBiology biology = new GlobalBiology(specie);
         when(fishState.getBiology()).thenReturn(biology);
+        when(fishState.getSpecies()).thenReturn(Collections.singletonList(specie));
 
         double gasCostPerLiter = 10;
         double litersPerKm = 10;
@@ -62,8 +66,8 @@ public class FisherTest {
                                    new FishUntilFullStrategy(1.0),
                                    new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)),
                                    new Hold(2, 1), gear );
-        fisher.start(mock(FishState.class));
-        fishmarket.start(mock(FishState.class));
+        fisher.start(fishState);
+        fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(),1,.001);
@@ -109,6 +113,8 @@ public class FisherTest {
         Specie specie = new Specie("pippo");
         GlobalBiology biology = new GlobalBiology(specie);
         when(fishState.getBiology()).thenReturn(biology);
+        when(fishState.getSpecies()).thenReturn(Collections.singletonList(specie));
+
 
         double gasCostPerLiter = 10;
         double litersPerKm = 10;
@@ -137,8 +143,8 @@ public class FisherTest {
 
 
 
-        fisher.start(mock(FishState.class));
-        fishmarket.start(mock(FishState.class));
+        fisher.start(fishState);
+        fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 1,.001);

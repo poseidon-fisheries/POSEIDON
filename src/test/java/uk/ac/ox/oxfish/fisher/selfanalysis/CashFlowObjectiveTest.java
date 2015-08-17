@@ -19,7 +19,7 @@ public class CashFlowObjectiveTest
         //let's do it every 6 days
         CashFlowObjective objective = new CashFlowObjective(6);
         Fisher fisher = mock(Fisher.class);
-        DailyFisherDataSet data = new DailyFisherDataSet();
+        DailyFisherDataSet data = new DailyFisherDataSet(0);
         data.start(mock(FishState.class),fisher);
         when(fisher.getDailyData()).thenReturn(data);
         when(fisher.balanceXDaysAgo(anyInt())).thenCallRealMethod();

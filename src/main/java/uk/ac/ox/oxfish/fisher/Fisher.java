@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.*;
+import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
@@ -101,9 +102,11 @@ public class Fisher implements Steppable, Startable{
     /**
      * the data gatherer that fires every day
      */
-    private final DailyFisherDataSet dailyFisherDataSet = new DailyFisherDataSet();
+    private DailyFisherDataSet dailyFisherDataSet;
 
     private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
+
+    private FisherDailyCounter dailyCounter;
 
     private final LocationMemories<Catch> catchMemories = new LocationMemories<>(.99,300,2);
 
@@ -225,7 +228,8 @@ public class Fisher implements Steppable, Startable{
             Regulation regulation,
             //strategies:
             DepartingStrategy departingStrategy,
-            DestinationStrategy destinationStrategy, FishingStrategy fishingStrategy,
+            DestinationStrategy destinationStrategy,
+            FishingStrategy fishingStrategy,
             //equipment:
             Boat boat, Hold hold, Gear gear) {
         this.fisherID = id;
@@ -263,9 +267,13 @@ public class Fisher implements Steppable, Startable{
 
 
         //start datas
+        dailyFisherDataSet = new DailyFisherDataSet(state.getSpecies().size());
+        dailyFisherDataSet.start(state,this);
         yearlyDataGatherer.start(state, this);
         yearlyCounter.start(state);
-        dailyFisherDataSet.start(state, this);
+        dailyCounter = new FisherDailyCounter(state.getSpecies().size());
+        dailyCounter.start(state);
+        //daily counter needs to keep track of stuff
         tripLogger.start(state);
         catchMemories.start(state);
         tripMemories.start(state);
@@ -299,6 +307,8 @@ public class Fisher implements Steppable, Startable{
     public void turnOff() {
         receipt.stop();
         yearlyDataGatherer.turnOff();
+        dailyCounter.turnOff();
+        yearlyCounter.turnOff();
         dailyFisherDataSet.turnOff();
         tripLogger.turnOff();
         catchMemories.turnOff();
@@ -687,6 +697,19 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    /**
+     * grabs the data and learns about profits and such
+     * @param info information about a trade
+     */
+    public void processTradeData(TradeInfo info){
+
+        Specie specie = info.getSpecie();
+
+        dailyCounter.countLanding(specie, info.getBiomassTraded());
+        dailyCounter.countEarnings(specie,info.getMoneyExchanged());
+
+    }
+
 
     public double balanceXDaysAgo(int daysAgo)
     {
@@ -853,7 +876,7 @@ public class Fisher implements Steppable, Startable{
      * new hold
      * @param newHold
      */
-    public void setHold(Hold newHold)
+    public void changeHold(Hold newHold)
     {
 
         //unload old hold
@@ -867,5 +890,9 @@ public class Fisher implements Steppable, Startable{
 
     public double getHoursAtPort() {
         return hoursAtPort;
+    }
+
+    public FisherDailyCounter getDailyCounter() {
+        return dailyCounter;
     }
 }

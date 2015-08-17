@@ -8,14 +8,11 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.utility.maximization.Actuator;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
 import uk.ac.ox.oxfish.utility.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Run every two months, check how are you doing, then check a friend. If he is doing better than you have a small probability
@@ -139,7 +136,7 @@ public class GearImitationAnalysis implements FisherStartable
                     return new Hold(fisher.getMaximumLoad() * (.8 + .4 * random.nextDouble()),
                                     species);
                 }
-            }, (fisher1, change, model1) -> fisher1.setHold(change),
+            }, (fisher1, change, model1) -> fisher1.changeHold(change),
                     fisher1 -> {
                 //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
                 return new Hold(fisher1.getMaximumLoad(),species);
