@@ -38,8 +38,8 @@ public class GearImitationAnalysisTest
         when(best.getDirectedFriends()).thenReturn(Collections.singletonList(worst));
         when(worst.getDirectedFriends()).thenReturn(Collections.singletonList(best));
         //set their gear
-        Gear bestGear = mock(Gear.class); when(bestGear.cloneGear()).thenReturn(bestGear); when(best.getGear()).thenReturn(bestGear);
-        Gear worstGear = mock(Gear.class); when(worstGear.cloneGear()).thenReturn(worstGear); when(worst.getGear()).thenReturn(worstGear);
+        Gear bestGear = mock(Gear.class); when(bestGear.makeCopy()).thenReturn(bestGear); when(best.getGear()).thenReturn(bestGear);
+        Gear worstGear = mock(Gear.class); when(worstGear.makeCopy()).thenReturn(worstGear); when(worst.getGear()).thenReturn(worstGear);
 
 
         //objective function is better for best than for worst

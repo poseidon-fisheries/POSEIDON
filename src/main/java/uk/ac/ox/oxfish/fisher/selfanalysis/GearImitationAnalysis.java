@@ -35,7 +35,7 @@ public class GearImitationAnalysis implements FisherStartable
             List<Gear> gearAvailable, ObjectiveFunction<Fisher> objective) {
         algorithm = new Adaptation<>(fisher1 -> true,
                                                            new DiscreteRandomAlgorithm<Gear>(gearAvailable),
-                                                           (fisher1, change,model) -> fisher1.setGear(change.cloneGear()),
+                                                           (fisher1, change,model) -> fisher1.setGear(change.makeCopy()),
                                                            Fisher::getGear,
                                                            objective,probabilityRandomizing,probabilityImitating);
 

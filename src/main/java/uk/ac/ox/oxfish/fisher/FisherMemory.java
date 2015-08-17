@@ -121,4 +121,17 @@ public class FisherMemory implements Serializable, FisherStartable {
         dailyTimeSeries.turnOff();
 
     }
+
+    public TripRecord getLastFinishedTrip() {
+            return tripLogger.getLastFinishedTrip();
+
+    }
+
+
+    public double balanceXDaysAgo(int daysAgo)
+    {
+        //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
+        return dailyTimeSeries.getColumn(YearlyFisherTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+    }
+
 }

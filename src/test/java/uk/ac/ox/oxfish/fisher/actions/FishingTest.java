@@ -4,8 +4,7 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
@@ -58,8 +57,10 @@ public class FishingTest {
                                      new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                      new FishingStrategy() {
                                          @Override
-                                         public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
-                                                                   FishState model) {
+                                         public boolean shouldFish(
+                                                 FisherEquipment equipment, FisherStatus status,
+                                                 FisherMemory memory, MersenneTwisterFast random,
+                                                 FishState model) {
                                              return true;
                                          }
 

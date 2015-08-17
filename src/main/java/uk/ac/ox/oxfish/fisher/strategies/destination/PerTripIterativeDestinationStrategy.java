@@ -1,8 +1,10 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -95,15 +97,19 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     /**
      * decides where to go.
      *
-     * @param fisher        the agent that needs to choose
+     * @param equipment
+     * @param status
+     * @param memory
      * @param random        the randomizer. It probably comes from the fisher but I make explicit it might be needed
      * @param model         the model link
      * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
-        return delegate.chooseDestination(fisher, random, model, currentAction);
+            FisherEquipment equipment, FisherStatus status, FisherMemory memory, MersenneTwisterFast random,
+            FishState model,
+            Action currentAction) {
+        return delegate.chooseDestination(equipment, status, memory, random, model, currentAction);
     }
 
 

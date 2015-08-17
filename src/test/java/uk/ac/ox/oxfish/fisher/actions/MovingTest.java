@@ -5,8 +5,7 @@ import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
@@ -55,8 +54,10 @@ public class MovingTest
                                      new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                      new FishingStrategy() {
                                          @Override
-                                         public boolean shouldFish(Fisher fisher, MersenneTwisterFast random,
-                                                                   FishState model) {
+                                         public boolean shouldFish(
+                                                 FisherEquipment equipment, FisherStatus status,
+                                                 FisherMemory memory, MersenneTwisterFast random,
+                                                 FishState model) {
                                              return true;
                                          }
 
@@ -139,7 +140,8 @@ public class MovingTest
         //lots of crap to initialize.
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(),any(),any(),any())).thenReturn(map.getSeaTile(2, 0));
+        when(strategy.chooseDestination(any(), any(),any() ,
+                                        any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
 
         Fisher fisher = new Fisher(0, port,
                                      new MersenneTwisterFast(), new Anarchy(),
@@ -172,7 +174,7 @@ public class MovingTest
         //lots of crap to initialize.
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
+        when(strategy.chooseDestination(any(), any(), any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(),
                 mock(DepartingStrategy.class), strategy,
                                      mock(FishingStrategy.class),

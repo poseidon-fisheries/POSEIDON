@@ -3,8 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -38,6 +37,7 @@ public class YearlyIterativeDestinationStrategyTest {
         when(fisher.getHomePort()).thenReturn(port);
 
 
+
         DailyFisherTimeSeries data = mock(DailyFisherTimeSeries.class);
         when(data.numberOfObservations()).thenReturn(8000);
         when(fisher.getDailyData()).thenReturn(data);
@@ -52,8 +52,8 @@ public class YearlyIterativeDestinationStrategyTest {
 
 
         //step the hill-climber
-        hill.chooseDestination(fisher, fisher.grabRandomizer(), fishState, new Arriving()); //feed it the fisher
-        hill.getAlgorithm().start(fishState, fisher);
+
+        hill.getAlgorithm().start(fishState, mock(Fisher.class));
 
         //give it 1000 years!
         for(int i=0; i<1000; i++)

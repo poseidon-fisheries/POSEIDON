@@ -351,7 +351,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public boolean isAtPort() {
-        return this.getLocation().equals(status.getHomePort().getLocation());
+        return this.status.isAtPort();
     }
 
     /**
@@ -379,7 +379,7 @@ public class Fisher implements Steppable, Startable{
      * @param model the model
      */
     public boolean shouldFisherLeavePort(FishState model) {
-        return departingStrategy.shouldFisherLeavePort(this, model);
+        return departingStrategy.shouldFisherLeavePort(equipment,status,memory , model);
     }
 
     /**
@@ -396,7 +396,7 @@ public class Fisher implements Steppable, Startable{
             status.setDestination(status.getHomePort().getLocation());
         else
             status.setDestination(
-                    destinationStrategy.chooseDestination(this, status.getRandom(), model, currentAction));
+                    destinationStrategy.chooseDestination(equipment,status,memory , status.getRandom(), model, currentAction));
         Preconditions.checkNotNull(status.getDestination(), "Destination can never be null!");
     }
 
@@ -463,7 +463,11 @@ public class Fisher implements Steppable, Startable{
 
     public boolean shouldIFish(FishState state)
     {
-        return !status.isFuelEmergencyOverride() && fishingStrategy.shouldFish(this, status.getRandom(),state);
+        return !status.isFuelEmergencyOverride() && fishingStrategy.shouldFish(equipment,
+                                                                               status,
+                                                                               memory,
+                                                                               grabRandomizer(),
+                                                                               state);
 
     }
 
@@ -491,7 +495,7 @@ public class Fisher implements Steppable, Startable{
      * @return pounds carried
      */
     public double getPoundsCarried() {
-        return equipment.getHold().getTonnesCarried();
+        return equipment.getHold().getTotalPoundsCarried();
     }
 
     /**
@@ -540,8 +544,8 @@ public class Fisher implements Steppable, Startable{
 
         //consume gas
         final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,
-                                                                                                 equipment.getBoat(),
-                                                                                                 status.getLocation()) * hoursSpentFishing;
+                                                                                           equipment.getBoat(),
+                                                                                           status.getLocation()) * hoursSpentFishing;
         consumeFuel(litersBurned);
 
 
@@ -779,7 +783,7 @@ public class Fisher implements Steppable, Startable{
 
     public boolean isGoingToPort()
     {
-        return getDestination().equals(getHomePort().getLocation());
+        return status.isGoingToPort();
     }
 
 
@@ -807,4 +811,7 @@ public class Fisher implements Steppable, Startable{
     public FisherDailyCounter getDailyCounter() {
         return memory.getDailyCounter();
     }
+
+
+
 }

@@ -89,4 +89,15 @@ public class FishingSeason implements Regulation
     public int getDaysOpened() {
         return daysOpened;
     }
+
+
+    /**
+     * returns a copy of the regulation, used defensively
+     *
+     * @return
+     */
+    @Override
+    public Regulation makeCopy() {
+        return new FishingSeason(respectMPAs,daysOpened);
+    }
 }

@@ -2,6 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -25,8 +28,9 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
      * @return true if the fisherman wants to leave port.
      */
     @Override
-    public boolean shouldFisherLeavePort(Fisher fisher, FishState model) {
-        return fisher.getHoursAtPort() >= minimumHoursToWait;
+    public boolean shouldFisherLeavePort(
+            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+        return status.getHoursAtPort() >= minimumHoursToWait;
     }
 
     /**

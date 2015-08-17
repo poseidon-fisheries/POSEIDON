@@ -131,4 +131,14 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
     public void setQuotaRemaining(double quotaRemaining) {
         this.quotaRemaining = quotaRemaining;
     }
+
+    /**
+     * returns a copy of the regulation, used defensively
+     *
+     * @return
+     */
+    @Override
+    public Regulation makeCopy() {
+        return new MonoQuotaRegulation(yearlyQuota, null); //todo turn into startable so this makes more sense
+    }
 }

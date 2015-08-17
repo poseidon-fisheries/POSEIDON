@@ -29,5 +29,5 @@ public interface Gear {
             SeaTile where);
 
 
-    Gear cloneGear();
+    Gear makeCopy();
 }

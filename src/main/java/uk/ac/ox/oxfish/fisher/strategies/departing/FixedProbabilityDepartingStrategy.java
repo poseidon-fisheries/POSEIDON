@@ -2,7 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -33,13 +35,16 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     /**
      * The fisher asks himself if he wants to leave the warm comfort of his bed.
      *
-     * @param fisher the fisher who is deciding whether to move or not
-     * @param model the model. Not used
-     * @return true if the fisherman wants to leave port.
+     *
+     * @param equipment
+     * @param status
+     *@param memory
+     * @param model the model. Not used  @return true if the fisherman wants to leave port.
      */
     @Override
-    public boolean shouldFisherLeavePort(Fisher fisher, FishState model) {
-        return fisher.grabRandomizer().nextBoolean(probabilityToLeavePort);
+    public boolean shouldFisherLeavePort(
+            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+        return status.getRandom().nextBoolean(probabilityToLeavePort);
     }
 
 

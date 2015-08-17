@@ -160,6 +160,9 @@ public class Boat {
         return engine.getWeightInKg();
     }
 
+    public double getSpeedInKph() {
+        return engine.getSpeedInKph();
+    }
 
     public double getEfficiencyAsLitersPerKm() {
         return engine.getEfficiencyAsLitersPerKm();

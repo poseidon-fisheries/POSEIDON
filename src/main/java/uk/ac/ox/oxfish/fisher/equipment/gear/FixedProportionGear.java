@@ -22,7 +22,7 @@ public class FixedProportionGear implements Gear
     }
 
     @Override
-    public Gear cloneGear() {
+    public Gear makeCopy() {
         return new FixedProportionGear(proportionFished);
     }
 

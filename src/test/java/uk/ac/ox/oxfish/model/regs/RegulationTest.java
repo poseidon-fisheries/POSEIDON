@@ -55,7 +55,9 @@ public class RegulationTest {
         when(port.getLocation()).thenReturn(portTile);
         DestinationStrategy destination = mock(DestinationStrategy.class);
         SeaTile destinationTile = mock(SeaTile.class);
-        when(destination.chooseDestination(any(),any(),any(),any())).thenReturn(destinationTile);
+
+
+        when(destination.chooseDestination(any(), any(), any(), any(), any(), any())).thenReturn(destinationTile);
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(mock(NauticalMap.class));
 

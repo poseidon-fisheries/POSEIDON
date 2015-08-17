@@ -56,7 +56,7 @@ public class OneSpecieGear implements Gear {
     }
 
     @Override
-    public Gear cloneGear() {
+    public Gear makeCopy() {
         return new OneSpecieGear(targetedSpecie,proportionCaught);
     }
 }

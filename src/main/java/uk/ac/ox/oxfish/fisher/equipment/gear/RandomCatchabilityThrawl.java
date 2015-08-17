@@ -83,7 +83,7 @@ public class RandomCatchabilityThrawl implements Gear
     }
 
     @Override
-    public Gear cloneGear() {
+    public Gear makeCopy() {
         return new RandomCatchabilityThrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
                                      Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
                                      thrawlSpeed);

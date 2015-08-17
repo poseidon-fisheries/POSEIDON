@@ -3,6 +3,9 @@ package uk.ac.ox.oxfish.fisher.strategies;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 
 import static org.junit.Assert.*;
@@ -17,11 +20,16 @@ public class FixedProbabilityDepartingStrategyTest {
     public void alwaysDeparts() throws Exception {
 
         FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0);
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
 
-        for(int i=0; i<50;i++)
-            assertTrue(always.shouldFisherLeavePort(fisher, null));
+        FisherStatus status = mock(FisherStatus.class);
+        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
+
+
+        for(int i=0; i<50;i++) {
+            assertTrue(always.shouldFisherLeavePort(mock(FisherEquipment.class) ,
+                                                    status,
+                                                    mock(FisherMemory.class),null));
+        }
 
     }
 
@@ -29,11 +37,12 @@ public class FixedProbabilityDepartingStrategyTest {
     public void neverDeparts() throws Exception {
 
         FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0);
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
-
+        FisherStatus status = mock(FisherStatus.class);
+        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
         for(int i=0; i<50;i++)
-            assertFalse(never.shouldFisherLeavePort(fisher, null));
+            assertFalse(never.shouldFisherLeavePort(mock(FisherEquipment.class),
+                                                    status,
+                                                    mock(FisherMemory.class), null));
 
     }
 
@@ -42,12 +51,14 @@ public class FixedProbabilityDepartingStrategyTest {
     public void departsSometimes() throws Exception
     {
         FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5);
-        MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class); when(fisher.grabRandomizer()).thenReturn(random);
+        FisherStatus status = mock(FisherStatus.class);
+        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
 
         int departures = 0;
         for(int i=0; i<50;i++)
-            if(sometimes.shouldFisherLeavePort(fisher, null))
+            if(sometimes.shouldFisherLeavePort(mock(FisherEquipment.class),
+                                               status,
+                                               mock(FisherMemory.class), null))
                 departures++;
         assertTrue(departures < 50);
         assertTrue(departures > 0);

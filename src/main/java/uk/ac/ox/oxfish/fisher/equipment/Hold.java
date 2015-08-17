@@ -3,6 +3,8 @@ package uk.ac.ox.oxfish.fisher.equipment;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Arrays;
+
 /**
  * The inventory object of the ship. It has a maximum capacity. Any fish caught after reaching capacity is thrown overboard
  * Created by carrknight on 4/21/15.
@@ -75,7 +77,7 @@ public class Hold {
         }
     }
 
-    public double getTonnesCarried() {
+    public double getTotalPoundsCarried() {
         return tonnesCarried;
     }
 
@@ -107,6 +109,16 @@ public class Hold {
         fishHold = new double[fishHold.length];
         tonnesCarried = 0;
         assert consistencyCheck();
+        return toReturn;
+    }
+
+
+    public Hold makeCopy()
+    {
+        Hold toReturn = new Hold(maximumLoad,0);
+        toReturn.fishHold = Arrays.copyOf(fishHold,fishHold.length);
+        toReturn.tonnesCarried = this.tonnesCarried;
+        toReturn.maximumLoad = this.maximumLoad;
         return toReturn;
     }
 }

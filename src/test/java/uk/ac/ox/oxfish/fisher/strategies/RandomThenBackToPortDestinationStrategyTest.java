@@ -5,8 +5,7 @@ import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -45,19 +44,21 @@ public class RandomThenBackToPortDestinationStrategyTest {
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = new Fisher(0, port,
+        /*Fisher fisher = new Fisher(0, port,
                                      random, new Anarchy(),
                                      mock(DepartingStrategy.class),
                                      mock(DestinationStrategy.class), mock(FishingStrategy.class), mock(Boat.class),
                                      mock(Hold.class), mock(Gear.class));
-
+*/
+        FisherStatus status = new FisherStatus(random,new Anarchy(),port);
 
         //choose 100 times
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
         Action action = new AtPort();
         for(int i=0; i<100; i++)
         {
-            SeaTile destination = strategy.chooseDestination(fisher,random,model,action);
+            SeaTile destination = strategy.chooseDestination(mock(FisherEquipment.class),
+                    status,mock(FisherMemory.class),random, model, action);
             assertEquals(destination.getGridX(),0);
             assertTrue(destination.getAltitude() < 0);
         }
@@ -79,11 +80,11 @@ public class RandomThenBackToPortDestinationStrategyTest {
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class);
+        FisherStatus status = mock(FisherStatus.class);
         //FISHER IS AT SEA
-        when(fisher.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
-        when(fisher.getLocation()).thenReturn(map.getSeaTile(0,1)); //he's at 0,1
-        when(fisher.getHomePort()).thenReturn(port);
+        when(status.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
+        when(status.getLocation()).thenReturn(map.getSeaTile(0,1)); //he's at 0,1
+        when(status.getHomePort()).thenReturn(port);
 
         //he should decide to keep going 0,0
 
@@ -91,10 +92,11 @@ public class RandomThenBackToPortDestinationStrategyTest {
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
         for(int i=0; i<520; i++)
         {
-            SeaTile destination = strategy.chooseDestination(fisher,random,model,null);
+            SeaTile destination = strategy.chooseDestination(mock(FisherEquipment.class),
+                    status,mock(FisherMemory.class), random, model, null);
             assertEquals(destination.getGridX(),0);
             assertEquals(destination.getGridY(),0);
-            assertEquals(destination, fisher.getDestination());
+            assertEquals(destination, status.getDestination());
         }
 
 
@@ -115,11 +117,11 @@ public class RandomThenBackToPortDestinationStrategyTest {
         map.addPort(port);
         //create fisher
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Fisher fisher = mock(Fisher.class);
+        FisherStatus status = mock(FisherStatus.class);
         //FISHER IS AT SEA
-        when(fisher.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
-        when(fisher.getLocation()).thenReturn(map.getSeaTile(0,0)); //he's arrived
-        when(fisher.getHomePort()).thenReturn(port);
+        when(status.getDestination()).thenReturn(map.getSeaTile(0,0)); //he's going to 0,0
+        when(status.getLocation()).thenReturn(map.getSeaTile(0,0)); //he's arrived
+        when(status.getHomePort()).thenReturn(port);
 
         //he should decide to keep going 0,0
 
@@ -127,7 +129,8 @@ public class RandomThenBackToPortDestinationStrategyTest {
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
         for(int i=0; i<520; i++)
         {
-            SeaTile destination = strategy.chooseDestination(fisher,random,model,null);
+            SeaTile destination = strategy.chooseDestination(mock(FisherEquipment.class),
+                                                             status,mock(FisherMemory.class), random, model, null);
             assertEquals(destination.getGridX(),1);
             assertEquals(destination.getGridY(),1);
             assertEquals(destination,port.getLocation());

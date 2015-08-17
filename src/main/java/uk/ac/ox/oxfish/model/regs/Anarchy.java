@@ -49,4 +49,14 @@ public class Anarchy implements Regulation {
     public void reactToSale(Specie specie, double biomass, double revenue) {
 
     }
+
+    /**
+     * returns a copy of the regulation, used defensively
+     *
+     * @return
+     */
+    @Override
+    public Regulation makeCopy() {
+        return new Anarchy();
+    }
 }

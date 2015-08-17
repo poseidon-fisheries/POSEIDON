@@ -195,4 +195,39 @@ public class FisherStatus implements Serializable {
         this.fuelEmergencyOverride = false;
         network = null;
     }
+
+
+    /**
+     *
+     * @return true if destination == location
+     */
+    public boolean isAtDestination()
+    {
+        return destination.equals(location);
+    }
+
+    public boolean isGoingToPort()
+    {
+        return destination.equals(homePort.getLocation());
+    }
+
+    public boolean isAtPort() {
+        return homePort.getLocation().equals(location);
+    }
+
+
+    public FisherStatus makeCopy()
+    {
+        return new FisherStatus(random,
+                                                 regulation.makeCopy(),
+                                                 action,
+                                                 homePort,
+                                                 location,
+                                                 destination,
+                                                 hoursAtSea,
+                                                 hoursAtPort,
+                                                 bankBalance,
+                                                 fuelEmergencyOverride,
+                                                 network);
+    }
 }

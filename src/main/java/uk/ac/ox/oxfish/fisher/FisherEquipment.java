@@ -1,6 +1,9 @@
 package uk.ac.ox.oxfish.fisher;
 
+import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Engine;
+import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 
@@ -58,5 +61,29 @@ public class FisherEquipment implements Serializable {
         this.gear = gear;
     }
 
+    public double getTotalPoundsCarried() {
+        return hold.getTotalPoundsCarried();
+    }
 
+    public double getPoundsCarried(Specie specie) {
+        return hold.getPoundsCarried(specie);
+    }
+
+    public double getMaximumLoad() {
+        return hold.getMaximumLoad();
+    }
+
+    public double getPercentageFilled() {
+        return hold.getPercentageFilled();
+    }
+
+
+    public FisherEquipment makeCopy()
+    {
+        FuelTank tank = new FuelTank(boat.getFuelCapacityInLiters());
+        tank.refill();
+        tank.consume(tank.getFuelCapacityInLiters()-boat.getLitersOfFuelInTank());
+        return new FisherEquipment(new Boat(boat.getLength(),boat.getWidth(),new Engine(boat.getWeightInKg(),boat.getEfficiencyAsLitersPerKm(),boat.getSpeedInKph()),
+                                            tank),hold.makeCopy(),gear.makeCopy());
+    }
 }

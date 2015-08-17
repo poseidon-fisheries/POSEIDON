@@ -2,9 +2,10 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -49,28 +50,32 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
     /**
      * decides where to go.
      *
-     * @param fisher        the agent that needs to choose
+     * @param equipment
+     * @param status
+     * @param memory
      * @param random        the randomizer. It probably comes from the fisher but I make explicit it might be needed
      * @param model         the model link
      * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
      */
     @Override
     public SeaTile chooseDestination(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+            FisherEquipment equipment, FisherStatus status, FisherMemory memory, MersenneTwisterFast random,
+            FishState model,
+            Action currentAction) {
 
         //if we have arrived
         // or
         //we were going to port already
-        if(fisher.getLocation().equals(favoriteSpot))
+        if(status.getLocation().equals(favoriteSpot))
         {
             //go back home
-            return fisher.getHomePort().getLocation();
+            return status.getHomePort().getLocation();
         }
         else
         {
             //if we are going to port, keep going
-            if(!fisher.isAtDestination() && fisher.isGoingToPort() )
-                return fisher.getHomePort().getLocation();
+            if(!status.isAtDestination() && status.isGoingToPort() )
+                return status.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot
 //            assert  currentAction instanceof Moving || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock

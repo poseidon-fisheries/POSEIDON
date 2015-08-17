@@ -2,6 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -23,15 +26,18 @@ public class FishUntilFullStrategy implements FishingStrategy {
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
      * not to continue fishing
      *
-     * @param fisher the agent
+     *
+     * @param equipment
+     * @param status
+     *@param memory
      * @param random the randomizer
-     * @param model  the model itself
-     * @return true if the fisher should fish here, false otherwise
+     * @param model  the model itself   @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model) {
-        return fisher.getPoundsCarried() + EPSILON < fisher.getMaximumLoad() * minimumPercentageFull  ;
+            FisherEquipment equipment, FisherStatus status, FisherMemory memory, MersenneTwisterFast random,
+            FishState model) {
+        return equipment.getTotalPoundsCarried() + EPSILON < equipment.getMaximumLoad() * minimumPercentageFull  ;
     }
 
     public double getMinimumPercentageFull() {
