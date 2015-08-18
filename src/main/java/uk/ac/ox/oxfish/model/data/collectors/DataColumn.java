@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.data;
+package uk.ac.ox.oxfish.model.data.collectors;
 
 import java.util.Iterator;
 import java.util.LinkedList;

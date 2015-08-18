@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.data;
+package uk.ac.ox.oxfish.model.data.collectors;
 
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;

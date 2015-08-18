@@ -19,14 +19,15 @@ public class HourlyProfitInTripFunctionTest {
 
         Fisher fisher = mock(Fisher.class);
         TripLogger logger = new TripLogger();
+        logger.setNumberOfSpecies(1);
         logger.newTrip();
         logger.recordCosts(100);
-        logger.recordEarnings(100);
+        logger.recordEarnings(0,1,100);
         logger.finishTrip(10);
 
         logger.newTrip();
         logger.recordCosts(100);
-        logger.recordEarnings(200);
+        logger.recordEarnings(0,1,200);
         logger.finishTrip(10);
         when(fisher.getFinishedTrips()).thenReturn(logger.getFinishedTrips());
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());

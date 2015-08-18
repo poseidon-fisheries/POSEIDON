@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 
 import java.util.ListIterator;
 import java.util.function.Function;

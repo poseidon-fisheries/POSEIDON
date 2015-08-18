@@ -1,9 +1,13 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.stream.DoubleStream;
 
 /**
  * Holds summary statistics of a trip, specifically how much money was made and how much was spent.
@@ -29,14 +33,10 @@ public class TripRecord {
     private boolean completed = false;
 
     /**
-     * total cash earned
-     */
-    private double totalEarnings = 0;
-
-    /**
      * total costs accrued
      */
     private double totalCosts = 0;
+
 
     /**
      * the places where fishing occured
@@ -44,16 +44,36 @@ public class TripRecord {
     private final HashMap<SeaTile,Integer> tilesFished = new HashMap<>();
 
 
-    public TripRecord()
+    /**
+     * the weight/biomass of everything that was sold at the end of the trip
+     */
+    private final double[] finalCatch;
+
+    /**
+     * the total earnings per specie
+     */
+    private final double[] earningsPerSpecie;
+
+
+
+    public TripRecord(int numberOfSpecies)
     {
+        finalCatch = new double[numberOfSpecies];
+        earningsPerSpecie = new double[numberOfSpecies];
     }
 
 
-    public void recordEarnings(double newEarnings)
+    /**
+     *
+     */
+    public void recordEarnings(int specieIndex, double biomass, double earnings)
     {
-        Preconditions.checkState(!completed);
-        totalEarnings += newEarnings;
+
+        finalCatch[specieIndex] += biomass;
+        earningsPerSpecie[specieIndex] += earnings;
     }
+
+
 
 
     public void recordFishing(FishingRecord record)
@@ -88,9 +108,45 @@ public class TripRecord {
     public double getProfitPerHour()
     {
 
+        double totalEarnings = DoubleStream.of(earningsPerSpecie).sum();
         Preconditions.checkArgument(durationInHours > 0 == completed);
         return (totalEarnings - totalCosts) / durationInHours;
     }
+
+
+    /**
+     * returns the profit associated with a particular specie
+     * @param specie the specie index
+     * @return NAN if there was nothing caught for this specie, otherwise specie revenue - costs*(proportion of catch that is from this specie)
+     */
+    public  double getProfitPerSpecie(int specie)
+    {
+        if(finalCatch[specie]<= FishStateUtilities.EPSILON)
+            return Double.NaN;
+        double totalCatch = DoubleStream.of(finalCatch).sum();
+        assert  totalCatch > 0;
+        assert totalCatch >= finalCatch[specie];
+        double catchProportion = finalCatch[specie]/totalCatch;
+        assert  catchProportion > 0;
+        assert catchProportion <=1.0;
+
+
+        return earningsPerSpecie[specie]-totalCosts*catchProportion;
+    }
+
+    /**
+     * profit per specie/ catch of that specie
+     * @param specie the index this specie belongs to
+     * @return profit per unit of catch
+     */
+    public double getUnitProfitPerSpecie(int specie)
+    {
+        if(finalCatch[specie]<= FishStateUtilities.EPSILON)
+            return Double.NaN;
+        else
+            return getProfitPerSpecie(specie)/finalCatch[specie];
+    }
+
 
     public boolean isCutShort() {
         return cutShort;
@@ -112,4 +168,10 @@ public class TripRecord {
         return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
 
     }
+
+    public double[] getFinalCatch() {
+        return finalCatch;
+    }
+
+
 }

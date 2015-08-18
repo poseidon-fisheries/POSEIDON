@@ -4,12 +4,11 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.*;
-import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
 
 import static org.mockito.Mockito.*;
 

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.data.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 
 /**
  * The more money is gained in a fixed number of days, the better!

@@ -6,8 +6,8 @@ import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import uk.ac.ox.oxfish.gui.DataCharter;
 import uk.ac.ox.oxfish.gui.FishGUI;
-import uk.ac.ox.oxfish.model.data.DataColumn;
-import uk.ac.ox.oxfish.model.data.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 
 import javax.swing.*;
 import java.awt.*;

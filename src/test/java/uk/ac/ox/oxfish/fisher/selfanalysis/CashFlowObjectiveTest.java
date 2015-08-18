@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.selfanalysis;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyInt;

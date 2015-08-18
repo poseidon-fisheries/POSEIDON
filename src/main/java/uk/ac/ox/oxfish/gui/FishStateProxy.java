@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.gui;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 
 /**
  * This is a lofty name for a simple class. Basically takes all the variables

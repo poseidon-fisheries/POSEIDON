@@ -23,7 +23,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.*;
+import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
@@ -538,7 +541,7 @@ public class Fisher implements Steppable, Startable{
         getCurrentTrip().recordFishing(record);
         memory.getCatchMemories().memorize(catchOfTheDay, status.getLocation());
 
-        //now let regulations and hold deal with it
+        //now let regulations and the hold deal with it
         status.getRegulation().reactToCatch(catchOfTheDay);
         load(catchOfTheDay);
 
@@ -602,7 +605,6 @@ public class Fisher implements Steppable, Startable{
     public void earn(double moneyEarned)
     {
         status.setBankBalance(status.getBankBalance() + moneyEarned);
-        memory.getTripLogger().recordEarnings(moneyEarned);
     }
 
     public void spend(double moneySpent)
@@ -623,6 +625,8 @@ public class Fisher implements Steppable, Startable{
 
         memory.getDailyCounter().countLanding(specie, info.getBiomassTraded());
         memory.getDailyCounter().countEarnings(specie, info.getMoneyExchanged());
+        memory.getTripLogger().recordEarnings(specie.getIndex(),info.getBiomassTraded(),
+                                              info.getMoneyExchanged());
 
     }
 
@@ -682,8 +686,8 @@ public class Fisher implements Steppable, Startable{
         memory.getTripLogger().recordTripCutShort();
     }
 
-    public void recordEarnings(double newEarnings) {
-        memory.getTripLogger().recordEarnings(newEarnings);
+    public void recordEarnings(int specieIndex,double biomass ,double newEarnings) {
+        memory.getTripLogger().recordEarnings(specieIndex,biomass,newEarnings);
     }
 
     public void recordCosts(double newCosts) {

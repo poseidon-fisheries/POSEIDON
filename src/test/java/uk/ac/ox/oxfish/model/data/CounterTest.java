@@ -2,6 +2,8 @@ package uk.ac.ox.oxfish.model.data;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

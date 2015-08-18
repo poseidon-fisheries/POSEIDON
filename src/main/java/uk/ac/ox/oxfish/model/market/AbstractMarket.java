@@ -3,9 +3,9 @@ package uk.ac.ox.oxfish.model.market;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.Counter;
-import uk.ac.ox.oxfish.model.data.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
+import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**

@@ -29,7 +29,7 @@ import java.util.function.Function;
 
 class Main{
 
-    public static void temp(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
 
 
@@ -68,7 +68,7 @@ class Main{
     }
 
 
-    public static void main(String[] args) throws IOException
+    public static void temp(String[] args) throws IOException
     {
 
 

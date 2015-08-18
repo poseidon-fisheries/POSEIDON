@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.data;
+package uk.ac.ox.oxfish.model.data.collectors;
 
 /**
  * How often should something step, every day or every year?

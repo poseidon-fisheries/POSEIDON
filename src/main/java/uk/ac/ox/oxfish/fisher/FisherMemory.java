@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.model.data.*;
+import uk.ac.ox.oxfish.model.data.collectors.*;
 
 import java.io.Serializable;
 
@@ -69,6 +69,9 @@ public class FisherMemory implements Serializable, FisherStartable {
         return tripLogger;
     }
 
+
+
+
     public FisherMemory() {
         yearlyTimeSeries = new YearlyFisherTimeSeries();
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
@@ -92,10 +95,13 @@ public class FisherMemory implements Serializable, FisherStartable {
     @Override
     public void start(FishState model, Fisher fisher) {
         dailyTimeSeries = new DailyFisherTimeSeries(model.getSpecies().size());
-        dailyTimeSeries.start(model,fisher);
         yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
-        yearlyTimeSeries.start(model, fisher);
         dailyCounter = new FisherDailyCounter(model.getSpecies().size());
+
+        dailyTimeSeries.start(model, fisher);
+        yearlyTimeSeries.start(model, fisher);
+        yearlyCounter.start(model);
+        dailyCounter.start(model);
         tripLogger.start(model);
         catchMemories.start(model);
         tripMemories.start(model);
@@ -133,5 +139,6 @@ public class FisherMemory implements Serializable, FisherStartable {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
         return dailyTimeSeries.getColumn(YearlyFisherTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
     }
+
 
 }

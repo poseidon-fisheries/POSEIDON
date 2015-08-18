@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.fisher.log;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -31,12 +33,14 @@ public class TripLogger implements Startable
     private final Set<TripListener> listeners = new HashSet<>();
 
 
+    private int numberOfSpecies = -1;
+
     /**
      * ignored
      */
     @Override
     public void start(FishState model) {
-
+        numberOfSpecies = model.getSpecies().size();
     }
 
     /**
@@ -63,7 +67,7 @@ public class TripLogger implements Startable
     public void newTrip(){
         assert currentTrip == null || currentTrip.isCompleted(); //the other trip is over
         //just replace the old trip
-        currentTrip = new TripRecord();
+        currentTrip = new TripRecord(numberOfSpecies);
     }
 
     /**
@@ -94,9 +98,7 @@ public class TripLogger implements Startable
         currentTrip.recordCosts(newCosts);
     }
 
-    public void recordEarnings(double newEarnings) {
-        currentTrip.recordEarnings(newEarnings);
-    }
+
 
     public void recordTripCutShort() {
         currentTrip.recordTripCutShort();
@@ -108,5 +110,20 @@ public class TripLogger implements Startable
 
     public TripRecord getLastFinishedTrip() {
         return lastFinishedTrip;
+    }
+
+    /**
+     *
+     * @param specieIndex
+     * @param biomass
+     * @param earnings
+     */
+    public void recordEarnings(int specieIndex, double biomass, double earnings) {
+        currentTrip.recordEarnings(specieIndex, biomass, earnings);
+    }
+
+    @VisibleForTesting
+    public void setNumberOfSpecies(int numberOfSpecies) {
+        this.numberOfSpecies = numberOfSpecies;
     }
 }

@@ -39,6 +39,8 @@ public class Docking implements Action{
 
         //sell your stuff
         Catch toSell = agent.unload();
+        //log it
+
         GlobalBiology biology = model.getBiology();
 
         MarketMap marketMap =port.getMarketMap();

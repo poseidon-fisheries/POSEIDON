@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.data;
+package uk.ac.ox.oxfish.model.data.collectors;
 
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.model.FishState;

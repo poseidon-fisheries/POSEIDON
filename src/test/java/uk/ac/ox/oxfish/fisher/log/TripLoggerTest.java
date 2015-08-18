@@ -18,6 +18,7 @@ public class TripLoggerTest
 
         TripLogger logger = new TripLogger();
         logger.start(mock(FishState.class));
+        logger.setNumberOfSpecies(1);
 
         assertNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
@@ -26,12 +27,14 @@ public class TripLoggerTest
         assertNotNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
 
-        logger.recordEarnings(100);
+        logger.recordEarnings(0,100,100);
         logger.recordCosts(200);
         logger.finishTrip(10);
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
         assertEquals(logger.getCurrentTrip().getProfitPerHour(),-10,.001);
+        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0),-100,.001);
+        assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0),-1,.001);
         assertEquals(logger.getFinishedTrips().size(),1);
 
 
@@ -42,6 +45,8 @@ public class TripLoggerTest
 
         TripListener receiver = mock(TripListener.class);
         TripLogger logger = new TripLogger();
+        logger.setNumberOfSpecies(0);
+
         logger.addTripListener(receiver);
         logger.newTrip();
         TripRecord record = logger.getCurrentTrip();

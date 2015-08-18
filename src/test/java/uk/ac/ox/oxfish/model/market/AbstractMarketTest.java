@@ -5,7 +5,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.util.LinkedList;
 import java.util.List;

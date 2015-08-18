@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.data;
+package uk.ac.ox.oxfish.model.data.collectors;
 
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.Specie;
@@ -26,7 +26,7 @@ public class FisherDailyCounter extends Counter {
 
         for(int i=0; i<landings.length; i++)
         {
-            landings[i] =0;
+            landings[i]=0;
             earnings[i]=0;
         }
     }

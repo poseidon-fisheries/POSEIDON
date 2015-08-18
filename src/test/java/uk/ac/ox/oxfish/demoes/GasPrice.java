@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.model.data.DataColumn;
 
 import static uk.ac.ox.oxfish.experiments.BestGearWins.efficiencyImitation;
 
