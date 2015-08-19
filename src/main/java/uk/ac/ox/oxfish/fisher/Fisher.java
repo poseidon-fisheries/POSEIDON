@@ -15,6 +15,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.*;
+import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -32,10 +34,12 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
 import uk.ac.ox.oxfish.utility.maximization.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.maximization.AdaptationPerTripScheduler;
+import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * The boat catching all that delicious fish.
@@ -138,6 +142,17 @@ public class Fisher implements Steppable, Startable{
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
 
 
+    /*
+    private final MovingAveragePredictor dailyCatchesPredictor = MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
+                                                                                            fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
+                                                                                            90);
+
+    private final MovingAveragePredictor profitPerUnitPredictor = MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
+                                                                                               fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
+                                                                                                       0),
+                                                                                               30);
+*/
+
     /**
      * Creates a fisher by giving it all its sub-components
      * @param id the id-number of the fisher
@@ -150,7 +165,7 @@ public class Fisher implements Steppable, Startable{
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
      * @param gear what is used for fishing
-    \     */
+     */
     public Fisher(
             int id,
             Port homePort, MersenneTwisterFast random,
@@ -207,7 +222,10 @@ public class Fisher implements Steppable, Startable{
         //start the adaptations
         bimonthlyAdaptation.start(state,this);
         yearlyAdaptation.start(state,this);
-        tripAdaptation.start(state,this);
+        tripAdaptation.start(state, this);
+
+        //predictors
+
     }
 
     /**

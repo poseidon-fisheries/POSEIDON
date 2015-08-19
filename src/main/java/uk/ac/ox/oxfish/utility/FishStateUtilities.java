@@ -4,13 +4,18 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.security.CodeSource;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -202,4 +207,48 @@ public class FishStateUtilities {
     }
 
 
+    public static void printCSVColumnToFile(DataColumn column, File file)
+    {
+        try {
+            FileWriter writer = new FileWriter(file);
+            for (Double aColumn : column) {
+                writer.write(aColumn.toString());
+                writer.write("\n");
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static void pollHistogramToFile(Sensor<Double> poller, Collection<Fisher> fishers,
+                                           File file)
+    {
+       // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
+        ArrayList<String> histogram = new ArrayList<>(fishers.size());
+        for(Fisher fisher : fishers)
+        {
+
+            histogram.add(
+                    Double.toString(
+                            poller.scan(fisher)
+                    )
+            );
+        }
+
+        String csvColumn = histogram.stream().reduce((t, u) -> t + "\n" + u).get();
+
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(csvColumn);
+            writer.flush();
+            writer.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 }

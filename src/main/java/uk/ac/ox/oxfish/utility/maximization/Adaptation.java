@@ -178,7 +178,8 @@ public class Adaptation<T> implements FisherStartable {
 
         //imitate?
         Collection<Fisher> friends = friendsExtractor.apply(new Pair<>(toAdapt, random));
-        if(imitationProbability>0 && !friends.isEmpty() && random.nextBoolean(imitationProbability))
+        if(imitationProbability>0 && friends!=null &&
+                !friends.isEmpty() && random.nextBoolean(imitationProbability))
         {
 
             act(toAdapt,

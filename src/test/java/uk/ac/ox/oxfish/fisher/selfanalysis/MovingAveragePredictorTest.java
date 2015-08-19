@@ -18,7 +18,7 @@ public class MovingAveragePredictorTest {
 
 
         Sensor<Double> dummy = mock(Sensor.class);
-        MovingAveragePredictor predictor = new MovingAveragePredictor("ignored",dummy,30);
+        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored",dummy,30);
         assertEquals(Double.NaN,predictor.predict(),0);
 
     }
@@ -31,7 +31,7 @@ public class MovingAveragePredictorTest {
 
 
 
-        MovingAveragePredictor predictor = new MovingAveragePredictor("ignored",dummy,30);
+        MovingAveragePredictor predictor = MovingAveragePredictor.perTripMAPredictor("ignored", dummy, 30);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
 
@@ -54,7 +54,7 @@ public class MovingAveragePredictorTest {
 
 
 
-        MovingAveragePredictor predictor = new MovingAveragePredictor("ignored",dummy,10);
+        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored",dummy,10);
         assertEquals(Double.NaN, predictor.predict(), 0);
 
 

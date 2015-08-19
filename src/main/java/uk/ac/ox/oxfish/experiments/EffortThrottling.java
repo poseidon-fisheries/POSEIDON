@@ -5,13 +5,13 @@ import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.factory.CongestedMarketFactory;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
@@ -69,7 +69,7 @@ public class EffortThrottling {
         );
 
         //print out the price!
-        printCSVColumnToFile(
+        FishStateUtilities.printCSVColumnToFile(
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
                 ), root.resolve("variable_price.csv").toFile());
@@ -85,10 +85,10 @@ public class EffortThrottling {
 
         Preconditions.checkArgument(state.seed()==0);
 
-        printCSVColumnToFile(
+        FishStateUtilities.printCSVColumnToFile(
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
-                ), root.resolve("variable_price2.csv").toFile() );
+                ), root.resolve("variable_price2.csv").toFile());
         //self-regulating from above
         state = EffortThrottling.effortThrottling(80, market2,
                                                   0,
@@ -97,10 +97,10 @@ public class EffortThrottling {
                                                   root.resolve("variable_grid3.csv").toFile()
         );
 
-        printCSVColumnToFile(
+        FishStateUtilities.printCSVColumnToFile(
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
-                ), root.resolve("variable_price3.csv").toFile() );
+                ), root.resolve("variable_price3.csv").toFile());
 
 
 
@@ -151,7 +151,8 @@ public class EffortThrottling {
         System.out.println("end: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
         if(timeSeries != null)
-            printCSVColumnToFile(state.getDailyDataSet().getColumn("Probability to leave port"), timeSeries);
+            FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("Probability to leave port"),
+                                                    timeSeries);
         if(grid!=null)
             gridToCSV(state.getFishedMap().field,grid);
 
@@ -159,22 +160,6 @@ public class EffortThrottling {
         return state;
     }
 
-
-    public static void printCSVColumnToFile(DataColumn column, File file)
-    {
-        try {
-            FileWriter writer = new FileWriter(file);
-            for (Double aColumn : column) {
-                writer.write(aColumn.toString());
-                writer.write("\n");
-            }
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     public static void gridToCSV(double[][] grid, File file)
     {
