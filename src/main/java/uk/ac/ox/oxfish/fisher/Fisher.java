@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.*;
+import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -142,16 +143,21 @@ public class Fisher implements Steppable, Startable{
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
 
 
-    /*
-    private final MovingAveragePredictor dailyCatchesPredictor = MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
+
+    private Predictor[] dailyCatchesPredictor;
+            /*MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
                                                                                             fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
                                                                                             90);
+                                                                                            */
 
-    private final MovingAveragePredictor profitPerUnitPredictor = MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
+    private Predictor[] profitPerUnitPredictor;
+            /*
+            MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
                                                                                                fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
                                                                                                        0),
                                                                                                30);
-*/
+                                                                                               */
+
 
     /**
      * Creates a fisher by giving it all its sub-components
@@ -221,10 +227,21 @@ public class Fisher implements Steppable, Startable{
 
         //start the adaptations
         bimonthlyAdaptation.start(state,this);
-        yearlyAdaptation.start(state,this);
+        yearlyAdaptation.start(state, this);
         tripAdaptation.start(state, this);
 
         //predictors
+        dailyCatchesPredictor = new Predictor[state.getSpecies().size()];
+        profitPerUnitPredictor = new Predictor[state.getSpecies().size()];
+        for(int i=0; i<dailyCatchesPredictor.length; i++)
+        {
+            final int finalI = i;
+            dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
+            dailyCatchesPredictor[i].start(state,this);
+            profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
+            profitPerUnitPredictor[i].start(state,this);
+
+        }
 
     }
 
@@ -643,7 +660,7 @@ public class Fisher implements Steppable, Startable{
 
         memory.getDailyCounter().countLanding(specie, info.getBiomassTraded());
         memory.getDailyCounter().countEarnings(specie, info.getMoneyExchanged());
-        memory.getTripLogger().recordEarnings(specie.getIndex(),info.getBiomassTraded(),
+        memory.getTripLogger().recordEarnings(specie.getIndex(), info.getBiomassTraded(),
                                               info.getMoneyExchanged());
 
     }
@@ -705,7 +722,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public void recordEarnings(int specieIndex,double biomass ,double newEarnings) {
-        memory.getTripLogger().recordEarnings(specieIndex,biomass,newEarnings);
+        memory.getTripLogger().recordEarnings(specieIndex, biomass, newEarnings);
     }
 
     public void recordCosts(double newCosts) {
@@ -835,5 +852,43 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    public double predictUnitProfit(int specieIndex)
+    {
+        return profitPerUnitPredictor[specieIndex].predict();
+    }
+
+
+    public double predictDailyCatches(int specieIndex)
+    {
+        return dailyCatchesPredictor[specieIndex].predict();
+    }
+
+    public double probabilityDailyCatchesBelowLevel(int specieIndex, double level)
+    {
+        return dailyCatchesPredictor[specieIndex].probabilityBelowThis(level);
+    }
+
+
+    public void setDailyCatchesPredictor(int specieIndex, Predictor newPredictor)
+    {
+        if(state!=null)
+        {
+            newPredictor.start(state, this);
+            dailyCatchesPredictor[specieIndex].turnOff();
+        }
+        dailyCatchesPredictor[specieIndex] = newPredictor;
+
+    }
+
+    public void setProfitPerUnitPredictor(int specieIndex, Predictor newPredictor)
+    {
+        if(state!=null)
+        {
+            newPredictor.start(state, this);
+            profitPerUnitPredictor[specieIndex].turnOff();
+        }
+        profitPerUnitPredictor[specieIndex] = newPredictor;
+
+    }
 
 }

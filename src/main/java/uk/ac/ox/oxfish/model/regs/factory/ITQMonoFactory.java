@@ -14,7 +14,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 {
 
 
-    DoubleParameter individualQuota = new FixedDoubleParameter(1000);
+    DoubleParameter individualQuota = new FixedDoubleParameter(5000);
 
 
     /**

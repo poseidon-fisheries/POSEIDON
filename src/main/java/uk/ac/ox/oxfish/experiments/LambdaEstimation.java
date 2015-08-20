@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
+import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.model.FishState;
@@ -30,6 +31,7 @@ public class LambdaEstimation {
         PrototypeScenario scenario = new PrototypeScenario();
         FishState state = new FishState(0);
         state.setScenario(scenario);
+        scenario.setBiologyInitializer(new FromLeftToRightFactory());
 
         state.registerStartable(new Startable() {
             @Override
@@ -46,8 +48,13 @@ public class LambdaEstimation {
                     final MovingAveragePredictor profitPerUnitPredictor =
                             MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
 
-                                                                      fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(
-                                                                              0),
+                                                                      fisher1 -> {
+                                                                          if(fisher1.getID()==1)
+                                                                              System.out.println(fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(
+                                                                                      0));
+                                                                          return fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(
+                                                                                  0);
+                                                                      },
                                                                       30);
 
                     profitPerUnitPredictor.start(model, fisher);
@@ -59,7 +66,6 @@ public class LambdaEstimation {
                                                                    return Double.NaN;
                                                                double probability = 1 - dailyCatchesPredictor.probabilityBelowThis(
                                                                        1000 / (365 - state.getDayOfTheYear()));
-
                                                                return (probability * profitPerUnitPredictor.predict());
                                                            }, Double.NaN);
 

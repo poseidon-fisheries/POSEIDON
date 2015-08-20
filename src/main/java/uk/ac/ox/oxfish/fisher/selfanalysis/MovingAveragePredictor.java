@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -120,7 +121,9 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     public void step(SimState simState)
     {
 
-        averager.addObservation(sensor.scan(fisher));
+        Double observation = sensor.scan(fisher);
+        if(Double.isFinite(observation))
+            averager.addObservation(observation);
 
     }
 

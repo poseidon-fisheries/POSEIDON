@@ -26,7 +26,7 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     /**
      * the quota to use
      */
-    private DoubleParameter quota = new FixedDoubleParameter(1000);
+    private DoubleParameter quota = new FixedDoubleParameter(500000);
 
     /**
      * Applies this function to the given argument.

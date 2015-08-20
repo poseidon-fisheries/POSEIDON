@@ -16,7 +16,7 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysStrategy
     /**
      * how many DAYS (not steps) after which the fisher refuses to fish
      */
-    private DoubleParameter daysAtSea = new FixedDoubleParameter(10);
+    private DoubleParameter daysAtSea = new FixedDoubleParameter(5);
 
 
     /**
