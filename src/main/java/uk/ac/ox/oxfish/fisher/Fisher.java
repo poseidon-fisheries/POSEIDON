@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -35,12 +34,10 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
 import uk.ac.ox.oxfish.utility.maximization.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.maximization.AdaptationPerTripScheduler;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * The boat catching all that delicious fish.
@@ -403,7 +400,7 @@ public class Fisher implements Steppable, Startable{
         final double litersBought = equipment.getBoat().refill();
         status.setFuelEmergencyOverride(false);
         //now pay for it
-        spend(litersBought * status.getHomePort().getGasPricePerLiter());
+        spendForTrip(litersBought * status.getHomePort().getGasPricePerLiter());
 
         //finish trip!
         memory.getTripLogger().finishTrip(status.getHoursAtSea());
@@ -642,10 +639,27 @@ public class Fisher implements Steppable, Startable{
         status.setBankBalance(status.getBankBalance() + moneyEarned);
     }
 
-    public void spend(double moneySpent)
+    /**
+     * consumes money and record the expenditure in the trip record. Useful for things like gas expenditure and other immediate
+     * needs of the current trip in progress
+     * @param moneySpent
+     */
+    public void spendForTrip(double moneySpent)
     {
-        status.setBankBalance(status.getBankBalance() - moneySpent);
+        spendExogenously(moneySpent);
         memory.getTripLogger().recordCosts(moneySpent);
+
+    }
+
+
+    /**
+     * consumes the money but doesn't record the cost in the trip record. This is useful for expenditures like
+     * bank interest payments, quota buying and selling and other things that are not due to the immediate needs of the trip
+     * being taken
+     * @param moneySpent
+     */
+    public void spendExogenously(double moneySpent){
+        status.setBankBalance(status.getBankBalance() - moneySpent);
 
     }
 
