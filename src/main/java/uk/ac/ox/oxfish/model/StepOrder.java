@@ -22,7 +22,12 @@ public enum StepOrder {
     /**
      * data is stored in TimeSeries objects
      */
-    INDIVIDUAL_DATA_GATHERING(false),
+    DAILY_DATA_GATHERING(false),
+
+    /**
+     * data is stored in TimeSeries objects
+     */
+    YEARLY_DATA_GATHERING(false),
 
     /**
      * aggregate data usually access individual data that has just been stored, so it has to happen later

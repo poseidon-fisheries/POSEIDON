@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ListIterator;
 import java.util.function.Function;
@@ -25,11 +26,11 @@ public class FishStateYearlyTimeSeriesTest {
         when(column.descendingIterator()).thenReturn(iterator);
 
         FishStateYearlyTimeSeries dataSet = new FishStateYearlyTimeSeries(mock(FishStateDailyTimeSeries.class));
-        final Function<FishState, Double> summer = dataSet.columnSummer(column);
+        final Function<FishState, Double> summer = FishStateUtilities.generateYearlySum(column);
         when(iterator.hasNext()).thenReturn(true);
         when(iterator.next()).thenReturn(5d);
         final Double sum = summer.apply(mock(FishState.class));
-        Assert.assertEquals(sum,364*5,.001);
+        Assert.assertEquals(sum,365*5,.001);
 
 
     }

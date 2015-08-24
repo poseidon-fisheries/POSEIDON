@@ -130,6 +130,7 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
 
     public void setQuotaRemaining(double quotaRemaining) {
         this.quotaRemaining = quotaRemaining;
+        Preconditions.checkArgument(quotaRemaining >= 0);
     }
 
     /**

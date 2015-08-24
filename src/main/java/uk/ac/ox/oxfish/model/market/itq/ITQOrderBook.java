@@ -98,7 +98,7 @@ public class ITQOrderBook implements Steppable,Startable{
                             trader.getKey()));
                 }
                 //can I sell?
-                if (((MonoQuotaRegulation) trader.getKey().getRegulation()).getQuotaRemaining() >= unitsTradedPerMatch) {
+                if (((MonoQuotaRegulation) trader.getKey().getRegulation()).getQuotaRemaining() >= unitsTradedPerMatch ) {
                     double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
                                                 buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                             ;

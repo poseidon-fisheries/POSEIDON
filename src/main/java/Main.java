@@ -1,8 +1,7 @@
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.resources.JFreeChartResources;
 import sim.display.Console;
+import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
@@ -13,10 +12,9 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
-import uk.ac.ox.oxfish.utility.maximization.Actuator;
 import uk.ac.ox.oxfish.utility.maximization.Adaptation;
 import uk.ac.ox.oxfish.utility.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import javax.swing.*;
@@ -25,7 +23,6 @@ import java.awt.event.WindowEvent;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 class Main{
 
@@ -56,7 +53,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
 
-        FishState state = new FishState(System.currentTimeMillis(),1);
+        FishState state = new FishState(0,1);
         Log.set(Log.LEVEL_NONE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
 
@@ -68,7 +65,24 @@ class Main{
     }
 
 
-    public static void temp(String[] args) throws IOException
+
+
+    public static void temp2(String[] args){
+
+        FishState state = MarketFirstDemo.generateMarketedModel(MarketFirstDemo.MarketDemoPolicy.ITQ,
+                                                                new FixedDoubleParameter(.05),
+                                                                new FixedDoubleParameter(10));
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+        c.setVisible(true);
+
+
+
+    }
+
+
+
+    public static void temp1(String[] args) throws IOException
     {
 
 

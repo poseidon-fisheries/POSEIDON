@@ -15,10 +15,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.security.CodeSource;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -250,5 +247,30 @@ public class FishStateUtilities {
         catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * takes a column of daily observations and sum them up to generate a yearly observation
+     * @param column colun to sum over
+     * @return a sum or NAN if the column is empty
+     */
+     public static <T> Function<T, Double> generateYearlySum(final DataColumn column) {
+
+        return new Function<T, Double>() {
+            @Override
+            public Double apply(T state) {
+                //get the iterator
+                final Iterator<Double> iterator = column.descendingIterator();
+                if(!iterator.hasNext()) //not ready/year 1
+                    return Double.NaN;
+                double sum = 0;
+                for(int i=0; i<365; i++) {
+                    assert iterator.hasNext() : column.getName() + " " + i;
+                    sum += iterator.next();
+                }
+
+                return sum;
+            }
+        };
     }
 }

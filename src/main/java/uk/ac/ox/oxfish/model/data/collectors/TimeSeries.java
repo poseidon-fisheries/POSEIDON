@@ -99,7 +99,7 @@ public class TimeSeries<T> implements Steppable
     }
 
     public TimeSeries(IntervalPolicy policy) {
-       this(policy,StepOrder.INDIVIDUAL_DATA_GATHERING);
+       this(policy, policy.equals(IntervalPolicy.EVERY_YEAR) ? StepOrder.YEARLY_DATA_GATHERING : StepOrder.DAILY_DATA_GATHERING);
     }
 
     public boolean isEmpty(){

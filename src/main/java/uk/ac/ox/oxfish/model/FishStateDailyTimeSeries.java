@@ -20,7 +20,7 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
 
     public FishStateDailyTimeSeries() {
-        super(IntervalPolicy.EVERY_DAY,StepOrder.AGGREGATE_DATA_GATHERING);
+        super(IntervalPolicy.EVERY_DAY,StepOrder.YEARLY_DATA_GATHERING);
     }
 
     /**

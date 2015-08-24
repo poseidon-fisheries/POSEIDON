@@ -5,6 +5,9 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
+import uk.ac.ox.oxfish.model.market.AbstractMarket;
+
+import java.util.function.Function;
 
 /**
  * Dataset for each fisher being updated once a day
@@ -15,19 +18,11 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
 
     public static final String CASH_COLUMN = YearlyFisherTimeSeries.CASH_COLUMN;
 
-    private MovingAverage<Double>[] monthlyAverageCatch;
-    private MovingAverage<Double>[] monthlyAverageEarnings;
 
-    public DailyFisherTimeSeries(int numberOfSpecies) {
+
+    public DailyFisherTimeSeries() {
         super(IntervalPolicy.EVERY_DAY);
-  /*
-        monthlyAverageCatch = new MovingAverage[numberOfSpecies];
-        monthlyAverageEarnings = new MovingAverage[numberOfSpecies];
-        for(int i=0; i<numberOfSpecies; i++) {
-            monthlyAverageCatch[i] = new MovingAverage<>(90);
-            monthlyAverageEarnings[i] = new MovingAverage<>(90);
-        }
-        */
+
     }
 
     /**
@@ -40,18 +35,17 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
     public void start(FishState state, Fisher observed) {
 
         registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
-        /*
-        for(Specie specie : state.getSpecies())
 
+        for(Specie specie : state.getSpecies())
         {
-            registerGatherer("Average Quarterly Landings from " + specie,
-                             fisher -> monthlyAverageCatch[specie.getIndex()].getSmoothedObservation(),
+            final String landings = specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+
+            registerGatherer(landings,
+                             fisher -> fisher.getDailyCounter().getLandingsPerSpecie(specie.getIndex()),
                              Double.NaN);
-            registerGatherer("Average QuarterlyEarnings from " + specie,
-                             fisher -> monthlyAverageCatch[specie.getIndex()].getSmoothedObservation(),
-                             Double.NaN);
+
         }
-        */
+
         super.start(state, observed);
 
     }
