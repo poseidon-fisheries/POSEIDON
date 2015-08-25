@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -43,7 +44,8 @@ public class MarketFirstDemo {
     public static FishState generateMarketedModel(
             final MarketDemoPolicy policy,
             final DoubleParameter catchabilityMean,
-            final DoubleParameter gasInefficiency) {
+            final DoubleParameter gasInefficiency,
+            final long seed) {
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
         scenario.setCatchabilityMean(catchabilityMean);
@@ -63,7 +65,7 @@ public class MarketFirstDemo {
         }
 
 
-        FishState state = new FishState(System.currentTimeMillis(), 2);
+        FishState state = new FishState(seed, 2);
         state.setScenario(scenario);
 
 
@@ -120,359 +122,103 @@ public class MarketFirstDemo {
     public static void main(String[] args) throws IOException {
 
 
-        /*
 
-        d888888b d888888b  .d88b.
-          `88'   `~~88~~' .8P  Y8.
-           88       88    88    88
-           88       88    88    88
-          .88.      88    `8P  d8'
-        Y888888P    YP     `Y88'Y8
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","itqFixed.csv").toFile(),
+                                 10, 0);
 
-         */
-        //with itq:
-        FishState state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
-                                                                new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        Specie specie = state.getSpecies().get(0);
-        //now write to file
-        Paths.get("runs","market1").toFile().mkdirs();
-        FileWriter writer = new FileWriter(Paths.get("runs","market1","itqFixed.csv").toFile());
-        LinkedList<String> list = new LinkedList<>();
-        for(Fisher fisher : state.getFishers())
-        {
-            list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new FixedDoubleParameter(.1),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","tacFixed.csv").toFile(),
+                                 10, 0);
 
-        }
-        String toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-
-        /*
-
-d888888b  .d8b.   .o88b.
-`~~88~~' d8' `8b d8P  Y8
-   88    88ooo88 8P
-   88    88~~~88 8b
-   88    88   88 Y8b  d8
-   YP    YP   YP  `Y88P'
-
-         */
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.TAC,new FixedDoubleParameter(.1),
-                                                      new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","tacFixed.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
-
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-        /*
-
-        d888888b  .d88b.
-          `88'   .8P  Y8.
-           88    88    88
-           88    88    88
-          .88.   `8P  d8'
-        Y888888P  `Y88'Y8
-         */
-
-
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.IQ,new FixedDoubleParameter(.1),
-                                                      new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","iqFixed.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
-
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
+        generateAndRunMarketDemo(MarketDemoPolicy.IQ,new FixedDoubleParameter(.1),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","iqFixed.csv").toFile(),
+                                 10, 0);
 
 
 
-        DifferentEfficiency();
-        DifferentGas();
-    }
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new UniformDoubleParameter(0.05,0.3),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","itqSmooth.csv").toFile(),
+                                 10, 0);
 
-    
-    
-    public static void DifferentEfficiency() throws IOException {
-          /*
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new UniformDoubleParameter(0.05,0.3),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","tacSmooth.csv").toFile(),
+                                 10, 0);
 
-        d888888b d888888b  .d88b.
-          `88'   `~~88~~' .8P  Y8.
-           88       88    88    88 
-           88       88    88    88
-          .88.      88    `8P  d8'
-        Y888888P    YP     `Y88'Y8
-
-         */
-        //with itq:
-        FishState state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.ITQ,new UniformDoubleParameter(0.05,0.3),
-                                                                new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        Specie specie = state.getSpecies().get(0);
-        //now write to file
-        FileWriter writer = new FileWriter(Paths.get("runs","market1","itqSmooth.csv").toFile());
-        LinkedList<String> list = new LinkedList<>();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
-
-        }
-        String toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
+        generateAndRunMarketDemo(MarketDemoPolicy.IQ,new UniformDoubleParameter(0.05,0.3),
+                                 new FixedDoubleParameter(5),
+                                 Paths.get("runs","market1","iqSmooth.csv").toFile(),
+                                 10, 0);
 
 
-        /*
 
-d888888b  .d8b.   .o88b.
-`~~88~~' d8' `8b d8P  Y8
-   88    88ooo88 8P
-   88    88~~~88 8b
-   88    88   88 Y8b  d8
-   YP    YP   YP  `Y88P'
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
+                                 new UniformDoubleParameter(0,20),
+                                 Paths.get("runs","market1","itqOil.csv").toFile(),
+                                 10, 0);
 
-         */
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.TAC,new UniformDoubleParameter(0.05,0.3),
-                                                      new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","tacSmooth.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC, new FixedDoubleParameter(.1),
+                                 new UniformDoubleParameter(0, 20),
+                                 Paths.get("runs", "market1", "tacOil.csv").toFile(),
+                                 10, 0);
 
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-        /*
-
-        d888888b  .d88b.
-          `88'   .8P  Y8.
-           88    88    88
-           88    88    88
-          .88.   `8P  d8'
-        Y888888P  `Y88'Y8
-         */
+        generateAndRunMarketDemo(MarketDemoPolicy.IQ, new FixedDoubleParameter(.1),
+                                 new UniformDoubleParameter(0, 20),
+                                 Paths.get("runs", "market1", "iqOil.csv").toFile(),
+                                 10, 0);
 
 
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.IQ,new UniformDoubleParameter(0.05,0.3),
-                                                      new FixedDoubleParameter(5));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","iqSmooth.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
 
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
+
 
 
     }
 
 
-    public static void DifferentGas() throws IOException {
 
-
-        /*
-
-        d888888b d888888b  .d88b.
-          `88'   `~~88~~' .8P  Y8.
-           88       88    88    88
-           88       88    88    88
-          .88.      88    `8P  d8'
-        Y888888P    YP     `Y88'Y8
-
-         */
-        //with itq:
-        FishState state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
-                                                                new UniformDoubleParameter(0,20));
+    public static FishState generateAndRunMarketDemo(
+            final MarketDemoPolicy policy,
+            final DoubleParameter catchabilityMean,
+            final DoubleParameter gasInefficiency,
+            final File file, //nullable
+            final int yearsToRun,
+            final long seed) throws IOException {
+        FishState state = MarketFirstDemo.generateMarketedModel(policy, catchabilityMean,
+                                                                gasInefficiency, seed);
         state.start();
-        while(state.getYear()<10)
+        while(state.getYear()< yearsToRun)
             state.schedule.step(state);
         Specie specie = state.getSpecies().get(0);
         //now write to file
-        Paths.get("runs","market1").toFile().mkdirs();
-        FileWriter writer = new FileWriter(Paths.get("runs","market1","itqOil.csv").toFile());
-        LinkedList<String> list = new LinkedList<>();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
+        if(file != null) {
 
+            LinkedList<String> list = new LinkedList<>();
+            for(Fisher fisher : state.getFishers())
+            {
+                list.add(String.valueOf
+                        (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
+                                 + "," +
+                                 (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
+                                 + "," +
+                                 String.valueOf(
+                                         fisher.getLatestYearlyObservation(
+                                                 specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
+
+            }
+            String toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
+
+            Paths.get("runs", "market1").toFile().mkdirs();
+            FileWriter writer = new FileWriter(file);
+            writer.write(toWrite);
+            writer.flush();
+            writer.close();
         }
-        String toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-
-        /*
-
-d888888b  .d8b.   .o88b.
-`~~88~~' d8' `8b d8P  Y8
-   88    88ooo88 8P
-   88    88~~~88 8b
-   88    88   88 Y8b  d8
-   YP    YP   YP  `Y88P'
-
-         */
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.TAC,new FixedDoubleParameter(.1),
-                                                      new UniformDoubleParameter(0,20));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","tacOil.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
-
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-        /*
-
-        d888888b  .d88b.
-          `88'   .8P  Y8.
-           88    88    88
-           88    88    88
-          .88.   `8P  d8'
-        Y888888P  `Y88'Y8
-         */
-
-
-        state = MarketFirstDemo.generateMarketedModel(MarketDemoPolicy.IQ,new FixedDoubleParameter(.1),
-                                                      new UniformDoubleParameter(0,20));
-        state.start();
-        while(state.getYear()<10)
-            state.schedule.step(state);
-        specie = state.getSpecies().get(0);
-        //now write to file
-        writer = new FileWriter(Paths.get("runs","market1","iqOil.csv").toFile());
-        list.clear();
-        for(Fisher fisher : state.getFishers())
-        {
-             list.add(String.valueOf
-                    (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
-                             + "," +
-                             (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
-                             + "," +
-                             String.valueOf(
-                                     fisher.getLatestYearlyObservation(
-                                             specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
-
-        }
-        toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
-        writer.write(toWrite);
-        writer.flush();
-        writer.close();
-
-
-
+        return state;
     }
 
 }

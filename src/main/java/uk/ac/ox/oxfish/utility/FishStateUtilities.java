@@ -273,4 +273,35 @@ public class FishStateUtilities {
             }
         };
     }
+
+
+    /**
+     * taken from the c++ version here: http://www.codeproject.com/Articles/49723/Linear-correlation-and-statistical-functions
+     * which explains the minimalistic naming convention
+     */
+    public static double computeCorrelation(double[] x, double[] y)
+    {
+
+        //will regularize the unusual case of complete correlation
+        final double TINY=1.0e-20;
+        int j,n=x.length;
+        Double yt,xt,t,df;
+        Double syy=0.0,sxy=0.0,sxx=0.0,ay=0.0,ax=0.0;
+        for (j=0;j<n;j++) {
+            //finds the mean
+            ax += x[j];
+            ay += y[j];
+        }
+        ax /= n;
+        ay /= n;
+        for (j=0;j<n;j++) {
+            // compute correlation coefficient
+            xt=x[j]-ax;
+            yt=y[j]-ay;
+            sxx += xt*xt;
+            syy += yt*yt;
+            sxy += xt*yt;
+        }
+        return sxy/(Math.sqrt(sxx*syy)+TINY);
+    }
 }

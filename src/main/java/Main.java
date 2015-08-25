@@ -71,7 +71,8 @@ class Main{
 
         FishState state = MarketFirstDemo.generateMarketedModel(MarketFirstDemo.MarketDemoPolicy.ITQ,
                                                                 new FixedDoubleParameter(.05),
-                                                                new FixedDoubleParameter(10));
+                                                                new FixedDoubleParameter(10),
+                                                                System.currentTimeMillis());
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);
         c.setVisible(true);
