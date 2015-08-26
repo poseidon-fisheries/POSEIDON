@@ -16,7 +16,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * The quota gets counted only when the fish is sold at the market
  * Created by carrknight on 5/2/15.
  */
-public class MonoQuotaRegulation implements Regulation, Steppable {
+public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable {
 
 
     /**
@@ -120,7 +120,12 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
         return yearlyQuota;
     }
 
-    public double getQuotaRemaining() {
+    /**
+     * get quota remaining
+     * @param specieIndex ignored
+     * @return
+     */
+    public double getQuotaRemaining(int specieIndex) {
         return quotaRemaining;
     }
 
@@ -128,7 +133,12 @@ public class MonoQuotaRegulation implements Regulation, Steppable {
         this.yearlyQuota = yearlyQuota;
     }
 
-    public void setQuotaRemaining(double quotaRemaining) {
+    /**
+     * set total quota remaining. specie index is completely ignored
+     * @param specieIndex ignored since the quota is for any specie
+     * @param quotaRemaining the quota remaining
+     */
+    public void setQuotaRemaining(int specieIndex, double quotaRemaining) {
         this.quotaRemaining = quotaRemaining;
         Preconditions.checkArgument(quotaRemaining >= 0);
     }

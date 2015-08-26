@@ -43,6 +43,9 @@ public class Regulations
         CONSTRUCTORS.put("Mono-TAC", () -> TAC_MONO_FACTORY);
         NAMES.put(TACMonoFactory.class,"Mono-TAC");
 
+        CONSTRUCTORS.put("Mono-IQ", IQMonoFactory::new);
+        NAMES.put(IQMonoFactory.class,"Mono-IQ");
+
         CONSTRUCTORS.put("Mono-ITQ", ITQMonoFactory::new);
         NAMES.put(ITQMonoFactory.class,"Mono-ITQ");
 

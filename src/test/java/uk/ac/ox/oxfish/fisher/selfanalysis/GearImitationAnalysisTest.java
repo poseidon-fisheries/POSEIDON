@@ -92,7 +92,7 @@ public class GearImitationAnalysisTest
             Fisher fisher = new Fisher(i,mock(Port.class),new MersenneTwisterFast(),
                                        mock(Regulation.class),mock(DepartingStrategy.class),
                                        mock(DestinationStrategy.class),mock(FishingStrategy.class),
-                                       mock(Boat.class),mock(Hold.class),gear);
+                                       mock(Boat.class),mock(Hold.class),gear, state.getSpecies().size());
             GearImitationAnalysis analysis = new GearImitationAnalysis(0d, 1d, new LinkedList<>(), function);
 
             fishers.add(fisher);

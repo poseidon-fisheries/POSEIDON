@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
@@ -39,6 +40,9 @@ public class ITQOrderBook implements Steppable,Startable{
     private int unitsTradedPerMatch = 100;
 
 
+    private final int specieIndex;
+
+
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
      * or just to percolate a reference to the model
@@ -62,13 +66,13 @@ public class ITQOrderBook implements Steppable,Startable{
 
     }
 
-    public ITQOrderBook(MersenneTwisterFast random)
+    public ITQOrderBook(int specieIndex)
     {
 
         //create the queues holding on to the quotes
         asks = new PriorityQueue<>(100, Quote::compareTo);
         bids = new PriorityQueue<>(100, (o1, o2) -> -o1.compareTo(o2));
-
+        this.specieIndex = specieIndex;
 
     }
 
@@ -98,7 +102,7 @@ public class ITQOrderBook implements Steppable,Startable{
                             trader.getKey()));
                 }
                 //can I sell?
-                if (((MonoQuotaRegulation) trader.getKey().getRegulation()).getQuotaRemaining() >= unitsTradedPerMatch ) {
+                if (((MonoQuotaRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch ) {
                     double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
                                                 buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                             ;
@@ -127,21 +131,18 @@ public class ITQOrderBook implements Steppable,Startable{
         Quote bestBid = bids.remove();
         Quote bestAsk = asks.remove();
         //does somebody want to trade?
-        if(bestAsk.getPrice() > bestBid.getPrice())
-            return; //best sale price is above best buy price; this trading day is overrrrr
-        else
-        {
+        if (bestAsk.getPrice() <= bestBid.getPrice()) {
 
             double tradingPrice = bestAsk.getPrice();
             assert tradingPrice >= bestAsk.getPrice();
             assert tradingPrice <=bestBid.getPrice();
 
             //now trade!
-            MonoQuotaRegulation buyerQuota = (MonoQuotaRegulation) bestBid.getTrader().getRegulation();
-            MonoQuotaRegulation sellerQuota = (MonoQuotaRegulation) bestAsk.getTrader().getRegulation();
+            QuotaPerSpecieRegulation buyerQuota = (QuotaPerSpecieRegulation) bestBid.getTrader().getRegulation();
+            QuotaPerSpecieRegulation sellerQuota = (QuotaPerSpecieRegulation) bestAsk.getTrader().getRegulation();
 
-            buyerQuota.setQuotaRemaining(buyerQuota.getQuotaRemaining()+unitsTradedPerMatch);
-            sellerQuota.setQuotaRemaining(sellerQuota.getQuotaRemaining()-unitsTradedPerMatch);
+            buyerQuota.setQuotaRemaining(specieIndex, buyerQuota.getQuotaRemaining(specieIndex)+unitsTradedPerMatch);
+            sellerQuota.setQuotaRemaining(specieIndex, sellerQuota.getQuotaRemaining(specieIndex)-unitsTradedPerMatch);
             bestBid.getTrader().spendExogenously(unitsTradedPerMatch * tradingPrice);
             bestAsk.getTrader().earn(unitsTradedPerMatch * tradingPrice);
             counter.count(QUOTA_COLUMN_NAME, unitsTradedPerMatch);
@@ -150,7 +151,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
 
 
-            assert sellerQuota.getQuotaRemaining()>=0;
+            assert sellerQuota.getQuotaRemaining(specieIndex)>=0;
 
             //again!
             clearQuotes(random);

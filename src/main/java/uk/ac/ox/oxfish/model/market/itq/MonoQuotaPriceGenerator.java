@@ -5,8 +5,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
-import java.util.function.Function;
-
 /**
  * A simple method to compute quota values for agents. Works in isolation, that is considers the value of a quota
  * by the unit profit of the specie caught and not by the bottleneck effect it might have as a choke specie for other
@@ -63,7 +61,7 @@ public class MonoQuotaPriceGenerator implements FisherStartable
             return Double.NaN;
         double probability = 1 - fisher.probabilityDailyCatchesBelowLevel(
                 specieIndex,
-                 quotas.getQuotaRemaining() / (365 - state.getDayOfTheYear()));
+                 quotas.getQuotaRemaining(specieIndex) / (365 - state.getDayOfTheYear()));
 
         return  (probability * fisher.predictUnitProfit(specieIndex));
 

@@ -72,7 +72,7 @@ public class MovingTest
                                          }
                                      },
                                      new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
-                                     new Hold(100.0, 1), gear);
+                                     new Hold(100.0, 1), gear, 1);
         fisher.start(mock(FishState.class));
         //starts at port!
         assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
@@ -153,7 +153,7 @@ public class MovingTest
 
 
                                    mock(Hold.class),
-                                     mock(Gear.class) );
+                                     mock(Gear.class),1);
         fisher.start(mock(FishState.class));
 
         //should move and spend 20 hours doing so
@@ -179,7 +179,7 @@ public class MovingTest
                 mock(DepartingStrategy.class), strategy,
                                      mock(FishingStrategy.class),
                                    new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
-                                   mock(Hold.class), mock(Gear.class) );
+                                   mock(Hold.class), mock(Gear.class), 1);
 
         fisher.start(mock(FishState.class));
 

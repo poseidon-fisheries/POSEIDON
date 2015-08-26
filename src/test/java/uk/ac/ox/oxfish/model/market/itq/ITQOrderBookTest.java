@@ -18,7 +18,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(new MersenneTwisterFast());
+        ITQOrderBook orderBook = new ITQOrderBook(0);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
@@ -43,8 +43,8 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //they should have exchanged quotas!
-        assertEquals(buyerReg.getQuotaRemaining(), 200,.0001);
-        assertEquals(sellerReg.getQuotaRemaining(),0,.0001);
+        assertEquals(buyerReg.getQuotaRemaining(0), 200,.0001);
+        assertEquals(sellerReg.getQuotaRemaining(0),0,.0001);
         assertEquals(orderBook.getDailyMatches(),1,.0001);
         assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
         assertEquals(orderBook.getDailyQuotasExchanged(),100,.0001);
@@ -62,7 +62,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(new MersenneTwisterFast());
+        ITQOrderBook orderBook = new ITQOrderBook(0);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
@@ -88,8 +88,8 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //no trading
-        assertEquals(buyerReg.getQuotaRemaining(), 100, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(), 100, .0001);
+        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        assertEquals(sellerReg.getQuotaRemaining(0), 100, .0001);
         //no money exchange
         verify(buyer,never()).spendExogenously(anyDouble());
         verify(buyer,never()).earn(anyDouble());
@@ -110,7 +110,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(new MersenneTwisterFast());
+        ITQOrderBook orderBook = new ITQOrderBook(0);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
@@ -135,8 +135,8 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //no trading
-        assertEquals(buyerReg.getQuotaRemaining(), 100, .0001);
-        assertEquals(sellerReg.getQuotaRemaining(), 50, .0001);
+        assertEquals(buyerReg.getQuotaRemaining(0), 100, .0001);
+        assertEquals(sellerReg.getQuotaRemaining(0), 50, .0001);
         //no money exchange
         verify(buyer,never()).spendExogenously(anyDouble());
         verify(buyer,never()).earn(anyDouble());
@@ -160,7 +160,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(new MersenneTwisterFast());
+        ITQOrderBook orderBook = new ITQOrderBook(0);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
@@ -182,11 +182,11 @@ public class ITQOrderBookTest {
 
         orderBook.step(state);
         //some bought, some sold
-        assertEquals(regs[4].getQuotaRemaining(), 200, .0001);
-        assertEquals(regs[3].getQuotaRemaining(), 200, .0001);
-        assertEquals(regs[2].getQuotaRemaining(), 100, .0001);
-        assertEquals(regs[1].getQuotaRemaining(), 0, .0001);
-        assertEquals(regs[0].getQuotaRemaining(), 0, .0001);
+        assertEquals(regs[4].getQuotaRemaining(0), 200, .0001);
+        assertEquals(regs[3].getQuotaRemaining(0), 200, .0001);
+        assertEquals(regs[2].getQuotaRemaining(0), 100, .0001);
+        assertEquals(regs[1].getQuotaRemaining(0), 0, .0001);
+        assertEquals(regs[0].getQuotaRemaining(0), 0, .0001);
 
         assertEquals(orderBook.getDailyMatches(), 2, .0001);
         assertEquals(orderBook.getDailyAveragePrice(), (100.01+200.01)/2, .0001); //with no markup there is a default 0.01 increase in prices so that bids and sells don't cross

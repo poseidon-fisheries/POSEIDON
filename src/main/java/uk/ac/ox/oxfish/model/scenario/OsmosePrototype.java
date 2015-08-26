@@ -219,7 +219,8 @@ public class OsmosePrototype implements Scenario {
                                       fishingStrategy.apply(model),
                                       new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
                                                new FuelTank(fuelCapacity)),                                      new Hold(capacity, biology.getSize()),
-                                      new OneSpecieGear(biology.getSpecie(0),efficiency)));
+                                      new OneSpecieGear(biology.getSpecie(0),efficiency),
+                                      model.getSpecies().size()));
         }
 
         SocialNetwork network = new SocialNetwork(networkBuilder);

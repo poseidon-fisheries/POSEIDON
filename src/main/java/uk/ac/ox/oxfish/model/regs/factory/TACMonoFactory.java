@@ -42,16 +42,16 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
         modelQuota.putIfAbsent(state,new MonoQuotaRegulation(yearlyQuota,state));
         final MonoQuotaRegulation quotaRegulation = modelQuota.get(state);
         //if it has not been consumed (probably because the model still has to start) then:
-        if(quotaRegulation.getQuotaRemaining() > 0 &&
-                Math.abs(quotaRegulation.getQuotaRemaining()-quotaRegulation.getYearlyQuota())<.1)
-            quotaRegulation.setQuotaRemaining(yearlyQuota);
+        if(quotaRegulation.getQuotaRemaining(0) > 0 &&
+                Math.abs(quotaRegulation.getQuotaRemaining(0)-quotaRegulation.getYearlyQuota())<.1)
+            quotaRegulation.setQuotaRemaining(0, yearlyQuota);
 
         //set yearly quota (notice that this will affect everyone)
         quotaRegulation.setYearlyQuota(yearlyQuota);
 
         //don't let quota remaining be above yearly quota though
-        if(quotaRegulation.getQuotaRemaining() > quotaRegulation.getYearlyQuota())
-            quotaRegulation.setQuotaRemaining(yearlyQuota);
+        if(quotaRegulation.getQuotaRemaining(0) > quotaRegulation.getYearlyQuota())
+            quotaRegulation.setQuotaRemaining(0, yearlyQuota);
 
         return quotaRegulation;
 

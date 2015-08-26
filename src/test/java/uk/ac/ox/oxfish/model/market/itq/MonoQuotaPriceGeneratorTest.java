@@ -37,7 +37,7 @@ public class MonoQuotaPriceGeneratorTest {
         assertEquals(5, gen.computeLambda(), .0001);
 
         //change quotas
-        regulation.setQuotaRemaining(200);
+        regulation.setQuotaRemaining(0, 200);
         when(fisher.probabilityDailyCatchesBelowLevel(3,200)).thenReturn(0d);
         assertEquals(10, gen.computeLambda(), .0001);
 

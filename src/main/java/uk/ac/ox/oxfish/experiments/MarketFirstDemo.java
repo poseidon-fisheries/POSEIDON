@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
+import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -58,10 +59,20 @@ public class MarketFirstDemo {
             TACMonoFactory regulation = new TACMonoFactory();
             regulation.setQuota(new FixedDoubleParameter(400000));
             scenario.setRegulation(regulation);
-        } else {
+            scenario.setUsePredictors(false);
+
+        } else if (policy.equals(MarketDemoPolicy.IQ))  {
+            IQMonoFactory regulation = new IQMonoFactory();
+            regulation.setIndividualQuota(new FixedDoubleParameter(4000));
+            scenario.setRegulation(regulation);
+            scenario.setUsePredictors(false);
+
+        } else
+        {
             ITQMonoFactory regulation = new ITQMonoFactory();
             regulation.setIndividualQuota(new FixedDoubleParameter(4000));
             scenario.setRegulation(regulation);
+            scenario.setUsePredictors(true);
         }
 
 
@@ -69,51 +80,6 @@ public class MarketFirstDemo {
         state.setScenario(scenario);
 
 
-        //if it's tradeable quota, create the market
-        if (policy.equals(MarketDemoPolicy.ITQ)) {
-            state.registerStartable(new Startable() {
-                @Override
-                public void start(FishState model) {
-
-                    ITQOrderBook market = new ITQOrderBook(model.getRandom());
-                    market.start(model);
-
-                    for (Fisher fisher : model.getFishers()) {
-
-                        //create the predictors
-                        fisher.setDailyCatchesPredictor(0,
-                                                        MovingAveragePredictor.dailyMAPredictor(
-                                                                "Predicted Daily Catches",
-                                                                fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                        0),
-                                                                90));
-                        fisher.setProfitPerUnitPredictor(0, MovingAveragePredictor.perTripMAPredictor(
-                                "Predicted Unit Profit",
-                                fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(0),
-                                30));
-
-
-                        //create price maker
-                        MonoQuotaPriceGenerator lambdaer = new MonoQuotaPriceGenerator(0);
-                        lambdaer.start(model, fisher);
-                        market.registerTrader(fisher, lambdaer);
-
-
-                    }
-
-                    model.getDailyDataSet().registerGatherer("ITQ Trades", state1 -> market.getDailyMatches(),
-                                                             Double.NaN);
-                    model.getDailyDataSet().registerGatherer("ITQ Prices", state1 -> market.getDailyAveragePrice(),
-                                                             Double.NaN);
-
-                }
-
-                @Override
-                public void turnOff() {
-
-                }
-            });
-        }
 
         return state;
     }

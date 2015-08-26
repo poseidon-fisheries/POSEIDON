@@ -50,7 +50,7 @@ public class FisherEvolutionTest {
                                      mock(DestinationStrategy.class),
                                      mock(FishingStrategy.class),
                                      mock(Boat.class), mock(Hold.class),
-                                     mock(Gear.class) ));
+                                     mock(Gear.class),1));
 
         DoubleGene gene = DoubleGene.of(0.5,0,1);
 

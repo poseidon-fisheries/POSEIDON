@@ -71,7 +71,7 @@ public class RegulationTest {
                                      destination,
                                      mock(FishingStrategy.class),
                                    mock,
-                                     mock(Hold.class), mock(Gear.class) );
+                                     mock(Hold.class), mock(Gear.class),0);
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);
         fisher.updateDestination(model,mock(Action.class));

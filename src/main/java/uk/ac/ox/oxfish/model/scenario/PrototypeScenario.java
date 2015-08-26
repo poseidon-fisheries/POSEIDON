@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -20,7 +21,6 @@ import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -34,7 +34,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -82,6 +81,11 @@ public class PrototypeScenario implements Scenario {
      * Uses Caartesian distance
      */
     private double gridCellSizeInKm = 10;
+
+    /**
+     * when this flag is true, agents use their memory to predict future catches and profits
+     */
+    private boolean usePredictors = false;
 
     /**
      * boat speed
@@ -238,10 +242,31 @@ public class PrototypeScenario implements Scenario {
                                   new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
                                            new FuelTank(fuelCapacity)),
                                   new Hold(capacity, biology.getSize()),
-                                          gear);
+                                          gear, model.getSpecies().size());
 
 
 
+
+
+
+            //if needed, install better predictors
+            if(usePredictors)
+            {
+                for(Specie specie : model.getSpecies())
+                {
+                    //create the predictors
+                    newFisher.setDailyCatchesPredictor(specie.getIndex(),
+                                                    MovingAveragePredictor.dailyMAPredictor(
+                                                            "Predicted Daily Catches of " + specie,
+                                                            fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                    specie.getIndex()),
+                                                            90));
+                    newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
+                            "Predicted Unit Profit",
+                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),
+                            30));
+                }
+            }
 
 
 
@@ -452,5 +477,13 @@ public class PrototypeScenario implements Scenario {
 
     public void setMarket(AlgorithmFactory<? extends Market> market) {
         this.market = market;
+    }
+
+    public boolean isUsePredictors() {
+        return usePredictors;
+    }
+
+    public void setUsePredictors(boolean usePredictors) {
+        this.usePredictors = usePredictors;
     }
 }

@@ -69,13 +69,13 @@ public class Fisher implements Steppable, Startable{
     private final FisherStatus status;
 
     /**
-     * a container of all the long term information processed
+     * a container of all the long term information that the fisher stores
      */
     private final FisherMemory memory;
 
     /**
-     * a link to the model. Got when start() is called. It's not used or shared except when a new strategy is plugged in
-     * at which point this reference is used to call their start
+     * a link to the model. Grabbed when start() is called. It's not used or shared except when a new strategy is plugged in
+     * at which point this reference is used to call the strategy's start method
      */
     private FishState state;
 
@@ -89,6 +89,7 @@ public class Fisher implements Steppable, Startable{
      *     |___\__, |\_,_|_| .__/_|_|_\___|_||_\__|
      *            |_|      |_|
      */
+
     /**
      * contains all the equipment variables (gear, boat,hold)
      */
@@ -168,6 +169,7 @@ public class Fisher implements Steppable, Startable{
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
      * @param gear what is used for fishing
+     * @param numberOfSpecies
      */
     public Fisher(
             int id,
@@ -178,7 +180,8 @@ public class Fisher implements Steppable, Startable{
             DestinationStrategy destinationStrategy,
             FishingStrategy fishingStrategy,
             //equipment:
-            Boat boat, Hold hold, Gear gear) {
+            Boat boat, Hold hold, Gear gear,
+            int numberOfSpecies) {
         this.fisherID = id;
 
         //set up variables
@@ -191,6 +194,19 @@ public class Fisher implements Steppable, Startable{
         this.departingStrategy = departingStrategy;
         this.destinationStrategy =destinationStrategy;
         this.fishingStrategy = fishingStrategy;
+
+
+        //predictors
+        dailyCatchesPredictor = new Predictor[numberOfSpecies];
+        profitPerUnitPredictor = new Predictor[numberOfSpecies];
+        for(int i=0; i<dailyCatchesPredictor.length; i++)
+        {
+            dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
+            profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
+            dailyCatchesPredictor[i].start(state, this);
+            profitPerUnitPredictor[i].start(state,this);
+
+        }
 
     }
 
@@ -227,18 +243,13 @@ public class Fisher implements Steppable, Startable{
         yearlyAdaptation.start(state, this);
         tripAdaptation.start(state, this);
 
-        //predictors
-        dailyCatchesPredictor = new Predictor[state.getSpecies().size()];
-        profitPerUnitPredictor = new Predictor[state.getSpecies().size()];
+        //start the predictors
         for(int i=0; i<dailyCatchesPredictor.length; i++)
         {
-            final int finalI = i;
-            dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
-            dailyCatchesPredictor[i].start(state,this);
-            profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
+            dailyCatchesPredictor[i].start(state, this);
             profitPerUnitPredictor[i].start(state,this);
-
         }
+
 
     }
 

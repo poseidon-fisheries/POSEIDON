@@ -88,7 +88,8 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
 
             @Override
             public void turnOff() {
-                this.fisher.removeTripListener(tripListener[0]);
+                if(tripListener[0]!=null)
+                    this.fisher.removeTripListener(tripListener[0]);
             }
         };
 
