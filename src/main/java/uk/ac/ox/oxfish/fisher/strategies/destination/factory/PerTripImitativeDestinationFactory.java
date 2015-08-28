@@ -2,14 +2,15 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.maximization.DefaultBeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 
+import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -21,8 +22,9 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
     private DoubleParameter stepSize = new FixedDoubleParameter(5d);
 
-    private DoubleParameter explorationProbability = new FixedDoubleParameter(0.8d);
 
+    private AlgorithmFactory<? extends AdaptationProbability> probability =
+            new ExplorationPenaltyProbabilityFactory(.8,1,.02,.01);
 
     private boolean ignoreEdgeDirection = true;
 
@@ -43,7 +45,8 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
                                                                               10);
         return new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map, random), algorithm,explorationProbability.apply(random),1d);
+                new FavoriteDestinationStrategy(map, random), algorithm,
+                probability.apply(state));
 
 
     }
@@ -56,19 +59,22 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         this.stepSize = stepSize;
     }
 
-    public DoubleParameter getExplorationProbability() {
-        return explorationProbability;
-    }
-
-    public void setExplorationProbability(DoubleParameter explorationProbability) {
-        this.explorationProbability = explorationProbability;
-    }
-
     public boolean isIgnoreEdgeDirection() {
         return ignoreEdgeDirection;
     }
 
     public void setIgnoreEdgeDirection(boolean ignoreEdgeDirection) {
         this.ignoreEdgeDirection = ignoreEdgeDirection;
+    }
+
+    public AlgorithmFactory<? extends AdaptationProbability> getProbability() {
+        return probability;
+    }
+
+
+
+    public void setProbability(
+            AlgorithmFactory<? extends AdaptationProbability> probability) {
+        this.probability = probability;
     }
 }

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;

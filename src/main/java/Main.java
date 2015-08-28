@@ -12,8 +12,8 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
-import uk.ac.ox.oxfish.utility.maximization.Adaptation;
-import uk.ac.ox.oxfish.utility.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 class Main{
 
     public static void main(String[] args) throws IOException {
-
 
 
 
@@ -88,7 +87,7 @@ class Main{
 
 
         FishYAML yaml = new FishYAML();
-        Scenario scenario = (Scenario) yaml.loadAs(new FileReader(Paths.get("inputs", "temp.yaml").toFile()),
+        Scenario scenario = yaml.loadAs(new FileReader(Paths.get("inputs", "temp.yaml").toFile()),
                                                    PrototypeScenario.class);
 
         FishState state = new FishState(System.currentTimeMillis(),2);

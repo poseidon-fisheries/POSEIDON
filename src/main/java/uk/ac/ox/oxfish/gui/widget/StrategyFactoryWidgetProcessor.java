@@ -62,9 +62,13 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 factoryBox.setSelectedIndex(-1);
                 //find out which strategy factory is currently selected and try to show it in the combo-box
                 try {
+                    String[] path = metawidget.getPath().split("/");
+                    //nested address? no problem
+                    String address = path.length == 2? path[1] + "." + attributes.get("name") :
+                            attributes.get("name");
                     //current class
-                    Class actualClass = PropertyUtils.getSimpleProperty(metawidget.getToInspect(),
-                                                                        attributes.get("name")).getClass();
+                    Class actualClass = PropertyUtils.getProperty(metawidget.getToInspect(),
+                                                                  address).getClass();
                     //go through the constructors looking for that class
                     String name = names.get(actualClass);
 
@@ -91,12 +95,17 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                     public void actionPerformed(ActionEvent e) {
                         //we need to make changes!
                         try {
+                            String[] path = metawidget.getPath().split("/");
+                            //nested address? no problem
+                            String address = path.length == 2? path[1] + "." + fieldName :
+                                    attributes.get("name");
+
                             //use the beansutils to set the new value to the field
-                            PropertyUtils.setSimpleProperty(
+                            PropertyUtils.setProperty(
                                     //the object to modify
                                     beingInspected,
                                     //the name of the field
-                                    fieldName,
+                                    address,
                                     //the new value (table lookup)
                                     constructors.get((String) factoryBox.getSelectedItem()).get());
 

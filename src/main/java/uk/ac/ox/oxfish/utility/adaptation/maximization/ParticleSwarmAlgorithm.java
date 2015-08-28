@@ -1,10 +1,11 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Collection;

@@ -1,14 +1,12 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * The algorithmic part of the adaptation routine of agents. There are always 3 possible actions:

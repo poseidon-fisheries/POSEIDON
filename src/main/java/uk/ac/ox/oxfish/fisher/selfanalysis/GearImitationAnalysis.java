@@ -8,8 +8,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.utility.maximization.Adaptation;
-import uk.ac.ox.oxfish.utility.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 
 import java.util.List;
 import java.util.function.Function;

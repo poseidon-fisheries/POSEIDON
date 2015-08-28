@@ -9,7 +9,8 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.maximization.*;
+import uk.ac.ox.oxfish.utility.adaptation.*;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 
 /**
  * A strategy that every year iteratively tries a new sea-patch to fish on. It uses net cash-flow as a fitness value

@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Function;

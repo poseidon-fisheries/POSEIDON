@@ -7,16 +7,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * A simple experiment on "expected quota prices" from crappy predictions

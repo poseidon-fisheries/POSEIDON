@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestination
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.maximization.ParticleSwarmAlgorithm;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.ParticleSwarmAlgorithm;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;

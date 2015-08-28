@@ -9,7 +9,14 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.maximization.*;
+import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.adaptation.*;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
+import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+
+import java.util.Collection;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -43,6 +50,37 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
      */
     private Fisher fisher;
 
+
+    public PerTripIterativeDestinationStrategy(
+            FavoriteDestinationStrategy delegate,
+            AdaptationAlgorithm<SeaTile> algorithm,
+            AdaptationProbability probability)
+    {
+        this.delegate = delegate;
+        this.algorithm = new Adaptation<SeaTile>(
+                fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
+
+
+                algorithm,
+                (fisher, change, model) -> {
+                    if (change.getAltitude() < 0) //ignores "go to land" commands
+                        delegate.setFavoriteSpot(change);
+                },
+                fisher1 -> {
+                    if (fisher1 == fisher) //if we are sensing ourselves
+                        //override to delegate
+                        return delegate.getFavoriteSpot();
+                    else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
+                            fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
+                        return null;
+                    else
+                        return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                },
+                new HourlyProfitInTripFunction(),
+                probability
+        );
+
+    }
 
     public PerTripIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate,

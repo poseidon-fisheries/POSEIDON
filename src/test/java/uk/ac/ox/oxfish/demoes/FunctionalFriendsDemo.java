@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
@@ -57,7 +58,7 @@ public class FunctionalFriendsDemo {
             networkBuilder.setDegree(friends);
             scenario.setNetworkBuilder(networkBuilder);
             final PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
-            destinationStrategy.setExplorationProbability(new FixedDoubleParameter(explorationProbability));
+            destinationStrategy.setProbability(new FixedProbabilityFactory(explorationProbability,1d));
             destinationStrategy.setIgnoreEdgeDirection(false);
             scenario.setDestinationStrategy(destinationStrategy);
         }

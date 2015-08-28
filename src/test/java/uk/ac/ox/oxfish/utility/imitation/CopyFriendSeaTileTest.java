@@ -4,13 +4,10 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.Assert.*;

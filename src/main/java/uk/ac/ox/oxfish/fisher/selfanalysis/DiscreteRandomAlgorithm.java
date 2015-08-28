@@ -5,8 +5,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
-import uk.ac.ox.oxfish.utility.maximization.AdaptationAlgorithm;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
 import java.util.List;

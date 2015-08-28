@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -48,6 +48,7 @@ public class MovingAveragePredictorTest {
 
     @Test
     public void someVarianceIsFine() throws Exception {
+
 
 
         Sensor<Double> dummy = mock(Sensor.class);

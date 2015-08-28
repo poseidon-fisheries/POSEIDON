@@ -70,7 +70,7 @@ public class HypotheticalLambdaDemo {
 
         state.start();
 
-        while(state.getYear()<6)
+        while(state.getYear()<4)
             state.schedule.step(state);
 
 
@@ -81,7 +81,7 @@ public class HypotheticalLambdaDemo {
 
 
         double averageLambda = state.getFishers().stream().mapToDouble(
-                value -> value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")).sum() / 100;
+                value -> Math.max(0,value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas"))).sum() / 100;
 
 
         //lambda estimated is higher than 4

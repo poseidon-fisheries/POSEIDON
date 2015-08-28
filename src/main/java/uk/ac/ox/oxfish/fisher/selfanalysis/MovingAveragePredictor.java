@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.MovingVariance;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.maximization.Sensor;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 /**
  * A predictor that simply returns the moving average as a predictor for a value and a normal distribution

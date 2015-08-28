@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -6,6 +6,9 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
+import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
 import java.util.Collection;
 import java.util.function.Function;
@@ -27,8 +30,8 @@ public class Adaptation<T> implements FisherStartable {
     /**
      * function to grab eligible friends
      */
-    private Function<Pair<Fisher,MersenneTwisterFast>,Collection<Fisher>> friendsExtractor =
-            input -> input.getFirst().getDirectedFriends();
+    private Function<Pair<Fisher,MersenneTwisterFast>,Collection<Fisher>> friendsExtractor;
+
 
 
     /**
@@ -48,15 +51,10 @@ public class Adaptation<T> implements FisherStartable {
 
 
 
-    /**
-     * probability of Exploring
-     */
-    private final double explorationProbability;
+    private final AdaptationProbability probability;
 
-    /**
-     * probability of imitatating (conditional on not exploring)
-     */
-    private final double imitationProbability;
+
+
 
     /**
      * holds the starting point of a randomization
@@ -82,36 +80,50 @@ public class Adaptation<T> implements FisherStartable {
             Sensor<T> sensor,
             ObjectiveFunction<Fisher> objective, double explorationProbability,
             double imitationProbability) {
+
+        this(validator,
+             decision, actuator, sensor, objective, explorationProbability, imitationProbability, input -> input.getFirst().getDirectedFriends()
+        );
+
+    }
+
+    public Adaptation(
+            Predicate<Fisher> validator,
+            AdaptationAlgorithm<T> decision,
+            Actuator<T> actuator,
+            Sensor<T> sensor,
+            ObjectiveFunction<Fisher> objective,
+            AdaptationProbability probability) {
         this.validator = validator;
+        this.friendsExtractor = input -> input.getFirst().getDirectedFriends();
         this.algorithm = decision;
         this.actuator = actuator;
         this.objective = objective;
-        this.explorationProbability = explorationProbability;
-        this.imitationProbability = imitationProbability;
+        this.probability = probability;
         this.sensor = sensor;
     }
 
     public Adaptation(
             Predicate<Fisher> validator,
-            Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor,
             AdaptationAlgorithm<T> decision,
-            Actuator<T> actuator,
-            Sensor<T> sensor,
-            ObjectiveFunction<Fisher> objective, double explorationProbability,
-            double imitationProbability) {
+            Actuator<T> actuator, Sensor<T> sensor,
+            ObjectiveFunction<Fisher> objective,
+            double explorationProbability,
+            double imitationProbability,
+            Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>> friendsExtractor) {
         this.validator = validator;
         this.friendsExtractor = friendsExtractor;
         this.algorithm = decision;
         this.actuator = actuator;
         this.objective = objective;
-        this.explorationProbability = explorationProbability;
-        this.imitationProbability = imitationProbability;
+        this.probability = new FixedProbability(explorationProbability,imitationProbability);
         this.sensor = sensor;
     }
 
     public void start(FishState state, Fisher toAdapt){
         this.model = state;
         algorithm.start(state, toAdapt,sensor.scan(toAdapt) );
+        probability.start(state,toAdapt);
     }
 
     /**
@@ -144,6 +156,8 @@ public class Adaptation<T> implements FisherStartable {
                                                            explorationStart.getFirst(),
                                                            current);
 
+            this.probability.judgeExploration(explorationStart.getSecond(),fitness);
+
             explorationStart = null;
 
 
@@ -165,6 +179,7 @@ public class Adaptation<T> implements FisherStartable {
 
         //you are ready
 
+        double explorationProbability = probability.getExplorationProbability();
         //explore?
         if(explorationProbability>0 && random.nextBoolean(explorationProbability)) {
 
@@ -177,6 +192,8 @@ public class Adaptation<T> implements FisherStartable {
         assert  explorationStart==null;
 
         //imitate?
+        double imitationProbability = probability.getImitationProbability();
+
         Collection<Fisher> friends = friendsExtractor.apply(new Pair<>(toAdapt, random));
         if(imitationProbability>0 && friends!=null &&
                 !friends.isEmpty() && random.nextBoolean(imitationProbability))
@@ -202,7 +219,7 @@ public class Adaptation<T> implements FisherStartable {
 
     @Override
     public void turnOff() {
-        //nothing really
+        probability.turnOff();
     }
 
     private void act(Fisher toAdapt,T newVariable)
@@ -240,13 +257,7 @@ public class Adaptation<T> implements FisherStartable {
         return objective;
     }
 
-    public double getExplorationProbability() {
-        return explorationProbability;
-    }
 
-    public double getImitationProbability() {
-        return imitationProbability;
-    }
 
     public Pair<T, Double> getExplorationStart() {
         return explorationStart;

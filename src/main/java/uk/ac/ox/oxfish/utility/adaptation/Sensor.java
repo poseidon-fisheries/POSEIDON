@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
@@ -8,5 +8,5 @@ import uk.ac.ox.oxfish.fisher.Fisher;
  */
 public interface Sensor<T> {
 
-    public T scan(Fisher fisher);
+    T scan(Fisher fisher);
 }

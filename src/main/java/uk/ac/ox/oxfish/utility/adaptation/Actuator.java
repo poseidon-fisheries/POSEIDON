@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.utility.maximization;
+package uk.ac.ox.oxfish.utility.adaptation;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -9,5 +9,5 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public interface Actuator<T> {
 
-    public void apply(Fisher fisher, T change, FishState model);
+    void apply(Fisher fisher, T change, FishState model);
 }

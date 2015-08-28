@@ -14,6 +14,8 @@ import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
+import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,6 +50,8 @@ public class AlgorithmFactories {
         NAMES_MAP.put(DirectedGraph.class, NetworkBuilders.NAMES);
         CONSTRUCTOR_MAP.put(Market.class, Markets.CONSTRUCTORS);
         NAMES_MAP.put(Market.class, Markets.NAMES);
+        CONSTRUCTOR_MAP.put(AdaptationProbability.class, Probabilities.CONSTRUCTORS);
+        NAMES_MAP.put(AdaptationProbability.class, Probabilities.NAMES);
     }
 
 

@@ -31,9 +31,9 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.utility.maximization.Adaptation;
-import uk.ac.ox.oxfish.utility.maximization.AdaptationDailyScheduler;
-import uk.ac.ox.oxfish.utility.maximization.AdaptationPerTripScheduler;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
+import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.Collection;
 import java.util.Comparator;
