@@ -75,11 +75,16 @@ public class NauticalMapFactory {
         ObjectGrid2D baseGrid =  new ObjectGrid2D(width, height);
 
         //the 10 rightmost patches are land, the rest is sea
+        int landX = 10;
+        if(width <= 10)
+            landX = (int) Math.ceil(width *.2);
+
         for(int x=0; x< width; x++)
-            for(int y=0; y< height; y++)
-                baseGrid.field[x][y] = x <width-10 ?
+            for(int y=0; y< height; y++) {
+                baseGrid.field[x][y] = x <width- landX ?
                         new SeaTile(x,y,-random.nextInt(5000)) :
                         new SeaTile(x,y,2000);
+            }
         /***
          *       ___              _        _   ___               _
          *      / __|___  __ _ __| |_ __ _| | | _ \___ _  _ __ _| |_  _ _  ___ ______
@@ -87,36 +92,37 @@ public class NauticalMapFactory {
          *      \___\___/\__,_/__/\__\__,_|_| |_|_\___/\_,_\__, |_||_|_||_\___/__/__/
          *                                                 |___/
          */
-        for(int i=0; i<coastalRoughness; i++) {
-            //now go roughen up the coast
-            List<SeaTile> toFlip = new LinkedList<>();
-            //go through all the tiles
-            for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++) {
-                    SeaTile tile = (SeaTile) baseGrid.field[x][y];
-                    if (tile.getAltitude() < 0)
-                        continue; //if it's ocean, don't bother
+        if(landX >=10)
+            for(int i=0; i<coastalRoughness; i++) {
+                //now go roughen up the coast
+                List<SeaTile> toFlip = new LinkedList<>();
+                //go through all the tiles
+                for (int x = 0; x < width; x++)
+                    for (int y = 0; y < height; y++) {
+                        SeaTile tile = (SeaTile) baseGrid.field[x][y];
+                        if (tile.getAltitude() < 0)
+                            continue; //if it's ocean, don't bother
 
-                    Bag neighbors = new Bag();
-                    baseGrid.getMooreNeighbors(x, y, 1, Grid2D.BOUNDED, false, neighbors, null, null);
-                    //count how many neighbors are ocean
-                    int seaNeighbors = 0;
-                    for (Object neighbor : neighbors) {
-                        if (((SeaTile) neighbor).getAltitude() < 0)
-                            seaNeighbors++;
+                        Bag neighbors = new Bag();
+                        baseGrid.getMooreNeighbors(x, y, 1, Grid2D.BOUNDED, false, neighbors, null, null);
+                        //count how many neighbors are ocean
+                        int seaNeighbors = 0;
+                        for (Object neighbor : neighbors) {
+                            if (((SeaTile) neighbor).getAltitude() < 0)
+                                seaNeighbors++;
+                        }
+                        //if it has at least one neighbor, 40% chance of turning into sea
+                        if (seaNeighbors > 0 && random.nextBoolean(.4))
+                            toFlip.add(tile);
                     }
-                    //if it has at least one neighbor, 40% chance of turning into sea
-                    if (seaNeighbors > 0 && random.nextBoolean(.4))
-                        toFlip.add(tile);
+                //remove all the marked land tiles and turn them into ocean
+                for (SeaTile toRemove : toFlip) {
+                    assert toRemove.getAltitude() >= 0; //should be removing land!
+                    SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000));
+                    assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
+                    baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
                 }
-            //remove all the marked land tiles and turn them into ocean
-            for (SeaTile toRemove : toFlip) {
-                assert toRemove.getAltitude() >= 0; //should be removing land!
-                SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000));
-                assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
-                baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
             }
-        }
 
         /***
          *      ___                _   _    _
@@ -303,7 +309,7 @@ public class NauticalMapFactory {
                     if(((SeaTile)neighbor).getAltitude() < 0 )
                         neighboringSeaTiles++;
 
-                if(neighboringSeaTiles >=4)
+                if(neighboringSeaTiles >=3)
                     candidateTiles.add(possible);
 
             }

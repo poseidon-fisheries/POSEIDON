@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 /**
  * basically a linked-list for double values that cannot be modified easily
@@ -100,5 +102,25 @@ public class DataColumn implements Iterable<Double>{
     @Override
     public Spliterator<Double> spliterator() {
         return data.spliterator();
+    }
+
+
+    /**
+     * Returns a sequential {@code Stream} with this collection as its source.
+     *
+     * <p>This method should be overridden when the {@link #spliterator()}
+     * method cannot return a spliterator that is {@code IMMUTABLE},
+     * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
+     * for details.)
+     *
+     * @implSpec
+     * The default implementation creates a sequential {@code Stream} from the
+     * collection's {@code Spliterator}.
+     *
+     * @return a sequential {@code Stream} over the elements in this collection
+     * @since 1.8
+     */
+    public Stream<Double> stream() {
+        return data.stream();
     }
 }

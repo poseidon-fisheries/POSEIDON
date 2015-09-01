@@ -1,6 +1,8 @@
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import sim.display.Console;
+import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
@@ -9,6 +11,7 @@ import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
@@ -52,7 +55,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
 
-        FishState state = new FishState(0,1);
+        FishState state = new FishState(System.currentTimeMillis(),1);
         Log.set(Log.LEVEL_NONE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
 
@@ -60,6 +63,33 @@ class Main{
         state.setScenario(scenarioSelector.getScenario());
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);
+        c.setVisible(true);
+    }
+
+
+    public static void main2(String[] args) throws IOException {
+
+
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(1);
+        scenario.setNetworkBuilder(new EmptyNetworkBuilder());
+        FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
+        biologyInitializer.setBiologySmoothingIndex(new FixedDoubleParameter(100));
+        scenario.setBiologyInitializer(biologyInitializer);
+        scenario.setHeight(10);
+        scenario.setWidth(10);
+
+
+        FishState state = new FishState(0,1);
+        Log.set(Log.LEVEL_NONE);
+        Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
+
+
+        state.setScenario(scenario);
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+
         c.setVisible(true);
     }
 

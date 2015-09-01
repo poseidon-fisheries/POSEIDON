@@ -4,6 +4,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.function.Function;
+
 /**
  * The probability of exploring increases whenever an exploration is successful and decreases otherwise
  * Created by carrknight on 8/28/15.
@@ -51,12 +53,15 @@ public class ExplorationPenaltyProbability implements AdaptationProbability
     }
 
     /**
-     * ignored
+     * register ata gatherer
      * @param model
      */
     @Override
     public void start(FishState model, Fisher fisher) {
         delegate.start(model,fisher);
+        fisher.getDailyData().registerGatherer("Exploration Probability",
+                                               fisher1 -> getExplorationProbability(),
+                                               Double.NaN);
     }
 
     /**

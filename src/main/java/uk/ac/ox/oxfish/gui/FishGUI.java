@@ -144,9 +144,9 @@ public class FishGUI extends GUIState{
         //fishing hotspots
         state.getMap().guiStart(state);
         fishingHotspots.setField(state.getFishedMap());
-        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size()+100, new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(new SimpleColorMap(0, (state.getFishers().size()+1)*10, new Color(0, 0, 0, 0), Color.RED));
         //reset your color map every year
-        fishingHotspots.setMap(new SimpleColorMap(0, state.getFishers().size() / 2, new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(new SimpleColorMap(0, (state.getFishers().size()+1)*10, new Color(0, 0, 0, 0), Color.RED));
 
         //boats
         boats.setField(state.getFisherGrid());

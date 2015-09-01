@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -45,7 +45,7 @@ public class FishState  extends SimState{
 
     private final FishStateDailyTimeSeries dailyDataSet = new FishStateDailyTimeSeries();
 
-    private final FishStateYearlyTimeSeries yearlyDataSet = new FishStateYearlyTimeSeries(dailyDataSet);
+    private final YearlyFishStateTimeSeries yearlyDataSet = new YearlyFishStateTimeSeries(dailyDataSet);
 
 
     private final List<Pair<Fisher,FisherStartable>> fisherStartables = new LinkedList<>();
@@ -359,7 +359,7 @@ public class FishState  extends SimState{
         return dailyDataSet;
     }
 
-    public FishStateYearlyTimeSeries getYearlyDataSet() {
+    public YearlyFishStateTimeSeries getYearlyDataSet() {
         return yearlyDataSet;
     }
 
