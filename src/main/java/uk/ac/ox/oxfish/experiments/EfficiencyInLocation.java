@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.stream.DoubleStream;
 
 /**
  * how to choose locations
@@ -30,7 +31,7 @@ public class EfficiencyInLocation
 
 
     private static final int YEARS_TO_SIMULATE = 10;
-
+    private static final double imitationProbability = 1d;;
 
 
     public static void main(String[] args) throws IOException {
@@ -42,12 +43,13 @@ public class EfficiencyInLocation
 
 
         AlgorithmFactory[] probabilities = new AlgorithmFactory[3];
-        probabilities[0] = new FixedProbabilityFactory(.8,1d);
+        probabilities[0] = new FixedProbabilityFactory(.8, imitationProbability);
         probabilities[1] = new DailyDecreasingProbabilityFactory();
         ((DailyDecreasingProbabilityFactory) probabilities[1]).setExplorationProbability(new FixedDoubleParameter(.8d));
-        ((DailyDecreasingProbabilityFactory) probabilities[1]).setImitationProbability(new FixedDoubleParameter(1d));
+        ((DailyDecreasingProbabilityFactory) probabilities[1]).setImitationProbability(new FixedDoubleParameter(
+                imitationProbability));
         ((DailyDecreasingProbabilityFactory) probabilities[1]).setExplorationProbabilityMinimum(new FixedDoubleParameter(0.01d));
-        probabilities[2] = new ExplorationPenaltyProbabilityFactory(.8,1d,.02,.01);
+        probabilities[2] = new ExplorationPenaltyProbabilityFactory(.8, imitationProbability,.02,0.01);
 
 
         AlgorithmFactory[] biologies = new AlgorithmFactory[2];
@@ -56,7 +58,7 @@ public class EfficiencyInLocation
 
 
 
-        for(@SuppressWarnings("unchecked")
+        for(@SuppressWarnings   ("unchecked")
         AlgorithmFactory<? extends AdaptationProbability> probability : probabilities)
         {
             for(@SuppressWarnings("unchecked")
@@ -110,37 +112,43 @@ public class EfficiencyInLocation
         AlgorithmFactory<? extends AdaptationProbability> probability : probabilities)
         {
 
-            OsmosePrototype scenario = new OsmosePrototype();
-            scenario.setPreInitializedConfiguration(true);
-            scenario.setFishers(100);
 
-            PerTripImitativeDestinationFactory imitative = new PerTripImitativeDestinationFactory();
-            imitative.setProbability(probability);
-            scenario.setDestinationStrategy(imitative);
+            //unfortunately OSMOSE has no easy way of setting a random seed. This means we have to average out over multiple runs!
+            double[] catches = new double[10];
+            double[] fuels = new double[10];
+
+            for(int i=0; i<10; i++) {
+                OsmosePrototype scenario = new OsmosePrototype();
+                scenario.setPreInitializedConfiguration(true);
+                scenario.setFishers(100);
+
+                PerTripImitativeDestinationFactory imitative = new PerTripImitativeDestinationFactory();
+                imitative.setProbability(probability);
+                scenario.setDestinationStrategy(imitative);
 
 
-            FishState state = new FishState(0,1);
-            state.setScenario(scenario);
+                FishState state = new FishState(0, 1);
+                state.setScenario(scenario);
 
-            state.start();
-            while(state.getYear() < YEARS_TO_SIMULATE)
-            {
+                state.start();
+                while (state.getYear() < YEARS_TO_SIMULATE) {
+                    state.schedule.step(state);
+                }
                 state.schedule.step(state);
+
+                //grab all catches and all fuel consumption and compute the ratio
+                catches[i] = state.getYearlyDataSet().
+                        getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).
+                        stream().reduce(0.0, Double::sum);
+
+                fuels[i] = state.getYearlyDataSet().
+                        getColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION).
+                        stream().reduce(0.0, Double::sum);
+
             }
-            state.schedule.step(state);
-
-            //grab all catches and all fuel consumption and compute the ratio
-            double catches = state.getYearlyDataSet().
-                    getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME).
-                    stream().reduce(0.0,Double::sum);
-
-            double fuel = state.getYearlyDataSet().
-                    getColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION).
-                    stream().reduce(0.0,Double::sum);
-
             writer.write(probability.getClass().getSimpleName() +
                                  "," +
-                                 "Osmose" + "," + catches + "\n");
+                                 "Osmose" + "," + DoubleStream.of(catches).sum()/10 + "\n");
             writer.flush();
 
 
