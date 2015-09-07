@@ -65,7 +65,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         final NauticalMap map = result.getMap();
         for(int i=0; i<10; i++)
             for(int j=0;j<getHeight(); j++)
-                map.getSeaTile(i,j).setMpa(new MasonGeometry());
+                map.getSeaTile(i,j).assignMpa(new MasonGeometry());
 */
 
         return result;

@@ -154,4 +154,9 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     public Adaptation<SeaTile> getAlgorithm() {
         return algorithm;
     }
+
+
+    public SeaTile getFavoriteSpot() {
+        return delegate.getFavoriteSpot();
+    }
 }

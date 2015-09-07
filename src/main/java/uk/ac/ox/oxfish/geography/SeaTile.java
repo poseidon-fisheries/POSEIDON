@@ -61,11 +61,11 @@ public class SeaTile implements Startable{
         return mpa != null;
     }
 
-    public MasonGeometry getMpa() {
+    public MasonGeometry grabMPA() {
         return mpa;
     }
 
-    public void setMpa(MasonGeometry mpa) {
+    public void assignMpa(MasonGeometry mpa) {
         this.mpa = mpa;
     }
 

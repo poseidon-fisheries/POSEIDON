@@ -16,9 +16,9 @@ public class SeaTileTest {
 
         MasonGeometry mpa = mock(MasonGeometry.class);
         SeaTile tile = new SeaTile(0,0,0);
-        tile.setMpa(mpa);
+        tile.assignMpa(mpa);
         assertTrue(tile.isProtected());
-        tile.setMpa(null);
+        tile.assignMpa(null);
         assertFalse(tile.isProtected());
 
     }

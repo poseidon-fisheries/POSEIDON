@@ -1,6 +1,7 @@
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import sim.display.Console;
+import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
@@ -12,6 +13,7 @@ import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
@@ -72,16 +74,32 @@ class Main{
 
 
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setFishers(1);
-        scenario.setNetworkBuilder(new EmptyNetworkBuilder());
+        scenario.setFishers(2);
+        EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
+        networkBuilder.setDegree(1);
+        scenario.setNetworkBuilder(networkBuilder);
+        //scenario.setNetworkBuilder(new EmptyNetworkBuilder());
         FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
         biologyInitializer.setBiologySmoothingIndex(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);
         scenario.setHeight(10);
         scenario.setWidth(10);
 
+        FishState state = new FishState(3,24);
+        //i am going to run the spot 5-3 in order to break a tie with 6-3. This means there is a single "best" place to fish
+        //and the video looks more interesting
+        state.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                model.getMap().getSeaTile(5,3).setBiology(new ConstantLocalBiology(800));
+            }
 
-        FishState state = new FishState(0,1);
+            @Override
+            public void turnOff() {
+
+            }
+        });
+
         Log.set(Log.LEVEL_NONE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
 

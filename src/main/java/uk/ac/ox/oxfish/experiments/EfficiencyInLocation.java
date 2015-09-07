@@ -30,8 +30,8 @@ public class EfficiencyInLocation
 {
 
 
-    private static final int YEARS_TO_SIMULATE = 10;
-    private static final double imitationProbability = 1d;;
+    private static final int YEARS_TO_SIMULATE = 5;
+    private static final double imitationProbability = 0d;;
 
 
     public static void main(String[] args) throws IOException {
@@ -39,7 +39,7 @@ public class EfficiencyInLocation
 
         File file = Paths.get("runs", "destination").toFile();
         file.mkdirs();
-        FileWriter writer = new FileWriter(Paths.get("runs", "destination", "results.csv").toFile());
+        FileWriter writer = new FileWriter(Paths.get("runs", "destination", "non-imitation.csv").toFile());
 
 
         AlgorithmFactory[] probabilities = new AlgorithmFactory[3];

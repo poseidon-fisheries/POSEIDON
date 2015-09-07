@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility.adaptation;
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
@@ -199,10 +200,11 @@ public class Adaptation<T> implements FisherStartable {
                 !friends.isEmpty() && random.nextBoolean(imitationProbability))
         {
 
+            Log.trace("imitation time!");
             act(toAdapt,
                 algorithm.imitate(random,
                                   toAdapt, fitness, current,
-                                  friends,objective,sensor));
+                                  friends, objective, sensor));
             return;
 
         }

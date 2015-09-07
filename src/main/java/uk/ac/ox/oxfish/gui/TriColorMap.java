@@ -43,6 +43,10 @@ public class TriColorMap implements ColorMap
 
     @Override
     public Color getColor(double level) {
+
+        if(Double.isNaN(level))
+            return Color.GRAY;
+
         if (level < mid)
             return lowerHalf.getColor(level);
         else
@@ -51,6 +55,10 @@ public class TriColorMap implements ColorMap
 
     @Override
     public int getRGB(double level) {
+
+        if(Double.isNaN(level))
+            return Color.GRAY.getRGB();
+
         if (level < mid)
             return lowerHalf.getRGB(level);
         else
@@ -59,6 +67,11 @@ public class TriColorMap implements ColorMap
 
     @Override
     public int getAlpha(double level) {
+
+        if(Double.isNaN(level))
+            return Color.GRAY.getAlpha();
+
+
         if (level < mid)
             return lowerHalf.getAlpha(level);
         else

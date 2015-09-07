@@ -258,12 +258,12 @@ public class NauticalMap implements Startable
                 if(coveringObjects.size() > 0)
                 {
                     assert coveringObjects.size() == 1 : "got a tile covered by multiple MPAs, is that normal?"; //assume there is no double MPA
-                    seaTile.setMpa((MasonGeometry) coveringObjects.get(0));
+                    seaTile.assignMpa((MasonGeometry) coveringObjects.get(0));
                     assert seaTile.isProtected() : "Set a tile to an MPA but it doesn't set the protected state to true";
                 }
                 else
                 {
-                    seaTile.setMpa(null);
+                    seaTile.assignMpa(null);
                     assert !seaTile.isProtected() : "This tile has no MPA but still is protected";
 
                 }
