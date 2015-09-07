@@ -15,11 +15,14 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.scenario.*;
+import uk.ac.ox.oxfish.model.scenario.GeneticLocationScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
+import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
@@ -231,9 +234,9 @@ public class FishState  extends SimState{
         return (int) ((schedule.getTime() / stepsPerDay) % 365) + 1;
     }
 
-    public double getDay(double scheduleTime)
+    public double getDay()
     {
-        return (scheduleTime / stepsPerDay);
+        return (schedule.getTime() / stepsPerDay);
     }
 
     public int getYear()

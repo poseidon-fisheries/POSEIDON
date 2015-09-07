@@ -8,7 +8,7 @@ Genetic Algorithm Prototype:
   fishingEfficiency: '0.01'
   fishingStrategy:
     Until Full With Day Limit:
-      daysAtSea: '10.0'
+      daysAtSea: '5.0'
   gridSizeInKm: 10.0
   height: 50
   holdSize: '100.0'

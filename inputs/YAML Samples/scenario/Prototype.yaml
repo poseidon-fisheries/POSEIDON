@@ -14,14 +14,19 @@ Prototype:
   depthSmoothing: 1000000
   destinationStrategy:
     Imitator-Explorator:
-      explorationProbability: '0.8'
       ignoreEdgeDirection: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.8'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
       stepSize: '5.0'
   engineWeight: normal 100.0 10.0
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:
-      daysAtSea: '10.0'
+      daysAtSea: '5.0'
   fuelTankSize: '100000.0'
   gasPricePerLiter: '0.01'
   gridCellSizeInKm: 10.0
@@ -38,4 +43,5 @@ Prototype:
   regulation: MPA Only
   speedInKmh: '5.0'
   thrawlingSpeed: '5.0'
+  usePredictors: false
   width: 50

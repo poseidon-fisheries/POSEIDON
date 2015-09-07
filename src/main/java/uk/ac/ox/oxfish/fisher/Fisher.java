@@ -12,9 +12,12 @@ import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.log.*;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
+import uk.ac.ox.oxfish.fisher.log.LocationMemory;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -425,7 +428,9 @@ public class Fisher implements Steppable, Startable{
      * @param model the model
      */
     public boolean shouldFisherLeavePort(FishState model) {
-        return departingStrategy.shouldFisherLeavePort(equipment,status,memory , model);
+        assert isAtPort();
+        assert !isFuelEmergencyOverride();
+        return !status.isAnyEmergencyFlagOn() && departingStrategy.shouldFisherLeavePort(equipment,status,memory , model);
     }
 
     /**
@@ -438,7 +443,7 @@ public class Fisher implements Steppable, Startable{
 
 
         //if you are not allowed at sea or you are running out of gas, go home
-        if(!status.getRegulation().allowedAtSea(this, model) || status.isFuelEmergencyOverride())
+        if(!status.getRegulation().allowedAtSea(this, model) || status.isAnyEmergencyFlagOn())
             status.setDestination(status.getHomePort().getLocation());
         else
             status.setDestination(
@@ -509,7 +514,7 @@ public class Fisher implements Steppable, Startable{
 
     public boolean shouldIFish(FishState state)
     {
-        return !status.isFuelEmergencyOverride() && fishingStrategy.shouldFish(equipment,
+        return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(equipment,
                                                                                status,
                                                                                memory,
                                                                                grabRandomizer(),

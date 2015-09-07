@@ -3,6 +3,7 @@ Fixed Price Market:
 -------
 Congested Market:
   acceptableBiomassThreshold: '7000.0'
+  consumptionPeriod: '1.0'
   dailyConsumption: '8000.0'
   demandSlope: '1.0E-4'
   maxPrice: '10.0'

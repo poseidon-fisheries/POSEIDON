@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class FishYAMLTest {
@@ -22,42 +22,56 @@ public class FishYAMLTest {
     public void canReadAScenario() throws Exception
     {
 
-        String scenarioFile = "!!uk.ac.ox.oxfish.model.scenario.PrototypeScenario\n" +
-                //here i am just using the constructor name as in the CONSTRUCTOR_MAP and then a simple map
-                "biologyInitializer:\n" +
-                "  Diffusing Logistic:\n"+
-                "    carryingCapacity: 14.0\n" +
-                "    differentialPercentageToMove: 5.0E-4\n" +
-                "    steepness: 0.7\n" +
-                "    percentageLimitOnDailyMovement: uniform '0.001 0.01'\n" +
-                "coastalRoughness: 4\n" +
-                "departingStrategy:\n" +
-                "  Fixed Probability:\n" +
-                "    probabilityToLeavePort: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "      fixedValue: 1.0\n" +
-                "depthSmoothing: 1000000\n" +
-                "fishers: 1234\n" +
-                "catchabilityMean: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "  fixedValue: 0.01\n" +
-                "fishingStrategy: !!uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory\n" +
-                "  daysAtSea: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "    fixedValue: 10.0\n" +
-                "gridCellSizeInKm: 10.0\n" +
-                "height: 50\n" +
-                "holdSize: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "  fixedValue: 100.0\n" +
-                "networkBuilder: !!uk.ac.ox.oxfish.model.network.EquidegreeBuilder\n" +
-                "  degree: 2\n" +
-                "ports: 1\n" +
-                //here i am calling the regulation object by !!
-                "regulation:\n" +
-                "  Anarchy\n" +
-                "speedInKmh: !!uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter\n" +
-                "  fixedValue: 5.0\n" +
-                "width: 50";
+        String scenarioFile = "Prototype:\n" +
+                "  biologyInitializer:\n" +
+                "    Diffusing Logistic:\n" +
+                "      carryingCapacity: '14.0'\n" +
+                "      differentialPercentageToMove: '5.0E-4'\n" +
+                "      percentageLimitOnDailyMovement: '0.01'\n" +
+                "      steepness: 0.7\n" +
+                "  catchabilityDeviation: '0.0'\n" +
+                "  catchabilityMean: '0.01'\n" +
+                "  coastalRoughness: 4\n" +
+                "  departingStrategy:\n" +
+                "    Fixed Rest:\n" +
+                "      hoursBetweenEachDeparture: '12.0'\n" +
+                "  depthSmoothing: 1000000\n" +
+                "  destinationStrategy:\n" +
+                "    Imitator-Explorator:\n" +
+                "      ignoreEdgeDirection: true\n" +
+                "      probability:\n" +
+                "        Adaptive Probability:\n" +
+                "          explorationProbability: '0.8'\n" +
+                "          explorationProbabilityMinimum: '0.01'\n" +
+                "          imitationProbability: '1.0'\n" +
+                "          incrementMultiplier: '0.02'\n" +
+                "      stepSize: '5.0'\n" +
+                "  engineWeight: normal 100.0 10.0\n" +
+                "  fishers: 100\n" +
+                "  fishingStrategy:\n" +
+                "    Until Full With Day Limit:\n" +
+                "      daysAtSea: '5.0'\n" +
+                "  fuelTankSize: '100000.0'\n" +
+                "  gasPricePerLiter: '0.01'\n" +
+                "  gridCellSizeInKm: 10.0\n" +
+                "  height: 50\n" +
+                "  holdSize: '100.0'\n" +
+                "  literPerKilometer: '10.0'\n" +
+                "  market:\n" +
+                "    Fixed Price Market:\n" +
+                "      marketPrice: '10.0'\n" +
+                "  networkBuilder:\n" +
+                "    Equal Out Degree:\n" +
+                "      degree: 2\n" +
+                "  ports: 1\n" +
+                "  regulation: Anarchy\n" +
+                "  speedInKmh: '5.0'\n" +
+                "  thrawlingSpeed: '5.0'\n" +
+                "  usePredictors: false\n" +
+                "  width: 50\n";
 
         FishYAML yaml = new FishYAML();
-        final Object loaded = yaml.load(scenarioFile);
+        final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);
         //read prototype scenario correctly
         Assert.assertTrue(loaded instanceof PrototypeScenario);
         PrototypeScenario scenario = (PrototypeScenario) loaded;

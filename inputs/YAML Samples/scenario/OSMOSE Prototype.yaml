@@ -12,7 +12,7 @@ OSMOSE Prototype:
   fishingEfficiency: '0.01'
   fishingStrategy:
     Until Full With Day Limit:
-      daysAtSea: '10.0'
+      daysAtSea: '5.0'
   fuelTankSize: '10000.0'
   gridSizeInKm: 5.0
   holdSize: '100.0'

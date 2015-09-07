@@ -14,8 +14,13 @@ Per Trip Iterative:
   stepSize: '5.0'
 -------
 Imitator-Explorator:
-  explorationProbability: '0.8'
   ignoreEdgeDirection: true
+  probability:
+    Adaptive Probability:
+      explorationProbability: '0.8'
+      explorationProbabilityMinimum: '0.01'
+      imitationProbability: '1.0'
+      incrementMultiplier: '0.02'
   stepSize: '5.0'
 -------
 PSO:

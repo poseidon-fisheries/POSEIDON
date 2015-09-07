@@ -11,7 +11,10 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.*;
+import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.Grid2D;
+import sim.field.grid.ObjectGrid2D;
+import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -220,8 +223,14 @@ public class NauticalMap implements Startable
         return rasterBackingGrid.elements();
     }
 
+
+    @SuppressWarnings("unchecked") //bags are annoying this way
+    /**
+     * get all the tiles of the map as a list
+     */
     public List<SeaTile> getAllSeaTilesAsList()
     {
+
         return new LinkedList<>(rasterBackingGrid.elements());
     }
 

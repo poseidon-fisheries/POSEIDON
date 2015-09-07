@@ -4,5 +4,5 @@ Fish Until Full:
   minimumPercentageFull: '1.0'
 -------
 Until Full With Day Limit:
-  daysAtSea: '10.0'
+  daysAtSea: '5.0'
 -------

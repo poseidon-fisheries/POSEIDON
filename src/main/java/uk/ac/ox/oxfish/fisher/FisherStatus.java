@@ -153,6 +153,27 @@ public class FisherStatus implements Serializable {
         this.fuelEmergencyOverride = fuelEmergencyOverride;
     }
 
+
+    /**
+     * when this flag is on, the agent believes it MUST return home to avoid the worst part of a storm. All other decisions
+     * are otherwise ignored
+     */
+    private boolean weatherEmergencyOverride = false;
+
+
+    public boolean isWeatherEmergencyOverride() {
+        return weatherEmergencyOverride;
+    }
+
+    public void setWeatherEmergencyOverride(boolean weatherEmergencyOverride) {
+        this.weatherEmergencyOverride = weatherEmergencyOverride;
+    }
+
+    public boolean isAnyEmergencyFlagOn()
+    {
+        return fuelEmergencyOverride || weatherEmergencyOverride;
+    }
+
     public FisherStatus(
             MersenneTwisterFast random, Regulation regulation, Action action, Port homePort, SeaTile location,
             SeaTile destination,

@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.geography;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.weather.LocalWeather;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -33,6 +34,13 @@ public class SeaTile implements Startable{
      * the local-biology object, used to check biomass
      */
     private LocalBiology biology;
+
+
+    /**
+     * weather object, contains temperatures and such at this tile
+     */
+    private LocalWeather weather;
+
 
     public SeaTile(int gridX, int gridY, double altitude) {
         this.gridX = gridX;
@@ -125,5 +133,26 @@ public class SeaTile implements Startable{
     @Override
     public void turnOff() {
         biology.turnOff();
+    }
+
+
+    public LocalWeather getWeather() {
+        return weather;
+    }
+
+    public void setWeather(LocalWeather weather) {
+        this.weather = weather;
+    }
+
+    public double getTemperatureInCelsius() {
+        return weather.getTemperatureInCelsius();
+    }
+
+    public double getWindSpeedInKph() {
+        return weather.getWindSpeedInKph();
+    }
+
+    public double getWindDirection() {
+        return weather.getWindDirection();
     }
 }
