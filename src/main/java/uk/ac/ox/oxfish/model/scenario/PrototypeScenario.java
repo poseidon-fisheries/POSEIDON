@@ -6,9 +6,14 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.equipment.*;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Engine;
+import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -17,6 +22,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -64,6 +71,9 @@ public class PrototypeScenario implements Scenario {
 
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer =
             new DiffusingLogisticFactory();
+
+    private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
+            new ConstantWeatherFactory();
 
     /**
      * map height
@@ -134,6 +144,9 @@ public class PrototypeScenario implements Scenario {
             new MaximumStepsFactory();
 
 
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
+            new IgnoreWeatherFactory();
+
     private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
 
 
@@ -161,14 +174,16 @@ public class PrototypeScenario implements Scenario {
         MersenneTwisterFast random = model.random;
 
         BiologyInitializer initializer = biologyInitializer.apply(model);
+        WeatherInitializer weather = weatherInitializer.apply(model);
+
         GlobalBiology biology = GlobalBiology.genericListOfSpecies(initializer.getNumberOfSpecies());
 
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    random,
                                                                                    depthSmoothing,
                                                                                    initializer,
-                                                                                   biology,
-                                                                                   model, width, height);
+                                                                                   weather,
+                                                                                   biology, model, width, height);
         map.setDistance(new CartesianDistance(gridCellSizeInKm));
 
 
@@ -234,14 +249,15 @@ public class PrototypeScenario implements Scenario {
                                                                          catchabilitySTD,
                                                                          thrawlingSpeed.apply(random));
             Fisher newFisher = new Fisher(i, port,
-                                  random,
-                                  regulation.apply(model),
-                                  departing,
-                                  destinationStrategy.apply(model),
-                                  fishingStrategy.apply(model),
-                                  new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
-                                           new FuelTank(fuelCapacity)),
-                                  new Hold(capacity, biology.getSize()),
+                                          random,
+                                          regulation.apply(model),
+                                          departing,
+                                          destinationStrategy.apply(model),
+                                          fishingStrategy.apply(model),
+                                          weatherStrategy.apply(model),
+                                          new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
+                                                                                new FuelTank(fuelCapacity)),
+                                          new Hold(capacity, biology.getSize()),
                                           gear, model.getSpecies().size());
 
 
@@ -256,11 +272,11 @@ public class PrototypeScenario implements Scenario {
                 {
                     //create the predictors
                     newFisher.setDailyCatchesPredictor(specie.getIndex(),
-                                                    MovingAveragePredictor.dailyMAPredictor(
-                                                            "Predicted Daily Catches of " + specie,
-                                                            fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                    specie.getIndex()),
-                                                            90));
+                                                       MovingAveragePredictor.dailyMAPredictor(
+                                                               "Predicted Daily Catches of " + specie,
+                                                               fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                       specie.getIndex()),
+                                                               90));
                     newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
                             "Predicted Unit Profit",
                             fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),
@@ -276,7 +292,7 @@ public class PrototypeScenario implements Scenario {
 
 
 
-     //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
+        //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
 
 
         return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
@@ -485,5 +501,23 @@ public class PrototypeScenario implements Scenario {
 
     public void setUsePredictors(boolean usePredictors) {
         this.usePredictors = usePredictors;
+    }
+
+    public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
+        return weatherInitializer;
+    }
+
+    public void setWeatherInitializer(
+            AlgorithmFactory<? extends WeatherInitializer> weatherInitializer) {
+        this.weatherInitializer = weatherInitializer;
+    }
+
+    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
+        return weatherStrategy;
+    }
+
+    public void setWeatherStrategy(
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        this.weatherStrategy = weatherStrategy;
     }
 }

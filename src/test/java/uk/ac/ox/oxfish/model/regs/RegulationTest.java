@@ -8,11 +8,12 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -70,7 +71,7 @@ public class RegulationTest {
                                      mock(DepartingStrategy.class),
                                      destination,
                                      mock(FishingStrategy.class),
-                                   mock,
+                                   new IgnoreWeatherStrategy(), mock,
                                      mock(Hold.class), mock(Gear.class),0);
 
         when(regs.allowedAtSea(fisher, model)).thenReturn(true);

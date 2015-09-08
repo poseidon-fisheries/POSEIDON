@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.weather;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Given a threshold, if the wind speed is above it then set emergency to true otherwise not
@@ -34,5 +35,15 @@ public class WindThresholdStrategy implements WeatherEmergencyStrategy {
             return true;
         else
             return location.getWindSpeedInKph() > threshold;
+    }
+
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    @Override
+    public void turnOff() {
+
     }
 }

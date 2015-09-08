@@ -9,8 +9,8 @@ import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.eq;
@@ -33,13 +33,13 @@ public class OscillatingWeatherInitializerTest
         );
 
         FishState state = generateSimple4x4Map();
-        when(state.getYearlyDataSet()).thenReturn(mock(YearlyFishStateTimeSeries.class));
+        when(state.getDailyDataSet()).thenReturn(mock(FishStateDailyTimeSeries.class));
         NauticalMap map = state.getMap();
 
         //shouldn't have any local weather
         for(int x=0; x<4; x++)
             for(int y=0; y<4; y++)
-                assertNull(map.getSeaTile(x, y).getWeather());
+                assertNull(map.getSeaTile(x, y).grabLocalWeather());
 
 
         //prepare yourself to catch the steppable
@@ -56,7 +56,7 @@ public class OscillatingWeatherInitializerTest
         for(int x=0; x<4; x++)
             for(int y=0; y<4; y++) {
                 SeaTile tile = map.getSeaTile(x, y);
-                assertTrue(tile.getWeather() instanceof ConstantWeather);
+                assertTrue(tile.grabLocalWeather() instanceof ConstantWeather);
                 assertEquals(tile.getTemperatureInCelsius(), 0, .001);
                 assertEquals(tile.getWindSpeedInKph(), 100, .001);
                 assertEquals(tile.getWindDirection(), 0, .001); //bounded!
@@ -65,35 +65,35 @@ public class OscillatingWeatherInitializerTest
 
         //step
         Steppable weatherStep = argument.getValue();
-        when(state.getDay()).thenReturn(1d);
+        when(state.getDay()).thenReturn(0d);
         weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 20, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 120, .001);
+        when(state.getDay()).thenReturn(1d);weatherStep.step(state);
         when(state.getDay()).thenReturn(2d);weatherStep.step(state);
         when(state.getDay()).thenReturn(3d);weatherStep.step(state);
-        when(state.getDay()).thenReturn(4d);weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 80, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 180, .001);
-        when(state.getDay()).thenReturn(5d);
+        when(state.getDay()).thenReturn(4d);
         weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 100, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 200, .001);
 
         //should go back now!
-        when(state.getDay()).thenReturn(6d);
+        when(state.getDay()).thenReturn(5d);
         weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 80, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 180, .001);
+        when(state.getDay()).thenReturn(6d);weatherStep.step(state);
         when(state.getDay()).thenReturn(7d);weatherStep.step(state);
         when(state.getDay()).thenReturn(8d);weatherStep.step(state);
         when(state.getDay()).thenReturn(9d);weatherStep.step(state);
-        when(state.getDay()).thenReturn(10d);weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 0, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 100, .001);
 
 
         //should go back up!
-        when(state.getDay()).thenReturn(11d);weatherStep.step(state);
+        when(state.getDay()).thenReturn(10d);weatherStep.step(state);
         assertEquals(map.getSeaTile(0, 0).getTemperatureInCelsius(), 20, .001);
         assertEquals(map.getSeaTile(0, 0).getWindSpeedInKph(), 120, .001);
 

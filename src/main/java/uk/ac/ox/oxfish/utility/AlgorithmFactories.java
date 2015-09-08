@@ -3,12 +3,16 @@ package uk.ac.ox.oxfish.utility;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
+import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
@@ -52,6 +56,10 @@ public class AlgorithmFactories {
         NAMES_MAP.put(Market.class, Markets.NAMES);
         CONSTRUCTOR_MAP.put(AdaptationProbability.class, Probabilities.CONSTRUCTORS);
         NAMES_MAP.put(AdaptationProbability.class, Probabilities.NAMES);
+        CONSTRUCTOR_MAP.put(WeatherInitializer.class, WeatherInitializers.CONSTRUCTORS);
+        NAMES_MAP.put(WeatherInitializer.class, WeatherInitializers.NAMES);
+        CONSTRUCTOR_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.CONSTRUCTORS);
+        NAMES_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.NAMES);
     }
 
 

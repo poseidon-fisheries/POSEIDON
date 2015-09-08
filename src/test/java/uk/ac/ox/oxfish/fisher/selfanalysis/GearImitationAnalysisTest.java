@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -20,7 +21,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -92,7 +94,8 @@ public class GearImitationAnalysisTest
             Fisher fisher = new Fisher(i,mock(Port.class),new MersenneTwisterFast(),
                                        mock(Regulation.class),mock(DepartingStrategy.class),
                                        mock(DestinationStrategy.class),mock(FishingStrategy.class),
-                                       mock(Boat.class),mock(Hold.class),gear, state.getSpecies().size());
+                                       new IgnoreWeatherStrategy(), mock(Boat.class),mock(Hold.class),gear, state.getSpecies().size()
+            );
             GearImitationAnalysis analysis = new GearImitationAnalysis(0d, 1d, new LinkedList<>(), function);
 
             fishers.add(fisher);

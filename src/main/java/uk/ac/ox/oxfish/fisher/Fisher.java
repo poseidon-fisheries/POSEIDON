@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -122,6 +123,13 @@ public class Fisher implements Steppable, Startable{
      */
     private FishingStrategy fishingStrategy;
 
+
+    /**
+     * the check the agent makes to decide whether it's time to go back home given the weather
+     */
+    private WeatherEmergencyStrategy weatherStrategy;
+
+
     /**
      * the turnOff switch to call when the fisher is turned off
      */
@@ -169,6 +177,7 @@ public class Fisher implements Steppable, Startable{
      * @param departingStrategy how the fisher decides how to leave the port
      * @param destinationStrategy how the fisher decides where to go
      * @param fishingStrategy how the fisher decides how much to fish
+     * @param weatherStrategy
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
      * @param gear what is used for fishing
@@ -182,8 +191,9 @@ public class Fisher implements Steppable, Startable{
             DepartingStrategy departingStrategy,
             DestinationStrategy destinationStrategy,
             FishingStrategy fishingStrategy,
+            WeatherEmergencyStrategy weatherStrategy,
             //equipment:
-            Boat boat, Hold hold, Gear gear,
+             Boat boat, Hold hold, Gear gear,
             int numberOfSpecies) {
         this.fisherID = id;
 
@@ -197,6 +207,7 @@ public class Fisher implements Steppable, Startable{
         this.departingStrategy = departingStrategy;
         this.destinationStrategy =destinationStrategy;
         this.fishingStrategy = fishingStrategy;
+        this.weatherStrategy = weatherStrategy;
 
 
         //predictors
@@ -240,6 +251,7 @@ public class Fisher implements Steppable, Startable{
         destinationStrategy.start(state,this);
         fishingStrategy.start(state,this);
         departingStrategy.start(state,this);
+        weatherStrategy.start(state,this);
 
         //start the adaptations
         bimonthlyAdaptation.start(state,this);
@@ -274,6 +286,7 @@ public class Fisher implements Steppable, Startable{
         destinationStrategy.turnOff();
         fishingStrategy.turnOff();
         departingStrategy.turnOff();
+        weatherStrategy.turnOff();
 
         //turn off the adaptations
         bimonthlyAdaptation.turnOff();
@@ -461,6 +474,9 @@ public class Fisher implements Steppable, Startable{
             status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
                     map.distance(status.getLocation(), getHomePort().getLocation()), 1.05));
 
+        status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(status.isWeatherEmergencyOverride(),
+                                                                                      this,
+                                                                                      getLocation()));
 
     }
 
@@ -473,19 +489,23 @@ public class Fisher implements Steppable, Startable{
     }
 
     public void setDestinationStrategy(DestinationStrategy newStrategy) {
+
+        DestinationStrategy old = this.destinationStrategy;
         this.destinationStrategy = newStrategy;
+
         if(state != null) //if we have started already
         {
-            newStrategy.turnOff(); //turn off old strategy
+            old.turnOff(); //turn off old strategy
             destinationStrategy.start(state,this);
         }
     }
 
     public void setDepartingStrategy(DepartingStrategy newStrategy) {
+        DepartingStrategy old = this.departingStrategy;
         this.departingStrategy = newStrategy;
         if(state != null) //if we have started already
         {
-            newStrategy.turnOff(); //turn off old strategy
+            old.turnOff(); //turn off old strategy
             departingStrategy.start(state,this);
         }
     }
@@ -504,10 +524,11 @@ public class Fisher implements Steppable, Startable{
 
     public void setFishingStrategy(FishingStrategy newStrategy) {
 
+        FishingStrategy old = this.fishingStrategy;
         this.fishingStrategy = newStrategy;
         if(state != null) //if we have started already
         {
-            newStrategy.turnOff(); //turn off old strategy
+            old.turnOff(); //turn off old strategy
             fishingStrategy.start(state,this);
         }
     }
@@ -515,10 +536,10 @@ public class Fisher implements Steppable, Startable{
     public boolean shouldIFish(FishState state)
     {
         return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(equipment,
-                                                                               status,
-                                                                               memory,
-                                                                               grabRandomizer(),
-                                                                               state);
+                                                                            status,
+                                                                            memory,
+                                                                            grabRandomizer(),
+                                                                            state);
 
     }
 
@@ -921,4 +942,18 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+    public void setWeatherStrategy(WeatherEmergencyStrategy weatherStrategy) {
+
+
+        WeatherEmergencyStrategy old = this.weatherStrategy;
+
+        this.weatherStrategy = weatherStrategy;
+        if(state!=null)
+        {
+            old.turnOff();
+
+            weatherStrategy.start(state, this);
+        }
+
+    }
 }

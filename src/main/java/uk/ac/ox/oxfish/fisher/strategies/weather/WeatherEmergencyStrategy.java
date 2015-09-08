@@ -2,12 +2,13 @@ package uk.ac.ox.oxfish.fisher.strategies.weather;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FisherStartable;
 
 /**
  * The strategy used by the fisher to fish
  * Created by carrknight on 9/7/15.
  */
-public interface WeatherEmergencyStrategy {
+public interface WeatherEmergencyStrategy extends FisherStartable{
 
 
     /**

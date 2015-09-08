@@ -7,7 +7,10 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.equipment.*;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Engine;
+import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
@@ -15,6 +18,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseMapMaker;
@@ -217,7 +221,7 @@ public class OsmosePrototype implements Scenario {
                                       departing,
                                       destinationStrategy.apply(model),
                                       fishingStrategy.apply(model),
-                                      new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
+                                      new IgnoreWeatherStrategy(), new Boat(10,10,new Engine(engineWeight,literPerKilometer,speed),
                                                new FuelTank(fuelCapacity)),                                      new Hold(capacity, biology.getSize()),
                                       new OneSpecieGear(biology.getSpecie(0),efficiency),
                                       model.getSpecies().size()));

@@ -10,6 +10,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
+import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -199,6 +200,7 @@ public class NauticalMapFactory {
             MersenneTwisterFast random,
             int depthSmoothing,
             BiologyInitializer biologyInitializer,
+            WeatherInitializer weatherInitializer,
             GlobalBiology biology, FishState model,
             final int width,
             final int height){
@@ -215,6 +217,7 @@ public class NauticalMapFactory {
          *                                                    |___/ |__/
          */
         biologyInitializer.processMap(biology,map,random,model );
+        weatherInitializer.processMap(map,random,model);
 
         return map;
 

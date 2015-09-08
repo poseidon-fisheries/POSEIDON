@@ -5,22 +5,21 @@ import org.jenetics.DoubleChromosome;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.junit.Test;
-
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 
 import java.util.LinkedList;
 
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +48,7 @@ public class FisherEvolutionTest {
                                      new FixedProbabilityDepartingStrategy(random.nextDouble()),
                                      mock(DestinationStrategy.class),
                                      mock(FishingStrategy.class),
-                                     mock(Boat.class), mock(Hold.class),
+                                   new IgnoreWeatherStrategy(), mock(Boat.class), mock(Hold.class),
                                      mock(Gear.class),1));
 
         DoubleGene gene = DoubleGene.of(0.5,0,1);

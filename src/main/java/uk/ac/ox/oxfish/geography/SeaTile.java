@@ -136,11 +136,11 @@ public class SeaTile implements Startable{
     }
 
 
-    public LocalWeather getWeather() {
+    public LocalWeather grabLocalWeather() {
         return weather;
     }
 
-    public void setWeather(LocalWeather weather) {
+    public void assignLocalWeather(LocalWeather weather) {
         this.weather = weather;
     }
 

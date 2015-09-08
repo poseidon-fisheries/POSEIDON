@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -18,7 +19,8 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Mockito.mock;
@@ -63,7 +65,7 @@ public class FisherTest {
                                    new FixedProbabilityDepartingStrategy(1.0),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
-                                   new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)),
                                    new Hold(2, 1), gear, 1);
         fisher.start(fishState);
         fishmarket.start(fishState);
@@ -137,7 +139,7 @@ public class FisherTest {
                                    new FixedProbabilityDepartingStrategy(1.0),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
-                                   new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(30)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(30)),
                                    new Hold(2, 1), gear, 1);
 
 

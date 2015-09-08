@@ -58,7 +58,7 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
 
         for(SeaTile tile : seaTiles)
         {
-            tile.setWeather(singleInstance);
+            tile.assignLocalWeather(singleInstance);
         }
 
 
@@ -70,7 +70,7 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
             @Override
             public void step(SimState simState)
             {
-                double day = model.getDay()-1;
+                double day = model.getDay();
                 assert day >=0;
 
                 // +1 increasing speed and temperature, -1 decreasing it
@@ -87,7 +87,7 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
 
 
         //also add windspeed in the model aggregate data
-        model.getYearlyDataSet().registerGatherer("Model WindSpeed", new Function<FishState, Double>() {
+        model.getDailyDataSet().registerGatherer("Model WindSpeed", new Function<FishState, Double>() {
             @Override
             public Double apply(FishState state) {
                 return singleInstance.getWindSpeedInKph();

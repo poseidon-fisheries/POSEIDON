@@ -7,17 +7,18 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
+import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class FishingTest {
@@ -74,7 +75,7 @@ public class FishingTest {
 
                                          }
                                      },
-                                   new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
                                      new Hold(100.0, 1), gear, 1);
         fisher.start(fishState);
         fisher.step(fishState);

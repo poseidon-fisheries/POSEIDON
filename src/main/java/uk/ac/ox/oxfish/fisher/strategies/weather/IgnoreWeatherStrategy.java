@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.weather;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Doesn't care at all about weather, always returns false
@@ -21,5 +22,16 @@ public class IgnoreWeatherStrategy implements WeatherEmergencyStrategy {
     public boolean updateWeatherEmergencyFlag(
             boolean currentEmergencyFlag, Fisher fisher, SeaTile location) {
         return false;
+    }
+
+
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    @Override
+    public void turnOff() {
+
     }
 }

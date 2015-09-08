@@ -6,7 +6,10 @@ import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.fisher.*;
-import uk.ac.ox.oxfish.fisher.equipment.*;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Engine;
+import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -14,6 +17,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStra
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -25,7 +29,8 @@ import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 
 import java.util.Queue;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -71,7 +76,7 @@ public class MovingTest
 
                                          }
                                      },
-                                     new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
                                      new Hold(100.0, 1), gear, 1);
         fisher.start(mock(FishState.class));
         //starts at port!
@@ -149,7 +154,7 @@ public class MovingTest
                                      strategy, mock(FishingStrategy.class),
 
 
-                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
 
 
                                    mock(Hold.class),
@@ -178,7 +183,7 @@ public class MovingTest
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(),
                 mock(DepartingStrategy.class), strategy,
                                      mock(FishingStrategy.class),
-                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
+                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
                                    mock(Hold.class), mock(Gear.class), 1);
 
         fisher.start(mock(FishState.class));

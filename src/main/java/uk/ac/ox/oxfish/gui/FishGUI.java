@@ -1,13 +1,11 @@
 package uk.ac.ox.oxfish.gui;
 
-import com.google.common.primitives.Ints;
 import sim.display.Console;
 import sim.display.Controller;
 import sim.display.Display2D;
 import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.field.grid.IntGrid2D;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.geo.GeomPortrayal;
@@ -22,7 +20,6 @@ import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
 import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
 import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -194,6 +191,10 @@ public class FishGUI extends GUIState{
 
         ((Console) controller).getTabPane().add("Regulations",new RegulationTab(this,drawer) );
         //drawer.attach();
+
+
+
+
 
 
 
