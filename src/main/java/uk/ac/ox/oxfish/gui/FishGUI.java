@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.gui;
 
+import javafx.collections.ListChangeListener;
 import sim.display.Console;
 import sim.display.Controller;
 import sim.display.Display2D;
@@ -13,7 +14,9 @@ import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import sim.portrayal.simple.TrailedPortrayal2D;
 import sim.util.gui.SimpleColorMap;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
@@ -43,13 +46,14 @@ public class FishGUI extends GUIState{
 
     private final SparseGridPortrayal2D ports = new SparseGridPortrayal2D();
     private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();
+    private final SparseGridPortrayal2D trails = new SparseGridPortrayal2D();
+
     private final FastValueGridPortrayal2D fishingHotspots = new FastValueGridPortrayal2D("Fishing Hotspots");
 
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
     private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
     private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
-
 
 
     /**
@@ -90,6 +94,7 @@ public class FishGUI extends GUIState{
         display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
         display2D.attach(fishingHotspots, "Fishing Hotspots");
+        display2D.attach(trails, "Boat Trails");
         display2D.attach(boats, "Boats");
         display2D.attach(ports, "Ports");
         displayFrame = display2D.createFrame();
@@ -141,20 +146,45 @@ public class FishGUI extends GUIState{
         //fishing hotspots
         state.getMap().guiStart(state);
         fishingHotspots.setField(state.getFishedMap());
-        fishingHotspots.setMap(new SimpleColorMap(0, (state.getFishers().size()+1)*10, new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(
+                new SimpleColorMap(0, (state.getFishers().size() + 1) * 2, new Color(0, 0, 0, 0), Color.RED));
         //reset your color map every year
-        fishingHotspots.setMap(new SimpleColorMap(0, (state.getFishers().size()+1)*10, new Color(0, 0, 0, 0), Color.RED));
+        fishingHotspots.setMap(
+                new SimpleColorMap(0, (state.getFishers().size() + 1) * 2, new Color(0, 0, 0, 0), Color.RED));
 
         //boats
+        trails.setField(state.getFisherGrid());
+        trails.setPortrayalForAll(null);
         boats.setField(state.getFisherGrid());
-        boats.setPortrayalForAll(new ImagePortrayal2D(boatIcon)
-        {
+        ImagePortrayal2D boatPortrayal = new ImagePortrayal2D(boatIcon) {
             @Override
             public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
-                return wrapper == null?null:
-                        new MetaInspector(wrapper.getObject(),self);
+                return wrapper == null ? null :
+                        new MetaInspector(wrapper.getObject(), self);
+            }
+
+
+        };
+        for(Fisher o : state.getFishers()) {
+            assignPortrayalToFisher(boatPortrayal, o);
+        }
+        state.getFishers().addListener(new ListChangeListener<Fisher>() {
+            @Override
+            public void onChanged(Change<? extends Fisher> c) {
+                for(Fisher fisher : c.getRemoved())
+                {
+                    boats.setPortrayalForObject(fisher,null);
+                    trails.setPortrayalForObject(fisher,null);
+                }
+                if(c.wasAdded())
+                    for(Fisher fisher : c.getAddedSubList())
+                        assignPortrayalToFisher(boatPortrayal,fisher);
+
             }
         });
+
+
+
 
         //ports
         ports.setField(state.getPortGrid());
@@ -199,6 +229,17 @@ public class FishGUI extends GUIState{
 
 
 
+    }
+
+    private void assignPortrayalToFisher(ImagePortrayal2D boatPortrayal, Fisher o) {
+        TrailedPortrayal2D trailed = new TrailedPortrayal2D
+                (this,
+                 boatPortrayal,
+                 trails,
+                 50, Color.RED,new Color(0,0,0,0));
+        trailed.setOnlyGrowTrailWhenSelected(true);
+        boats.setPortrayalForObject(o,trailed);
+        trails.setPortrayalForObject(o,trailed);
     }
 
 

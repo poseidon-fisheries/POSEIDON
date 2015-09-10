@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static uk.ac.ox.oxfish.experiments.BestGearWins.efficiencyImitation;
 
-public class GasPrice {
+public class GasPriceAndTech {
 
     @Test
     public void expensiveOilPushesEfficientGear() throws Exception {

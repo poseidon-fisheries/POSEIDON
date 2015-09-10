@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.ga;
 
 import ec.util.MersenneTwisterFast;
+import javafx.collections.FXCollections;
 import org.jenetics.DoubleChromosome;
 import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
@@ -40,7 +41,7 @@ public class FisherEvolutionTest {
         when(model.seed()).thenReturn(random.nextLong());
 
         LinkedList<Fisher> fishers = new LinkedList<>();
-        when(model.getFishers()).thenReturn(fishers);
+        when(model.getFishers()).thenReturn(FXCollections.observableList(fishers));
         for(int i=0; i<100; i++)
             fishers.add(new Fisher(i, mock(Port.class),
                                      random,

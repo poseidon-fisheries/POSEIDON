@@ -2,6 +2,8 @@ package uk.ac.ox.oxfish.model;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -42,7 +44,7 @@ public class FishState  extends SimState{
 
     private GlobalBiology biology;
 
-    private List<Fisher> fishers;
+    private ObservableList<Fisher> fishers;
 
     private List<Startable> toStart;
 
@@ -88,7 +90,7 @@ public class FishState  extends SimState{
 
     /**
      * create a fishstate model with one step per day
-     * @param seed the random seed
+     * @param seed the random seedf
      */
     public FishState(long seed) {
         this(seed,1);
@@ -137,7 +139,7 @@ public class FishState  extends SimState{
 
 
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
-        fishers = scenarioPopulation.getPopulation();
+        fishers = FXCollections.observableList(scenarioPopulation.getPopulation());
         socialNetwork = scenarioPopulation.getNetwork();
         socialNetwork.populate(this);
 
@@ -212,7 +214,7 @@ public class FishState  extends SimState{
         this.scenario = scenario;
     }
 
-    public List<Fisher> getFishers() {
+    public ObservableList<Fisher> getFishers() {
         return fishers;
     }
 

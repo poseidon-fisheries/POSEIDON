@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import ec.util.MersenneTwisterFast;
+import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -105,7 +106,7 @@ public class GearImitationAnalysisTest
         //create the social network
         SocialNetwork network = new SocialNetwork(NetworkBuilders.CONSTRUCTORS.get("Equal Out Degree").get());
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
-        when(state.getFishers()).thenReturn(fishers);
+        when(state.getFishers()).thenReturn(FXCollections.observableList(fishers));
         when(state.getSocialNetwork()).thenReturn(network);
         network.populate(state);
 

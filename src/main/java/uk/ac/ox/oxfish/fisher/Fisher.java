@@ -956,4 +956,8 @@ public class Fisher implements Steppable, Startable{
         }
 
     }
+
+    public WeatherEmergencyStrategy getWeatherStrategy() {
+        return weatherStrategy;
+    }
 }

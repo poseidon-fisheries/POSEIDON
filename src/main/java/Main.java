@@ -1,16 +1,20 @@
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import sim.display.Console;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -63,6 +67,64 @@ class Main{
         state.setScenario(scenarioSelector.getScenario());
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);
+        c.setVisible(true);
+    }
+
+
+    public static void maintrails(String[] args) throws IOException {
+
+
+
+        PrototypeScenario scenario = new PrototypeScenario();
+
+        scenario.setFishers(100);
+        scenario.setHoldSize(new FixedDoubleParameter(500));
+        scenario.setGridCellSizeInKm(2);
+        scenario.setBiologyInitializer(new FromLeftToRightFactory());
+        scenario.setThrawlingSpeed(new FixedDoubleParameter(0)); //fishing needs no fuel, just travelling
+
+
+
+        FishState state = new FishState(System.currentTimeMillis(),24);
+        state.setScenario(scenario);
+
+
+        state.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                state.scheduleEveryDay(new Steppable() {
+                    Port port = state.getPorts().iterator().next();
+
+                    @Override
+                    public void step(SimState simState) {
+                        if (state.getYear() > 0)
+                            if (state.getYear() % 2 == 1) {
+                                port.setGasPricePerLiter(port.getGasPricePerLiter() + 0.02);
+                            } else
+                                port.setGasPricePerLiter(port.getGasPricePerLiter() - 0.02);
+
+                    }
+                }, StepOrder.DAWN);
+            }
+
+            @Override
+            public void turnOff() {
+
+            }
+        });
+
+
+
+
+
+        Log.set(Log.LEVEL_NONE);
+        Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
+
+
+        state.setScenario(scenario);
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+
         c.setVisible(true);
     }
 
@@ -134,7 +196,7 @@ class Main{
 
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(new FileReader(Paths.get("inputs", "temp.yaml").toFile()),
-                                                   PrototypeScenario.class);
+                                        PrototypeScenario.class);
 
         FishState state = new FishState(System.currentTimeMillis(),2);
         state.setScenario(scenario);
