@@ -4,6 +4,7 @@ import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -34,6 +35,12 @@ public class SeaTile implements Startable{
      * the local-biology object, used to check biomass
      */
     private LocalBiology biology;
+
+
+    /**
+     * a reference to a port if it is in the seatile
+     */
+    private Port portHere;
 
 
     /**
@@ -154,5 +161,13 @@ public class SeaTile implements Startable{
 
     public double getWindDirection() {
         return weather.getWindDirection();
+    }
+
+    public boolean isPortHere() {
+        return portHere != null;
+    }
+
+    public void linkTileToPort(Port portHere) {
+        this.portHere = portHere;
     }
 }

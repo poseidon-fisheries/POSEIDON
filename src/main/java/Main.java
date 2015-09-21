@@ -10,11 +10,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -33,6 +35,7 @@ import java.nio.file.Paths;
 
 class Main{
 
+    //main
     public static void main(String[] args) throws IOException {
 
 
@@ -71,7 +74,7 @@ class Main{
     }
 
 
-    public static void maintrails(String[] args) throws IOException {
+    public static void oilPriceMiniDemo(String[] args) throws IOException {
 
 
 
@@ -80,6 +83,7 @@ class Main{
         scenario.setFishers(100);
         scenario.setHoldSize(new FixedDoubleParameter(500));
         scenario.setGridCellSizeInKm(2);
+        scenario.setCoastalRoughness(0);
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
         scenario.setThrawlingSpeed(new FixedDoubleParameter(0)); //fishing needs no fuel, just travelling
 
@@ -128,17 +132,22 @@ class Main{
         c.setVisible(true);
     }
 
-
-    public static void main2(String[] args) throws IOException {
+//OneDudeFishingAloneDemo
+    public static void OneDudeFishingAloneDemo(String[] args) throws IOException {
 
 
 
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setFishers(2);
+        scenario.setFishers(1);
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
         networkBuilder.setDegree(1);
-        scenario.setNetworkBuilder(networkBuilder);
-        //scenario.setNetworkBuilder(new EmptyNetworkBuilder());
+        //make hill-climbing step closer
+        PerTripImitativeDestinationFactory hill = new PerTripImitativeDestinationFactory();
+        hill.setStepSize(new FixedDoubleParameter(1));
+        scenario.setDestinationStrategy(hill);
+
+        //scenario.setNetworkBuilder(networkBuilder);
+        scenario.setNetworkBuilder(new EmptyNetworkBuilder());
         FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
         biologyInitializer.setBiologySmoothingIndex(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);

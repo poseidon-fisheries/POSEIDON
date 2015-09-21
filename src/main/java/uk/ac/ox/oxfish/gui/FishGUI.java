@@ -9,10 +9,12 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
+import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
+import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
 import sim.util.gui.SimpleColorMap;
@@ -156,7 +158,7 @@ public class FishGUI extends GUIState{
         trails.setField(state.getFisherGrid());
         trails.setPortrayalForAll(null);
         boats.setField(state.getFisherGrid());
-        ImagePortrayal2D boatPortrayal = new ImagePortrayal2D(boatIcon) {
+        SimplePortrayal2D boatPortrayal = new ImagePortrayal2D(boatIcon) {
             @Override
             public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
                 return wrapper == null ? null :
@@ -231,14 +233,17 @@ public class FishGUI extends GUIState{
 
     }
 
-    private void assignPortrayalToFisher(ImagePortrayal2D boatPortrayal, Fisher o) {
+    private void assignPortrayalToFisher(SimplePortrayal2D boatPortrayal, Fisher o) {
         TrailedPortrayal2D trailed = new TrailedPortrayal2D
                 (this,
                  boatPortrayal,
                  trails,
-                 50, Color.RED,new Color(0,0,0,0));
+                 50, Color.BLUE,new Color(0,0,255,0));
         trailed.setOnlyGrowTrailWhenSelected(true);
-        boats.setPortrayalForObject(o,trailed);
+        trailed.setOnlyShowTrailWhenSelected(false);
+        CircledPortrayal2D circled = new CircledPortrayal2D(trailed);
+        circled.setOnlyCircleWhenSelected(true);
+        boats.setPortrayalForObject(o, circled);
         trails.setPortrayalForObject(o,trailed);
     }
 

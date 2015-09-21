@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.DoubleLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -32,9 +33,16 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("Fixed Rest",
                          FixedRestTimeDepartingFactory::new);
         NAMES.put(FixedRestTimeDepartingFactory.class,"Fixed Rest");
+        CONSTRUCTORS.put("Double Logistic",
+                         DoubleLogisticDepartingFactory::new);
+        NAMES.put(DoubleLogisticDepartingFactory.class,"Double Logistic");
     }
 
     private DepartingStrategies() {}
+
+
+
+
 
 
 }

@@ -141,4 +141,9 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
+
+    public int numberOfDailyObservations()
+    {
+        return dailyTimeSeries.numberOfObservations();
+    }
 }

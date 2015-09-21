@@ -5,6 +5,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import fr.ird.osmose.OsmoseSimulation;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.weather.initializer.ConstantWeatherInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -162,6 +163,8 @@ public class OsmosePrototype implements Scenario {
         NauticalMap map = OsmoseMapMaker.buildMap(osmoseSimulation, gridSizeInKm,stepper,model.random );
 
 
+        ConstantWeatherInitializer weather = new ConstantWeatherInitializer(100,0,0);
+        weather.processMap(map,model.getRandom(),model);
 
         //general biology
         //create fixed price market

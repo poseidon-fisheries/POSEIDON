@@ -77,8 +77,8 @@ public class CoordinateTransformer
             e.printStackTrace();
             System.err.println("failure to transform");
         }
-        //get proper X and y
 
+        //get proper X and y
         final Point2D transformed = transform.transform(new Point2D.Double(guiX, guiY), null);
 
         //now get the ratios of widths/heights; notice that we need to grab the inside display because

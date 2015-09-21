@@ -6,7 +6,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A location fishermen come and go from
@@ -42,6 +44,9 @@ public class Port {
         this.marketMap = marketMap;
         this.gasPricePerLiter = gasPricePerLiter;
         fishersHere = new HashSet<>();
+
+        location.linkTileToPort(this);
+
     }
 
     /**

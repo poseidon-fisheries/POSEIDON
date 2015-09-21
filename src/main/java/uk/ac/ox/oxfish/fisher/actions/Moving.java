@@ -77,7 +77,7 @@ public class Moving implements Action
                 else
                     return new ActionResult(new Moving(),hoursLeft-hoursForThisStep);
             }
-           //too far, try closer
+            //too far, try closer
         }
         return new ActionResult(new Moving(hoursLeft),0);
 
@@ -104,10 +104,40 @@ public class Moving implements Action
 
         while( x != endX || y!= endY)
         {
-            x+= Integer.signum( endX - x );
-            y+= Integer.signum( endY - y );
-            path.add(map.getSeaTile(x,y));
+
+            int candidateX =  x + Integer.signum( endX - x );
+            int candidateY =  y + Integer.signum( endY - y );
+
+            //can you move your preferred way?
+            SeaTile bestSeaTile = map.getSeaTile(candidateX, candidateY);
+            if(bestSeaTile.getAltitude() <= 0 || bestSeaTile.isPortHere())
+            {
+                path.add(bestSeaTile);
+                x = candidateX;
+                y=candidateY;
+            }
+            //try to move on the x axis only then
+            else if(candidateX != x && map.getSeaTile(candidateX,y).getAltitude() <= 0)
+            {
+                x= candidateX;
+                path.add(map.getSeaTile(candidateX,y));
+            }
+            else if(candidateY != y && map.getSeaTile(x,candidateY).getAltitude() <= 0)
+            {
+                y=candidateY;
+                path.add(map.getSeaTile(x,candidateY));
+
+            }
+            //otherwise just go over land!
+            else
+            {
+                path.add(map.getSeaTile(candidateX,candidateY));
+                x= candidateX;
+                y=candidateY;
+            }
         }
+
+
         assert path.isEmpty() || path.peekLast().equals(end);
 
         return path;

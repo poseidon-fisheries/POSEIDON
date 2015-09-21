@@ -303,4 +303,19 @@ public class FishStateUtilities {
         }
         return sxy/(Math.sqrt(sxx*syy)+TINY);
     }
+
+
+    /**
+     * returns L *  (1-(1/(Math.exp(-k*(x-x0)))));
+     */
+    public static double logisticProbability(double L, double k, double x0, double x)
+    {
+
+
+        return L *  (1-(1/(1+Math.exp(-k*(x-x0)))));
+
+
+
+
+    }
 }
