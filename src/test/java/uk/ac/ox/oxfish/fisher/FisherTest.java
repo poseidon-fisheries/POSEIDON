@@ -96,7 +96,7 @@ public class FisherTest {
         //2 steps fishing, 9  liters each, 10$ per liter
         //--->
         //380$ of costs per step
-        assertEquals(record.getProfitPerHour(), (23*2 - 10.0 * 10 * 2 - 2 * 10 * 9)/4,.001);
+        assertEquals(record.getProfitPerHour(false), (23*2 - 10.0 * 10 * 2 - 2 * 10 * 9)/4,.001);
 
 
     }

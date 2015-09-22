@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -125,5 +124,9 @@ public class TripLogger implements Startable
     @VisibleForTesting
     public void setNumberOfSpecies(int numberOfSpecies) {
         this.numberOfSpecies = numberOfSpecies;
+    }
+
+    public void recordOpportunityCosts(double implicitCost) {
+        currentTrip.recordOpportunityCosts(implicitCost);
     }
 }

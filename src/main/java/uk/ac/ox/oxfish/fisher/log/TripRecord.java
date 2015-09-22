@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.DoubleStream;
 
 /**
@@ -36,6 +35,12 @@ public class TripRecord {
      * total costs accrued
      */
     private double totalCosts = 0;
+
+    /**
+     * costs that are economic but not accounting, that is they do not involve direct loss of money but they try to
+     * estimate losses in opportunities
+     */
+    private double opportunityCosts = 0;
 
 
     /**
@@ -90,6 +95,13 @@ public class TripRecord {
         totalCosts += newCosts;
     }
 
+
+    public void recordOpportunityCosts(double opportunityCosts)
+    {
+        Preconditions.checkState(!completed);
+        this.opportunityCosts+=opportunityCosts;
+    }
+
     public void recordTripCutShort(){
         Preconditions.checkState(!completed);
         cutShort = true;
@@ -104,22 +116,28 @@ public class TripRecord {
     /**
      * return profit/step; an easy way to compare trip records
      * @return profits/days
+     * @param includingOpportunityCosts
      */
-    public double getProfitPerHour()
+    public double getProfitPerHour(boolean includingOpportunityCosts)
     {
 
         double totalEarnings = DoubleStream.of(earningsPerSpecie).sum();
         Preconditions.checkArgument(durationInHours > 0 == completed);
-        return (totalEarnings - totalCosts) / durationInHours;
+        if(!includingOpportunityCosts)
+            return (totalEarnings - totalCosts) / durationInHours;
+        else
+            return (totalEarnings - totalCosts - opportunityCosts) / durationInHours;
+
     }
 
 
     /**
      * returns the profit associated with a particular specie
      * @param specie the specie index
+     * @param countOpportunityCosts
      * @return NAN if there was nothing caught for this specie, otherwise specie revenue - costs*(proportion of catch that is from this specie)
      */
-    public  double getProfitPerSpecie(int specie)
+    public  double getProfitPerSpecie(int specie, boolean countOpportunityCosts)
     {
         if(finalCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
@@ -130,8 +148,11 @@ public class TripRecord {
         assert  catchProportion > 0;
         assert catchProportion <=1.0;
 
+        if(!countOpportunityCosts)
+            return earningsPerSpecie[specie]-totalCosts*catchProportion;
+        else
+            return earningsPerSpecie[specie]-(totalCosts+opportunityCosts)*catchProportion;
 
-        return earningsPerSpecie[specie]-totalCosts*catchProportion;
     }
 
     /**
@@ -144,7 +165,7 @@ public class TripRecord {
         if(finalCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
         else
-            return getProfitPerSpecie(specie)/finalCatch[specie];
+            return getProfitPerSpecie(specie, false)/finalCatch[specie];
     }
 
 

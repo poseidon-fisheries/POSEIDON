@@ -34,6 +34,8 @@ public class ITQOrderBook implements Steppable,Startable{
     private double markup = 0.05;
 
 
+    private double lastClosingPrice = Double.NaN;
+
     private Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
 
 
@@ -151,6 +153,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
 
 
+            lastClosingPrice = tradingPrice;
             assert sellerQuota.getQuotaRemaining(specieIndex)>=0;
 
             //again!
@@ -194,7 +197,7 @@ public class ITQOrderBook implements Steppable,Startable{
     }
 
     /**
-     * How many buyers and sellers fruitfully since the beginning of the day
+     * How many buyers and sellers traded since the beginning of the day
      */
     public double getDailyAveragePrice()
     {
@@ -202,5 +205,9 @@ public class ITQOrderBook implements Steppable,Startable{
         if(quotas ==0)
             return Double.NaN;
         return counter.getColumn(MONEY_COLUMN_NAME)/ quotas;
+    }
+
+    public double getLastClosingPrice() {
+        return lastClosingPrice;
     }
 }

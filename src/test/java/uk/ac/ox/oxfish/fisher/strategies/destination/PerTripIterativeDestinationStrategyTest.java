@@ -59,7 +59,7 @@ public class PerTripIterativeDestinationStrategyTest {
             when(record.isCutShort()).thenReturn(true);
             favoriteSpot = hill.chooseDestination(mock(FisherEquipment.class),
                                                   status, mock(FisherMemory.class) , random, fishState, new Moving());
-            when(record.getProfitPerHour()).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
+            when(record.getProfitPerHour(true)).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
             hill.getAlgorithm().adapt(fisher,random);
 

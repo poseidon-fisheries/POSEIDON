@@ -32,8 +32,8 @@ public class TripLoggerTest
         logger.finishTrip(10);
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
-        assertEquals(logger.getCurrentTrip().getProfitPerHour(),-10,.001);
-        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0),-100,.001);
+        assertEquals(logger.getCurrentTrip().getProfitPerHour(false),-10,.001);
+        assertEquals(logger.getCurrentTrip().getProfitPerSpecie(0, false),-100,.001);
         assertEquals(logger.getCurrentTrip().getUnitProfitPerSpecie(0),-1,.001);
         assertEquals(logger.getFinishedTrips().size(),1);
 

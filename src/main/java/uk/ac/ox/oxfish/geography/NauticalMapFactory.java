@@ -199,13 +199,23 @@ public class NauticalMapFactory {
             int coastalRoughness,
             MersenneTwisterFast random,
             int depthSmoothing,
-            BiologyInitializer biologyInitializer,
-            WeatherInitializer weatherInitializer,
-            GlobalBiology biology, FishState model,
             final int width,
             final int height){
 
-        NauticalMap map = prototypeMap(coastalRoughness,random,depthSmoothing, width, height);
+        return prototypeMap(coastalRoughness,random,depthSmoothing, width, height);
+
+
+
+
+    }
+
+
+    public static NauticalMap addWeatherAndBiologyToMap(NauticalMap map,
+                                                        MersenneTwisterFast random,
+                                                        BiologyInitializer biologyInitializer,
+                                                        WeatherInitializer weatherInitializer,
+                                                        GlobalBiology biology, FishState model)
+    {
 
         //map.initializeBiology(RandomConstantBiologyInitializer(random,minBiomass,maxBiomass));;
         map.initializeBiology(biologyInitializer,random ,biology );
@@ -220,9 +230,6 @@ public class NauticalMapFactory {
         weatherInitializer.processMap(map,random,model);
 
         return map;
-
-
-
     }
 
     /**

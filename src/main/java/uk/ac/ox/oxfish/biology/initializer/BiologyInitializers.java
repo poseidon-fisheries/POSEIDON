@@ -46,6 +46,10 @@ public class BiologyInitializers {
                          HalfBycatchFactory::new);
         NAMES.put(HalfBycatchFactory.class,"Half Bycatch");
 
+     CONSTRUCTORS.put("Split in Half",
+                      SplitInitializerFactory::new);
+        NAMES.put(SplitInitializerFactory.class,"Split in Half");
+
 
     }
 

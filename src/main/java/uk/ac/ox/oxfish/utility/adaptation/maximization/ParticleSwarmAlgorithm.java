@@ -103,8 +103,8 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                                                                 Fisher fisher) {
                                                             return fisher.getBestSpotForTripsRemembered(
                                                                     (o1, o2) -> Double.compare(
-                                                                            o1.getInformation().getProfitPerHour(),
-                                                                            o2.getInformation().getProfitPerHour())
+                                                                            o1.getInformation().getProfitPerHour(true),
+                                                                            o2.getInformation().getProfitPerHour(true))
                                                             );
                                                         }
                                                     },

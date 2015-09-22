@@ -51,10 +51,11 @@ public interface Regulation
     /**
      * tell the regulation object this much of this specie has been sold
      * @param specie the specie of fish sold
+     * @param seller agent selling the fish
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
-    void reactToSale(Specie specie, double biomass, double revenue);
+    void reactToSale(Specie specie, Fisher seller, double biomass, double revenue);
 
     /**
      * returns a copy of the regulation, used defensively

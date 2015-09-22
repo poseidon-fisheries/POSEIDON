@@ -19,11 +19,22 @@ public class TripRecordTest {
         record.recordCosts(100);
         record.recordEarnings(0,1,200);
         record.completeTrip(10);
-        assertEquals(record.getProfitPerHour(),10,.001d);
+        assertEquals(record.getProfitPerHour(false),10,.001d);
     }
 
 
+    @Test
+    public void opportunityCosts() throws Exception {
 
+
+        TripRecord record = new TripRecord(1);
+        record.recordCosts(100);
+        record.recordOpportunityCosts(50);
+        record.recordEarnings(0,1,200);
+        record.completeTrip(10);
+        assertEquals(record.getProfitPerHour(false),10,.001d);
+        assertEquals(record.getProfitPerHour(true),5,.001d);
+    }
 
     @Test
     public void cannotChangeCompletedStuff(){

@@ -5,7 +5,6 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * 
@@ -17,6 +16,19 @@ public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher>
 
 
     /**
+     * whether we should count opportunity costs when it comes to decisions
+     */
+    private final boolean includingOpportunityCosts;
+
+    public HourlyProfitInTripFunction(boolean includingOpportunityCosts) {
+        this.includingOpportunityCosts = includingOpportunityCosts;
+    }
+
+    public HourlyProfitInTripFunction() {
+        this(true);
+    }
+
+    /**
      * compute current fitness of the agent
      *
      * @param observed agent whose fitness we are trying to compute
@@ -26,7 +38,7 @@ public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher>
     public double computeCurrentFitness(Fisher observed) {
         TripRecord lastFinishedTrip = observed.getLastFinishedTrip();
         return lastFinishedTrip == null ? Double.NaN :
-                FishStateUtilities.round(lastFinishedTrip.getProfitPerHour());
+                FishStateUtilities.round(lastFinishedTrip.getProfitPerHour(includingOpportunityCosts));
     }
 
     /**
@@ -42,7 +54,7 @@ public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher>
         List<TripRecord> finishedTrips = observed.getFinishedTrips();
         if(finishedTrips.size() >= 2)
             return FishStateUtilities.round(
-                    finishedTrips.get(finishedTrips.size() - 2).getProfitPerHour()
+                    finishedTrips.get(finishedTrips.size() - 2).getProfitPerHour(includingOpportunityCosts)
             );
         else
             return Double.NaN;

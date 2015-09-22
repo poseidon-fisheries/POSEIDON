@@ -97,6 +97,9 @@ public class PrototypeScenario implements Scenario {
      */
     private boolean usePredictors = false;
 
+
+
+
     /**
      * boat speed
      */
@@ -156,6 +159,12 @@ public class PrototypeScenario implements Scenario {
 
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
+    /**
+     * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
+     * in the biology/fishery
+     */
+    private Long mapMakerDedicatedRandomSeed =  null;
+
     public PrototypeScenario() {
     }
 
@@ -173,19 +182,28 @@ public class PrototypeScenario implements Scenario {
 
         MersenneTwisterFast random = model.random;
 
+        MersenneTwisterFast mapMakerRandom = model.random;
+        if(mapMakerDedicatedRandomSeed != null)
+            mapMakerRandom = new MersenneTwisterFast(mapMakerDedicatedRandomSeed);
+
+
+
         BiologyInitializer initializer = biologyInitializer.apply(model);
         WeatherInitializer weather = weatherInitializer.apply(model);
 
         GlobalBiology biology = GlobalBiology.genericListOfSpecies(initializer.getNumberOfSpecies());
 
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
-                                                                                   random,
+                                                                                   mapMakerRandom,
                                                                                    depthSmoothing,
-                                                                                   initializer,
-                                                                                   weather,
-                                                                                   biology, model, width, height);
+                                                                                   width, height);
+
+
         map.setDistance(new CartesianDistance(gridCellSizeInKm));
 
+        NauticalMapFactory.addWeatherAndBiologyToMap(map,random,initializer,
+                                                     weather,
+                                                     biology, model);
 
         //general biology
         //create fixed price market
@@ -200,7 +218,7 @@ public class PrototypeScenario implements Scenario {
             marketMap.addMarket(specie,market.apply(model));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, random);
+        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
 
 
 
@@ -519,5 +537,13 @@ public class PrototypeScenario implements Scenario {
     public void setWeatherStrategy(
             AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
         this.weatherStrategy = weatherStrategy;
+    }
+
+    public Long getMapMakerDedicatedRandomSeed() {
+        return mapMakerDedicatedRandomSeed;
+    }
+
+    public void setMapMakerDedicatedRandomSeed(Long mapMakerDedicatedRandomSeed) {
+        this.mapMakerDedicatedRandomSeed = mapMakerDedicatedRandomSeed;
     }
 }

@@ -690,6 +690,17 @@ public class Fisher implements Steppable, Startable{
 
 
     /**
+     * tell the logger you incurred some travel costs without actually touching the bank balance. This is useful for accounting
+     * for things like opportunity costs
+     * @param implicitCost implicit expenditure
+     */
+    public void recordOpportunityCosts(double implicitCost)
+    {
+        memory.getTripLogger().recordOpportunityCosts(implicitCost);
+    }
+
+
+    /**
      * consumes the money but doesn't record the cost in the trip record. This is useful for expenditures like
      * bank interest payments, quota buying and selling and other things that are not due to the immediate needs of the trip
      * being taken

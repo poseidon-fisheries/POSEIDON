@@ -10,16 +10,14 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 /**
- * A diffusing logistic initializer where the bycatch specie only exists on the upper half of the sea.
- * Created by carrknight on 7/30/15.
+ * A diffusing logistic initializer with 2 species: 1 lives on the top and one at the bottom of the map
+ * Created by carrknight on 9/22/15.
  */
-public class HalfBycatchInitializer implements BiologyInitializer {
-
-
+public class SplitInitializer implements BiologyInitializer {
 
     private final  DiffusingLogisticInitializer delegate;
 
-    public HalfBycatchInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
+    public SplitInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
                                   double percentageLimitOnDailyMovement,
                                   double differentialPercentageToMove) {
         delegate = new DiffusingLogisticInitializer(carryingCapacity, steepness,
@@ -48,9 +46,12 @@ public class HalfBycatchInitializer implements BiologyInitializer {
                                                                                                             mapHeightInCells,
                                                                                                             mapWidthInCells);
 
-            //if you are at the top, make carrying capacity of the second specie = 0
+            //make the map split in half
             if (seaTile.getGridY() < mapHeightInCells / 2)
                 generated.setCarryingCapacity(biology.getSpecie(1), 0d);
+            else
+                generated.setCarryingCapacity(biology.getSpecie(0), 0d);
+
 
             return generated;
         }

@@ -104,13 +104,13 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
     /**
      * tell the regulation object this much of this specie has been sold
-     *
-     * @param specie  the specie of fish sold
+     *  @param specie  the specie of fish sold
+     * @param seller
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Specie specie, double biomass, double revenue) {
+    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
 
         quotaRemaining -= biomass;
         Preconditions.checkState(quotaRemaining >= 0, quotaRemaining);

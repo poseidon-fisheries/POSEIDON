@@ -2,11 +2,13 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -33,7 +35,7 @@ public class IQMonoFactoryTest {
         assertNotEquals(tac1,tac2);
 
         //consume a bit of the second, it will NOT affect the first
-        tac2.reactToSale(mock(Specie.class),100,1234);
+        tac2.reactToSale(mock(Specie.class),mock(Fisher.class) , 100, 1234);
         assertEquals(tac1.getYearlyQuota(),200,.0001);
         assertEquals(tac1.getQuotaRemaining(0),200,.0001);
         assertEquals(tac2.getYearlyQuota(),200,.0001);

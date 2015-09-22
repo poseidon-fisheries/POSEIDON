@@ -38,7 +38,7 @@ public class MonoQuotaPriceGenerator implements FisherStartable
 
 
 
-        fisher.getDailyData().registerGatherer("Reservation Lambda Owning 1000 quotas",
+        fisher.getDailyData().registerGatherer("Reservation Quota Price of " + model.getSpecies().get(specieIndex),
                                                fisher1 -> computeLambda(),
                                                Double.NaN);
 

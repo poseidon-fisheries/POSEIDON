@@ -53,7 +53,7 @@ public class ProtectedAreasOnly implements Regulation {
      * no reaction
      */
     @Override
-    public void reactToSale(Specie specie, double biomass, double revenue) {
+    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
 
     }
 

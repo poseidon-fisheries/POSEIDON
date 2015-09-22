@@ -131,7 +131,7 @@ public class CongestedMarket extends AbstractMarket implements Steppable{
         fisher.earn(revenue);
 
         //tell regulation
-        regulation.reactToSale(specie, biomassActuallySellable, revenue);
+        regulation.reactToSale(specie,fisher , biomassActuallySellable, revenue);
 
         //return biomass sellable
         return new TradeInfo(biomassActuallySellable,specie,revenue);

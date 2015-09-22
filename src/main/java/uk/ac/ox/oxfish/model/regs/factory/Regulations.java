@@ -49,6 +49,9 @@ public class Regulations
         CONSTRUCTORS.put("Mono-ITQ", ITQMonoFactory::new);
         NAMES.put(ITQMonoFactory.class,"Mono-ITQ");
 
+        CONSTRUCTORS.put("Specific-ITQ", ITQSpecificFactory::new);
+        NAMES.put(ITQSpecificFactory.class,"Specific-ITQ");
+
 
 
     }
