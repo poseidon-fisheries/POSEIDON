@@ -43,7 +43,11 @@ public class Moving implements Action
         assert accruedHours < 24;
 
         //adapt if needed
+        SeaTile oldDestination = agent.getDestination();
         agent.updateDestination(model,this);
+        //if you changed your direction, you lose your accrued hours
+        if(oldDestination != agent.getDestination())
+            accruedHours = -1;
 
         /**
          * we have arrived!
@@ -52,12 +56,12 @@ public class Moving implements Action
             return new ActionResult(new Arriving(),hoursLeft);
 
         Deque<SeaTile> route = getRoute(model.getMap(),agent.getLocation(),agent.getDestination());
-        //while there are still places to go
         NauticalMap map = model.getMap();
 
         if(accruedHours > 0)
             hoursLeft+= accruedHours;
 
+        //while there are still places to go
         while(!route.isEmpty())
         {
             SeaTile step = route.pollLast();
@@ -65,7 +69,7 @@ public class Moving implements Action
             double distance = map.distance(agent.getLocation(),step);
             //if you have time move
             final double hoursForThisStep = agent.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distance);
-
+            assert  hoursForThisStep >= accruedHours : agent;
 
             if(hoursForThisStep <= hoursLeft)
             {
