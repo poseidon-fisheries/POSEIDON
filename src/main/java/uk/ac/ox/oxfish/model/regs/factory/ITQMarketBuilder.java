@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
@@ -43,6 +42,8 @@ public class ITQMarketBuilder  implements Startable
                                                  Double.NaN);
         model.getDailyDataSet().registerGatherer("ITQ Prices", state1 -> market.getDailyAveragePrice(),
                                                  Double.NaN);
+        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price", state1 -> market.getLastClosingPrice(),
+                                                 Double.NaN);
 
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers())
@@ -53,22 +54,6 @@ public class ITQMarketBuilder  implements Startable
             //record it
             reservationPricers.put(fisher,reservationPricer);
 
-
-
-            //todo move predictors somewhere else
-
-            //they can't use fixed predictors
-            //create the predictors
-            fisher.setDailyCatchesPredictor(specieIndex,
-                                               MovingAveragePredictor.dailyMAPredictor(
-                                                       "Predicted Daily Catches of " + model.getSpecies().get(specieIndex),
-                                                       fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                               specieIndex),
-                                                       90));
-            fisher.setProfitPerUnitPredictor(specieIndex, MovingAveragePredictor.perTripMAPredictor(
-                    "Predicted Unit Profit of " + model.getSpecies().get(specieIndex),
-                    fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specieIndex),
-                    30));
 
         }
 

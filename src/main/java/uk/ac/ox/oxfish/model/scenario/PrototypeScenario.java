@@ -99,6 +99,14 @@ public class PrototypeScenario implements Scenario {
 
 
 
+    private int[] forcedPortPosition = null;
+
+    /**
+     * to use if you really want to port to be somewhere specific
+     */
+    public void forcePortPosition(int[] forcedPortPosition) {
+        this.forcedPortPosition = forcedPortPosition;
+    }
 
     /**
      * boat speed
@@ -218,7 +226,14 @@ public class PrototypeScenario implements Scenario {
             marketMap.addMarket(specie,market.apply(model));
 
         //create random ports, all sharing the same market
-        NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
+        if(forcedPortPosition == null)
+            NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
+        else
+        {
+            Port port = new Port(map.getSeaTile(forcedPortPosition[0],forcedPortPosition[1]),
+                                 marketMap,0);
+            map.addPort(port);
+        }
 
 
 
@@ -296,7 +311,7 @@ public class PrototypeScenario implements Scenario {
                                                                        specie.getIndex()),
                                                                90));
                     newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit",
+                            "Predicted Unit Profit " + specie,
                             fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),
                             30));
                 }

@@ -5,6 +5,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -18,6 +19,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.regs.factory.ITQSpecificFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
@@ -74,7 +76,69 @@ class Main{
     }
 
 
-    public static void oilPriceMiniDemo(String[] args) throws IOException {
+    //opportunity costs
+    public static void opportunity(String[] args) throws IOException {
+        final FishState state = new FishState(0);
+        //world split in half
+        /*
+        ITQSpecificFactory regs2 = new ITQSpecificFactory(){
+            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+                                                SpecificQuotaRegulation regulation, ITQOrderBook market)
+            {
+                //account for opportunity costs
+                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                {
+                    double lastClosingPrice = -10 + 20* state.getDayOfTheYear() /365d ;
+                    if(Double.isFinite(lastClosingPrice))
+                    {
+                        seller.recordOpportunityCosts(lastClosingPrice * biomass); //you could have sold those quotas!
+                    }
+                }
+            }
+        };
+        regs2.setIndividualQuota(new FixedDoubleParameter(500000000));
+        state.getDailyDataSet().registerGatherer("fake", new Function<FishState, Double>() {
+            @Override
+            public Double apply(FishState state) {
+                return -10 + 20 * state.getDayOfTheYear() / 365d;
+            }
+        }, Double.NaN);
+*/
+
+/*
+        ITQSpecificFactory ignoreCosts = new ITQSpecificFactory() {
+
+            @Override
+            public void computeOpportunityCosts(
+                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    ITQOrderBook market) {
+            }
+        };
+
+*/
+        ITQSpecificFactory germane = new ITQSpecificFactory();
+        germane.setIndividualQuota(new FixedDoubleParameter(5000));
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        state.setScenario(scenario);
+        //world split in half
+        //scenario.setBiologyInitializer(OpportunityCostsDemo.FIXED_AND_SPLIT_BIOLOGY);
+        scenario.setBiologyInitializer(new SplitInitializerFactory());
+
+        scenario.setRegulation(germane);
+        scenario.setCoastalRoughness(0);
+        scenario.setGridCellSizeInKm(2);
+        scenario.forcePortPosition(new int[]{40, 25});
+        scenario.setUsePredictors(true);
+
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+        c.setVisible(true);
+
+    }
+
+
+        public static void oilPriceMiniDemo(String[] args) throws IOException {
 
 
 

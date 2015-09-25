@@ -47,8 +47,10 @@ public class SplitInitializer implements BiologyInitializer {
                                                                                                             mapWidthInCells);
 
             //make the map split in half
-            if (seaTile.getGridY() < mapHeightInCells / 2)
+            if (seaTile.getGridY() < mapHeightInCells / 2) {
+
                 generated.setCarryingCapacity(biology.getSpecie(1), 0d);
+            }
             else
                 generated.setCarryingCapacity(biology.getSpecie(0), 0d);
 

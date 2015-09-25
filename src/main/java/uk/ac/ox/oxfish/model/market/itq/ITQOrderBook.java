@@ -135,7 +135,7 @@ public class ITQOrderBook implements Steppable,Startable{
         //does somebody want to trade?
         if (bestAsk.getPrice() <= bestBid.getPrice()) {
 
-            double tradingPrice = bestAsk.getPrice();
+            double tradingPrice = bestAsk.getPrice()    ;
             assert tradingPrice >= bestAsk.getPrice();
             assert tradingPrice <=bestBid.getPrice();
 

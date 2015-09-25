@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 public class SplitInitializerFactory implements AlgorithmFactory<SplitInitializer> {
 
 
-    private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
+    private DoubleParameter carryingCapacity = new FixedDoubleParameter(10000);
 
     private DoubleParameter steepness = new UniformDoubleParameter(0.6,0.8);
 

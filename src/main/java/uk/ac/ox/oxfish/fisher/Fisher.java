@@ -867,7 +867,7 @@ public class Fisher implements Steppable, Startable{
 
     private void increaseHoursAtSea(double hoursIncrease)
     {
-        Preconditions.checkArgument(hoursIncrease >= 0);
+        Preconditions.checkArgument(hoursIncrease >= 0, hoursIncrease);
         Preconditions.checkArgument(status.getHoursAtPort() == 0);
         status.setHoursAtSea(status.getHoursAtSea() + hoursIncrease);
     }

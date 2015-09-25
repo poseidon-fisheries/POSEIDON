@@ -1,8 +1,10 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -12,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Like Mono factory but this quotas are not valid for all species but only for one of them
+ * Like Mono factory but these quotas are not valid for all species but only for one of them
  * Created by carrknight on 9/22/15.
  */
 public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulation>
@@ -68,20 +70,30 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
                 //do the usual stuff
                 super.reactToSale(specie, seller, biomass, revenue);
 
-                //account for opportunity costs
-                if(biomass > 0 && getProtectedSpecie().equals(specie))
-                {
-                    double lastClosingPrice = marketBuilder.getMarket().getLastClosingPrice();
-                    if(Double.isFinite(lastClosingPrice))
-                    {
-                        seller.recordOpportunityCosts(lastClosingPrice * biomass); //you could have sold those quotas!
-                    }
-                }
+                computeOpportunityCosts(specie,seller,biomass,revenue,this,marketBuilder.getMarket());
             }
         };
     }
 
 
+    /**
+     * this is visible to be overridden by tests. It's just the method used to assign opportunity costs at the end
+     * of the trip
+     */
+    @VisibleForTesting
+    public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+                                        SpecificQuotaRegulation regulation, ITQOrderBook market)
+    {
+        //account for opportunity costs
+        if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+        {
+            double lastClosingPrice = market.getLastClosingPrice();
+            if(Double.isFinite(lastClosingPrice))
+            {
+                seller.recordOpportunityCosts(lastClosingPrice * biomass); //you could have sold those quotas!
+            }
+        }
+    }
 
 
     public DoubleParameter getIndividualQuota() {

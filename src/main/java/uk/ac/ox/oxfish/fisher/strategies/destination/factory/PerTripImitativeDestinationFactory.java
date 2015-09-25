@@ -8,11 +8,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
-
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * creates a trip strategy that has imitates friends when not exploring
@@ -20,7 +19,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
 {
 
-    private DoubleParameter stepSize = new FixedDoubleParameter(5d);
+    private DoubleParameter stepSize = new UniformDoubleParameter(1d,10d);
 
 
     private AlgorithmFactory<? extends AdaptationProbability> probability =

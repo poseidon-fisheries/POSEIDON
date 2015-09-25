@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
@@ -91,5 +92,14 @@ public class RandomCatchabilityThrawl implements Gear
 
     public double getThrawlSpeed() {
         return thrawlSpeed;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("catchabilityMeanPerSpecie", catchabilityMeanPerSpecie)
+                .add("catchabilityDeviationPerSpecie", catchabilityDeviationPerSpecie)
+                .add("thrawlSpeed", thrawlSpeed)
+                .toString();
     }
 }

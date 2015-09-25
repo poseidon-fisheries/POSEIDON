@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.regs;
 
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -27,6 +28,24 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
         this.protectedSpecie = specie;
     }
 
+
+    /**
+     * Can this fisher be at sea?
+     *
+     */
+    @Override
+    public boolean allowedAtSea(Fisher fisher, FishState model) {
+        return true;
+    }
+
+
+    /**
+     * You are allowed to fish, just never to sell the protected quota if you are wrong
+     */
+    @Override
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+        return true;
+    }
 
     /**
      * ignore if wrong specie.
