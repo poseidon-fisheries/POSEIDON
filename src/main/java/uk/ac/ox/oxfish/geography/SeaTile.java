@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -44,15 +45,21 @@ public class SeaTile implements Startable{
 
 
     /**
+     * a description of the sea-bed and its properties
+     */
+    private TileHabitat habitat;
+
+    /**
      * weather object, contains temperatures and such at this tile
      */
     private LocalWeather weather;
 
 
-    public SeaTile(int gridX, int gridY, double altitude) {
+    public SeaTile(int gridX, int gridY, double altitude, TileHabitat habitat) {
         this.gridX = gridX;
         this.gridY = gridY;
         this.altitude = altitude;
+        this.habitat = habitat;
     }
 
 
@@ -126,6 +133,10 @@ public class SeaTile implements Startable{
     }
 
 
+    public double getRockyPercentage() {
+        return habitat.getHardPercentage();
+    }
+
     /**
      * starts local biology
      */
@@ -169,5 +180,13 @@ public class SeaTile implements Startable{
 
     public void linkTileToPort(Port portHere) {
         this.portHere = portHere;
+    }
+
+    public TileHabitat getHabitat() {
+        return habitat;
+    }
+
+    public void setHabitat(TileHabitat habitat) {
+        this.habitat = habitat;
     }
 }

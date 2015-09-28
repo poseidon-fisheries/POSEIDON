@@ -8,6 +8,7 @@ import sim.portrayal.LocationWrapper;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
@@ -15,7 +16,10 @@ import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Basically a transformer that changes color mapping according to species.
@@ -25,7 +29,9 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
 
 
-    private Map<Specie,Color> colors;
+    private Map<String,ColorEncoding> encodings;
+
+    private ColorEncoding selected;
 
     /**
      * the default encoder just returns altitude
@@ -38,7 +44,6 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     /**
      * the specie currently selected, no selection means depth
      */
-    private Specie selectedSpecie = null;
 
     private int maxBiomass = 5000;
 
@@ -47,14 +52,46 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     public ColorfulGrid(MersenneTwisterFast random)
     {
-        colors = new HashMap<>();
+        encodings = new HashMap<>();
         this.random = random;
-        setSelectedSpecie(null);
+        //add the default color map showing depth
+        encodings.put("Depth", new ColorEncoding(
+                new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED),
+                seaTile -> seaTile.isProtected() ? Double.NaN : seaTile.getAltitude(), true));
 
+        //add the default color map showing rocky areas
+        encodings.put("Habitat",new ColorEncoding(
+                new TriColorMap(-1,0,1,Color.black,new Color(237, 201, 175), new Color(69, 67, 67)),
+                seaTile -> seaTile.getAltitude() >=0 ? Double.NaN : seaTile.getRockyPercentage(),
+                true));
+
+
+
+        setSelectedEncoding("Depth");
 
         defaultFishColors.add(Color.RED);
         defaultFishColors.add(Color.BLUE);
+        defaultFishColors.add(Color.ORANGE);
+        defaultFishColors.add(Color.YELLOW);
     }
+
+
+    /**
+     * create a colormap for each specie
+     * @param biology
+     */
+    public void initializeGrid(GlobalBiology biology)
+    {
+
+        for(Specie specie : biology.getSpecies())
+        {
+            Color color =  defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll();
+            encodings.put(specie.getName(), new ColorEncoding(new SimpleColorMap(0, maxBiomass, Color.WHITE, color),
+                                                           seaTile -> seaTile.getBiomass(specie), false));
+        }
+
+    }
+
 
     /**
      * turn the seatile into a double that can be coded into color by the portrayal
@@ -63,13 +100,8 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      */
     public double encodeSeaTile(SeaTile tile)
     {
-        if(selectedSpecie == null)
-            if(tile.isProtected())
-                return Double.NaN;
-            else
-                return tile.getAltitude();
-        else
-            return tile.getBiomass(selectedSpecie);
+
+        return selected.getEncoding().apply(tile);
     }
 
     @Override
@@ -79,26 +111,15 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     /**
      * set the correct transform
-     * @param selectedSpecie the species to show, null means bathymetry
+     * @param encodingName the name of the correct encoding
      */
-    public void setSelectedSpecie(Specie selectedSpecie) {
-        this.selectedSpecie = selectedSpecie;
-        if(selectedSpecie == null) {
-            this.setMap(depthColor);
-            this.setImmutableField(true);
-        }
-        else {
+    public void setSelectedEncoding(String encodingName) {
 
-        /*    colors.putIfAbsent(selectedSpecie, new Color(random.nextInt(256),
-                                                         random.nextInt(256),
-                                                         random.nextInt(256)));
-                                                         */
-            colors.putIfAbsent(selectedSpecie, defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll());
-            this.setMap(new SimpleColorMap(0, maxBiomass,Color.WHITE,
-                                           colors.get(selectedSpecie)));
-            this.setImmutableField(false);
+        selected = encodings.get(encodingName);
+        assert selected != null;
+        this.setMap(selected.getMap());
+        this.setImmutableField(selected.isImmutable());
 
-        }
     }
 
 

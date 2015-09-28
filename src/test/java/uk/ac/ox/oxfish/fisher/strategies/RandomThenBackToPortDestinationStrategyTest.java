@@ -5,25 +5,24 @@ import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.fisher.*;
+import uk.ac.ox.oxfish.fisher.FisherEquipment;
+import uk.ac.ox.oxfish.fisher.FisherMemory;
+import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.RandomThenBackToPortDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -141,10 +140,10 @@ public class RandomThenBackToPortDestinationStrategyTest {
     public static FishState generateSimple2x2Map(final int distancePerCell) {
         ObjectGrid2D grid2D = new ObjectGrid2D(2,2);
         //2x2, first column sea, second  column land
-        grid2D.field[0][0] = new SeaTile(0,0,-100);
-        grid2D.field[0][1] = new SeaTile(0,1,-100);
-        grid2D.field[1][0] = new SeaTile(1,0,100);
-        grid2D.field[1][1] = new SeaTile(1,1,100);
+        grid2D.field[0][0] = new SeaTile(0,0,-100, new TileHabitat(0d));
+        grid2D.field[0][1] = new SeaTile(0,1,-100, new TileHabitat(0d));
+        grid2D.field[1][0] = new SeaTile(1,0,100, new TileHabitat(0d));
+        grid2D.field[1][1] = new SeaTile(1,1,100, new TileHabitat(0d));
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
                                           new CartesianDistance(1));
@@ -161,7 +160,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         for(int i=0; i<size; i++)
             for(int j=0; j<size; j++)
             {
-                grid2D.field[i][j] = new SeaTile(i,j,-100);
+                grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
             }
 
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),

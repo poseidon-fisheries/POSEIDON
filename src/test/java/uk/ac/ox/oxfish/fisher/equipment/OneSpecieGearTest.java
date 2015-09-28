@@ -8,8 +8,9 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -23,7 +24,7 @@ public class OneSpecieGearTest {
         Specie second = new Specie("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
         LocalBiology local = new EmptyLocalBiology();
-        SeaTile where = new SeaTile(0,0,-100);
+        SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);
@@ -44,7 +45,7 @@ public class OneSpecieGearTest {
         when(local.getBiomass(first)).thenReturn(100.0);
         when(local.getBiomass(second)).thenReturn(0.0);
 
-        SeaTile where = new SeaTile(0,0,-100);
+        SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);
@@ -67,7 +68,7 @@ public class OneSpecieGearTest {
         when(local.getBiomass(first)).thenReturn(0.0);
         when(local.getBiomass(second)).thenReturn(100.0);
 
-        SeaTile where = new SeaTile(0,0,-100);
+        SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
         where.setBiology(local);
 
         OneSpecieGear gear = new OneSpecieGear(first,.5);

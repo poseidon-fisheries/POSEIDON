@@ -5,8 +5,9 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 
 public class FromLeftToRightInitializerTest {
@@ -19,9 +20,9 @@ public class FromLeftToRightInitializerTest {
     public void moreOnTheLeft() throws Exception
     {
 
-        SeaTile left = new SeaTile(0,0,-1);
-        SeaTile middle = new SeaTile(50,0,-1);
-        SeaTile right = new SeaTile(100,0,-1);
+        SeaTile left = new SeaTile(0,0,-1, new TileHabitat(0d));
+        SeaTile middle = new SeaTile(50,0,-1, new TileHabitat(0d));
+        SeaTile right = new SeaTile(100,0,-1, new TileHabitat(0d));
         FromLeftToRightInitializer initializer = new FromLeftToRightInitializer(5000,1);
         final Specie specie = new Specie("Specie0");
         GlobalBiology biology = new GlobalBiology(specie);

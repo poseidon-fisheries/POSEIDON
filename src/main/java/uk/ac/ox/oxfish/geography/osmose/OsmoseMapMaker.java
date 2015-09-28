@@ -7,7 +7,11 @@ import fr.ird.osmose.grid.IGrid;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
-import uk.ac.ox.oxfish.geography.*;
+import uk.ac.ox.oxfish.geography.CartesianDistance;
+import uk.ac.ox.oxfish.geography.Distance;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 /**
  * Takes a OsmoseSimulation object and extract a map from it
@@ -37,8 +41,8 @@ public class OsmoseMapMaker{
             for(int y=0; y< height; y++) {
                 final Cell cell = osmoseMap.getCell(x, height-y-1);
                 final SeaTile seaTile = cell.isLand() ?
-                        new SeaTile(x, y, 20) :
-                        new SeaTile(x, y, -20);
+                        new SeaTile(x, y, 20, new TileHabitat(0d)) :
+                        new SeaTile(x, y, -20, new TileHabitat(0d));
                 final LocalOsmoseBiology biology = new LocalOsmoseBiology(simulation.getMortality(),
                                                                           simulation.getCounter().getBiomass(x, height-y-1),
                                                                           simulation.getNumberOfSpecies(),

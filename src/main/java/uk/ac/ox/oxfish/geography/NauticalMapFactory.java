@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.GISReaders;
@@ -37,7 +38,7 @@ public class NauticalMapFactory {
         ObjectGrid2D rasterBackingGrid = new ObjectGrid2D(temporaryField.getGridWidth(),temporaryField.getGridHeight());
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
             for(int j=0; j<rasterBackingGrid.getHeight(); j++)
-                rasterBackingGrid.field[i][j]=new SeaTile(i,j,temporaryGrid.field[i][j]);
+                rasterBackingGrid.field[i][j]=new SeaTile(i,j,temporaryGrid.field[i][j], new TileHabitat(0d));
         //now from this grid create the correct bathymetry object
         GeomGridField rasterBathymetry = new GeomGridField(rasterBackingGrid);
         rasterBathymetry.setPixelHeight(temporaryField.getPixelHeight());
@@ -83,8 +84,8 @@ public class NauticalMapFactory {
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {
                 baseGrid.field[x][y] = x <width- landX ?
-                        new SeaTile(x,y,-random.nextInt(5000)) :
-                        new SeaTile(x,y,2000);
+                        new SeaTile(x,y,-random.nextInt(5000), new TileHabitat(0d)) :
+                        new SeaTile(x,y,2000, new TileHabitat(0d));
             }
         /***
          *       ___              _        _   ___               _
@@ -119,7 +120,8 @@ public class NauticalMapFactory {
                 //remove all the marked land tiles and turn them into ocean
                 for (SeaTile toRemove : toFlip) {
                     assert toRemove.getAltitude() >= 0; //should be removing land!
-                    SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000));
+                    SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000),
+                                                     new TileHabitat(0d));
                     assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
                     baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] = substitute;
                 }
@@ -152,7 +154,7 @@ public class NauticalMapFactory {
 
             //put the new one in!
             baseGrid.set(toChange.getGridX(),toChange.getGridY(),
-                         new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude));
+                         new SeaTile(toChange.getGridX(),toChange.getGridY(),newAltitude, new TileHabitat(0d)));
 
 
         }

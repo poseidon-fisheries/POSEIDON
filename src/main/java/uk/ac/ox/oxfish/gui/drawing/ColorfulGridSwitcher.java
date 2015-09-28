@@ -7,8 +7,6 @@ import uk.ac.ox.oxfish.biology.Specie;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Custom combo-box to switch what is displayed
@@ -16,7 +14,6 @@ import java.util.Map;
  */
 public class ColorfulGridSwitcher extends JComboBox<String>{
 
-    private final Map<String, Specie> speciesMap = new HashMap<>();
 
 
     /**
@@ -30,8 +27,8 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
     public ColorfulGridSwitcher(ColorfulGrid toModify, GlobalBiology biology, Display2D toRefresh) {
         String initialSelection = "Depth";
         addItem(initialSelection);
+        addItem("Habitat");
         for(Specie specie : biology.getSpecies()) {
-            speciesMap.put(specie.getName(),specie);
             addItem(specie.getName());
         }
         setSelectedItem(initialSelection);
@@ -42,8 +39,8 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                Specie selected = speciesMap.get(reference.getSelectedItem());
-                toModify.setSelectedSpecie(selected);
+
+                toModify.setSelectedEncoding(reference.getSelectedItem().toString());
                 toRefresh.repaint();
             }
         });

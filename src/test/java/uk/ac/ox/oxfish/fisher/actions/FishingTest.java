@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
@@ -30,7 +31,9 @@ public class FishingTest {
         Action fishing = new Fishing();
 
         Fisher agent = mock(Fisher.class);
-        when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1));
+        when(agent.isAtDestination()).thenReturn(true); when(agent.getLocation()).thenReturn(new SeaTile(0,0,-1,
+                                                                                                         new TileHabitat(
+                                                                                                                 0d)));
         fishing.act(mock(FishState.class), agent, new Anarchy(),1d );
         verify(agent).fishHere(any(),anyDouble(),any() );
     }

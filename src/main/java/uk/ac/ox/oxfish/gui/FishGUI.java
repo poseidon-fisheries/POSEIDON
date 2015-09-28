@@ -116,10 +116,12 @@ public class FishGUI extends GUIState{
 
 
 
-        displayFrame.setVisible(true);
 
         final FishGUI self = this;
         FishState state = (FishState) this.state;
+        myPortrayal.initializeGrid(state.getBiology());
+        displayFrame.setVisible(true);
+
 
         //the console label is a pain in the ass so we need to really use a wrecking ball to modify the way
         //the label is used

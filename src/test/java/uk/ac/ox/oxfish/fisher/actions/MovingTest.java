@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
@@ -261,7 +262,7 @@ public class MovingTest
         //2x2, first column sea, second  column land
         for(int i=0;i<4;i++)
             for(int j=0;j<4;j++)
-                grid2D.field[i][j] = new SeaTile(i,j,-100);
+                grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
 
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
