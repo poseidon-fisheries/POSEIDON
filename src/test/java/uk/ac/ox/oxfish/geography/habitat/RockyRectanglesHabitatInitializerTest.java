@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import static uk.ac.ox.oxfish.fisher.actions.MovingTest.generateSimple4x4Map;
 
 
-public class RockyRectanglesInitializerTest {
+public class RockyRectanglesHabitatInitializerTest {
 
 
     @Test
@@ -23,9 +23,9 @@ public class RockyRectanglesInitializerTest {
             FishState state = generateSimple4x4Map();
             NauticalMap map = state.getMap();
             MersenneTwisterFast random = new MersenneTwisterFast();
-            RockyRectanglesInitializer initializer = new RockyRectanglesInitializer(3,3,3,3,1,random);
+            RockyRectanglesHabitatInitializer initializer = new RockyRectanglesHabitatInitializer(3, 3, 3, 3, 1);
 
-            initializer.accept(map);
+            initializer.applyHabitats(map,random);
             int count = 0;
             for(SeaTile tile : map.getAllSeaTilesAsList())
                 if(tile.getHabitat().getHardPercentage() > .99d)

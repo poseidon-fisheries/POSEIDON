@@ -58,6 +58,10 @@ public class FishGUI extends GUIState{
     private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
 
+
+
+
+
     /**
      * create a random fishstate with seed = milliseconds since epoch
      */
@@ -223,7 +227,7 @@ public class FishGUI extends GUIState{
                                          myPortrayal, this);
 
 
-        ((Console) controller).getTabPane().add("Regulations",new RegulationTab(this,drawer) );
+        ((Console) controller).getTabPane().add("Policies",new RegulationTab(this,drawer) );
         //drawer.attach();
 
 

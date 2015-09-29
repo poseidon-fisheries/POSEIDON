@@ -3,16 +3,16 @@ package uk.ac.ox.oxfish.biology;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
-public class IndependentLogisticLocalBiologyTest
+public class LogisticLocalBiologyTest
 {
     @Test
     public void logisticGrowthWorks() throws Exception {
 
-        IndependentLogisticLocalBiology bio = new IndependentLogisticLocalBiology(
+        LogisticLocalBiology bio = new LogisticLocalBiology(
                 new Double[]{100d,200d}, new Double[]{100d,400d}, new Double[]{.5,.5}
         );
         Specie specie0 = new Specie("0"); specie0.setIndex(0);
@@ -42,7 +42,7 @@ public class IndependentLogisticLocalBiologyTest
     public void canAddSpecieshalfwaythrough() throws Exception {
 
         //starts with only specie0
-        IndependentLogisticLocalBiology bio = new IndependentLogisticLocalBiology(
+        LogisticLocalBiology bio = new LogisticLocalBiology(
                 new Double[]{100d}, new Double[]{100d}, new Double[]{.5d}
         );
         Specie specie0 = new Specie("0"); specie0.setIndex(0);

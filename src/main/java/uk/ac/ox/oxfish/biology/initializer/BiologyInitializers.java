@@ -34,6 +34,11 @@ public class BiologyInitializers {
         NAMES.put(DiffusingLogisticFactory.class,"Diffusing Logistic");
 
 
+        CONSTRUCTORS.put("Habitat-Aware Diffusing Logistic",
+                         RockyLogisticFactory::new);
+        NAMES.put(RockyLogisticFactory.class,"Habitat-Aware Diffusing Logistic");
+
+
         CONSTRUCTORS.put("From Left To Right Fixed",
                          FromLeftToRightFactory::new);
         NAMES.put(FromLeftToRightFactory.class,"From Left To Right Fixed");

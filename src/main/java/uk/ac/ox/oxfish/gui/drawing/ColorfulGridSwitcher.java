@@ -25,6 +25,7 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
      * @see DefaultComboBoxModel
      */
     public ColorfulGridSwitcher(ColorfulGrid toModify, GlobalBiology biology, Display2D toRefresh) {
+        //add defaults
         String initialSelection = "Depth";
         addItem(initialSelection);
         addItem("Habitat");

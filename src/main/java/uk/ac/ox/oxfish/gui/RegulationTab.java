@@ -46,6 +46,7 @@ public class RegulationTab extends JPanel
 
         this.add(jButton);
 
+        this.add(new JSeparator());
         //second button is the enabled kind
         JToggleButton drawerButton = new JToggleButton("Draw new MPAs");
         drawerButton.addActionListener(new ActionListener() {

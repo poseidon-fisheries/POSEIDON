@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
+import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -165,6 +167,9 @@ public class PrototypeScenario implements Scenario {
             new EquidegreeBuilder();
 
 
+    private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
+
+
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
     /**
@@ -196,6 +201,8 @@ public class PrototypeScenario implements Scenario {
 
 
 
+
+
         BiologyInitializer initializer = biologyInitializer.apply(model);
         WeatherInitializer weather = weatherInitializer.apply(model);
 
@@ -205,6 +212,11 @@ public class PrototypeScenario implements Scenario {
                                                                                    mapMakerRandom,
                                                                                    depthSmoothing,
                                                                                    width, height);
+        //set habitats
+        HabitatInitializer rocky = habitatInitializer.apply(model);
+        rocky.applyHabitats(map, mapMakerRandom);
+
+
 
 
         map.setDistance(new CartesianDistance(gridCellSizeInKm));
@@ -213,7 +225,10 @@ public class PrototypeScenario implements Scenario {
                                                      weather,
                                                      biology, model);
 
-        //general biology
+
+
+
+
         //create fixed price market
         MarketMap marketMap = new MarketMap(biology);
         /*
@@ -560,5 +575,14 @@ public class PrototypeScenario implements Scenario {
 
     public void setMapMakerDedicatedRandomSeed(Long mapMakerDedicatedRandomSeed) {
         this.mapMakerDedicatedRandomSeed = mapMakerDedicatedRandomSeed;
+    }
+
+    public AlgorithmFactory<? extends HabitatInitializer> getHabitatInitializer() {
+        return habitatInitializer;
+    }
+
+    public void setHabitatInitializer(
+            AlgorithmFactory<? extends HabitatInitializer> habitatInitializer) {
+        this.habitatInitializer = habitatInitializer;
     }
 }

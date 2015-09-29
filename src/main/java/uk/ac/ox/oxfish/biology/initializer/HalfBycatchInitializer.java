@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.IndependentLogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -42,7 +42,7 @@ public class HalfBycatchInitializer implements BiologyInitializer {
             int mapWidthInCells) {
 
         if(seaTile.getAltitude() < 0) {
-            IndependentLogisticLocalBiology generated = (IndependentLogisticLocalBiology) delegate.generate(biology,
+            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generate(biology,
                                                                                                             seaTile,
                                                                                                             random,
                                                                                                             mapHeightInCells,

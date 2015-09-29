@@ -1,13 +1,13 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 import java.util.List;
@@ -51,13 +51,8 @@ public class RandomCatchabilityThrawl implements Gear
         {
             double q = fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[specie.getIndex()]
                     + catchabilityMeanPerSpecie[specie.getIndex()];
-            Preconditions.checkState(q>=0);
-            //catch
-            double specieCatch = where.getBiomass(specie) * q * hoursSpentFishing;
-            totalCatch[specie.getIndex()] = specieCatch;
-            //tell biomass
-            if(specieCatch> 0)
-                where.reactToThisAmountOfBiomassBeingFished(specie,specieCatch);
+            totalCatch[specie.getIndex()] =
+                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
         }
         return new Catch(totalCatch);
     }
@@ -86,8 +81,8 @@ public class RandomCatchabilityThrawl implements Gear
     @Override
     public Gear makeCopy() {
         return new RandomCatchabilityThrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
-                                     Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
-                                     thrawlSpeed);
+                                            Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
+                                            thrawlSpeed);
     }
 
     public double getThrawlSpeed() {

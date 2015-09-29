@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -15,7 +16,7 @@ import java.util.Arrays;
  * each year through logistic regression. There is no link/movement to other biologies.
  * Created by carrknight on 5/8/15.
  */
-public class IndependentLogisticLocalBiology implements LocalBiology, Steppable, Startable {
+public class LogisticLocalBiology implements LocalBiology, Steppable, Startable {
 
     /**
      * the current amount of biomass in this spot
@@ -38,8 +39,9 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
      * @param carryingCapacity the maximum amount of fish
      * @param malthusianParameter the unconstrained growth rate of each species
      */
-    public IndependentLogisticLocalBiology(Double[] currentBiomass, Double[] carryingCapacity,
-                                           Double[] malthusianParameter) {
+    public LogisticLocalBiology(
+            Double[] currentBiomass, Double[] carryingCapacity,
+            Double[] malthusianParameter) {
         Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
         Preconditions.checkArgument(currentBiomass.length==malthusianParameter.length);
 
@@ -49,6 +51,21 @@ public class IndependentLogisticLocalBiology implements LocalBiology, Steppable,
 
     }
 
+
+    public LogisticLocalBiology(
+            double carryingCapacity, int species, double steepness,
+            MersenneTwisterFast random)
+    {
+        this.carryingCapacity = new Double[species];
+        Arrays.fill(this.carryingCapacity, carryingCapacity);
+        this.currentBiomass = new Double[species];
+        this.malthusianParameter = new Double[species];
+        for(int i=0; i<currentBiomass.length; i++)
+        {
+            currentBiomass[i] = random.nextDouble(true, true) * carryingCapacity;
+            malthusianParameter[i] = steepness;
+        }
+    }
 
     /**
      * the biomass at this location for a single specie.

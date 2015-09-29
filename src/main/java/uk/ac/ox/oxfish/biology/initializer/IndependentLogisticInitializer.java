@@ -1,13 +1,14 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-
-import java.util.Arrays;
 
 /**
  * Each tile below water is filled with an independent logistic-growth. They all have the same carrying capacity
@@ -47,17 +48,10 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
         else
         {
             int species = biology.getSize();
-            Double[] carryingCapacities = new Double[species];
-            Double tileCarryingCapacity = carryingCapacity.apply(random);
-            Arrays.fill(carryingCapacities, tileCarryingCapacity);
-            Double[] currentCapacities = new Double[species];
-            Double[] malthusians = new Double[species];
-            for(int i=0; i<currentCapacities.length; i++)
-            {
-                currentCapacities[i] = random.nextDouble(true, true) * tileCarryingCapacity;
-                malthusians[i] =  steepness.apply(random);
-            }
-            return new IndependentLogisticLocalBiology(currentCapacities,carryingCapacities,malthusians);
+            double carryingCapacityLevel = carryingCapacity.apply(random);
+            double steepness = this.steepness.apply(random);
+
+            return new LogisticLocalBiology(carryingCapacityLevel,species,steepness,random);
         }
     }
 

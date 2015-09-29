@@ -1,24 +1,12 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import sim.util.Bag;
+import uk.ac.ox.oxfish.biology.BiomassDiffuser;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.IndependentLogisticLocalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -37,11 +25,6 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
     private final double differentialPercentageToMove;
-
-    /**
-     * we store here for each tile its neighbors. This way we ask the map only once
-     */
-    private final Map<SeaTile,List<SeaTile>> neighbors = new HashMap<>();
 
 
 
@@ -66,74 +49,13 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
         super.processMap(biology, map, random, model);
 
-        //get the all the tiles
-        final Bag allSeaTiles = map.getAllSeaTiles();
-        for(Object inBag : allSeaTiles)
-        {
-            final SeaTile tile = (SeaTile) inBag;
-            if(tile.getAltitude()<0)
-                //every day
-                model.scheduleEveryDay(new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-
-                        //grab neighbors
-                        neighbors.putIfAbsent(tile,getUsefulNeighbors(tile,map));
-                        List<SeaTile> neighborList = neighbors.get(tile);
-                        //for each neighbor
-                        for(SeaTile neighbor : neighborList)
-                        {
-                            //for each specie
-                            for(int i=0; i<biology.getSize(); i++)
-                            {
-                                //if here there are more than there
-                                final Specie specie = biology.getSpecie(i);
-                                assert  tile.getBiomass(specie) >=0 ;
-                                double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
-                                differential = FishStateUtilities.round(differential);
-                                if(differential > 0 )
-                                {
-                                    //share!
-                                    double movement =  Math.min(differentialPercentageToMove * differential,
-                                                                percentageLimitOnDailyMovement * tile.getBiomass(specie));
-                                    assert movement >=0 : movement + " --- " +  differential + " ------ " + tile.getBiomass(specie) + " ------ " + FishStateUtilities.round(movement);
-                                    assert tile.getBiomass(specie) >= movement;
-                                    IndependentLogisticLocalBiology here = (IndependentLogisticLocalBiology) tile.getBiology();
-                                    IndependentLogisticLocalBiology there = (IndependentLogisticLocalBiology) neighbor.getBiology();
-                                    here.getCurrentBiomass()[i]-=movement;
-                                    assert here.getCurrentBiomass()[i] >= 0;
-                                    there.getCurrentBiomass()[i]+=movement;
-
-                                }
-                            }
-                        }
+        BiomassDiffuser diffuser = new BiomassDiffuser(map,random,biology,
+                                                       differentialPercentageToMove,
+                                                       percentageLimitOnDailyMovement);
+        model.scheduleEveryDay(diffuser,StepOrder.DAWN);
 
 
-
-
-                    }
-                }, StepOrder.DAWN);
-        }
     }
 
-    /**
-     * get all the neighbors of a given tile that have the right local biology and are above water
-     * @param tile the tile we want the neighbors of
-     * @param map the map object
-     * @return a bag with all the neighbors
-     */
-    private List<SeaTile> getUsefulNeighbors(SeaTile tile, NauticalMap map)
-    {
-        final Bag mooreNeighbors = map.getMooreNeighbors(tile, 1);
-        List<SeaTile> toKeep = new LinkedList<>();
-        for(Object inBag : mooreNeighbors)
-        {
-            SeaTile newTile = (SeaTile) inBag;
-            if (newTile.getAltitude() < 0 && newTile.getBiology() instanceof IndependentLogisticLocalBiology)
-            {
-                toKeep.add(newTile);
-            }
-        }
-        return toKeep;
-    }
+
 }
