@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -28,8 +29,10 @@ public class ExpensiveGasMakesYouFishAtHome
         scenario.setHoldSize(new FixedDoubleParameter(500));
         scenario.setGridCellSizeInKm(2);
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
-        scenario.setThrawlingSpeed(new FixedDoubleParameter(0)); //fishing needs no fuel, just travelling
 
+        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
+        gear.setTrawlSpeed(new FixedDoubleParameter(0));
+        scenario.setGear(gear);
 
 
         FishState state = new FishState(System.currentTimeMillis(),1);

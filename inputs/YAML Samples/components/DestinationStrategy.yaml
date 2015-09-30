@@ -21,7 +21,7 @@ Imitator-Explorator:
       explorationProbabilityMinimum: '0.01'
       imitationProbability: '1.0'
       incrementMultiplier: '0.02'
-  stepSize: '5.0'
+  stepSize: uniform 1.0 10.0
 -------
 PSO:
   explorationProbability: '0.3'

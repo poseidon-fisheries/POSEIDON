@@ -4,13 +4,10 @@ package uk.ac.ox.oxfish.experiments;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
-import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
@@ -49,8 +46,11 @@ public class MarketFirstDemo {
             final long seed) {
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
-        scenario.setCatchabilityMean(catchabilityMean);
-        scenario.setThrawlingSpeed(gasInefficiency);
+        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
+        gear.setMeanCatchabilityOtherSpecies(catchabilityMean);
+        gear.setMeanCatchabilityFirstSpecies(catchabilityMean);
+        gear.setTrawlSpeed(gasInefficiency);
+        scenario.setGear(gear);
         //make gas expensive!
         scenario.setGasPricePerLiter(new FixedDoubleParameter(0.2));
 
@@ -167,9 +167,9 @@ public class MarketFirstDemo {
             for(Fisher fisher : state.getFishers())
             {
                 list.add(String.valueOf
-                        (((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
+                        (((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
                                  + "," +
-                                 (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed())
+                                 (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed())
                                  + "," +
                                  String.valueOf(
                                          fisher.getLatestYearlyObservation(

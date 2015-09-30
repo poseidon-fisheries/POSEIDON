@@ -8,13 +8,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class RandomCatchabilityThrawlTest {
+public class RandomCatchabilityTrawlFactoryTest {
 
     @Test
     public void catchability() throws Exception {
@@ -23,7 +23,7 @@ public class RandomCatchabilityThrawlTest {
         MersenneTwisterFast random = mock(MersenneTwisterFast.class);
         when(mock.grabRandomizer()).thenReturn(random);
 
-        RandomCatchabilityThrawl thrawl = new RandomCatchabilityThrawl(new double[]{.5},
+        RandomCatchabilityTrawl thrawl = new RandomCatchabilityTrawl(new double[]{.5},
                                                                        new double[]{.1},
                                                                        100);
 

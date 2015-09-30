@@ -15,3 +15,7 @@ Mono-IQ:
 Mono-ITQ:
   individualQuota: '5000.0'
 -------
+Specific-ITQ:
+  individualQuota: '5000.0'
+  specieIndex: 0
+-------

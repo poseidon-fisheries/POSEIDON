@@ -4,10 +4,7 @@ import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.MovingAverage;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-
-import java.util.function.Function;
 
 /**
  * Dataset for each fisher being updated once a day
@@ -45,6 +42,7 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
                              Double.NaN);
 
         }
+
 
         super.start(state, observed);
 

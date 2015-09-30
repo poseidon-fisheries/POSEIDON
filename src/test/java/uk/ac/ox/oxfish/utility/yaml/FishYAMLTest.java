@@ -22,53 +22,66 @@ public class FishYAMLTest {
     public void canReadAScenario() throws Exception
     {
 
-        String scenarioFile = "Prototype:\n" +
-                "  biologyInitializer:\n" +
-                "    Diffusing Logistic:\n" +
-                "      carryingCapacity: '14.0'\n" +
-                "      differentialPercentageToMove: '5.0E-4'\n" +
-                "      percentageLimitOnDailyMovement: '0.01'\n" +
-                "      steepness: 0.7\n" +
-                "  catchabilityDeviation: '0.0'\n" +
-                "  catchabilityMean: '0.01'\n" +
-                "  coastalRoughness: 4\n" +
-                "  departingStrategy:\n" +
-                "    Fixed Rest:\n" +
-                "      hoursBetweenEachDeparture: '12.0'\n" +
-                "  depthSmoothing: 1000000\n" +
-                "  destinationStrategy:\n" +
-                "    Imitator-Explorator:\n" +
-                "      ignoreEdgeDirection: true\n" +
-                "      probability:\n" +
-                "        Adaptive Probability:\n" +
-                "          explorationProbability: '0.8'\n" +
-                "          explorationProbabilityMinimum: '0.01'\n" +
-                "          imitationProbability: '1.0'\n" +
-                "          incrementMultiplier: '0.02'\n" +
-                "      stepSize: '5.0'\n" +
-                "  engineWeight: normal 100.0 10.0\n" +
-                "  fishers: 100\n" +
-                "  fishingStrategy:\n" +
-                "    Until Full With Day Limit:\n" +
-                "      daysAtSea: '5.0'\n" +
-                "  fuelTankSize: '100000.0'\n" +
-                "  gasPricePerLiter: '0.01'\n" +
-                "  gridCellSizeInKm: 10.0\n" +
-                "  height: 50\n" +
-                "  holdSize: '100.0'\n" +
-                "  literPerKilometer: '10.0'\n" +
-                "  market:\n" +
-                "    Fixed Price Market:\n" +
-                "      marketPrice: '10.0'\n" +
-                "  networkBuilder:\n" +
-                "    Equal Out Degree:\n" +
-                "      degree: 2\n" +
-                "  ports: 1\n" +
-                "  regulation: Anarchy\n" +
-                "  speedInKmh: '5.0'\n" +
-                "  thrawlingSpeed: '5.0'\n" +
-                "  usePredictors: false\n" +
-                "  width: 50\n";
+        String scenarioFile =
+                "Prototype:\n" +
+                        "  biologyInitializer:\n" +
+                        "    Diffusing Logistic:\n" +
+                        "      carryingCapacity: '14.0'\n" +
+                        "      differentialPercentageToMove: '5.0E-4'\n" +
+                        "      percentageLimitOnDailyMovement: '0.01'\n" +
+                        "      steepness: .7\n" +
+                        "  coastalRoughness: 4\n" +
+                        "  departingStrategy:\n" +
+                        "    Fixed Rest:\n" +
+                        "      hoursBetweenEachDeparture: '12.0'\n" +
+                        "  depthSmoothing: 1000000\n" +
+                        "  destinationStrategy:\n" +
+                        "    Imitator-Explorator:\n" +
+                        "      ignoreEdgeDirection: true\n" +
+                        "      probability:\n" +
+                        "        Adaptive Probability:\n" +
+                        "          explorationProbability: '0.8'\n" +
+                        "          explorationProbabilityMinimum: '0.01'\n" +
+                        "          imitationProbability: '1.0'\n" +
+                        "          incrementMultiplier: '0.02'\n" +
+                        "      stepSize: uniform 1.0 10.0\n" +
+                        "  engineWeight: normal 100.0 10.0\n" +
+                        "  fishers: 100\n" +
+                        "  fishingStrategy:\n" +
+                        "    Until Full With Day Limit:\n" +
+                        "      daysAtSea: '5.0'\n" +
+                        "  fuelTankSize: '100000.0'\n" +
+                        "  gasPricePerLiter: '0.01'\n" +
+                        "  gear:\n" +
+                        "    Random Catchability:\n" +
+                        "      meanCatchabilityFirstSpecies: '0.01'\n" +
+                        "      meanCatchabilityOtherSpecies: '0.01'\n" +
+                        "      standardDeviationCatchabilityFirstSpecies: '0.0'\n" +
+                        "      standardDeviationCatchabilityOtherSpecies: '0.0'\n" +
+                        "      trawlSpeed: '5.0'\n" +
+                        "  gridCellSizeInKm: 10.0\n" +
+                        "  habitatInitializer: All Sand\n" +
+                        "  height: 50\n" +
+                        "  holdSize: '100.0'\n" +
+                        "  literPerKilometer: '10.0'\n" +
+                        "  mapMakerDedicatedRandomSeed: null\n" +
+                        "  market:\n" +
+                        "    Fixed Price Market:\n" +
+                        "      marketPrice: '10.0'\n" +
+                        "  networkBuilder:\n" +
+                        "    Equal Out Degree:\n" +
+                        "      degree: 2\n" +
+                        "  ports: 1\n" +
+                        "  regulation: Anarchy\n" +
+                        "  speedInKmh: '5.0'\n" +
+                        "  usePredictors: false\n" +
+                        "  weatherInitializer:\n" +
+                        "    Constant Weather:\n" +
+                        "      temperature: '30.0'\n" +
+                        "      windOrientation: '0.0'\n" +
+                        "      windSpeed: '0.0'\n" +
+                        "  weatherStrategy: Ignore Weather\n" +
+                        "  width: 50\n";
 
         FishYAML yaml = new FishYAML();
         final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);

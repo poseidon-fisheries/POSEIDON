@@ -8,6 +8,14 @@ Diffusing Logistic:
   percentageLimitOnDailyMovement: '0.01'
   steepness: uniform 0.6 0.8
 -------
+Habitat-Aware Diffusing Logistic:
+  differentialPercentageToMove: '5.0E-4'
+  numberOfSpecies: 1
+  percentageLimitOnDailyMovement: '0.01'
+  rockyCarryingCapacity: '10000.0'
+  sandyCarryingCapacity: '2000.0'
+  steepness: uniform 0.6 0.8
+-------
 From Left To Right Fixed:
   biologySmoothingIndex: '1000000.0'
   maximumBiomass: '5000.0'
@@ -19,6 +27,12 @@ Random Smoothed and Fixed:
 -------
 Half Bycatch:
   carryingCapacity: '5000.0'
+  differentialPercentageToMove: '5.0E-4'
+  percentageLimitOnDailyMovement: '0.01'
+  steepness: uniform 0.6 0.8
+-------
+Split in Half:
+  carryingCapacity: '10000.0'
   differentialPercentageToMove: '5.0E-4'
   percentageLimitOnDailyMovement: '0.01'
   steepness: uniform 0.6 0.8

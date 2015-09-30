@@ -6,6 +6,7 @@ import org.jenetics.DoubleGene;
 import org.jenetics.Genotype;
 import org.jenetics.util.Factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -42,7 +43,9 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
         departingStrategy.setProbabilityToLeavePort(new FixedDoubleParameter(1));
         scenario.setDepartingStrategy(departingStrategy);
         //fixed low efficiency
-        scenario.setCatchabilityMean(new FixedDoubleParameter(.01));
+        FixedProportionGearFactory gear = new FixedProportionGearFactory();
+        gear.setCatchabilityPerHour(new FixedDoubleParameter(.01));
+        scenario.setGear(gear);
 
         scenario.setRegulation(new ProtectedAreasOnlyFactory());
       //  scenario.setRegulation(new MonoQuotaRegulation(10*scenario.getFishers(),model));

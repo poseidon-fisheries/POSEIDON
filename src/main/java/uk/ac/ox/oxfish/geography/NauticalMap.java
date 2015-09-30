@@ -6,8 +6,6 @@ import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -26,6 +24,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,6 +87,11 @@ public class NauticalMap implements Startable
      * a map holding
      */
     private DoubleGrid2D fishedMap;
+
+    /**
+     * sum of heatmap values
+     */
+    private double fishingIntensity = 0;
 
     /**
      * todo move to parameter list
@@ -210,13 +214,11 @@ public class NauticalMap implements Startable
         Preconditions.checkArgument(receipt==null);
         //reset fished map count
         receipt =
-                model.scheduleEveryDay(new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-
-                        fishedMap.multiply(.8);
-                    }
+                model.scheduleEveryDay(simState -> {
+                    fishedMap.multiply(.8);
+                    fishingIntensity = Arrays.stream(fishedMap.toArray()).sum();
                 }, StepOrder.DATA_RESET);
+
     }
     public Bag getAllSeaTiles()
     {
@@ -427,6 +429,7 @@ public class NauticalMap implements Startable
      */
     public void recordFishing(SeaTile tile)
     {
+
         if(receipt != null)
             fishedMap.field[tile.getGridX()][tile.getGridY()]++;
     }
@@ -454,5 +457,9 @@ public class NauticalMap implements Startable
 
     public DoubleGrid2D getFishedMap() {
         return fishedMap;
+    }
+
+    public double getFishingIntensity() {
+        return fishingIntensity;
     }
 }

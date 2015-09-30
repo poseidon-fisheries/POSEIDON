@@ -5,8 +5,6 @@ Prototype:
       differentialPercentageToMove: '5.0E-4'
       percentageLimitOnDailyMovement: '0.01'
       steepness: uniform 0.6 0.8
-  catchabilityDeviation: '0.0'
-  catchabilityMean: '0.01'
   coastalRoughness: 4
   departingStrategy:
     Fixed Rest:
@@ -21,7 +19,7 @@ Prototype:
           explorationProbabilityMinimum: '0.01'
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
-      stepSize: '5.0'
+      stepSize: uniform 1.0 10.0
   engineWeight: normal 100.0 10.0
   fishers: 100
   fishingStrategy:
@@ -29,10 +27,19 @@ Prototype:
       daysAtSea: '5.0'
   fuelTankSize: '100000.0'
   gasPricePerLiter: '0.01'
+  gear:
+    Random Catchability:
+      meanCatchabilityFirstSpecies: '0.01'
+      meanCatchabilityOtherSpecies: '0.01'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+      trawlSpeed: '5.0'
   gridCellSizeInKm: 10.0
+  habitatInitializer: All Sand
   height: 50
   holdSize: '100.0'
   literPerKilometer: '10.0'
+  mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
       marketPrice: '10.0'
@@ -42,6 +49,11 @@ Prototype:
   ports: 1
   regulation: MPA Only
   speedInKmh: '5.0'
-  thrawlingSpeed: '5.0'
   usePredictors: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather
   width: 50

@@ -1,0 +1,16 @@
+Fixed Probability:
+  explorationProbability: '0.8'
+  imitationProbability: '1.0'
+-------
+Daily Decreasing Probability:
+  dailyDecreaseMultiplier: '0.99'
+  explorationProbability: '0.8'
+  explorationProbabilityMinimum: '0.01'
+  imitationProbability: '1.0'
+-------
+Adaptive Probability:
+  explorationProbability: '0.8'
+  explorationProbabilityMinimum: '0.01'
+  imitationProbability: '1.0'
+  incrementMultiplier: '0.02'
+-------

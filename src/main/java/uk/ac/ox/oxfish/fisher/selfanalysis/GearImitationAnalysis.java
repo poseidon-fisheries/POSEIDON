@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -88,7 +88,7 @@ public class GearImitationAnalysis implements FisherStartable
                 {
                     double total = 0;
                     for(Fisher fisher : state.getFishers())
-                        total+= ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
+                        total+= ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
                     return total/size;
                 }
             }
@@ -104,7 +104,7 @@ public class GearImitationAnalysis implements FisherStartable
                 else {
                     double total = 0;
                     for (Fisher fisher : state.getFishers())
-                        total += ((RandomCatchabilityThrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0];
+                        total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0];
                     return total / size;
                 }
             }

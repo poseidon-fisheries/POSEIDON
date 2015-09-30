@@ -162,9 +162,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
 
-    public DoubleParameter getFishingEfficiency() {
-        return delegate.getCatchabilityMean();
-    }
 
 
 
@@ -183,9 +180,7 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         return delegate.getDepartingStrategy();
     }
 
-    public void setFishingEfficiency(DoubleParameter fishingEfficiency) {
-        delegate.setCatchabilityMean(fishingEfficiency);
-    }
+
 
     public void setWidth(int width) {
         delegate.setWidth(width);

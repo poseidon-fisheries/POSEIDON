@@ -4,3 +4,15 @@ Fixed Probability:
 Fixed Rest:
   hoursBetweenEachDeparture: '12.0'
 -------
+Double Logistic:
+  boatLengthSensitivity: '-0.02'
+  cashflowPeriod: '30.0'
+  cashflowTarget: '1000.0'
+  efficiencyK: '20.0'
+  efficiencyL: '1.0'
+  efficiencyX0: '1.0'
+  weatherK: '10.0'
+  weatherL: '1.0'
+  weatherX0: '1.0'
+  windspeedSensitivity: '0.03'
+-------

@@ -14,7 +14,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -123,11 +124,7 @@ public class PrototypeScenario implements Scenario {
     /**
      * efficiency
      */
-    private DoubleParameter catchabilityMean = new FixedDoubleParameter(0.01);
-
-    private DoubleParameter catchabilityDeviation = new FixedDoubleParameter(0);
-
-    private DoubleParameter thrawlingSpeed = new FixedDoubleParameter(5);
+    private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
 
 
     private DoubleParameter engineWeight = new NormalDoubleParameter(100,10);
@@ -213,9 +210,8 @@ public class PrototypeScenario implements Scenario {
                                                                                    depthSmoothing,
                                                                                    width, height);
         //set habitats
-        HabitatInitializer rocky = habitatInitializer.apply(model);
-        rocky.applyHabitats(map, mapMakerRandom);
-
+        HabitatInitializer habitat = habitatInitializer.apply(model);
+        habitat.applyHabitats(map, mapMakerRandom, model);
 
 
 
@@ -288,14 +284,9 @@ public class PrototypeScenario implements Scenario {
 
             double[] catchabilityMeanPerSpecie = new double[biology.getSize()];
             double[] catchabilitySTD = new double[biology.getSize()];
-            for(int j=0; j<catchabilityMeanPerSpecie.length; j++)
-            {
-                catchabilityMeanPerSpecie[j] = catchabilityMean.apply(random);
-                catchabilitySTD[j] = catchabilityDeviation.apply(random);
-            }
-            RandomCatchabilityThrawl gear = new RandomCatchabilityThrawl(catchabilityMeanPerSpecie,
-                                                                         catchabilitySTD,
-                                                                         thrawlingSpeed.apply(random));
+
+            Gear fisherGear = gear.apply(model);
+
             Fisher newFisher = new Fisher(i, port,
                                           random,
                                           regulation.apply(model),
@@ -306,7 +297,7 @@ public class PrototypeScenario implements Scenario {
                                           new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
                                                                                 new FuelTank(fuelCapacity)),
                                           new Hold(capacity, biology.getSize()),
-                                          gear, model.getSpecies().size());
+                                          fisherGear, model.getSpecies().size());
 
 
 
@@ -412,14 +403,6 @@ public class PrototypeScenario implements Scenario {
         this.speedInKmh = speedInKmh;
     }
 
-    public DoubleParameter getCatchabilityMean() {
-        return catchabilityMean;
-    }
-
-    public void setCatchabilityMean(DoubleParameter catchabilityMean) {
-        this.catchabilityMean = catchabilityMean;
-    }
-
 
     public AlgorithmFactory<? extends Regulation> getRegulation() {
         return regulation;
@@ -510,20 +493,14 @@ public class PrototypeScenario implements Scenario {
         this.literPerKilometer = literPerKilometer;
     }
 
-    public DoubleParameter getCatchabilityDeviation() {
-        return catchabilityDeviation;
+
+    public AlgorithmFactory<? extends Gear> getGear() {
+        return gear;
     }
 
-    public void setCatchabilityDeviation(DoubleParameter catchabilityDeviation) {
-        this.catchabilityDeviation = catchabilityDeviation;
-    }
-
-    public DoubleParameter getThrawlingSpeed() {
-        return thrawlingSpeed;
-    }
-
-    public void setThrawlingSpeed(DoubleParameter thrawlingSpeed) {
-        this.thrawlingSpeed = thrawlingSpeed;
+    public void setGear(
+            AlgorithmFactory<? extends Gear> gear) {
+        this.gear = gear;
     }
 
     public DoubleParameter getGasPricePerLiter() {

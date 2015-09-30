@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
-import com.google.common.base.Objects;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -18,7 +17,7 @@ import java.util.List;
  * Catches = biomass * q * hours
  * Created by carrknight on 7/29/15.
  */
-public class RandomCatchabilityThrawl implements Gear
+public class RandomCatchabilityTrawl implements Gear
 {
 
     private final double[]  catchabilityMeanPerSpecie;
@@ -29,16 +28,16 @@ public class RandomCatchabilityThrawl implements Gear
     /**
      * speed (used for fuel consumption) of thrawling
      */
-    private  final double thrawlSpeed;
+    private  final double trawlSpeed;
 
 
-    public RandomCatchabilityThrawl(
+    public RandomCatchabilityTrawl(
             double[] catchabilityMeanPerSpecie,
             double[] catchabilityDeviationPerSpecie,
-            double thrawlSpeed) {
+            double trawlSpeed) {
         this.catchabilityMeanPerSpecie = catchabilityMeanPerSpecie;
         this.catchabilityDeviationPerSpecie = catchabilityDeviationPerSpecie;
-        this.thrawlSpeed = thrawlSpeed;
+        this.trawlSpeed = trawlSpeed;
     }
 
     @Override
@@ -67,7 +66,7 @@ public class RandomCatchabilityThrawl implements Gear
     @Override
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
-        return boat.expectedFuelConsumption(thrawlSpeed);
+        return boat.expectedFuelConsumption(trawlSpeed);
     }
 
     public double[] getCatchabilityMeanPerSpecie() {
@@ -80,21 +79,20 @@ public class RandomCatchabilityThrawl implements Gear
 
     @Override
     public Gear makeCopy() {
-        return new RandomCatchabilityThrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
+        return new RandomCatchabilityTrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
                                             Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
-                                            thrawlSpeed);
+                                           trawlSpeed);
     }
 
-    public double getThrawlSpeed() {
-        return thrawlSpeed;
+    public double getTrawlSpeed() {
+        return trawlSpeed;
     }
+
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("catchabilityMeanPerSpecie", catchabilityMeanPerSpecie)
-                .add("catchabilityDeviationPerSpecie", catchabilityDeviationPerSpecie)
-                .add("thrawlSpeed", thrawlSpeed)
-                .toString();
+        return "RandomCatchabilityTrawl{" + "catchabilityMeanPerSpecie=" + Arrays.toString(
+                catchabilityMeanPerSpecie) + ", catchabilityDeviationPerSpecie=" + Arrays.toString(
+                catchabilityDeviationPerSpecie) + ", trawlSpeed=" + trawlSpeed + '}';
     }
 }

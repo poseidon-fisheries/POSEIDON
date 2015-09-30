@@ -14,10 +14,10 @@ public class RockyRectanglesHabitatFactory implements AlgorithmFactory<RockyRect
 {
 
 
-    private DoubleParameter rockyHeight = new UniformDoubleParameter(5,10);
-    private DoubleParameter rockyWidth = new UniformDoubleParameter(5,10);
+    private DoubleParameter rockyHeight = new UniformDoubleParameter(25,30);
+    private DoubleParameter rockyWidth = new UniformDoubleParameter(20,25);
 
-    private DoubleParameter numberOfRectangles = new FixedDoubleParameter(5);
+    private DoubleParameter numberOfRectangles = new FixedDoubleParameter(1);
 
 
     public RockyRectanglesHabitatFactory() {

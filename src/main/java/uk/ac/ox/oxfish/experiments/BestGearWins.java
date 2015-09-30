@@ -2,7 +2,8 @@ package uk.ac.ox.oxfish.experiments;
 
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -33,7 +34,9 @@ public class BestGearWins {
         scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get(biologyInitializer).get());
         scenario.setFishers(100);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
-        scenario.setThrawlingSpeed(new UniformDoubleParameter(0, 20));
+        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
+        gear.setTrawlSpeed(new UniformDoubleParameter(0,20));
+        scenario.setGear(gear);
         //start everything
         FishState state = new FishState(seed);
         state.setScenario(scenario);
@@ -45,7 +48,7 @@ public class BestGearWins {
         double average = 0;
         for(Fisher fisher : state.getFishers())
         {
-            average += ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
         }
         average/=100;
   //      System.out.println(average);
@@ -57,7 +60,7 @@ public class BestGearWins {
         average = 0;
         for(Fisher fisher : state.getFishers())
         {
-            average += ((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed();
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
         }
         average/=100;
      //   System.out.println(average);

@@ -1,0 +1,7 @@
+All Sand
+-------
+Rocky Rectangles:
+  numberOfRectangles: '5.0'
+  rockyHeight: uniform 5.0 10.0
+  rockyWidth: uniform 5.0 10.0
+-------

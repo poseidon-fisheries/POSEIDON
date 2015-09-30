@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -76,6 +77,9 @@ class Main{
     }
 
 
+
+
+
     //opportunity costs
     public static void opportunity(String[] args) throws IOException {
         final FishState state = new FishState(0);
@@ -138,7 +142,7 @@ class Main{
     }
 
 
-        public static void oilPriceMiniDemo(String[] args) throws IOException {
+    public static void oilPriceMiniDemo(String[] args) throws IOException {
 
 
 
@@ -149,7 +153,10 @@ class Main{
         scenario.setGridCellSizeInKm(2);
         scenario.setCoastalRoughness(0);
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
-        scenario.setThrawlingSpeed(new FixedDoubleParameter(0)); //fishing needs no fuel, just travelling
+
+        RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
+        gear.setTrawlSpeed(new FixedDoubleParameter(0));
+        scenario.setGear(gear);
 
 
 
@@ -196,7 +203,7 @@ class Main{
         c.setVisible(true);
     }
 
-//OneDudeFishingAloneDemo
+    //OneDudeFishingAloneDemo
     public static void OneDudeFishingAloneDemo(String[] args) throws IOException {
 
 

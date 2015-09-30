@@ -4,7 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityThrawl;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -43,7 +43,7 @@ public class ITQCaresAboutMileage {
         int i=0;
         for(Fisher fisher : state.getFishers())
         {
-            mileage[i] = (((RandomCatchabilityThrawl) fisher.getGear()).getThrawlSpeed());
+            mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed());
             catches[i] = fisher.getLatestYearlyObservation(
                     specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 

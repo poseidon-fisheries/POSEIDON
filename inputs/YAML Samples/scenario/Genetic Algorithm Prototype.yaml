@@ -5,7 +5,6 @@ Genetic Algorithm Prototype:
       hoursBetweenEachDeparture: '12.0'
   depthSmoothing: 1000000
   fishers: 100
-  fishingEfficiency: '0.01'
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
