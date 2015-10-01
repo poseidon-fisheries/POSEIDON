@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -295,7 +296,7 @@ public class PrototypeScenario implements Scenario {
                                           fishingStrategy.apply(model),
                                           weatherStrategy.apply(model),
                                           new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
-                                                                                new FuelTank(fuelCapacity)),
+                                                   new FuelTank(fuelCapacity)),
                                           new Hold(capacity, biology.getSize()),
                                           fisherGear, model.getSpecies().size());
 
@@ -332,9 +333,11 @@ public class PrototypeScenario implements Scenario {
 
 
         //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
+        if(fisherList.isEmpty())
+            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()));
+        else
 
-
-        return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
+            return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 
     public int getCoastalRoughness() {

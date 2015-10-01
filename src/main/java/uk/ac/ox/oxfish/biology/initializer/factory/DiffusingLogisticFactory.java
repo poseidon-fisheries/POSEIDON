@@ -23,12 +23,12 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
-    private DoubleParameter percentageLimitOnDailyMovement =new FixedDoubleParameter(0.01);
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
 
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.0005);
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
 
 
     /**

@@ -20,6 +20,7 @@ import sim.portrayal.simple.TrailedPortrayal2D;
 import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.gui.controls.PolicyButton;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
 import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
@@ -28,6 +29,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedList;
 
 /**
  * The GUI of FishState
@@ -58,6 +60,7 @@ public class FishGUI extends GUIState{
     private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
 
+    private final LinkedList<PolicyButton> policyButtons = new LinkedList<>();
 
 
 
@@ -97,7 +100,7 @@ public class FishGUI extends GUIState{
         display2D = new Display2D(WIDTH, HEIGHT,this);
         //attach it the portrayal
         display2D.attach(myPortrayal,"Bathymetry");
-        display2D.attach(mpaPortrayal,"MPAs");
+    //    display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(cities,"Cities");
         display2D.attach(fishingHotspots, "Fishing Hotspots");
         display2D.attach(trails, "Boat Trails");
@@ -265,5 +268,10 @@ public class FishGUI extends GUIState{
     public static String getName()
     {
         return  "Proto-Prototype of a Fishery Model";
+    }
+
+
+    public LinkedList<PolicyButton> getPolicyButtons() {
+        return policyButtons;
     }
 }

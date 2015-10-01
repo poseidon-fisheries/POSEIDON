@@ -26,7 +26,7 @@ public class GlobalBiology
 
         this.species = species;
         for(int i=0; i<species.length; i++) //now assign a number to each
-            species[i].setIndex(i);
+            species[i].resetIndexTo(i);
         unmodifiableView = Collections.unmodifiableList(Arrays.asList(species));
     }
 

@@ -26,7 +26,7 @@ public class Specie {
         return index;
     }
 
-    public void setIndex(int index) {
+    public void resetIndexTo(int index) {
         this.index = index;
     }
 

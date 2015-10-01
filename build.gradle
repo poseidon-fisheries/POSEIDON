@@ -86,6 +86,7 @@ task wrapper(type: Wrapper) {
 task fatJar(type: FatCapsule) {
     archiveName = "oxfish_executable.jar"
     applicationClass 'Main'
+ //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
     capsuleManifest {
         minJavaVersion = '1.8.0'

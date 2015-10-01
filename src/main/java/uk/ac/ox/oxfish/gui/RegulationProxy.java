@@ -23,4 +23,5 @@ public class RegulationProxy {
             AlgorithmFactory<? extends Regulation> globalRegulations) {
         this.globalRegulations = globalRegulations;
     }
+
 }

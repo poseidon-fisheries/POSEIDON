@@ -33,7 +33,7 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
     /**
      * how much of the differential between two seatile's biomass should be solved by movement in a single day
      */
-    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.0005);
+    private DoubleParameter differentialPercentageToMove =new FixedDoubleParameter(0.001);
 
 
     private int numberOfSpecies = 1;
@@ -105,4 +105,7 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
     public void setNumberOfSpecies(int numberOfSpecies) {
         this.numberOfSpecies = numberOfSpecies;
     }
+
+
+
 }

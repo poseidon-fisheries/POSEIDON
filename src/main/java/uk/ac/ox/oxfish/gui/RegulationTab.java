@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.gui;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.gui.controls.PolicyButton;
 import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,7 +25,7 @@ public class RegulationTab extends JPanel
         super();
 
         regulations = new RegulationProxy();
-        this.setLayout(new FlowLayout());
+        this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         this.add(new MetaInspector(regulations,gui));
 
         JButton jButton = new JButton("Change regulations for all agents");
@@ -52,13 +52,18 @@ public class RegulationTab extends JPanel
         drawerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(drawerButton.isSelected())
+                if (drawerButton.isSelected())
                     drawer.attach();
                 else
                     drawer.detach();
             }
         });
         this.add(drawerButton);
+        for(PolicyButton policy : gui.getPolicyButtons()) {
+            this.add(new JSeparator());
+            this.add(policy.buildJComponent(gui));
+        }
+
     }
 
 }

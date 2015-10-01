@@ -73,9 +73,16 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
         //create numberOfAreas rectangles
         for(int i=0; i< numberOfRectangles; i++)
         {
+
             //create the bottom left corner
-            int x = random.nextInt(mapWidth);
-            int y = random.nextInt(mapHeight);
+            int x;
+            int y;
+            do {
+                x = random.nextInt(mapWidth);
+                y = random.nextInt(mapHeight);
+            }
+            while (map.getSeaTile(x,y).getAltitude()>0);
+
 
             //get rectangle size
             int rockyWidth = this.rockyWidth.apply(random).intValue();
@@ -141,9 +148,6 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
 
         borderTiles.removeAll(rockyTiles);
-
-        System.out.println(rockyTiles);
-        System.out.println(borderTiles);
 
 
 

@@ -103,4 +103,11 @@ public class HabitatDeploymentScenario implements Scenario{
         return biology;
     }
 
+    public Long getMapRandomSeed() {
+        return delegate.getMapMakerDedicatedRandomSeed();
+    }
+
+    public void setMapRandomSeed(Long mapMakerDedicatedRandomSeed) {
+        delegate.setMapMakerDedicatedRandomSeed(mapMakerDedicatedRandomSeed);
+    }
 }

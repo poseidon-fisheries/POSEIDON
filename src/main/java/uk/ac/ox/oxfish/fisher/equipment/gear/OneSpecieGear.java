@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -20,6 +21,8 @@ public class OneSpecieGear implements Gear {
 
     public OneSpecieGear(Specie targetedSpecie, double proportionCaught)
     {
+        Preconditions.checkArgument(proportionCaught <=1);
+        Preconditions.checkArgument(proportionCaught >=0);
         this.targetedSpecie = targetedSpecie;
         this.proportionCaught = proportionCaught;
     }
@@ -58,5 +61,13 @@ public class OneSpecieGear implements Gear {
     @Override
     public Gear makeCopy() {
         return new OneSpecieGear(targetedSpecie,proportionCaught);
+    }
+
+    public Specie getTargetedSpecie() {
+        return targetedSpecie;
+    }
+
+    public double getProportionCaught() {
+        return proportionCaught;
     }
 }

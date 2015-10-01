@@ -35,6 +35,10 @@ public class HabitatInitializers {
         CONSTRUCTORS.put("Rocky Rectangles",
                          RockyRectanglesHabitatFactory::new);
         NAMES.put(RockyRectanglesHabitatFactory.class,"Rocky Rectangles");
+
+        CONSTRUCTORS.put("Rocky Pyramids",
+                         RockyPyramidsFactory::new);
+        NAMES.put(RockyPyramidsFactory.class,"Rocky Pyramids");
     }
 
     private HabitatInitializers() {

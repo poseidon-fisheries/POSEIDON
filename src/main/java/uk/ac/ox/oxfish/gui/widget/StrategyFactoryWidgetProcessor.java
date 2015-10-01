@@ -115,6 +115,10 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
 
                             //so i bind it again by setter
                             metawidget.setToInspect(beingInspected);
+                            if(metawidget.getParent()!=null) {
+                                metawidget.getParent().revalidate();
+
+                            }
                         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                             System.err.print("failed to find class! " + e1);
                             e1.printStackTrace();
