@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
 import org.junit.Test;
-import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
@@ -28,7 +28,6 @@ public class RespondToFines {
         FishState state = new FishState(System.currentTimeMillis(), 1);
         state.setScenario(scenario);
         state.start();
-        state.getMap().guiStart(state);
         //make fishing specie 1 very expensive
         ((FixedPriceMarket) state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(1))).setPrice(-50);
 
@@ -40,7 +39,7 @@ public class RespondToFines {
         //now check the hotspots
         double allHotspots = 0;
         double lowerHotSpots = 0;
-        DoubleGrid2D hotspots = state.getMap().getFishedMap();
+        IntGrid2D hotspots = state.getMap().getDailyTrawlsMap();
         for(int x =0; x<state.getMap().getWidth(); x++)
         {
             for (int y = 0; y < state.getMap().getHeight(); y++)

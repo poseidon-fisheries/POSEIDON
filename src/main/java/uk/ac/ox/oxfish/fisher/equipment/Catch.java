@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Specie;
 
+import java.util.Arrays;
+
 /**
  * Right now this is just a map specie--->pounds caught. It might in the future deal with age and other factors which is
  * why I create the object catch rather than just using a map
@@ -43,5 +45,9 @@ public class Catch {
 
 
 
+    public double totalCatchWeight()
+    {
+        return Arrays.stream(catchMap).sum();
+    }
 
 }

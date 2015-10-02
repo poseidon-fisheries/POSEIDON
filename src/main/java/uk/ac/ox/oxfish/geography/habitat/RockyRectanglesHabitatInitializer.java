@@ -153,10 +153,10 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
         model.getDailyDataSet().registerGatherer("% Rocky Fishing Intensity",
                                                  state -> {
-                                                     double total = Arrays.stream(map.getFishedMap().toArray()).sum();
+                                                     double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                                                      double rocky=0;
                                                      for(SeaTile tile : rockyTiles)
-                                                        rocky += map.getFishedMap().field[tile.getGridX()][tile.getGridY()];
+                                                        rocky += map.getDailyTrawlsMap().field[tile.getGridX()][tile.getGridY()];
 
                                                      return 100* rocky/total;
 
@@ -164,10 +164,10 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
         model.getDailyDataSet().registerGatherer("% Rocky Border Fishing Intensity",
                                                  state -> {
-                                                     double total = Arrays.stream(map.getFishedMap().toArray()).sum();
+                                                     double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                                                      double rocky=0;
                                                      for(SeaTile tile : borderTiles)
-                                                         rocky += map.getFishedMap().field[tile.getGridX()][tile.getGridY()];
+                                                         rocky += map.getDailyTrawlsMap().field[tile.getGridX()][tile.getGridY()];
 
                                                      return 100* rocky/total;
 

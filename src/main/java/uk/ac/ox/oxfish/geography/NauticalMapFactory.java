@@ -57,7 +57,12 @@ public class NauticalMapFactory {
         EquirectangularDistance distance = new EquirectangularDistance(temporaryField.toXCoord(0.5),
                                                                        temporaryField.getPixelHeight());
 
-        return new NauticalMap(rasterBathymetry,mpaVectorField,distance);
+
+        NauticalMap map = new NauticalMap(rasterBathymetry, mpaVectorField, distance);
+        for(SeaTile tile : map.getAllSeaTilesAsList())
+            tile.setBiology(new EmptyLocalBiology());
+        return map;
+
 
 
 

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -9,8 +10,8 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
-import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.Grid2D;
+import sim.field.grid.IntGrid2D;
 import sim.field.grid.ObjectGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
@@ -24,7 +25,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,7 +86,7 @@ public class NauticalMap implements Startable
     /**
      * a map holding
      */
-    private DoubleGrid2D fishedMap;
+    private IntGrid2D dailyTrawlsMap;
 
     /**
      * sum of heatmap values
@@ -126,7 +126,7 @@ public class NauticalMap implements Startable
         ports = new HashSet<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
-        fishedMap = new DoubleGrid2D(getWidth(),getHeight());
+        dailyTrawlsMap = new IntGrid2D(getWidth(),getHeight());
     }
 
     public int getHeight() {
@@ -152,7 +152,7 @@ public class NauticalMap implements Startable
 
     public static NauticalMap initializeWithDefaultValues()
     {
-       return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
+        return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
     }
 
 
@@ -202,24 +202,20 @@ public class NauticalMap implements Startable
             tile.start(model);
         }
 
-    }
-
-
-    /**
-     * start the resetting of fish-hotspots; pointless if you have no gui
-     * @param model
-     */
-    public void guiStart(FishState model)
-    {
         Preconditions.checkArgument(receipt==null);
         //reset fished map count
         receipt =
                 model.scheduleEveryDay(simState -> {
-                    fishedMap.multiply(.8);
-                    fishingIntensity = Arrays.stream(fishedMap.toArray()).sum();
-                }, StepOrder.DATA_RESET);
+
+                    dailyTrawlsMap.setTo(0);
+
+
+                }, StepOrder.DAWN);
 
     }
+
+
+
     public Bag getAllSeaTiles()
     {
         return rasterBackingGrid.elements();
@@ -290,7 +286,7 @@ public class NauticalMap implements Startable
      */
     public SeaTile getSeaTile(int gridX, int gridY) {
         if(rasterBackingGrid.getHeight() <= gridY || rasterBackingGrid.getWidth() <= gridX
-                 || gridX < 0 || gridY <0)
+                || gridX < 0 || gridY <0)
             return null;
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
@@ -384,7 +380,7 @@ public class NauticalMap implements Startable
         //check it's coastal
         Bag neighbors = new Bag();
         rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
-                Grid2D.BOUNDED, false, neighbors,null,null);
+                                            Grid2D.BOUNDED, false, neighbors,null,null);
         boolean isCoastal = false;
         for(Object tile : neighbors)
         {
@@ -430,8 +426,7 @@ public class NauticalMap implements Startable
     public void recordFishing(SeaTile tile)
     {
 
-        if(receipt != null)
-            fishedMap.field[tile.getGridX()][tile.getGridY()]++;
+        dailyTrawlsMap.field[tile.getGridX()][tile.getGridY()]++;
     }
 
     public SparseGrid2D getFisherGrid() {
@@ -445,7 +440,7 @@ public class NauticalMap implements Startable
         int tries = 0;
         do{
             toReturn = getSeaTile(random.nextInt(getWidth()),
-                                      random.nextInt(getHeight()));
+                                  random.nextInt(getHeight()));
 
             tries++;
             if(tries > 100000)
@@ -455,11 +450,16 @@ public class NauticalMap implements Startable
         return toReturn;
     }
 
-    public DoubleGrid2D getFishedMap() {
-        return fishedMap;
+    public IntGrid2D getDailyTrawlsMap() {
+        return dailyTrawlsMap;
     }
 
     public double getFishingIntensity() {
         return fishingIntensity;
+    }
+
+    @VisibleForTesting
+    public Stoppable getReceipt() {
+        return receipt;
     }
 }

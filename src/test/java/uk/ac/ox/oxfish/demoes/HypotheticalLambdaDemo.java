@@ -1,23 +1,15 @@
 package uk.ac.ox.oxfish.demoes;
 
-import junit.framework.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.nio.file.Paths;
-import java.util.function.ToDoubleFunction;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by carrknight on 8/20/15.
- */
+
 public class HypotheticalLambdaDemo {
 
 

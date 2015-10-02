@@ -109,5 +109,21 @@ public class NauticalMapTest {
     }
 
 
+    @Test
+    public void towCountCorrect() throws Exception {
 
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
+        FishState state = new FishState(0l);
+        map.recordFishing(map.getSeaTile(2,2));
+        map.recordFishing(map.getSeaTile(2,2));
+        map.recordFishing(map.getSeaTile(2,3));
+
+        assertEquals(map.getDailyTrawlsMap().get(2,2),2);
+        assertEquals(map.getDailyTrawlsMap().get(2, 2), 2);
+        assertEquals(map.getDailyTrawlsMap().get(2,3),1);
+        assertEquals(map.getDailyTrawlsMap().get(3, 3), 0);
+
+
+
+    }
 }

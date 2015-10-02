@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.actions;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -27,11 +28,8 @@ public class Fishing implements Action
         Preconditions.checkArgument(agent.getLocation().getAltitude() <= 0); //you are at sea
         Preconditions.checkState(regulation.canFishHere(agent,agent.getLocation(), model)); //i should be allowed to fish here!
         //fish!
-        if(hoursLeft >= 1)
-            agent.fishHere(model.getBiology(), 1, model);
-        else
-            agent.fishHere(model.getBiology(),hoursLeft, model);
-        //consume fuel
+        Catch caught =  agent.fishHere(model.getBiology(), Math.min(1,hoursLeft), model);
+
         model.recordFishing(agent.getLocation());
 
         //go back to "arrived" state

@@ -1,32 +1,17 @@
 package uk.ac.ox.oxfish.demoes;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 import org.junit.Assert;
 import org.junit.Test;
-import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.IntGrid2D;
 import sim.util.geo.MasonGeometry;
-import uk.ac.ox.oxfish.biology.Specie;
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
-import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
-import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-
-import static uk.ac.ox.oxfish.demoes.FunctionalFriendsDemo.stepsItTook;
 
 /**
  * I write here in unit-test format the results of the demoes I show on the website. This will help make sure
@@ -61,7 +46,6 @@ public class FishTheLineDemo {
         FishState state = new FishState(System.currentTimeMillis(), 1);
         state.setScenario(scenario);
         state.start();
-        state.getMap().guiStart(state); //needed to have fishing hotspots
         state.schedule.step(state);
         CoordinateTransformer transformer = new CoordinateTransformer(null,state.getMap());
 
@@ -91,7 +75,7 @@ public class FishTheLineDemo {
         //now check the hotspots
         double allHotspots = 0;
         double onTheLine = 0;
-        DoubleGrid2D hotspots = state.getMap().getFishedMap();
+        IntGrid2D hotspots = state.getMap().getDailyTrawlsMap();
         for(int x =0; x<state.getMap().getWidth(); x++)
         {
             for (int y = 0; y < state.getMap().getHeight(); y++)

@@ -154,14 +154,14 @@ public class EffortThrottling {
             FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("Probability to leave port"),
                                                     timeSeries);
         if(grid!=null)
-            gridToCSV(state.getFishedMap().field,grid);
+            gridToCSV(state.getDailyTrawlsMap().field,grid);
 
 
         return state;
     }
 
 
-    public static void gridToCSV(double[][] grid, File file)
+    public static void gridToCSV(int[][] grid, File file)
     {
 
         try {

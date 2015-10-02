@@ -12,12 +12,10 @@ import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
-import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
-import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
@@ -52,8 +50,6 @@ public class FishGUI extends GUIState{
     private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();
     private final SparseGridPortrayal2D trails = new SparseGridPortrayal2D();
 
-    private final FastValueGridPortrayal2D fishingHotspots = new FastValueGridPortrayal2D("Fishing Hotspots");
-
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
     private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
@@ -63,6 +59,7 @@ public class FishGUI extends GUIState{
     private final LinkedList<PolicyButton> policyButtons = new LinkedList<>();
 
 
+    private TrawlingHeatMap heatMap ;
 
 
     /**
@@ -98,16 +95,7 @@ public class FishGUI extends GUIState{
 
         //create the display2d
         display2D = new Display2D(WIDTH, HEIGHT,this);
-        //attach it the portrayal
-        display2D.attach(myPortrayal,"Bathymetry");
-    //    display2D.attach(mpaPortrayal,"MPAs");
-        display2D.attach(cities,"Cities");
-        display2D.attach(fishingHotspots, "Fishing Hotspots");
-        display2D.attach(trails, "Boat Trails");
-        display2D.attach(boats, "Boats");
-        display2D.attach(ports, "Ports");
-        displayFrame = display2D.createFrame();
-        controller.registerFrame(displayFrame);
+
 
 
 
@@ -127,7 +115,6 @@ public class FishGUI extends GUIState{
         final FishGUI self = this;
         FishState state = (FishState) this.state;
         myPortrayal.initializeGrid(state.getBiology());
-        displayFrame.setVisible(true);
 
 
         //the console label is a pain in the ass so we need to really use a wrecking ball to modify the way
@@ -154,14 +141,7 @@ public class FishGUI extends GUIState{
         //cities portrayal
         cities.setField(state.getCities());
         cities.setPortrayalForAll(new GeomPortrayal(Color.BLACK, .05, true));
-        //fishing hotspots
-        state.getMap().guiStart(state);
-        fishingHotspots.setField(state.getFishedMap());
-        fishingHotspots.setMap(
-                new SimpleColorMap(0, (state.getFishers().size() + 1) * 2, new Color(0, 0, 0, 0), Color.RED));
-        //reset your color map every year
-        fishingHotspots.setMap(
-                new SimpleColorMap(0, (state.getFishers().size() + 1) * 2, new Color(0, 0, 0, 0), Color.RED));
+
 
         //boats
         trails.setField(state.getFisherGrid());
@@ -234,6 +214,19 @@ public class FishGUI extends GUIState{
         //drawer.attach();
 
 
+        heatMap = new TrawlingHeatMap(state.getDailyTrawlsMap(),state, 30);
+
+        //attach it the portrayal
+        display2D.attach(myPortrayal,"Bathymetry");
+        //    display2D.attach(mpaPortrayal,"MPAs");
+        display2D.attach(cities,"Cities");
+        display2D.attach(heatMap.getHeatMapPortrayal(), "Fishing Hotspots");
+        display2D.attach(trails, "Boat Trails");
+        display2D.attach(boats, "Boats");
+        display2D.attach(ports, "Ports");
+        displayFrame = display2D.createFrame();
+        controller.registerFrame(displayFrame);
+        displayFrame.setVisible(true);
 
 
 
