@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 {
 
+    public static final String ROCKY_FISHING_INTENSITY = "% Rocky Fishing Intensity";
+    public static final String BORDER_FISHING_INTENSITY = "% Rocky Border Fishing Intensity";
     final private DoubleParameter rockyHeight;
 
     final private DoubleParameter rockyWidth;
@@ -151,7 +153,7 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
 
 
-        model.getDailyDataSet().registerGatherer("% Rocky Fishing Intensity",
+        model.getDailyDataSet().registerGatherer(ROCKY_FISHING_INTENSITY,
                                                  state -> {
                                                      double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                                                      double rocky=0;
@@ -162,7 +164,7 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
                                                  },Double.NaN);
 
-        model.getDailyDataSet().registerGatherer("% Rocky Border Fishing Intensity",
+        model.getDailyDataSet().registerGatherer(BORDER_FISHING_INTENSITY,
                                                  state -> {
                                                      double total = Arrays.stream(map.getDailyTrawlsMap().toArray()).sum();
                                                      double rocky=0;

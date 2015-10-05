@@ -82,7 +82,7 @@ class Main{
 
     //opportunity costs
     public static void opportunity(String[] args) throws IOException {
-        final FishState state = new FishState(0);
+        final FishState state = new FishState(System.currentTimeMillis());
         //world split in half
         /*
         ITQSpecificFactory regs2 = new ITQSpecificFactory(){

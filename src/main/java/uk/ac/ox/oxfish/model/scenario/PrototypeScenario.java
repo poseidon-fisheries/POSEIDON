@@ -283,9 +283,6 @@ public class PrototypeScenario implements Scenario {
             final double literPerKilometer = this.literPerKilometer.apply(random);
             final double  fuelCapacity = this.fuelTankSize.apply(random);
 
-            double[] catchabilityMeanPerSpecie = new double[biology.getSize()];
-            double[] catchabilitySTD = new double[biology.getSize()];
-
             Gear fisherGear = gear.apply(model);
 
             Fisher newFisher = new Fisher(i, port,
