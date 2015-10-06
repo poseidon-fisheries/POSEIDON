@@ -23,6 +23,8 @@ public class ITQMarketBuilder  implements Startable
     private HashMap<Fisher,MonoQuotaPriceGenerator> reservationPricers = new HashMap<>();
     private ITQOrderBook market;
 
+
+
     public ITQMarketBuilder() {
         specieIndex = 0;
     }
@@ -48,7 +50,7 @@ public class ITQMarketBuilder  implements Startable
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers())
         {
-            MonoQuotaPriceGenerator reservationPricer = new MonoQuotaPriceGenerator(specieIndex);
+            MonoQuotaPriceGenerator reservationPricer = new MonoQuotaPriceGenerator(specieIndex, false);
             reservationPricer.start(model, fisher);
             market.registerTrader(fisher, reservationPricer);
             //record it

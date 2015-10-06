@@ -24,8 +24,17 @@ public class MonoQuotaPriceGenerator implements FisherStartable
 
     private MonoQuotaRegulation quotas;
 
-    public MonoQuotaPriceGenerator(int specieIndex) {
+
+    /**
+     * whether to include or not daily profits in the reservation price computation. This was something I attempted
+     * on 20151006 but I decided to abandon as I don't think it makes as much economic sense as I thought it did
+     */
+    private final boolean includeDailyProfits;
+
+    public MonoQuotaPriceGenerator(int specieIndex,
+                                   boolean includeDailyProfits) {
         this.specieIndex = specieIndex;
+        this.includeDailyProfits = includeDailyProfits;
     }
 
     @Override
@@ -48,11 +57,11 @@ public class MonoQuotaPriceGenerator implements FisherStartable
 
     @Override
     public void turnOff() {
-
+        //todo remove gatherer
     }
 
 
-    double computeLambda()
+    protected double computeLambda()
     {
 
         if(fisher == null)
@@ -63,7 +72,11 @@ public class MonoQuotaPriceGenerator implements FisherStartable
                 specieIndex,
                  quotas.getQuotaRemaining(specieIndex) / (365 - state.getDayOfTheYear()));
 
-        return  (probability * fisher.predictUnitProfit(specieIndex));
+        if(!includeDailyProfits)
+            return  (probability * fisher.predictUnitProfit(specieIndex));
+        else
+            return  (probability * (fisher.predictUnitProfit(specieIndex) +  (365 - state.getDayOfTheYear()) * fisher.predictDailyProfits() ));
+
 
 
 

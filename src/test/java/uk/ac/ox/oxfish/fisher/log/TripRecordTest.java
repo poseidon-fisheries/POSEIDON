@@ -48,4 +48,15 @@ public class TripRecordTest {
 
 
     }
+
+    @Test
+    public void profitsAreCorrect() throws Exception {
+        TripRecord record = new TripRecord(2);
+        record.recordCosts(100);
+        record.recordEarnings(0,1,200);
+        record.recordEarnings(1,1,100);
+        record.completeTrip(10);
+        assertEquals(record.getTotalTripProfit(),200,.001);
+
+    }
 }

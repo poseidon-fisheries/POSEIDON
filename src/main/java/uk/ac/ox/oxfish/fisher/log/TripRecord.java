@@ -168,6 +168,14 @@ public class TripRecord {
             return getProfitPerSpecie(specie, false)/finalCatch[specie];
     }
 
+    public double getTotalTripProfit()
+    {
+        return DoubleStream.of(earningsPerSpecie).sum() - totalCosts;
+
+    }
+
+
+
 
     public boolean isCutShort() {
         return cutShort;

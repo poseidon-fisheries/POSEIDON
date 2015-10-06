@@ -56,6 +56,18 @@ public class TimeSeries<T> implements Steppable
     }
 
 
+    public DataColumn removeGatherer(String title)
+    {
+        DataColumn removed = data.remove(title);
+        assert removed!=null;
+        gatherers.remove(title);
+
+        return removed;
+
+
+
+    }
+
 
     private Stoppable receipt = null;
     /**

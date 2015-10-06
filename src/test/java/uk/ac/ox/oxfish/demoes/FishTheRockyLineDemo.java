@@ -37,7 +37,7 @@ public class FishTheRockyLineDemo {
             scenario.setFishers(200); //this way resources are consumed faster, makes for a stronger fish the line
             //one can get reliably between 35-50% fishing the border (which is a small area anyway) just with 100
             //but there are times where a corner of the map recovers enough that temporal dips happen; that makes
-            //for an ineffectual thing to test. Rather with 200 fishers i have never seen the percentage of effort
+            //for an ineffectual measure to test against. Rather with 200 fishers i have never seen the percentage of effort
             //spent in the border to be below 60%
             scenario.setGear(gear);
             scenario.setBiologyInitializer(new RockyLogisticFactory());
@@ -74,7 +74,7 @@ public class FishTheRockyLineDemo {
 
         assertTrue(state.getDailyDataSet().getColumn(
                 RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
-                           > 40); //on average more than 50% of all tows happened in rocky areas
+                           > 40); //on average more than 40% of all tows happened in rocky areas
     }
 
 

@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -318,7 +319,19 @@ public class PrototypeScenario implements Scenario {
                             "Predicted Unit Profit " + specie,
                             fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),
                             30));
+
+
+
                 }
+
+                //daily profits predictor
+                newFisher.setDailyProfitsPredictor(
+                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                fisher ->
+                                                                        fisher.getDailyData().
+                                                                                getColumn(
+                                                                                        YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                90));
             }
 
 

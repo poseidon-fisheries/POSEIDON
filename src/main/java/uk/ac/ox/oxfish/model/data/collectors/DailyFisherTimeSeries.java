@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 
+import java.util.function.Function;
+
 /**
  * Dataset for each fisher being updated once a day
  * Created by carrknight on 8/4/15.
@@ -32,6 +34,18 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
     public void start(FishState state, Fisher observed) {
 
         registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
+        registerGatherer( YearlyFisherTimeSeries.CASH_FLOW_COLUMN,
+                          new Function<Fisher, Double>() {
+
+                              double oldCash = observed.getBankBalance();
+
+        @Override
+        public Double apply(Fisher fisher) {
+            double flow = fisher.getBankBalance() - oldCash;
+            oldCash = fisher.getBankBalance();
+            return flow;
+        }},Double.NaN);
+
 
         for(Specie specie : state.getSpecies())
         {

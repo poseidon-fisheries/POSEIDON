@@ -38,7 +38,8 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
         //CASH
         registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
 
-        registerGatherer(CASH_FLOW_COLUMN, new Function<Fisher, Double>() {
+        registerGatherer(CASH_FLOW_COLUMN,
+                         new Function<Fisher, Double>() {
             double oldCash = observed.getBankBalance();
 
             @Override

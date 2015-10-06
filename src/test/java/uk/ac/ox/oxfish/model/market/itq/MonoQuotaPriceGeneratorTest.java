@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -33,7 +34,7 @@ public class MonoQuotaPriceGeneratorTest {
         when(fisher.predictUnitProfit(3)).thenReturn(10d);
 
 
-        MonoQuotaPriceGenerator gen = new MonoQuotaPriceGenerator(3);
+        MonoQuotaPriceGenerator gen = new MonoQuotaPriceGenerator(3, false);
 
         gen.start(model, fisher);
 
@@ -50,6 +51,30 @@ public class MonoQuotaPriceGeneratorTest {
         when(model.getDayOfTheYear()).thenReturn(363);
         assertEquals(5, gen.computeLambda(), .0001);
 
+
+    }
+
+    @Test
+    public void countingDailyProfits() throws Exception {
+
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
+        FishState model = mock(FishState.class);
+        when(model.getSpecies()).thenReturn(Collections.singletonList(new Specie("a")));
+
+        MonoQuotaRegulation regulation = new MonoQuotaRegulation(200, model);
+        when(fisher.getRegulation()).thenReturn(regulation);
+
+        when(fisher.probabilityDailyCatchesBelowLevel(0, 100)).thenReturn(.5); //50%
+        when(fisher.predictUnitProfit(0)).thenReturn(10d);
+        when(fisher.predictDailyProfits()).thenReturn(10d);
+        when(model.getDayOfTheYear()).thenReturn(363);
+
+        MonoQuotaPriceGenerator gen = new MonoQuotaPriceGenerator(0,true);
+        gen.start(model,fisher);
+
+        // .5 * (10+10*2) = 15
+        assertEquals(15d,gen.computeLambda(),.001d );
 
     }
 }

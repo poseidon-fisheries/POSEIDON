@@ -168,6 +168,17 @@ public class Fisher implements Steppable, Startable{
                                                                                                */
 
 
+    private Predictor dailyProfitsPredictor = new FixedPredictor(Double.NaN);
+            /*
+            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                                      fisher ->
+                                                                                              fisher.getDailyData().
+                                                                                                      getColumn(
+                                                                                                              YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                                      365);
+*/
+
+
     /**
      * Creates a fisher by giving it all its sub-components
      * @param id the id-number of the fisher
@@ -217,8 +228,8 @@ public class Fisher implements Steppable, Startable{
         {
             dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
             profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
-            dailyCatchesPredictor[i].start(state, this);
-            profitPerUnitPredictor[i].start(state,this);
+
+
 
         }
 
@@ -263,7 +274,9 @@ public class Fisher implements Steppable, Startable{
         {
             dailyCatchesPredictor[i].start(state, this);
             profitPerUnitPredictor[i].start(state,this);
+
         }
+        dailyProfitsPredictor.start(state,this);
 
 
     }
@@ -727,7 +740,6 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-
     public double balanceXDaysAgo(int daysAgo)
     {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
@@ -931,6 +943,24 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    public double predictDailyProfits()
+    {
+        return dailyProfitsPredictor.predict();
+    }
+
+    public void setDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
+
+        if(state != null)
+        {
+            this.dailyProfitsPredictor.turnOff();
+            dailyProfitsPredictor.start(state,this);
+        }
+
+        this.dailyProfitsPredictor = dailyProfitsPredictor;
+
+
+    }
+
     public void setDailyCatchesPredictor(int specieIndex, Predictor newPredictor)
     {
         if(state!=null)
@@ -952,6 +982,8 @@ public class Fisher implements Steppable, Startable{
         profitPerUnitPredictor[specieIndex] = newPredictor;
 
     }
+
+
 
     public void setWeatherStrategy(WeatherEmergencyStrategy weatherStrategy) {
 
