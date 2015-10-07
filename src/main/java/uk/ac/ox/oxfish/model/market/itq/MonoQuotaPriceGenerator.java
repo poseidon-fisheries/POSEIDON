@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
 /**
@@ -11,7 +10,7 @@ import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
  * quotas
  * Created by carrknight on 8/20/15.
  */
-public class MonoQuotaPriceGenerator implements FisherStartable
+public class MonoQuotaPriceGenerator implements PriceGenerator
 {
 
 
@@ -61,7 +60,7 @@ public class MonoQuotaPriceGenerator implements FisherStartable
     }
 
 
-    protected double computeLambda()
+    public double computeLambda()
     {
 
         if(fisher == null)

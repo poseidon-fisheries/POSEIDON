@@ -88,12 +88,21 @@ public class TrawlingHeatMap implements Steppable{
             }
         }
         //change the color if the current maximum is 15% above the map maximum
-        if(.85*newMaximum>maximum)
+        if(newMaximum>maximum)
         {
             maximum = .85 *  newMaximum;
             heatMapPortrayal.setMap(new SimpleColorMap(0,maximum,new Color(0,0,0,0),Color.RED));
 
         }
+        else
+        if(maximum > 0)
+        {
+            //decrease it by 0.1% every day otherwise initial close-to port heat is the only thing that matters
+            maximum = .999 * maximum;
+            heatMapPortrayal.setMap(new SimpleColorMap(0,maximum,new Color(0,0,0,0),Color.RED));
+
+        }
+
     }
 
     public FastObjectGridPortrayal2D getHeatMapPortrayal() {

@@ -948,7 +948,7 @@ public class Fisher implements Steppable, Startable{
         return dailyProfitsPredictor.predict();
     }
 
-    public void setDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
+    public void assignDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
 
         if(state != null)
         {

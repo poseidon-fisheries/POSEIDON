@@ -50,7 +50,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
         if(!marketBuilders.containsKey(state))
         {
             //if not, create it!
-            ITQMarketBuilder initializer = new ITQMarketBuilder();
+            ITQMarketBuilder initializer = new ITQMarketBuilder(0);
             //make sure it will start with the model
             state.registerStartable(initializer);
             //put it in the map so we only create it once
@@ -74,7 +74,8 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
                     double lastClosingPrice = marketBuilder.getMarket().getLastClosingPrice();
                     if(Double.isFinite(lastClosingPrice))
                     {
-                        seller.recordOpportunityCosts(lastClosingPrice * biomass); //you could have sold those quotas!
+                        //you could have sold those quotas!
+                        seller.recordOpportunityCosts(lastClosingPrice * biomass);
                     }
                 }
             }

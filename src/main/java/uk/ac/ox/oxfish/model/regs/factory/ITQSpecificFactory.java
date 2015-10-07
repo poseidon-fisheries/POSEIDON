@@ -50,7 +50,7 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         if(!marketBuilders.containsKey(state))
         {
             //if not, create it!
-            ITQMarketBuilder initializer = new ITQMarketBuilder();
+            ITQMarketBuilder initializer = new ITQMarketBuilder(0);
             //make sure it will start with the model
             state.registerStartable(initializer);
             //put it in the map so we only create it once

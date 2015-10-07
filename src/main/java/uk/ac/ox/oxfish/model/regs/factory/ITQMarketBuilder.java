@@ -5,8 +5,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
+import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * A startable useful to create an ITQ market and to create the ITQ reservation pricer.
@@ -16,17 +18,34 @@ public class ITQMarketBuilder  implements Startable
 {
 
 
-    private final int specieIndex;
+    private final int speciesIndex;
     /**
      * the generators of reservation prices for each fisher
      */
-    private HashMap<Fisher,MonoQuotaPriceGenerator> reservationPricers = new HashMap<>();
-    private ITQOrderBook market;
+    private HashMap<Fisher,PriceGenerator> reservationPricers = new HashMap<>();
 
 
+    final private Supplier<PriceGenerator> priceGeneratorMaker;
 
-    public ITQMarketBuilder() {
-        specieIndex = 0;
+    private final ITQOrderBook market;
+
+
+    public ITQMarketBuilder(
+            int speciesIndex,
+            Supplier<PriceGenerator> priceGeneratorMaker) {
+        this.speciesIndex = speciesIndex;
+        this.priceGeneratorMaker = priceGeneratorMaker;
+        market = new ITQOrderBook(speciesIndex);
+
+    }
+
+    /**
+     * creates an ITQ market using MonoQuotaPriceGenerator
+     * @param speciesIndex
+     */
+    public ITQMarketBuilder(int speciesIndex) {
+
+        this(speciesIndex,() -> new MonoQuotaPriceGenerator(speciesIndex,false));
     }
 
     /**
@@ -37,20 +56,19 @@ public class ITQMarketBuilder  implements Startable
     @Override
     public void start(FishState model) {
         //create the market
-        market = new ITQOrderBook(specieIndex);
         market.start(model);
         //gather market data
-        model.getDailyDataSet().registerGatherer("ITQ Trades", state1 -> market.getDailyMatches(),
+        model.getDailyDataSet().registerGatherer("ITQ Trades Of Specie " + speciesIndex, state1 -> market.getDailyMatches(),
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Prices", state1 -> market.getDailyAveragePrice(),
+        model.getDailyDataSet().registerGatherer("ITQ Prices Of Specie " + speciesIndex, state1 -> market.getDailyAveragePrice(),
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price", state1 -> market.getLastClosingPrice(),
+        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of Specie " + speciesIndex, state1 -> market.getLastClosingPrice(),
                                                  Double.NaN);
 
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers())
         {
-            MonoQuotaPriceGenerator reservationPricer = new MonoQuotaPriceGenerator(specieIndex, false);
+            PriceGenerator reservationPricer = priceGeneratorMaker.get();
             reservationPricer.start(model, fisher);
             market.registerTrader(fisher, reservationPricer);
             //record it
@@ -68,12 +86,12 @@ public class ITQMarketBuilder  implements Startable
     @Override
     public void turnOff() {
         market.turnOff();
-        for(MonoQuotaPriceGenerator pricer : reservationPricers.values())
+        for(PriceGenerator pricer : reservationPricers.values())
             pricer.turnOff();
     }
 
 
-    public MonoQuotaPriceGenerator getReservationPriceGenerator(Fisher fisher)
+    public PriceGenerator getReservationPriceGenerator(Fisher fisher)
     {
         return reservationPricers.get(fisher);
     }

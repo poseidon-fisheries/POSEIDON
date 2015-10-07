@@ -325,7 +325,7 @@ public class PrototypeScenario implements Scenario {
                 }
 
                 //daily profits predictor
-                newFisher.setDailyProfitsPredictor(
+                newFisher.assignDailyProfitsPredictor(
                         MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
                                                                 fisher ->
                                                                         fisher.getDailyData().

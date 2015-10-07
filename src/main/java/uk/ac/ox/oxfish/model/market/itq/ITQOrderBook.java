@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -25,7 +24,7 @@ public class ITQOrderBook implements Steppable,Startable{
     public static final String MATCHES_COLUMN_NAME = "MATCHES";
     public static final String QUOTA_COLUMN_NAME = "QUOTA_VOLUME";
     public static final String MONEY_COLUMN_NAME = "MONEY_VOLUME";
-    HashMap<Fisher,MonoQuotaPriceGenerator> pricers  = new HashMap<>();
+    HashMap<Fisher,PriceGenerator> pricers  = new HashMap<>();
 
     private Queue<Quote> asks;
 
@@ -79,7 +78,7 @@ public class ITQOrderBook implements Steppable,Startable{
     }
 
 
-    public void registerTrader(Fisher fisher, MonoQuotaPriceGenerator pricer)
+    public void registerTrader(Fisher fisher, PriceGenerator pricer)
     {
         pricers.put(fisher,pricer);
     }
@@ -88,11 +87,11 @@ public class ITQOrderBook implements Steppable,Startable{
     public void step(SimState state)
     {
         MersenneTwisterFast random = ((FishState) state).getRandom();
-        List<Map.Entry<Fisher,MonoQuotaPriceGenerator>> traders = new ArrayList<>(pricers.entrySet());
+        List<Map.Entry<Fisher,PriceGenerator>> traders = new ArrayList<>(pricers.entrySet());
         Collections.shuffle(traders,new Random(random.nextLong()));
 
         //fill the quotes
-        for(Map.Entry<Fisher,MonoQuotaPriceGenerator> trader : traders)
+        for(Map.Entry<Fisher,PriceGenerator> trader : traders)
         {
             double price = trader.getValue().computeLambda();
             if(Double.isFinite(price)) {
@@ -104,7 +103,7 @@ public class ITQOrderBook implements Steppable,Startable{
                             trader.getKey()));
                 }
                 //can I sell?
-                if (((MonoQuotaRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch ) {
+                if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch ) {
                     double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
                                                 buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                             ;
@@ -117,7 +116,7 @@ public class ITQOrderBook implements Steppable,Startable{
         }
 
         //go for it
-        clearQuotes(random);
+        clearQuotes();
 
 
         //clear the quotes
@@ -125,7 +124,7 @@ public class ITQOrderBook implements Steppable,Startable{
         bids.clear();
     }
 
-    private void clearQuotes(MersenneTwisterFast random)
+    private void clearQuotes()
     {
         if(bids.isEmpty() || asks.isEmpty())
             return;
@@ -157,7 +156,7 @@ public class ITQOrderBook implements Steppable,Startable{
             assert sellerQuota.getQuotaRemaining(specieIndex)>=0;
 
             //again!
-            clearQuotes(random);
+            clearQuotes();
 
         }
     }

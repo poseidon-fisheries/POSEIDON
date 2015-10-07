@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 /**
@@ -12,7 +11,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  * Right now lambda(i) =  Pr(needed)*(profit for fish(i) + ratio of catches(j,i) (profit for fish(j) - lambda(j))
  * Created by carrknight on 10/6/15.
  */
-public class ProportionalQuotaPriceGenerator  implements FisherStartable
+public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 {
 
 
@@ -39,12 +38,12 @@ public class ProportionalQuotaPriceGenerator  implements FisherStartable
     /**
      * the function that returns how many quotas are left!
      */
-    private final Sensor<Integer> numberOfQuotasLeftGetter;
+    private final Sensor<Double> numberOfQuotasLeftGetter;
 
 
     public ProportionalQuotaPriceGenerator(
             ITQOrderBook[] orderBooks, int specieIndex,
-            Sensor<Integer> numberOfQuotasLeftGetter) {
+            Sensor<Double> numberOfQuotasLeftGetter) {
         this.orderBooks = orderBooks;
         this.specieIndex = specieIndex;
         this.numberOfQuotasLeftGetter = numberOfQuotasLeftGetter;
@@ -63,7 +62,7 @@ public class ProportionalQuotaPriceGenerator  implements FisherStartable
                                                Double.NaN);
     }
 
-    private double computeLambda() {
+    public double computeLambda() {
 
         if(fisher == null)
             return Double.NaN;
@@ -73,7 +72,7 @@ public class ProportionalQuotaPriceGenerator  implements FisherStartable
         //if you expect to catch nothing, then the quota is worthless
         double dailyCatchesPredicted = fisher.predictDailyCatches(specieIndex);
 
-        if(dailyCatchesPredicted == 0)
+        if(dailyCatchesPredicted == 0) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
             return 0d;
 
         assert dailyCatchesPredicted > 0;
