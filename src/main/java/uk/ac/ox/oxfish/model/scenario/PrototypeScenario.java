@@ -303,7 +303,7 @@ public class PrototypeScenario implements Scenario {
 
 
 
-            //if needed, install better predictors
+            //if needed, install better airs
             if(usePredictors)
             {
                 for(Specie specie : model.getSpecies())
@@ -312,8 +312,15 @@ public class PrototypeScenario implements Scenario {
                     newFisher.setDailyCatchesPredictor(specie.getIndex(),
                                                        MovingAveragePredictor.dailyMAPredictor(
                                                                "Predicted Daily Catches of " + specie,
-                                                               fisher1 -> fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                       specie.getIndex()),
+                                                               fisher1 ->
+                                                                       //check the daily counter but do not input new values
+                                                                       //if you were not allowed at sea
+                                                                       fisher1.isAllowedAtSea() ?
+                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                       specie.getIndex()) :
+                                                                               Double.NaN
+
+                                                               ,
                                                                90));
                     newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
                             "Predicted Unit Profit " + specie,
@@ -328,9 +335,16 @@ public class PrototypeScenario implements Scenario {
                 newFisher.assignDailyProfitsPredictor(
                         MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
                                                                 fisher ->
+                                                                        //check the daily counter but do not input new values
+                                                                        //if you were not allowed at sea
+                                                                        fisher.isAllowedAtSea() ?
                                                                         fisher.getDailyData().
                                                                                 getColumn(
-                                                                                        YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                                        YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest()
+                                                                                :
+                                                                                Double.NaN
+                                ,
+
                                                                 90));
             }
 

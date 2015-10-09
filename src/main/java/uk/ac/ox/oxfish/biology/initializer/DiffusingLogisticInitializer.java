@@ -52,7 +52,7 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
         BiomassDiffuser diffuser = new BiomassDiffuser(map,random,biology,
                                                        differentialPercentageToMove,
                                                        percentageLimitOnDailyMovement);
-        model.scheduleEveryDay(diffuser,StepOrder.DAWN);
+        model.scheduleEveryDay(diffuser,StepOrder.BIOLOGY_PHASE);
 
 
     }

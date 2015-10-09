@@ -55,6 +55,10 @@ public class BiologyInitializers {
                       SplitInitializerFactory::new);
         NAMES.put(SplitInitializerFactory.class,"Split in Half");
 
+     CONSTRUCTORS.put("Well-Mixed",
+                      WellMixedBiologyFactory::new);
+        NAMES.put(WellMixedBiologyFactory.class,"Split in Half");
+
 
     }
 

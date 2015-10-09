@@ -493,6 +493,14 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+    public boolean isAllowedAtSea()
+    {
+        if(state == null) //you aren't allowed if you haven't started
+            return false;
+        else
+            return getRegulation().allowedAtSea(this,state);
+    }
+
     public void setBoat(Boat boat) {
         equipment.setBoat(boat);
     }
