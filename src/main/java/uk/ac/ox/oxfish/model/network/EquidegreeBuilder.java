@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.network;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -35,8 +36,15 @@ public class EquidegreeBuilder implements AlgorithmFactory<DirectedGraph<Fisher,
         //get all the fishers
         final List<Fisher> fishers = state.getFishers();
         final int populationSize = fishers.size();
-        Preconditions.checkArgument(
-                populationSize > degree, " Cannot achieve desired degree of " + degree + " with only " + populationSize + " fishers");
+        if(populationSize <= 1)
+            Preconditions.checkArgument(
+                    false, "Cannot create social network with no fishers to connect");
+        if( populationSize <= degree) {
+
+            degree = populationSize-1;
+            Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
+
+        }
         for(Fisher fisher : fishers)
         {
             Set<Fisher> friends = new HashSet<>(degree);

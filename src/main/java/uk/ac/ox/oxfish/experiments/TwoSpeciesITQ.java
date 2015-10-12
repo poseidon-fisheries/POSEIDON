@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 import sim.display.Console;
+import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
@@ -23,7 +24,7 @@ import java.util.List;
 public class TwoSpeciesITQ
 {
 
-    public static void main(String[] args)
+    public static void firstDemo(String[] args)
     {
 
 
@@ -123,6 +124,45 @@ public class TwoSpeciesITQ
 
             }
         });
+
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+        c.setVisible(true);
+
+    }
+
+
+    public static void main(String[] args)
+    {
+
+
+        final FishState state = new FishState(System.currentTimeMillis());
+        //world split in half
+
+        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        //quota ratios: 90-10
+        multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
+        multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
+
+        HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
+        biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
+
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        state.setScenario(scenario);
+        //world split in half
+        scenario.setBiologyInitializer(biologyFactory);
+        scenario.setRegulation(multiFactory);
+
+        scenario.setCoastalRoughness(0);
+        scenario.forcePortPosition(new int[]{40,25});
+        //try also 40,25
+
+
+
+        scenario.setUsePredictors(true);
+
+
 
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);

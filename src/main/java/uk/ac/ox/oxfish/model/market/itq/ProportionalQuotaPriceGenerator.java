@@ -75,7 +75,11 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         if(dailyCatchesPredicted == 0) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
             return 0d;
 
-        assert dailyCatchesPredicted > 0;
+        //if you are not ready, you are not ready!
+        if(Double.isNaN(dailyCatchesPredicted))
+            return Double.NaN;
+
+        assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
         double probability = 1 - fisher.probabilityDailyCatchesBelowLevel(
                 specieIndex,

@@ -357,10 +357,9 @@ public class PrototypeScenario implements Scenario {
 
 
         //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
-        if(fisherList.isEmpty())
+        if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()));
         else
-
             return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 
