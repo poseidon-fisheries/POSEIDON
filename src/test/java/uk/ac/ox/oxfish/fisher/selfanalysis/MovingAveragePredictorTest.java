@@ -4,7 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,5 +70,25 @@ public class MovingAveragePredictorTest {
         assertEquals(0.430902,predictor.probabilityBelowThis(5),.0001);
         assertEquals(0.941407,predictor.probabilityBelowThis(10),.0001);
 
+    }
+
+    @Test
+    public void predictSumsCorrectly() throws Exception
+    {
+
+        Sensor<Double> dummy = mock(Sensor.class);
+        MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("summer",dummy,10);
+        assertEquals(Double.NaN, predictor.predict(), 0);
+
+        for(int i=1;i<=10;i++)
+        {
+            when(dummy.scan(any())).thenReturn((double) i);
+            predictor.step(mock(FishState.class));
+        }
+
+
+        System.out.println(predictor.probabilitySumBelowThis(50,10));
+        //pnorm( (50-10*5.5)/(Sqrt(10)*2.872281323) ) = 0.2909945
+        assertEquals(0.2909945,predictor.probabilitySumBelowThis(50,10),.0001);
     }
 }

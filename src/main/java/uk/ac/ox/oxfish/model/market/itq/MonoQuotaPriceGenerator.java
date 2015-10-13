@@ -67,9 +67,8 @@ public class MonoQuotaPriceGenerator implements PriceGenerator
             return Double.NaN;
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
-        double probability = 1 - fisher.probabilityDailyCatchesBelowLevel(
-                specieIndex,
-                 quotas.getQuotaRemaining(specieIndex) / (365 - state.getDayOfTheYear()));
+        double probability = 1 - fisher.probabilitySumDailyCatchesBelow(specieIndex,quotas.getQuotaRemaining(specieIndex),
+                                                                        365-state.getDayOfTheYear());
 
         if(!includeDailyProfits)
             return  (probability * fisher.predictUnitProfit(specieIndex));

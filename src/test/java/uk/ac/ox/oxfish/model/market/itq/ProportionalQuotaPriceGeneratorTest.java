@@ -35,7 +35,7 @@ public class ProportionalQuotaPriceGeneratorTest {
         when(fisher.predictDailyCatches(0)).thenReturn(100d);
         when(fisher.predictDailyCatches(1)).thenReturn(100d);
 
-        when(fisher.probabilityDailyCatchesBelowLevel(0,123)).thenReturn(.5); //50% chance of needing it
+        when(fisher.probabilitySumDailyCatchesBelow(0,123,1)).thenReturn(.5); //50% chance of needing it
 
         when(fisher.predictUnitProfit(0)).thenReturn(1d);
         when(fisher.predictUnitProfit(1)).thenReturn(2d);

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 /**
@@ -72,8 +73,11 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         //if you expect to catch nothing, then the quota is worthless
         double dailyCatchesPredicted = fisher.predictDailyCatches(specieIndex);
 
-        if(dailyCatchesPredicted == 0) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
+        if(dailyCatchesPredicted < FishStateUtilities.EPSILON) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
+        {
+            assert dailyCatchesPredicted > -FishStateUtilities.EPSILON;
             return 0d;
+        }
 
         //if you are not ready, you are not ready!
         if(Double.isNaN(dailyCatchesPredicted))
@@ -81,11 +85,12 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
-        double probability = 1 - fisher.probabilityDailyCatchesBelowLevel(
-                specieIndex,
-                numberOfQuotasLeftGetter.scan(fisher) / (365 - state.getDayOfTheYear()));
+        double probability = 1 -
+                fisher.probabilitySumDailyCatchesBelow(specieIndex, numberOfQuotasLeftGetter.scan(fisher),
+                                                       365 - state.getDayOfTheYear());
 
-        if(probability < .0001) //if the probability is very low, skip computations, you value it nothing
+
+        if(probability < FishStateUtilities.EPSILON) //if the probability is very low, skip computations, you value it nothing
             return 0d;
 
 

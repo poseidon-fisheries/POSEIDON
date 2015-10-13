@@ -22,5 +22,13 @@ public interface Predictor extends FisherStartable{
     public double probabilityBelowThis(double level);
 
 
+    /**
+     * Asks the predictor what is the probability that a sum of #elementsInSum of identically distributed elements of
+     * this predictor is below the given level
+     * @param level the level the sum has to be below of
+     * @param elementsInSum the number of i.i.d independent variables given by the predictor summed together
+     * @return a probability value
+     */
+    public double probabilitySumBelowThis(double level, int elementsInSum);
 
 }

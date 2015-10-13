@@ -38,17 +38,19 @@ public class MonoQuotaPriceGeneratorTest {
 
         gen.start(model, fisher);
 
-        when(fisher.probabilityDailyCatchesBelowLevel(3,100)).thenReturn(.5);
+        when(fisher.probabilitySumDailyCatchesBelow(3, 100, 1)).thenReturn(.5);
         //.5*10
         assertEquals(5, gen.computeLambda(), .0001);
 
         //change quotas
         regulation.setQuotaRemaining(0, 200);
-        when(fisher.probabilityDailyCatchesBelowLevel(3,200)).thenReturn(0d);
+        when(fisher.probabilitySumDailyCatchesBelow(3, 200, 1)).thenReturn(0d);
         assertEquals(10, gen.computeLambda(), .0001);
 
 
         when(model.getDayOfTheYear()).thenReturn(363);
+        when(fisher.probabilitySumDailyCatchesBelow(3, 200, 2)).thenReturn(.5d);
+
         assertEquals(5, gen.computeLambda(), .0001);
 
 
@@ -65,7 +67,7 @@ public class MonoQuotaPriceGeneratorTest {
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(200, model);
         when(fisher.getRegulation()).thenReturn(regulation);
 
-        when(fisher.probabilityDailyCatchesBelowLevel(0, 100)).thenReturn(.5); //50%
+        when(fisher.probabilitySumDailyCatchesBelow(0, 200, 2)).thenReturn(.5); //50%
         when(fisher.predictUnitProfit(0)).thenReturn(10d);
         when(fisher.predictDailyProfits()).thenReturn(10d);
         when(model.getDayOfTheYear()).thenReturn(363);

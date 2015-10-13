@@ -24,7 +24,7 @@ import java.util.List;
 public class TwoSpeciesITQ
 {
 
-    public static void firstDemo(String[] args)
+    public static void firstdemo(String[] args)
     {
 
 
@@ -85,7 +85,7 @@ public class TwoSpeciesITQ
 
 
 
-    public static void gui(String[] args)
+    public static void main(String[] args)
     {
 
 
@@ -132,7 +132,7 @@ public class TwoSpeciesITQ
     }
 
 
-    public static void main(String[] args)
+    public static void secondDemo(String[] args)
     {
 
 

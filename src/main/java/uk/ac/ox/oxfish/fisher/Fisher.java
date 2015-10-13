@@ -950,6 +950,11 @@ public class Fisher implements Steppable, Startable{
         return dailyCatchesPredictor[specieIndex].probabilityBelowThis(level);
     }
 
+    public double probabilitySumDailyCatchesBelow(int specieIndex, double level, int daysToSum)
+    {
+        return dailyCatchesPredictor[specieIndex].probabilitySumBelowThis(level,daysToSum);
+    }
+
 
     public double predictDailyProfits()
     {

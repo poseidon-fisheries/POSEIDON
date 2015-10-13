@@ -41,6 +41,23 @@ public class FixedPredictor implements Predictor {
             return 0;
     }
 
+
+    /**
+     * Asks the predictor what is the probability that a sum of #elementsInSum of identically distributed elements of
+     * this predictor is below the given level
+     *
+     * @param level         the level the sum has to be below of
+     * @param elementsInSum the number of i.i.d independent variables given by the predictor summed together
+     * @return a probability value
+     */
+    @Override
+    public double probabilitySumBelowThis(double level, int elementsInSum) {
+        if(level >= fixedValue * elementsInSum)
+            return 1;
+        else
+            return 0;
+    }
+
     @Override
     public void start(FishState model, Fisher fisher)
     {

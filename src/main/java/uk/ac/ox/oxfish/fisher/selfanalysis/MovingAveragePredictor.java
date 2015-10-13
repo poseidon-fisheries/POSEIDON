@@ -157,4 +157,26 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     }
 
 
+    /**
+     * Asks the predictor what is the probability that a sum of #elementsInSum of identically distributed elements of
+     * this predictor is below the given level
+     *
+     * @param level         the level the sum has to be below of
+     * @param elementsInSum the number of i.i.d independent variables given by the predictor summed together
+     * @return a probability value
+     */
+    @Override
+    public double probabilitySumBelowThis(double level, int elementsInSum)
+    {
+        if(averager.getSmoothedObservation()==0)
+            return level < averager.getAverage() ? 0 : 1;
+
+        //sum of t normally distributed values is N(t*mu,t*sigma^2)
+        double normalized = (level-elementsInSum * averager.getAverage()) / Math.sqrt(
+                elementsInSum * averager.getSmoothedObservation());
+        if(Double.isFinite(normalized))
+            return FishStateUtilities.CNDF(normalized);
+        else
+            return Double.NaN;
+    }
 }
