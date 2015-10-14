@@ -41,7 +41,7 @@ public class TimeSeries<T> implements Steppable
      * @param defaultValue the value to fill the rows with if this gatherer is added after other columns already have
      *                     some rows filled
      */
-    public void registerGatherer(String title, Function<T, Double> gatherer, double defaultValue)
+    public DataColumn registerGatherer(String title, Function<T, Double> gatherer, double defaultValue)
     {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists");
         int size =noGatherers() ? 0 : numberOfObservations();
@@ -53,6 +53,7 @@ public class TimeSeries<T> implements Steppable
         gatherers.put(title,gatherer);
 
         assert consistencyCheck();
+        return column;
     }
 
 

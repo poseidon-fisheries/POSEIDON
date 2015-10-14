@@ -41,6 +41,13 @@ public class GlobalBiology
             generics[i] = new Specie("Specie " + i);
         return new GlobalBiology(generics);
     }
+
+    public static GlobalBiology listOfSpeciesWithNames(String... names){
+        Specie[] generics = new Specie[names.length];
+        for(int i=0; i<names.length; i++)
+            generics[i] = new Specie(names[i]);
+        return new GlobalBiology(generics);
+    }
     /**
      *
      * @return an unmodifiable list of all the species available

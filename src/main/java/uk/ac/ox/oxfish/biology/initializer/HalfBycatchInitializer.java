@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 /**
@@ -18,6 +20,7 @@ public class HalfBycatchInitializer implements BiologyInitializer {
 
 
     private final  DiffusingLogisticInitializer delegate;
+
 
     public HalfBycatchInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
                                   double percentageLimitOnDailyMovement,
@@ -79,7 +82,38 @@ public class HalfBycatchInitializer implements BiologyInitializer {
 
         delegate.processMap(biology, map, random, model);
 
+        int width = map.getHeight();
+        int heightLow = map.getHeight() / 2;
+        int heightHigh = heightLow+1;
 
+
+        //create daily data
+        //record info:
+        DataColumn dailyNorthColumn = model.getDailyDataSet().registerGatherer("# of North Tows", state -> {
+            double towsNorth = 0;
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < heightLow; y++)
+                    towsNorth += map.getDailyTrawlsMap().get(x, y);
+
+            return towsNorth;
+        }, Double.NaN);
+        DataColumn dailySouthColumn = model.getDailyDataSet().registerGatherer("# of South Tows", state -> {
+            double towsSouth = 0;
+            for (int x = 0; x < width; x++)
+                for (int y = heightHigh; y < map.getHeight(); y++)
+                    towsSouth += map.getDailyTrawlsMap().get(x, y);
+
+            return towsSouth;
+        }, Double.NaN);
+
+
+        //create yearly data
+        model.getYearlyDataSet().registerGatherer("# of North Tows",
+                                                  FishStateUtilities.generateYearlySum(dailyNorthColumn),
+                                                  Double.NaN);
+        model.getYearlyDataSet().registerGatherer("# of South Tows",
+                                                  FishStateUtilities.generateYearlySum(dailySouthColumn),
+                                                  Double.NaN);
     }
 
     @Override

@@ -223,6 +223,8 @@ public class GearImitationAnalysis implements FisherStartable
 
     }
 
+
+
     public Adaptation<Gear> getAlgorithm() {
         return algorithm;
     }

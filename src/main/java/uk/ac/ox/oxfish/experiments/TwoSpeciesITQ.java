@@ -85,7 +85,7 @@ public class TwoSpeciesITQ
 
 
 
-    public static void main(String[] args)
+    public static void firstGui(String[] args)
     {
 
 
@@ -132,7 +132,7 @@ public class TwoSpeciesITQ
     }
 
 
-    public static void secondDemo(String[] args)
+    public static void main(String[] args)
     {
 
 
@@ -169,6 +169,8 @@ public class TwoSpeciesITQ
         c.setVisible(true);
 
     }
+
+
 
 
 

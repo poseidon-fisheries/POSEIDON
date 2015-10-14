@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -11,7 +10,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Create RandomCatchabilityTrawlGear
  * Created by carrknight on 9/30/15.
  */
-public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<Gear>
+public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCatchabilityTrawl>
 {
 
 
@@ -39,7 +38,7 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<Gear>
      * @return the function result
      */
     @Override
-    public Gear apply(FishState state) {
+    public RandomCatchabilityTrawl apply(FishState state) {
         int species = state.getSpecies().size();
         double[] means = new double[species];
         double[] std = new double[species];
