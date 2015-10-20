@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
@@ -29,7 +30,7 @@ public class TripLoggerTest
 
         logger.recordEarnings(0,100,100);
         logger.recordCosts(200);
-        logger.finishTrip(10);
+        logger.finishTrip(10, mock(Port.class));
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
         assertEquals(logger.getCurrentTrip().getProfitPerHour(false),-10,.001);
@@ -51,7 +52,7 @@ public class TripLoggerTest
         logger.newTrip();
         TripRecord record = logger.getCurrentTrip();
 
-        logger.finishTrip(1);
+        logger.finishTrip(1, mock(Port.class));
         verify(receiver).reactToFinishedTrip(record);
 
 

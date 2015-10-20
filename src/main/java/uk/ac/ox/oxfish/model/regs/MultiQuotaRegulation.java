@@ -37,7 +37,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     }
 
 
-    private boolean isFishingStillAllowed(){
+    public boolean isFishingStillAllowed(){
 
         //all must be strictly positive!
         return
@@ -144,5 +144,17 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     public void step(SimState simState) {
         System.arraycopy(yearlyQuota, 0, quotaRemaining, 0, quotaRemaining.length);
 
+    }
+
+    protected double[] getYearlyQuota() {
+        return yearlyQuota;
+    }
+
+    protected double[] getQuotaRemaining() {
+        return quotaRemaining;
+    }
+
+    protected FishState getState() {
+        return state;
     }
 }

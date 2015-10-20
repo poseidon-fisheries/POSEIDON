@@ -58,7 +58,8 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
                 this.stoppable = model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
 
                 //store your prediction:
-                fisher.getDailyData().registerGatherer(name, fisher1 -> averager.getAverage(),Double.NaN);
+                if(name!=null)
+                    fisher.getDailyData().registerGatherer(name, fisher1 -> averager.getAverage(),Double.NaN);
             }
         };
 

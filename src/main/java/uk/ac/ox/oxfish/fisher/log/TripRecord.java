@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -59,7 +60,7 @@ public class TripRecord {
      */
     private final double[] earningsPerSpecie;
 
-
+    private Port terminal;
 
     public TripRecord(int numberOfSpecies)
     {
@@ -107,9 +108,10 @@ public class TripRecord {
         cutShort = true;
     }
 
-    public void completeTrip(double durationInHours)
+    public void completeTrip(double durationInHours, Port terminal)
     {
         this.durationInHours = durationInHours;
+        this.terminal = terminal;
         completed = true;
     }
 
@@ -203,4 +205,11 @@ public class TripRecord {
     }
 
 
+    public Port getTerminal() {
+        return terminal;
+    }
+
+    public double getDurationInHours() {
+        return durationInHours;
+    }
 }

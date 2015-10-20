@@ -443,7 +443,7 @@ public class Fisher implements Steppable, Startable{
         spendForTrip(litersBought * status.getHomePort().getGasPricePerLiter());
 
         //finish trip!
-        memory.getTripLogger().finishTrip(status.getHoursAtSea());
+        memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort() );
 
         status.setHoursAtSea(0);
     }
