@@ -421,7 +421,7 @@ public class Fisher implements Steppable, Startable{
         assert this.status.getHoursAtSea() == 0;
         assert isAtPort();
         status.getHomePort().depart(this);
-        memory.getTripLogger().newTrip();
+        memory.getTripLogger().newTrip(getHoursAtPort());
         status.setHoursAtPort(0);
     }
 

@@ -17,7 +17,7 @@ public class TripRecordTest {
     @Test
     public void records() throws Exception 
     {
-        TripRecord record = new TripRecord(1);
+        TripRecord record = new TripRecord(1, 0d);
         record.recordCosts(100);
         record.recordEarnings(0,1,200);
         record.completeTrip(10, mock(Port.class));
@@ -29,7 +29,7 @@ public class TripRecordTest {
     public void opportunityCosts() throws Exception {
 
 
-        TripRecord record = new TripRecord(1);
+        TripRecord record = new TripRecord(1, 123d);
         record.recordCosts(100);
         record.recordOpportunityCosts(50);
         record.recordEarnings(0,1,200);
@@ -40,7 +40,7 @@ public class TripRecordTest {
 
     @Test
     public void cannotChangeCompletedStuff(){
-        TripRecord record = new TripRecord(0);
+        TripRecord record = new TripRecord(0,123d );
         assertFalse(record.isCompleted());
         //should not allow earnings after it's complete
         record.completeTrip(10,mock(Port.class) );
@@ -53,7 +53,7 @@ public class TripRecordTest {
 
     @Test
     public void profitsAreCorrect() throws Exception {
-        TripRecord record = new TripRecord(2);
+        TripRecord record = new TripRecord(2,123d );
         record.recordCosts(100);
         record.recordEarnings(0,1,200);
         record.recordEarnings(1,1,100);

@@ -55,6 +55,9 @@ public class Regulations
         CONSTRUCTORS.put("Partial-ITQ", ITQSpecificFactory::new);
         NAMES.put(ITQSpecificFactory.class,"Partial-ITQ");
 
+        CONSTRUCTORS.put("Multi-TAC", TACMultiFactory::new);
+        NAMES.put(TACMultiFactory.class,"Multi-TAC");
+
 
 
     }

@@ -25,8 +25,11 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     public static final int MOVING_AVERAGE_SIZE = 10;
 
     final private MovingAverage<Double>[] smoothedDailyLandings;
+    final private MovingAverage<Double> smoothedHoursAtSea;
 
     final private MultiQuotaRegulation quotaRegulationToUse;
+
+    private double hoursAtSeaCounter = 0d;
 
     private Stoppable stoppable;
 
@@ -37,6 +40,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     public TACOpportunityCostManager(MultiQuotaRegulation quotaRegulationToUse, int numberOfSpecies) {
         this.quotaRegulationToUse = quotaRegulationToUse;
         smoothedDailyLandings = new MovingAverage[numberOfSpecies];
+        smoothedHoursAtSea = new MovingAverage<>(MOVING_AVERAGE_SIZE);
     }
 
     /**
@@ -54,6 +58,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
          *    every dawn take your average!
          */
         stoppable = model.scheduleEveryDay(this, StepOrder.DAWN);
+
 
 
         //listen to all trips
@@ -80,19 +85,29 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
      */
     @Override
     public void step(SimState simState) {
-        //for each specie
-        for (Specie selectedSpecie : model.getSpecies()) {
 
-            //read what were yesterday's landings
-            Double observation = model.getDailyDataSet().
-                    getColumn(selectedSpecie +
-                                      " " +
-                                      AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+        //if there is a fishing ban in place, no point in counting
+        if(quotaRegulationToUse.isFishingStillAllowed())
+        {
+            //count hours at sea
+            smoothedHoursAtSea.addObservation(hoursAtSeaCounter);
+            hoursAtSeaCounter = 0;
 
-            //if they are a number AND if the TAC is still open (we drop censored observations)
-            if (Double.isFinite(observation) && quotaRegulationToUse.isFishingStillAllowed())
-                smoothedDailyLandings[selectedSpecie.getIndex()].addObservation(observation);
 
+            //for each specie
+            for (Specie selectedSpecie : model.getSpecies()) {
+
+                //read what were yesterday's landings
+                Double observation = model.getDailyDataSet().
+                        getColumn(selectedSpecie +
+                                          " " +
+                                          AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+
+                //if they are a number AND if the TAC is still open (we drop censored observations)
+                if (Double.isFinite(observation) )
+                    smoothedDailyLandings[selectedSpecie.getIndex()].addObservation(observation);
+
+            }
         }
     }
 
@@ -100,28 +115,40 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     @Override
     public void reactToFinishedTrip(TripRecord record) {
 
+        hoursAtSeaCounter+= record.getDurationInHours();
+
         for (Specie selectedSpecie : model.getSpecies()) {
 
+            //daily catches
             double averageDailyCatches = smoothedDailyLandings[selectedSpecie.getIndex()].getSmoothedObservation();
-            if(!Double.isFinite(averageDailyCatches)) //if we have no credible observation
+            double averageHoursAtSea =  smoothedHoursAtSea.getSmoothedObservation();
+
+            if(!Double.isFinite(averageDailyCatches) || !Double.isFinite(averageHoursAtSea) || averageHoursAtSea == 0) //if we have no credible observation
                 continue;
 
             //if on average the TAC isn't binding (more quotas available than projected to be used), then ignore
             if(averageDailyCatches * (365-model.getDayOfTheYear()) < quotaRegulationToUse.getQuotaRemaining(selectedSpecie.getIndex()) )
                 continue;
 
-            //hourly average catches * hours spent at sea!
-            double averageExpectedTripCatches = record.getDurationInHours() * averageDailyCatches/24;
-            assert averageExpectedTripCatches >=0;
+
+            //make it hourly
+            double hourlyCatches = averageDailyCatches/averageHoursAtSea;
+
+
+
+            //hourly average catches * trip length (including portside preparation)
             double actualTripCatches = record.getFinalCatch()[selectedSpecie.getIndex()];
             assert actualTripCatches >=0;
 
-            double differenceInCatchesFromAverage = averageExpectedTripCatches-actualTripCatches;
-            //if this is negative, you are being slower than the average so in a way you are wasting quotas. If this is positive
+            double actualHourlyCatches = actualTripCatches / record.getDurationInHours();
+
+            double differenceInCatchesFromAverage = hourlyCatches- actualHourlyCatches;
+            //if this is positive, you are being slower than the average so in a way you are wasting quotas. If this is negative
             //then you are siphoning off quotas from competitors and that's a good thing (for you at least)
             double price = record.getTerminal().getMarket(selectedSpecie).getMarginalPrice();
 
-            record.recordOpportunityCosts(price * differenceInCatchesFromAverage);
+            double opportunityCosts = price * differenceInCatchesFromAverage * record.getDurationInHours() ;
+            record.recordOpportunityCosts(opportunityCosts);
 
 
         }

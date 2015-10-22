@@ -21,6 +21,11 @@ public class TripRecord {
      */
     private double durationInHours = 0;
 
+    /**
+     * how many hours have been spent at port waiting/preparing for this trip
+     */
+    private double hoursSinceLastTrip;
+
 
     /**
      * set to true if the regulations forced the fisher home earlier.
@@ -62,10 +67,11 @@ public class TripRecord {
 
     private Port terminal;
 
-    public TripRecord(int numberOfSpecies)
+    public TripRecord(int numberOfSpecies, double hoursSpentAtPort)
     {
         finalCatch = new double[numberOfSpecies];
         earningsPerSpecie = new double[numberOfSpecies];
+        this.hoursSinceLastTrip = hoursSpentAtPort;
     }
 
 
@@ -99,7 +105,8 @@ public class TripRecord {
 
     public void recordOpportunityCosts(double opportunityCosts)
     {
-        Preconditions.checkState(!completed);
+        //it's possible for opportunity costs to be computed at the end of the trip
+       // Preconditions.checkState(!completed);
         this.opportunityCosts+=opportunityCosts;
     }
 
@@ -211,5 +218,9 @@ public class TripRecord {
 
     public double getDurationInHours() {
         return durationInHours;
+    }
+
+    public double getHoursSinceLastTrip() {
+        return hoursSinceLastTrip;
     }
 }

@@ -28,12 +28,6 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
      */
     private DoubleParameter quota = new FixedDoubleParameter(500000);
 
-    /**
-     * should I keep track of opportunity costs  for each fisher (depending on whether or not they are consuming quotas
-     * faster than others)
-     */
-    private boolean countOpportunityCosts = true;
-
 
     /**
      * Creates a TAC and optionally the whole structure that keeps track of opportunity costs
@@ -78,12 +72,5 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     }
 
 
-    public boolean isCountOpportunityCosts() {
-        return countOpportunityCosts;
-    }
-
-    public void setCountOpportunityCosts(boolean countOpportunityCosts) {
-        this.countOpportunityCosts = countOpportunityCosts;
-    }
 }
 

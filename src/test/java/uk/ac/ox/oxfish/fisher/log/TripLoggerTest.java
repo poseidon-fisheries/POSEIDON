@@ -24,7 +24,7 @@ public class TripLoggerTest
         assertNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
         //create a new trip, now there is a current trip, but it's not in the history
-        logger.newTrip();
+        logger.newTrip(0);
         assertNotNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
 
@@ -49,7 +49,7 @@ public class TripLoggerTest
         logger.setNumberOfSpecies(0);
 
         logger.addTripListener(receiver);
-        logger.newTrip();
+        logger.newTrip(0);
         TripRecord record = logger.getCurrentTrip();
 
         logger.finishTrip(1, mock(Port.class));
