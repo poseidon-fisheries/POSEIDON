@@ -8,6 +8,7 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 
@@ -148,7 +149,9 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
         //grow fish
         for(int i=0; i<currentBiomass.length; i++)
         {
-            if(carryingCapacity[i] > 0) {
+            assert currentBiomass[i] >=0;
+
+            if(carryingCapacity[i] > FishStateUtilities.EPSILON) {
                 currentBiomass[i] = Math.min(carryingCapacity[i], currentBiomass[i] + malthusianParameter[i] *
                         (1d - currentBiomass[i] / carryingCapacity[i]) * currentBiomass[i]);
             }

@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.fisher.actions;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -45,7 +44,15 @@ public class Fishing implements Action
         Preconditions.checkArgument(agent.isAtDestination()); //you arrived
         Preconditions.checkArgument(agent.getLocation().getAltitude() <= 0); //you are at sea
         Preconditions.checkState(
-                regulation.canFishHere(agent, agent.getLocation(), model)); //i should be allowed to fish here!
+                regulation.canFishHere(agent, agent.getLocation(), model) || accruedHours > 0); //i should be allowed to fish here!
+
+        //there is a possibility that you were allowed to fish last step but you didn't have enough time to do it
+        //you waited till this new step but now the season is over. Tough luck, I am afraid it's time to go home
+        if(!regulation.canFishHere(agent,agent.getLocation(),model))
+        {
+            assert  accruedHours > 0;
+            return new ActionResult(new Arriving(),hoursLeft);
+        }
 
         //if you stored hours from before, here they are
         if (accruedHours > 0) {
@@ -54,7 +61,7 @@ public class Fishing implements Action
 
         if (hoursLeft >= MINIMUM_HOURS_TO_PRODUCE_A_CATCH) {
             //fish!
-            Catch caught = agent.fishHere(model.getBiology(), MINIMUM_HOURS_TO_PRODUCE_A_CATCH, model);
+            agent.fishHere(model.getBiology(), MINIMUM_HOURS_TO_PRODUCE_A_CATCH, model);
 
             model.recordFishing(agent.getLocation());
 
