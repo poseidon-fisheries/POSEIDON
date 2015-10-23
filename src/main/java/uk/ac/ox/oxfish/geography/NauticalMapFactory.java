@@ -326,7 +326,7 @@ public class NauticalMapFactory {
                     if(((SeaTile)neighbor).getAltitude() < 0 )
                         neighboringSeaTiles++;
 
-                if(neighboringSeaTiles >=3)
+                if(neighboringSeaTiles >=Math.min(height,3))
                     candidateTiles.add(possible);
 
             }
