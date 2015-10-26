@@ -386,4 +386,9 @@ public class FishState  extends SimState{
         return socialNetwork;
     }
 
+    public Double getLatestDailyObservation(String columnName)
+    {
+        return getDailyDataSet().getColumn(columnName).getLatest();
+    }
+
 }

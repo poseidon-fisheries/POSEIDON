@@ -81,6 +81,16 @@ public class Port {
 
 
     /**
+     * get the marginal price of the market associated with this specie
+     * @param specie
+     * @return
+     */
+    public double getMarginalPrice(Specie specie)
+    {
+        return marketMap.getMarket(specie).getMarginalPrice();
+    }
+
+    /**
      * returns an immutable view of the fishers listed here
      * @return the set of fishers here
      */

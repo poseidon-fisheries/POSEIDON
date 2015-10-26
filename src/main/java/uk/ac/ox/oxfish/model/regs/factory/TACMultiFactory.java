@@ -70,7 +70,7 @@ public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
         }
         MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
-        TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations,numberOfSpecies);
+        TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
         state.registerStartable(manager);
 
 

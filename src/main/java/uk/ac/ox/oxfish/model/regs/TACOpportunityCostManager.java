@@ -37,9 +37,9 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
     @SuppressWarnings("unchecked")
-    public TACOpportunityCostManager(MultiQuotaRegulation quotaRegulationToUse, int numberOfSpecies) {
+    public TACOpportunityCostManager(MultiQuotaRegulation quotaRegulationToUse) {
         this.quotaRegulationToUse = quotaRegulationToUse;
-        smoothedDailyLandings = new MovingAverage[numberOfSpecies];
+        smoothedDailyLandings = new MovingAverage[quotaRegulationToUse.getQuotaRemaining().length];
         smoothedHoursAtSea = new MovingAverage<>(MOVING_AVERAGE_SIZE);
     }
 
@@ -98,10 +98,10 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
             for (Specie selectedSpecie : model.getSpecies()) {
 
                 //read what were yesterday's landings
-                Double observation = model.getDailyDataSet().
-                        getColumn(selectedSpecie +
-                                          " " +
-                                          AbstractMarket.LANDINGS_COLUMN_NAME).getLatest();
+                Double observation = model.getLatestDailyObservation(selectedSpecie +
+                                                                             " " +
+                                                                             AbstractMarket.LANDINGS_COLUMN_NAME);
+
 
                 //if they are a number AND if the TAC is still open (we drop censored observations)
                 if (Double.isFinite(observation) )
@@ -112,6 +112,10 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     }
 
 
+    /**
+     * computes and assigns opportunity costs to the fisher for being faster/slower than the rest
+     * @param record
+     */
     @Override
     public void reactToFinishedTrip(TripRecord record) {
 
@@ -145,7 +149,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
             double differenceInCatchesFromAverage = hourlyCatches- actualHourlyCatches;
             //if this is positive, you are being slower than the average so in a way you are wasting quotas. If this is negative
             //then you are siphoning off quotas from competitors and that's a good thing (for you at least)
-            double price = record.getTerminal().getMarket(selectedSpecie).getMarginalPrice();
+            double price = record.getImplicitPriceReceived(selectedSpecie);
 
             double opportunityCosts = price * differenceInCatchesFromAverage * record.getDurationInHours() ;
             record.recordOpportunityCosts(opportunityCosts);
@@ -155,6 +159,15 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
     }
+
+
+    public double predictedHourlyCatches(int speciesIndex)
+    {
+        double averageDailyCatches = smoothedDailyLandings[speciesIndex].getSmoothedObservation();
+        double averageHoursAtSea =  smoothedHoursAtSea.getSmoothedObservation();
+        return averageDailyCatches/averageHoursAtSea;
+    }
+
 
     /**
      * tell the startable to turnoff,
