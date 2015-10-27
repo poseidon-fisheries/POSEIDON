@@ -197,7 +197,8 @@ public class PrototypeScenario implements Scenario {
         MersenneTwisterFast mapMakerRandom = model.random;
         if(mapMakerDedicatedRandomSeed != null)
             mapMakerRandom = new MersenneTwisterFast(mapMakerDedicatedRandomSeed);
-
+        //force the mapMakerRandom as the new random until the start is completed.
+        model.random = mapMakerRandom;
 
 
 
@@ -250,8 +251,8 @@ public class PrototypeScenario implements Scenario {
 
 
 
-
-
+        //substitute back the original randomizer
+        model.random = random;
         return new ScenarioEssentials(biology,map, marketMap);
     }
 

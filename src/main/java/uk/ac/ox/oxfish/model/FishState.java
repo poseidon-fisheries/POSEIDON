@@ -390,5 +390,9 @@ public class FishState  extends SimState{
     {
         return getDailyDataSet().getColumn(columnName).getLatest();
     }
+    public Double getLatestYearlyObservation(String columnName)
+    {
+        return getYearlyDataSet().getColumn(columnName).getLatest();
+    }
 
 }
