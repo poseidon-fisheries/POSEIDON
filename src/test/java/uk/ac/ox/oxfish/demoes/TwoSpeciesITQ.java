@@ -87,7 +87,7 @@ public class TwoSpeciesITQ {
                                        + blueLandings / (500 * scenario.getFishers()));
 
 
-            //red quotas are cheap (but not 0!)
+            //red quotas are cheap
             double highestRed = 0;
             Iterator<Double> redIterator = state.getDailyDataSet().getColumn(
                     "ITQ Prices Of Specie " + 0).descendingIterator();
@@ -96,7 +96,7 @@ public class TwoSpeciesITQ {
                 if (Double.isFinite(current) && current > highestRed)
                     highestRed = current;
             }
-            assertTrue(highestRed > 0);
+            assertTrue(highestRed >= 0);
             assertTrue(highestRed + " ----- ",highestRed < 7);
 
             //blue quotas are pricey!

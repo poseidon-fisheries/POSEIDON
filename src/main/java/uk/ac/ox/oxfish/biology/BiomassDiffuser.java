@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * An object that spreads biomass around as long as the underlying local biology is Logistic
@@ -48,8 +49,9 @@ public class BiomassDiffuser  implements Steppable {
     @Override
     public void step(SimState simState) {
 
-        //get all the tiles
-        final List<SeaTile> tiles = map.getAllSeaTilesAsList();
+        //get all the tiles that are in the sea
+        final List<SeaTile> tiles = map.getAllSeaTilesAsList().stream().filter(tile -> tile.getAltitude()<0).collect(
+                Collectors.toList());
         //shuffle them
         Collections.shuffle(tiles, new Random(random.nextLong()));
 
@@ -68,8 +70,20 @@ public class BiomassDiffuser  implements Steppable {
                 for (int i = 0; i < biology.getSize(); i++) {
                     //if here there are more than there
                     final Specie specie = biology.getSpecie(i);
+
+                    //if your carrying capacity is 0 do not diffuse
+                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie)<= FishStateUtilities.EPSILON)
+                        continue;
+                    //if they are full, do not diffuse
+                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie) - neighbor.getBiomass(specie)<= FishStateUtilities.EPSILON)
+                        continue;
+
+
+
                     assert tile.getBiomass(specie) >= 0;
                     double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
+                    //don't transport more than the other is able to accomodate anyway
+                    differential = Math.min(differential, ((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie)-neighbor.getBiomass(specie));
                     differential = FishStateUtilities.round(differential);
                     if (differential > 0) {
                         //share!

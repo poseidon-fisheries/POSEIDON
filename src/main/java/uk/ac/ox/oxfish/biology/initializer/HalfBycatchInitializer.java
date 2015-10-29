@@ -52,7 +52,7 @@ public class HalfBycatchInitializer implements BiologyInitializer {
                                                                                                             mapWidthInCells);
 
             //if you are at the top, make carrying capacity of the second specie = 0
-            if (seaTile.getGridY() < mapHeightInCells / 2)
+            if (seaTile.getGridY() <= mapHeightInCells / 2)
                 generated.setCarryingCapacity(biology.getSpecie(1), 0d);
 
             return generated;

@@ -31,7 +31,7 @@ public class ITQCaresAboutMileage {
                 MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
                                                          new FixedDoubleParameter(.1),
                                                          new UniformDoubleParameter(0, 20),
-                                                         Paths.get("runs", "market1", "tacOil.csv").toFile(),
+                                                         Paths.get("runs", "market1", "itqOil.csv").toFile(),
                                                          5, seed);
 
         //the correlation ought to be very small

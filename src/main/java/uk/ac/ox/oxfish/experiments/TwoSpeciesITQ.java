@@ -133,7 +133,7 @@ public class TwoSpeciesITQ
     }
 
 
-    public static void secondGUI(String[] args)
+    public static void main(String[] args)
     {
 
 
@@ -147,7 +147,9 @@ public class TwoSpeciesITQ
 
         HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
-
+        biologyFactory.setSteepness(new FixedDoubleParameter(.9));
+        biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
+        biologyFactory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(.2));
 
         PrototypeScenario scenario = new PrototypeScenario();
         state.setScenario(scenario);
@@ -172,7 +174,7 @@ public class TwoSpeciesITQ
     }
 
 
-        public static void main(String[] args)
+        public static void secondDemo(String[] args)
     {
 
 
@@ -229,6 +231,44 @@ public class TwoSpeciesITQ
 
     }
 
+    public static void thirdGUI(String[] args)
+    {
 
+
+        final FishState state = new FishState(System.currentTimeMillis());
+        //world split in half
+
+        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        //quota ratios: 90-10
+        multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
+        multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
+
+        HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
+        biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
+        biologyFactory.setSteepness(new FixedDoubleParameter(.9));
+        biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
+        biologyFactory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(.2));
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        state.setScenario(scenario);
+        //world split in half
+        scenario.setBiologyInitializer(biologyFactory);
+        scenario.setRegulation(multiFactory);
+
+        scenario.setCoastalRoughness(0);
+        scenario.forcePortPosition(new int[]{40,25});
+        //try also 40,25
+
+
+
+        scenario.setUsePredictors(true);
+
+
+
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+        c.setVisible(true);
+
+    }
 
 }

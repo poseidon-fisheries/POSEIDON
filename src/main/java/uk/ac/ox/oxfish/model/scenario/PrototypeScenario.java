@@ -319,10 +319,10 @@ public class PrototypeScenario implements Scenario {
                                                                        fisher1.isAllowedAtSea() ?
                                                                        fisher1.getDailyCounter().getLandingsPerSpecie(
                                                                        specie.getIndex()) :
-                                                                               Double.NaN
+                                                                               0
 
                                                                ,
-                                                               90));
+                                                               360));
                     newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
                             "Predicted Unit Profit " + specie,
                             fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),

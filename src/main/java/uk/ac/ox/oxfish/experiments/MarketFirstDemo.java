@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
@@ -106,12 +107,12 @@ public class MarketFirstDemo {
 
 
 
-        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new UniformDoubleParameter(0.05,0.3),
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new UniformDoubleParameter(0.01,0.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","itqSmooth.csv").toFile(),
                                  10, 0);
 
-        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new UniformDoubleParameter(0.05,0.3),
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new UniformDoubleParameter(0.01,0.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","tacSmooth.csv").toFile(),
                                  10, 0);
@@ -173,7 +174,13 @@ public class MarketFirstDemo {
                                  + "," +
                                  String.valueOf(
                                          fisher.getLatestYearlyObservation(
-                                                 specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME)));
+                                                 specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME))
+                         + "," +
+                         String.valueOf(
+                                 fisher.getLatestYearlyObservation(
+                                         YearlyFisherTimeSeries.FUEL_CONSUMPTION))
+
+                );
 
             }
             String toWrite = list.stream().reduce((s, s2) -> s + "\n" + s2).get();
