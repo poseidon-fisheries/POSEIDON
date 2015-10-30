@@ -17,6 +17,7 @@ public class NotGoingTooFar {
     {
 
 
+
         final FishState state = new FishState(System.currentTimeMillis());
 
         //world split in half
@@ -38,36 +39,35 @@ public class NotGoingTooFar {
 
         //find the highest X (rightmost) seatile that has biomass above 10000. There is never any point fishing left of there
         int limitX = 0;
-        for(int i=0; i<50;i++)
-        {
-            if(state.getMap().getSeaTile(i,0).getBiomass(state.getSpecies().get(0))>10000)
+        for (int i = 0; i < 50; i++) {
+            if (state.getMap().getSeaTile(i, 0).getBiomass(state.getSpecies().get(0)) > 10000)
                 limitX = i;
             else break;
         }
 
 
-        while(state.getYear()<1)
+        while (state.getYear() < 1)
             state.schedule.step(state);
 
-        int bestTows=0;
-        int worstTows= 0; //they still happen due to exploratory noise
+        int bestTows = 0;
+        int worstTows = 0; //they still happen due to exploratory noise
 
 
-
-        while(state.getYear()<2) {
+        while (state.getYear() < 2) {
             state.schedule.step(state);
             IntGrid2D hotspots = state.getMap().getDailyTrawlsMap();
 
-            for (int x = 0; x < limitX; x++)
-            {
+            for (int x = 0; x < limitX; x++) {
                 worstTows += hotspots.get(x, 0);
             }
-            bestTows += hotspots.get(limitX, 0);
-            //sometimes 99999 is as good
-            bestTows += hotspots.get(limitX+1, 0);
+            //the tows must happen on the area before 100000 is hit
+            for(int x=limitX; x<50; x++)
+            {
+                bestTows += hotspots.get(x, 0);
+            }
         }
 
-        System.out.println(bestTows + " ---- " + worstTows);
+        System.out.println(bestTows + " ---- " + worstTows + " ---- " + limitX);
         Assert.assertTrue(bestTows > 9 * worstTows);
 
 

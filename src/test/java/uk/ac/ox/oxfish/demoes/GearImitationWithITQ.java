@@ -32,6 +32,8 @@ public class GearImitationWithITQ
     public void ITQDrivePeopleToSwitchToBetterGear() throws Exception {
 
 
+
+
         System.out.println("Test starting!");
         final FishState state = new FishState(System.currentTimeMillis());
 
@@ -144,7 +146,7 @@ public class GearImitationWithITQ
         Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
 
 
-        while (state.getYear() < 10)
+        while (state.getYear() < 20)
             state.schedule.step(state);
 
         state.schedule.step(state);
@@ -165,9 +167,9 @@ public class GearImitationWithITQ
         System.out.println(
                 "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
 
-        //you move towards a red quota choke actually (even though blue quotas are still very used there are only a few and a single run could have them used only up to 80%
+        //much better efficiency by the end of the simulation
         Assert.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);
-        Assert.assertTrue(lateRedLandings > .9 * totalRedQuotas);
+        Assert.assertTrue(lateRedLandings > .8 * totalRedQuotas); //this is actually almost always above 90% after 20 years
 
 
     }
