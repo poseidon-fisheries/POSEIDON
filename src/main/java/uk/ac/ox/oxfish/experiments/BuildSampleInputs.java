@@ -6,11 +6,13 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -34,6 +36,14 @@ public class BuildSampleInputs
             final Path file = directory.resolve(name+ ".yaml");
             final String dump = yaml.dump(scenario);
             FileWriter writer = new FileWriter(file.toFile());
+            if(Objects.equals(name, "Prototype"))
+            {
+                File base =                Dashboard.DASHBOARD_INPUT_DIRECTORY.resolve("base.yaml").toFile();
+
+                FileWriter auxiliary = new FileWriter(base);
+                auxiliary.write(dump);
+                auxiliary.close();
+            }
             writer.write(dump);
             writer.close();
         }

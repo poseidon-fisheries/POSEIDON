@@ -1,7 +1,12 @@
 All Sand
 -------
 Rocky Rectangles:
-  numberOfRectangles: '5.0'
-  rockyHeight: uniform 5.0 10.0
-  rockyWidth: uniform 5.0 10.0
+  numberOfRectangles: '1.0'
+  rockyHeight: uniform 25.0 30.0
+  rockyWidth: uniform 20.0 25.0
+-------
+Rocky Pyramids:
+  maxSpread: 6
+  numberOfPeaks: 10
+  smoothingValue: '0.7'
 -------

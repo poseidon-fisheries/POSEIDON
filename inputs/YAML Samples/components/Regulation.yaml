@@ -15,7 +15,15 @@ Mono-IQ:
 Mono-ITQ:
   individualQuota: '5000.0'
 -------
-Specific-ITQ:
+Multi-ITQ:
+  quotaFirstSpecie: '5000.0'
+  quotaOtherSpecies: '5000.0'
+-------
+Partial-ITQ:
   individualQuota: '5000.0'
   specieIndex: 0
+-------
+Multi-TAC:
+  firstSpeciesQuota: '500000.0'
+  otherSpeciesQuota: '500000.0'
 -------

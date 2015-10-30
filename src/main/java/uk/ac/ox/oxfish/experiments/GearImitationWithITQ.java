@@ -22,6 +22,7 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class GearImitationWithITQ
@@ -31,7 +32,54 @@ public class GearImitationWithITQ
     public static void main(String[] args)
     {
 
-        final FishState state = new FishState(System.currentTimeMillis());
+        final Path directory = Paths.get("docs", "20151014 corollaries");
+
+        FishState state = gearImitationWithITQ(System.currentTimeMillis(), 10, new Consumer<FishState>() {
+                                                   @Override
+                                                   public void accept(FishState state) {
+
+                                                       //initial distributions
+                                                       FishStateUtilities.pollHistogramToFile(
+                                                               fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
+                                                               state.getFishers(),
+                                                               directory.resolve("initial_red.csv").toFile());
+                                                       FishStateUtilities.pollHistogramToFile(
+                                                               fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
+                                                               state.getFishers(),
+                                                               directory.resolve("initial_blue.csv").toFile());
+                                                   }
+                                               }
+
+        );
+
+
+        FishStateUtilities.pollHistogramToFile(
+                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
+                state.getFishers(),
+                directory.resolve("final_red.csv").toFile());
+
+        //initial distributions
+        FishStateUtilities.pollHistogramToFile(
+                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
+                state.getFishers(),
+                directory.resolve("final_blue.csv").toFile());
+
+        //show the effect on catches
+        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
+                                                directory.resolve("red_landings.csv").toFile());
+
+        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
+                                                directory.resolve("blue_landings.csv").toFile());
+
+    }
+
+
+
+    public static FishState gearImitationWithITQ(
+            final long randomSeed, final int simulationRunTimeInYears,
+            final Consumer<FishState> dayOneConsumer){
+
+        final FishState state = new FishState(randomSeed);
 
         ITQMultiFactory multiFactory = new ITQMultiFactory();
         //quota ratios: 90-10
@@ -129,45 +177,17 @@ public class GearImitationWithITQ
         state.start();
         state.schedule.step(state);
 
-        Path directory = Paths.get("docs", "20151014 corollaries");
+        dayOneConsumer.accept(state);
 
-        //initial distributions
-        FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
-                state.getFishers(),
-                directory.resolve("initial_red.csv").toFile());
-        FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                state.getFishers(),
-                directory.resolve("initial_blue.csv").toFile());
-
-        while(state.getYear()<10)
+        while(state.getYear() < simulationRunTimeInYears)
             state.schedule.step(state);
 
-        state.schedule.step(state);
+        return state;
 
-        //final distributions
-        FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
-                state.getFishers(),
-                directory.resolve("final_red.csv").toFile());
 
-        //initial distributions
-        FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                state.getFishers(),
-                directory.resolve("final_blue.csv").toFile());
-
-        //show the effect on catches
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("red_landings.csv").toFile());
-
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("blue_landings.csv").toFile());
 
 
     }
-
 
     public static void gui(String[] args)
     {
