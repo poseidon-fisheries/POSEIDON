@@ -1,5 +1,9 @@
 .directory
-runs/
+runs/*
+!runs/dashboards
+runs/dashboards/*
+!runs/dashboards/dashboard.R
+
 oxfish.iml
 ### NetBeans template
 nbproject/private/

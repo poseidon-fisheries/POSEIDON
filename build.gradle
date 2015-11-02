@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     id 'application'
-    id "us.kirchmeier.capsule" version "1.0-rc1"
-
+    id "us.kirchmeier.capsule" version "1.0.1"
 }
+
 
 mainClassName = 'Main'
 
@@ -101,7 +101,33 @@ task buildSampleFiles(type: JavaExec){
 }
 
 
+//easy function to get formatted date
+def getDate() {
+    if(ext.date==null) {
+        def date = new Date()
+        def formattedDate = date.format('yyyyMMdd-HH:mm:ss')
+        ext.date = formattedDate.toString()
+    }
+    return ext.date
+}
 
+ext{
+    date=null;
+    website_folder = '/home/carrknight/code/carrknight.github.io/assets/oxfish/dashboards';
+
+}
+//creates the CSV the dashboard will use
+task prepareDashBoard(type: JavaExec) {
+            classpath = sourceSets.main.runtimeClasspath
+            main = 'uk.ac.ox.oxfish.experiments.Dashboard'
+            args = [ date ]
+        }
+
+task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
+    executable = 'Rscript'
+    workingDir = "${projectDir}/runs/dashboards"
+    args = [ "dashboard.R",  date, website_folder ]
+}
 
 test {
   useJUnit()
