@@ -1,0 +1,6 @@
+Prototype:
+   usePredictors: true
+   regulation:
+      Multi-ITQ:
+         quotaFirstSpecie: '4000.0'
+         quotaOtherSpecies: '0'

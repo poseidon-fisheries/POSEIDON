@@ -105,7 +105,7 @@ task buildSampleFiles(type: JavaExec){
 def getDate() {
     if(ext.date==null) {
         def date = new Date()
-        def formattedDate = date.format('yyyyMMdd-HH:mm:ss')
+        def formattedDate = date.format('yyyy-MM-dd=HH:mm:ss')
         ext.date = formattedDate.toString()
     }
     return ext.date
@@ -113,20 +113,20 @@ def getDate() {
 
 ext{
     date=null;
-    website_folder = '/home/carrknight/code/carrknight.github.io/assets/oxfish/dashboards';
+    website_folder = '/home/carrknight/code/carrknight.github.io';
 
 }
 //creates the CSV the dashboard will use
-task prepareDashBoard(type: JavaExec) {
+task prepareDashBoard(type: JavaExec, dependsOn: test) {
             classpath = sourceSets.main.runtimeClasspath
             main = 'uk.ac.ox.oxfish.experiments.Dashboard'
             args = [ date ]
         }
 
 task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
-    executable = 'Rscript'
-    workingDir = "${projectDir}/runs/dashboards"
-    args = [ "dashboard.R",  date, website_folder ]
+    executable = 'sh'
+    workingDir = "${projectDir}"
+    args = [ "dashboard.sh",  date, website_folder ]
 }
 
 test {
