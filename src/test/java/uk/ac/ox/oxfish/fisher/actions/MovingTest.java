@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
@@ -105,14 +106,14 @@ public class MovingTest
 
 
     @Test
-    public void pathToItselfIsEmpty() throws Exception {
+    public void pathToItselfIsOne() throws Exception {
 
         FishState simple = generateSimple4x4Map();
         Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
-        Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(2, 2), map.getSeaTile(2, 2));
-        assertTrue(route.isEmpty());
+        Queue<SeaTile> route = map.getRoute(map.getSeaTile(2, 2), map.getSeaTile(2, 2));
+        assertTrue(route.size()==1);
 
 
     }
@@ -203,7 +204,9 @@ public class MovingTest
         Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
-        Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 2), map.getSeaTile(2, 2));
+        Queue<SeaTile> route = map.getRoute(map.getSeaTile(0, 2), map.getSeaTile(2, 2));
+        route.poll(); //ignore start
+
         assertEquals(route.size(),2);
         assertEquals(route.poll(),map.getSeaTile(1,2));
         assertEquals(route.poll(), map.getSeaTile(2, 2));
@@ -219,7 +222,9 @@ public class MovingTest
         Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
-        Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(2, 0), map.getSeaTile(2, 2));
+        Queue<SeaTile> route = map.getRoute(map.getSeaTile(2, 0), map.getSeaTile(2, 2));
+        route.poll(); //ignore start
+
         assertEquals(route.size(),2);
         assertEquals(route.poll(),map.getSeaTile(2, 1));
         assertEquals(route.poll(),map.getSeaTile(2, 2));
@@ -235,7 +240,9 @@ public class MovingTest
         Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
-        Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 0), map.getSeaTile(2, 2));
+        Queue<SeaTile> route = map.getRoute(map.getSeaTile(0, 0), map.getSeaTile(2, 2));
+        route.poll(); //ignore start
+
         assertEquals(route.size(),2);
         assertEquals(route.poll(),map.getSeaTile(1, 1));
         assertEquals(route.poll(),map.getSeaTile(2, 2));
@@ -249,7 +256,8 @@ public class MovingTest
         Moving move = new Moving();
 
         NauticalMap map = simple.getMap();
-        Queue<SeaTile> route = move.getRoute(map, map.getSeaTile(0, 0), map.getSeaTile(2, 3));
+        Queue<SeaTile> route = map.getRoute( map.getSeaTile(0, 0), map.getSeaTile(2, 3));
+        route.poll(); //ignore start
         assertEquals(route.size(),3);
         assertEquals(route.poll(),map.getSeaTile(1, 1));
         assertEquals(route.poll(),map.getSeaTile(2, 2));
@@ -266,7 +274,7 @@ public class MovingTest
 
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
-                                          new EquirectangularDistance(0.0,1));
+                                          new EquirectangularDistance(0.0,1), new StraightLinePathfinder());
         FishState model = mock(FishState.class);
         when(model.getMap()).thenReturn(map);
         when(model.getStepsPerDay()).thenReturn(1);

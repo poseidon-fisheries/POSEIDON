@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.Deque;
-import java.util.LinkedList;
 
 /**
  * The action of moving
@@ -55,7 +54,11 @@ public class Moving implements Action
         if(agent.getDestination().equals(agent.getLocation()))
             return new ActionResult(new Arriving(),hoursLeft);
 
-        Deque<SeaTile> route = getRoute(model.getMap(),agent.getLocation(),agent.getDestination());
+        Deque<SeaTile> route = model.getMap().getRoute(agent.getLocation(),agent.getDestination());
+        assert  route.peek().equals(agent.getLocation()); //starts at the right location
+        assert route.peekLast().equals(agent.getDestination()); //ends where we are
+        route.poll(); //remove start, it's useless
+
         NauticalMap map = model.getMap();
 
         if(accruedHours > 0)
@@ -90,63 +93,4 @@ public class Moving implements Action
     }
 
 
-    /**
-     * builds a path from start to end. No weird pathfinding here, simply move diagonally then horizontally-vertically when that's not possible anymore
-     * @param map the nautical map
-     * @param start the start point
-     * @param end the end point
-     * @return a queue of tiles to pass through (not including the starting point but including the end point). Empty if starting point is the ending point
-     */
-    public Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end)
-    {
-
-
-        int x = start.getGridX(); int endX = end.getGridX();
-        int y = start.getGridY(); int endY =end.getGridY();
-
-        LinkedList<SeaTile> path = new LinkedList<>();
-
-        while( x != endX || y!= endY)
-        {
-
-            int candidateX =  x + Integer.signum( endX - x );
-            int candidateY =  y + Integer.signum( endY - y );
-
-            //can you move your preferred way?
-            SeaTile bestSeaTile = map.getSeaTile(candidateX, candidateY);
-            if(bestSeaTile.getAltitude() <= 0 || bestSeaTile.isPortHere())
-            {
-                path.add(bestSeaTile);
-                x = candidateX;
-                y=candidateY;
-            }
-            //try to move on the x axis only then
-            else if(candidateX != x && map.getSeaTile(candidateX,y).getAltitude() <= 0)
-            {
-                x= candidateX;
-                path.add(map.getSeaTile(candidateX,y));
-            }
-            else if(candidateY != y && map.getSeaTile(x,candidateY).getAltitude() <= 0)
-            {
-                y=candidateY;
-                path.add(map.getSeaTile(x,candidateY));
-
-            }
-            //otherwise just go over land!
-            else
-            {
-                path.add(map.getSeaTile(candidateX,candidateY));
-                x= candidateX;
-                y=candidateY;
-            }
-        }
-
-
-        assert path.isEmpty() || path.peekLast().equals(end);
-
-        return path;
-
-
-
-    }
 }

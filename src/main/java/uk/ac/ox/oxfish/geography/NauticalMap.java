@@ -21,10 +21,13 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,6 +68,8 @@ public class NauticalMap implements Startable
      */
     private double horizontalVerticalDistanceInKm = Double.NaN;
 
+
+    private Pathfinder pathfinder;
 
 
     /**
@@ -116,8 +121,10 @@ public class NauticalMap implements Startable
      * @param mpaVectorField the vector field with the MPAs polygons
      * @param distance the distance calculator
      */
-    public NauticalMap(GeomGridField rasterBathymetry, GeomVectorField mpaVectorField, Distance distance) {
+    public NauticalMap(GeomGridField rasterBathymetry, GeomVectorField mpaVectorField,
+                       Distance distance, Pathfinder pathfinder) {
         this.rasterBathymetry = rasterBathymetry;
+        this.pathfinder = pathfinder;
         this.mpaVectorField = mpaVectorField;
         this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
@@ -152,7 +159,7 @@ public class NauticalMap implements Startable
 
     public static NauticalMap initializeWithDefaultValues()
     {
-        return NauticalMapFactory.fromBathymetryAndShapeFiles(DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
+        return NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
     }
 
 
@@ -461,5 +468,23 @@ public class NauticalMap implements Startable
     @VisibleForTesting
     public Stoppable getReceipt() {
         return receipt;
+    }
+
+    public Pathfinder getPathfinder() {
+        return pathfinder;
+    }
+
+    public void setPathfinder(Pathfinder pathfinder) {
+        this.pathfinder = pathfinder;
+    }
+
+    /**
+     * return the full path that brings us from start to end
+     * @param start the starting tile
+     * @param end the ending tile
+     * @return a queue of steps from start to end or null if it isn't possible to go from start to end
+     */
+    public Deque<SeaTile> getRoute(SeaTile start, SeaTile end) {
+        return pathfinder.getRoute(this, start, end);
     }
 }

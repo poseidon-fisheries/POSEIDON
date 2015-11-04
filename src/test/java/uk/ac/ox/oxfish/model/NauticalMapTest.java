@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.*;
@@ -20,7 +21,7 @@ public class NauticalMapTest {
     public void readTilesDepthCorrectly() {
 
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("test.asc", "fakempa.shp");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "test.asc", "fakempa.shp");
         //open the test grid and the test mpas
 
         //now, the grid ought to be simple: the altitude increases for each element from the row
@@ -40,7 +41,7 @@ public class NauticalMapTest {
 
         //test2.asc is like test.asc but it should be so that lower-left corner center grid is exactly lat0,long0 and
         //grid size is 1
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("test2.asc", "fakempa.shp");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "test2.asc", "fakempa.shp");
         //open the test grid and the test mpas
 
         //now, the grid ought to be simple: the altitude increases for each element from the row
@@ -55,7 +56,7 @@ public class NauticalMapTest {
     public void readMPAsCorrectly() {
 
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("test.asc", "fakempa.shp");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "test.asc", "fakempa.shp");
 
         //there is only one big square MPA in the middle. So at the borders we ought not to be protected
         assertFalse(map.getSeaTile(0,0).isProtected());
@@ -76,7 +77,7 @@ public class NauticalMapTest {
 
 
         //read the 5by5 asc
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
         //it has 3 sea columns and then 2 columns of land
         //I can put a port for each coastal land port
         for(int row=0; row<5; row++)
@@ -97,14 +98,14 @@ public class NauticalMapTest {
     @Test(expected=IllegalArgumentException.class)
     public void addPortsOnSeaIsWrong()
     {
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
         map.addPort(new Port(map.getSeaTile(2, 0),mock(MarketMap.class), 0)); //throws exception since the seatile is underwater
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void addPortsAwayFromSeaIsWrong()
     {
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
         map.addPort(new Port(map.getSeaTile(4,0),mock(MarketMap.class), 0)); //it's on land but there is no sea around.
     }
 
@@ -112,7 +113,7 @@ public class NauticalMapTest {
     @Test
     public void towCountCorrect() throws Exception {
 
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles("5by5.asc");
+        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), "5by5.asc");
         FishState state = new FishState(0l);
         map.recordFishing(map.getSeaTile(2,2));
         map.recordFishing(map.getSeaTile(2,2));

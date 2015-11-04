@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.Specie;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -14,7 +15,9 @@ import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Reads the bathymetry file of california and for now not much else.
@@ -39,7 +42,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
         NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
-                Paths.get("inputs", "california", "california1000.asc").toString(),
+                new StraightLinePathfinder(), Paths.get("inputs", "california", "california1000.asc").toString(),
                 Paths.get("inputs", "california", "cssr_mpa", "reprojected","mpa_central.shp").toString(),
                 Paths.get("inputs", "california", "ncssr_mpa", "reprojected","mpa_north.shp").toString()
         );

@@ -12,6 +12,8 @@ import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
+import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
 
 /**
  * Takes a OsmoseSimulation object and extract a map from it
@@ -57,7 +59,8 @@ public class OsmoseMapMaker{
         GeomGridField bathymetry = new GeomGridField(baseGrid);
         GeomVectorField mpas = new GeomVectorField(); //empty MPAs
         Distance distance = new CartesianDistance(gridCellSizeInKm);
-        return new NauticalMap(bathymetry,mpas,distance);
+        Pathfinder astar = new AStarPathfinder(distance);
+        return new NauticalMap(bathymetry,mpas,distance,astar);
     }
 
 

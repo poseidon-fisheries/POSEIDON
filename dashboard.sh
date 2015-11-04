@@ -20,6 +20,6 @@ echo "$1" >> $2/assets/oxfish/dashboards/dashboards.txt
 cd $2
 git add $2/assets/oxfish/*
 git commit -m "added dashboard $1"
-#git push
+git push
 
 

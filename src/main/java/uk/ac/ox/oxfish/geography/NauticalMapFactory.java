@@ -13,6 +13,8 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.GISReaders;
@@ -29,7 +31,8 @@ import java.util.function.Function;
 public class NauticalMapFactory {
 
 
-    public static NauticalMap fromBathymetryAndShapeFiles(String bathymetryResource, String... mpaSources)
+    public static NauticalMap fromBathymetryAndShapeFiles(
+            Pathfinder pathfinder, String bathymetryResource, String... mpaSources)
     {
         //read raster bathymetry
         GeomGridField temporaryField = GISReaders.readRaster(bathymetryResource);
@@ -58,7 +61,7 @@ public class NauticalMapFactory {
                                                                        temporaryField.getPixelHeight());
 
 
-        NauticalMap map = new NauticalMap(rasterBathymetry, mpaVectorField, distance);
+        NauticalMap map = new NauticalMap(rasterBathymetry, mpaVectorField, distance,pathfinder);
         for(SeaTile tile : map.getAllSeaTilesAsList())
             tile.setBiology(new EmptyLocalBiology());
         return map;
@@ -73,7 +76,7 @@ public class NauticalMapFactory {
      * creates a map like the NETLOGO prototype. That's a 50x50 map
      */
     public static NauticalMap prototypeMap(
-            int coastalRoughness,
+            Pathfinder pathfinder, int coastalRoughness,
             MersenneTwisterFast random,
             int depthSmoothing, final int width, final int height)
     {
@@ -192,7 +195,7 @@ public class NauticalMapFactory {
         mpas.setMBR(bathymetry.getMBR());
 
         Distance distance = new EquirectangularDistance(0,1);
-        return new NauticalMap(bathymetry,mpas,distance);
+        return new NauticalMap(bathymetry,mpas,distance,pathfinder);
 
 
 
@@ -209,7 +212,7 @@ public class NauticalMapFactory {
             final int width,
             final int height){
 
-        return prototypeMap(coastalRoughness,random,depthSmoothing, width, height);
+        return prototypeMap(new StraightLinePathfinder(), coastalRoughness,random,depthSmoothing, width, height);
 
 
 

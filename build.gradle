@@ -77,7 +77,7 @@ test{
 
 //this just mentions what the gradle version for the "wrapper" gradlew ought to be
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '2.8'
 }
 
 
