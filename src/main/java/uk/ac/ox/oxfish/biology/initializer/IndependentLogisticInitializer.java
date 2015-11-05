@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * but each starts at a random level of biomass
  * Created by carrknight on 6/22/15.
  */
-public class IndependentLogisticInitializer implements BiologyInitializer {
+public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
 
     private final DoubleParameter carryingCapacity;
@@ -39,7 +39,7 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 

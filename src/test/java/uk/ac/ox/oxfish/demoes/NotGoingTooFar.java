@@ -6,6 +6,7 @@ import org.junit.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -22,8 +23,7 @@ public class NotGoingTooFar {
 
         //world split in half
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setHeight(1);
-        scenario.setWidth(50);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50,1,0,100000,2));
         state.setScenario(scenario);
         //world split in half
         //scenario.setBiologyInitializer(OpportunityCostsDemo.FIXED_AND_SPLIT_BIOLOGY);
@@ -31,8 +31,6 @@ public class NotGoingTooFar {
         biologyInitializer.setMaximumBiomass(new FixedDoubleParameter(50000));
         scenario.setBiologyInitializer(biologyInitializer);
         scenario.setFishingStrategy(new FishOnceFactory());
-        scenario.setCoastalRoughness(0);
-        scenario.setGridCellSizeInKm(2);
 
 
         state.start();

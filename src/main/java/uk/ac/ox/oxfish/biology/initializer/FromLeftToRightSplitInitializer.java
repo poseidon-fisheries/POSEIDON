@@ -13,7 +13,7 @@ import java.util.List;
  * From left to right, two species, one at the top, one at the bottom
  * Created by carrknight on 9/24/15.
  */
-public class FromLeftToRightSplitInitializer implements BiologyInitializer {
+public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer {
 
 
     /**
@@ -42,7 +42,7 @@ public class FromLeftToRightSplitInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells)
     {

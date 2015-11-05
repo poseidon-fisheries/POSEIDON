@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * Uniformly distributed constant biomass for each cell
  * Created by carrknight on 6/22/15.
  */
-public class RandomConstantBiologyInitializer implements BiologyInitializer {
+public class RandomConstantBiologyInitializer extends AbstractBiologyInitializer {
 
 
     final private double minBiomass;
@@ -45,7 +45,7 @@ public class RandomConstantBiologyInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells)
     {

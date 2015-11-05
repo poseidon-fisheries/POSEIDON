@@ -220,11 +220,11 @@ public class NauticalMapFactory {
     }
 
 
-    public static NauticalMap addWeatherAndBiologyToMap(NauticalMap map,
-                                                        MersenneTwisterFast random,
-                                                        BiologyInitializer biologyInitializer,
-                                                        WeatherInitializer weatherInitializer,
-                                                        GlobalBiology biology, FishState model)
+    public static NauticalMap initializeMap(NauticalMap map,
+                                            MersenneTwisterFast random,
+                                            BiologyInitializer biologyInitializer,
+                                            WeatherInitializer weatherInitializer,
+                                            GlobalBiology biology, FishState model)
     {
 
         //map.initializeBiology(RandomConstantBiologyInitializer(random,minBiomass,maxBiomass));;

@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepar
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -51,7 +52,7 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
       //  scenario.setRegulation(new MonoQuotaRegulation(10*scenario.getFishers(),model));
 
 
-        scenario.setGridCellSizeInKm(5);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50, 50, 4, 1000000, 5));
 
         return scenario;
     }
@@ -111,8 +112,8 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
             public Genotype<DoubleGene> apply(Fisher fisher) {
                 SeaTile favoriteSpot =
                         ((FavoriteDestinationStrategy) fisher.getDestinationStrategy()).getFavoriteSpot();
-                double x = (double)favoriteSpot.getGridX()/(double)getWidth();
-                double y = (double)favoriteSpot.getGridY()/(double)getHeight();
+                double x = (double)favoriteSpot.getGridX()/50d;
+                double y = (double)favoriteSpot.getGridY()/50d;
                 Chromosome<DoubleGene> location = DoubleChromosome.of(
                         DoubleGene.of(x,0d,.9999),DoubleGene.of(y,0d,.9999)
                 );
@@ -142,8 +143,8 @@ public class GeneticLocationScenario extends PrototypeGeneticScenario {
                     Pair<Fisher, Genotype<DoubleGene>> fisherGenotypePair) {
                 Chromosome<DoubleGene> chromosome = fisherGenotypePair.getSecond().getChromosome(0);
                 //grab new spot
-                int x = (int) Math.floor(chromosome.getGene(0).floatValue() * getWidth());
-                int y = (int) Math.floor(chromosome.getGene(1).floatValue() * getHeight());
+                int x = (int) Math.floor(chromosome.getGene(0).floatValue() * 50);
+                int y = (int) Math.floor(chromosome.getGene(1).floatValue() * 50);
                 //System.out.println(x + " --- " + y);
                 SeaTile seaTile = map.getSeaTile(x, y);
                 final Fisher fisher = fisherGenotypePair.getFirst();

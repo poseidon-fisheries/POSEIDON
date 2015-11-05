@@ -25,11 +25,12 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
-import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -54,23 +55,11 @@ import java.util.LinkedList;
  */
 public class PrototypeScenario implements Scenario {
 
-    /**
-     * higher the more the coast gets jagged
-     */
-    private int coastalRoughness = 4;
-    /**
-     * how many rounds of depth smoothing to do
-     */
-    private int depthSmoothing = 1000000;
 
     /**
      * number of ports
      */
     private int ports = 1;
-    /**
-     * map width
-     */
-    private int width = 50;
 
 
 
@@ -80,10 +69,11 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
             new ConstantWeatherFactory();
 
-    /**
-     * map height
-     */
-    private int height =50;
+
+    private AlgorithmFactory<? extends MapInitializer> mapInitializer =
+            new SimpleMapInitializerFactory();
+
+
 
     /**
      * the number of fishers
@@ -91,11 +81,6 @@ public class PrototypeScenario implements Scenario {
     private int fishers = 100;
 
 
-
-    /**
-     * Uses Caartesian distance
-     */
-    private double gridCellSizeInKm = 10;
 
     /**
      * when this flag is true, agents use their memory to predict future catches and profits
@@ -203,49 +188,37 @@ public class PrototypeScenario implements Scenario {
 
 
 
-        BiologyInitializer initializer = biologyInitializer.apply(model);
+        BiologyInitializer biology = biologyInitializer.apply(model);
         WeatherInitializer weather = weatherInitializer.apply(model);
 
-        //turn list of names into list of species
-        String[] names = initializer.getSpeciesNames();
-        Species[] speciesArray = new Species[names.length];
-        for(int i=0; i< names.length; i++)
-        {
-            speciesArray[i] = new Species(names[i]);
-        }
-        GlobalBiology biology = new GlobalBiology(speciesArray);
+        //create global biology
+        GlobalBiology global = biology.generateGlobal(mapMakerRandom,model);
 
 
+        MapInitializer mapMaker = mapInitializer.apply(model);
+        NauticalMap map = mapMaker.makeMap(random,global,model);
 
-        NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
-                                                                                   mapMakerRandom,
-                                                                                   depthSmoothing,
-                                                                                   width, height);
         //set habitats
         HabitatInitializer habitat = habitatInitializer.apply(model);
         habitat.applyHabitats(map, mapMakerRandom, model);
 
 
+        //set what kind of distance function should we use for this map
 
-        map.setDistance(new CartesianDistance(gridCellSizeInKm));
-
-        NauticalMapFactory.addWeatherAndBiologyToMap(map,random,initializer,
-                                                     weather,
-                                                     biology, model);
-
-
-
+        NauticalMapFactory.initializeMap(map, random, biology,
+                                         weather,
+                                         global, model);
 
 
         //create fixed price market
-        MarketMap marketMap = new MarketMap(biology);
+        MarketMap marketMap = new MarketMap(global);
         /*
       market prices for each species
      */
 
 
 
-        for(Species species : biology.getSpecies())
+        for(Species species : global.getSpecies())
             marketMap.addMarket(species, market.apply(model));
 
         //create random ports, all sharing the same market
@@ -262,7 +235,7 @@ public class PrototypeScenario implements Scenario {
 
         //substitute back the original randomizer
         model.random = random;
-        return new ScenarioEssentials(biology,map, marketMap);
+        return new ScenarioEssentials(global,map, marketMap);
     }
 
 
@@ -373,21 +346,6 @@ public class PrototypeScenario implements Scenario {
             return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
     }
 
-    public int getCoastalRoughness() {
-        return coastalRoughness;
-    }
-
-    public void setCoastalRoughness(int coastalRoughness) {
-        this.coastalRoughness = coastalRoughness;
-    }
-
-    public int getDepthSmoothing() {
-        return depthSmoothing;
-    }
-
-    public void setDepthSmoothing(int depthSmoothing) {
-        this.depthSmoothing = depthSmoothing;
-    }
 
 
 
@@ -397,38 +355,6 @@ public class PrototypeScenario implements Scenario {
 
     public void setPorts(int ports) {
         this.ports = ports;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getFishers() {
-        return fishers;
-    }
-
-    public void setFishers(int fishers) {
-        this.fishers = fishers;
-    }
-
-    public double getGridCellSizeInKm() {
-        return gridCellSizeInKm;
-    }
-
-    public void setGridCellSizeInKm(double gridCellSizeInKm) {
-        this.gridCellSizeInKm = gridCellSizeInKm;
     }
 
     public DoubleParameter getSpeedInKmh() {
@@ -573,6 +499,14 @@ public class PrototypeScenario implements Scenario {
         this.weatherInitializer = weatherInitializer;
     }
 
+    public int getFishers() {
+        return fishers;
+    }
+
+    public void setFishers(int fishers) {
+        this.fishers = fishers;
+    }
+
     public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
         return weatherStrategy;
     }
@@ -598,4 +532,15 @@ public class PrototypeScenario implements Scenario {
             AlgorithmFactory<? extends HabitatInitializer> habitatInitializer) {
         this.habitatInitializer = habitatInitializer;
     }
+
+    public AlgorithmFactory<? extends MapInitializer> getMapInitializer() {
+        return mapInitializer;
+    }
+
+    public void setMapInitializer(
+            AlgorithmFactory<? extends MapInitializer> mapInitializer) {
+        this.mapInitializer = mapInitializer;
+    }
+
+
 }

@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * A well mixed multiple-species diffusing logistic biology initializer
  * Created by carrknight on 10/8/15.
  */
-public class WellMixedBiologyInitializer implements BiologyInitializer
+public class WellMixedBiologyInitializer extends AbstractBiologyInitializer
 {
 
     /**
@@ -63,7 +63,7 @@ public class WellMixedBiologyInitializer implements BiologyInitializer
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 

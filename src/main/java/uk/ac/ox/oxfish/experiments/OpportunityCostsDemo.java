@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightSplitInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
@@ -48,10 +49,9 @@ public class OpportunityCostsDemo {
         //world split in half
         scenario.setBiologyInitializer(biologyInitializer);
         scenario.setRegulation(regulationInitializer);
-        scenario.setCoastalRoughness(0);
         scenario.forcePortPosition(new int[]{40, 25});
         scenario.setUsePredictors(true);
-        scenario.setGridCellSizeInKm(2);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50, 50, 0, 1000000, 2));
 
 
 

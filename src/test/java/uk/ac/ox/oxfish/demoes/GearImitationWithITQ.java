@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -57,7 +58,9 @@ public class GearImitationWithITQ
         scenario.setGear(gearFactory);
 
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40, 25});
 
         scenario.setUsePredictors(true);

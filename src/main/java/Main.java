@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFact
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
@@ -130,8 +131,8 @@ class Main{
         scenario.setBiologyInitializer(new SplitInitializerFactory());
 
         scenario.setRegulation(germane);
-        scenario.setCoastalRoughness(0);
-        scenario.setGridCellSizeInKm(2);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50,50,0,1000000,2));
+
         scenario.forcePortPosition(new int[]{40, 25});
         scenario.setUsePredictors(true);
 
@@ -150,8 +151,8 @@ class Main{
 
         scenario.setFishers(100);
         scenario.setHoldSize(new FixedDoubleParameter(500));
-        scenario.setGridCellSizeInKm(2);
-        scenario.setCoastalRoughness(0);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50,50,0,1000000,2));
+
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
 
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
@@ -222,8 +223,8 @@ class Main{
         FromLeftToRightFactory biologyInitializer = new FromLeftToRightFactory();
         biologyInitializer.setBiologySmoothingIndex(new FixedDoubleParameter(100));
         scenario.setBiologyInitializer(biologyInitializer);
-        scenario.setHeight(10);
-        scenario.setWidth(10);
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(10,10,4,1000000,10));
+
 
         FishState state = new FishState(3,24);
         //i am going to ruin the spot 5-3 in order to break a tie with 6-3. This means there is a single "best" place to fish

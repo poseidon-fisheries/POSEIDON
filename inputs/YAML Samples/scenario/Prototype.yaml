@@ -5,11 +5,9 @@ Prototype:
       differentialPercentageToMove: '0.001'
       percentageLimitOnDailyMovement: '0.01'
       steepness: uniform 0.6 0.8
-  coastalRoughness: 4
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
-  depthSmoothing: 1000000
   destinationStrategy:
     Imitator-Explorator:
       ignoreEdgeDirection: true
@@ -34,11 +32,15 @@ Prototype:
       standardDeviationCatchabilityFirstSpecies: '0.0'
       standardDeviationCatchabilityOtherSpecies: '0.0'
       trawlSpeed: '5.0'
-  gridCellSizeInKm: 10.0
   habitatInitializer: All Sand
-  height: 50
   holdSize: '100.0'
   literPerKilometer: '10.0'
+  mapInitializer: !!uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory
+    cellSizeInKilometers: '10.0'
+    coastalRoughness: '4.0'
+    depthSmoothing: '1000000.0'
+    height: '50.0'
+    width: '50.0'
   mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
@@ -56,4 +58,3 @@ Prototype:
       windOrientation: '0.0'
       windSpeed: '0.0'
   weatherStrategy: Ignore Weather
-  width: 50

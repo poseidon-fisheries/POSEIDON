@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * A diffusing logistic initializer with 2 species: 1 lives on the top and one at the bottom of the map
  * Created by carrknight on 9/22/15.
  */
-public class SplitInitializer implements BiologyInitializer {
+public class SplitInitializer extends AbstractBiologyInitializer {
 
     private final  DiffusingLogisticInitializer delegate;
 
@@ -35,16 +35,16 @@ public class SplitInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 
         if(seaTile.getAltitude() < 0) {
-            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generate(biology,
-                                                                                                            seaTile,
-                                                                                                            random,
-                                                                                                            mapHeightInCells,
-                                                                                                            mapWidthInCells);
+            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generateLocal(biology,
+                                                                                           seaTile,
+                                                                                           random,
+                                                                                           mapHeightInCells,
+                                                                                           mapWidthInCells);
 
             //make the map split in half
             if (seaTile.getGridY() < mapHeightInCells / 2) {
@@ -58,11 +58,11 @@ public class SplitInitializer implements BiologyInitializer {
             return generated;
         }
         else
-            return delegate.generate(biology,
-                                     seaTile,
-                                     random,
-                                     mapHeightInCells,
-                                     mapWidthInCells);
+            return delegate.generateLocal(biology,
+                                          seaTile,
+                                          random,
+                                          mapHeightInCells,
+                                          mapWidthInCells);
 
     }
 

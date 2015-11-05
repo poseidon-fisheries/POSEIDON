@@ -115,9 +115,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
      */
     protected abstract Consumer<Pair<Fisher,Genotype<DoubleGene>>> generateFisherAdapterToNewGenotype(ScenarioEssentials result);
 
-    public void setDepthSmoothing(int depthSmoothing) {
-        delegate.setDepthSmoothing(depthSmoothing);
-    }
 
 
     public void setRegulation(
@@ -129,9 +126,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         return delegate.getRegulation();
     }
 
-    public int getHeight() {
-        return delegate.getHeight();
-    }
 
 
 
@@ -145,19 +139,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
     public void setPorts(int ports) {
         delegate.setPorts(ports);
-    }
-
-    public int getWidth() {
-        return delegate.getWidth();
-    }
-
-    public void setHeight(int height) {
-        delegate.setHeight(height);
-    }
-
-
-    public void setGridSizeInKm(double gridSizeInKm) {
-        delegate.setGridCellSizeInKm(gridSizeInKm);
     }
 
 
@@ -182,9 +163,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
 
-    public void setWidth(int width) {
-        delegate.setWidth(width);
-    }
 
     public DoubleParameter getHoldSize() {
         return delegate.getHoldSize();
@@ -195,25 +173,16 @@ public abstract class PrototypeGeneticScenario implements Scenario {
         delegate.setFishingStrategy(fishingStrategy);
     }
 
-    public int getCoastalRoughness() {
-        return delegate.getCoastalRoughness();
-    }
 
     public void setHoldSize(DoubleParameter holdSize) {
         delegate.setHoldSize(holdSize);
     }
 
-    public void setCoastalRoughness(int coastalRoughness) {
-        delegate.setCoastalRoughness(coastalRoughness);
-    }
 
     public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
         return delegate.getFishingStrategy();
     }
 
-    public int getDepthSmoothing() {
-        return delegate.getDepthSmoothing();
-    }
 
     public int getPorts() {
         return delegate.getPorts();
@@ -227,9 +196,6 @@ public abstract class PrototypeGeneticScenario implements Scenario {
 
 
 
-    public double getGridSizeInKm() {
-        return delegate.getGridCellSizeInKm();
-    }
 
     public DoubleParameter getSpeedInKmh() {
         return delegate.getSpeedInKmh();

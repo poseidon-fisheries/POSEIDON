@@ -5,6 +5,7 @@ import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -184,9 +185,11 @@ public class PolicyAndLocations
         state.setScenario(scenario);
         //world split in half
         scenario.setBiologyInitializer(biologyInitializer);
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(2d));
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40,25});
-        scenario.setGridCellSizeInKm(2); //just to give it a bit of depth
         scenario.setRegulation(regulation);
         scenario.setUsePredictors(true);
 

@@ -4,6 +4,7 @@ package uk.ac.ox.oxfish.demoes;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
@@ -43,7 +44,9 @@ public class TwoSpeciesITQSplit
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40, 25});
 
         scenario.setUsePredictors(true);
@@ -112,7 +115,9 @@ public class TwoSpeciesITQSplit
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40, 25});
 
         scenario.setUsePredictors(true);

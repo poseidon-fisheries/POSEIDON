@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * A diffusing logistic initializer where the bycatch specie only exists on the upper half of the sea.
  * Created by carrknight on 7/30/15.
  */
-public class HalfBycatchInitializer implements BiologyInitializer {
+public class HalfBycatchInitializer extends AbstractBiologyInitializer {
 
 
 
@@ -40,16 +40,16 @@ public class HalfBycatchInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 
         if(seaTile.getAltitude() < 0) {
-            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generate(biology,
-                                                                                                            seaTile,
-                                                                                                            random,
-                                                                                                            mapHeightInCells,
-                                                                                                            mapWidthInCells);
+            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generateLocal(biology,
+                                                                                           seaTile,
+                                                                                           random,
+                                                                                           mapHeightInCells,
+                                                                                           mapWidthInCells);
 
             //if you are at the top, make carrying capacity of the second specie = 0
             if (seaTile.getGridY() <= mapHeightInCells / 2)
@@ -58,11 +58,11 @@ public class HalfBycatchInitializer implements BiologyInitializer {
             return generated;
         }
         else
-            return delegate.generate(biology,
-                                     seaTile,
-                                     random,
-                                     mapHeightInCells,
-                                     mapWidthInCells);
+            return delegate.generateLocal(biology,
+                                          seaTile,
+                                          random,
+                                          mapHeightInCells,
+                                          mapWidthInCells);
 
     }
 

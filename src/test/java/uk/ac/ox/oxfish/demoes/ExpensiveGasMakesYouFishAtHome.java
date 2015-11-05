@@ -4,6 +4,7 @@ package uk.ac.ox.oxfish.demoes;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -27,7 +28,9 @@ public class ExpensiveGasMakesYouFishAtHome
 
         scenario.setFishers(100);
         scenario.setHoldSize(new FixedDoubleParameter(500));
-        scenario.setGridCellSizeInKm(2);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(2d));
+        scenario.setMapInitializer(simpleMap);
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
 
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();

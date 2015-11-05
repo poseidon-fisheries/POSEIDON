@@ -26,10 +26,10 @@ public class WellMixedBiologyInitializerTest {
 
 
         SeaTile tile = mock(SeaTile.class);
-        LogisticLocalBiology biology = (LogisticLocalBiology) initializer.generate(mock(GlobalBiology.class),
-                                                    tile,
-                                                    new MersenneTwisterFast(), 50,
-                                                     50);
+        LogisticLocalBiology biology = (LogisticLocalBiology) initializer.generateLocal(mock(GlobalBiology.class),
+                                                                                        tile,
+                                                                                        new MersenneTwisterFast(), 50,
+                                                                                        50);
 
 
         Species zero = new Species("zero"); zero.resetIndexTo(0);

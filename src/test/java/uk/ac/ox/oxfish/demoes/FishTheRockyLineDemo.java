@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HabitatAwareGearFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.habitat.RockyRectanglesHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.RockyRectanglesHabitatInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -41,8 +42,9 @@ public class FishTheRockyLineDemo {
             //spent in the border to be below 60%
             scenario.setGear(gear);
             scenario.setBiologyInitializer(new RockyLogisticFactory());
-            scenario.setGridCellSizeInKm(2);
-
+            SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+            simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(2d));
+            scenario.setMapInitializer(simpleMap);
 
             state = new FishState(System.currentTimeMillis());
             state.setScenario(scenario);

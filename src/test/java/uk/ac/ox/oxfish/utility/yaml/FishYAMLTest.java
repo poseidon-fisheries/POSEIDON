@@ -29,14 +29,12 @@ public class FishYAMLTest {
                         "  biologyInitializer:\n" +
                         "    Diffusing Logistic:\n" +
                         "      carryingCapacity: '14.0'\n" +
-                        "      differentialPercentageToMove: '5.0E-4'\n" +
+                        "      differentialPercentageToMove: '0.001'\n" +
                         "      percentageLimitOnDailyMovement: '0.01'\n" +
-                        "      steepness: .7\n" +
-                        "  coastalRoughness: 4\n" +
+                        "      steepness: 0.7\n" +
                         "  departingStrategy:\n" +
                         "    Fixed Rest:\n" +
                         "      hoursBetweenEachDeparture: '12.0'\n" +
-                        "  depthSmoothing: 1000000\n" +
                         "  destinationStrategy:\n" +
                         "    Imitator-Explorator:\n" +
                         "      ignoreEdgeDirection: true\n" +
@@ -61,11 +59,15 @@ public class FishYAMLTest {
                         "      standardDeviationCatchabilityFirstSpecies: '0.0'\n" +
                         "      standardDeviationCatchabilityOtherSpecies: '0.0'\n" +
                         "      trawlSpeed: '5.0'\n" +
-                        "  gridCellSizeInKm: 10.0\n" +
                         "  habitatInitializer: All Sand\n" +
-                        "  height: 50\n" +
                         "  holdSize: '100.0'\n" +
                         "  literPerKilometer: '10.0'\n" +
+                        "  mapInitializer: !!uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory\n" +
+                        "    cellSizeInKilometers: '10.0'\n" +
+                        "    coastalRoughness: '4.0'\n" +
+                        "    depthSmoothing: '1000000.0'\n" +
+                        "    height: '50.0'\n" +
+                        "    width: '50.0'\n" +
                         "  mapMakerDedicatedRandomSeed: null\n" +
                         "  market:\n" +
                         "    Fixed Price Market:\n" +
@@ -82,8 +84,7 @@ public class FishYAMLTest {
                         "      temperature: '30.0'\n" +
                         "      windOrientation: '0.0'\n" +
                         "      windSpeed: '0.0'\n" +
-                        "  weatherStrategy: Ignore Weather\n" +
-                        "  width: 50\n";
+                        "  weatherStrategy: Ignore Weather";
 
         FishYAML yaml = new FishYAML();
         final Object loaded = yaml.loadAs(scenarioFile, Scenario.class);

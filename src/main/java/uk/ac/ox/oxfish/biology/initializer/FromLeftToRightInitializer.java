@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * Creates fixed local biologies that are much richer on the left side of the map than on the right
  * Created by carrknight on 6/22/15.
  */
-public class FromLeftToRightInitializer implements BiologyInitializer {
+public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
 
 
     /**
@@ -46,7 +46,7 @@ public class FromLeftToRightInitializer implements BiologyInitializer {
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells)
     {

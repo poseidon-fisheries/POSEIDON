@@ -27,7 +27,7 @@ public interface BiologyInitializer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells width of the map
      */
-    LocalBiology generate(
+    LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells);
 
@@ -44,9 +44,11 @@ public interface BiologyInitializer
 
 
     /**
-     * Get a list of the species with their names. The size of this array determines the size of the model array
-     * @return
+     * creates the global biology object for the model
+     * @param random the random number generator
+     * @param modelBeingInitialized the model we are in the process of initializing
+     * @return a global biology object
      */
-    String[] getSpeciesNames();
+    GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized);
 
 }

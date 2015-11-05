@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -121,7 +122,9 @@ public class EffortThrottling {
         scenario.setBiologyInitializer(biologyInitializer);
 
         //change distances
-        scenario.setGridCellSizeInKm(1d);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(1d));
+        scenario.setMapInitializer(simpleMap);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(0.5));
 
         //set very low price

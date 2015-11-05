@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * in the map
  * Created by carrknight on 9/29/15.
  */
-public class RockyLogisticInitializer implements BiologyInitializer
+public class RockyLogisticInitializer extends AbstractBiologyInitializer
 {
 
 
@@ -64,7 +64,7 @@ public class RockyLogisticInitializer implements BiologyInitializer
      * @param mapWidthInCells  width of the map
      */
     @Override
-    public LocalBiology generate(
+    public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
         if(seaTile.getAltitude() >=0)

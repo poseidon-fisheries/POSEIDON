@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FixedFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.runs.BeanFisherModification;
 import uk.ac.ox.oxfish.model.runs.Experiment;
@@ -45,7 +46,7 @@ public class FindBestPositions {
 
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get("From Left To Right Fixed").get());
-
+        scenario.setMapInitializer(new SimpleMapInitializerFactory(50, 50, 4, 1000000, 10));
         scenario.setDestinationStrategy(new RandomFavoriteDestinationFactory());
         scenario.setFishers(NUMBER_OF_FISHERS);
 
@@ -105,8 +106,8 @@ public class FindBestPositions {
             //this will proceed by A-B trial
             Consumer<FishState> aCondition = getAllPreviouslyAcceptedConditions();
             Consumer<FishState> newCondition = generateExperimentCondition(randomizer, fisherToChange,
-                                                                           scenario.getWidth(),
-                                                                           scenario.getHeight());
+                                                                           50,
+                                                                           50);
             Consumer<FishState> bCondition = getAllPreviouslyAcceptedConditions().andThen(newCondition);
 
             //run the two experiments

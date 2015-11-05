@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.experiments;
 import sim.display.Console;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -157,7 +158,9 @@ public class TwoSpeciesITQ
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40,25});
         //try also 40,25
 
@@ -196,7 +199,9 @@ public class TwoSpeciesITQ
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40,25});
         //try also 40,25
 
@@ -255,7 +260,9 @@ public class TwoSpeciesITQ
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
 
-        scenario.setCoastalRoughness(0);
+        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
+        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
+        scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40,25});
         //try also 40,25
 
