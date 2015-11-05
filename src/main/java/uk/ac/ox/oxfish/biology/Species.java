@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.biology;
 
 /**
- * A collection of all information regarding a specie (for now just a name)
+ * A collection of all information regarding a species (for now just a name)
  * Created by carrknight on 4/11/15.
  */
-public class Specie {
+public class Species {
 
     private final String name;
 
@@ -13,7 +13,7 @@ public class Specie {
      */
     private int index;
 
-    public Specie(String name) {
+    public Species(String name) {
         this.name = name;
     }
 

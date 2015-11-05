@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -31,9 +31,9 @@ public class HabitatAwareRandomCatchabilityTest
 
 
         SeaTile tile = mock(SeaTile.class);
-        Specie specie = new Specie("0");
-        GlobalBiology biology = new GlobalBiology(specie);
-        when(tile.getBiomass(specie)).thenReturn(100d);
+        Species species = new Species("0");
+        GlobalBiology biology = new GlobalBiology(species);
+        when(tile.getBiomass(species)).thenReturn(100d);
         when(tile.getRockyPercentage()).thenReturn(1d);
 
 
@@ -41,9 +41,9 @@ public class HabitatAwareRandomCatchabilityTest
         when(fisher.grabRandomizer()).thenReturn(new MersenneTwisterFast());
         Catch fishCaught = gear.fish(fisher, tile, 1, biology);
 
-        Assert.assertEquals(20,fishCaught.getPoundsCaught(specie),.01);
+        Assert.assertEquals(20, fishCaught.getPoundsCaught(species), .01);
         when(tile.getRockyPercentage()).thenReturn(0d);
-        Assert.assertEquals(10,gear.fish(fisher, tile, 1, biology).getPoundsCaught(specie),.01);
+        Assert.assertEquals(10, gear.fish(fisher, tile, 1, biology).getPoundsCaught(species), .01);
 
 
 

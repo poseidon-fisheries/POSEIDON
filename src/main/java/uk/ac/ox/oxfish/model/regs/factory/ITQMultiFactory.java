@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -108,11 +108,11 @@ public class ITQMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
             @Override
             public void reactToSale(
-                    Specie specie, Fisher seller, double biomass, double revenue) {
-                super.reactToSale(specie, seller, biomass, revenue);
+                    Species species, Fisher seller, double biomass, double revenue) {
+                super.reactToSale(species, seller, biomass, revenue);
                 if(biomass>0)
                 {
-                    double lastClosingPrice = orderBooks[specie.getIndex()].getLastClosingPrice();
+                    double lastClosingPrice = orderBooks[species.getIndex()].getLastClosingPrice();
 
                     if(Double.isFinite(lastClosingPrice))
                     {

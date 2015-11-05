@@ -38,13 +38,13 @@ public class OsmoseMapMaker{
         ObjectGrid2D baseGrid =  new ObjectGrid2D(width,
                                                   height);
 
-        //the 10 rightmost patches are land, the rest is sea
+        //Create sea tiles by reading them from the simulation map
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {
                 final Cell cell = osmoseMap.getCell(x, height-y-1);
                 final SeaTile seaTile = cell.isLand() ?
-                        new SeaTile(x, y, 20, new TileHabitat(0d)) :
-                        new SeaTile(x, y, -20, new TileHabitat(0d));
+                        new SeaTile(x, y, 200, new TileHabitat(0d)) :
+                        new SeaTile(x, y, -200, new TileHabitat(0d));
                 final LocalOsmoseBiology biology = new LocalOsmoseBiology(simulation.getMortality(),
                                                                           simulation.getCounter().getBiomass(x, height-y-1),
                                                                           simulation.getNumberOfSpecies(),

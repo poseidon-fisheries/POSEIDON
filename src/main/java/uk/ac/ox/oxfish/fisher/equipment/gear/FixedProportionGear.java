@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -31,12 +31,13 @@ public class FixedProportionGear implements Gear
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
 
         double[] caught = new double[modelBiology.getSize()];
-        for (Specie specie : modelBiology.getSpecies())
+        for (Species species : modelBiology.getSpecies())
         {
-            double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionFished * where.getBiomass(specie));
+            double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionFished * where.getBiomass(
+                    species));
             if(poundsCaught>0) {
-                where.reactToThisAmountOfBiomassBeingFished(specie, poundsCaught);
-                caught[specie.getIndex()] = poundsCaught;
+                where.reactToThisAmountOfBiomassBeingFished(species, poundsCaught);
+                caught[species.getIndex()] = poundsCaught;
             }
 
         }

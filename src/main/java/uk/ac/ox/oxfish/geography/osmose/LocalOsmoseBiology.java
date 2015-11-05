@@ -6,7 +6,7 @@ import fr.ird.osmose.School;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -41,15 +41,15 @@ public class LocalOsmoseBiology implements LocalBiology
     }
 
     /**
-     * the biomass at this location for a single specie.
+     * the biomass at this location for a single species.
      *
-     * @param specie the specie you care about
-     * @return the biomass of this specie
+     * @param species the species you care about
+     * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Specie specie) {
+    public Double getBiomass(Species species) {
 
-        final double currentBiomass = counter.getBiomass(specie.getIndex()) - biomassAlreadyFished[specie.getIndex()];
+        final double currentBiomass = counter.getBiomass(species.getIndex()) - biomassAlreadyFished[species.getIndex()];
         assert  currentBiomass >= -FishStateUtilities.EPSILON;
         return currentBiomass;
 
@@ -61,26 +61,26 @@ public class LocalOsmoseBiology implements LocalBiology
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      *
-     * @param specie        the specie fished
+     * @param species        the species fished
      * @param biomassFished the biomass fished
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished)
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished)
     {
-        //this is the biomass available for this specie
-        double biomassAvailable = counter.getBiomass(specie.getIndex())-
-                biomassAlreadyFished[specie.getIndex()] ;
+        //this is the biomass available for this species
+        double biomassAvailable = counter.getBiomass(species.getIndex())-
+                biomassAlreadyFished[species.getIndex()] ;
         //you can't fish MORE than what is available right now
         Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
                                     "can't fish this much!");
 
-        //get all the schools of fish that belong to this specie
-        List<School> schools = counter.getSchoolsPerSpecie(specie.getIndex());
+        //get all the schools of fish that belong to this species
+        List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
 
         //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
         //variable I have
         assert Math.abs(schools.stream().mapToDouble(School::getInstantaneousBiomass).sum()
-                                -biomassAvailable-biomassAlreadyFished[specie.getIndex()])
+                                -biomassAvailable-biomassAlreadyFished[species.getIndex()])
                                 < FishStateUtilities.EPSILON;
 
         //shuffle the school
@@ -121,7 +121,7 @@ public class LocalOsmoseBiology implements LocalBiology
 
 
         //count the biomass as fished!
-        biomassAlreadyFished[specie.getIndex()]+=biomassFished;
+        biomassAlreadyFished[species.getIndex()]+=biomassFished;
 
     }
 

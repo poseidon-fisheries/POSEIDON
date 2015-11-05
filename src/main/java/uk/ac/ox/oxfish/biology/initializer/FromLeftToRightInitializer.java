@@ -98,8 +98,14 @@ public class FromLeftToRightInitializer implements BiologyInitializer {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
 
+    /**
+     * Singleton array with "species 0" in it
+     *
+     * @return
+     */
     @Override
-    public int getNumberOfSpecies() {
-        return 1;
+    public String[] getSpeciesNames() {
+        return new String[]{"Species 0"};
     }
+
 }

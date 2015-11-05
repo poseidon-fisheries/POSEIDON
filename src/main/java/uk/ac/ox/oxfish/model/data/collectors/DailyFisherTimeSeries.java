@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
 import sim.engine.SimState;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -47,12 +47,12 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
         }},Double.NaN);
 
 
-        for(Specie specie : state.getSpecies())
+        for(Species species : state.getSpecies())
         {
-            final String landings = specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+            final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
 
             registerGatherer(landings,
-                             fisher -> fisher.getDailyCounter().getLandingsPerSpecie(specie.getIndex()),
+                             fisher -> fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex()),
                              Double.NaN);
 
         }

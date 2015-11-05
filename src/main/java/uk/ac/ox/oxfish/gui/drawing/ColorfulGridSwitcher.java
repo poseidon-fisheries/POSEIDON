@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.gui.drawing;
 
 import sim.display.Display2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -29,8 +29,8 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
         String initialSelection = "Depth";
         addItem(initialSelection);
         addItem("Habitat");
-        for(Specie specie : biology.getSpecies()) {
-            addItem(specie.getName());
+        for(Species species : biology.getSpecies()) {
+            addItem(species.getName());
         }
         setSelectedItem(initialSelection);
 

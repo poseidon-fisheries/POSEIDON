@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -42,7 +42,7 @@ public class RandomCatchabilityTrawlFactoryTest {
         when(tile.getBiomass(any())).thenReturn(1000d);
         when(random.nextGaussian()).thenReturn(0d); //no deviation
 
-        GlobalBiology biology = new GlobalBiology(new Specie("test"));
+        GlobalBiology biology = new GlobalBiology(new Species("test"));
         assertEquals(500, thrawl.fish(mock, tile, 1, biology).getPoundsCaught(0), .0001d);
         when(random.nextGaussian()).thenReturn(2d); //no deviation
         assertEquals(700, thrawl.fish(mock, tile, 1, biology).getPoundsCaught(0), .0001d);

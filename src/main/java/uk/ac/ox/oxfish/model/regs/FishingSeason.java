@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -51,7 +51,7 @@ public class FishingSeason implements Regulation
      * can sell anything as long as the fishing season is open
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Specie specie, FishState model) {
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
         if(seasonOpen(model))
             return Double.MAX_VALUE;
         else
@@ -78,7 +78,7 @@ public class FishingSeason implements Regulation
      * nothing
      */
     @Override
-    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
 
     }
 

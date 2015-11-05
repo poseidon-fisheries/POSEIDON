@@ -47,6 +47,7 @@ public class AStarPathfinder implements Pathfinder {
 
 
 
+
         //where we will eventually put the path
         LinkedList<SeaTile> path = new LinkedList<>();
 
@@ -76,7 +77,7 @@ public class AStarPathfinder implements Pathfinder {
             {
                 SeaTile neighbor = ((SeaTile) next);
 
-                if(neighbor.getAltitude() >= 0) //don't bother if it's land
+                if(neighbor.getAltitude() >= 0 && neighbor != end) //don't bother if it's land
                     continue;
 
                 //check how much it would cost to move there

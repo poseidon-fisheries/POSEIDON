@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
@@ -81,8 +81,8 @@ public class Hold {
         return tonnesCarried;
     }
 
-    public double getPoundsCarried(Specie specie) {
-        return fishHold[specie.getIndex()];
+    public double getPoundsCarried(Species species) {
+        return fishHold[species.getIndex()];
     }
 
 

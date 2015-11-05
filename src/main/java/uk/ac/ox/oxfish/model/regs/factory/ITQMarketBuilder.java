@@ -58,11 +58,11 @@ public class ITQMarketBuilder  implements Startable
         //create the market
         market.start(model);
         //gather market data
-        model.getDailyDataSet().registerGatherer("ITQ Trades Of Specie " + speciesIndex, state1 -> market.getDailyMatches(),
+        model.getDailyDataSet().registerGatherer("ITQ Trades Of Species " + speciesIndex, state1 -> market.getDailyMatches(),
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Prices Of Specie " + speciesIndex, state1 -> market.getDailyAveragePrice(),
+        model.getDailyDataSet().registerGatherer("ITQ Prices Of Species " + speciesIndex, state1 -> market.getDailyAveragePrice(),
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of Specie " + speciesIndex, state1 -> market.getLastClosingPrice(),
+        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of Species " + speciesIndex, state1 -> market.getLastClosingPrice(),
                                                  Double.NaN);
 
         //and give to each fisher a price-maker

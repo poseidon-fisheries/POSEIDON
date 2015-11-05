@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
@@ -24,8 +24,8 @@ public class FromLeftToRightInitializerTest {
         SeaTile middle = new SeaTile(50,0,-1, new TileHabitat(0d));
         SeaTile right = new SeaTile(100,0,-1, new TileHabitat(0d));
         FromLeftToRightInitializer initializer = new FromLeftToRightInitializer(5000,1);
-        final Specie specie = new Specie("Specie0");
-        GlobalBiology biology = new GlobalBiology(specie);
+        final Species species = new Species("Specie0");
+        GlobalBiology biology = new GlobalBiology(species);
 
         left.setBiology(
                 initializer.generate(biology,left,new MersenneTwisterFast(System.currentTimeMillis()),100,100)
@@ -40,7 +40,7 @@ public class FromLeftToRightInitializerTest {
         );
 
 
-        assertTrue(left.getBiomass(specie)> middle.getBiomass(specie));
-        assertTrue(middle.getBiomass(specie)> right.getBiomass(specie));
+        assertTrue(left.getBiomass(species)> middle.getBiomass(species));
+        assertTrue(middle.getBiomass(species)> right.getBiomass(species));
     }
 }

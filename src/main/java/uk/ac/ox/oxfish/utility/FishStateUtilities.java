@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.utility;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -323,13 +323,13 @@ public class FishStateUtilities {
     }
 
     public static double catchSpecieGivenCatchability(
-            SeaTile where, double hoursSpentFishing, Specie specie, double q) {
+            SeaTile where, double hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
         //catch
-        double specieCatch = where.getBiomass(specie) * q * hoursSpentFishing;
+        double specieCatch = where.getBiomass(species) * q * hoursSpentFishing;
         //tell biomass
         if(specieCatch> 0)
-            where.reactToThisAmountOfBiomassBeingFished(specie,specieCatch);
+            where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);
 
         return specieCatch;
 

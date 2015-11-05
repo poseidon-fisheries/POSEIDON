@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
 public class FunctionalFriendsDemo {
@@ -65,18 +64,18 @@ public class FunctionalFriendsDemo {
         FishState state = new FishState(seed, 1);
         state.setScenario(scenario);
         state.start();
-        Specie onlySpecie = state.getBiology().getSpecie(0);
+        Species onlySpecies = state.getBiology().getSpecie(0);
         final double minimumBiomass = state.getTotalBiomass(
-                onlySpecie) * .05; //how much does it take to eat 95% of all the fish?
+                onlySpecies) * .05; //how much does it take to eat 95% of all the fish?
 
 
         int steps = 0;
         for (steps = 0; steps < maxSteps; steps++) {
             state.schedule.step(state);
-            if (state.getTotalBiomass(onlySpecie) <= minimumBiomass)
+            if (state.getTotalBiomass(onlySpecies) <= minimumBiomass)
                 break;
         }
-        //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecie));
+        //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecies));
         return steps;
 
 

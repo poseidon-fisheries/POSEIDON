@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -114,13 +114,13 @@ public class CongestedMarket extends AbstractMarket implements Steppable{
     @Override
     protected TradeInfo sellFishImplementation(
             double biomass, Fisher fisher, Regulation regulation, FishState state,
-            Specie specie) {
+            Species species) {
 
         //find out legal biomass sold
         double biomassActuallySellable = Math.min(biomass,
-                                                  regulation.maximumBiomassSellable(fisher, specie, state));
+                                                  regulation.maximumBiomassSellable(fisher, species, state));
         if(biomassActuallySellable <=0)
-            return new TradeInfo(0,specie,0);
+            return new TradeInfo(0, species, 0);
 
 
         biomassHere+=biomassActuallySellable;
@@ -131,10 +131,10 @@ public class CongestedMarket extends AbstractMarket implements Steppable{
         fisher.earn(revenue);
 
         //tell regulation
-        regulation.reactToSale(specie,fisher , biomassActuallySellable, revenue);
+        regulation.reactToSale(species, fisher , biomassActuallySellable, revenue);
 
         //return biomass sellable
-        return new TradeInfo(biomassActuallySellable,specie,revenue);
+        return new TradeInfo(biomassActuallySellable, species, revenue);
 
 
 

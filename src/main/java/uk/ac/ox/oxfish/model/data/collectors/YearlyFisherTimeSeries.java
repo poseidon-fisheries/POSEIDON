@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -55,9 +55,9 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
                          fisher -> observed.getYearlyCounterColumn(FUEL_CONSUMPTION),Double.NaN);
 
         //also aggregate
-        for(Specie specie : state.getSpecies())
+        for(Species species : state.getSpecies())
         {
-            final String landings = specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+            final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
             registerGatherer(landings,
                              FishStateUtilities.generateYearlySum(observed.getDailyData().getColumn(
                                      landings))

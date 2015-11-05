@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -81,13 +81,13 @@ public class Port {
 
 
     /**
-     * get the marginal price of the market associated with this specie
-     * @param specie
+     * get the marginal price of the market associated with this species
+     * @param species
      * @return
      */
-    public double getMarginalPrice(Specie specie)
+    public double getMarginalPrice(Species species)
     {
-        return marketMap.getMarket(specie).getMarginalPrice();
+        return marketMap.getMarket(species).getMarginalPrice();
     }
 
     /**
@@ -118,8 +118,8 @@ public class Port {
         return marketMap;
     }
 
-    public Market getMarket(Specie specie) {
-        return marketMap.getMarket(specie);
+    public Market getMarket(Species species) {
+        return marketMap.getMarket(species);
     }
 
     public double getGasPricePerLiter() {

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightSplitInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
@@ -95,11 +95,11 @@ public class OpportunityCostsDemo {
 
         final FishState state = new FishState(0);
         ITQSpecificFactory regs = new ITQSpecificFactory(){
-            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+            public void computeOpportunityCosts(Species specie, Fisher seller, double biomass, double revenue,
                                                 SpecificQuotaRegulation regulation, ITQOrderBook market)
             {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     double lastClosingPrice = -10 + 20* state.getDayOfTheYear() /365d ;
                     if(Double.isFinite(lastClosingPrice))
@@ -122,11 +122,11 @@ public class OpportunityCostsDemo {
 
         final FishState state2 = new FishState(0);
         ITQSpecificFactory regs2 = new ITQSpecificFactory(){
-            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+            public void computeOpportunityCosts(Species specie, Fisher seller, double biomass, double revenue,
                                                 SpecificQuotaRegulation regulation, ITQOrderBook market)
             {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     double lastClosingPrice = -10 + 20* state2.getDayOfTheYear() /365d ;
                     if(Double.isFinite(lastClosingPrice))
@@ -160,11 +160,11 @@ public class OpportunityCostsDemo {
         final FishState state = new FishState(0);
         //world split in half
         ITQSpecificFactory regs = new ITQSpecificFactory(){
-            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+            public void computeOpportunityCosts(Species specie, Fisher seller, double biomass, double revenue,
                                                 SpecificQuotaRegulation regulation, ITQOrderBook market)
             {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     double lastClosingPrice = state.getYear() <= 3d ? 10d :  state.getYear() <= 6d ? 0 : -10d;
                     if(Double.isFinite(lastClosingPrice))
@@ -192,11 +192,11 @@ public class OpportunityCostsDemo {
 
         final FishState state2 = new FishState(0);
         ITQSpecificFactory regs2 = new ITQSpecificFactory(){
-            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+            public void computeOpportunityCosts(Species specie, Fisher seller, double biomass, double revenue,
                                                 SpecificQuotaRegulation regulation, ITQOrderBook market)
             {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     double lastClosingPrice = state2.getYear() <= 3d ? 10d :  state2.getYear() <= 6d ? 0 : -10d;
                     if(Double.isFinite(lastClosingPrice))
@@ -256,7 +256,7 @@ public class OpportunityCostsDemo {
              */
             @Override
             public void computeOpportunityCosts(
-                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
                     ITQOrderBook market) {
             }
         };
@@ -271,7 +271,7 @@ public class OpportunityCostsDemo {
              */
             @Override
             public void computeOpportunityCosts(
-                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
                     ITQOrderBook market) {
             }
         };

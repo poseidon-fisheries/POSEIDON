@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -35,7 +35,7 @@ public class ITQCaresAboutMileage {
                                                          5, seed);
 
         //the correlation ought to be very small
-        Specie specie = state.getSpecies().get(0);
+        Species species = state.getSpecies().get(0);
 
         double[] mileage = new double[state.getFishers().size()];
         double[] catches =  new double[state.getFishers().size()];
@@ -45,7 +45,7 @@ public class ITQCaresAboutMileage {
         {
             mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed());
             catches[i] = fisher.getLatestYearlyObservation(
-                    specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 
             i++;
         }
@@ -57,7 +57,7 @@ public class ITQCaresAboutMileage {
 
 
         //make sure the same number of landings is recorded in the market
-        DataColumn marketData = state.getPorts().iterator().next().getMarket(specie).getData().getColumn(
+        DataColumn marketData = state.getPorts().iterator().next().getMarket(species).getData().getColumn(
                 AbstractMarket.LANDINGS_COLUMN_NAME);
         Iterator<Double> doubleIterator = marketData.descendingIterator();
         double landedCatches = 0;

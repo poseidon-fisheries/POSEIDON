@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 
 import java.util.Arrays;
 
@@ -17,14 +17,14 @@ public class Catch {
     private final double[] catchMap;
 
     /**
-     * single specie catch
-     * @param specie the specie caught
+     * single species catch
+     * @param species the species caught
      * @param poundsCaught the pounds that have been caugh
      */
-    public Catch(Specie specie, double poundsCaught, GlobalBiology biology) {
+    public Catch(Species species, double poundsCaught, GlobalBiology biology) {
         Preconditions.checkState(poundsCaught >=0);
         catchMap = new double[biology.getSize()];
-        catchMap[specie.getIndex()] = poundsCaught;
+        catchMap[species.getIndex()] = poundsCaught;
     }
 
     public Catch(double[] catches)
@@ -33,9 +33,9 @@ public class Catch {
         this.catchMap = catches;
     }
 
-    public double getPoundsCaught(Specie specie)
+    public double getPoundsCaught(Species species)
     {
-        return catchMap[specie.getIndex()];
+        return catchMap[species.getIndex()];
     }
 
     public double getPoundsCaught(int index)

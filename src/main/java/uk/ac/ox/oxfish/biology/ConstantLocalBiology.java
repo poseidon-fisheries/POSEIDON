@@ -18,7 +18,7 @@ public class ConstantLocalBiology implements LocalBiology {
      * returned the fixed biomass
      */
     @Override
-    public Double getBiomass(Specie specie) {
+    public Double getBiomass(Species species) {
         return fixedBiomass;
     }
 
@@ -26,7 +26,7 @@ public class ConstantLocalBiology implements LocalBiology {
      * nothing happens
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished)
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished)
     {
 
     }

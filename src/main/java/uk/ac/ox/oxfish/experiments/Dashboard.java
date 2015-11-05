@@ -142,7 +142,7 @@ public class Dashboard
 
         //write to file
         File outputFile = outputPath.resolve(outputName + "_" + run + ".csv").toFile();
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Specie 0"),
+        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species 0"),
                                                 outputFile);
 
 

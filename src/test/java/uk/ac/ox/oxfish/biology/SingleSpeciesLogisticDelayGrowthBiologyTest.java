@@ -7,13 +7,13 @@ import uk.ac.ox.oxfish.model.FishState;
 import static org.mockito.Mockito.mock;
 
 
-public class SingleSpecieLogisticDelayGrowthBiologyTest {
+public class SingleSpeciesLogisticDelayGrowthBiologyTest {
 
 
     @Test
     public void nofishing() throws Exception {
 
-        Specie aaa = new Specie("aaa");
+        Species aaa = new Species("aaa");
         SingleSpecieLogisticDelayGrowthBiology biology = new SingleSpecieLogisticDelayGrowthBiology(
                 aaa,
                 1000,
@@ -43,7 +43,7 @@ public class SingleSpecieLogisticDelayGrowthBiologyTest {
     @Test
     public void suddenlyFishing() throws Exception {
 
-        Specie aaa = new Specie("aaa");
+        Species aaa = new Species("aaa");
         SingleSpecieLogisticDelayGrowthBiology biology = new SingleSpecieLogisticDelayGrowthBiology(
                 aaa,
                 1000,

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
@@ -64,9 +64,9 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
              * in addition tell the fisher to count opportunity costs
              */
             @Override
-            public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
+            public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
                 //do the usual stuff
-                super.reactToSale(specie, seller, biomass, revenue);
+                super.reactToSale(species, seller, biomass, revenue);
 
                 //account for opportunity costs
                 if(biomass > 0)

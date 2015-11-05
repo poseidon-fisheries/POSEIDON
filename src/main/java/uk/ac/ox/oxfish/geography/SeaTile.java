@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.geography;
 
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
@@ -105,21 +105,21 @@ public class SeaTile implements Startable{
     }
 
     /**
-     * the biomass at this location for a single specie.
-     * @param specie  the specie you care about
-     * @return the biomass of this specie
+     * the biomass at this location for a single species.
+     * @param species  the species you care about
+     * @return the biomass of this species
      */
-    public Double getBiomass(Specie specie) {
-        return biology.getBiomass(specie);
+    public Double getBiomass(Species species) {
+        return biology.getBiomass(species);
     }
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     * @param specie the specie fished
+     * @param species the species fished
      * @param biomassFished the biomass fished
      */
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
-        biology.reactToThisAmountOfBiomassBeingFished(specie, biomassFished);
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+        biology.reactToThisAmountOfBiomassBeingFished(species, biomassFished);
     }
 
 

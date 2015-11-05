@@ -2,9 +2,8 @@ package uk.ac.ox.oxfish.model.market;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -12,7 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * A simple map Specie ---> Market
+ * A simple map Species ---> Market
  * Created by carrknight on 5/3/15.
  */
 public class MarketMap {
@@ -24,22 +23,22 @@ public class MarketMap {
         marketList = new Market[biology.getSize()];
     }
 
-    public void addMarket(Specie specie, Market market)
+    public void addMarket(Species species, Market market)
     {
-        Preconditions.checkArgument( marketList[specie.getIndex()]==null);
-        marketList[specie.getIndex()]=market;
+        Preconditions.checkArgument( marketList[species.getIndex()]==null);
+        marketList[species.getIndex()]=market;
     }
 
-    public Market getMarket(Specie specie)
+    public Market getMarket(Species species)
     {
-        return marketList[specie.getIndex()];
+        return marketList[species.getIndex()];
     }
 
 
-    public TradeInfo sellFish(Specie specie, double biomass, Fisher fisher,
+    public TradeInfo sellFish(Species species, double biomass, Fisher fisher,
                               Regulation regulation, FishState state)
     {
-        return marketList[specie.getIndex()].sellFish(biomass,fisher,regulation,state,specie);
+        return marketList[species.getIndex()].sellFish(biomass, fisher, regulation, state, species);
 
     }
 

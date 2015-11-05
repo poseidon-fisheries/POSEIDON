@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -22,7 +22,7 @@ public class Anarchy implements Regulation {
      *  return maximum double
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Specie specie, FishState model) {
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
         return Double.MAX_VALUE;
     }
 
@@ -46,7 +46,7 @@ public class Anarchy implements Regulation {
      * no reaction
      */
     @Override
-    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
 
     }
 

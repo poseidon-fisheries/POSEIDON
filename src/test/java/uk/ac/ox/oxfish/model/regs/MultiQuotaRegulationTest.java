@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -21,8 +21,8 @@ public class MultiQuotaRegulationTest {
         FishState model = mock(FishState.class);
         MultiQuotaRegulation regs = new MultiQuotaRegulation(new double[]{1d,2d}, model);
         Fisher fisher = mock(Fisher.class);
-        Specie zero = new Specie("zero"); zero.resetIndexTo(0);
-        Specie one = new Specie("one"); one.resetIndexTo(1);
+        Species zero = new Species("zero"); zero.resetIndexTo(0);
+        Species one = new Species("one"); one.resetIndexTo(1);
 
 
         assertTrue(regs.allowedAtSea(fisher, model));
@@ -53,8 +53,8 @@ public class MultiQuotaRegulationTest {
         FishState model = mock(FishState.class);
         MultiQuotaRegulation regs = new MultiQuotaRegulation(new double[]{1d,2d}, model);
         Fisher fisher = mock(Fisher.class);
-        Specie zero = new Specie("zero"); zero.resetIndexTo(0);
-        Specie one = new Specie("one"); one.resetIndexTo(1);
+        Species zero = new Species("zero"); zero.resetIndexTo(0);
+        Species one = new Species("one"); one.resetIndexTo(1);
 
 
         assertTrue(regs.allowedAtSea(fisher, model));

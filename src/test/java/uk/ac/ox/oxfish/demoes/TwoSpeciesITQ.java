@@ -90,7 +90,7 @@ public class TwoSpeciesITQ {
             //red quotas are cheap
             double highestRed = 0;
             Iterator<Double> redIterator = state.getDailyDataSet().getColumn(
-                    "ITQ Prices Of Specie " + 0).descendingIterator();
+                    "ITQ Prices Of Species " + 0).descendingIterator();
             for (int i = 0; i < 365; i++) {
                 double current = redIterator.next();
                 if (Double.isFinite(current) && current > highestRed)
@@ -102,7 +102,7 @@ public class TwoSpeciesITQ {
             //blue quotas are pricey!
             double highestBlue = 0;
             Iterator<Double> blueIterator = state.getDailyDataSet().getColumn(
-                    "ITQ Prices Of Specie " + 1).descendingIterator();
+                    "ITQ Prices Of Species " + 1).descendingIterator();
             for (int i = 0; i < 365; i++) {
                 double current = blueIterator.next();
                 if (Double.isFinite(current) && current > highestBlue)

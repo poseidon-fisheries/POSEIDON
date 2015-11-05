@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.regs;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -48,17 +48,17 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
 
     /**
-     * how much of this specie biomass is sellable. Zero means it is unsellable
+     * how much of this species biomass is sellable. Zero means it is unsellable
      *
      * @param agent  the fisher selling its catch
-     * @param specie the specie we are being asked about
+     * @param species the species we are being asked about
      * @param model  a link to the model
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Specie specie, FishState model) {
-        return quotaRemaining[specie.getIndex()];
+            Fisher agent, Species species, FishState model) {
+        return quotaRemaining[species.getIndex()];
     }
 
 
@@ -103,15 +103,15 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     /**burn through quotas; because of "maximum biomass sellable"  method, I expect here that the biomass
      * sold is less or equal to the quota available
      *
-     * @param specie  the specie of fish sold
+     * @param species  the species of fish sold
      * @param seller  agent selling the fish
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
-        quotaRemaining[specie.getIndex()]-=biomass;
-        Preconditions.checkArgument(quotaRemaining[specie.getIndex()]>=0);
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+        quotaRemaining[species.getIndex()]-=biomass;
+        Preconditions.checkArgument(quotaRemaining[species.getIndex()]>=0);
     }
 
     /**

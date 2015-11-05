@@ -70,7 +70,7 @@ public class FromLeftToRightSplitInitializer implements BiologyInitializer {
     @Override
     public void processMap(
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
-        List<Specie> species = biology.getSpecies();
+        List<Species> species = biology.getSpecies();
 
         ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
         for (int i = 0; i < biologySmoothingIndex; i++) {
@@ -126,11 +126,16 @@ public class FromLeftToRightSplitInitializer implements BiologyInitializer {
     public void setBiologySmoothingIndex(int biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
     }
-
+    /**
+     * "Species 0" and "Species 1"
+     *
+     * @return
+     */
     @Override
-    public int getNumberOfSpecies() {
-        return 2;
+    public String[] getSpeciesNames() {
+        return new String[]{"Species 0", "Species 1"};
     }
+
 }
 
 

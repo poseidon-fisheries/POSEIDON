@@ -16,21 +16,21 @@ public class ConstantHeterogeneousLocalBiology implements LocalBiology {
     }
 
     /**
-     * the biomass at this location for a single specie.
+     * the biomass at this location for a single species.
      *
-     * @param specie the specie you care about
-     * @return the biomass of this specie
+     * @param species the species you care about
+     * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Specie specie) {
-        return biomasses[specie.getIndex()];
+    public Double getBiomass(Species species) {
+        return biomasses[species.getIndex()];
     }
 
     /**
      *  nothing
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
 
     }
 

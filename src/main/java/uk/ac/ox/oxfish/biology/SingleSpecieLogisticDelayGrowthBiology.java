@@ -50,20 +50,20 @@ public class SingleSpecieLogisticDelayGrowthBiology implements LocalBiology, Ste
     final private double  maxBiomass;
 
     /**
-     * the specie modeled
+     * the species modeled
      */
-    private final Specie specie;
+    private final Species species;
     private Stoppable stoppable;
 
 
     public SingleSpecieLogisticDelayGrowthBiology(
-            Specie specie, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
+            Species species, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
             double bParameter) {
         Preconditions.checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
         Preconditions.checkArgument(maxBiomass > 0);
         Preconditions.checkArgument(currentBiomass <= maxBiomass);
         Preconditions.checkArgument(currentBiomass >= 0);
-        this.specie =specie;
+        this.species = species;
         this.yearDelays = yearDelays;
         pastBiomass = EvictingQueue.create(yearDelays);
         while(pastBiomass.remainingCapacity()>0)
@@ -75,15 +75,15 @@ public class SingleSpecieLogisticDelayGrowthBiology implements LocalBiology, Ste
     }
 
     /**
-     * the biomass at this location for a single specie.
+     * the biomass at this location for a single species.
      *
-     * @param specie the specie you care about
-     * @return the biomass of this specie
+     * @param species the species you care about
+     * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Specie specie)
+    public Double getBiomass(Species species)
     {
-        if(specie== this.specie)
+        if(species == this.species)
             return currentBiomass;
         else
             return null;
@@ -92,12 +92,12 @@ public class SingleSpecieLogisticDelayGrowthBiology implements LocalBiology, Ste
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      *
-     * @param specie        the specie fished
+     * @param species        the species fished
      * @param biomassFished the biomass fished
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
-        if(specie.equals(this.specie))
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+        if(species.equals(this.species))
         {
             Preconditions.checkArgument(biomassFished <= currentBiomass);
             currentBiomass-= biomassFished;

@@ -1,14 +1,12 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.function.Function;
 
 /**
  * Aggregate data, yearly. Mostly just sums up what the daily data-set discovered
@@ -47,11 +45,11 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
         },Double.NaN);
 
 
-        for(Specie specie : observed.getSpecies())
+        for(Species species : observed.getSpecies())
         {
 
-            final String earnings =  specie + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
-            final String landings = specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+            final String earnings =  species + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
+            final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
             registerGatherer(landings,
                              FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
                                      landings))
@@ -66,9 +64,9 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
 
         }
 
-        for(Specie specie : observed.getSpecies())
+        for(Species species : observed.getSpecies())
         {
-            final String biomass = "Biomass " + specie.getName();
+            final String biomass = "Biomass " + species.getName();
             registerGatherer(biomass,
                              state1 -> originalGatherer.getLatestObservation(biomass)
                     , Double.NaN);

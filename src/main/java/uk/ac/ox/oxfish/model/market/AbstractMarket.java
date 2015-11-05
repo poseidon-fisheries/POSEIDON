@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
@@ -85,8 +85,8 @@ public abstract class AbstractMarket implements Market {
      */
     @Override
     final public TradeInfo sellFish(double biomass, Fisher fisher, Regulation regulation,
-                                    FishState state, Specie specie) {
-        TradeInfo receipt = sellFishImplementation(biomass,fisher, regulation,state,specie);
+                                    FishState state, Species species) {
+        TradeInfo receipt = sellFishImplementation(biomass, fisher, regulation, state, species);
         recordTrade(receipt);
         return receipt;
     }
@@ -101,7 +101,7 @@ public abstract class AbstractMarket implements Market {
      */
     protected abstract TradeInfo sellFishImplementation(double biomass, Fisher fisher,
                                                         Regulation regulation, FishState state,
-                                                        Specie specie);
+                                                        Species species);
 
 
     public void recordTrade(TradeInfo info)

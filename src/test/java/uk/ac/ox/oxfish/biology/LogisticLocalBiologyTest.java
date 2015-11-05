@@ -15,56 +15,56 @@ public class LogisticLocalBiologyTest
         LogisticLocalBiology bio = new LogisticLocalBiology(
                 new Double[]{100d,200d}, new Double[]{100d,400d}, new Double[]{.5,.5}
         );
-        Specie specie0 = new Specie("0"); specie0.resetIndexTo(0);
-        Specie specie1 = new Specie("1"); specie1.resetIndexTo(1);
-        Specie specie2 = new Specie("2"); specie2.resetIndexTo(2);
+        Species species0 = new Species("0"); species0.resetIndexTo(0);
+        Species species1 = new Species("1"); species1.resetIndexTo(1);
+        Species species2 = new Species("2"); species2.resetIndexTo(2);
 
-        assertEquals(100, bio.getBiomass(specie0), .1);
-        assertEquals(200, bio.getBiomass(specie1), .1);
-        assertEquals(0, bio.getBiomass(specie2), .1);
+        assertEquals(100, bio.getBiomass(species0), .1);
+        assertEquals(200, bio.getBiomass(species1), .1);
+        assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
         bio.step(mock(FishState.class));
 
-        assertEquals(100,bio.getBiomass(specie0),.1); //didn't grow because it is at capacity
-        assertEquals(250,bio.getBiomass(specie1),.1); //grew by 50%
-        assertEquals(0, bio.getBiomass(specie2), .1);  //0 doesn't grow
+        assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
+        assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
+        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
 
-        bio.setCurrentBiomass(specie1,399.88);
+        bio.setCurrentBiomass(species1, 399.88);
         //grow it again
         bio.step(mock(FishState.class));
-        assertEquals(100,bio.getBiomass(specie0),.1); //didn't grow because it is at capacity
-        assertEquals(400,bio.getBiomass(specie1),.1); //grew until capacity
-        assertEquals(0, bio.getBiomass(specie2), .1);  //0 doesn't grow
+        assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
+        assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
+        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
     }
 
     @Test
     public void canAddSpecieshalfwaythrough() throws Exception {
 
-        //starts with only specie0
+        //starts with only species0
         LogisticLocalBiology bio = new LogisticLocalBiology(
                 new Double[]{100d}, new Double[]{100d}, new Double[]{.5d}
         );
-        Specie specie0 = new Specie("0"); specie0.resetIndexTo(0);
-        Specie specie2 = new Specie("2"); specie2.resetIndexTo(2);
+        Species species0 = new Species("0"); species0.resetIndexTo(0);
+        Species species2 = new Species("2"); species2.resetIndexTo(2);
 
-        assertEquals(100, bio.getBiomass(specie0), .1);
-        assertEquals(0, bio.getBiomass(specie2), .1);
+        assertEquals(100, bio.getBiomass(species0), .1);
+        assertEquals(0, bio.getBiomass(species2), .1);
 
         //nothing happens
         bio.step(mock(FishState.class));
-        assertEquals(100, bio.getBiomass(specie0), .1);
-        assertEquals(0, bio.getBiomass(specie2), .1);
+        assertEquals(100, bio.getBiomass(species0), .1);
+        assertEquals(0, bio.getBiomass(species2), .1);
 
-        bio.setCarryingCapacity(specie2, 100);
-        bio.setCurrentBiomass(specie2, 50);
-        bio.setMalthusianParameter(specie2, .5);
-        assertEquals(100, bio.getBiomass(specie0), .1);
+        bio.setCarryingCapacity(species2, 100);
+        bio.setCurrentBiomass(species2, 50);
+        bio.setMalthusianParameter(species2, .5);
+        assertEquals(100, bio.getBiomass(species0), .1);
 
         //added specie will work
         bio.step(mock(FishState.class));
-        assertEquals(100, bio.getBiomass(specie0), .1);
-        assertEquals(62.5, bio.getBiomass(specie2), .1);
+        assertEquals(100, bio.getBiomass(species0), .1);
+        assertEquals(62.5, bio.getBiomass(species2), .1);
 
 
 

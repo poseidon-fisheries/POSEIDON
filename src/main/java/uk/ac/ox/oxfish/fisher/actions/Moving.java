@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Deque;
 
@@ -20,15 +21,24 @@ public class Moving implements Action
      */
     private double accruedHours = -1;
 
-    public Moving(double timeAlreadyTravelling) {
+    private Deque<SeaTile> path;
+
+    public Moving(double timeAlreadyTravelling, Deque<SeaTile> currentPath) {
         this.accruedHours = timeAlreadyTravelling;
+        this.path = currentPath;
     }
 
     public Moving() {
+        this(-1,null);
+    }
+
+    public Moving(Deque<SeaTile> currentPath)
+    {
+        this(-1,currentPath);
     }
 
     /**
-     * Do something and returns a result which is the next state and whether or not it should be run on the same turn
+     * Move on a previous path or ask the map for a new path and follow it from agent location to agent destination
      *
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
@@ -45,48 +55,85 @@ public class Moving implements Action
         SeaTile oldDestination = agent.getDestination();
         agent.updateDestination(model,this);
         //if you changed your direction, you lose your accrued hours
-        if(oldDestination != agent.getDestination())
+        if(oldDestination != agent.getDestination()) {
             accruedHours = -1;
+            path = null;
+        }
 
         /**
-         * we have arrived!
+         * If we have arrived, don't bother moving.
          */
         if(agent.getDestination().equals(agent.getLocation()))
             return new ActionResult(new Arriving(),hoursLeft);
 
-        Deque<SeaTile> route = model.getMap().getRoute(agent.getLocation(),agent.getDestination());
-        assert  route.peek().equals(agent.getLocation()); //starts at the right location
-        assert route.peekLast().equals(agent.getDestination()); //ends where we are
-        route.poll(); //remove start, it's useless
 
         NauticalMap map = model.getMap();
+        //if you don't have a path, you have to find it
+        if(path==null) {
+            //get the pathfinder to help
+            path = map.getRoute(agent.getLocation(), agent.getDestination());
+            assert path.peek().equals(agent.getLocation()); //starts at the right location
+            assert path.peekLast().equals(agent.getDestination()); //ends where we are
+            path.poll(); //remove start, it's useless
+        }
+        //the first step should not be where we currently are
+        assert path != null;
+        assert !path.isEmpty();
+        assert !path.peekFirst().equals(agent.getLocation());
 
+
+        //if you have been moving from the previous step, count those hours
         if(accruedHours > 0)
             hoursLeft+= accruedHours;
 
         //while there are still places to go
-        while(!route.isEmpty())
+
+
+
+
+        //moving actually happens in more than one "step" at a time; this is because agent.move(*) is slow (since we have to update the MASON map)
+        //so what we do is that we check what's the farthest we can go in one period and go there
+        double timeSpentTravelling=0;
+        SeaTile next = agent.getLocation();
+        //go through the path until it's empty
+        while(!path.isEmpty())
         {
-            SeaTile step = route.pollLast();
+            //check distance and time to travel one more node during this period
+            SeaTile step = path.peekFirst();
+            double distance = map.distance(next, step);
+            final double hoursForThisNode = agent.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distance);
 
-            double distance = map.distance(agent.getLocation(),step);
-            //if you have time move
-            final double hoursForThisStep = agent.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distance);
-            assert  hoursForThisStep >= accruedHours : agent;
-
-            if(hoursForThisStep <= hoursLeft)
+            //if you can make this step within the time given, do it
+            if(timeSpentTravelling + hoursForThisNode<=hoursLeft)
             {
-                agent.move(step, map,model);
-
-                assert agent.getLocation().equals(step);
-                if(step.equals(agent.getDestination()))
-                    return new ActionResult(new Arriving(),hoursLeft-hoursForThisStep);
-                else
-                    return new ActionResult(new Moving(),hoursLeft-hoursForThisStep);
+                next = path.poll();
+                assert next == step;
+                timeSpentTravelling+=hoursForThisNode;
             }
-            //too far, try closer
+            else
+             break;
+
         }
-        return new ActionResult(new Moving(hoursLeft),0);
+
+        if(!next.equals(agent.getLocation())) //if you have time to make at least one step
+        {
+            assert hoursLeft >= timeSpentTravelling;
+            hoursLeft = hoursLeft - timeSpentTravelling;
+            hoursLeft = Math.abs(hoursLeft) < FishStateUtilities.EPSILON ? 0 : hoursLeft;
+
+            agent.move(next, map,model);
+
+            assert agent.getLocation().equals(next); //check that I moved to the right spot
+            if(next.equals(agent.getDestination()))
+                return new ActionResult(new Arriving(),hoursLeft);
+            else
+            {
+                assert !path.isEmpty();
+                return new ActionResult(new Moving(path), hoursLeft);
+            }
+        }
+        //didn't make it to there
+        return new ActionResult(new Moving(hoursLeft,path),0);
 
 
 

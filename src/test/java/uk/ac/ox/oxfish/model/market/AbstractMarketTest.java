@@ -3,14 +3,14 @@ package uk.ac.ox.oxfish.model.market;
 import org.junit.Test;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -24,7 +24,7 @@ public class AbstractMarketTest {
 
 
         FishState model = mock(FishState.class);
-        Specie test = new Specie("papapapap");
+        Species test = new Species("papapapap");
         AbstractMarket market = new FixedPriceMarket(1.0);
         List<Steppable> steppables = new LinkedList<>();
         doAnswer(invocation -> {

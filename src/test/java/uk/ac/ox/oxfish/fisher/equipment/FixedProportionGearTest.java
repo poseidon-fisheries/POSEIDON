@@ -4,7 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.FixedProportionGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -19,8 +19,8 @@ public class FixedProportionGearTest {
 
     @Test
     public void fishEmpty() throws Exception {
-        Specie first = new Specie("First");
-        Specie second = new Specie("Second");
+        Species first = new Species("First");
+        Species second = new Species("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
         LocalBiology local = new EmptyLocalBiology();
         SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
@@ -37,8 +37,8 @@ public class FixedProportionGearTest {
     @Test
     public void fishOnlyWhatIsAvailable()
     {
-        Specie first = new Specie("First");
-        Specie second = new Specie("Second");
+        Species first = new Species("First");
+        Species second = new Species("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
         LocalBiology local = mock(LocalBiology.class);
         when(local.getBiomass(first)).thenReturn(100.0);
@@ -60,8 +60,8 @@ public class FixedProportionGearTest {
     @Test
     public void fishOnlyWhatIsAvailable2()
     {
-        Specie first = new Specie("First");
-        Specie second = new Specie("Second");
+        Species first = new Species("First");
+        Species second = new Species("Second");
         GlobalBiology biology = new GlobalBiology(first, second);
         LocalBiology local = mock(LocalBiology.class);
         when(local.getBiomass(first)).thenReturn(0.0);

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -33,21 +33,21 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
     public void start(FishState state, FishState observed) {
 
 
-        for(Specie specie : observed.getSpecies())
+        for(Species species : observed.getSpecies())
         {
-            //get all the markets for this specie
-            final List<Market> toAggregate = observed.getAllMarketsForThisSpecie(specie);
+            //get all the markets for this species
+            final List<Market> toAggregate = observed.getAllMarketsForThisSpecie(species);
             //now register it!
             final String landingsColumnName = AbstractMarket.LANDINGS_COLUMN_NAME;
             final String earningsColumnName = AbstractMarket.EARNINGS_COLUMN_NAME;
-            registerGatherer(specie + " " + landingsColumnName,
+            registerGatherer(species + " " + landingsColumnName,
                              //so "stream" is a trick from Java 8. In this case it just sums up all the data
                              model ->
                                      toAggregate.stream().mapToDouble(
                                      value -> value.getData().getLatestObservation(landingsColumnName))
                                      .sum(), Double.NaN);
 
-            registerGatherer(specie + " " + earningsColumnName,
+            registerGatherer(species + " " + earningsColumnName,
                              //so "stream" is a trick from Java 8. In this case it just sums up all the data
                              model -> toAggregate.stream().mapToDouble(
                                      value -> value.getData().getLatestObservation(earningsColumnName))
@@ -65,10 +65,10 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         final NauticalMap map = state.getMap();
         final List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
 
-        for(Specie specie : observed.getSpecies())
+        for(Species species : observed.getSpecies())
         {
-            registerGatherer("Biomass " + specie.getName(),
-                             state1 -> allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(specie)).sum(),
+            registerGatherer("Biomass " + species.getName(),
+                             state1 -> allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum(),
                              0d);
         }
 

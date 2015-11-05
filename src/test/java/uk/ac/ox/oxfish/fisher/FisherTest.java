@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -38,10 +38,10 @@ public class FisherTest {
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
-        Specie specie = new Specie("pippo");
-        GlobalBiology biology = new GlobalBiology(specie);
+        Species species = new Species("pippo");
+        GlobalBiology biology = new GlobalBiology(species);
         when(fishState.getBiology()).thenReturn(biology);
-        when(fishState.getSpecies()).thenReturn(Collections.singletonList(specie));
+        when(fishState.getSpecies()).thenReturn(Collections.singletonList(species));
 
         double gasCostPerLiter = 10;
         double litersPerKm = 10;
@@ -51,12 +51,12 @@ public class FisherTest {
         final MarketMap marketMap = new MarketMap(biology);
         final int pricePerFish = 23;
         final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
-        marketMap.addMarket(specie, fishmarket);
+        marketMap.addMarket(species, fishmarket);
         Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(specie, 1, biology));
+        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(species, 1, biology));
         //9 liters each time you fish
         when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(9d);
         Fisher fisher = new Fisher(0, port,
@@ -111,10 +111,10 @@ public class FisherTest {
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
-        Specie specie = new Specie("pippo");
-        GlobalBiology biology = new GlobalBiology(specie);
+        Species species = new Species("pippo");
+        GlobalBiology biology = new GlobalBiology(species);
         when(fishState.getBiology()).thenReturn(biology);
-        when(fishState.getSpecies()).thenReturn(Collections.singletonList(specie));
+        when(fishState.getSpecies()).thenReturn(Collections.singletonList(species));
 
 
         double gasCostPerLiter = 10;
@@ -125,12 +125,12 @@ public class FisherTest {
         final MarketMap marketMap = new MarketMap(biology);
         final int pricePerFish = 23;
         final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
-        marketMap.addMarket(specie, fishmarket);
+        marketMap.addMarket(species, fishmarket);
         Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(specie, 1, biology));
+        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(species, 1, biology));
         //10 liters each time you fish
         when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(10d);
         Fisher fisher = new Fisher(0, port,

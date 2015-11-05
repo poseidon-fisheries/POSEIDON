@@ -2,9 +2,9 @@ package uk.ac.ox.oxfish.fisher.equipment;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class HoldTest {
@@ -17,8 +17,8 @@ public class HoldTest {
         public void loadCorrectly() throws Exception
     {
         Hold hold = new Hold(100,2);
-        Specie first = new Specie("lame");
-        Specie second = new Specie("second");
+        Species first = new Species("lame");
+        Species second = new Species("second");
         GlobalBiology bio = new GlobalBiology(first,second);
 
         hold.load(new Catch(second,50.0,bio));
@@ -39,8 +39,8 @@ public class HoldTest {
     public void throwsOverboard() throws Exception
     {
         Hold hold = new Hold(100,2);
-        Specie first = new Specie("lame");
-        Specie second = new Specie("second");
+        Species first = new Species("lame");
+        Species second = new Species("second");
         GlobalBiology bio = new GlobalBiology(first,second);
 
         hold.load(new Catch(first, 100.0, bio));
@@ -61,8 +61,8 @@ public class HoldTest {
     public void unloadsCorrectly()
     {
         Hold hold = new Hold(100,2);
-        Specie first = new Specie("lame");
-        Specie second = new Specie("second");
+        Species first = new Species("lame");
+        Species second = new Species("second");
         GlobalBiology bio = new GlobalBiology(first,second);
 
         hold.load(new Catch(first, 25.0, bio));

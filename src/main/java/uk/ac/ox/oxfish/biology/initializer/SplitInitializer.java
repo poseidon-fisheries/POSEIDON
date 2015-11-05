@@ -85,8 +85,13 @@ public class SplitInitializer implements BiologyInitializer {
 
     }
 
+    /**
+     * "Species 0" and "Species 1"
+     *
+     * @return
+     */
     @Override
-    public int getNumberOfSpecies() {
-        return 2;
+    public String[] getSpeciesNames() {
+        return new String[]{"Species 0", "Species 1"};
     }
 }

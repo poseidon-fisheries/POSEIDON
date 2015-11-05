@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
 import sim.engine.SimState;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 
 /**
  *
@@ -36,12 +36,12 @@ public class FisherDailyCounter extends Counter {
      *
      * @param add        by how much to increment
      */
-    public void countLanding(Specie specie, double add) {
-        landings[specie.getIndex()]+=add;
+    public void countLanding(Species species, double add) {
+        landings[species.getIndex()]+=add;
     }
 
-    public void countEarnings(Specie specie, double add) {
-        earnings[specie.getIndex()]+=add;
+    public void countEarnings(Species species, double add) {
+        earnings[species.getIndex()]+=add;
     }
 
     public double getLandingsPerSpecie(int index)

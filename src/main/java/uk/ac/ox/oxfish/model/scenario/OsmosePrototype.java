@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import fr.ird.osmose.OsmoseSimulation;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.weather.initializer.ConstantWeatherInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -153,9 +153,9 @@ public class OsmosePrototype implements Scenario {
         } catch (IOException e) {
             throw  new IllegalArgumentException("Can't instantiate OSMOSE!");
         }
-        Specie[] species = new Specie[osmoseSimulation.getNumberOfSpecies()];
+        Species[] species = new Species[osmoseSimulation.getNumberOfSpecies()];
         for(int i=0; i<species.length; i++)
-            species[i] = new Specie(osmoseSimulation.getSpecies(i).getName());
+            species[i] = new Species(osmoseSimulation.getSpecies(i).getName());
 
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -176,7 +176,7 @@ public class OsmosePrototype implements Scenario {
         Arrays.fill(marketPrices, 1.0);
 
 
-        for(Specie specie : biology.getSpecies())
+        for(Species specie : biology.getSpecies())
             marketMap.addMarket(specie,new FixedPriceMarket( marketPrices[specie.getIndex()]));
 
         //create random ports, all sharing the same market

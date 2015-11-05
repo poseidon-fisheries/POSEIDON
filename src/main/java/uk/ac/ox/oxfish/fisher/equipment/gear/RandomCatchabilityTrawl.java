@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -44,9 +44,9 @@ public class RandomCatchabilityTrawl implements Gear
     public Catch fish(
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology)
     {
-        List<Specie> species = modelBiology.getSpecies();
+        List<Species> species = modelBiology.getSpecies();
         double[] totalCatch = new double[modelBiology.getSize()];
-        for(Specie specie : species)
+        for(Species specie : species)
         {
             double q = fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[specie.getIndex()]
                     + catchabilityMeanPerSpecie[specie.getIndex()];

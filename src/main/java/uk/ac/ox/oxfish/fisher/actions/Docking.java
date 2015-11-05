@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -44,13 +44,13 @@ public class Docking implements Action{
         GlobalBiology biology = model.getBiology();
 
         MarketMap marketMap =port.getMarketMap();
-        for(Specie specie : biology.getSpecies())
+        for(Species species : biology.getSpecies())
         {
-            double biomass = toSell.getPoundsCaught(specie);
+            double biomass = toSell.getPoundsCaught(species);
             assert  biomass>=0;
             if(biomass>0) {
                 //this should take care of everything including transferring cash
-                TradeInfo tradeInfo = marketMap.sellFish(specie, biomass, agent, regulation, model);
+                TradeInfo tradeInfo = marketMap.sellFish(species, biomass, agent, regulation, model);
                 //bean counting happens here:
                 agent.processTradeData(tradeInfo);
             }

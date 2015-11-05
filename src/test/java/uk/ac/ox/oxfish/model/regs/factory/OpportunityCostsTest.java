@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -36,10 +36,10 @@ public class OpportunityCostsTest {
              */
             @Override
             public void computeOpportunityCosts(
-                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
                     ITQOrderBook market) {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     seller.recordOpportunityCosts(1000 * biomass);
                 }
@@ -86,10 +86,10 @@ public class OpportunityCostsTest {
              */
             @Override
             public void computeOpportunityCosts(
-                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
                     ITQOrderBook market) {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     seller.recordOpportunityCosts(1000 * biomass);
                 }

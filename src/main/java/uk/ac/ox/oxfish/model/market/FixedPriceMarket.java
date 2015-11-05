@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -39,9 +39,9 @@ public class FixedPriceMarket extends AbstractMarket {
     @Override
     protected TradeInfo sellFishImplementation(
             double biomass, Fisher fisher, Regulation regulation, FishState state,
-            Specie specie) {
+            Species species) {
         return Market.defaultMarketTransaction(biomass, fisher, regulation, state,
-                                               biomassTraded -> biomassTraded *price,specie);
+                                               biomassTraded -> biomassTraded *price, species);
     }
 
 

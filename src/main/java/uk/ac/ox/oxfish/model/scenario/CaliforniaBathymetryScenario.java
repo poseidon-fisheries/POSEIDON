@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -49,7 +49,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
         final GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
 
-        final HashMap<Specie, String> biomassFiles = new HashMap<>();
+        final HashMap<Species, String> biomassFiles = new HashMap<>();
         biomassFiles.put(biology.getSpecie(0), FishStateUtilities.getAbsolutePath(
                 Paths.get("inputs", "california", "soletest.asc").toString()));
         final Map<SeaTile, double[]> speciesForEachCellFromData = NauticalMapFactory.getSpeciesForEachCellFromData(

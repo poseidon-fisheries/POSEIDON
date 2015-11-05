@@ -69,29 +69,31 @@ public class BiomassDiffuser  implements Steppable {
                 //for each specie
                 for (int i = 0; i < biology.getSize(); i++) {
                     //if here there are more than there
-                    final Specie specie = biology.getSpecie(i);
+                    final Species species = biology.getSpecie(i);
 
                     //if your carrying capacity is 0 do not diffuse
-                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie)<= FishStateUtilities.EPSILON)
+                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON)
                         continue;
                     //if they are full, do not diffuse
-                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie) - neighbor.getBiomass(specie)<= FishStateUtilities.EPSILON)
+                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(species) - neighbor.getBiomass(
+                            species)<= FishStateUtilities.EPSILON)
                         continue;
 
 
 
-                    assert tile.getBiomass(specie) >= 0;
-                    double differential = tile.getBiomass(specie) - neighbor.getBiomass(specie);
+                    assert tile.getBiomass(species) >= 0;
+                    double differential = tile.getBiomass(species) - neighbor.getBiomass(species);
                     //don't transport more than the other is able to accomodate anyway
-                    differential = Math.min(differential, ((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(specie)-neighbor.getBiomass(specie));
+                    differential = Math.min(differential, ((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(
+                            species)-neighbor.getBiomass(species));
                     differential = FishStateUtilities.round(differential);
                     if (differential > 0) {
                         //share!
                         double movement = Math.min(differentialPercentageToMove * differential,
-                                                   percentageLimitOnDailyMovement * tile.getBiomass(specie));
+                                                   percentageLimitOnDailyMovement * tile.getBiomass(species));
                         assert movement >= 0 : movement + " --- " + differential + " ------ " + tile.getBiomass(
-                                specie) + " ------ " + FishStateUtilities.round(movement);
-                        assert tile.getBiomass(specie) >= movement;
+                                species) + " ------ " + FishStateUtilities.round(movement);
+                        assert tile.getBiomass(species) >= movement;
                         LogisticLocalBiology here = (LogisticLocalBiology) tile.getBiology();
                         LogisticLocalBiology there = (LogisticLocalBiology) neighbor.getBiology();
                         here.getCurrentBiomass()[i] -= movement;

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,7 +15,7 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
     /**
      * specie to protect by quota
      */
-    private final Specie protectedSpecie;
+    private final Species protectedSpecies;
 
     /**
      * when created it sets itself to step every year to reset the quota
@@ -23,9 +23,9 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * @param yearlyQuota the yearly quota
      * @param state       the model link to schedule on
      */
-    public SpecificQuotaRegulation(double yearlyQuota, FishState state, Specie specie) {
+    public SpecificQuotaRegulation(double yearlyQuota, FishState state, Species species) {
         super(yearlyQuota, state);
-        this.protectedSpecie = specie;
+        this.protectedSpecies = species;
     }
 
 
@@ -48,16 +48,16 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
     }
 
     /**
-     * ignore if wrong specie.
+     * ignore if wrong species.
      */
     @Override
-    public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
-        if(specie == protectedSpecie)
-            super.reactToSale(specie, seller, biomass, revenue);
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+        if(species == protectedSpecies)
+            super.reactToSale(species, seller, biomass, revenue);
     }
 
 
-    public Specie getProtectedSpecie() {
-        return protectedSpecie;
+    public Species getProtectedSpecies() {
+        return protectedSpecies;
     }
 }

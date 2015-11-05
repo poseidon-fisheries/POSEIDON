@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.MarketFirstDemo;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -31,7 +31,7 @@ public class TACNotCaresAboutMileage {
                                                          5, System.currentTimeMillis());
 
         //the correlation ought to be very small
-        Specie specie = state.getSpecies().get(0);
+        Species species = state.getSpecies().get(0);
 
         double[] mileage = new double[state.getFishers().size()];
         double[] catches =  new double[state.getFishers().size()];
@@ -41,7 +41,7 @@ public class TACNotCaresAboutMileage {
         {
             mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed());
             catches[i] = fisher.getLatestYearlyObservation(
-                    specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 
             i++;
         }

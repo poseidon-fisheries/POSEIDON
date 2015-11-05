@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.actions;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.*;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
@@ -46,14 +46,14 @@ public class FishingTest {
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
-        Specie specie = new Specie("pippo");
-        GlobalBiology biology = new GlobalBiology(specie);
+        Species species = new Species("pippo");
+        GlobalBiology biology = new GlobalBiology(species);
         when(fishState.getBiology()).thenReturn(biology);
 
         Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(MarketMap.class), 0);
 
         Gear gear = mock(Gear.class);
-        when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(specie, 50.0, biology));
+        when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(species, 50.0, biology));
         Fisher fisher = new Fisher(0, port,
                                      new MersenneTwisterFast(),
                                      new AnarchyFactory().apply(fishState),

@@ -76,10 +76,10 @@ public class TwoSpeciesITQ
         FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
                                                 Paths.get("docs","20151009 lambda3","blue_landings.csv").toFile());
 
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Specie " + 0),
+        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 0),
                                                 Paths.get("docs","20151009 lambda3","red_quotas.csv").toFile());
 
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Specie " + 1),
+        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 1),
                                                 Paths.get("docs","20151009 lambda3","blue_quotas.csv").toFile());
     }
 

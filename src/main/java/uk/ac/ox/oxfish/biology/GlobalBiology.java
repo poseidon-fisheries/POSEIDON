@@ -14,12 +14,12 @@ public class GlobalBiology
     /**
      * an unmodifiable list of species.
      */
-    private final Specie species[];
+    private final Species species[];
 
 
-    private final List<Specie> unmodifiableView;
+    private final List<Species> unmodifiableView;
 
-    public GlobalBiology(Specie... species)
+    public GlobalBiology(Species... species)
     {
 
 
@@ -36,28 +36,28 @@ public class GlobalBiology
      * @param numberOfSpecies the number of species
      */
     public static GlobalBiology genericListOfSpecies(int numberOfSpecies){
-        Specie[] generics = new Specie[numberOfSpecies];
+        Species[] generics = new Species[numberOfSpecies];
         for(int i=0; i<numberOfSpecies; i++)
-            generics[i] = new Specie("Specie " + i);
+            generics[i] = new Species("Species " + i);
         return new GlobalBiology(generics);
     }
 
     public static GlobalBiology listOfSpeciesWithNames(String... names){
-        Specie[] generics = new Specie[names.length];
+        Species[] generics = new Species[names.length];
         for(int i=0; i<names.length; i++)
-            generics[i] = new Specie(names[i]);
+            generics[i] = new Species(names[i]);
         return new GlobalBiology(generics);
     }
     /**
      *
      * @return an unmodifiable list of all the species available
      */
-    public List<Specie> getSpecies()
+    public List<Species> getSpecies()
     {
         return unmodifiableView;
     }
 
-    public Specie getSpecie(int order)
+    public Species getSpecie(int order)
     {
         return species[order];
     }

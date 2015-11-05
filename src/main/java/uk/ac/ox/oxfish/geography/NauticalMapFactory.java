@@ -369,7 +369,7 @@ public class NauticalMapFactory {
     }
 
 
-    public static Map<SeaTile,double[]> getSpeciesForEachCellFromData(Map<Specie,String> filenamesForSpecie,
+    public static Map<SeaTile,double[]> getSpeciesForEachCellFromData(Map<Species,String> filenamesForSpecie,
                                                                       NauticalMap map)
     {
         //number of species
@@ -382,7 +382,7 @@ public class NauticalMapFactory {
         Map<SeaTile,double[]> toReturn = new HashMap<>();
 
         //we go for each specie/file since that's probably the largest thing to keep in memory
-        for(Map.Entry<Specie,String> file : filenamesForSpecie.entrySet())
+        for(Map.Entry<Species,String> file : filenamesForSpecie.entrySet())
         {
             final GeomGridField biomass = GISReaders.readRaster(file.getValue());
 

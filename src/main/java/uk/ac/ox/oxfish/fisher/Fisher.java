@@ -6,7 +6,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
@@ -575,12 +575,12 @@ public class Fisher implements Steppable, Startable{
     }
 
     /**
-     * how many pounds of a specific specie are we carrying
-     * @param specie the specie
-     * @return lbs of specie carried
+     * how many pounds of a specific species are we carrying
+     * @param species the species
+     * @return lbs of species carried
      */
-    public double getPoundsCarried(Specie specie) {
-        return equipment.getHold().getPoundsCarried(specie);
+    public double getPoundsCarried(Species species) {
+        return equipment.getHold().getPoundsCarried(species);
     }
 
     /**
@@ -739,11 +739,11 @@ public class Fisher implements Steppable, Startable{
      */
     public void processTradeData(TradeInfo info){
 
-        Specie specie = info.getSpecie();
+        Species species = info.getSpecies();
 
-        memory.getDailyCounter().countLanding(specie, info.getBiomassTraded());
-        memory.getDailyCounter().countEarnings(specie, info.getMoneyExchanged());
-        memory.getTripLogger().recordEarnings(specie.getIndex(), info.getBiomassTraded(),
+        memory.getDailyCounter().countLanding(species, info.getBiomassTraded());
+        memory.getDailyCounter().countEarnings(species, info.getMoneyExchanged());
+        memory.getTripLogger().recordEarnings(species.getIndex(), info.getBiomassTraded(),
                                               info.getMoneyExchanged());
 
     }

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.annotations.VisibleForTesting;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
@@ -66,11 +66,11 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
              * in addition tell the fisher to count opportunity costs
              */
             @Override
-            public void reactToSale(Specie specie, Fisher seller, double biomass, double revenue) {
+            public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
                 //do the usual stuff
-                super.reactToSale(specie, seller, biomass, revenue);
+                super.reactToSale(species, seller, biomass, revenue);
 
-                computeOpportunityCosts(specie,seller,biomass,revenue,this,marketBuilder.getMarket());
+                computeOpportunityCosts(species, seller, biomass, revenue, this, marketBuilder.getMarket());
             }
         };
     }
@@ -81,11 +81,11 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
      * of the trip
      */
     @VisibleForTesting
-    public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+    public void computeOpportunityCosts(Species species, Fisher seller, double biomass, double revenue,
                                         SpecificQuotaRegulation regulation, ITQOrderBook market)
     {
         //account for opportunity costs
-        if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+        if(biomass > 0 && regulation.getProtectedSpecies().equals(species))
         {
             double lastClosingPrice = market.getLastClosingPrice();
             if(Double.isFinite(lastClosingPrice))

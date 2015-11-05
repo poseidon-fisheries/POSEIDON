@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.market.itq;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
@@ -26,7 +26,7 @@ public class ProportionalQuotaPriceGeneratorTest {
 
         FishState state = mock(FishState.class);
         when(state.getDayOfTheYear()).thenReturn(364); //one day left!
-        when(state.getSpecies()).thenReturn(Arrays.asList(new Specie("a"),new Specie("b")));
+        when(state.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b")));
 
 
 

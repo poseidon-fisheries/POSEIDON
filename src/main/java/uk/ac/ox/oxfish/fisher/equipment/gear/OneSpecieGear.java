@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -15,15 +15,15 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  */
 public class OneSpecieGear implements Gear {
 
-    final Specie targetedSpecie;
+    final Species targetedSpecies;
 
     final double proportionCaught;
 
-    public OneSpecieGear(Specie targetedSpecie, double proportionCaught)
+    public OneSpecieGear(Species targetedSpecies, double proportionCaught)
     {
         Preconditions.checkArgument(proportionCaught <=1);
         Preconditions.checkArgument(proportionCaught >=0);
-        this.targetedSpecie = targetedSpecie;
+        this.targetedSpecies = targetedSpecies;
         this.proportionCaught = proportionCaught;
     }
 
@@ -38,11 +38,12 @@ public class OneSpecieGear implements Gear {
     @Override
     public Catch fish(
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
-        double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(targetedSpecie));
+        double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
+                targetedSpecies));
         assert  poundsCaught >=0;
         if(poundsCaught> 0)
-            where.reactToThisAmountOfBiomassBeingFished(targetedSpecie,poundsCaught);
-        return new Catch(targetedSpecie, poundsCaught,modelBiology);
+            where.reactToThisAmountOfBiomassBeingFished(targetedSpecies, poundsCaught);
+        return new Catch(targetedSpecies, poundsCaught, modelBiology);
     }
 
 
@@ -60,11 +61,11 @@ public class OneSpecieGear implements Gear {
 
     @Override
     public Gear makeCopy() {
-        return new OneSpecieGear(targetedSpecie,proportionCaught);
+        return new OneSpecieGear(targetedSpecies, proportionCaught);
     }
 
-    public Specie getTargetedSpecie() {
-        return targetedSpecie;
+    public Species getTargetedSpecies() {
+        return targetedSpecies;
     }
 
     public double getProportionCaught() {

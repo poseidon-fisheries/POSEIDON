@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -32,8 +32,8 @@ public class WellMixedBiologyInitializerTest {
                                                      50);
 
 
-        Specie zero = new Specie("zero"); zero.resetIndexTo(0);
-        Specie one = new Specie("one"); one.resetIndexTo(1);
+        Species zero = new Species("zero"); zero.resetIndexTo(0);
+        Species one = new Species("one"); one.resetIndexTo(1);
 
 
         assertEquals(biology.getCarryingCapacity(zero),60,.001);

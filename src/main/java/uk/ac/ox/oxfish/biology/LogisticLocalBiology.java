@@ -69,14 +69,14 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
     }
 
     /**
-     * the biomass at this location for a single specie.
+     * the biomass at this location for a single species.
      *
-     * @param specie the specie you care about
-     * @return the biomass of this specie
+     * @param species the species you care about
+     * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Specie specie) {
-        final int index = specie.getIndex();
+    public Double getBiomass(Species species) {
+        final int index = species.getIndex();
         if(index>=this.currentBiomass.length)
             return 0d; //don't have it
         else
@@ -84,13 +84,13 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
     }
 
     /**
-     * the carrying capacity of this location for this specie
-     * @param specie the specie
-     * @return the carrying capacity for this specie at this location
+     * the carrying capacity of this location for this species
+     * @param species the species
+     * @return the carrying capacity for this species at this location
      */
-    public Double getCarryingCapacity(Specie specie)
+    public Double getCarryingCapacity(Species species)
     {
-        final int index = specie.getIndex();
+        final int index = species.getIndex();
         if(index>=this.carryingCapacity.length)
             return 0d; //don't have it
         else
@@ -100,12 +100,12 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
 
     /**
      * Get the unconstrained growth rate of the biomass
-     * @param specie the specie
+     * @param species the species
      * @return the unconstrained growth rate.
      */
-    public Double getMalthusianParameter(Specie specie)
+    public Double getMalthusianParameter(Species species)
     {
-        final int index = specie.getIndex();
+        final int index = species.getIndex();
         if(index>=this.malthusianParameter.length)
             return 0d; //don't have it
         else
@@ -116,13 +116,13 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      *
-     * @param specie        the specie fished
+     * @param species        the species fished
      * @param biomassFished the biomass fished
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
 
-        final int specieIntex = specie.getIndex();
+        final int specieIntex = species.getIndex();
         Preconditions.checkArgument(specieIntex < currentBiomass.length || biomassFished == 0,
                                     "you can't fish species that aren't here");
 
@@ -166,7 +166,7 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
      * @param s the specie
      * @param newCarryingCapacity the new carrying capacity
      */
-    public void setCarryingCapacity(Specie s, double newCarryingCapacity)
+    public void setCarryingCapacity(Species s, double newCarryingCapacity)
     {
         Preconditions.checkArgument(newCarryingCapacity >= 0, "new carrying capacity must be positive");
 
@@ -185,7 +185,7 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
      * @param s the specie
      * @param newCurrentBiomass the new biomass in lbs
      */
-    public void setCurrentBiomass(Specie s, double newCurrentBiomass)
+    public void setCurrentBiomass(Species s, double newCurrentBiomass)
     {
 
         Preconditions.checkArgument(newCurrentBiomass >= 0, "new biomass can't be negative!");
@@ -204,7 +204,7 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
      * @param s the specie
      * @param newGrowth the new growth rate, must be not negative
      */
-    public void setMalthusianParameter(Specie s, double newGrowth)
+    public void setMalthusianParameter(Species s, double newGrowth)
     {
         Preconditions.checkArgument(newGrowth >= 0, "growth can't be negative!");
         final int index = s.getIndex();

@@ -9,7 +9,7 @@ import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.MetaInspector;
@@ -83,11 +83,11 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     public void initializeGrid(GlobalBiology biology)
     {
 
-        for(Specie specie : biology.getSpecies())
+        for(Species species : biology.getSpecies())
         {
             Color color =  defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll();
-            encodings.put(specie.getName(), new ColorEncoding(new SimpleColorMap(0, maxBiomass, Color.WHITE, color),
-                                                           seaTile -> seaTile.getBiomass(specie), false));
+            encodings.put(species.getName(), new ColorEncoding(new SimpleColorMap(0, maxBiomass, Color.WHITE, color),
+                                                           seaTile -> seaTile.getBiomass(species), false));
         }
 
     }

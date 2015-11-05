@@ -12,7 +12,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -182,7 +182,7 @@ public class FishState  extends SimState{
      *
      * @return an unmodifiable list of all the species available
      */
-    public List<Specie> getSpecies() {
+    public List<Species> getSpecies() {
         return biology.getSpecies();
     }
 
@@ -298,9 +298,9 @@ public class FishState  extends SimState{
         return null;
     }
 
-    public double getTotalBiomass(Specie specie)
+    public double getTotalBiomass(Species species)
     {
-        return map.getTotalBiology(specie);
+        return map.getTotalBiology(species);
     }
 
     /**
@@ -339,13 +339,13 @@ public class FishState  extends SimState{
         return map.getDailyTrawlsMap();
     }
 
-    public List<Market> getAllMarketsForThisSpecie(Specie specie)
+    public List<Market> getAllMarketsForThisSpecie(Species species)
     {
         List<Market> toAggregate = new LinkedList<>();
         //now get for each port, its markets
         for (Port port : getPorts())
         {
-            final Market market = port.getMarket(specie);
+            final Market market = port.getMarket(species);
             if (market != null)
                 toAggregate.add(market);
         }

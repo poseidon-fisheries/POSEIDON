@@ -43,6 +43,10 @@ public interface BiologyInitializer
     void processMap(GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model);
 
 
-    int getNumberOfSpecies();
+    /**
+     * Get a list of the species with their names. The size of this array determines the size of the model array
+     * @return
+     */
+    String[] getSpeciesNames();
 
 }

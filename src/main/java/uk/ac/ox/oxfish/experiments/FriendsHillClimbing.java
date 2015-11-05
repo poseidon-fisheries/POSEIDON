@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.stream.IntStream;
 
@@ -51,18 +50,18 @@ public class FriendsHillClimbing
                 FishState state = new FishState(run,1);
                 state.setScenario(scenario);
                 state.start();
-                Specie onlySpecie = state.getBiology().getSpecie(0);
-                final double minimumBiomass= state.getTotalBiomass(onlySpecie)*.05; //how much does it take to eat 95% of all the fish?
+                Species onlySpecies = state.getBiology().getSpecie(0);
+                final double minimumBiomass= state.getTotalBiomass(onlySpecies)*.05; //how much does it take to eat 95% of all the fish?
 
 
                 int steps = 0;
                 for(steps = 0; steps<3500; steps++)
                 {
                     state.schedule.step(state);
-                    if(state.getTotalBiomass(onlySpecie)<=minimumBiomass)
+                    if(state.getTotalBiomass(onlySpecies)<=minimumBiomass)
                         break;
                 }
-             //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecie));
+             //   System.out.println(steps + " -- " + state.getTotalBiomass(onlySpecies));
                 stepsItTook[run] =steps;
 
 

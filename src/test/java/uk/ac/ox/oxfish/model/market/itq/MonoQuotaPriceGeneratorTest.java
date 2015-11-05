@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
@@ -26,8 +26,8 @@ public class MonoQuotaPriceGeneratorTest {
         when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getDayOfTheYear()).thenReturn(364);
-        when(model.getSpecies()).thenReturn(Arrays.asList(new Specie("a"),new Specie("b"),
-                                                          new Specie("c"),new Specie("d")));
+        when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
+                                                          new Species("c"), new Species("d")));
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(100, model);
         when(fisher.getRegulation()).thenReturn(regulation);
 
@@ -62,7 +62,7 @@ public class MonoQuotaPriceGeneratorTest {
         Fisher fisher = mock(Fisher.class);
         when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
         FishState model = mock(FishState.class);
-        when(model.getSpecies()).thenReturn(Collections.singletonList(new Specie("a")));
+        when(model.getSpecies()).thenReturn(Collections.singletonList(new Species("a")));
 
         MonoQuotaRegulation regulation = new MonoQuotaRegulation(200, model);
         when(fisher.getRegulation()).thenReturn(regulation);

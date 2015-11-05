@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -189,7 +189,7 @@ public class TripRecord {
      * @param species the species you want to know the price of
      * @return the ratio
      */
-    public double getImplicitPriceReceived(Specie species)
+    public double getImplicitPriceReceived(Species species)
     {
         return getImplicitPriceReceived(species.getIndex());
     }

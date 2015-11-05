@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
@@ -206,7 +206,16 @@ public class PrototypeScenario implements Scenario {
         BiologyInitializer initializer = biologyInitializer.apply(model);
         WeatherInitializer weather = weatherInitializer.apply(model);
 
-        GlobalBiology biology = GlobalBiology.genericListOfSpecies(initializer.getNumberOfSpecies());
+        //turn list of names into list of species
+        String[] names = initializer.getSpeciesNames();
+        Species[] speciesArray = new Species[names.length];
+        for(int i=0; i< names.length; i++)
+        {
+            speciesArray[i] = new Species(names[i]);
+        }
+        GlobalBiology biology = new GlobalBiology(speciesArray);
+
+
 
         NauticalMap map = NauticalMapFactory.prototypeMapWithRandomSmoothedBiology(coastalRoughness,
                                                                                    mapMakerRandom,
@@ -236,8 +245,8 @@ public class PrototypeScenario implements Scenario {
 
 
 
-        for(Specie specie : biology.getSpecies())
-            marketMap.addMarket(specie,market.apply(model));
+        for(Species species : biology.getSpecies())
+            marketMap.addMarket(species, market.apply(model));
 
         //create random ports, all sharing the same market
         if(forcedPortPosition == null)
@@ -307,25 +316,25 @@ public class PrototypeScenario implements Scenario {
             //if needed, install better airs
             if(usePredictors)
             {
-                for(Specie specie : model.getSpecies())
+                for(Species species : model.getSpecies())
                 {
                     //create the predictors
-                    newFisher.setDailyCatchesPredictor(specie.getIndex(),
+                    newFisher.setDailyCatchesPredictor(species.getIndex(),
                                                        MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + specie,
+                                                               "Predicted Daily Catches of " + species,
                                                                fisher1 ->
                                                                        //check the daily counter but do not input new values
                                                                        //if you were not allowed at sea
                                                                        fisher1.isAllowedAtSea() ?
                                                                        fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                       specie.getIndex()) :
+                                                                               species.getIndex()) :
                                                                                0
 
                                                                ,
                                                                360));
-                    newFisher.setProfitPerUnitPredictor(specie.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + specie,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(specie.getIndex()),
+                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
+                            "Predicted Unit Profit " + species,
+                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
                             30));
 
 

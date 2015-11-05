@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model.regs;
 
 import javafx.collections.FXCollections;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -22,7 +22,7 @@ public class TACOpportunityCostManagerTest {
 
 
         FishState model = mock(FishState.class);
-        Specie species = new Specie("dummy");
+        Species species = new Species("dummy");
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         when(model.getFishers()).thenReturn(FXCollections.observableList(new LinkedList<>()));
         MultiQuotaRegulation quotas = new MultiQuotaRegulation(new double[]{100}, model);

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher;
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -65,8 +65,8 @@ public class FisherEquipment implements Serializable {
         return hold.getTotalPoundsCarried();
     }
 
-    public double getPoundsCarried(Specie specie) {
-        return hold.getPoundsCarried(specie);
+    public double getPoundsCarried(Species species) {
+        return hold.getPoundsCarried(species);
     }
 
     public double getMaximumLoad() {

@@ -65,7 +65,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
 
-        FishState state = new FishState(System.currentTimeMillis(),1);
+        FishState state = new FishState(System.currentTimeMillis(),24);
         Log.set(Log.LEVEL_NONE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
 
@@ -86,11 +86,11 @@ class Main{
         //world split in half
         /*
         ITQSpecificFactory regs2 = new ITQSpecificFactory(){
-            public void computeOpportunityCosts(Specie specie, Fisher seller, double biomass, double revenue,
+            public void computeOpportunityCosts(Species specie, Fisher seller, double biomass, double revenue,
                                                 SpecificQuotaRegulation regulation, ITQOrderBook market)
             {
                 //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecie().equals(specie))
+                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
                 {
                     double lastClosingPrice = -10 + 20* state.getDayOfTheYear() /365d ;
                     if(Double.isFinite(lastClosingPrice))
@@ -114,7 +114,7 @@ class Main{
 
             @Override
             public void computeOpportunityCosts(
-                    Specie specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
+                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
                     ITQOrderBook market) {
             }
         };

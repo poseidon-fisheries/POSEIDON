@@ -102,7 +102,20 @@ public class RockyLogisticInitializer implements BiologyInitializer
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
     }
 
+
+    /**
+     * Get a list of the species with their names. The size of this array determines the size of the model array
+     *
+     * @return
+     */
     @Override
+    public String[] getSpeciesNames() {
+        String[] generics = new String[numberOfSpecies];
+        for(int i=0; i<numberOfSpecies; i++)
+            generics[i] = "Species " + i;
+        return generics;
+    }
+
     public int getNumberOfSpecies() {
         return numberOfSpecies;
     }

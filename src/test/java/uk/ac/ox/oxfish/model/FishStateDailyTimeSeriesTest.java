@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import javafx.collections.FXCollections;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -29,9 +29,9 @@ public class FishStateDailyTimeSeriesTest {
         final NauticalMap map = mock(NauticalMap.class);
         when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<>());
         when(state.getMap()).thenReturn(map);
-        Specie specie = new Specie("lalala");
-        //1 specie
-        when(state.getSpecies()).thenReturn(Collections.singletonList(specie));
+        Species species = new Species("lalala");
+        //1 species
+        when(state.getSpecies()).thenReturn(Collections.singletonList(species));
 
         //===> aggregate over two markets
         Market market1 = mock(Market.class); TimeSeries<Market> data1 = mock(TimeSeries.class);
@@ -45,7 +45,7 @@ public class FishStateDailyTimeSeriesTest {
         when(market2.getData()).thenReturn(data2);
 
         List<Market> markets = new LinkedList<>();markets.add(market1); markets.add(market2);
-        when(state.getAllMarketsForThisSpecie(specie)).thenReturn(markets);
+        when(state.getAllMarketsForThisSpecie(species)).thenReturn(markets);
 
 
         //and after all that set up, see if it aggregates correctly
@@ -53,12 +53,12 @@ public class FishStateDailyTimeSeriesTest {
         dataSet.step(state);
         assertEquals(
                 -300d,
-                dataSet.getLatestObservation(specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
+                dataSet.getLatestObservation(species + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
                 .0001d
         );
         assertEquals(
                 300d,
-                dataSet.getLatestObservation(specie + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
+                dataSet.getLatestObservation(species + " " + AbstractMarket.EARNINGS_COLUMN_NAME),
                 .0001d
         );
     }

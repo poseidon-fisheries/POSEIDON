@@ -78,8 +78,16 @@ public class IndependentLogisticInitializer implements BiologyInitializer {
         return carryingCapacity;
     }
 
+
+    /**
+     * Singleton array with "Species 0" in it
+     *
+     * @return
+     */
     @Override
-    public int getNumberOfSpecies() {
-        return 1;
+    public String[] getSpeciesNames() {
+        return new String[]{"Species 0"};
     }
+
+
 }

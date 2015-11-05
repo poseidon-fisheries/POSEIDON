@@ -17,7 +17,7 @@ import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -184,9 +184,9 @@ public class NauticalMap implements Startable
     }
 
 
-    public double getTotalBiology(Specie specie)
+    public double getTotalBiology(Species species)
     {
-        return getAllSeaTilesAsList().stream().mapToDouble(value -> value.getBiomass(specie)).sum();
+        return getAllSeaTilesAsList().stream().mapToDouble(value -> value.getBiomass(species)).sum();
     }
 
 

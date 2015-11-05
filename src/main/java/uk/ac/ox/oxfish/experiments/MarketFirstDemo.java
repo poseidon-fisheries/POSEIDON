@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 
-import uk.ac.ox.oxfish.biology.Specie;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -160,7 +160,7 @@ public class MarketFirstDemo {
         state.start();
         while(state.getYear()< yearsToRun)
             state.schedule.step(state);
-        Specie specie = state.getSpecies().get(0);
+        Species species = state.getSpecies().get(0);
         //now write to file
         if(file != null) {
 
@@ -174,7 +174,7 @@ public class MarketFirstDemo {
                                  + "," +
                                  String.valueOf(
                                          fisher.getLatestYearlyObservation(
-                                                 specie + " " + AbstractMarket.LANDINGS_COLUMN_NAME))
+                                                 species + " " + AbstractMarket.LANDINGS_COLUMN_NAME))
                          + "," +
                          String.valueOf(
                                  fisher.getLatestYearlyObservation(

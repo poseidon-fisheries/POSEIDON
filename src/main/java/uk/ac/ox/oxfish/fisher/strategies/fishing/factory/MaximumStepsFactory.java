@@ -28,9 +28,9 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysStrategy
     @Override
     public MaximumDaysStrategy apply(FishState state) {
 
-        int steps = (int) Math.round(daysAtSea.apply(state.random) * state.getStepsPerDay());
+        int rounded = (int) Math.round(daysAtSea.apply(state.random));
 
-        return new MaximumDaysStrategy(steps);
+        return new MaximumDaysStrategy(rounded);
 
     }
 

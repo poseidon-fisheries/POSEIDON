@@ -16,20 +16,20 @@ public interface LocalBiology extends Startable
 
 
     /**
-     * the biomass at this location for a single specie.
-     * @param specie  the specie you care about
-     * @return the biomass of this specie
+     * the biomass at this location for a single species.
+     * @param species  the species you care about
+     * @return the biomass of this species
      */
-    Double getBiomass(Specie specie);
+    Double getBiomass(Species species);
 
 
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     * @param specie the specie fished
+     * @param species the species fished
      * @param biomassFished the biomass fished
      */
-    void reactToThisAmountOfBiomassBeingFished(Specie specie, Double biomassFished);
+    void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished);
 
 
 }
