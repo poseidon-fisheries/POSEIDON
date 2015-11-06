@@ -7,7 +7,6 @@ library(cowplot)
 #warning(commandArgs(TRUE)[1])
 #warning(commandArgs(TRUE)[2])
 
-
 thisFile <- function() {
   cmdArgs <- commandArgs(trailingOnly = FALSE)
   needle <- "--file="

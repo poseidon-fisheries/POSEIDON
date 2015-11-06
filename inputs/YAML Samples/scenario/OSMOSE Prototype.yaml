@@ -1,5 +1,5 @@
 OSMOSE Prototype:
-  buninLength: 100
+  initializationInYears: 100
   departingStrategy:
     Fixed Probability:
       probabilityToLeavePort: '1.0'

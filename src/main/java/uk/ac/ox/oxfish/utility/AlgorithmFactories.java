@@ -17,6 +17,8 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
+import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.MapInitializers;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
@@ -70,6 +72,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(Gear.class, Gears.CONSTRUCTORS);
         NAMES_MAP.put(Gear.class, Gears.NAMES);
+
+        CONSTRUCTOR_MAP.put(MapInitializer.class, MapInitializers.CONSTRUCTORS);
+        NAMES_MAP.put(MapInitializer.class, MapInitializers.NAMES);
     }
 
 

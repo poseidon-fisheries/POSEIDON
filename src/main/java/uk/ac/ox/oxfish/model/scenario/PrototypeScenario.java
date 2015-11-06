@@ -203,8 +203,7 @@ public class PrototypeScenario implements Scenario {
         habitat.applyHabitats(map, mapMakerRandom, model);
 
 
-        //set what kind of distance function should we use for this map
-
+        //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(map, random, biology,
                                          weather,
                                          global, model);

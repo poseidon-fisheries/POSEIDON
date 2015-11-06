@@ -47,17 +47,21 @@ public class BiologyInitializers {
                          RandomConstantBiologyFactory::new);
         NAMES.put(RandomConstantBiologyFactory.class,"Random Smoothed and Fixed");
 
-     CONSTRUCTORS.put("Half Bycatch",
+        CONSTRUCTORS.put("Half Bycatch",
                          HalfBycatchFactory::new);
         NAMES.put(HalfBycatchFactory.class,"Half Bycatch");
 
-     CONSTRUCTORS.put("Split in Half",
-                      SplitInitializerFactory::new);
+        CONSTRUCTORS.put("Split in Half",
+                         SplitInitializerFactory::new);
         NAMES.put(SplitInitializerFactory.class,"Split in Half");
 
-     CONSTRUCTORS.put("Well-Mixed",
-                      WellMixedBiologyFactory::new);
-        NAMES.put(WellMixedBiologyFactory.class,"Split in Half");
+        CONSTRUCTORS.put("Well-Mixed",
+                         WellMixedBiologyFactory::new);
+        NAMES.put(WellMixedBiologyFactory.class,"Well-Mixed");
+
+        CONSTRUCTORS.put("Osmose Biology",
+                         OsmoseBiologyFactory::new);
+        NAMES.put(OsmoseBiologyFactory.class,"Osmose Biology");
 
 
     }
