@@ -15,7 +15,7 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
 {
 
 
-    private int initializationInYears = 100;
+    private int numberOfOsmoseStepsToPulseBeforeSimulationStart = 100;
 
 
     private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath(
@@ -45,16 +45,16 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
         return new OsmoseBiologyInitializer(osmoseConfigurationFile,
                                             preInitializedConfiguration,
                                             preInitializedConfigurationDirectory,
-                                            initializationInYears);
+                                            numberOfOsmoseStepsToPulseBeforeSimulationStart);
     }
 
 
-    public int getInitializationInYears() {
-        return initializationInYears;
+    public int getNumberOfOsmoseStepsToPulseBeforeSimulationStart() {
+        return numberOfOsmoseStepsToPulseBeforeSimulationStart;
     }
 
-    public void setInitializationInYears(int initializationInYears) {
-        this.initializationInYears = initializationInYears;
+    public void setNumberOfOsmoseStepsToPulseBeforeSimulationStart(int numberOfOsmoseStepsToPulseBeforeSimulationStart) {
+        this.numberOfOsmoseStepsToPulseBeforeSimulationStart = numberOfOsmoseStepsToPulseBeforeSimulationStart;
     }
 
     public String getOsmoseConfigurationFile() {

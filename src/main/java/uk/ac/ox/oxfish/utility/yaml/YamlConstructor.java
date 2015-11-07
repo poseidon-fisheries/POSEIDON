@@ -3,7 +3,10 @@ package uk.ac.ox.oxfish.utility.yaml;
 import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.*;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -115,6 +118,12 @@ public class YamlConstructor extends  Constructor {
 
         //get it as a string
         String nodeContent = (String) constructScalar(node);
+        return parseDoubleParameter(nodeContent);
+
+
+    }
+
+    public static DoubleParameter parseDoubleParameter(String nodeContent) {
         //trim and split
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
         if(split.length == 1)
@@ -122,13 +131,11 @@ public class YamlConstructor extends  Constructor {
         return new FixedDoubleParameter(Double.parseDouble(split[0]));
 
         if(split[0].toLowerCase().equals("normal"))
-            return new NormalDoubleParameter(Double.parseDouble(split[1]),Double.parseDouble(split[2]));
+            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
         Preconditions.checkArgument(split[0].toLowerCase().equals("uniform"), "The parameter given is neither fixed not normal nor uniform, what is " + nodeContent + " ?");
-        return new UniformDoubleParameter(Double.parseDouble(split[1]),Double.parseDouble(split[2]));
-
+        return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
     }
-
 
 
 }

@@ -66,7 +66,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
 
-        FishState state = new FishState(System.currentTimeMillis(),24);
+        FishState state = new FishState(System.currentTimeMillis(),1);
         Log.set(Log.LEVEL_NONE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.csv")));
 

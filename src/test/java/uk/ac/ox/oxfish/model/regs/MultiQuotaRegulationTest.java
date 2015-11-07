@@ -46,6 +46,34 @@ public class MultiQuotaRegulationTest {
     }
 
 
+    //giving infinity is equal to ignore the quota remaining
+    @Test
+    public void multiIgnoreGen() throws Exception {
+
+
+
+        FishState model = mock(FishState.class);
+        Species zero = new Species("zero"); zero.resetIndexTo(0);
+        Species one = new Species("one"); one.resetIndexTo(1);
+        Species two = new Species("two"); two.resetIndexTo(2);
+        Fisher fisher = mock(Fisher.class);
+
+        MultiQuotaRegulation regs = new MultiQuotaRegulation(new double[]{1d,2d,Double.POSITIVE_INFINITY}, model);
+        assertTrue(regs.allowedAtSea(fisher, model));
+        assertEquals(1,regs.getQuotaRemaining(0),.0001);
+        assertEquals(2,regs.getQuotaRemaining(1),.0001);
+        assertEquals(Double.POSITIVE_INFINITY,regs.getQuotaRemaining(2),.0001);
+        regs.reactToSale(two,fisher,100,123141);
+
+        assertEquals(1,regs.getQuotaRemaining(0),.0001);
+        assertEquals(2,regs.getQuotaRemaining(1),.0001);
+        assertEquals(Double.POSITIVE_INFINITY,regs.getQuotaRemaining(2),.0001);
+        regs.step(model);
+        assertEquals(1,regs.getQuotaRemaining(0),.0001);
+        assertEquals(2,regs.getQuotaRemaining(1),.0001);
+        assertEquals(Double.POSITIVE_INFINITY,regs.getQuotaRemaining(2),.0001);
+    }
+
     @Test
     public void multiQuotaGen() throws Exception {
 

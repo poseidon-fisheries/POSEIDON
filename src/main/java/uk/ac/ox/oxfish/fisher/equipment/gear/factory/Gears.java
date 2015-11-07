@@ -44,6 +44,10 @@ public class Gears {
                          RandomCatchabilityTrawlFactory::new);
         NAMES.put(RandomCatchabilityTrawlFactory.class,"Random Catchability");
 
+        CONSTRUCTORS.put("Random Catchability By List",
+                         RandomTrawlFromStringFactory::new);
+        NAMES.put(RandomTrawlFromStringFactory.class,"Random Catchability By List");
+
         CONSTRUCTORS.put("Habitat Aware Gear",
                          HabitatAwareGearFactory::new);
         NAMES.put(HabitatAwareGearFactory.class,"Habitat Aware Gear");

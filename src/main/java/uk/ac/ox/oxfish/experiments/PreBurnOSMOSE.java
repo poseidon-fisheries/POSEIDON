@@ -1,9 +1,11 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.scenario.OsmosePrototype;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
 import java.io.File;
 
@@ -24,16 +26,20 @@ public class PreBurnOSMOSE {
 
         //because i am planning on running this once I am just going to hard-code this in.
         String configurationLocation =  "/home/carrknight/code/config_OSMOSE-WFS_v3u2/osm_all-parameters.csv";
-        final String outputDir = "/home/carrknight/code/config_OSMOSE-WFS_v3u2/output/restart/";
+        final String outputDir = "/home/carrknight/code/config_OSMOSE-WFS_v3u2/randomStarts";
         String output = outputDir + "osm_snapshot_step1379.nc.0";
 
         for(int i=0; i<1000; i++)
         {
-            OsmosePrototype scenario = new OsmosePrototype();
+            PrototypeScenario scenario = new PrototypeScenario();
+            scenario.setMapInitializer(new OsmoseMapInitializerFactory());
+            OsmoseBiologyFactory biologyFactory = new OsmoseBiologyFactory();
+            scenario.setBiologyInitializer(biologyFactory);
             scenario.setFishers(0); //no fishers
             scenario.setNetworkBuilder(new EmptyNetworkBuilder()); //no social network
-            scenario.setBuninLength(115*12);
-            scenario.setOsmoseConfigurationFile(configurationLocation);
+            biologyFactory.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(115*12);
+            biologyFactory.setOsmoseConfigurationFile(configurationLocation);
+            biologyFactory.setPreInitializedConfiguration(false);
             FishState state = new FishState(i);
             state.setScenario(scenario);
             state.start();
@@ -55,7 +61,7 @@ public class PreBurnOSMOSE {
     /**
      * generated 1000 random starting point for the default OSMOSE scenario
      */
-    public static void main(String[] args)
+    public static void southAfrica(String[] args)
     {
 
 
@@ -66,11 +72,15 @@ public class PreBurnOSMOSE {
 
         for(int i=0; i<1000; i++)
         {
-            OsmosePrototype scenario = new OsmosePrototype();
+            PrototypeScenario scenario = new PrototypeScenario();
+            scenario.setMapInitializer(new OsmoseMapInitializerFactory());
+            OsmoseBiologyFactory biologyFactory = new OsmoseBiologyFactory();
             scenario.setFishers(0); //no fishers
             scenario.setNetworkBuilder(new EmptyNetworkBuilder()); //no social network
-            scenario.setBuninLength(114*25);
-            scenario.setOsmoseConfigurationFile(configurationLocation);
+            biologyFactory.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*25);
+            biologyFactory.setOsmoseConfigurationFile(configurationLocation);
+            biologyFactory.setPreInitializedConfiguration(false);
+            scenario.setBiologyInitializer(biologyFactory);
             FishState state = new FishState(i);
             state.setScenario(scenario);
             state.start();

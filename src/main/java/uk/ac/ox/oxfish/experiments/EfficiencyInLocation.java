@@ -3,11 +3,12 @@ package uk.ac.ox.oxfish.experiments;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.scenario.OsmosePrototype;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
@@ -31,7 +32,7 @@ public class EfficiencyInLocation
 
 
     private static final int YEARS_TO_SIMULATE = 5;
-    private static final double imitationProbability = 0d;;
+    private static final double imitationProbability = 0d;
 
 
     public static void main(String[] args) throws IOException {
@@ -118,8 +119,11 @@ public class EfficiencyInLocation
             double[] fuels = new double[10];
 
             for(int i=0; i<10; i++) {
-                OsmosePrototype scenario = new OsmosePrototype();
-                scenario.setPreInitializedConfiguration(true);
+                PrototypeScenario scenario = new PrototypeScenario();
+                OsmoseBiologyFactory biology = new OsmoseBiologyFactory();
+                biology.setPreInitializedConfiguration(true);
+                scenario.setBiologyInitializer(biology);
+                scenario.setMapInitializer(new OsmoseMapInitializerFactory());
                 scenario.setFishers(100);
 
                 PerTripImitativeDestinationFactory imitative = new PerTripImitativeDestinationFactory();

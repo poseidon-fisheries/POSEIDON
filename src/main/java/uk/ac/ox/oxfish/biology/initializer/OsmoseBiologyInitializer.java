@@ -134,7 +134,8 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
             }
 
         } catch (IOException e) {
-            throw  new IllegalArgumentException("Can't instantiate OSMOSE!");
+            e.printStackTrace();
+            throw  new IllegalArgumentException("Can't instantiate OSMOSE! \n" );
         }
         //grab all the species
         Species[] species = new Species[osmoseSimulation.getNumberOfSpecies()];
