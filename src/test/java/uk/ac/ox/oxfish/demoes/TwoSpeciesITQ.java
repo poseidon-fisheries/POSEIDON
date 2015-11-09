@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -28,7 +28,7 @@ public class TwoSpeciesITQ {
 
             final FishState state = new FishState(System.currentTimeMillis());
 
-            ITQMultiFactory multiFactory = new ITQMultiFactory();
+            MultiITQFactory multiFactory = new MultiITQFactory();
             //quota ratios: 90-10
             multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
             multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));

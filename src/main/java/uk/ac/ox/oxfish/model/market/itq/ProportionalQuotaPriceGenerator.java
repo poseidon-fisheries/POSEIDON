@@ -70,9 +70,13 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         if (state.getDayOfTheYear() == 365)
             return Double.NaN;
 
+        //if you have infinite quotas (unprotected species), you have no value for them
+        Double quotasLeft = numberOfQuotasLeftGetter.scan(fisher);
+        if(Double.isInfinite(quotasLeft))
+            return Double.NaN;
+
         //if you expect to catch nothing, then the quota is worthless
         double dailyCatchesPredicted = fisher.predictDailyCatches(specieIndex);
-
         if(dailyCatchesPredicted < FishStateUtilities.EPSILON) //if you predict no catches a day, you don't value the quota at all (the probability will be 0)
         {
             assert dailyCatchesPredicted > -FishStateUtilities.EPSILON;
@@ -86,7 +90,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
         double probability = 1 -
-                fisher.probabilitySumDailyCatchesBelow(specieIndex, numberOfQuotasLeftGetter.scan(fisher),
+                fisher.probabilitySumDailyCatchesBelow(specieIndex, quotasLeft,
                                                        365 - state.getDayOfTheYear());
 
 
@@ -97,10 +101,11 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         double multiplier = fisher.predictUnitProfit(specieIndex);
         for(int species = 0; species < state.getSpecies().size(); species++)
         {
-            if(species == specieIndex)
+            if(species == specieIndex ) //don't count yourself
                 continue;
 
-            double quotaPrice = orderBooks[species].getLastClosingPrice();
+            //quota price (0 if there is no market)
+            double quotaPrice = orderBooks[species] != null ? orderBooks[species].getLastClosingPrice() : 0;
             quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
 
             multiplier += (fisher.predictUnitProfit(species) - quotaPrice)

@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
@@ -82,7 +82,7 @@ public class GearImitationWithITQ
 
         final FishState state = new FishState(randomSeed);
 
-        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        MultiITQFactory multiFactory = new MultiITQFactory();
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
@@ -197,7 +197,7 @@ public class GearImitationWithITQ
 
         final FishState state = new FishState(System.currentTimeMillis());
 
-        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        MultiITQFactory multiFactory = new MultiITQFactory();
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));

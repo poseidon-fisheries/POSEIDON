@@ -13,8 +13,11 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
+import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -33,15 +36,34 @@ public class GearImitationWithITQ
     public void ITQDrivePeopleToSwitchToBetterGear() throws Exception {
 
 
-
-
-        System.out.println("Test starting!");
-        final FishState state = new FishState(System.currentTimeMillis());
-
-        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        MultiITQFactory multiFactory = new MultiITQFactory();
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
+
+        gearImitationTestRun(multiFactory,true);
+
+
+    }
+
+    @Test
+    public void UnprotectedVersusProtectedGearSwitch() throws Exception {
+
+
+        MultiITQStringFactory multiFactory = new MultiITQStringFactory();
+        //only blue are protected by quota
+        multiFactory.setYearlyQuotaMaps("1:500");
+
+        gearImitationTestRun(multiFactory,false);
+
+
+    }
+
+    public void gearImitationTestRun(AlgorithmFactory<MultiQuotaRegulation> multiFactory, boolean checkRed) {
+        System.out.println("Test starting!");
+        final FishState state = new FishState(System.currentTimeMillis());
+
+
         //biomass ratio: 70-30
         WellMixedBiologyFactory biologyFactory = new WellMixedBiologyFactory();
         biologyFactory.setCapacityRatioSecondToFirst(new FixedDoubleParameter(.3));
@@ -145,9 +167,10 @@ public class GearImitationWithITQ
         double totalBlueQuotas = 500 * 100;
         Assert.assertTrue(earlyBlueLandings > .8 * totalBlueQuotas);
         //red is underutilized
-        double totalRedQuotas = 4500 * 100;
-        Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
-
+        if(checkRed) {
+            double totalRedQuotas = 4500 * 100;
+            Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
+        }
 
         while (state.getYear() < 20)
             state.schedule.step(state);
@@ -161,19 +184,24 @@ public class GearImitationWithITQ
         assertTrue(blue < .01);
         assertTrue(red > blue + .005);
 
-        //by year 10 the quotas are very well used!
+        //by year 20 the quotas are very well used!
         double lateRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
                                                                                        AbstractMarket.LANDINGS_COLUMN_NAME);
         double lateBlueLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(1) + " " +
                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
         System.out.println("Late Landings: " + lateRedLandings + " --- " + lateBlueLandings);
         System.out.println(
-                "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
+                "Late Quota Efficiency: " + (checkRed ? Double.NaN : lateRedLandings / (4500 * 100)) + " --- " + lateBlueLandings / totalBlueQuotas);
 
         //much better efficiency by the end of the simulation
         Assert.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);
-        Assert.assertTrue(lateRedLandings > .8 * totalRedQuotas); //this is actually almost always above 90% after 20 years
+        if(checkRed) {
+            double totalRedQuotas = 4500 * 100;
 
-
+            Assert.assertTrue(
+                    lateRedLandings > .8 * totalRedQuotas); //this is actually almost always above 90% after 20 years
+        }
     }
+
+
 }

@@ -63,7 +63,7 @@ public class MultiQuotaRegulationTest {
         assertEquals(1,regs.getQuotaRemaining(0),.0001);
         assertEquals(2,regs.getQuotaRemaining(1),.0001);
         assertEquals(Double.POSITIVE_INFINITY,regs.getQuotaRemaining(2),.0001);
-        regs.reactToSale(two,fisher,100,123141);
+        regs.reactToSale(two,fisher,100,123141); //sell 100 of the infinite quota
 
         assertEquals(1,regs.getQuotaRemaining(0),.0001);
         assertEquals(2,regs.getQuotaRemaining(1),.0001);

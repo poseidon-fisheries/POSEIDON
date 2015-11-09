@@ -19,6 +19,9 @@ Multi-ITQ:
   quotaFirstSpecie: '5000.0'
   quotaOtherSpecies: '5000.0'
 -------
+Multi-ITQ by List:
+  yearlyQuotaMaps: 0:5000
+-------
 Partial-ITQ:
   individualQuota: '5000.0'
   specieIndex: 0

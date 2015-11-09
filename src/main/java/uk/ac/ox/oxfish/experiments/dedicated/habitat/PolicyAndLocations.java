@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMultiFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -79,11 +79,11 @@ public class PolicyAndLocations
 
 
         writer = new FileWriter(mainDirectory.resolve("itq1.csv").toFile());
-        ITQMultiFactory itqMultiFactory = new ITQMultiFactory();
-        itqMultiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4000));
-        itqMultiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(1000)); //80-20 proportion (used in the two species world)
+        MultiITQFactory multiITQFactory = new MultiITQFactory();
+        multiITQFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4000));
+        multiITQFactory.setQuotaOtherSpecies(new FixedDoubleParameter(1000)); //80-20 proportion (used in the two species world)
         simulation = policyLocationGrid(new FromLeftToRightFactory(),
-                                        itqMultiFactory,
+                                        multiITQFactory,
                                         0l,
                                         5, null);
         writer.write(simulation.getCumulativeTrawls()); writer.close();
@@ -123,7 +123,7 @@ public class PolicyAndLocations
 
         writer = new FileWriter(mainDirectory.resolve("itq2.csv").toFile());
         simulation = policyLocationGrid(splitBiology,
-                                        itqMultiFactory,
+                                        multiITQFactory,
                                         0l,
                                         5,
                                         mainDirectory.resolve("itq2_hist.csv").toFile());

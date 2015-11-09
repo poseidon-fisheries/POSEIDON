@@ -35,12 +35,13 @@ Prototype:
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'
-  mapInitializer: !!uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory
-    cellSizeInKilometers: '10.0'
-    coastalRoughness: '4.0'
-    depthSmoothing: '1000000.0'
-    height: '50.0'
-    width: '50.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '4.0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      width: '50.0'
   mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:

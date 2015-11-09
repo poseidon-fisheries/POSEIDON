@@ -49,8 +49,11 @@ public class Regulations
         CONSTRUCTORS.put("Mono-ITQ", ITQMonoFactory::new);
         NAMES.put(ITQMonoFactory.class,"Mono-ITQ");
 
-        CONSTRUCTORS.put("Multi-ITQ", ITQMultiFactory::new);
-        NAMES.put(ITQMultiFactory.class,"Multi-ITQ");
+        CONSTRUCTORS.put("Multi-ITQ", MultiITQFactory::new);
+        NAMES.put(MultiITQFactory.class, "Multi-ITQ");
+
+        CONSTRUCTORS.put("Multi-ITQ by List", MultiITQStringFactory::new);
+        NAMES.put(MultiITQStringFactory.class, "Multi-ITQ by List");
 
         CONSTRUCTORS.put("Partial-ITQ", ITQSpecificFactory::new);
         NAMES.put(ITQSpecificFactory.class,"Partial-ITQ");

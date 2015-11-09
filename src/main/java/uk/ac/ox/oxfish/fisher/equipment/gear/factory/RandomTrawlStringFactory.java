@@ -16,7 +16,7 @@ import java.util.Map;
  * specie 2 to have catchability 10 and everything else 0 then catchabilityMap will look like this: "0:0.01,2:10"
  * Created by carrknight on 11/6/15.
  */
-public class RandomTrawlFromStringFactory implements AlgorithmFactory<RandomCatchabilityTrawl> {
+public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabilityTrawl> {
 
 
     private String catchabilityMap = "0:0.01"; //by default only specie 0 is given any catchability
@@ -26,7 +26,7 @@ public class RandomTrawlFromStringFactory implements AlgorithmFactory<RandomCatc
     private DoubleParameter trawlSpeed = new FixedDoubleParameter(5);
 
 
-    public RandomTrawlFromStringFactory() {
+    public RandomTrawlStringFactory() {
     }
 
 

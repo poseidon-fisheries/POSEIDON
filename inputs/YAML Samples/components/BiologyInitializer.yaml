@@ -37,10 +37,16 @@ Split in Half:
   percentageLimitOnDailyMovement: '0.01'
   steepness: uniform 0.6 0.8
 -------
-Split in Half:
+Well-Mixed:
   capacityRatioSecondToFirst: '0.2'
   differentialPercentageToMove: '0.001'
   firstSpeciesCapacity: '5000.0'
   percentageLimitOnDailyMovement: '0.01'
   steepness: uniform 0.6 0.8
+-------
+Osmose Biology:
+  numberOfOsmoseStepsToPulseBeforeSimulationStart: 100
+  osmoseConfigurationFile: /home/carrknight/code/oxfish/inputs/osmose/prototype/osm_all-parameters.csv
+  preInitializedConfiguration: true
+  preInitializedConfigurationDirectory: /home/carrknight/code/oxfish/inputs/osmose/prototype/restart
 -------

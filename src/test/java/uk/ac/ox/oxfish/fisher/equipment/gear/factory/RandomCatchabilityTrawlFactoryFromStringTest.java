@@ -22,7 +22,7 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
     public void simpleMap() throws Exception
     {
 
-        RandomTrawlFromStringFactory factory = new RandomTrawlFromStringFactory();
+        RandomTrawlStringFactory factory = new RandomTrawlStringFactory();
         factory.setCatchabilityMap(" 0:1, 3:1 ");
         factory.setStandardDeviationMap(" 0:1 , 2  : 1");
 
@@ -54,7 +54,7 @@ public class RandomCatchabilityTrawlFactoryFromStringTest {
 
     @Test
     public void doubleParameterSupport() throws Exception {
-        RandomTrawlFromStringFactory factory = new RandomTrawlFromStringFactory();
+        RandomTrawlStringFactory factory = new RandomTrawlStringFactory();
         factory.setCatchabilityMap("0: uniform 1 2");
         factory.setStandardDeviationMap("  ");
 

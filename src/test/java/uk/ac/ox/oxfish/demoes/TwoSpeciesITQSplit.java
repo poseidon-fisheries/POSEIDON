@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMultiFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -29,7 +29,7 @@ public class TwoSpeciesITQSplit
         final FishState state = new FishState(System.currentTimeMillis());
         //world split in half
 
-        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        MultiITQFactory multiFactory = new MultiITQFactory();
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
@@ -97,7 +97,7 @@ public class TwoSpeciesITQSplit
         final FishState state = new FishState(System.currentTimeMillis());
         //world split in half
 
-        ITQMultiFactory multiFactory = new ITQMultiFactory();
+        MultiITQFactory multiFactory = new MultiITQFactory();
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));

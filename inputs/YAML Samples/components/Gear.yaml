@@ -12,6 +12,11 @@ Random Catchability:
   standardDeviationCatchabilityOtherSpecies: '0.0'
   trawlSpeed: '5.0'
 -------
+Random Catchability By List:
+  catchabilityMap: '0:0.01'
+  standardDeviationMap: ''
+  trawlSpeed: '5.0'
+-------
 Habitat Aware Gear:
   meanCatchabilityRocky: '0.01'
   meanCatchabilitySandy: '0.01'
