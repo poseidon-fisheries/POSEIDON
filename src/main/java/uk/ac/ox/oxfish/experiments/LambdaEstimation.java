@@ -82,8 +82,9 @@ public class LambdaEstimation {
         Paths.get("runs","lambda").toFile().mkdirs();
         FishStateUtilities.printCSVColumnToFile(
                 //fisher 0 has some years where profits are really low, making the graph a lot less clear
-                state.getFishers().get(0).getDailyData().getColumn("Reservation Lambda Owning 1000 quotas"),
-                Paths.get("runs", "lambda", "overTime.csv").toFile());
+                Paths.get("runs", "lambda", "overTime.csv").toFile(),
+                state.getFishers().get(0).getDailyData().getColumn("Reservation Lambda Owning 1000 quotas")
+        );
 
 
         while(state.getDayOfTheYear() != 100)

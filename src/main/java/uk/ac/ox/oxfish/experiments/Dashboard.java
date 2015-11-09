@@ -142,8 +142,9 @@ public class Dashboard
 
         //write to file
         File outputFile = outputPath.resolve(outputName + "_" + run + ".csv").toFile();
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species 0"),
-                                                outputFile);
+        FishStateUtilities.printCSVColumnToFile(outputFile,
+                                                state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species 0")
+        );
 
 
     }
@@ -196,8 +197,9 @@ public class Dashboard
 
         //write to file
         File outputFile = outputPath.resolve(outputName + "_" + run + ".csv").toFile();
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("Average Hypothetical Quota"),
-                                                outputFile);
+        FishStateUtilities.printCSVColumnToFile(outputFile,
+                                                state.getDailyDataSet().getColumn("Average Hypothetical Quota")
+        );
 
 
 
@@ -235,8 +237,8 @@ public class Dashboard
 
         //write to file
         File outputFile = outputPath.resolve(outputName + "_" + i + ".csv").toFile();
-        FishStateUtilities.printCSVColumnToFile(mileage,
-                                                outputFile);
+        FishStateUtilities.printCSVColumnToFile(outputFile, mileage
+        );
     }
 
 

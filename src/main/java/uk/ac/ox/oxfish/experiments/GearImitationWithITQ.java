@@ -66,11 +66,13 @@ public class GearImitationWithITQ
                 directory.resolve("final_blue.csv").toFile());
 
         //show the effect on catches
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("red_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("red_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("blue_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("blue_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
     }
 

@@ -67,20 +67,18 @@ public class OpportunityCostsDemo {
         Paths.get("runs", "split", directoryName).toFile().mkdirs();
         //quota price
         FishStateUtilities.printCSVColumnToFile(
-                state.getDailyDataSet().getColumn(priceColumnName),
-                Paths.get("runs", "split", directoryName, "price.csv").toFile()
+                Paths.get("runs", "split", directoryName, "price.csv").toFile(),
+                state.getDailyDataSet().getColumn(priceColumnName)
         );
         //protected landings
         FishStateUtilities.printCSVColumnToFile(
-                state.getDailyDataSet().getColumn(
-                        state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                Paths.get("runs", "split", directoryName, "protected.csv").toFile()
+                Paths.get("runs", "split", directoryName, "protected.csv").toFile(), state.getDailyDataSet().getColumn(
+                        state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
         );
         //unprotected landings
         FishStateUtilities.printCSVColumnToFile(
-                state.getDailyDataSet().getColumn(
-                        state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                Paths.get("runs", "split", directoryName, "free.csv").toFile()
+                Paths.get("runs", "split", directoryName, "free.csv").toFile(), state.getDailyDataSet().getColumn(
+                        state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
         );
 
     }

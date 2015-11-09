@@ -206,13 +206,47 @@ public class FishStateUtilities {
     }
 
 
-    public static void printCSVColumnToFile(DataColumn column, File file)
+    public static void printCSVColumnToFile(File file, DataColumn column)
     {
         try {
             FileWriter writer = new FileWriter(file);
             for (Double aColumn : column) {
                 writer.write(aColumn.toString());
                 writer.write("\n");
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static void printCSVColumnsToFile(File file, DataColumn... columns)
+    {
+        try {
+            FileWriter writer = new FileWriter(file);
+            //write header
+            for(int i=0; i<columns.length; i++)
+            {
+                if(i!=0)
+                    writer.write(",");
+                writer.write(columns[i].getName());
+            }
+            writer.write("\n");
+
+            //write columns
+            for(int row=0; row<columns[0].size(); row++)
+            {
+                for(int i=0; i<columns.length; i++)
+                {
+                    if(i!=0)
+                        writer.write(",");
+                    writer.write(String.valueOf(columns[i].get(row)));
+                }
+                writer.write("\n");
+
             }
             writer.flush();
             writer.close();

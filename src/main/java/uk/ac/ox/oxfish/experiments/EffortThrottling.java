@@ -71,9 +71,10 @@ public class EffortThrottling {
 
         //print out the price!
         FishStateUtilities.printCSVColumnToFile(
+                root.resolve("variable_price.csv").toFile(),
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
-                ), root.resolve("variable_price.csv").toFile());
+                ));
 
 
         //self-regulating from below
@@ -87,9 +88,10 @@ public class EffortThrottling {
         Preconditions.checkArgument(state.seed()==0);
 
         FishStateUtilities.printCSVColumnToFile(
+                root.resolve("variable_price2.csv").toFile(),
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
-                ), root.resolve("variable_price2.csv").toFile());
+                ));
         //self-regulating from above
         state = EffortThrottling.effortThrottling(80, market2,
                                                   0,
@@ -99,9 +101,10 @@ public class EffortThrottling {
         );
 
         FishStateUtilities.printCSVColumnToFile(
+                root.resolve("variable_price3.csv").toFile(),
                 state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
-                ), root.resolve("variable_price3.csv").toFile());
+                ));
 
 
 
@@ -154,8 +157,9 @@ public class EffortThrottling {
         System.out.println("end: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
         if(timeSeries != null)
-            FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("Probability to leave port"),
-                                                    timeSeries);
+            FishStateUtilities.printCSVColumnToFile(timeSeries,
+                                                    state.getDailyDataSet().getColumn("Probability to leave port")
+            );
         if(grid!=null)
             gridToCSV(state.getDailyTrawlsMap().field,grid);
 

@@ -71,17 +71,21 @@ public class TwoSpeciesITQ
         while(state.getYear()<10)
             state.schedule.step(state);
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                Paths.get("docs","20151009 lambda3","red_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(Paths.get("docs", "20151009 lambda3", "red_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                Paths.get("docs","20151009 lambda3","blue_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(Paths.get("docs", "20151009 lambda3", "blue_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 0),
-                                                Paths.get("docs","20151009 lambda3","red_quotas.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(Paths.get("docs", "20151009 lambda3", "red_quotas.csv").toFile(),
+                                                state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 0)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 1),
-                                                Paths.get("docs","20151009 lambda3","blue_quotas.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(Paths.get("docs", "20151009 lambda3", "blue_quotas.csv").toFile(),
+                                                state.getDailyDataSet().getColumn("ITQ Last Closing Price Of Species " + 1)
+        );
     }
 
 
@@ -218,17 +222,21 @@ public class TwoSpeciesITQ
         Path directory = Paths.get("docs", "20151014 corollaries");
 
         //show the effect on catches
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("geo_red_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("geo_red_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(0) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME),
-                                                directory.resolve("geo_blue_landings.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("geo_blue_landings.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn("# of North Tows"),
-                                                directory.resolve("north.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("north.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn("# of North Tows")
+        );
 
-        FishStateUtilities.printCSVColumnToFile(state.getYearlyDataSet().getColumn("# of South Tows"),
-                                                directory.resolve("south.csv").toFile());
+        FishStateUtilities.printCSVColumnToFile(directory.resolve("south.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn("# of South Tows")
+        );
 
 
 
