@@ -37,4 +37,9 @@ public class Quote implements Comparable<Quote>{
     public Fisher getTrader() {
         return trader;
     }
+
+    @Override
+    public String toString() {
+        return price + "$";
+    }
 }

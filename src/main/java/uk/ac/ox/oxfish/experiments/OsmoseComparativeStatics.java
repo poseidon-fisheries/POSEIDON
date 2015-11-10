@@ -1,18 +1,28 @@
 package uk.ac.ox.oxfish.experiments;
 
+import com.esotericsoftware.minlog.Log;
+import sim.display.Console;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
+import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.FishStateLogger;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * What happens to a few fish biomasses in OSMOSE depending on # of fishers and gear used
@@ -24,7 +34,7 @@ public class OsmoseComparativeStatics
     public static final int RUNS = 50;
     public static final int YEARS_PER_SIMULATION = 30;
 
-    public static void main(String[] args)
+    public static void secondaryEffects(String[] args)
     {
         Path root = Paths.get("runs", "osmose");
         root.toFile().mkdirs();
@@ -133,5 +143,78 @@ public class OsmoseComparativeStatics
 
     }
 
+
+    public static void main(String[] args) throws IOException {
+        FishState model = new FishState(System.currentTimeMillis(),1);
+        Log.setLogger(new FishStateLogger(model,Paths.get("log.txt")));
+        Log.set(Log.LEVEL_TRACE);
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setBiologyInitializer(new OsmoseBiologyFactory());
+        scenario.setMapInitializer(new OsmoseMapInitializerFactory());
+        scenario.setFishers(100);
+        RandomTrawlStringFactory gear = new RandomTrawlStringFactory();
+        gear.setCatchabilityMap("3:.01");
+        scenario.setGear(gear);
+
+        //mpa rules
+        MultiITQStringFactory itqs = new MultiITQStringFactory();
+        itqs.setYearlyQuotaMaps("3:500");
+        scenario.setUsePredictors(true);
+        scenario.setRegulation(itqs);
+        scenario.forcePortPosition(new int[]{1,1});
+
+        RandomTrawlStringFactory option1 = new RandomTrawlStringFactory();
+        option1.setCatchabilityMap("3:.01");
+        RandomTrawlStringFactory option2= new RandomTrawlStringFactory();
+        option1.setCatchabilityMap("2:.01");
+        model.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                GearImitationAnalysis.attachGearAnalysisToEachFisher(model.getFishers(),model,
+                                                                     Arrays.asList(option1.apply(model),option2.apply(model)));
+            }
+
+            @Override
+            public void turnOff() {
+
+            }
+        });
+
+
+        //now work!
+        model.setScenario(scenario);
+        FishGUI gui = new FishGUI(model);
+        Console c = new Console(gui);
+        c.setVisible(true);
+
+
+
+    }
+
+
+    public static void mpaGUI(String[] args)
+    {
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setBiologyInitializer(new OsmoseBiologyFactory());
+        scenario.setMapInitializer(new OsmoseMapInitializerFactory());
+        scenario.setFishers(100);
+        RandomTrawlStringFactory gear = new RandomTrawlStringFactory();
+        gear.setCatchabilityMap("3:.01");
+        scenario.setGear(gear);
+
+        //mpa rules
+        scenario.setRegulation(new ProtectedAreasOnlyFactory());
+        scenario.forcePortPosition(new int[]{1,1});
+
+        //now work!
+        FishState model = new FishState(System.currentTimeMillis(),1);
+        model.setScenario(scenario);
+        FishGUI gui = new FishGUI(model);
+        Console c = new Console(gui);
+        c.setVisible(true);
+
+
+    }
 
 }

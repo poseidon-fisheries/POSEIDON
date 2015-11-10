@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -103,7 +104,8 @@ public class ITQOrderBook implements Steppable,Startable{
                             trader.getKey()));
                 }
                 //can I sell?
-                if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch ) {
+                if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch )
+                {
                     double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
                                                 buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                             ;
@@ -114,6 +116,14 @@ public class ITQOrderBook implements Steppable,Startable{
                 }
             }
         }
+
+        if(Log.TRACE)
+        {
+            Log.trace(asks.size() + " ---- " + bids.size());
+            Log.trace(asks.toString());
+            Log.trace(bids.toString());
+        }
+
 
         //go for it
         clearQuotes();

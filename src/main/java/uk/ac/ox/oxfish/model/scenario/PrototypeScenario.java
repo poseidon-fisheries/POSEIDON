@@ -327,7 +327,7 @@ public class PrototypeScenario implements Scenario {
                                                                                 Double.NaN
                                 ,
 
-                                                                90));
+                                                                7));
             }
 
 

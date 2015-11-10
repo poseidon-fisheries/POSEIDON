@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -89,7 +90,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
-        double probability = 1 -
+        double probability = quotasLeft == 0 ? 1 : 1 -
                 fisher.probabilitySumDailyCatchesBelow(specieIndex, quotasLeft,
                                                        365 - state.getDayOfTheYear());
 
@@ -99,18 +100,31 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 
 
         double multiplier = fisher.predictUnitProfit(specieIndex);
+        if(Double.isNaN(multiplier))
+            //you  can't predict profits yet (predictor not ready, probably)
+            return Double.NaN;
+
+        //for every species
         for(int species = 0; species < state.getSpecies().size(); species++)
         {
             if(species == specieIndex ) //don't count yourself
+                continue;
+            //if we can't predict profits for this species (maybe because we never catch it) then don't count it
+            double predictedCatches = fisher.predictDailyCatches(species);
+            double predictedUnitProfit = fisher.predictUnitProfit(species);
+            if(Double.isNaN(predictedCatches) ||
+                    predictedCatches == 0 ||
+                    Double.isNaN(predictedUnitProfit))
                 continue;
 
             //quota price (0 if there is no market)
             double quotaPrice = orderBooks[species] != null ? orderBooks[species].getLastClosingPrice() : 0;
             quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
 
-            multiplier += (fisher.predictUnitProfit(species) - quotaPrice)
-                    * fisher.predictDailyCatches(species)/ dailyCatchesPredicted;
+            multiplier += (predictedUnitProfit - quotaPrice)
+                    * predictedCatches / dailyCatchesPredicted;
 
+            Preconditions.checkArgument(Double.isFinite(multiplier));
         }
 
         return multiplier * probability;

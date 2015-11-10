@@ -71,7 +71,7 @@ public class GearImitationAnalysis implements FisherStartable
         //add analysis
         for(Fisher fisher : fishers)
         {
-            GearImitationAnalysis analysis = new GearImitationAnalysis(0, .25, randomGear,
+            GearImitationAnalysis analysis = new GearImitationAnalysis(0.05, .25, randomGear,
                                                                        new CashFlowObjective(60));
 
             model.registerStartable(analysis,fisher);
@@ -95,20 +95,25 @@ public class GearImitationAnalysis implements FisherStartable
         },Double.NaN);
 
 
-        model.getDailyDataSet().registerGatherer("Thrawling Efficiency", new Function<FishState, Double>() {
-            @Override
-            public Double apply(FishState state) {
-                double size = state.getFishers().size();
-                if (size == 0)
-                    return Double.NaN;
-                else {
-                    double total = 0;
-                    for (Fisher fisher : state.getFishers())
-                        total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0];
-                    return total / size;
+        for(int i=0; i<model.getSpecies().size(); i++)
+        {
+            final int finalI = i;
+            model.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
+                                                     new Function<FishState, Double>() {
+                @Override
+                public Double apply(FishState state) {
+                    double size = state.getFishers().size();
+                    if (size == 0)
+                        return Double.NaN;
+                    else {
+                        double total = 0;
+                        for (Fisher fisher : state.getFishers())
+                            total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                        return total / size;
+                    }
                 }
-            }
-        }, Double.NaN);
+            }, Double.NaN);
+        }
     }
 
 
