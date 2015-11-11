@@ -90,7 +90,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 
         assert dailyCatchesPredicted > 0 : dailyCatchesPredicted;
 
-        double probability = quotasLeft == 0 ? 1 : 1 -
+        double probability = quotasLeft < FishStateUtilities.EPSILON ? 1 : 1 -
                 fisher.probabilitySumDailyCatchesBelow(specieIndex, quotasLeft,
                                                        365 - state.getDayOfTheYear());
 
@@ -113,7 +113,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
             double predictedCatches = fisher.predictDailyCatches(species);
             double predictedUnitProfit = fisher.predictUnitProfit(species);
             if(Double.isNaN(predictedCatches) ||
-                    predictedCatches == 0 ||
+                    predictedCatches < FishStateUtilities.EPSILON ||
                     Double.isNaN(predictedUnitProfit))
                 continue;
 

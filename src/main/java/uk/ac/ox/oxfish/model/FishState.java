@@ -268,6 +268,11 @@ public class FishState  extends SimState{
         return schedule.scheduleRepeating(steppable,order.ordinal(),1.0);
     }
 
+    public void scheduleOnce(Steppable steppable, StepOrder order)
+    {
+        schedule.scheduleOnce(steppable,order.ordinal());
+    }
+
     public Stoppable scheduleEveryDay(Steppable steppable, StepOrder order)
     {
         if(order.isToRandomize())

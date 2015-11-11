@@ -33,16 +33,20 @@ public class ITQOrderBook implements Steppable,Startable{
 
     private double markup = 0.05;
 
+    private final int yearOfImplementation;
 
     private double lastClosingPrice = Double.NaN;
 
     private Counter counter = new Counter(IntervalPolicy.EVERY_DAY);
 
+    private PricingPolicy pricingPolicy;
 
     private int unitsTradedPerMatch = 100;
 
 
     private final int specieIndex;
+
+
 
 
     /**
@@ -68,14 +72,22 @@ public class ITQOrderBook implements Steppable,Startable{
 
     }
 
-    public ITQOrderBook(int specieIndex)
+    /**
+     * create the order book
+     * @param specieIndex the index of the species being traded
+     * @param implementationYear the year this order book starts asking for quotes
+     * @param pricingPolicy
+     */
+    public ITQOrderBook(int specieIndex, int implementationYear,
+                        PricingPolicy pricingPolicy)
     {
 
         //create the queues holding on to the quotes
         asks = new PriorityQueue<>(100, Quote::compareTo);
         bids = new PriorityQueue<>(100, (o1, o2) -> -o1.compareTo(o2));
         this.specieIndex = specieIndex;
-
+        this.yearOfImplementation = implementationYear;
+        this.pricingPolicy = pricingPolicy;
     }
 
 
@@ -91,47 +103,47 @@ public class ITQOrderBook implements Steppable,Startable{
         List<Map.Entry<Fisher,PriceGenerator>> traders = new ArrayList<>(pricers.entrySet());
         Collections.shuffle(traders,new Random(random.nextLong()));
 
-        //fill the quotes
-        for(Map.Entry<Fisher,PriceGenerator> trader : traders)
-        {
-            double price = trader.getValue().computeLambda();
-            if(Double.isFinite(price)) {
-                double buyPrice = FishStateUtilities.round(price * (1 - markup));
-                //do I want to buy?
-                if (price > 0) {
-                    bids.add(new Quote(
-                            buyPrice,
-                            trader.getKey()));
-                }
-                //can I sell?
-                if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(specieIndex) >= unitsTradedPerMatch )
-                {
-                    double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
-                                                buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
-                            ;
-                    assert buyPrice < salePrice;
-                    asks.add(new Quote(
-                            salePrice,
-                            trader.getKey()));
+        if(((FishState) state).getYear() >= yearOfImplementation) {
+            //fill the quotes
+            for (Map.Entry<Fisher, PriceGenerator> trader : traders) {
+                double price = trader.getValue().computeLambda();
+                if (Double.isFinite(price)) {
+                    double buyPrice = FishStateUtilities.round(price * (1 - markup));
+                    //do I want to buy?
+                    if (price > 0) {
+                        bids.add(new Quote(
+                                buyPrice,
+                                trader.getKey()));
+                    }
+                    //can I sell?
+                    if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(
+                            specieIndex) >= unitsTradedPerMatch) {
+                        double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
+                                                    buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
+                                ;
+                        assert buyPrice < salePrice;
+                        asks.add(new Quote(
+                                salePrice,
+                                trader.getKey()));
+                    }
                 }
             }
+
+            if (Log.TRACE) {
+                Log.trace(asks.size() + " ---- " + bids.size());
+                Log.trace(asks.toString());
+                Log.trace(bids.toString());
+            }
+
+
+            //go for it
+            clearQuotes();
+
+
+            //clear the quotes
+            asks.clear();
+            bids.clear();
         }
-
-        if(Log.TRACE)
-        {
-            Log.trace(asks.size() + " ---- " + bids.size());
-            Log.trace(asks.toString());
-            Log.trace(bids.toString());
-        }
-
-
-        //go for it
-        clearQuotes();
-
-
-        //clear the quotes
-        asks.clear();
-        bids.clear();
     }
 
     private void clearQuotes()
@@ -144,7 +156,7 @@ public class ITQOrderBook implements Steppable,Startable{
         //does somebody want to trade?
         if (bestAsk.getPrice() <= bestBid.getPrice()) {
 
-            double tradingPrice = bestAsk.getPrice()    ;
+            double tradingPrice = pricingPolicy.tradePrice(bestAsk.getPrice(),bestBid.getPrice());
             assert tradingPrice >= bestAsk.getPrice();
             assert tradingPrice <=bestBid.getPrice();
 
@@ -219,4 +231,18 @@ public class ITQOrderBook implements Steppable,Startable{
     public double getLastClosingPrice() {
         return lastClosingPrice;
     }
+
+    public int getYearOfImplementation() {
+        return yearOfImplementation;
+    }
+
+    public PricingPolicy getPricingPolicy() {
+        return pricingPolicy;
+    }
+
+    public void setPricingPolicy(PricingPolicy pricingPolicy) {
+        this.pricingPolicy = pricingPolicy;
+    }
+
+
 }

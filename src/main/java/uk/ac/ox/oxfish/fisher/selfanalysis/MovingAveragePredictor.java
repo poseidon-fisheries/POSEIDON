@@ -28,7 +28,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     /**
      * this actually computes both
      */
-    protected final MovingVariance<Double> averager;
+    protected MovingVariance<Double> averager;
 
     /**
      * this we use to add to the averager
@@ -105,7 +105,15 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
 
     }
 
-
+    /**
+     * this is called if something happens (gear change for example) that makes us think the old predictors are full of garbage
+     * data and need to be reset
+     */
+    @Override
+    public void reset() {
+        averager = new MovingVariance<>(averager.getSize());
+        assert !averager.isReady();
+    }
 
     @Override
     public void turnOff() {
@@ -180,4 +188,6 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
         else
             return Double.NaN;
     }
+
+
 }

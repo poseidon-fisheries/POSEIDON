@@ -20,6 +20,7 @@ public class DisfunctionalFriends {
         int stepsAlone = stepsItTook(Double.NaN,0,5000, seed);
         int stepsWithManyFriends = stepsItTook(.1,20,5000, seed);
 
+        System.out.println(stepsAlone + " ---- " + stepsWithManyFriends);
         Assert.assertTrue(stepsAlone + " ---- " + stepsWithManyFriends, stepsAlone < stepsWithManyFriends);
 
         //in fact with many friends you don't even clear all the map after 5000 days

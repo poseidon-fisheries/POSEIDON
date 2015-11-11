@@ -35,7 +35,7 @@ public class ITQMarketBuilder  implements Startable
             Supplier<PriceGenerator> priceGeneratorMaker) {
         this.speciesIndex = speciesIndex;
         this.priceGeneratorMaker = priceGeneratorMaker;
-        market = new ITQOrderBook(speciesIndex);
+        market = new ITQOrderBook(speciesIndex, 1, (ask, bids) -> (ask + bids) / 2);
 
     }
 

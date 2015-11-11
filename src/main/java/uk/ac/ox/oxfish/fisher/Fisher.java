@@ -985,6 +985,12 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+    public void resetDailyCatchesPredictors()
+    {
+        for(Predictor predictor : dailyCatchesPredictor)
+            predictor.reset();
+    }
+
     public void setProfitPerUnitPredictor(int specieIndex, Predictor newPredictor)
     {
         if(state!=null)

@@ -69,4 +69,13 @@ public class FixedPredictor implements Predictor {
     public void turnOff() {
         //ignored
     }
+
+    /**
+     * this is called if something happens (gear change for example) that makes us think the old predictors are full of garbage
+     * data and need to be reset
+     */
+    @Override
+    public void reset() {
+        //ignored
+    }
 }

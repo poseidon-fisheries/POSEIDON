@@ -169,6 +169,7 @@ public class GearImitationWithITQ
         //red is underutilized
         if(checkRed) {
             double totalRedQuotas = 4500 * 100;
+            System.out.println("red landings are " + earlyRedLandings/totalRedQuotas + " of the total quota" );
             Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
         }
 

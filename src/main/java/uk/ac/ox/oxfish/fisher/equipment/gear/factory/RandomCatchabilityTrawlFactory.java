@@ -100,4 +100,6 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     public void setTrawlSpeed(DoubleParameter trawlSpeed) {
         this.trawlSpeed = trawlSpeed;
     }
+
+
 }

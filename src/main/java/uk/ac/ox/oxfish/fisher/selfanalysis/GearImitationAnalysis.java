@@ -1,13 +1,20 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 
@@ -30,17 +37,62 @@ public class GearImitationAnalysis implements FisherStartable
 
     private  Fisher fisher;
 
+    /**
+     * the default actuator resets predictors and changes gear only at the end of the trip, use this
+     * if you want to use something different
+     * @param probabilityRandomizing
+     * @param probabilityImitating
+     * @param gearAvailable
+     * @param objective
+     */
     public GearImitationAnalysis(
             double probabilityRandomizing, double probabilityImitating,
-            List<Gear> gearAvailable, ObjectiveFunction<Fisher> objective) {
+            List<Gear> gearAvailable, ObjectiveFunction<Fisher> objective,
+            Actuator<Gear> actuator)
+    {
         algorithm = new Adaptation<>(fisher1 -> true,
-                                                           new DiscreteRandomAlgorithm<Gear>(gearAvailable),
-                                                           (fisher1, change,model) -> fisher1.setGear(change.makeCopy()),
-                                                           Fisher::getGear,
-                                                           objective,probabilityRandomizing,probabilityImitating);
+                                     new DiscreteRandomAlgorithm<Gear>(gearAvailable),
+                                     actuator,
+                                     Fisher::getGear,
+                                     objective,probabilityRandomizing,probabilityImitating);
 
 
 
+    }
+
+    public GearImitationAnalysis(
+            double probabilityRandomizing, double probabilityImitating,
+            List<Gear> gearAvailable, ObjectiveFunction<Fisher> objective)
+    {
+        this(probabilityRandomizing,probabilityImitating,gearAvailable,objective,new Actuator<Gear>()
+        {
+            @Override
+            public void apply(Fisher fisher1, Gear change, FishState model) {
+                if(Log.TRACE)
+                    Log.trace(fisher1 + " is about to change gear");
+                //predictions are wrong: reset at the end of the trip
+                fisher1.addTripListener(new TripListener() {
+                    @Override
+                    public void reactToFinishedTrip(TripRecord record) {
+                        fisher1.setGear(change.makeCopy());
+                        final TripListener listener = this;
+                        Log.trace(fisher1 + " has changed gear and is about to reset its predictor");
+                        //fisher1.resetDailyCatchesPredictors();
+
+                        model.scheduleOnce(new Steppable() {
+                            @Override
+                            public void step(SimState simState) {
+                                fisher1.resetDailyCatchesPredictors();
+                                Log.trace(fisher1 + " finished resetting");
+                                fisher1.removeTripListener(listener);
+
+                            }
+                        }, StepOrder.DAWN);
+                    }
+                });
+
+            }
+        });
     }
 
 

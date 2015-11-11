@@ -51,7 +51,7 @@ public class MovingVariance<T extends Number>{
         if(observations.size() == size && Double.isNaN(average))
         {
             average = computeBatchAverage();
-            variance = computeInitialVarianceThroughCompensatedSummation();
+            variance = computeInitialVarianceThroughCompensatedSummation(average);
         }
         else if(observations.size() > size)
         {
@@ -73,6 +73,14 @@ public class MovingVariance<T extends Number>{
      */
     public double getSmoothedObservation() {
 
+
+        double currentVariance = variance;
+
+        //use preliminary variance
+        if(observations.size() >= 2 && Double.isNaN(variance))
+            variance = computeInitialVarianceThroughCompensatedSummation(computeBatchAverage());
+
+        //if variance is very small,
         if(variance< FishStateUtilities.EPSILON)
             return 0;
         return variance;
@@ -88,35 +96,40 @@ public class MovingVariance<T extends Number>{
 
 
     private double computeBatchAverage(){
-        assert observations.size() == size;
         double sum = 0;
         for(T n : observations )
             sum+= n.doubleValue();
 
-        return sum/size;
+        return sum/observations.size();
     }
 
     //from the wikipedia.
-    private double computeInitialVarianceThroughCompensatedSummation(){
-        assert observations.size() == size;
-        assert Double.isFinite(average);
+    private double computeInitialVarianceThroughCompensatedSummation(final double currentAverage){
+        assert observations.size() == size ^ Double.isNaN(average);
+        assert Double.isFinite(currentAverage);
 
         double squaredSum=0;
         double compensatingSum=0;
         for(T observation : observations )
         {
-            squaredSum +=  Math.pow(observation.doubleValue()-average,2);
-            compensatingSum +=  observation.doubleValue()-average;
+            squaredSum +=  Math.pow(observation.doubleValue()- currentAverage, 2);
+            compensatingSum +=  observation.doubleValue()- currentAverage;
         }
 
-        return (double) ((squaredSum-Math.pow(compensatingSum,2)/size)/size);
+        return (double) ((squaredSum-Math.pow(compensatingSum,2)/observations.size())/observations.size());
 
     }
 
     public double getAverage() {
-        return average;
+
+        if(Double.isFinite(average))
+            return average;
+        else
+            return computeBatchAverage();
     }
 
 
-
+    public int getSize() {
+        return size;
+    }
 }

@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
@@ -18,8 +18,8 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0);
-        FishState state = mock(FishState.class);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids) -> ask);
+        FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
         orderBook.setMarkup(.1);
@@ -62,8 +62,8 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0);
-        FishState state = mock(FishState.class);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids) -> ask);
+        FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
         orderBook.start(state);
@@ -110,8 +110,8 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0);
-        FishState state = mock(FishState.class);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids) -> (ask + bids) / 2);
+        FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
         orderBook.setMarkup(.1);
@@ -160,7 +160,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids) -> ask);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);

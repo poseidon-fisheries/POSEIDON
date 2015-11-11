@@ -52,8 +52,10 @@ public class GearImitationAnalysisTest
         when(fitness.computeCurrentFitness(worst)).thenReturn(0d);
 
         //100% imitating, 0% randomizing
-        GearImitationAnalysis bestAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness);
-        GearImitationAnalysis worstAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness);
+        GearImitationAnalysis bestAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness,
+                                                                       (fisher1, change, model) -> fisher1.setGear(change));
+        GearImitationAnalysis worstAnalysis = new GearImitationAnalysis(0d,1d,new LinkedList<>(), fitness,
+                                                                        (fisher1, change, model) -> fisher1.setGear(change));
 
         //best should not switch gear. Worst should
         bestAnalysis.getAlgorithm().adapt(best,new MersenneTwisterFast());
@@ -97,7 +99,8 @@ public class GearImitationAnalysisTest
                                        mock(DestinationStrategy.class),mock(FishingStrategy.class),
                                        new IgnoreWeatherStrategy(), mock(Boat.class),mock(Hold.class),gear, state.getSpecies().size()
             );
-            GearImitationAnalysis analysis = new GearImitationAnalysis(0d, 1d, new LinkedList<>(), function);
+            GearImitationAnalysis analysis = new GearImitationAnalysis(0d, 1d, new LinkedList<>(), function,
+                                                                       (fisher1, change, model) -> fisher1.setGear(change));
 
             fishers.add(fisher);
             analyses.add(analysis);

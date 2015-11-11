@@ -31,4 +31,11 @@ public interface Predictor extends FisherStartable{
      */
     public double probabilitySumBelowThis(double level, int elementsInSum);
 
+
+    /**
+     * this is called if something happens (gear change for example) that makes us think the old predictors are full of garbage
+     * data and need to be reset
+     */
+    public void reset();
+
 }

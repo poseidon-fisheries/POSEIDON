@@ -1,14 +1,20 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
 import sim.display.Console;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -145,11 +151,12 @@ public class OsmoseComparativeStatics
 
 
     public static void main(String[] args) throws IOException {
-        FishState model = new FishState(System.currentTimeMillis(),1);
+        FishState model = new FishState(-1,1);
         Log.setLogger(new FishStateLogger(model,Paths.get("log.txt")));
         Log.set(Log.LEVEL_TRACE);
 
         PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setMapMakerDedicatedRandomSeed(0l);
         scenario.setBiologyInitializer(new OsmoseBiologyFactory());
         scenario.setMapInitializer(new OsmoseMapInitializerFactory());
         scenario.setFishers(100);
@@ -173,6 +180,52 @@ public class OsmoseComparativeStatics
             public void start(FishState model) {
                 GearImitationAnalysis.attachGearAnalysisToEachFisher(model.getFishers(),model,
                                                                      Arrays.asList(option1.apply(model),option2.apply(model)));
+            }
+
+            @Override
+            public void turnOff() {
+
+            }
+        });
+
+        //sanity check: you either catch 2 or 3
+        model.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                model.scheduleEveryDay(new Steppable() {
+                    @Override
+                    public void step(SimState simState)
+                    {
+                        for(Fisher fisher : model.getFishers())
+                        {
+
+                            if(!( Double.isNaN(fisher.predictDailyCatches(0)) ^
+                                    ( fisher.predictDailyCatches(2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) > FishStateUtilities.EPSILON) ^
+                                    ( fisher.predictDailyCatches(2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) < FishStateUtilities.EPSILON) ^
+                                    ( fisher.predictDailyCatches(2) >FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) < FishStateUtilities.EPSILON))) {
+                                Preconditions.checkArgument(
+                                        Double.isNaN(fisher.predictDailyCatches(0)) ^
+                                                (fisher.predictDailyCatches(
+                                                        2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
+                                                        3) > FishStateUtilities.EPSILON) ^
+                                                (fisher.predictDailyCatches(
+                                                        2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
+                                                        3) < FishStateUtilities.EPSILON) ^
+                                                (fisher.predictDailyCatches(
+                                                        2) > FishStateUtilities.EPSILON && fisher.predictDailyCatches(
+                                                        3) < FishStateUtilities.EPSILON)
+                                        , fisher.predictDailyCatches(2) + " ---- " + fisher.predictDailyCatches(
+                                                3) + " ---- " +
+                                                ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[2] + " , " +
+                                                ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[3] + " <--- " +
+                                                fisher.getID() + "\n"
+
+
+                                );
+                            }
+                        }
+                    }
+                }, StepOrder.AFTER_DATA);
             }
 
             @Override
