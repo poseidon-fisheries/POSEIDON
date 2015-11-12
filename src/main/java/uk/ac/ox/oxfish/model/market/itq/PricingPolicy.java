@@ -8,7 +8,7 @@ public interface PricingPolicy {
 
 
 
-    public double tradePrice(double askPrice, double bidPrice);
+    public double tradePrice(double askPrice, double bidPrice, double secondBestAsk, double secondBestBid);
 
 
 }

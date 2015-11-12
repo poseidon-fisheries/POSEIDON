@@ -21,7 +21,7 @@ import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.scenario.GeneticLocationScenario;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
@@ -56,7 +56,7 @@ public class FishState  extends SimState{
     private final List<Pair<Fisher,FisherStartable>> fisherStartables = new LinkedList<>();
 
 
-    private Scenario scenario = new GeneticLocationScenario();
+    private Scenario scenario = new PrototypeScenario();
 
     private boolean started = false;
 
@@ -149,7 +149,7 @@ public class FishState  extends SimState{
             fisher.start(this);
         //start the markets (for each port
         for(Port port : getPorts())
-            for(Market market : port.getMarketMap().getMarkets())
+            for(Market market : port.marketMap().getMarkets())
                 market.start(this);
 
         //start everything else that required to be started

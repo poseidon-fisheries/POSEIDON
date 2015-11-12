@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
@@ -150,7 +151,9 @@ public class OsmoseComparativeStatics
     }
 
 
-    public static void main(String[] args) throws IOException {
+
+
+    public static void osmoseITQGear(String[] args) throws IOException {
         FishState model = new FishState(-1,1);
         Log.setLogger(new FishStateLogger(model,Paths.get("log.txt")));
         Log.set(Log.LEVEL_TRACE);
@@ -166,7 +169,7 @@ public class OsmoseComparativeStatics
 
         //mpa rules
         MultiITQStringFactory itqs = new MultiITQStringFactory();
-        itqs.setYearlyQuotaMaps("3:500");
+        itqs.setYearlyQuotaMaps("3:1000");
         scenario.setUsePredictors(true);
         scenario.setRegulation(itqs);
         scenario.forcePortPosition(new int[]{1,1});
@@ -178,8 +181,9 @@ public class OsmoseComparativeStatics
         model.registerStartable(new Startable() {
             @Override
             public void start(FishState model) {
-                GearImitationAnalysis.attachGearAnalysisToEachFisher(model.getFishers(),model,
-                                                                     Arrays.asList(option1.apply(model),option2.apply(model)));
+                GearImitationAnalysis.attachGearAnalysisToEachFisher(model.getFishers(), model,
+                                                                     Arrays.asList(option1.apply(model),option2.apply(model)),
+                                                                     new CashFlowObjective(60));
             }
 
             @Override
@@ -196,6 +200,7 @@ public class OsmoseComparativeStatics
                     @Override
                     public void step(SimState simState)
                     {
+
                         for(Fisher fisher : model.getFishers())
                         {
 

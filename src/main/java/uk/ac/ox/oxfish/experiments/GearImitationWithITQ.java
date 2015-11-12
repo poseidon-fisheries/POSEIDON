@@ -30,7 +30,11 @@ public class GearImitationWithITQ
 {
 
 
-    public static void main(String[] args)
+
+
+
+
+    public static void toFile(String[] args)
     {
 
         final Path directory = Paths.get("docs", "20151014 corollaries");

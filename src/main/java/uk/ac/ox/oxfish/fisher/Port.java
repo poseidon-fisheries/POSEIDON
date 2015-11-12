@@ -114,7 +114,7 @@ public class Port {
         return "Port at " +location;
     }
 
-    public MarketMap getMarketMap() {
+    public MarketMap marketMap() {
         return marketMap;
     }
 

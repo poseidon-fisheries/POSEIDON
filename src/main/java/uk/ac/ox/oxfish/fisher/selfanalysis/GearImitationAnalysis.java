@@ -77,7 +77,7 @@ public class GearImitationAnalysis implements FisherStartable
                         fisher1.setGear(change.makeCopy());
                         final TripListener listener = this;
                         Log.trace(fisher1 + " has changed gear and is about to reset its predictor");
-                        //fisher1.resetDailyCatchesPredictors();
+                        fisher1.resetDailyCatchesPredictors();
 
                         model.scheduleOnce(new Steppable() {
                             @Override
@@ -118,13 +118,14 @@ public class GearImitationAnalysis implements FisherStartable
      * utility function to add the imitation analysis to every fisher in the group
      */
     public static void attachGearAnalysisToEachFisher(
-            List<Fisher> fishers, FishState model, final List<Gear> randomGear)
+            List<Fisher> fishers, FishState model, final List<Gear> randomGear,
+            final CashFlowObjective objectiveFunction)
     {
         //add analysis
         for(Fisher fisher : fishers)
         {
             GearImitationAnalysis analysis = new GearImitationAnalysis(0.05, .25, randomGear,
-                                                                       new CashFlowObjective(60));
+                                                                       objectiveFunction);
 
             model.registerStartable(analysis,fisher);
         }

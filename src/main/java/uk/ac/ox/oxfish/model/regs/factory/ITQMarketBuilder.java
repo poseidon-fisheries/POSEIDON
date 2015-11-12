@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
+import uk.ac.ox.oxfish.model.market.itq.PricingPolicy;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
@@ -35,7 +36,17 @@ public class ITQMarketBuilder  implements Startable
             Supplier<PriceGenerator> priceGeneratorMaker) {
         this.speciesIndex = speciesIndex;
         this.priceGeneratorMaker = priceGeneratorMaker;
-        market = new ITQOrderBook(speciesIndex, 1, (ask, bids) -> (ask + bids) / 2);
+        market = new ITQOrderBook(speciesIndex, 1,
+                                  new PricingPolicy() {
+                                      @Override
+                                      public double tradePrice(
+                                              double askPrice, double bidPrice, double secondBestAsk,
+                                              double secondBestBid) {
+
+                                          return  (askPrice + bidPrice) / 2;
+
+                                      }
+                                  });
 
     }
 

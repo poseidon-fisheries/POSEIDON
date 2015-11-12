@@ -130,9 +130,9 @@ public class ITQOrderBook implements Steppable,Startable{
             }
 
             if (Log.TRACE) {
-                Log.trace(asks.size() + " ---- " + bids.size());
-                Log.trace(asks.toString());
-                Log.trace(bids.toString());
+                Log.trace(specieIndex + " ask size : " + asks.size() + " ---- " + bids.size());
+                Log.trace(specieIndex + " asks: " + asks.toString());
+                Log.trace(specieIndex + " bids: " + bids.toString());
             }
 
 
@@ -156,7 +156,18 @@ public class ITQOrderBook implements Steppable,Startable{
         //does somebody want to trade?
         if (bestAsk.getPrice() <= bestBid.getPrice()) {
 
-            double tradingPrice = pricingPolicy.tradePrice(bestAsk.getPrice(),bestBid.getPrice());
+            Quote secondBestAsk = asks.peek();
+            Quote secondBestBid = bids.peek();
+            double tradingPrice = pricingPolicy.tradePrice(bestAsk.getPrice(),bestBid.getPrice(),
+                                                           secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN,
+                                                           secondBestBid != null ? secondBestBid.getPrice() : Double.NaN
+            );
+            if(Log.TRACE)
+                Log.trace( bestAsk.getPrice() + " , bid: " + bestBid.getPrice() + " ,secondBestAsk " +
+                                   (secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN)  + " , secondBestBid:  " +
+                                   (secondBestBid != null ? secondBestBid.getPrice() : Double.NaN) + " ---->" +
+                        tradingPrice
+                );
             assert tradingPrice >= bestAsk.getPrice();
             assert tradingPrice <=bestBid.getPrice();
 

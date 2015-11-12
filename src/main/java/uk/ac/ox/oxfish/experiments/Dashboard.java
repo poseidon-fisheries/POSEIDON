@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
+import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -231,7 +232,8 @@ public class Dashboard
         //run it for 10 years
         state.start();
         //make agents optimize their gear
-        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(), state, new ArrayList<>());
+        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(), state, new ArrayList<>(),
+                                                             new CashFlowObjective(60));
         while(state.getYear()<10)
             state.schedule.step(state);
 

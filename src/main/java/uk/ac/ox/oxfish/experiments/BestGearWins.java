@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
@@ -42,7 +43,8 @@ public class BestGearWins {
         state.setScenario(scenario);
         state.start();
         //attach analysis
-        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(),state,new ArrayList<>());
+        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(), state, new ArrayList<>(),
+                                                             new CashFlowObjective(60));
 
         //pre-run average efficiency
         double average = 0;

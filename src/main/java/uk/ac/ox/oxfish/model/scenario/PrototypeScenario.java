@@ -177,6 +177,7 @@ public class PrototypeScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
 
+        System.out.println(model.random.nextInt(100));
         MersenneTwisterFast random = model.random;
 
         MersenneTwisterFast mapMakerRandom = model.random;
@@ -234,6 +235,7 @@ public class PrototypeScenario implements Scenario {
 
         //substitute back the original randomizer
         model.random = random;
+
         return new ScenarioEssentials(global,map, marketMap);
     }
 
@@ -304,6 +306,9 @@ public class PrototypeScenario implements Scenario {
 
                                                                ,
                                                                360));
+
+
+
                     newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
                             "Predicted Unit Profit " + species,
                             fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
