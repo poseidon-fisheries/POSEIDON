@@ -130,7 +130,7 @@ public class MovingTest
         when(fisher.getLocation()).thenReturn(map.getSeaTile(0, 0));
 
         ActionResult result = move.act(simple, fisher, new Anarchy(),24 );
-        verify(fisher,never()).move(any(),any(),any()); //never moved
+        verify(fisher,never()).move(any(),any(),any(), anyDouble()); //never moved
         assertTrue(result.isActAgainThisTurn()); //think he has arrived
         assertTrue(result.getNextState() instanceof Arriving);
 

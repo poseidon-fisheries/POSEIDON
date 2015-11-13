@@ -42,7 +42,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
         //all must be strictly positive!
         return
-                Arrays.stream(quotaRemaining).allMatch(value -> value > FishStateUtilities.EPSILON);
+                Arrays.stream(quotaRemaining).allMatch(value -> value >= 0);
 
 
     }
@@ -59,7 +59,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     @Override
     public double maximumBiomassSellable(
             Fisher agent, Species species, FishState model) {
-        return quotaRemaining[species.getIndex()];
+        return quotaRemaining[species.getIndex()] + FishStateUtilities.EPSILON/2;
     }
 
 
@@ -112,7 +112,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     @Override
     public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
         quotaRemaining[species.getIndex()]-=biomass;
-        Preconditions.checkArgument(quotaRemaining[species.getIndex()]>=0);
+        Preconditions.checkArgument(quotaRemaining[species.getIndex()]>=- FishStateUtilities.EPSILON, quotaRemaining[species.getIndex()]);
     }
 
     /**
@@ -132,7 +132,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     @Override
     public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
         quotaRemaining[specieIndex] = newQuotaValue;
-        Preconditions.checkArgument(newQuotaValue >= 0);
+        Preconditions.checkArgument(newQuotaValue >= -FishStateUtilities.EPSILON);
 
     }
 

@@ -29,6 +29,35 @@ import java.util.function.Function;
 public class GearImitationAnalysis implements FisherStartable
 {
 
+    public static final Actuator<Gear> DEFAULT_GEAR_ACTUATOR = new Actuator<Gear>() {
+        @Override
+        public void apply(Fisher fisher1, Gear change, FishState model) {
+            if (Log.TRACE)
+                Log.trace(fisher1 + " is about to change gear");
+            fisher1.resetDailyCatchesPredictors();
+            //predictions are wrong: reset at the end of the trip
+            fisher1.addTripListener(new TripListener() {
+                @Override
+                public void reactToFinishedTrip(TripRecord record) {
+                    fisher1.setGear(change.makeCopy());
+                    final TripListener listener = this;
+                    Log.trace(fisher1 + " has changed gear and is about to reset its predictor");
+                    fisher1.resetDailyCatchesPredictors();
+
+                    model.scheduleOnce(new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            fisher1.resetDailyCatchesPredictors();
+                            Log.trace(fisher1 + " finished resetting");
+                            fisher1.removeTripListener(listener);
+
+                        }
+                    }, StepOrder.DAWN);
+                }
+            });
+
+        }
+    };
     /**
      * the algorithm doing the exploration-imitation thing
      */
@@ -64,35 +93,8 @@ public class GearImitationAnalysis implements FisherStartable
             double probabilityRandomizing, double probabilityImitating,
             List<Gear> gearAvailable, ObjectiveFunction<Fisher> objective)
     {
-        this(probabilityRandomizing,probabilityImitating,gearAvailable,objective,new Actuator<Gear>()
-        {
-            @Override
-            public void apply(Fisher fisher1, Gear change, FishState model) {
-                if(Log.TRACE)
-                    Log.trace(fisher1 + " is about to change gear");
-                //predictions are wrong: reset at the end of the trip
-                fisher1.addTripListener(new TripListener() {
-                    @Override
-                    public void reactToFinishedTrip(TripRecord record) {
-                        fisher1.setGear(change.makeCopy());
-                        final TripListener listener = this;
-                        Log.trace(fisher1 + " has changed gear and is about to reset its predictor");
-                        fisher1.resetDailyCatchesPredictors();
-
-                        model.scheduleOnce(new Steppable() {
-                            @Override
-                            public void step(SimState simState) {
-                                fisher1.resetDailyCatchesPredictors();
-                                Log.trace(fisher1 + " finished resetting");
-                                fisher1.removeTripListener(listener);
-
-                            }
-                        }, StepOrder.DAWN);
-                    }
-                });
-
-            }
-        });
+        this(probabilityRandomizing,probabilityImitating,gearAvailable,objective,
+             DEFAULT_GEAR_ACTUATOR);
     }
 
 

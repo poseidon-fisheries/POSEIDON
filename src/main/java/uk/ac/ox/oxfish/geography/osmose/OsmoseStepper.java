@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.OsmoseSimulation;
@@ -88,7 +89,7 @@ public class OsmoseStepper implements Startable,Steppable{
         //notice the dithering when steps don't match really well
         if(stepsLeft<=0 || (stepsLeft < 1 && random.nextBoolean(1-stepsLeft)))
         {
-            System.out.print("OSMOSE step!");
+            Log.trace("OSMOSE step!");
             osmoseSimulation.oneStep();
             stepsLeft=stepRatio; //reset
             toReset.forEach(LocalOsmoseBiology::osmoseStep);

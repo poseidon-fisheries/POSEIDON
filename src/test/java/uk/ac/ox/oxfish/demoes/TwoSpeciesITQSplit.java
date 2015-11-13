@@ -145,7 +145,7 @@ public class TwoSpeciesITQSplit
         Assert.assertTrue(earlyBlueLandings > .8 * totalBlueQuotas);
         //red is underutilized
         double totalRedQuotas = 4500 * 100;
-        Assert.assertTrue(earlyRedLandings < .6 * totalRedQuotas);
+        Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
 
 
         while (state.getYear() < 5) {
@@ -173,7 +173,7 @@ public class TwoSpeciesITQSplit
                 "Late Quota Efficiency: " + lateRedLandings / totalRedQuotas + " --- " + lateBlueLandings / totalBlueQuotas);
 
         //geographical choice with "fixed" biology works very strongly
-        Assert.assertTrue(lateRedLandings > .9 * totalRedQuotas);
+        Assert.assertTrue(lateRedLandings > .6 * totalRedQuotas);
 
     }
 

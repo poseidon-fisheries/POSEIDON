@@ -23,7 +23,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
 
     private AlgorithmFactory<? extends AdaptationProbability> probability =
-            new ExplorationPenaltyProbabilityFactory(.8,.5,.02,.01);
+            new ExplorationPenaltyProbabilityFactory(.8,1d,.02,.01);
 
     private boolean ignoreEdgeDirection = true;
 

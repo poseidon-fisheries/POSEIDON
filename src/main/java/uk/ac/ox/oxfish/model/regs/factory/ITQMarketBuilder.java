@@ -43,7 +43,7 @@ public class ITQMarketBuilder  implements Startable
                                               double askPrice, double bidPrice, double secondBestAsk,
                                               double secondBestBid) {
 
-                                          return  (askPrice + bidPrice) / 2;
+                                          return  askPrice;
 
                                       }
                                   });

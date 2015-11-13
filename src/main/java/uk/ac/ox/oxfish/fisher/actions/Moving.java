@@ -94,6 +94,7 @@ public class Moving implements Action
         //moving actually happens in more than one "step" at a time; this is because agent.move(*) is slow (since we have to update the MASON map)
         //so what we do is that we check what's the farthest we can go in one period and go there
         double timeSpentTravelling=0;
+        double totalDistance = 0;
         SeaTile next = agent.getLocation();
         //go through the path until it's empty
         while(!path.isEmpty())
@@ -109,6 +110,7 @@ public class Moving implements Action
                 next = path.poll();
                 assert next == step;
                 timeSpentTravelling+=hoursForThisNode;
+                totalDistance+=distance;
             }
             else
              break;
@@ -121,7 +123,7 @@ public class Moving implements Action
             hoursLeft = hoursLeft - timeSpentTravelling;
             hoursLeft = Math.abs(hoursLeft) < FishStateUtilities.EPSILON ? 0 : hoursLeft;
 
-            agent.move(next, map,model);
+            agent.move(next, map,model, totalDistance);
 
             assert agent.getLocation().equals(next); //check that I moved to the right spot
             if(next.equals(agent.getDestination()))

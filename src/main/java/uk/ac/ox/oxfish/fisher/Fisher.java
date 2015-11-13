@@ -390,11 +390,12 @@ public class Fisher implements Steppable, Startable{
      * set new location, consume time and tell the map about our new location
      * @param newPosition the new position
      * @param map the map on which we are moving
+     * @param distanceTravelled
      */
-    public void move(SeaTile newPosition,NauticalMap map, FishState state)
+    public void move(SeaTile newPosition, NauticalMap map, FishState state, double distanceTravelled)
     {
         Preconditions.checkArgument(newPosition != status.getLocation()); //i am not already here!
-        double distanceTravelled = map.distance(status.getLocation(), newPosition);
+        Preconditions.checkArgument(distanceTravelled > 0); //i am not already here!
         equipment.getBoat().recordTravel(distanceTravelled); //tell the boat
         //consume gas!
         consumeFuel(equipment.getBoat().expectedFuelConsumption(distanceTravelled));

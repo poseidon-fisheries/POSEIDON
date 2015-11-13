@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import sim.display.Console;
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
@@ -15,21 +14,21 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.function.Predicate;
 
 /**
  * What happens to a few fish biomasses in OSMOSE depending on # of fishers and gear used
@@ -40,15 +39,15 @@ public class OsmoseComparativeStatics
 
     public static final int RUNS = 50;
     public static final int YEARS_PER_SIMULATION = 30;
+    public static final Path ROOT = Paths.get("runs", "osmose");
 
     public static void secondaryEffects(String[] args)
     {
-        Path root = Paths.get("runs", "osmose");
-        root.toFile().mkdirs();
+        ROOT.toFile().mkdirs();
         //10 times virgin
         for(int run = 0; run< RUNS; run++)
         {
-            File runFile = root.resolve("virgin_"+run+".csv").toFile();
+            File runFile = ROOT.resolve("virgin_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
@@ -79,7 +78,7 @@ public class OsmoseComparativeStatics
         //10 times demersal 1
         for(int run = 0; run<RUNS; run++)
         {
-            File runFile = root.resolve("dem1_"+run+".csv").toFile();
+            File runFile = ROOT.resolve("dem1_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
@@ -113,7 +112,7 @@ public class OsmoseComparativeStatics
         //10 times demersal 1
         for(int run = 0; run<RUNS; run++)
         {
-            File runFile = root.resolve("dem2_"+run+".csv").toFile();
+            File runFile = ROOT.resolve("dem2_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
@@ -153,98 +152,113 @@ public class OsmoseComparativeStatics
 
 
 
-    public static void osmoseITQGear(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         FishState model = new FishState(-1,1);
         Log.setLogger(new FishStateLogger(model,Paths.get("log.txt")));
-        Log.set(Log.LEVEL_TRACE);
+        Log.set(Log.LEVEL_NONE);
 
+        ROOT.toFile().mkdirs();
+
+
+        int firstSpecies = 2;
+        int secondSpecies = 3;
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setMapMakerDedicatedRandomSeed(0l);
+
         scenario.setBiologyInitializer(new OsmoseBiologyFactory());
         scenario.setMapInitializer(new OsmoseMapInitializerFactory());
         scenario.setFishers(100);
         RandomTrawlStringFactory gear = new RandomTrawlStringFactory();
-        gear.setCatchabilityMap("3:.01");
+        gear.setCatchabilityMap(firstSpecies+":.01");
         scenario.setGear(gear);
 
-        //mpa rules
-        MultiITQStringFactory itqs = new MultiITQStringFactory();
-        itqs.setYearlyQuotaMaps("3:1000");
-        scenario.setUsePredictors(true);
-        scenario.setRegulation(itqs);
-        scenario.forcePortPosition(new int[]{1,1});
+        //no rules
+
 
         RandomTrawlStringFactory option1 = new RandomTrawlStringFactory();
-        option1.setCatchabilityMap("3:.01");
+        option1.setCatchabilityMap(firstSpecies+":.01");
         RandomTrawlStringFactory option2= new RandomTrawlStringFactory();
-        option1.setCatchabilityMap("2:.01");
+        option2.setCatchabilityMap(secondSpecies+":.01");
         model.registerStartable(new Startable() {
-            @Override
-            public void start(FishState model) {
-                GearImitationAnalysis.attachGearAnalysisToEachFisher(model.getFishers(), model,
-                                                                     Arrays.asList(option1.apply(model),option2.apply(model)),
-                                                                     new CashFlowObjective(60));
-            }
+                                    @Override
+                                    public void start(FishState model) {
 
-            @Override
-            public void turnOff() {
+                                        for (Fisher fisher : model.getFishers()) {
 
-            }
-        });
+                                            Adaptation<Gear> trawlAdaptation =
+                                                    new Adaptation<>(
+                                                            (Predicate<Fisher>) fisher1 -> true,
+                                                            new BeamHillClimbing<Gear>() {
+                                                                @Override
+                                                                public Gear randomStep(
+                                                                        FishState state, MersenneTwisterFast random,
+                                                                        Fisher fisher,
+                                                                        Gear current) {
+                                                                    return state.random.nextBoolean() ?
+                                                                            option1.apply(state) :
+                                                                            option2.apply(state);
+                                                                }
+                                                            },
+                                                            GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR,
+                                                            fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
+                                                            new CashFlowObjective(365),
+                                                            .1, .8);
 
-        //sanity check: you either catch 2 or 3
-        model.registerStartable(new Startable() {
-            @Override
-            public void start(FishState model) {
-                model.scheduleEveryDay(new Steppable() {
-                    @Override
-                    public void step(SimState simState)
-                    {
-
-                        for(Fisher fisher : model.getFishers())
-                        {
-
-                            if(!( Double.isNaN(fisher.predictDailyCatches(0)) ^
-                                    ( fisher.predictDailyCatches(2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) > FishStateUtilities.EPSILON) ^
-                                    ( fisher.predictDailyCatches(2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) < FishStateUtilities.EPSILON) ^
-                                    ( fisher.predictDailyCatches(2) >FishStateUtilities.EPSILON && fisher.predictDailyCatches(3) < FishStateUtilities.EPSILON))) {
-                                Preconditions.checkArgument(
-                                        Double.isNaN(fisher.predictDailyCatches(0)) ^
-                                                (fisher.predictDailyCatches(
-                                                        2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                        3) > FishStateUtilities.EPSILON) ^
-                                                (fisher.predictDailyCatches(
-                                                        2) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                        3) < FishStateUtilities.EPSILON) ^
-                                                (fisher.predictDailyCatches(
-                                                        2) > FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                        3) < FishStateUtilities.EPSILON)
-                                        , fisher.predictDailyCatches(2) + " ---- " + fisher.predictDailyCatches(
-                                                3) + " ---- " +
-                                                ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[2] + " , " +
-                                                ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[3] + " <--- " +
-                                                fisher.getID() + "\n"
+                                            //tell the fisher to use this once a year
+                                            fisher.addYearlyAdaptation(trawlAdaptation);
+                                        }
+                                        model.getYearlyDataSet().registerGatherer(model.getSpecies().get(firstSpecies)+ " Catchers", state1 -> {
+                                            double size = state1.getFishers().size();
+                                            if (size == 0)
+                                                return Double.NaN;
+                                            else {
+                                                double total = 0;
+                                                for (Fisher fisher1 : state1.getFishers())
+                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[firstSpecies]
+                                                            ;
+                                                return total / .01;
+                                            }
+                                        }, Double.NaN);
 
 
-                                );
-                            }
-                        }
-                    }
-                }, StepOrder.AFTER_DATA);
-            }
+                                        model.getYearlyDataSet().registerGatherer(model.getSpecies().get(secondSpecies) + " Catchers", state1 -> {
+                                            double size = state1.getFishers().size();
+                                            if (size == 0)
+                                                return Double.NaN;
+                                            else {
+                                                double total = 0;
+                                                for (Fisher fisher1 : state1.getFishers())
+                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[secondSpecies]
+                                                            ;
+                                                return total / .01;
+                                            }
+                                        }, Double.NaN);
 
-            @Override
-            public void turnOff() {
 
-            }
-        });
+                                    }
+
+                                    /**
+                                     * tell the startable to turnoff,
+                                     */
+                                    @Override
+                                    public void turnOff() {
+
+                                    }
+                                }
+        );
+
 
 
         //now work!
         model.setScenario(scenario);
-        FishGUI gui = new FishGUI(model);
-        Console c = new Console(gui);
-        c.setVisible(true);
+        model.start();
+        while(model.getYear() < 45)
+            model.schedule.step(model);
+
+        FishStateUtilities.printCSVColumnsToFile(ROOT.resolve("hardswitch.csv").toFile(),
+                                                 model.getYearlyDataSet().getColumn(model.getSpecies().get(firstSpecies)+ " Catchers"),
+                                                 model.getYearlyDataSet().getColumn(model.getSpecies().get(secondSpecies)+ " Catchers"),
+                                                 model.getYearlyDataSet().getColumn( "Biomass " + model.getSpecies().get(firstSpecies).getName()),
+                                                 model.getYearlyDataSet().getColumn( "Biomass " + model.getSpecies().get(secondSpecies).getName()));
 
 
 
