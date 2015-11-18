@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.geography.habitat;
 
+import uk.ac.ox.oxfish.geography.habitat.rectangles.OneRockyRectangleFactory;
+import uk.ac.ox.oxfish.geography.habitat.rectangles.RockyRectanglesHabitatFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -35,6 +37,10 @@ public class HabitatInitializers {
         CONSTRUCTORS.put("Rocky Rectangles",
                          RockyRectanglesHabitatFactory::new);
         NAMES.put(RockyRectanglesHabitatFactory.class,"Rocky Rectangles");
+
+        CONSTRUCTORS.put("One Rocky Rectangle",
+                         OneRockyRectangleFactory::new);
+        NAMES.put(OneRockyRectangleFactory.class,"One Rocky Rectangle");
 
         CONSTRUCTORS.put("Rocky Pyramids",
                          RockyPyramidsFactory::new);

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.geography.habitat;
+package uk.ac.ox.oxfish.geography.habitat.rectangles;
 
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -10,7 +10,8 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
  * A factory that creates the rocky rectangle habitat initializers.
  * Created by carrknight on 9/29/15.
  */
-public class RockyRectanglesHabitatFactory implements AlgorithmFactory<RockyRectanglesHabitatInitializer>
+public class RockyRectanglesHabitatFactory
+        implements AlgorithmFactory<RockyRectanglesHabitatInitializer>
 {
 
 

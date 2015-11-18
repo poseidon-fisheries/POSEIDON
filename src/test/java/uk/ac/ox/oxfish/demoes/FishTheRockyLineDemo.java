@@ -4,8 +4,8 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.RockyLogisticFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HabitatAwareGearFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.habitat.RockyRectanglesHabitatFactory;
-import uk.ac.ox.oxfish.geography.habitat.RockyRectanglesHabitatInitializer;
+import uk.ac.ox.oxfish.geography.habitat.rectangles.RockyRectanglesHabitatFactory;
+import uk.ac.ox.oxfish.geography.habitat.rectangles.RockyRectanglesHabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -66,9 +66,9 @@ public class FishTheRockyLineDemo {
 
 
 
-        System.out.println(state.getDailyDataSet().getColumn(
+        System.out.println("Border fishing intensity: " + state.getDailyDataSet().getColumn(
                                    RockyRectanglesHabitatInitializer.BORDER_FISHING_INTENSITY).getLatest()
-                                   + " -------- " +
+                                   + "\n -------- \nRocky fishing intensity: " +
                                    state.getDailyDataSet().getColumn(
                                            RockyRectanglesHabitatInitializer.ROCKY_FISHING_INTENSITY).getLatest()
 

@@ -1,9 +1,11 @@
-package uk.ac.ox.oxfish.geography.habitat;
+package uk.ac.ox.oxfish.geography.habitat.rectangles;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -22,11 +24,8 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
     public static final String ROCKY_FISHING_INTENSITY = "% Rocky Fishing Intensity";
     public static final String BORDER_FISHING_INTENSITY = "% Rocky Border Fishing Intensity";
-    final private DoubleParameter rockyHeight;
 
-    final private DoubleParameter rockyWidth;
-
-    final private int numberOfRectangles;
+    private final RockyRectangleMaker maker;
 
     private List<SeaTile> rockyTiles = new ArrayList<>();
 
@@ -38,22 +37,31 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
     public RockyRectanglesHabitatInitializer(
             int minRockyWidth, int maxRockyWidth, int minRockyHeight, int maxRockyHeight,
             int numberOfRectangles) {
+        this(new RandomRockyRectangles(new UniformDoubleParameter(minRockyWidth,maxRockyHeight),
+                                       new UniformDoubleParameter(minRockyHeight,maxRockyHeight),
+                                       numberOfRectangles));
         Preconditions.checkArgument(minRockyWidth > 0);
         Preconditions.checkArgument(minRockyHeight > 0);
         Preconditions.checkArgument(maxRockyWidth >= minRockyWidth);
         Preconditions.checkArgument(maxRockyHeight >= minRockyHeight);
-        this.rockyWidth = new UniformDoubleParameter(minRockyWidth,maxRockyHeight);
-        this.rockyHeight = new UniformDoubleParameter(minRockyHeight,maxRockyHeight);
-        this.numberOfRectangles = numberOfRectangles;
+
+    }
+
+    public RockyRectanglesHabitatInitializer(int x, int y, int width, int height)
+    {
+        this((random, map) -> new RockyRectangle[]{new RockyRectangle(x, y, width, height)});
     }
 
 
     public RockyRectanglesHabitatInitializer(
             DoubleParameter rockyHeight, DoubleParameter rockyWidth,
             int numberOfRectangles) {
-        this.rockyHeight = rockyHeight;
-        this.rockyWidth = rockyWidth;
-        this.numberOfRectangles = numberOfRectangles;
+        this(new RandomRockyRectangles(rockyHeight,rockyWidth,numberOfRectangles));
+    }
+
+    public RockyRectanglesHabitatInitializer(RockyRectangleMaker maker)
+    {
+        this.maker = maker;
     }
 
     /**
@@ -69,28 +77,17 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
         //here I assume everything is sandy at first. I do not force it in case at some point I want to chain a series
         //of initializers (unlikely as it is)
 
-        final int mapHeight = map.getHeight();
-        final int mapWidth = map.getWidth();
 
-        //create numberOfAreas rectangles
-        for(int i=0; i< numberOfRectangles; i++)
+        //ask the maker to give you rectangles
+        RockyRectangle[] rectangles = maker.buildRectangles(random,map);
+
+        //turn rectangles into the real thing
+        for(RockyRectangle rectangle : rectangles)
         {
-
-            //create the bottom left corner
-            int x;
-            int y;
-            do {
-                x = random.nextInt(mapWidth);
-                y = random.nextInt(mapHeight);
-            }
-            while (map.getSeaTile(x,y).getAltitude()>0);
-
-
-            //get rectangle size
-            int rockyWidth = this.rockyWidth.apply(random).intValue();
-
-            int rockyHeight =  this.rockyHeight.apply(random).intValue();
-
+            //strip the rectangle class
+            int x = rectangle.getTopLeftX(); int y = rectangle.getTopLeftY();
+            int rockyWidth = rectangle.getWidth();
+            int rockyHeight = rectangle.getHeight();
             //for each tile in the rectangle
             for(int w=0; w<rockyWidth; w++)
             {
@@ -177,3 +174,39 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
     }
 }
+
+class RockyRectangle
+{
+
+    private final int topLeftX;
+    private final int topLeftY;
+    private final int width;
+    private final int height;
+
+
+    public RockyRectangle(int topLeftX, int topLeftY, int width, int height) {
+        this.topLeftX = topLeftX;
+        this.topLeftY = topLeftY;
+        this.width = width;
+        this.height = height;
+    }
+
+    public int getTopLeftX() {
+        return topLeftX;
+    }
+
+    public int getTopLeftY() {
+        return topLeftY;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+}
+
+
+

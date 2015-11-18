@@ -42,6 +42,8 @@ dependencies
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
     //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
     compile fileTree(dir: 'libs/osmose', include: '*.jar')
+    //yaml merger, for juggling multiple yml files!
+    compile fileTree(dir: 'libs/mergeyml', include: '*.jar')
 
     //guava. Useful for PreConditions and sometimes specialized collections
     compile "com.google.guava:guava:18.0"
@@ -85,6 +87,19 @@ task fatJar(type: FatCapsule) {
     archiveName = "oxfish_executable.jar"
     applicationClass 'Main'
  //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
+
+    capsuleManifest {
+        minJavaVersion = '1.8.0'
+        minUpdateVersion =  ['1.8.0':'31']
+    }
+}
+
+//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
+//distributed
+task deployHeadless(type: FatCapsule) {
+    archiveName = "oxfish_headless.jar"
+    applicationClass 'YamlMain'
+    //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
     capsuleManifest {
         minJavaVersion = '1.8.0'

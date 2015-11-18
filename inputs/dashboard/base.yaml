@@ -52,6 +52,8 @@ Prototype:
   ports: 1
   regulation: MPA Only
   speedInKmh: '5.0'
+  startingMPAs: [
+    ]
   usePredictors: false
   weatherInitializer:
     Constant Weather:

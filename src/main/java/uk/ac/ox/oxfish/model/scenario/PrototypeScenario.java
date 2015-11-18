@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -42,12 +43,14 @@ import uk.ac.ox.oxfish.model.network.FriendshipEdge;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -156,6 +159,12 @@ public class PrototypeScenario implements Scenario {
 
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
+
+    private List<StartingMPA> startingMPAs  = new LinkedList<>();
+    {
+//        startingMPAs.add(new StartingMPA(5,33,35,18));
+    }
+
     /**
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
      * in the biology/fishery
@@ -231,7 +240,14 @@ public class PrototypeScenario implements Scenario {
             map.addPort(port);
         }
 
-
+        //create initial mpas
+        if(startingMPAs != null)
+            for(StartingMPA mpa : startingMPAs)
+            {
+                if(Log.INFO)
+                    Log.info("building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
+                mpa.buildMPA(map);
+            }
 
         //substitute back the original randomizer
         model.random = random;
@@ -300,8 +316,8 @@ public class PrototypeScenario implements Scenario {
                                                                        //check the daily counter but do not input new values
                                                                        //if you were not allowed at sea
                                                                        fisher1.isAllowedAtSea() ?
-                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                               species.getIndex()) :
+                                                                               fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                                       species.getIndex()) :
                                                                                0
 
                                                                ,
@@ -325,9 +341,9 @@ public class PrototypeScenario implements Scenario {
                                                                         //check the daily counter but do not input new values
                                                                         //if you were not allowed at sea
                                                                         fisher.isAllowedAtSea() ?
-                                                                        fisher.getDailyData().
-                                                                                getColumn(
-                                                                                        YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest()
+                                                                                fisher.getDailyData().
+                                                                                        getColumn(
+                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest()
                                                                                 :
                                                                                 Double.NaN
                                 ,
@@ -546,5 +562,11 @@ public class PrototypeScenario implements Scenario {
         this.mapInitializer = mapInitializer;
     }
 
+    public List<StartingMPA> getStartingMPAs() {
+        return startingMPAs;
+    }
 
+    public void setStartingMPAs(List<StartingMPA> startingMPAs) {
+        this.startingMPAs = startingMPAs;
+    }
 }
