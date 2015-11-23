@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 /**
@@ -122,5 +121,10 @@ public class DataColumn implements Iterable<Double>{
      */
     public Stream<Double> stream() {
         return data.stream();
+    }
+
+
+    public LinkedList<Double> copy(){
+        return new LinkedList<>(data);
     }
 }

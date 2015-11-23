@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -13,6 +14,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +63,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
         for(int i=1; i<numberOfSpecies; i++)
             quotas[i] = quotaOtherSpecies.apply(state.getRandom());
 
+        if(Log.INFO)
+            Log.info(Arrays.toString(quotas));
 
         /***
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___

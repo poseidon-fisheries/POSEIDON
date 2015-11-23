@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.mpa;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
@@ -37,14 +38,18 @@ public class StartingMPA {
         CoordinateTransformer transformer = new CoordinateTransformer(null,map);
 
         int lowerLeftX = topLeftX;
-        int lowerLeftY = Math.min(topLeftY + height,map.getHeight()-1);
-        Point point = transformer.gridToJTSPoint(lowerLeftX, lowerLeftY);
+        int height = Math.min(this.height,map.getHeight()-1-topLeftY);
+        int lowerLeftY = topLeftY + height;
+
+        Point lowerLeft = transformer.gridToJTSPoint(lowerLeftX, lowerLeftY);
+      //  Point topRight = transformer.gridToJTSPoint(topRightX, topRightY);
         //correct (JTS transformer gets you the centroid, you want the lower corner)
-        double correctedX= point.getX()-transformer.getCellWidthInJTS()/2;
-        double correctedY= point.getY()-transformer.getCellHeightInJTS()/2;
+        double correctedX= lowerLeft.getX()-transformer.getCellWidthInJTS()/2;
+        double correctedY= lowerLeft.getY()-transformer.getCellHeightInJTS()/2;
         //setup the factory
         GeometricShapeFactory geometryFactory = new GeometricShapeFactory();
-        geometryFactory.setBase(point.getCoordinate());
+        geometryFactory.setBase(new Coordinate(correctedX,
+                                               correctedY));
         geometryFactory.setHeight(transformer.getCellHeightInJTS() * height + transformer.getCellHeightInJTS());
         geometryFactory.setWidth(transformer.getCellWidthInJTS() * width + transformer.getCellWidthInJTS() );
         //build it

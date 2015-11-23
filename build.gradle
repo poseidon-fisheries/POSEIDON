@@ -96,8 +96,8 @@ task fatJar(type: FatCapsule) {
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-task deployHeadless(type: FatCapsule) {
-    archiveName = "oxfish_headless.jar"
+task buildHeadless(type: FatCapsule, dependsOn: test) {
+    archiveName = "yamler.jar"
     applicationClass 'YamlMain'
     //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
@@ -105,6 +105,13 @@ task deployHeadless(type: FatCapsule) {
         minJavaVersion = '1.8.0'
         minUpdateVersion =  ['1.8.0':'31']
     }
+}
+//this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
+//to make optimization.py work correctly
+task deployHeadless(type: Copy, dependsOn: buildHeadless) {
+    from 'build/libs/'
+    into 'runs/optimization/'
+    include 'yamler.jar'
 }
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder

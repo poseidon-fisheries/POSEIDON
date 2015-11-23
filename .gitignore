@@ -3,6 +3,8 @@ runs/*
 !runs/dashboards
 runs/dashboards/*
 !runs/dashboards/dashboard.R
+!runs/optimization
+
 
 oxfish.iml
 ### NetBeans template

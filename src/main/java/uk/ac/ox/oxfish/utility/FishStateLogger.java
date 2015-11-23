@@ -13,17 +13,22 @@ import java.nio.file.Path;
  */
 public class FishStateLogger extends Log.Logger{
 
-    private final FileWriter writer;
+    private FileWriter writer;
+
+    private final Path path;
 
     private final FishState model;
 
     public FishStateLogger(FishState model, Path pathToFile) throws IOException {
         this.model = model;
-        writer = new FileWriter(pathToFile.toFile());
+        path = pathToFile;
     }
 
     @Override
     public void log(int level, String category, String message, Throwable ex) {
+
+
+
         StringBuilder builder = new StringBuilder(256);
         builder.append(model.timeString());
         builder.append(',');
@@ -36,6 +41,8 @@ public class FishStateLogger extends Log.Logger{
 
         System.out.println(builder);
         try {
+            if(writer==null)
+                writer = new FileWriter(path.toFile());
             writer.write(builder.toString());
         } catch (IOException e) {
             e.printStackTrace();

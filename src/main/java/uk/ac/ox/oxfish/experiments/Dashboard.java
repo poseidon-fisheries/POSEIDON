@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
+import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
@@ -37,6 +38,8 @@ public class Dashboard
 
     public static void main(String[] args) throws IOException {
 
+        //don't log during the dashboarding
+        Log.set(Log.LEVEL_NONE);
         //get the directory to write in: probably with today's date
         String subDirectory = args[0];
         //turn it into a path

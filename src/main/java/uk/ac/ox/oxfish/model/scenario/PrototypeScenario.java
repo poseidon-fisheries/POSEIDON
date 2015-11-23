@@ -162,7 +162,9 @@ public class PrototypeScenario implements Scenario {
 
     private List<StartingMPA> startingMPAs  = new LinkedList<>();
     {
-//        startingMPAs.add(new StartingMPA(5,33,35,18));
+        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
+        //best third:
+        //startingMPAs.add(new StartingMPA(0,26,34,40));
     }
 
     /**

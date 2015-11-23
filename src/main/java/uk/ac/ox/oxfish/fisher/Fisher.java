@@ -673,7 +673,7 @@ public class Fisher implements Steppable, Startable{
     }
 
 
-    public TimeSeries getYearlyData() {
+    public TimeSeries<Fisher> getYearlyData() {
         return memory.getYearlyTimeSeries();
 
     }
