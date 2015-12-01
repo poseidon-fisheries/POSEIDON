@@ -53,10 +53,10 @@ Prototype:
   regulation: MPA Only
   speedInKmh: '5.0'
   startingMPAs:
-  - height: 60
+  - height: 40
     topLeftX: 0
-    topLeftY: 0
-    width: 60
+    topLeftY: 26
+    width: 34
   usePredictors: false
   weatherInitializer:
     Constant Weather:

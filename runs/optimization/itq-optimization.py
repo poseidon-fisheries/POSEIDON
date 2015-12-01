@@ -12,7 +12,7 @@ def build_itq_input(filename, x):
     :param x: the numpy array with the parameters. I just expect 2: quota for first and quota for second species
     :return: nothing
     '''
-    with open("base.yaml", 'r') as infile:
+    with open("separated.yaml", 'r') as infile:
         data = yaml.load(infile)
 
     # change regulations
@@ -28,6 +28,6 @@ def build_itq_input(filename, x):
         outfile.write(yaml.dump(data, default_flow_style=True))
 
 bounds = [(0, 10000), (0, 10000)]
-title = "mixed_itq"
+title = "separated_itq"
 
 optimization.optimize(title,build_itq_input,bounds)

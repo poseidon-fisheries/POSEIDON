@@ -1,0 +1,40 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "mpa.py",
+    "experiment-name" : "mpa",
+    "likelihood"      : "GAUSSIAN",
+    "resources" : {
+        "my-machine" : {
+            "scheduler"         : "local",
+            "max-concurrent"    : 1,
+            "max-finished-jobs" : 200
+        }
+    },
+    "variables" : {
+        "height" : {
+            "type" : "INT",
+            "size" : 1,
+            "min"  : 1,
+            "max"  : 40
+        },
+        "width" : {
+            "type" : "INT",
+            "size" : 1,
+            "min"  : 1,
+            "max"  : 40
+        },
+        "x" : {
+            "type" : "INT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 49
+        },
+        "y" : {
+            "type" : "INT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 49
+        }
+    }
+}
+

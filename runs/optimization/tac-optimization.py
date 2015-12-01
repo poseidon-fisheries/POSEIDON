@@ -14,6 +14,7 @@ def build_tac_input(filename, x):
     with open("base.yaml", 'r') as infile:
         data = yaml.load(infile)
 
+    data["Prototype"]["fishers"] = 100
     # change regulations
     data["Prototype"]["regulation"] = dict()
     data["Prototype"]["regulation"]["Multi-TAC"] = {
@@ -26,6 +27,6 @@ def build_tac_input(filename, x):
     with open(filename, 'w') as outfile:
         outfile.write(yaml.dump(data, default_flow_style=True))
 
-title = "mixed_tac"
-bounds = [(0,1000000),(0,1000000)]
+title = "mixed_tac_100"
+bounds = [(0,2000000),(0,2000000)]
 optimization.optimize(title,build_tac_input,bounds)
