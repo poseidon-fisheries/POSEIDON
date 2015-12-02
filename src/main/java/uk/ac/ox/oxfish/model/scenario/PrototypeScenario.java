@@ -86,19 +86,27 @@ public class PrototypeScenario implements Scenario {
 
 
     /**
-     * when this flag is true, agents use their memory to predict future catches and profits
+     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
+     * for ITQs to work
      */
     private boolean usePredictors = false;
 
 
-
-    private int[] forcedPortPosition = null;
+    /**
+     * the X position of the port on the grid. If null or a negative number the position is randomized
+     */
+    private Integer portPositionX = null;
+    /**
+     * the X position of the port on the grid. If null or a negative number the position is randomized
+     */
+    private Integer portPositionY = null;
 
     /**
      * to use if you really want to port to be somewhere specific
      */
     public void forcePortPosition(int[] forcedPortPosition) {
-        this.forcedPortPosition = forcedPortPosition;
+        portPositionX = forcedPortPosition[0];
+        portPositionY = forcedPortPosition[1];
     }
 
     /**
@@ -188,7 +196,6 @@ public class PrototypeScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
 
-        System.out.println(model.random.nextInt(100));
         MersenneTwisterFast random = model.random;
 
         MersenneTwisterFast mapMakerRandom = model.random;
@@ -233,11 +240,11 @@ public class PrototypeScenario implements Scenario {
             marketMap.addMarket(species, market.apply(model));
 
         //create random ports, all sharing the same market
-        if(forcedPortPosition == null)
+        if(portPositionX == null || portPositionX < 0)
             NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
         else
         {
-            Port port = new Port(map.getSeaTile(forcedPortPosition[0],forcedPortPosition[1]),
+            Port port = new Port(map.getSeaTile(portPositionX,portPositionY),
                                  marketMap,0);
             map.addPort(port);
         }
@@ -570,5 +577,21 @@ public class PrototypeScenario implements Scenario {
 
     public void setStartingMPAs(List<StartingMPA> startingMPAs) {
         this.startingMPAs = startingMPAs;
+    }
+
+    public Integer getPortPositionX() {
+        return portPositionX;
+    }
+
+    public void setPortPositionX(Integer portPositionX) {
+        this.portPositionX = portPositionX;
+    }
+
+    public Integer getPortPositionY() {
+        return portPositionY;
+    }
+
+    public void setPortPositionY(Integer portPositionY) {
+        this.portPositionY = portPositionY;
     }
 }

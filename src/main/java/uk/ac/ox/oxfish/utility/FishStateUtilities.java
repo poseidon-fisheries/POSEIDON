@@ -164,7 +164,18 @@ public class FishStateUtilities {
                         return objectiveFunction.computeCurrentFitness(fisher);
                     }
                 })).entrySet().stream().max(
-                Map.Entry.comparingByValue());
+
+                new Comparator<Map.Entry<Fisher, Double>>() {
+                    @Override
+                    public int compare(
+                            Map.Entry<Fisher, Double> o1, Map.Entry<Fisher, Double> o2) {
+                        int comparison = Double.compare(o1.getValue(),o2.getValue());
+                        if(comparison!= 0)
+                            return comparison;
+                        else
+                            return Integer.compare(o1.getKey().getID(),o2.getKey().getID());
+                    }
+                });
 
         if(bestFriend.isPresent()) //if the best friend knows what he's doing
         {

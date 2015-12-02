@@ -1,0 +1,16 @@
+Prototype:
+  biologyInitializer:
+    Independent Logistic:
+      carryingCapacity: 5000
+      steepness : 0.4
+  destinationStrategy:
+    Imitator-Explorator:
+      ignoreEdgeDirection: false
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.2'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0'
+      stepSize: uniform 1.0 10.0
+  fishers: 300

@@ -1,6 +1,9 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
+import sim.field.grid.IntGrid2D;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
@@ -8,6 +11,9 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -46,8 +52,6 @@ public class Dashboard
         Path containerPath = DASHBOARD_OUTPUT_DIRECTORY.resolve(subDirectory);
         containerPath.toFile().mkdirs();
 
-        //read in the base scenario
-        String baseScenario = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("base.yaml")));
         //get ready to initialize stuff
         FishYAML yamler = new FishYAML();
 
@@ -67,7 +71,6 @@ public class Dashboard
         Path output = containerPath.resolve("gearopt");
         output.toFile().mkdirs();
         //putting initial scenario back means that the new yaml will override the old one
-        expensiveGas = expensiveGas + "\n" + baseScenario;
 
         for(int i=0; i<RUNS_PER_SCENARIO; i++)
         {
@@ -77,8 +80,6 @@ public class Dashboard
         System.out.println("    - Free Gas");
 
         String freeGas = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("free_gas.yaml")));
-
-        freeGas = freeGas + "\n" + baseScenario;
 
         for(int i=0; i<RUNS_PER_SCENARIO; i++)
         {
@@ -99,7 +100,6 @@ public class Dashboard
         output = containerPath.resolve("1itq");
         output.toFile().mkdirs();
         String oneSpeciesYAML = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("itq_1_rare.yaml")));
-        oneSpeciesYAML = oneSpeciesYAML + "\n" + baseScenario;
 
         for(int i=0; i<Math.floorDiv(RUNS_PER_SCENARIO, 3); i++)
         {
@@ -109,7 +109,6 @@ public class Dashboard
         System.out.println("    - Common Quota");
 
         oneSpeciesYAML = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("itq_1_common.yaml")));
-        oneSpeciesYAML = oneSpeciesYAML + "\n" + baseScenario;
         for(int i=0; i<Math.floorDiv(RUNS_PER_SCENARIO, 3); i++)
         {
             oneSpeciesITQRun(yamler, oneSpeciesYAML, i, "common", output,10);
@@ -119,13 +118,138 @@ public class Dashboard
         System.out.println("    - Hypothetical Quota");
 
         oneSpeciesYAML = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("itq_1_hypothetical.yaml")));
-        oneSpeciesYAML = oneSpeciesYAML + "\n" + baseScenario;
         for(int i=0; i<Math.floorDiv(RUNS_PER_SCENARIO, 3); i++)
         {
             hypotheticalOneSpeciesITQRun(yamler, oneSpeciesYAML, i, "hypothetical", output,10);
         }
 
+
+        /***
+         *      ___  _     __              _   _               _   ___    _             _
+         *     |   \(_)___/ _|_  _ _ _  __| |_(_)___ _ _  __ _| | | __| _(_)___ _ _  __| |___
+         *     | |) | (_-<  _| || | ' \/ _|  _| / _ \ ' \/ _` | | | _| '_| / -_) ' \/ _` (_-<
+         *     |___/|_/__/_|  \_,_|_||_\__|\__|_\___/_||_\__,_|_| |_||_| |_\___|_||_\__,_/__/
+         *
+         */
+        System.out.println("===============================================================");
+        System.out.println("Disfunctional Friends");
+        String disfunctionalYaml = String.join("\n", Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("disfunctional.yaml")));
+        String toOutput = "friends,steps\n";
+        //check how much it takes in days to consume 95% of all the biomass
+        for(int friends =0; friends<30;friends++)
+        {
+            int steps = disfunctionalFriendsRun(friends,
+                                                yamler.loadAs(disfunctionalYaml,PrototypeScenario.class),
+                                                15);
+            toOutput = toOutput + friends + "," + steps + "\n";
+        }
+        Path outputPath = containerPath.resolve("disfunctional");
+        outputPath.toFile().mkdir();
+        Files.write(outputPath.resolve("disfunctional.csv"), toOutput.getBytes());
+        /***
+         *      ___ _____ ___     ___     _    _
+         *     |_ _|_   _/ _ \   / __|_ _(_)__| |
+         *      | |  | || (_) | | (_ | '_| / _` |
+         *     |___| |_| \__\_\  \___|_| |_\__,_|
+         *
+         */
+        System.out.println("===============================================================");
+        System.out.println("ITQ Grid");
+        String umuffledITQ = String.join("\n",
+                                               Files.readAllLines(DASHBOARD_INPUT_DIRECTORY.resolve("itq_geography.yaml")));
+        outputPath = containerPath.resolve("grid");
+        outputPath.toFile().mkdir();
+        for(int i=0; i<5; i++)
+        {
+            System.out.println("    Run:" + i);
+            unmuffledITQGrid(yamler.loadAs(umuffledITQ, PrototypeScenario.class),
+                             5,
+                             "grid_"+i+".csv",
+                             outputPath);
+
+        }
+
+
     }
+
+
+    private static void unmuffledITQGrid(PrototypeScenario scenario,
+                                         final int yearsToRun,
+                                         final String outputName, final Path outputPath) throws IOException {
+        scenario.forcePortPosition(new int[]{40,25});
+        assert  scenario.isUsePredictors();
+        final FishState state = new FishState(System.currentTimeMillis());
+        state.setScenario(scenario);
+        state.start();
+        //run first year "free"
+        while(state.getYear()<1)
+            state.schedule.step(state);
+
+
+        double[][] theGrid = new double[state.getMap().getWidth()][state.getMap().getHeight()];
+        double[][] theBlue = new double[state.getMap().getWidth()][state.getMap().getHeight()];
+
+        while(state.getYear()<yearsToRun)
+        {
+            state.schedule.step(state);
+            IntGrid2D trawls = state.getMap().getDailyTrawlsMap();
+            for(int x =0; x<state.getMap().getWidth(); x++)
+            {
+                for (int y = 0; y < state.getMap().getHeight(); y++)
+                {
+                    theGrid[x][state.getMap().getHeight()-y-1] += trawls.get(x, y);
+                    theBlue[x][state.getMap().getHeight()-y-1] += state.getMap().getSeaTile(x,y).
+                            getBiomass(state.getSpecies().get(1));
+                }
+            }
+        }
+
+        String grid = PolicyAndLocations.gridToCSV(theGrid);
+        Files.write(outputPath.resolve(outputName),grid.getBytes());
+        grid = PolicyAndLocations.gridToCSV(theBlue);
+        Files.write(outputPath.resolve("blue_"+outputName),grid.getBytes());
+
+
+    }
+
+    /**
+     * run a disfunctional friends simulation: very low p, very high i
+     * @param friends how many friends each person has
+     * @param scenario the original scenario, as read from the yaml
+     * @param maxYearsToRun maximum years after which to cut the simulation
+     * @return
+     */
+    private static int disfunctionalFriendsRun(int friends, PrototypeScenario scenario,
+                                               final int maxYearsToRun)
+    {
+        System.out.println("    Friends: " + friends);
+        if(friends > 0) {
+            EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
+            networkBuilder.setDegree(friends);
+            scenario.setNetworkBuilder(networkBuilder);
+        }
+        else
+            scenario.setNetworkBuilder(new EmptyNetworkBuilder());
+        FishState state = new FishState(System.currentTimeMillis());
+        state.setScenario(scenario);
+        state.start();
+
+        Species onlySpecies = state.getBiology().getSpecie(0);
+        //how much does it take to eat 95% of all the fish?
+        final double minimumBiomass = state.getTotalBiomass(onlySpecies) * .05;
+
+
+        int steps = 0;
+        while(state.getYear()<=maxYearsToRun)
+        {
+            state.schedule.step(state);
+            if (state.getTotalBiomass(onlySpecies) <= minimumBiomass)
+                break;
+            steps++;
+        }
+        return steps;
+    }
+
 
     private static void oneSpeciesITQRun(
             FishYAML yaml, String scenarioYAML, int run,
