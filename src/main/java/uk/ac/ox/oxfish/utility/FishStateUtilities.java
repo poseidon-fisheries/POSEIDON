@@ -128,72 +128,145 @@ public class FishStateUtilities {
         return toClean;
     }
 
-    public static <T> T imitateFriendAtRandom(
+    public static <T> Pair<T,Fisher> imitateFriendAtRandom(
             MersenneTwisterFast random, double fitness, T current, Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
         //get random friend
-        assert friends.size() >0;
-        int i = random.nextInt(friends.size());
-        Fisher friend = null;
-        for(Fisher fisher : friends)
-        {
-            friend = fisher;
-            if(i==0)
-                break;
-            i--;
-        }
-        double friendFitness = objectiveFunction.computeCurrentFitness(friend);
+        List<Fisher> friendList = friends.stream().
+                //remove friends we can't imitate
+                filter(fisher -> sensor.scan(fisher) != null).
+                        //sort by id (remove hashing randomness)
+                sorted((o1, o2) -> Integer.compare(o1.getID(),o2.getID())).collect(Collectors.toList());
 
-        if(friendFitness > fitness && Double.isFinite(friendFitness) && Double.isFinite(fitness)) {
-            return sensor.scan(friend);
+        assert friends.size() >0;
+        if(friendList.isEmpty())
+            return new Pair<>(current,null);
+        else {
+            Fisher friend = friendList.get(random.nextInt(friendList.size()));
+            double friendFitness = objectiveFunction.computeCurrentFitness(friend);
+            if(friendFitness > fitness && Double.isFinite(friendFitness) && Double.isFinite(fitness)) {
+                return new Pair<>(sensor.scan(friend),friend);
+            }
+            else
+                return new Pair<>(current,null);
         }
-        else
-            return current;
+
     }
 
 
-    public static <T> T imitateBestFriend(MersenneTwisterFast random, double fitness,
+    public static <T> Pair<T,Fisher> imitateBestFriend(MersenneTwisterFast random, double fitness,
                                           T current, Collection<Fisher> friends,
                                           ObjectiveFunction<Fisher> objectiveFunction,
                                           Sensor<T> sensor)
     {
-        final Optional<Map.Entry<Fisher, Double>> bestFriend = friends.stream().collect(
-                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
-                    @Override
-                    public Double apply(Fisher fisher) {
-                        return objectiveFunction.computeCurrentFitness(fisher);
-                    }
-                })).entrySet().stream().max(
 
-                new Comparator<Map.Entry<Fisher, Double>>() {
-                    @Override
-                    public int compare(
-                            Map.Entry<Fisher, Double> o1, Map.Entry<Fisher, Double> o2) {
-                        int comparison = Double.compare(o1.getValue(),o2.getValue());
-                        if(comparison!= 0)
-                            return comparison;
-                        else
-                            return Integer.compare(o1.getKey().getID(),o2.getKey().getID());
-                    }
-                });
+        //if you have no friends, keep doing what you currently are doing
+        if(friends.isEmpty())
+            return new Pair<>(current,null);
 
-        if(bestFriend.isPresent()) //if the best friend knows what he's doing
-        {
-            Double friendFitness = bestFriend.get().getValue();
-            if(friendFitness > fitness) {
-                T bestFriendDecision = sensor.scan(bestFriend.get().getKey());
-                if (bestFriendDecision != null)
-                    return bestFriendDecision;
+        //associate a fitness to each friend and compute the maxFitness
+        final double[] maxFitness = {fitness};
+        Set<Map.Entry<Fisher, Double>> friendsFitnesses = friends.stream().
+                //ignore friends who we can't imitate
+                        filter(fisher -> sensor.scan(fisher) != null).
+                        collect(
+                                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
+                                    @Override
+                                    public Double apply(Fisher fisher) {
+                                        //get your friend fitness
+                                        double friendFitness = objectiveFunction.computeCurrentFitness(fisher);
+                                        //if it is finite check if it is better than what we already have
+                                        if(Double.isFinite(friendFitness))
+                                            maxFitness[0] = Math.max(maxFitness[0], friendFitness);
+                                        //return it
+                                        return friendFitness;
+                                    }
+                                })).entrySet();
 
-            }
-            return current;
+        //make sure it's finite and at least as good as our current fitness
+        assert Double.isFinite(maxFitness[0]);
+        assert maxFitness[0] >= fitness;
 
-        }
-        else
-            return current;
+        //if you are doing better than your friends, keep doing what you are doing
+        if(Math.abs(maxFitness[0] -fitness)<EPSILON)
+            return new Pair<>(current,null);
+
+        //prepare to store the possible imitation options
+        List<Fisher> bestFriends = new LinkedList<>();
+        //take all your friends
+        friendsFitnesses.stream().
+                //choose only the ones with the highest fitness
+                filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
+                // sort them by id (we need to kill the hashing randomization which we can't control)
+                        sorted((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID())).
+                //now put in the best option list by scanning
+                        forEachOrdered(fisherDoubleEntry -> bestFriends.add(fisherDoubleEntry.getKey()));
+
+
+
+        //return a random best option
+
+        Fisher bestFriend = bestFriends.size() == 1 ?
+                bestFriends.get(0) :
+                bestFriends.get(random.nextInt(bestFriends.size()));
+        assert bestFriend!=null;
+        return new Pair<>(sensor.scan(bestFriend),bestFriend);
+
 
     }
 
+
+    /*
+     //if you have no friends, keep doing what you currently are doing
+        if(friends.isEmpty())
+            return current;
+
+        //associate a fitness to each friend and compute the maxFitness
+        final double[] maxFitness = {fitness};
+        Set<Map.Entry<Fisher, Double>> friendsFitnesses = friends.stream().
+                //ignore friends who we can't imitate
+                        filter(fisher -> sensor.scan(fisher) != null).
+                        collect(
+                                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
+                                    @Override
+                                    public Double apply(Fisher fisher) {
+                                        //get your friend fitness
+                                        double friendFitness = objectiveFunction.computeCurrentFitness(fisher);
+                                        //if it is finite check if it is better than what we already have
+                                        if(Double.isFinite(friendFitness))
+                                            maxFitness[0] = Math.max(maxFitness[0], friendFitness);
+                                        //return it
+                                        return friendFitness;
+                                    }
+                                })).entrySet();
+
+        //make sure it's finite and at least as good as our current fitness
+        assert Double.isFinite(maxFitness[0]);
+        assert maxFitness[0] >= fitness;
+
+        //if you are doing better than your friends, keep doing what you are doing
+        if(Math.abs(maxFitness[0] -fitness)<EPSILON)
+            return current;
+
+        //prepare to store the possible imitation options
+        List<T> bestOptions = new LinkedList<>();
+        //take all your friends
+        friendsFitnesses.stream().
+                //choose only the ones with the highest fitness
+                filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
+                // sort them by id (we need to kill the hashing randomization which we can't control)
+                        sorted((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID())).
+                //now put in the best option list by scanning
+                        forEachOrdered(fisherDoubleEntry -> bestOptions.add(sensor.scan(fisherDoubleEntry.getKey())));
+
+
+
+        //return a random best option
+        return bestOptions.size() == 1  ?
+                bestOptions.get(0) :
+                bestOptions.get(random.nextInt(bestOptions.size()));
+
+     */
 
     /**
      * stolen from here:
@@ -271,7 +344,7 @@ public class FishStateUtilities {
     public static void pollHistogramToFile(Sensor<Double> poller, Collection<Fisher> fishers,
                                            File file)
     {
-       // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
+        // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         ArrayList<String> histogram = new ArrayList<>(fishers.size());
         for(Fisher fisher : fishers)
         {
@@ -301,7 +374,7 @@ public class FishStateUtilities {
      * @param column colun to sum over
      * @return a sum or NAN if the column is empty
      */
-     public static <T> Function<T, Double> generateYearlySum(final DataColumn column) {
+    public static <T> Function<T, Double> generateYearlySum(final DataColumn column) {
 
         return new Function<T, Double>() {
             @Override

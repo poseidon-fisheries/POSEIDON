@@ -139,6 +139,9 @@ public class FisherStatus implements Serializable {
         this.network = network;
     }
 
+
+
+
     /**
      * when this flag is on, the agent believes that it MUST return home or it will run out of fuel. All other usual
      * decisions about destination are ignored.

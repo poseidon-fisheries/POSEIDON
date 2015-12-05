@@ -57,6 +57,7 @@ dependencies
     //jung social network:
     compile "net.sf.jung:jung-api:2.0.1"
     compile 'net.sf.jung:jung-graph-impl:2.0.1'
+    compile 'net.sf.jung:jung-io:2.0.1'
     compile 'net.sf.jung:jung-algorithms:2.0.1'
 
     //yaml parser, useful for reading configuration files

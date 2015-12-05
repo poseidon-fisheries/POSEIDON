@@ -1023,4 +1023,14 @@ public class Fisher implements Steppable, Startable{
     public WeatherEmergencyStrategy getWeatherStrategy() {
         return weatherStrategy;
     }
+
+
+    public Fisher replaceFriend(Fisher friendToReplace,
+                                    boolean ignoreDirection) {
+        return status.getNetwork().replaceFriend(this,
+                                                 friendToReplace,
+                                                 ignoreDirection,
+                                                 state.getRandom(),
+                                                 state.getFishers());
+    }
 }

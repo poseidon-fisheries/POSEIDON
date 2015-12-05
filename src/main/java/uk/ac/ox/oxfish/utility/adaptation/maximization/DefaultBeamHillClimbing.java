@@ -16,10 +16,16 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
     private final int attempts;
 
-    public DefaultBeamHillClimbing(int maxStep, int attempts)
-    {
+    public DefaultBeamHillClimbing(
+            boolean copyAlwaysBest, boolean dynamicFriendshipNetwork, int maxStep, int attempts) {
+        super(copyAlwaysBest, dynamicFriendshipNetwork);
         this.maxStep = maxStep;
         this.attempts = attempts;
+    }
+
+    public DefaultBeamHillClimbing(int maxStep, int attempts)
+    {
+        this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts);
     }
 
     @Override

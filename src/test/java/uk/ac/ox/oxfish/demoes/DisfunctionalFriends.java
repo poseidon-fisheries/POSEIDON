@@ -23,8 +23,8 @@ public class DisfunctionalFriends {
 
         for(int i=0; i<2; i++) {
             long seed = System.currentTimeMillis();
-            int stepsAlone = stepsItTook(.2, 1, 5000, seed);
-            int stepsWithManyFriends = stepsItTook(.2, 20, 5000, seed);
+            int stepsAlone = stepsItTook(.2, 1, 5000, seed, true);
+            int stepsWithManyFriends = stepsItTook(.2, 20, 5000, seed, true);
 
             System.out.println(stepsAlone + " ---- " + stepsWithManyFriends);
             Assert.assertTrue(stepsAlone + " ---- " + stepsWithManyFriends, stepsAlone <= stepsWithManyFriends);
@@ -36,6 +36,12 @@ public class DisfunctionalFriends {
             totalStepsManyFriends +=stepsWithManyFriends;
         }
         Assert.assertTrue(totalStepsAlone < totalStepsManyFriends);
+
+
+        //finally, copying a friend at random doesn't cause any problem
+        int functional = stepsItTook(.2, 20, 5000, System.currentTimeMillis(), false);
+        Assert.assertTrue(functional < 4000);
+
 
     }
 

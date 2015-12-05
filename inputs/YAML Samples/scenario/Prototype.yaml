@@ -10,6 +10,8 @@ Prototype:
       hoursBetweenEachDeparture: '12.0'
   destinationStrategy:
     Imitator-Explorator:
+      alwaysCopyBest: false
+      dynamicFriendshipNetwork: false
       ignoreEdgeDirection: true
       probability:
         Adaptive Probability:
@@ -49,14 +51,13 @@ Prototype:
   networkBuilder:
     Equal Out Degree:
       degree: 2
+  portPositionX: null
+  portPositionY: null
   ports: 1
   regulation: MPA Only
   speedInKmh: '5.0'
-  startingMPAs:
-  - height: 40
-    topLeftX: 0
-    topLeftY: 26
-    width: 34
+  startingMPAs: [
+    ]
   usePredictors: false
   weatherInitializer:
     Constant Weather:

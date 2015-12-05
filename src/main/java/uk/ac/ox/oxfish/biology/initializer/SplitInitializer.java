@@ -21,7 +21,7 @@ public class SplitInitializer extends AbstractBiologyInitializer {
     public SplitInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
                                   double percentageLimitOnDailyMovement,
                                   double differentialPercentageToMove) {
-        Log.info("Creating Split Initializer!");
+        Log.trace("Creating Split Initializer!");
         delegate = new DiffusingLogisticInitializer(carryingCapacity, steepness,
                                                     percentageLimitOnDailyMovement,
                                                     differentialPercentageToMove);
@@ -95,7 +95,7 @@ public class SplitInitializer extends AbstractBiologyInitializer {
     @Override
     public String[] getSpeciesNames() {
 
-        Log.info("Returning two species");
+        Log.trace("Returning two species");
 
         return new String[]{"Species 0", "Species 1"};
     }

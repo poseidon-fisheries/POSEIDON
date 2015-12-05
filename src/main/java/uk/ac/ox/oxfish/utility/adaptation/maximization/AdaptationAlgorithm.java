@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
@@ -44,7 +45,29 @@ public interface AdaptationAlgorithm<T> {
             double previousFitness, double currentFitness,
             T previous, T current);
 
-    T imitate(
+    /**
+     * if you have imitated in the previous step, this gets called for you to judge imitation (you might want to backtrack)
+     * Return null if you don't want to backtrack and skip directly to another round of exploration-exploitation
+     */
+    T judgeImitation(
+            MersenneTwisterFast random, Fisher agent,
+            Fisher friendImitated,
+            double fitnessBeforeImitating,
+            double fitnessAfterImitating,
+            T previous, T current);
+
+    /**
+     * asks the agent to imitate someone.
+     * @param random the randomizer
+     * @param agent the agent who has to imitate
+     * @param fitness his current fitness
+     * @param current his current decision
+     * @param friends the collection of friends he has
+     * @param objectiveFunction the objective function by which the agent judges himself and others
+     * @param sensor the function that maps Fisher--->current decision
+     * @return a pair of the new decision to take AND the friend imitated (which can be null)
+     */
+    Pair<T,Fisher> imitate(
             MersenneTwisterFast random,
             Fisher agent, double fitness,
             T current,

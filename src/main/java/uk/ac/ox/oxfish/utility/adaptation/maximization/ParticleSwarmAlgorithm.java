@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -186,7 +187,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
      * best memory and best friend
      */
     @Override
-    public T imitate(
+    public Pair<T,Fisher> imitate(
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor)
     {
@@ -221,7 +222,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                 velocities[i]+= socialWeight * (socialCoordinates[i]-currentCoordinates[i]);
         }
 
-        return move(agent);
+        return new Pair<>(move(agent),bestFriend.orElse(null));
 
     }
 
@@ -238,6 +239,16 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         return move(agent);
     }
 
+
+    /**
+     * returns null
+     */
+    @Override
+    public T judgeImitation(
+            MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
+            double fitnessAfterImitating, T previous, T current) {
+        return null;
+    }
 
     /**
      * object to convert from  PSO made up coordinates to actual variables and viceversa

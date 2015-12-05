@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestination
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
@@ -27,6 +28,16 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
     private boolean ignoreEdgeDirection = true;
 
+    /**
+     * If you imitate a friend and it makes you worse off then if this flag is also true you change the friend you have
+     * imitate with a new one
+     */
+    private boolean dynamicFriendshipNetwork = BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK;
+
+    /**
+     * whether, when imitating, you ask your friend who is doing best (true) or a friend at random (false)
+     */
+    private boolean alwaysCopyBest = BeamHillClimbing.DEFAULT_ALWAYS_COPY_BEST;
 
     /**
      * Applies this function to the given argument.
@@ -41,8 +52,10 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         NauticalMap map = state.getMap();
 
 
-        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
-                                                                              10);
+        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(
+                alwaysCopyBest,
+                dynamicFriendshipNetwork,
+                stepSize.apply(random).intValue(),10);
         return new PerTripIterativeDestinationStrategy(
                 new FavoriteDestinationStrategy(map, random), algorithm,
                 probability.apply(state));
@@ -75,5 +88,22 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     public void setProbability(
             AlgorithmFactory<? extends AdaptationProbability> probability) {
         this.probability = probability;
+    }
+
+
+    public boolean isDynamicFriendshipNetwork() {
+        return dynamicFriendshipNetwork;
+    }
+
+    public void setDynamicFriendshipNetwork(boolean dynamicFriendshipNetwork) {
+        this.dynamicFriendshipNetwork = dynamicFriendshipNetwork;
+    }
+
+    public boolean isAlwaysCopyBest() {
+        return alwaysCopyBest;
+    }
+
+    public void setAlwaysCopyBest(boolean alwaysCopyBest) {
+        this.alwaysCopyBest = alwaysCopyBest;
     }
 }

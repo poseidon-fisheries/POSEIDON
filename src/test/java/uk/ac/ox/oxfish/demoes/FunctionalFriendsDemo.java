@@ -23,8 +23,8 @@ public class FunctionalFriendsDemo {
 
 
         long seed = System.currentTimeMillis();
-        int stepsAlone = stepsItTook(Double.NaN,0,3500, seed);
-        int stepsWithFewFriends = stepsItTook(.9,3,3500, seed);
+        int stepsAlone = stepsItTook(Double.NaN, 0, 3500, seed, true);
+        int stepsWithFewFriends = stepsItTook(.9, 3, 3500, seed, true);
 
 
 
@@ -43,7 +43,7 @@ public class FunctionalFriendsDemo {
     public static int stepsItTook(
             double explorationProbability,
             int friends,
-            int maxSteps, final long seed) {
+            int maxSteps, final long seed, final boolean alwaysCopyBest) {
 
 
         PrototypeScenario scenario = new PrototypeScenario();
@@ -59,6 +59,7 @@ public class FunctionalFriendsDemo {
             final PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
             destinationStrategy.setProbability(new FixedProbabilityFactory(explorationProbability,1d));
             destinationStrategy.setIgnoreEdgeDirection(false);
+            destinationStrategy.setAlwaysCopyBest(alwaysCopyBest); //this is what makes it disfunctional, really
             scenario.setDestinationStrategy(destinationStrategy);
         }
         FishState state = new FishState(seed, 1);

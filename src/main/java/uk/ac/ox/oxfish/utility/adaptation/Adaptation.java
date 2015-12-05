@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.utility.adaptation;
 
-import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
@@ -61,6 +60,8 @@ public class Adaptation<T> implements FisherStartable {
      * holds the starting point of a randomization
      */
     private Pair<T,Double> explorationStart;
+
+    private ImitationStart<T> imitationStart;
 
     private final Sensor<T> sensor;
 
@@ -147,7 +148,7 @@ public class Adaptation<T> implements FisherStartable {
         //if you explored in the previous step
         if(explorationStart != null)
         {
-
+            assert imitationStart == null;
 
 
 
@@ -168,17 +169,30 @@ public class Adaptation<T> implements FisherStartable {
                 act(toAdapt, decision);
                 return;
             }
+        }
 
+        //if you imitated in the previous step
+        else if(imitationStart != null)
+        {
+            assert explorationStart == null;
+            T decision = this.algorithm.judgeImitation(random,toAdapt,
+                                                       imitationStart.getFriend(),
+                                                       imitationStart.getPreviousFitness(),
+                                                       fitness,
+                                                       imitationStart.getPreviousDecision(),
+                                                       current);
 
-
-
-
-
-
+            imitationStart = null;
+            if(decision != null)
+            {
+                act(toAdapt, decision);
+                return;
+            }
 
         }
 
-        //you are ready
+        //you have no previous decisions to judge or you had but decided not to act upon them
+        //you are now ready to check whether to explore or exploit
 
         double explorationProbability = probability.getExplorationProbability();
         //explore?
@@ -200,11 +214,15 @@ public class Adaptation<T> implements FisherStartable {
                 !friends.isEmpty() && random.nextBoolean(imitationProbability))
         {
 
-            Log.trace("imitation time!");
+
+            Pair<T, Fisher> imitation = algorithm.imitate(random,
+                                                        toAdapt, fitness, current,
+                                                        friends, objective, sensor);
+            if(imitation.getSecond() != null)
+                imitationStart = new ImitationStart<>(imitation.getSecond(),fitness,imitation.getFirst());
+
             act(toAdapt,
-                algorithm.imitate(random,
-                                  toAdapt, fitness, current,
-                                  friends, objective, sensor));
+                imitation.getFirst());
             return;
 
         }
@@ -275,5 +293,31 @@ public class Adaptation<T> implements FisherStartable {
 
     public void setValidator(Predicate<Fisher> validator) {
         this.validator = validator;
+    }
+
+
+    private class ImitationStart<K>
+    {
+        private final Fisher friend;
+        private final double previousFitness;
+        private final K previousDecision;
+
+        public ImitationStart(Fisher friend, double previousFitness, K previousDecision) {
+            this.friend = friend;
+            this.previousFitness = previousFitness;
+            this.previousDecision = previousDecision;
+        }
+
+        public Fisher getFriend() {
+            return friend;
+        }
+
+        public double getPreviousFitness() {
+            return previousFitness;
+        }
+
+        public K getPreviousDecision() {
+            return previousDecision;
+        }
     }
 }

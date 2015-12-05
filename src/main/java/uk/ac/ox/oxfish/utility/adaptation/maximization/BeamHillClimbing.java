@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
@@ -24,6 +25,38 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
 
     private FishState model;
 
+    /**
+     * the default value of copyAlwaysBest
+     */
+    public final static boolean DEFAULT_ALWAYS_COPY_BEST = true;
+
+    /**
+     * the default state of the dynamicFriendshipNetwork field
+     */
+    public final static boolean DEFAULT_DYNAMIC_NETWORK = false;
+
+    /**
+     * if true imitation occurs by looking at your friend who is performing better, otherwise it
+     * works by looking at a random friend. <br>
+     *     In both cases we ignore friends who perform worse or equal to us
+     */
+    private final boolean copyAlwaysBest;
+
+    /**
+     * if true, when an imitation makes you worse off cut your friendship
+     */
+    private final boolean dynamicFriendshipNetwork;
+
+
+    public BeamHillClimbing(boolean copyAlwaysBest, boolean dynamicFriendshipNetwork) {
+        this.copyAlwaysBest = copyAlwaysBest;
+        this.dynamicFriendshipNetwork = dynamicFriendshipNetwork;
+    }
+
+    public BeamHillClimbing() {
+        this(DEFAULT_ALWAYS_COPY_BEST,
+             DEFAULT_DYNAMIC_NETWORK);
+    }
 
     @Override
     public void start(FishState model, Fisher agent, T initial) {
@@ -44,12 +77,17 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
      * copy friend. No problem
      */
     @Override
-    public T imitate(
+    public Pair<T, Fisher> imitate(
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
-        return FishStateUtilities.imitateBestFriend(random, fitness,
-                                                        current, friends,
-                                                        objectiveFunction, sensor);
+        if(copyAlwaysBest)
+            return FishStateUtilities.imitateBestFriend(random, fitness,
+                                                            current, friends,
+                                                            objectiveFunction, sensor);
+        else
+            return FishStateUtilities.imitateFriendAtRandom(random, fitness,
+                                                            current, friends,
+                                                            objectiveFunction, sensor);
     }
 
     @Override
@@ -66,5 +104,18 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     @Override
     public T exploit(MersenneTwisterFast random, Fisher agent, double currentFitness, T current) {
         return current;
+    }
+
+    /**
+     * returns null
+     */
+    @Override
+    public T judgeImitation(
+            MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
+            double fitnessAfterImitating, T previous,
+            T current) {
+        if(dynamicFriendshipNetwork && fitnessBeforeImitating > fitnessAfterImitating )
+            agent.replaceFriend(friendImitated,true);
+        return null;
     }
 }
