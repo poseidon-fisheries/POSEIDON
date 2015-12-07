@@ -47,6 +47,8 @@ public class TACNotCaresAboutMileage {
         }
 
         double correlation = FishStateUtilities.computeCorrelation(mileage, catches);
+        System.out.println("the correlation between mileage and TAC is: " + correlation);
+        System.out.println("Ideally it should be, in absolute value, less than .3");
         assertTrue(correlation <.3);
         assertTrue(correlation >-.3);
 

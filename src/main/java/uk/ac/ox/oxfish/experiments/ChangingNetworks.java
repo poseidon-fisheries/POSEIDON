@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +30,7 @@ public class ChangingNetworks {
         state.setScenario(scenario);
 
         PerTripImitativeDestinationFactory imitation = new PerTripImitativeDestinationFactory();
-        imitation.setDynamicFriendshipNetwork(true);
+        imitation.setDropInUtilityNeededForUnfriend(new FixedDoubleParameter(1d));
         imitation.setIgnoreEdgeDirection(false);
         scenario.setDestinationStrategy(imitation);
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();

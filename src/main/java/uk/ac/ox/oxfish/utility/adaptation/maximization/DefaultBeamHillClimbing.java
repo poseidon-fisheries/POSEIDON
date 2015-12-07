@@ -1,9 +1,13 @@
 package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
+
+import java.util.function.Predicate;
 
 /**
  * Pre-made hillclimber specifically for moving around maps
@@ -17,8 +21,8 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
     private final int attempts;
 
     public DefaultBeamHillClimbing(
-            boolean copyAlwaysBest, boolean dynamicFriendshipNetwork, int maxStep, int attempts) {
-        super(copyAlwaysBest, dynamicFriendshipNetwork);
+            boolean copyAlwaysBest, Predicate<Pair<Double,Double>> unfriendPredicate, int maxStep, int attempts) {
+        super(copyAlwaysBest, unfriendPredicate);
         this.maxStep = maxStep;
         this.attempts = attempts;
     }
@@ -26,6 +30,20 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
     public DefaultBeamHillClimbing(int maxStep, int attempts)
     {
         this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts);
+    }
+
+
+    static public DefaultBeamHillClimbing  BeamHillClimbingWithUnfriending(boolean alwaysCopyBest,
+                                                                           final double unfriendingThreshold,
+                                                                           int maxSteps,int attempts)
+    {
+        Preconditions.checkArgument(unfriendingThreshold>=0, "Unfriending threshold should be above 0!");
+        return new DefaultBeamHillClimbing(alwaysCopyBest,
+                                           oldFitnessAndNew ->
+                                                   unfriendingThreshold * oldFitnessAndNew.getFirst() >
+                                                           oldFitnessAndNew.getSecond(),
+                                           maxSteps,
+                                           attempts);
     }
 
     @Override

@@ -1,29 +1,35 @@
 {
-    "language"        : "PYTHON",
-    "main-file"       : "tac-mixed.py",
-    "experiment-name" : "tac-mixed",
-    "likelihood"      : "GAUSSIAN",
-    "acquisition"     : "PES",
-    "resources" : {
-        "my-machine" : {
-            "scheduler"         : "local",
-            "max-concurrent"    : 3,
-            "max-finished-jobs" : 200
-        }
-    },
-    "variables" : {
-        "x" : {
-            "type" : "FLOAT",
-            "size" : 1,
-            "min"  : 0,
-            "max"  : 2000000
-        },
-        "y" : {
-            "type" : "FLOAT",
-            "size" : 1,
-            "min"  : 0,
-            "max"  : 2000000
-        }
+  "language": "PYTHON",
+  "main-file": "unfriend.py",
+  "experiment-name": "unfriend",
+  "likelihood": "GAUSSIAN",
+  "resources": {
+    "my-machine": {
+      "scheduler": "local",
+      "max-concurrent": 3,
+      "max-finished-jobs": 200
     }
+  },
+  "variables": {
+    "unfriend": {
+      "type": "FLOAT",
+      "size": 1,
+      "min": 0,
+      "max": 2
+    },
+    "degree": {
+      "type": "INT",
+      "size": 1,
+      "min": 1,
+      "max": 20
+    },
+    "best": {
+      "type": "enum",
+      "size": 1,
+      "options": [
+        "true",
+        "false"
+      ]
+    }
+  }
 }
-

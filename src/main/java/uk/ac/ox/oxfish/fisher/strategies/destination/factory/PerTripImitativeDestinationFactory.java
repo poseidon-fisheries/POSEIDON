@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
@@ -29,10 +30,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     private boolean ignoreEdgeDirection = true;
 
     /**
-     * If you imitate a friend and it makes you worse off then if this flag is also true you change the friend you have
-     * imitate with a new one
+     * If you imitate a friend and it makes you worse off then as long as this is a positive number that's by how much
+     * the utility needs to drop in imitating a friend in order for you to unfriend him. If this is negative or null
+     * then no unfriending ever happens
      */
-    private boolean dynamicFriendshipNetwork = BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK;
+    private DoubleParameter dropInUtilityNeededForUnfriend = new FixedDoubleParameter(-1);
+
 
     /**
      * whether, when imitating, you ask your friend who is doing best (true) or a friend at random (false)
@@ -50,12 +53,24 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
+        double probabilityUnfriending = dropInUtilityNeededForUnfriend.apply(state.getRandom());
+        DefaultBeamHillClimbing algorithm;
+        if(probabilityUnfriending <= 0)
+        { //no unfriending
 
-
-        final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(
-                alwaysCopyBest,
-                dynamicFriendshipNetwork,
-                stepSize.apply(random).intValue(),10);
+            algorithm = new DefaultBeamHillClimbing(alwaysCopyBest,
+                                                    BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
+                                                    stepSize.apply(
+                                                            random).intValue(),
+                                                    10);
+        }
+        else {
+            algorithm = DefaultBeamHillClimbing.BeamHillClimbingWithUnfriending(alwaysCopyBest,
+                                                                                probabilityUnfriending,
+                                                                                stepSize.apply(
+                                                                                        random).intValue(),
+                                                                                10);
+        }
         return new PerTripIterativeDestinationStrategy(
                 new FavoriteDestinationStrategy(map, random), algorithm,
                 probability.apply(state));
@@ -91,12 +106,13 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     }
 
 
-    public boolean isDynamicFriendshipNetwork() {
-        return dynamicFriendshipNetwork;
+    public DoubleParameter getDropInUtilityNeededForUnfriend() {
+        return dropInUtilityNeededForUnfriend;
     }
 
-    public void setDynamicFriendshipNetwork(boolean dynamicFriendshipNetwork) {
-        this.dynamicFriendshipNetwork = dynamicFriendshipNetwork;
+    public void setDropInUtilityNeededForUnfriend(
+            DoubleParameter dropInUtilityNeededForUnfriend) {
+        this.dropInUtilityNeededForUnfriend = dropInUtilityNeededForUnfriend;
     }
 
     public boolean isAlwaysCopyBest() {

@@ -10,8 +10,8 @@ Prototype:
       hoursBetweenEachDeparture: '12.0'
   destinationStrategy:
     Imitator-Explorator:
-      alwaysCopyBest: false
-      dynamicFriendshipNetwork: false
+      alwaysCopyBest: true
+      dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       probability:
         Adaptive Probability:

@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  * An hill=climber that tries a new step on "randomize", copy a friend in "imitate" and stays put in "exploit".
@@ -31,9 +32,9 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     public final static boolean DEFAULT_ALWAYS_COPY_BEST = true;
 
     /**
-     * the default state of the dynamicFriendshipNetwork field
+     * the default state of the unfriendPredicate field
      */
-    public final static boolean DEFAULT_DYNAMIC_NETWORK = false;
+    public final static Predicate<Pair<Double,Double>> DEFAULT_DYNAMIC_NETWORK = doubleDoublePair -> false;
 
     /**
      * if true imitation occurs by looking at your friend who is performing better, otherwise it
@@ -43,14 +44,15 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     private final boolean copyAlwaysBest;
 
     /**
-     * if true, when an imitation makes you worse off cut your friendship
+     * A function that judges whether to change a friend after imitating given the pair (previous fitness,newfitness).
+     * When the function returns true, we will replace whoever we imitated with somebody at random
      */
-    private final boolean dynamicFriendshipNetwork;
+    private final Predicate<Pair<Double,Double>> unfriendPredicate;
 
 
-    public BeamHillClimbing(boolean copyAlwaysBest, boolean dynamicFriendshipNetwork) {
+    public BeamHillClimbing(boolean copyAlwaysBest, Predicate<Pair<Double,Double>> unfriendPredicate) {
         this.copyAlwaysBest = copyAlwaysBest;
-        this.dynamicFriendshipNetwork = dynamicFriendshipNetwork;
+        this.unfriendPredicate = unfriendPredicate;
     }
 
     public BeamHillClimbing() {
@@ -114,7 +116,7 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
             MersenneTwisterFast random, Fisher agent, Fisher friendImitated, double fitnessBeforeImitating,
             double fitnessAfterImitating, T previous,
             T current) {
-        if(dynamicFriendshipNetwork && fitnessBeforeImitating > fitnessAfterImitating )
+        if(unfriendPredicate.test(new Pair<>(fitnessBeforeImitating, fitnessAfterImitating)) )
             agent.replaceFriend(friendImitated,true);
         return null;
     }

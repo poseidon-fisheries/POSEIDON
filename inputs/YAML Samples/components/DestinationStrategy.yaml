@@ -14,8 +14,8 @@ Per Trip Iterative:
   stepSize: '5.0'
 -------
 Imitator-Explorator:
-  alwaysCopyBest: false
-  dynamicFriendshipNetwork: false
+  alwaysCopyBest: true
+  dropInUtilityNeededForUnfriend: '-1.0'
   ignoreEdgeDirection: true
   probability:
     Adaptive Probability:

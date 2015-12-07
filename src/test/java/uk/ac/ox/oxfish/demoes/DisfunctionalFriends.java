@@ -38,9 +38,6 @@ public class DisfunctionalFriends {
         Assert.assertTrue(totalStepsAlone < totalStepsManyFriends);
 
 
-        //finally, copying a friend at random doesn't cause any problem
-        int functional = stepsItTook(.2, 20, 5000, System.currentTimeMillis(), false);
-        Assert.assertTrue(functional < 4000);
 
 
     }
