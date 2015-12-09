@@ -15,7 +15,8 @@ public interface Gear {
     Catch fish(
             Fisher fisher,
             SeaTile where,
-            double hoursSpentFishing, GlobalBiology modelBiology);
+            double hoursSpentFishing,
+            GlobalBiology modelBiology);
 
     /**
      * get how much gas is consumed by fishing a spot with this gear

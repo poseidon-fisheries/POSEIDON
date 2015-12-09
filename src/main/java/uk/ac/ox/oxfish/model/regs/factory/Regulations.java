@@ -61,6 +61,12 @@ public class Regulations
         CONSTRUCTORS.put("Multi-TAC", TACMultiFactory::new);
         NAMES.put(TACMultiFactory.class,"Multi-TAC");
 
+        CONSTRUCTORS.put("Multi-TAC by List", MultiTACStringFactory::new);
+        NAMES.put(MultiTACStringFactory.class,"Multi-TAC");
+
+        CONSTRUCTORS.put("Kitchen Sink", KitchenSinkFactory::new);
+        NAMES.put(KitchenSinkFactory.class,"Kitchen Sink");
+
 
 
     }

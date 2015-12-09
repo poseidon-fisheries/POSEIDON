@@ -30,3 +30,11 @@ Multi-TAC:
   firstSpeciesQuota: '500000.0'
   otherSpeciesQuota: '500000.0'
 -------
+Multi-TAC:
+  yearlyQuotaMaps: 0:500000
+-------
+Kitchen Sink:
+  individualTradeableQuotas: true
+  seasonLength: '200.0'
+  yearlyQuotaMaps: 0:5000
+-------

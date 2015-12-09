@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.model.network;
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import edu.uci.ics.jung.algorithms.matrix.GraphMatrixOperations;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -123,7 +122,13 @@ public class SocialNetwork
 
     public String toMatrixFile()
     {
-        return GraphMatrixOperations.graphToSparseMatrix(network).toString();
+        StringBuffer buffer = new StringBuffer();
+        for(Fisher fisher: network.getVertices())
+        {
+            for(Fisher friend : getDirectedNeighbors(fisher))
+                buffer.append(fisher.getID()).append(",").append(friend.getID()).append("\n");
+        }
+        return buffer.toString();
     }
 
 

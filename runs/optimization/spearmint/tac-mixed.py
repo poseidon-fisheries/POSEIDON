@@ -17,6 +17,8 @@ def build_mpa_input(filename, x, y):
     with open("base.yaml", 'r') as infile:
         data = yaml.load(infile)
 
+
+
     data["Prototype"]["regulation"] = dict()
     data["Prototype"]["regulation"]["Multi-TAC"] = {
         "firstSpeciesQuota": float(x),

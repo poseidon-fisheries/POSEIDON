@@ -33,8 +33,8 @@ public class FixedProportionGear implements Gear
         double[] caught = new double[modelBiology.getSize()];
         for (Species species : modelBiology.getSpecies())
         {
-            double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionFished * where.getBiomass(
-                    species));
+            double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionFished *
+                                                                   where.getBiomass(species));
             if(poundsCaught>0) {
                 where.reactToThisAmountOfBiomassBeingFished(species, poundsCaught);
                 caught[species.getIndex()] = poundsCaught;

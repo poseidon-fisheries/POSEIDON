@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.OneSpecieGearFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -15,6 +16,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 /**
  * World is split in blue and red, people can only one species. Will they reconnect in a way that avoids friends
@@ -30,12 +32,38 @@ public class ChangingNetworks {
         state.setScenario(scenario);
 
         PerTripImitativeDestinationFactory imitation = new PerTripImitativeDestinationFactory();
-        imitation.setDropInUtilityNeededForUnfriend(new FixedDoubleParameter(1d));
+        imitation.setDropInUtilityNeededForUnfriend(new FixedDoubleParameter(0.027688));
         imitation.setIgnoreEdgeDirection(false);
+        imitation.setAlwaysCopyBest(false);
         scenario.setDestinationStrategy(imitation);
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
-        networkBuilder.setDegree(5);
+        networkBuilder.setDegree(1);
         scenario.setNetworkBuilder(networkBuilder);
+
+
+        state.getYearlyDataSet().registerGatherer("Same Gear Friends",
+                                                  fishState -> {
+                                                      double sameGearConnections = 0;
+                                                      double connections = 0;
+                                                      for(Fisher fisher : fishState.getFishers())
+                                                      {
+                                                          Collection<Fisher> friends = fisher.getDirectedFriends();
+                                                          connections += friends.size();
+                                                          for(Fisher friend : friends)
+                                                          {
+                                                              System.out.println(fisher.getID() +"--->" + friend.getID());
+                                                              if(friend.getID() < 50 && fisher.getID() < 50) {
+                                                                  sameGearConnections++;
+                                                              }
+                                                              else  if (friend.getID() >= 50 && fisher.getID() >= 50) {
+                                                                  sameGearConnections++;
+                                                              }
+                                                          }
+
+                                                      }
+                                                      return sameGearConnections/connections;
+                                                  },
+                                                  Double.NaN);
 
 
         OneSpecieGearFactory option1 = new OneSpecieGearFactory();
@@ -71,6 +99,7 @@ public class ChangingNetworks {
             state.schedule.step(state);
 
         Files.write(Paths.get("runs","networks","after.txt"),state.getSocialNetwork().toMatrixFile().getBytes());
+        System.out.println(state.getYearlyDataSet().getColumn("Same Gear Friends").copy());
 
 
 

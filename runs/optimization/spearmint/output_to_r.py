@@ -8,6 +8,7 @@ import importlib
 import spearmint
 from spearmint.main import parse_resources_from_config, load_jobs, remove_broken_jobs
 
+
 def print_dict(d, level=1):
     if isinstance(d, dict):
         if level > 1: print ""
@@ -108,13 +109,13 @@ def get_options(expt_dir, config_file="config.json"):
                          "Aborting.\n" % (expt_dir))
         sys.exit(-1)
 
-
     return options
 
 
 def plot(experiment_name=None):
     os.chdir("/home/carrknight/code/oxfish/runs/optimization/spearmint")
-    options = get_options("/home/carrknight/code/oxfish/runs/optimization/spearmint",config_file=experiment_name+".json")
+    options = get_options("/home/carrknight/code/oxfish/runs/optimization/spearmint",
+                          config_file=experiment_name + ".json")
     if experiment_name is None:
         experiment_name = str(options['experiment-name'])
     db = MongoDB()
@@ -159,7 +160,26 @@ def plot(experiment_name=None):
     obj_std = [obj_task.unstandardize_variance(np.sqrt(v)) for v in obj_var]
 
     # make a grid, feed it to the predictor:
-    grid = cartesian((np.linspace(0, 1, num=300), np.linspace(0, 1, num=300)))
+
+    dimensions = ()
+    for key in options['variables'].keys():
+        type = str(options['variables'][key]["type"]).strip().lower()
+        if type == "float":
+            dimension = np.linspace(0, 1, num=300)
+            dimensions = dimensions + (dimension,)
+        elif type == "int":
+            min = int(options['variables'][key]["min"])
+            max = int(options['variables'][key]["max"])
+            dimension = np.array([x + min for x in range(max - min + 1)])
+            dimensions = dimensions + (dimension,)
+        else:
+            assert type == "enum"
+            dimension = tuple([(0, 1) for i in range(len(options['variables'][key]["options"]))])
+            for t in dimension:
+                dimensions = dimensions + (t,)
+                # print(dimension)
+
+    grid = cartesian(dimensions)
     mean, variance = obj_model.function_over_hypers(obj_model.predict, grid)
 
     mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in mean]
@@ -174,13 +194,13 @@ def plot(experiment_name=None):
     task = task_group.tasks['main']
     xy = np.array(task.inputs)
     # function values:
-   # vals = idata["values"]
-   # vals = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in vals]
-    #vals = np.array(vals)
-   # xy = np.concatenate((xy, vals), axis=1)
+    # vals = idata["values"]
+    # vals = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in vals]
+    # vals = np.array(vals)
+    # xy = np.concatenate((xy, vals), axis=1)
     np.savetxt(experiment_name + "_runs.csv", xy, delimiter=",", fmt='%.3e')
 
-#plot(experiment_name="tac-separated")
-#plot(experiment_name="itq-separated")
-#plot(experiment_name="itq-mixed")
-#plot(experiment_name="tac-mixed")
+    # plot(experiment_name="tac-separated")
+    # plot(experiment_name="itq-separated")
+    # plot(experiment_name="itq-mixed")
+    # plot(experiment_name="unfriend")

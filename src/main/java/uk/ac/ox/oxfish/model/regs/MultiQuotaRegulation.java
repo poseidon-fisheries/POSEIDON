@@ -147,11 +147,11 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     }
 
-    protected double[] getYearlyQuota() {
+    public double[] getYearlyQuota() {
         return yearlyQuota;
     }
 
-    protected double[] getQuotaRemaining() {
+    public double[] getQuotaRemaining() {
         return quotaRemaining;
     }
 

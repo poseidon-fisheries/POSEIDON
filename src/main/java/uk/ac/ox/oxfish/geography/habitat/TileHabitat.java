@@ -13,6 +13,8 @@ public class TileHabitat
      */
     private final double hardPercentage;
 
+
+
     public TileHabitat(double hardPercentage) {
         this.hardPercentage = hardPercentage;
     }

@@ -120,14 +120,16 @@ public class YamlMain {
                                                           connections += friends.size();
                                                           for(Fisher friend : friends)
                                                           {
-                                                              if(friend.getID() < 50 && fisher.getID() < 50)
+                                                              if(friend.getID() < 50 && fisher.getID() < 50) {
                                                                   sameGearConnections++;
-                                                              else  if (friend.getID() >= 50 && fisher.getID() >= 50)
+                                                              }
+                                                              else  if (friend.getID() >= 50 && fisher.getID() >= 50) {
                                                                   sameGearConnections++;
+                                                              }
                                                           }
 
                                                       }
-                                                      return sameGearConnections/connections;
+                                                     return sameGearConnections/connections;
                                                   },
                                                   Double.NaN);
 
