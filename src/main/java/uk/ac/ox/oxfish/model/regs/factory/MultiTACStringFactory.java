@@ -25,6 +25,11 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     private String yearlyQuotaMaps = "0:500000";
 
 
+    /**
+     * for each model there is only one quota object being shared
+     */
+    private final Map<FishState,MultiQuotaRegulation> modelQuota = new HashMap<>();
+
 
     /**
      * Applies this function to the given argument.
@@ -46,11 +51,6 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
     }
 
-
-    /**
-     * for each model there is only one quota object being shared
-     */
-    private final Map<FishState,MultiQuotaRegulation> modelQuota = new HashMap<>();
 
 
     private MultiQuotaRegulation createInstance(MersenneTwisterFast random, int numberOfSpecies,

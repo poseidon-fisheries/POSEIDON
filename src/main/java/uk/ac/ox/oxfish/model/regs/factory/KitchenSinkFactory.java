@@ -43,9 +43,9 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         FishingSeason subcomponent2 = seasons.apply(fishState);
         MultiQuotaRegulation subcomponent3;
         if(individualTradeableQuotas)
-            subcomponent3 = tacFactory.apply(fishState);
-        else
             subcomponent3 = itqFactory.apply(fishState);
+        else
+            subcomponent3 = tacFactory.apply(fishState);
 
         return new KitchenSinkRegulation(subcomponent1,
                                          subcomponent2,
