@@ -1,4 +1,5 @@
 import com.esotericsoftware.minlog.Log;
+import com.google.common.io.Files;
 import ec.util.MersenneTwisterFast;
 import sim.display.Console;
 import sim.engine.SimState;
@@ -31,8 +32,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -44,7 +49,7 @@ class Main{
 
 
 
-        JDialog scenarioSelection = new JDialog((JFrame)null,true);
+        final JDialog scenarioSelection = new JDialog((JFrame)null,true);
         final ScenarioSelector scenarioSelector = new ScenarioSelector();
         final JPanel contentPane = new JPanel(new BorderLayout());
         contentPane.add(scenarioSelector,BorderLayout.CENTER);
@@ -59,6 +64,74 @@ class Main{
         final JButton cancel = new JButton("Cancel");
         cancel.addActionListener(e -> System.exit(0));
         buttonBox.add(cancel);
+
+
+        //create file opener (for YAML)
+        final JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        Log.info("current directory: " + Paths.get(".").toFile());
+        chooser.setCurrentDirectory(Paths.get(".").toFile());
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if(f.isDirectory()) //you can open directories
+                    return true;
+                String extension = Files.getFileExtension(f.getAbsolutePath()).trim().toLowerCase();
+                if(extension.equals("yaml") || extension.equals("yml"))
+                    return true;
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                return "Any YAML scenario";
+            }
+        });
+
+
+        final JButton filer = new JButton("Open from File");
+        filer.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+
+                        if (chooser.showOpenDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION)
+                        {
+                            File file = chooser.getSelectedFile();
+                            //This is where a real application would open the file.
+                            Log.info("opened file " + file);
+                            FishYAML yaml = new FishYAML();
+                            try{
+                                //read yaml
+                                Scenario scenario = yaml.loadAs(
+                                        String.join("\n", java.nio.file.Files.readAllLines(file.toPath())),
+                                        Scenario.class);
+                                //add it to the swing
+                                SwingUtilities.invokeLater(() -> {
+                                    if(scenarioSelector.hasScenario("yaml"))
+                                        scenarioSelector.removeScenarioOption("yaml");
+                                    scenarioSelector.addScenarioOption("yaml",scenario);
+                                    scenarioSelector.select("yaml");
+                                    scenarioSelector.repaint();
+                                });
+
+                            }
+                            catch (Exception yamlError)
+                            {
+                                Log.warn(file + " is not a valid YAML scenario!");
+                            }
+                        } else {
+                            Log.info("open file cancelled");
+                        }
+                    }
+                }
+
+
+        );
+        buttonBox.add(filer);
+
 
 
         scenarioSelection.setContentPane(contentPane);

@@ -1,7 +1,7 @@
 {
   "language": "PYTHON",
   "main-file": "kitchensink.py",
-  "experiment-name": "kitchensink",
+  "experiment-name": "kitchensink_opt",
   "likelihood": "GAUSSIAN",
   "resources": {
     "my-machine": {
@@ -40,13 +40,13 @@
     "height" : {
       "type" : "INT",
       "size" : 1,
-      "min"  : 1,
+      "min"  : 0,
       "max"  : 40
     },
     "width" : {
       "type" : "INT",
       "size" : 1,
-      "min"  : 1,
+      "min"  : 0,
       "max"  : 40
     },
     "x" : {

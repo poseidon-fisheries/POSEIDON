@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.gui;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.gui.widget.ScenarioJComponent;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
@@ -8,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,11 +22,16 @@ public class ScenarioSelector extends JPanel implements ActionListener
     private Scenario scenario;
 
     private final JPanel settings;
+    private final JPanel scenariosPanel;
+    private final HashMap<String,JRadioButton> radioButtons;
+    private final HashMap<String,Scenario> scenarioMap = new HashMap<>();
+    private final ButtonGroup radioButtonGroup;
+    private final Map<String,ScenarioJComponent> widgets = new HashMap<>();
 
 
     public ScenarioSelector()
     {
-        LinkedList<JRadioButton> buttons = new LinkedList<>();
+        radioButtons = new HashMap<>();
         //border layout
         this.setLayout(new BorderLayout());
 
@@ -35,31 +41,62 @@ public class ScenarioSelector extends JPanel implements ActionListener
 
 
         //create radio buttons on the left
-        JPanel scenarios = new JPanel(new GridLayout(0, 1));
-        this.add(scenarios,BorderLayout.WEST);
+        scenariosPanel = new JPanel(new GridLayout(0, 1));
+        this.add(scenariosPanel, BorderLayout.WEST);
         //populate radio button group
-        ButtonGroup scenarioGroup = new ButtonGroup();
+        radioButtonGroup = new ButtonGroup();
         for(Map.Entry<String,Scenario> scenarioItem : Scenarios.SCENARIOS.entrySet())
         {
-            final JRadioButton scenarioButton = new JRadioButton(scenarioItem.getKey());
-            scenarioButton.setActionCommand(scenarioItem.getKey());
-            scenarioButton.setToolTipText(Scenarios.DESCRIPTIONS.get(scenarioItem.getKey()));
-            scenarios.add(scenarioButton);
-            buttons.add(scenarioButton);
-            scenarioGroup.add(scenarioButton);
-            scenarioButton.addActionListener(this);
+            addScenarioOption(scenarioItem.getKey(),scenarioItem.getValue());
 
-            //create widget for scenario
-            final ScenarioJComponent widget = new ScenarioJComponent(scenarioItem.getValue());
-            settings.add(scenarioItem.getKey(),widget.getJComponent());
 
         }
-        scenarioGroup.clearSelection();
-        //now force the first one to be selected
-        buttons.getLast().doClick();
+        radioButtonGroup.clearSelection();
+        //now force the prototype
+        select("Prototype");
 
 
+    }
 
+    public void select(final String scenarioName) {
+        radioButtons.get(scenarioName).doClick();
+    }
+
+    public void addScenarioOption(String name, Scenario scenario) {
+        scenarioMap.put(name,scenario);
+        final JRadioButton scenarioButton = new JRadioButton(name);
+        scenarioButton.setActionCommand(name);
+        scenarioButton.setToolTipText(Scenarios.DESCRIPTIONS.get(name));
+        final ScenarioJComponent widget = new ScenarioJComponent(scenario);
+        widgets.put(name,widget);
+        settings.add(name,widget.getJComponent());
+
+
+        scenariosPanel.add(scenarioButton);
+        radioButtons.put(name,scenarioButton);
+        radioButtonGroup.add(scenarioButton);
+        scenarioButton.addActionListener(this);
+
+        scenariosPanel.revalidate();
+        scenariosPanel.repaint();
+    }
+
+
+    public void removeScenarioOption(String name)
+    {
+        Preconditions.checkArgument(widgets.containsKey(name));
+        Preconditions.checkArgument(radioButtons.containsKey(name));
+        Preconditions.checkArgument(scenarioMap.containsKey(name));
+        scenarioMap.put(name,scenario);
+
+
+        ScenarioJComponent toRemove = widgets.get(name);
+        settings.remove(toRemove.getJComponent());
+
+        JRadioButton button = radioButtons.remove(name);
+        scenariosPanel.remove(button);
+        radioButtonGroup.remove(button);
+        button.removeActionListener(this);
 
     }
 
@@ -70,7 +107,7 @@ public class ScenarioSelector extends JPanel implements ActionListener
     public void actionPerformed(ActionEvent e) {
 
         //new scenario!
-        scenario = Scenarios.SCENARIOS.get(e.getActionCommand());
+        scenario = scenarioMap.get(e.getActionCommand());
 
         CardLayout cl = (CardLayout)(settings.getLayout());
         cl.show(settings, e.getActionCommand());
@@ -78,6 +115,11 @@ public class ScenarioSelector extends JPanel implements ActionListener
         settings.repaint();
         this.repaint();
 
+    }
+
+    public boolean hasScenario(String name)
+    {
+        return widgets.containsKey(name);
     }
 
     public Scenario getScenario() {
