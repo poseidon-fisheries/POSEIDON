@@ -6,7 +6,6 @@ import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,11 +28,11 @@ public class SocialNetwork
     /**
      * the algorithm that takes the model object and creates a full network which is then stored here.
      */
-    private final AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>> networkPopulator;
+    private final NetworkBuilder networkPopulator;
 
 
     public SocialNetwork(
-            AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkPopulator)
+            NetworkBuilder networkPopulator)
     {
         this.networkPopulator = networkPopulator;
     }
@@ -132,5 +131,26 @@ public class SocialNetwork
     }
 
 
+    /**
+     * remove fisher from network. This is to be used while the model is running to clear any ties
+     * @param toRemove fisher to remove
+     * @param state
+     */
+    public void removeFisher(
+            Fisher toRemove,
+            FishState state) {
+        networkPopulator.removeFisher(toRemove, network, state);
+    }
 
+    /**
+     * this is supposed to be called not so much when initializing the network but later on if any agent is created
+     * while the model is running
+     * @param newAddition
+     * @param state
+     */
+    public void addFisher(
+            Fisher newAddition,
+            FishState state) {
+        networkPopulator.addFisher(newAddition, network, state);
+    }
 }

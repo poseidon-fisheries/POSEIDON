@@ -8,7 +8,6 @@ import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Collection;
 
@@ -25,7 +24,7 @@ public class SocialNetworkTest {
 
 
         //create a network with a fake populator that only connects fisher 0 with fisher 1
-        SocialNetwork network = new SocialNetwork(new AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>>() {
+        SocialNetwork network = new SocialNetwork(new NetworkBuilder() {
             @Override
             public DirectedGraph<Fisher, FriendshipEdge> apply(FishState fishState) {
                 DirectedGraph<Fisher,FriendshipEdge> graph = new DirectedSparseGraph<>();
@@ -33,6 +32,33 @@ public class SocialNetworkTest {
                     graph.addVertex(fisher);
                 graph.addEdge(new FriendshipEdge(),fishState.getFishers().get(0),fishState.getFishers().get(1));
                 return graph;
+            }
+
+            /**
+             * this is supposed to be called not so much when initializing the network but later on if any agent is created
+             * while the model is running
+             *
+             * @param newAddition
+             * @param currentNetwork
+             * @param state
+             */
+            @Override
+            public void addFisher(
+                    Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+
+            }
+
+            /**
+             * remove fisher from network. This is to be used while the model is running to clear any ties
+             *
+             * @param toRemove       fisher to remove
+             * @param currentNetwork network to modify
+             * @param state
+             */
+            @Override
+            public void removeFisher(
+                    Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+
             }
         });
 

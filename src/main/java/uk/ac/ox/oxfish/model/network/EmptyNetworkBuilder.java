@@ -4,13 +4,12 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 /**
  * Returns an empty network
  * Created by carrknight on 7/1/15.
  */
-public class EmptyNetworkBuilder implements AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>
+public class EmptyNetworkBuilder implements NetworkBuilder
 {
 
     /**
@@ -22,5 +21,25 @@ public class EmptyNetworkBuilder implements AlgorithmFactory<DirectedGraph<Fishe
     @Override
     public DirectedGraph<Fisher, FriendshipEdge> apply(FishState state) {
         return new DirectedSparseGraph<>();
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void addFisher(
+            Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        //ignored
+        assert !currentNetwork.containsVertex(newAddition);
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void removeFisher(
+            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        assert !currentNetwork.containsVertex(toRemove);
+
     }
 }

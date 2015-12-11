@@ -82,7 +82,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public ScenarioPopulation populateModel(FishState model) {
 
 
-        return new ScenarioPopulation(new ArrayList<>(),new SocialNetwork(new EmptyNetworkBuilder()));
+        return new ScenarioPopulation(new ArrayList<>(),new SocialNetwork(new EmptyNetworkBuilder()),null );
     }
 
 

@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
-import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -39,7 +38,7 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
-import uk.ac.ox.oxfish.model.network.FriendshipEdge;
+import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
@@ -51,6 +50,7 @@ import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
@@ -158,7 +158,7 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
 
 
-    private AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>> networkBuilder =
+    private NetworkBuilder networkBuilder =
             new EquidegreeBuilder();
 
 
@@ -368,11 +368,29 @@ public class PrototypeScenario implements Scenario {
 
 
 
-        //   GearImitationAnalysis.attachHoldSizeAnalysisToEachFisher(fisherList,model);
+        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
+        //while the model is running
+        FisherFactory fisherFactory = new FisherFactory(
+                (Supplier<Port>) () -> ports[0],
+                regulation,
+                departingStrategy,
+                destinationStrategy,
+                fishingStrategy,
+                weatherStrategy,
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(engineWeight.apply(random),
+                                                                   literPerKilometer.apply(random),
+                                                                   speedInKmh.apply(random)),
+                                                new FuelTank(fuelTankSize.apply(random))),
+                (Supplier<Hold>) () -> new Hold(holdSize.apply(random), biology.getSize()),
+                gear,
+                fishers
+
+        );
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()));
-        else
-            return new ScenarioPopulation(fisherList,new SocialNetwork(networkBuilder));
+            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
+        else {
+            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+        }
     }
 
 
@@ -451,12 +469,12 @@ public class PrototypeScenario implements Scenario {
     }
 
 
-    public AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> getNetworkBuilder() {
+    public NetworkBuilder getNetworkBuilder() {
         return networkBuilder;
     }
 
     public void setNetworkBuilder(
-            AlgorithmFactory<DirectedGraph<Fisher, FriendshipEdge>> networkBuilder) {
+            NetworkBuilder networkBuilder) {
         this.networkBuilder = networkBuilder;
     }
 

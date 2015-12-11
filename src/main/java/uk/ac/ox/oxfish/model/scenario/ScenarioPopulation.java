@@ -24,13 +24,21 @@ public class ScenarioPopulation
     private final SocialNetwork network;
 
     /**
+     * method to create and kill fishers while the model is running
+     */
+    private final FisherFactory factory;
+
+    /**
      * The list of agents and a network ready to be populated!
      * @param population list of agents
      * @param network   network NOT populated
+     * @param factory
      */
-    public ScenarioPopulation(List<Fisher> population, SocialNetwork network) {
+    public ScenarioPopulation(List<Fisher> population, SocialNetwork network,
+                              FisherFactory factory) {
         this.population = population;
         this.network = network;
+        this.factory = factory;
     }
 
 
@@ -40,5 +48,9 @@ public class ScenarioPopulation
 
     public SocialNetwork getNetwork() {
         return network;
+    }
+
+    public FisherFactory getFactory() {
+        return factory;
     }
 }

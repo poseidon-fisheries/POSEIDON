@@ -5,9 +5,9 @@ import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
+import javafx.collections.ObservableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Set;
  * Builds network where everyone has the same out-degree of edges
  * Created by carrknight on 7/1/15.
  */
-public class EquidegreeBuilder implements AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>{
+public class EquidegreeBuilder implements NetworkBuilder{
 
     private int degree = 2;
 
@@ -71,5 +71,49 @@ public class EquidegreeBuilder implements AlgorithmFactory<DirectedGraph<Fisher,
 
     public void setDegree(int degree) {
         this.degree = degree;
+    }
+
+
+    /**
+     * this is supposed to be called not so much when initializing the network but later on if any agent is created
+     * while the model is running
+     *
+     * @param fisher
+     * @param currentNetwork
+     * @param state
+     */
+    @Override
+    public void addFisher(
+            Fisher fisher, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        Preconditions.checkArgument(!currentNetwork.containsVertex(fisher));
+
+        currentNetwork.addVertex(fisher);
+        ObservableList<Fisher> fishers = state.getFishers();
+        int populationSize = fishers.size();
+
+        Set<Fisher> friends = new HashSet<>(degree);
+        while(friends.size() < Math.min(degree,populationSize))
+        {
+            final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
+            if(candidate != fisher)
+                friends.add(candidate);
+        }
+        //now make them your friends!
+        for(Fisher friend : friends)
+            currentNetwork.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
+
+    }
+
+    /**
+     * remove fisher from network. This is to be used while the model is running to clear any ties
+     *
+     * @param toRemove       fisher to remove
+     * @param currentNetwork network to modify
+     * @param state
+     */
+    @Override
+    public void removeFisher(
+            Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+        currentNetwork.removeVertex(toRemove);
     }
 }

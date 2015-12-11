@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.model.network;
 
-import edu.uci.ics.jung.graph.DirectedGraph;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -17,7 +15,7 @@ public class NetworkBuilders
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>>> CONSTRUCTORS =
+    public static final LinkedHashMap<String,Supplier<NetworkBuilder>> CONSTRUCTORS =
             new LinkedHashMap<>();
 
     public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();

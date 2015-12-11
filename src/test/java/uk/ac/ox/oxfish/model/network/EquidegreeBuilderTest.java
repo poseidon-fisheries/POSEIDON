@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
-import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -30,7 +30,7 @@ public class EquidegreeBuilderTest {
 
         EquidegreeBuilder builder = new EquidegreeBuilder();
         builder.setDegree(2);
-        Graph<Fisher, FriendshipEdge> graph = builder.apply(state);
+        DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
 
         assertEquals(graph.outDegree(one),2);
         assertEquals(graph.outDegree(two),2);
@@ -41,6 +41,18 @@ public class EquidegreeBuilderTest {
         assertEquals(graph.outDegree(one),1);
         assertEquals(graph.outDegree(two),1);
         assertEquals(graph.outDegree(three),1);
+
+
+        Fisher fourth = mock(Fisher.class);
+        builder.addFisher(fourth,graph,state);
+        assertEquals(graph.outDegree(one),1);
+        assertEquals(graph.outDegree(two),1);
+        assertEquals(graph.outDegree(three),1);
+        assertEquals(graph.outDegree(fourth),1);
+        builder.removeFisher(one,graph,state);
+
+
+
 
 
 
