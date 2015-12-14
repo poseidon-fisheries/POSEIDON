@@ -134,9 +134,9 @@ public class FishStateUtilities {
         //get random friend
         List<Fisher> friendList = friends.stream().
                 //remove friends we can't imitate
-                filter(fisher -> sensor.scan(fisher) != null).
-                        //sort by id (remove hashing randomness)
-                sorted((o1, o2) -> Integer.compare(o1.getID(),o2.getID())).collect(Collectors.toList());
+                        filter(fisher -> sensor.scan(fisher) != null).
+                //sort by id (remove hashing randomness)
+                        sorted((o1, o2) -> Integer.compare(o1.getID(),o2.getID())).collect(Collectors.toList());
 
         assert friends.size() >0;
         if(friendList.isEmpty())
@@ -155,9 +155,9 @@ public class FishStateUtilities {
 
 
     public static <T> Pair<T,Fisher> imitateBestFriend(MersenneTwisterFast random, double fitness,
-                                          T current, Collection<Fisher> friends,
-                                          ObjectiveFunction<Fisher> objectiveFunction,
-                                          Sensor<T> sensor)
+                                                       T current, Collection<Fisher> friends,
+                                                       ObjectiveFunction<Fisher> objectiveFunction,
+                                                       Sensor<T> sensor)
     {
 
         //if you have no friends, keep doing what you currently are doing
@@ -196,7 +196,7 @@ public class FishStateUtilities {
         //take all your friends
         friendsFitnesses.stream().
                 //choose only the ones with the highest fitness
-                filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
+                        filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
                 // sort them by id (we need to kill the hashing randomization which we can't control)
                         sorted((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID())).
                 //now put in the best option list by scanning
@@ -385,8 +385,10 @@ public class FishStateUtilities {
                     return Double.NaN;
                 double sum = 0;
                 for(int i=0; i<365; i++) {
-                    assert iterator.hasNext() : column.getName() + " " + i;
-                    sum += iterator.next();
+                    //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                    //and only has a partially filled collection
+                    if(iterator.hasNext())
+                        sum += iterator.next();
                 }
 
                 return sum;

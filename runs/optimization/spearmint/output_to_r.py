@@ -200,7 +200,8 @@ def plot(experiment_name=None):
     # xy = np.concatenate((xy, vals), axis=1)
     np.savetxt(experiment_name + "_runs.csv", xy, delimiter=",", fmt='%.3e')
 
-    # plot(experiment_name="tac-separated")
-    # plot(experiment_name="itq-separated")
-    # plot(experiment_name="itq-mixed")
-    # plot(experiment_name="unfriend")
+# plot(experiment_name="tac-separated")
+# plot(experiment_name="itq-separated")
+# plot(experiment_name="itq-mixed")
+# plot(experiment_name="unfriend")
+plot(experiment_name="kitchensink")

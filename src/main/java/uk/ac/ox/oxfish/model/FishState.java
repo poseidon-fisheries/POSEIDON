@@ -21,10 +21,7 @@ import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
-import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
+import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
@@ -39,25 +36,54 @@ import java.util.*;
  */
 public class FishState  extends SimState{
 
-
+    /**
+     * contains the geography of the map
+     */
     private NauticalMap map;
 
+    /**
+     * a list of all the species
+     */
     private GlobalBiology biology;
 
+    /**
+     * the list of agents. Observable so it can be listened to for changes
+     */
     private ObservableList<Fisher> fishers;
 
+    /**
+     * list of all objects that need to be started when the model actually starts
+     */
     private List<Startable> toStart;
 
+    /**
+     * Dataset of all the columns that are updated daily
+     */
     private final FishStateDailyTimeSeries dailyDataSet = new FishStateDailyTimeSeries();
 
+    /**
+     * Dataset of all the columns that are updated yearly.
+     */
     private final YearlyFishStateTimeSeries yearlyDataSet = new YearlyFishStateTimeSeries(dailyDataSet);
 
+    /**
+     * created by the scenario (optionally, could be null) this object is used to add fishers on the fly.
+     */
+    private FisherFactory fisherFactory;
 
+    /**
+     * all the objects that need to be started when this model starts but also need a reference to the original fisher
+     */
     private final List<Pair<Fisher,FisherStartable>> fisherStartables = new LinkedList<>();
 
-
+    /**
+     * the scenario object responsible for the initialization of the model
+     */
     private Scenario scenario = new PrototypeScenario();
 
+    /**
+     * flag that is set to true when start() is called
+     */
     private boolean started = false;
 
     /**
@@ -118,6 +144,7 @@ public class FishState  extends SimState{
      */
     @Override
     public void start() {
+        Preconditions.checkState(!started, "Already started!");
         super.start();
 
         //schedule aggregate steppables
@@ -139,6 +166,7 @@ public class FishState  extends SimState{
 
 
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
+        fisherFactory = scenarioPopulation.getFactory();
         fishers = FXCollections.observableList(scenarioPopulation.getPopulation());
         socialNetwork = scenarioPopulation.getNetwork();
         socialNetwork.populate(this);
@@ -399,6 +427,31 @@ public class FishState  extends SimState{
     public Double getLatestYearlyObservation(String columnName)
     {
         return getYearlyDataSet().getColumn(columnName).getLatest();
+    }
+
+    /**
+     *
+     * @return true if the model has a fisher factory it can use to create more fishers
+     */
+    public boolean canCreateMoreFishers()
+    {
+        return fisherFactory!=null;
+    }
+
+    public Fisher createFisher()
+    {
+        Preconditions.checkState(canCreateMoreFishers());
+        Fisher newborn = fisherFactory.apply(this);
+        return newborn;
+    }
+
+    public void killRandomFisher()
+    {
+        Preconditions.checkState(fishers.size()>0, "There are no more fishers left to kill");
+        Fisher sacrifice = fishers.remove(random.nextInt(fishers.size()));
+        sacrifice.turnOff();
+        map.getFisherGrid().setObjectLocation(sacrifice,-1,-1);
+
     }
 
 }

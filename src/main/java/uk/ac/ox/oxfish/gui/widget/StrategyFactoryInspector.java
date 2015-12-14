@@ -1,11 +1,13 @@
 package uk.ac.ox.oxfish.gui.widget;
 
+import com.esotericsoftware.minlog.Log;
 import org.metawidget.inspector.impl.BaseObjectInspector;
 import org.metawidget.inspector.impl.propertystyle.Property;
 import org.metawidget.util.CollectionUtils;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 
 /**
@@ -40,13 +42,26 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
             try {
                 final Class<?> propertyClass = Class.forName(property.getType());
                 if (AlgorithmFactory.class.isAssignableFrom(propertyClass)) {
+
                     //it is a strategy factory!
                     //now most of the time it should be something like factory<? extends x>
                     //with getGenericType() we get ? extends x, but we want only x
                     //so we split and take last
-                    final String[] splitType = FishStateUtilities.removeParentheses(property.getGenericType()).split(" ");
+                    String[] splitType;
+                    if(property.getGenericType()!=null)
+                    {
+                        splitType = FishStateUtilities.removeParentheses(
+                                property.getGenericType()).split(" ");
+                    }
+                    else{
+                        ParameterizedType type = (ParameterizedType)(propertyClass.getGenericInterfaces()[0]);
+                        splitType = FishStateUtilities.removeParentheses(type.getActualTypeArguments()[0].toString()).split(" ");
+                    }
+                    if(Log.TRACE)
+                        Log.trace("analyzed a strategy factory and put : '" + splitType[splitType.length - 1] + "' in" );
                     //store it as attribute factory_strategy="x" which we will use to build widgets on
                     attributes.put("factory_strategy", splitType[splitType.length - 1]);
+
                 }
             } catch (ClassNotFoundException e) {
                 //this can happen (think primitives)

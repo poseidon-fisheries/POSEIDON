@@ -95,11 +95,11 @@ public class PrototypeScenario implements Scenario {
     /**
      * the X position of the port on the grid. If null or a negative number the position is randomized
      */
-    private Integer portPositionX = null;
+    private Integer portPositionX = -1;
     /**
      * the X position of the port on the grid. If null or a negative number the position is randomized
      */
-    private Integer portPositionY = null;
+    private Integer portPositionY = -1;
 
     /**
      * to use if you really want to port to be somewhere specific

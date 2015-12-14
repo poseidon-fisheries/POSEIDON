@@ -133,7 +133,7 @@ class Main{
         buttonBox.add(filer);
 
 
-
+        Log.set(Log.LEVEL_TRACE);
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();
         scenarioSelection.setVisible(true);

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -65,7 +64,7 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
     }
 
     /**
-     * Applies this function to the given argument.
+     * Creates the fisher, add it to the social network and registers it as a startable
      *
      * @param fishState the function argument
      * @return the function result
@@ -90,15 +89,6 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
         fishState.registerStartable(fisher);
         return fisher;
     }
-
-    public void killFisher(Fisher fisher, FishState state)
-    {
-        Preconditions.checkArgument(state.getFishers().contains(fisher));
-        fisher.turnOff();
-        state.getFishers().remove(fisher);
-
-    }
-
 
 
 }

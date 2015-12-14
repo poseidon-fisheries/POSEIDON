@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
 /**
@@ -147,6 +149,7 @@ public class FishGUI extends GUIState{
         trails.setField(state.getFisherGrid());
         trails.setPortrayalForAll(null);
         boats.setField(state.getFisherGrid());
+        boats.setPortrayalForRemainder(null);
         SimplePortrayal2D boatPortrayal = new ImagePortrayal2D(boatIcon) {
             @Override
             public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
@@ -162,15 +165,16 @@ public class FishGUI extends GUIState{
         state.getFishers().addListener(new ListChangeListener<Fisher>() {
             @Override
             public void onChanged(Change<? extends Fisher> c) {
-                for(Fisher fisher : c.getRemoved())
-                {
-                    boats.setPortrayalForObject(fisher,null);
-                    trails.setPortrayalForObject(fisher,null);
-                }
-                if(c.wasAdded())
-                    for(Fisher fisher : c.getAddedSubList())
-                        assignPortrayalToFisher(boatPortrayal,fisher);
+                while (c.next()) {
+                    for (Fisher fisher : c.getRemoved()) {
+                        boats.setPortrayalForObject(fisher, null);
+                        trails.setPortrayalForObject(fisher, null);
+                    }
+                    if (c.wasAdded())
+                        for (Fisher fisher : c.getAddedSubList())
+                            assignPortrayalToFisher(boatPortrayal, fisher);
 
+                }
             }
         });
 
@@ -201,6 +205,54 @@ public class FishGUI extends GUIState{
         ((Console) controller).getTabPane().add("Aggregate Data", pane);
 
 
+
+        //if possible create buttons to add fishers
+        if(state.canCreateMoreFishers()) {
+            policyButtons.add(gui -> {
+                JButton button = new JButton("Add 1 Fisher");
+                button.addActionListener(e -> {
+                    scheduleImmediatelyBefore(
+                            state1->
+                    state.createFisher()
+                    );
+
+                });
+                return button;
+            });
+        }
+        //create a button to kill fishers, grey it out when there are no more fishers
+        policyButtons.add(new PolicyButton() {
+            @Override
+            public JComponent buildJComponent(FishGUI gui) {
+                JButton button = new JButton("Remove Random Fisher");
+                if(state.getFishers().size()==0)
+                    button.setEnabled(false);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        //kill a fisher, but do so in the model thread
+                        scheduleImmediatelyBefore(
+                                state1->state.killRandomFisher());
+                    }
+                });
+                state.getFishers().addListener(new ListChangeListener<Fisher>() {
+                    @Override
+                    public void onChanged(Change<? extends Fisher> c) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(state.getFishers().size()==0)
+                                    button.setEnabled(false);
+                                else
+                                    button.setEnabled(true);
+                            }
+                        });
+
+                    }
+                });
+                return button;
+            }
+        });
 
 
         //mpa drawer

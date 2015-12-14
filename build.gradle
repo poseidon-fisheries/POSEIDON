@@ -73,7 +73,7 @@ dependencies
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test{
-    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),1)
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
 }
 
 //this just mentions what the gradle version for the "wrapper" gradlew ought to be
