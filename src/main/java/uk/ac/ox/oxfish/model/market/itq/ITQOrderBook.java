@@ -46,7 +46,14 @@ public class ITQOrderBook implements Steppable,Startable{
 
     private final int specieIndex;
 
+    /**
+     * here we put agents who bought to prevent them from selling immediately after and avoid
+     * bid-ask bounces
+     */
+    private final PenaltyBox penaltyBox;
 
+
+    private final LinkedList<Fisher> toPenalize = new LinkedList<>();
 
 
     /**
@@ -77,9 +84,11 @@ public class ITQOrderBook implements Steppable,Startable{
      * @param specieIndex the index of the species being traded
      * @param implementationYear the year this order book starts asking for quotes
      * @param pricingPolicy
+     * @param penaltyDuration
      */
-    public ITQOrderBook(int specieIndex, int implementationYear,
-                        PricingPolicy pricingPolicy)
+    public ITQOrderBook(
+            int specieIndex, int implementationYear,
+            PricingPolicy pricingPolicy, int penaltyDuration)
     {
 
         //create the queues holding on to the quotes
@@ -88,6 +97,7 @@ public class ITQOrderBook implements Steppable,Startable{
         this.specieIndex = specieIndex;
         this.yearOfImplementation = implementationYear;
         this.pricingPolicy = pricingPolicy;
+        this.penaltyBox = new PenaltyBox(penaltyDuration);
     }
 
 
@@ -99,6 +109,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
     public void step(SimState state)
     {
+        penaltyBox.step(state); //tell the penalty box to update durations
         MersenneTwisterFast random = ((FishState) state).getRandom();
         List<Map.Entry<Fisher,PriceGenerator>> traders = new ArrayList<>(pricers.entrySet());
         Collections.shuffle(traders,new Random(random.nextLong()));
@@ -117,7 +128,8 @@ public class ITQOrderBook implements Steppable,Startable{
                     }
                     //can I sell?
                     if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(
-                            specieIndex) >= unitsTradedPerMatch) {
+                            specieIndex) >= unitsTradedPerMatch &&
+                            !penaltyBox.has(trader.getKey())) {
                         double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
                                                     buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                                 ;
@@ -143,6 +155,11 @@ public class ITQOrderBook implements Steppable,Startable{
             //clear the quotes
             asks.clear();
             bids.clear();
+
+            //add buyers to penalty box
+            for(Fisher trader : toPenalize)
+                penaltyBox.registerTrader(trader);
+            toPenalize.clear();
         }
     }
 
@@ -153,6 +170,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
         Quote bestBid = bids.remove();
         Quote bestAsk = asks.remove();
+        assert !penaltyBox.has(bestAsk.getTrader()); //seller ought not to be in the penalty box
         //does somebody want to trade?
         if (bestAsk.getPrice() <= bestBid.getPrice()) {
 
@@ -184,7 +202,7 @@ public class ITQOrderBook implements Steppable,Startable{
             counter.count(MATCHES_COLUMN_NAME,1);
 
 
-
+            toPenalize.add(bestBid.getTrader());
             lastClosingPrice = tradingPrice;
             assert sellerQuota.getQuotaRemaining(specieIndex)>=0;
 

@@ -18,7 +18,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask, 7);
         FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
@@ -62,7 +62,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask, 7);
         FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
@@ -110,7 +110,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignored2) -> (ask + bids) / 2);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignored2) -> (ask + bids) / 2, 7);
         FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);
@@ -160,7 +160,7 @@ public class ITQOrderBookTest {
     {
 
 
-        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask);
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask, 7);
         FishState state = mock(FishState.class);
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
         orderBook.start(state);

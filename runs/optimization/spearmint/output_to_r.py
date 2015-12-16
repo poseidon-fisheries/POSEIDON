@@ -179,29 +179,28 @@ def plot(experiment_name=None):
                 dimensions = dimensions + (t,)
                 # print(dimension)
 
-    grid = cartesian(dimensions)
-    mean, variance = obj_model.function_over_hypers(obj_model.predict, grid)
-
-    mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in mean]
-    variance = [obj_task.unstandardize_variance(np.sqrt(v)) for v in variance]
-
-    # xymv = [([x for x in xy], m, v) for xy, m, v in izip(new_grid, obj_mean, obj_std)]  # if .2 < xy[0] < .25]
-    with open(experiment_name + ".csv", 'w') as fileout:
-        for i in range(len(mean)):
-            fileout.write(str(([x for x in grid[i]], mean[i], variance[i])).replace("(", "").replace(")", "").
-                          replace("[", "").replace("]", "") + "\n")
+    # grid = cartesian(dimensions)
+    # mean, variance = obj_model.function_over_hypers(obj_model.predict, grid)
+    #
+    # mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in mean]
+    # variance = [obj_task.unstandardize_variance(np.sqrt(v)) for v in variance]
+    #
+    # # xymv = [([x for x in xy], m, v) for xy, m, v in izip(new_grid, obj_mean, obj_std)]  # if .2 < xy[0] < .25]
+    # with open(experiment_name + ".csv", 'w') as fileout:
+    #     for i in range(len(mean)):
+    #         fileout.write(str(([x for x in grid[i]], mean[i], variance[i])).replace("(", "").replace(")", "").
+    #                       replace("[", "").replace("]", "") + "\n")
 
     task = task_group.tasks['main']
     xy = np.array(task.inputs)
     # function values:
-    # vals = idata["values"]
-    # vals = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in vals]
-    # vals = np.array(vals)
-    # xy = np.concatenate((xy, vals), axis=1)
+    vals = task.values
+    vals = np.array(vals)
     np.savetxt(experiment_name + "_runs.csv", xy, delimiter=",", fmt='%.3e')
+    np.savetxt(experiment_name + "_runs_values.csv", vals, delimiter=",", fmt='%.3e')
 
-# plot(experiment_name="tac-separated")
-# plot(experiment_name="itq-separated")
-# plot(experiment_name="itq-mixed")
-# plot(experiment_name="unfriend")
+    # plot(experiment_name="tac-separated")
+    # plot(experiment_name="itq-separated")
+    # plot(experiment_name="itq-mixed")
+    # plot(experiment_name="unfriend")
 plot(experiment_name="kitchensink")
