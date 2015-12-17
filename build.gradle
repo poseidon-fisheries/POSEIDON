@@ -150,6 +150,29 @@ task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
     args = [ "dashboard.sh",  date, website_folder ]
 }
 
+
+task testCSV(){
+    def output = file("build/reports/multitest/" + date + ".csv")
+    doLast {
+        file("build/reports").mkdirs()
+        output.text = '"Project","Test","Time","Result","Duration"\r\n'
+        allprojects.each { project2 ->
+            logger.info("Processing project ${project2.name}")
+            def resultFiles = project2.fileTree("build") { include '**/TEST-*.xml' }
+            resultFiles.each { file ->
+                logger.info("Processing report ${file}")
+                def testsuite = new XmlSlurper().parse(file)
+                testsuite.testcase.each { testcase ->
+                    def result = "pass"
+                    if (!testcase.failure.isEmpty()) { result = "fail" }
+                    else if (!testcase.skipped.isEmpty()) { result = "skip" }
+                    output << "\"${project2.name}\",\"${testcase.@classname}.${testcase.@name}\",\"${testcase.@timestamp}\",\"${result}\",\"${testcase.@time}\"\r\n"
+                }
+            }
+        }
+    }
+}
+
 test {
   useJUnit()
   testLogging {

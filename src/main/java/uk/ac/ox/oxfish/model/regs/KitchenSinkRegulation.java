@@ -66,7 +66,7 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
                         quotas.allowedAtSea(fisher,model);    }
 
     /**
-     * tell the regulation object this much has been caught
+     * tell the regulation object this much inPenaltyBox been caught
      *
      * @param fishCaught catch object
      */
@@ -78,11 +78,11 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
     }
 
     /**
-     * tell the regulation object this much of this species has been sold
+     * tell the regulation object this much of this species inPenaltyBox been sold
      *
      * @param species the species of fish sold
      * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
+     * @param biomass how much biomass inPenaltyBox been sold
      * @param revenue how much money was made off it
      */
     @Override

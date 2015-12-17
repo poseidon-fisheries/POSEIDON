@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -51,6 +52,20 @@ public class ITQOrderBookTest {
         //they should have traded  (assuming they use seller quote)
         verify(buyer).spendExogenously( 11 * 100);
         verify(seller).earn( 11 * 100);
+
+        assertTrue(orderBook.inPenaltyBox(buyer));
+        assertTrue(!orderBook.inPenaltyBox(seller));
+
+        //now check that the buyer isn't placing a sale quote because of the penalty box
+        sellerReg.step(state); assertEquals(sellerReg.getQuotaRemaining(0),100,.0001);
+        buyerReg.step(state); assertEquals(buyerReg.getQuotaRemaining(0),100,.0001);
+        //reverse the prices so that buyer would like to sell now
+        when(buyerGenerator.computeLambda()).thenReturn(10d);
+        when(sellerGenerator.computeLambda()).thenReturn(10d);
+        orderBook.step(state);
+        //they shouldn't have traded
+        assertEquals(buyerReg.getQuotaRemaining(0), 100,.0001);
+        assertEquals(sellerReg.getQuotaRemaining(0),100,.0001);
 
 
 
@@ -125,7 +140,7 @@ public class ITQOrderBookTest {
         when(buyerGenerator.computeLambda()).thenReturn(100d);
         orderBook.registerTrader(buyer,buyerGenerator);
 
-        //the second guy values quota 10: but has not enough to sell
+        //the second guy values quota 10: but inPenaltyBox not enough to sell
         MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(50, state);
         Fisher seller = mock(Fisher.class);
         when(seller.getRegulation()).thenReturn(sellerReg);

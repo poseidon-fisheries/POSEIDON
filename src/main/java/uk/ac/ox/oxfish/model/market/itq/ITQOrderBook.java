@@ -274,4 +274,12 @@ public class ITQOrderBook implements Steppable,Startable{
     }
 
 
+    /**
+     * check if the trader is in the penalty box!
+     * @param fisher
+     * @return
+     */
+    public boolean inPenaltyBox(Fisher fisher) {
+        return penaltyBox.has(fisher);
+    }
 }
