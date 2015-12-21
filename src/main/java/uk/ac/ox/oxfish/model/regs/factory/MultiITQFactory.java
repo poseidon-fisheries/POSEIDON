@@ -63,8 +63,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
         for(int i=1; i<numberOfSpecies; i++)
             quotas[i] = quotaOtherSpecies.apply(state.getRandom());
 
-        if(Log.INFO)
-            Log.info(Arrays.toString(quotas));
+
 
         /***
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
@@ -91,6 +90,11 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
     public static void buildITQMarketsIfNeeded(
             FishState state, int numberOfSpecies, double[] quotas, Map<FishState, ITQOrderBook[]> orderBooks,
             Map<FishState, ITQMarketBuilder[]> orderBooksBuilder) {
+
+        if(Log.TRACE)
+            Log.trace("Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
+
+
         //perfect, if needed create a market container/market builder container
         if(!orderBooks.containsKey(state)) {
             orderBooks.put(state, new ITQOrderBook[numberOfSpecies]);

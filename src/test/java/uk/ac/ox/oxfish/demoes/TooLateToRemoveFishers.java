@@ -31,17 +31,15 @@ public class TooLateToRemoveFishers
         //run the model for a full 3 years before progressing
         state.setScenario(scenario);
         state.start();
-        while(state.getYear()<3)
+        while (state.getYear() < 3)
             state.schedule.step(state);
 
-        //now keep running for 10 years adding 5 fishers every month
-        while(state.getYear()<13)
-        {
-            if (state.getDayOfTheYear() % 30 == 0)
-            {
+        //now keep running for 10 years adding 3 fishers every month
+        while (state.getYear() < 13) {
+            if (state.getDayOfTheYear() % 30 == 0) {
                 state.createFisher();
                 state.createFisher();
-                //  state.createFisher();
+                state.createFisher();
                 //   state.createFisher();
                 //   state.createFisher();
             }
@@ -49,21 +47,21 @@ public class TooLateToRemoveFishers
         }
 
         //for the next 10 years remove the fishers
-        while(state.getYear()<23)
-        {
-            if (state.getDayOfTheYear() % 30 == 0)
-            {
+        while (state.getYear() < 23) {
+            if (state.getDayOfTheYear() % 30 == 0) {
                 state.killRandomFisher();
                 state.killRandomFisher();
-                //    state.killRandomFisher();
+                state.killRandomFisher();
                 //    state.killRandomFisher();
                 //    state.killRandomFisher();
             }
             state.schedule.step(state);
         }
 
-        Log.info("I am assuming that the biomass is below 10% the virgin level of 5million");
-        Log.info("The actual remaining biomass is: " +500000 );
-        assertTrue(state.getLatestYearlyObservation("Biomass Species 0") < 500000);
+        Log.info("I am assuming that the biomass is below 10% the virgin level of 10million");
+        Double biomass = state.getLatestYearlyObservation("Biomass Species 0");
+        Log.info("The actual remaining biomass is: " + biomass);
+        assertTrue(biomass < 1000000);
     }
+
 }

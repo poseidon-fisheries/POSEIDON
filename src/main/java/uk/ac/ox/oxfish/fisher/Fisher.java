@@ -142,9 +142,9 @@ public class Fisher implements Steppable, Startable{
     private final AdaptationDailyScheduler bimonthlyAdaptation = new AdaptationDailyScheduler(60);
 
     /**
-     * collection of adaptation algorithms to fire every 360  days
+     * collection of adaptation algorithms to fire every 365  days
      */
-    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(360);
+    private final AdaptationDailyScheduler yearlyAdaptation = new AdaptationDailyScheduler(365);
 
     /**
      * collection of adaptation algorithms to fire every trip

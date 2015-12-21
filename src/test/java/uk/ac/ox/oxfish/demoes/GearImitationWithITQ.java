@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.demoes;
 
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,8 +41,10 @@ public class GearImitationWithITQ
         //quota ratios: 90-10
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
+        long seed = System.currentTimeMillis();
+        Log.info("seed is : " + seed);
+        gearImitationTestRun(multiFactory, true, seed);
 
-        gearImitationTestRun(multiFactory,true);
 
 
     }
@@ -54,14 +57,16 @@ public class GearImitationWithITQ
         //only blue are protected by quota
         multiFactory.setYearlyQuotaMaps("1:500");
 
-        gearImitationTestRun(multiFactory,false);
+        gearImitationTestRun(multiFactory, false, System.currentTimeMillis());
 
 
     }
 
-    public void gearImitationTestRun(AlgorithmFactory<MultiQuotaRegulation> multiFactory, boolean checkRed) {
+    public void gearImitationTestRun(
+            AlgorithmFactory<MultiQuotaRegulation> multiFactory, boolean checkRed,
+            final long seed) {
         System.out.println("Test starting!");
-        final FishState state = new FishState(System.currentTimeMillis());
+        final FishState state = new FishState(seed);
 
 
         //biomass ratio: 70-30
@@ -192,7 +197,7 @@ public class GearImitationWithITQ
                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
         System.out.println("Late Landings: " + lateRedLandings + " --- " + lateBlueLandings);
         System.out.println(
-                "Late Quota Efficiency: " + (checkRed ? Double.NaN : lateRedLandings / (4500 * 100)) + " --- " + lateBlueLandings / totalBlueQuotas);
+                "Late Quota Efficiency: " + (!checkRed ? Double.NaN : lateRedLandings / (4500 * 100)) + " --- " + lateBlueLandings / totalBlueQuotas);
 
         //much better efficiency by the end of the simulation
         Assert.assertTrue(lateBlueLandings > .75 * totalBlueQuotas);

@@ -184,6 +184,9 @@ public class FishStateUtilities {
                                 })).entrySet();
 
         //make sure it's finite and at least as good as our current fitness
+        if(Double.isNaN(fitness) && Double.isNaN(maxFitness[0]))
+            return new Pair<>(current,null);
+
         assert Double.isFinite(maxFitness[0]);
         assert maxFitness[0] >= fitness;
 

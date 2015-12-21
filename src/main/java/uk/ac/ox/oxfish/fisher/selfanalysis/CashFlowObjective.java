@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 
 /**
  * The more money is gained in a fixed number of days, the better!
@@ -11,7 +10,6 @@ public class CashFlowObjective implements  ObjectiveFunction<Fisher>
 {
 
 
-    public static final String CASH_COLUMN = YearlyFisherTimeSeries.CASH_COLUMN;
     /**
      * how many days pass between one check and the other? Basically cashflow:
      * Cash(today) - Cash(today-period)

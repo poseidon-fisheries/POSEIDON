@@ -7,3 +7,7 @@ do
     gradle cleanTest test
     gradle testCSV
 done
+
+cd ./runs/dashboards/
+Rscript -e "rmarkdown::render('multitest.Rmd')"
+cp ./multitest.html ./../../multitest.html
