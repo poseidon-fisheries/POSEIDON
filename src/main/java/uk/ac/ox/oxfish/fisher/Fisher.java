@@ -41,6 +41,7 @@ import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -430,6 +431,17 @@ public class Fisher implements Steppable, Startable{
         return this.status.isAtPort();
     }
 
+
+    private LinkedList<DockingListener> dockingListeners = new LinkedList<>();
+    public void addDockingListener(DockingListener listener){
+        dockingListeners.add(listener);
+    }
+    public void removeDockingListener(DockingListener listener)
+    {
+        dockingListeners.remove(listener);
+    }
+
+
     /**
      * anchors at home-port and sets the trip to "over"
      */
@@ -446,7 +458,14 @@ public class Fisher implements Steppable, Startable{
         //finish trip!
         memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort() );
 
+
         status.setHoursAtSea(0);
+        assert  isAtPort();
+        //notify listeners
+        for(DockingListener listener : dockingListeners)
+        {
+            listener.dockingEvent(this,getHomePort());
+        }
     }
 
     /**
@@ -696,6 +715,8 @@ public class Fisher implements Steppable, Startable{
     public void earn(double moneyEarned)
     {
         status.setBankBalance(status.getBankBalance() + moneyEarned);
+        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,moneyEarned);
+
     }
 
     /**
@@ -707,6 +728,7 @@ public class Fisher implements Steppable, Startable{
     {
         spendExogenously(moneySpent);
         memory.getTripLogger().recordCosts(moneySpent);
+        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,-moneySpent);
 
     }
 
@@ -730,6 +752,7 @@ public class Fisher implements Steppable, Startable{
      */
     public void spendExogenously(double moneySpent){
         status.setBankBalance(status.getBankBalance() - moneySpent);
+        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,-moneySpent);
 
     }
 

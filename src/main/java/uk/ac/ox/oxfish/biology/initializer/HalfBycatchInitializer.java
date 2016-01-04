@@ -10,24 +10,27 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * A diffusing logistic initializer where the bycatch specie only exists on the upper half of the sea.
  * Created by carrknight on 7/30/15.
  */
-public class HalfBycatchInitializer extends AbstractBiologyInitializer {
+public class HalfBycatchInitializer extends TwoSpeciesBoxInitializer {
 
 
 
-    private final  DiffusingLogisticInitializer delegate;
 
 
     public HalfBycatchInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
                                   double percentageLimitOnDailyMovement,
                                   double differentialPercentageToMove) {
-        delegate = new DiffusingLogisticInitializer(carryingCapacity, steepness,
-                                                    percentageLimitOnDailyMovement,
-                                                    differentialPercentageToMove);
+        super(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE,true,
+              carryingCapacity,
+              new FixedDoubleParameter(1d),
+              steepness,
+              percentageLimitOnDailyMovement,
+              differentialPercentageToMove);
     }
 
     /**
@@ -44,43 +47,21 @@ public class HalfBycatchInitializer extends AbstractBiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 
-        if(seaTile.getAltitude() < 0) {
-            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generateLocal(biology,
-                                                                                           seaTile,
-                                                                                           random,
-                                                                                           mapHeightInCells,
-                                                                                           mapWidthInCells);
+        setLowestY(mapHeightInCells / 2);
+        return super.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells);
 
-            //if you are at the top, make carrying capacity of the second specie = 0
-            if (seaTile.getGridY() <= mapHeightInCells / 2)
-                generated.setCarryingCapacity(biology.getSpecie(1), 0d);
-
-            return generated;
-        }
-        else
-            return delegate.generateLocal(biology,
-                                          seaTile,
-                                          random,
-                                          mapHeightInCells,
-                                          mapWidthInCells);
 
     }
 
     /**
-     * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
-     * biomasses or whatever
-     *
-     * @param biology the global biology instance
-     * @param map     the map which by now should have all the tiles in place
-     * @param random
-     * @param model   the model: it is in the process of being initialized so it should be only used to schedule stuff rather
+     * creates data columns
      */
     @Override
     public void processMap(
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
     {
 
-        delegate.processMap(biology, map, random, model);
+        super.processMap(biology, map, random, model);
 
         int width = map.getHeight();
         int heightLow = map.getHeight() / 2;
@@ -116,14 +97,5 @@ public class HalfBycatchInitializer extends AbstractBiologyInitializer {
                                                   Double.NaN);
     }
 
-    /**
-     * "Species 0" and "Species 1"
-     *
-     * @return
-     */
-    @Override
-    public String[] getSpeciesNames() {
-        return new String[]{"Species 0", "Species 1"};
-    }
 
 }

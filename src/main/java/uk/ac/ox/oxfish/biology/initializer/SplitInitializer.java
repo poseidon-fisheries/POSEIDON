@@ -9,22 +9,26 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
- * A diffusing logistic initializer with 2 species: 1 lives on the top and one at the bottom of the map
+ * A facade for TwoSpeciesBoxInitializer where species 0 lives on the top and species1 at the bottom of the map
  * Created by carrknight on 9/22/15.
  */
-public class SplitInitializer extends AbstractBiologyInitializer {
+public class SplitInitializer extends TwoSpeciesBoxInitializer {
 
-    private final  DiffusingLogisticInitializer delegate;
 
     public SplitInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
                                   double percentageLimitOnDailyMovement,
                                   double differentialPercentageToMove) {
-        Log.trace("Creating Split Initializer!");
-        delegate = new DiffusingLogisticInitializer(carryingCapacity, steepness,
-                                                    percentageLimitOnDailyMovement,
-                                                    differentialPercentageToMove);
+        //box top Y will have to be reset when generateLocal is called as the map doesn't exist just yet
+        super(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE,false,
+              carryingCapacity,
+              new FixedDoubleParameter(1d),
+              steepness,
+              percentageLimitOnDailyMovement,
+              differentialPercentageToMove);
+
     }
 
     /**
@@ -41,62 +45,10 @@ public class SplitInitializer extends AbstractBiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
 
-        if(seaTile.getAltitude() < 0) {
-            LogisticLocalBiology generated = (LogisticLocalBiology) delegate.generateLocal(biology,
-                                                                                           seaTile,
-                                                                                           random,
-                                                                                           mapHeightInCells,
-                                                                                           mapWidthInCells);
-
-            //make the map split in half
-            if (seaTile.getGridY() < mapHeightInCells / 2) {
-
-                generated.setCarryingCapacity(biology.getSpecie(1), 0d);
-            }
-            else
-                generated.setCarryingCapacity(biology.getSpecie(0), 0d);
-
-
-            return generated;
-        }
-        else
-            return delegate.generateLocal(biology,
-                                          seaTile,
-                                          random,
-                                          mapHeightInCells,
-                                          mapWidthInCells);
+        setLowestY(mapHeightInCells / 2);
+        return super.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells);
 
     }
 
-    /**
-     * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
-     * biomasses or whatever
-     *
-     * @param biology the global biology instance
-     * @param map     the map which by now should have all the tiles in place
-     * @param random
-     * @param model   the model: it is in the process of being initialized so it should be only used to schedule stuff rather
-     */
-    @Override
-    public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
-    {
 
-        delegate.processMap(biology, map, random, model);
-
-
-    }
-
-    /**
-     * "Species 0" and "Species 1"
-     *
-     * @return
-     */
-    @Override
-    public String[] getSpeciesNames() {
-
-        Log.trace("Returning two species");
-
-        return new String[]{"Species 0", "Species 1"};
-    }
 }

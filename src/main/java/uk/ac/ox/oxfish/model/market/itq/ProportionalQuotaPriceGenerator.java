@@ -1,8 +1,12 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
 import com.google.common.base.Preconditions;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -13,7 +17,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
  * Right now lambda(i) =  Pr(needed)*(profit for fish(i) + ratio of catches(j,i) (profit for fish(j) - lambda(j))
  * Created by carrknight on 10/6/15.
  */
-public class ProportionalQuotaPriceGenerator  implements PriceGenerator
+public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppable
 {
 
 
@@ -43,6 +47,18 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
     private final Sensor<Double> numberOfQuotasLeftGetter;
 
 
+    /**
+     * the lambda as it was last computed
+     */
+    private double lastLambda;
+
+    /**
+     * the stoppable to use when turning off
+     */
+    private Stoppable receipt;
+
+
+
     public ProportionalQuotaPriceGenerator(
             ITQOrderBook[] orderBooks, int specieIndex,
             Sensor<Double> numberOfQuotasLeftGetter) {
@@ -57,11 +73,17 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
         this.state = model;
         assert model.getSpecies().size() > 1; //more than one specie or  you are better off using just Monoquota
 
+        receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
 
 
         fisher.getDailyData().registerGatherer("Reservation Quota Price of " + model.getSpecies().get(specieIndex),
-                                               fisher1 -> computeLambda(),
+                                               fisher1 -> lastLambda,
                                                Double.NaN);
+    }
+
+    @Override
+    public void step(SimState simState) {
+        lastLambda = computeLambda();
     }
 
     public double computeLambda() {
@@ -138,8 +160,10 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator
 
     @Override
     public void turnOff() {
-        if(state!=null)
+        if(state!=null) {
             fisher.getDailyData().removeGatherer("Reservation Quota Price of " + state.getSpecies().get(specieIndex));
+            receipt.stop();
+        }
     }
 
 

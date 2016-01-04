@@ -27,7 +27,8 @@ public class Quote implements Comparable<Quote>{
      */
     @Override
     public int compareTo(Quote o) {
-        return Double.compare(this.price,o.price);
+        int compare = Double.compare(this.price, o.price);
+        return compare;
     }
 
     public double getPrice() {

@@ -18,6 +18,7 @@ public class FisherDailyCounter extends Counter {
         super(IntervalPolicy.EVERY_DAY);
         landings = new double[numberOfSpecies];
         earnings = new double[numberOfSpecies];
+        super.addColumn(YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
     }
 
     @Override

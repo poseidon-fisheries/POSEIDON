@@ -87,9 +87,9 @@ public class HardGearSwitchTest {
 
         System.out.println(firstQuotaEfficiency + " ------ " + secondQuotaEfficiency);
         assertTrue(firstQuotaEfficiency <=1 + FishStateUtilities.EPSILON);
-        assertTrue(firstQuotaEfficiency >.8);
+        assertTrue(firstQuotaEfficiency >.7);
         assertTrue(secondQuotaEfficiency <=1+ FishStateUtilities.EPSILON);
-        assertTrue(secondQuotaEfficiency >.8);
+        assertTrue(secondQuotaEfficiency >.7);
 
 
 

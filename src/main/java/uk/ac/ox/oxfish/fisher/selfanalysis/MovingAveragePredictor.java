@@ -30,6 +30,8 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
      */
     protected MovingVariance<Double> averager;
 
+    protected double latestAverage = Double.NaN;
+
     /**
      * this we use to add to the averager
      */
@@ -55,11 +57,11 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
             public void start(FishState model, Fisher fisher) {
 
                 this.fisher = fisher;
-                this.stoppable = model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
+                this.stoppable = model.scheduleEveryDay(this, StepOrder.YEARLY_DATA_GATHERING);
 
                 //store your prediction:
                 if(name!=null)
-                    fisher.getDailyData().registerGatherer(name, fisher1 -> averager.getAverage(),Double.NaN);
+                    fisher.getDailyData().registerGatherer(name, fisher1 -> this.latestAverage,Double.NaN);
             }
         };
 
@@ -84,7 +86,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
                 fisher.addTripListener(tripListener[0]);
 
                 //store your prediction (still every day)
-                fisher.getDailyData().registerGatherer(this.name, fisher1 -> this.averager.getAverage(),Double.NaN);
+                fisher.getDailyData().registerGatherer(this.name, fisher1 -> this.latestAverage,Double.NaN);
             }
 
             @Override
@@ -127,8 +129,10 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     {
 
         Double observation = sensor.scan(fisher);
-        if(Double.isFinite(observation))
+        if(Double.isFinite(observation)) {
             averager.addObservation(observation);
+            latestAverage = averager.getAverage();
+        }
 
     }
 
@@ -139,7 +143,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
      */
     @Override
     public double predict() {
-        return averager.getAverage();
+        return latestAverage;
     }
 
 

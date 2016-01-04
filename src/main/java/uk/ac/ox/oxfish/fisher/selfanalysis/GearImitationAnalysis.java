@@ -1,10 +1,13 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -34,27 +37,25 @@ public class GearImitationAnalysis implements FisherStartable
         public void apply(Fisher fisher1, Gear change, FishState model) {
             if (Log.TRACE)
                 Log.trace(fisher1 + " is about to change gear");
-            fisher1.resetDailyCatchesPredictors();
             //predictions are wrong: reset at the end of the trip
-            fisher1.addTripListener(new TripListener() {
+            fisher1.addDockingListener(new DockingListener() {
+                boolean active = true;
                 @Override
-                public void reactToFinishedTrip(TripRecord record) {
+                public void dockingEvent(Fisher fisher, Port port)
+                {
+                    if(!active)
+                        return;
                     fisher1.setGear(change.makeCopy());
-                    final TripListener listener = this;
-                    Log.trace(fisher1 + " has changed gear and is about to reset its predictor");
+                    Log.trace(fisher1 + " has changed gear and will reset its predictor");
                     fisher1.resetDailyCatchesPredictors();
-
-                    model.scheduleOnce(new Steppable() {
-                        @Override
-                        public void step(SimState simState) {
-                            fisher1.resetDailyCatchesPredictors();
-                            Log.trace(fisher1 + " finished resetting");
-                            fisher1.removeTripListener(listener);
-
-                        }
-                    }, StepOrder.DAWN);
+                    active=false;
+                    DockingListener outer = this;
+                    //schedule to remove the listener
+                    model.scheduleOnce((Steppable) simState -> fisher1.removeDockingListener(outer), StepOrder.DAWN);
                 }
             });
+
+
 
         }
     };

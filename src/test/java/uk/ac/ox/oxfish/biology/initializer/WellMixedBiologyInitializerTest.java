@@ -18,10 +18,11 @@ public class WellMixedBiologyInitializerTest {
     @Test
     public void initializerMixesWell() throws Exception {
 
-        WellMixedBiologyInitializer initializer = new WellMixedBiologyInitializer(new FixedDoubleParameter(60),
-                                                                                  new FixedDoubleParameter(.25),
-                                                                                  new FixedDoubleParameter(.8),
-                                                                                  .01,.01);
+        WellMixedBiologyInitializer initializer =
+                new WellMixedBiologyInitializer(new FixedDoubleParameter(60),
+                                                          new FixedDoubleParameter(.25),
+                                                          new FixedDoubleParameter(.8),
+                                                          .01,.01);
 
 
 

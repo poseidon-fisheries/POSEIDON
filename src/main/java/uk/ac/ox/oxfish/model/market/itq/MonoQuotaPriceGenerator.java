@@ -1,7 +1,11 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
 /**
@@ -10,7 +14,7 @@ import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
  * quotas
  * Created by carrknight on 8/20/15.
  */
-public class MonoQuotaPriceGenerator implements PriceGenerator
+public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
 {
 
 
@@ -29,6 +33,19 @@ public class MonoQuotaPriceGenerator implements PriceGenerator
      * on 20151006 but I decided to abandon as I don't think it makes as much economic sense as I thought it did
      */
     private final boolean includeDailyProfits;
+    /**
+     * the title we registered our lambda to
+     */
+    private String dataTitle;
+    /**
+     * the lambda as it was last computed
+     */
+    private double lastLambda;
+
+    /**
+     * the stoppable to use when turning off
+     */
+    private Stoppable receipt;
 
     public MonoQuotaPriceGenerator(int specieIndex,
                                    boolean includeDailyProfits) {
@@ -45,9 +62,11 @@ public class MonoQuotaPriceGenerator implements PriceGenerator
         quotas = ((MonoQuotaRegulation) fisher.getRegulation());
 
 
+        receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
 
-        fisher.getDailyData().registerGatherer("Reservation Quota Price of " + model.getSpecies().get(specieIndex),
-                                               fisher1 -> computeLambda(),
+        dataTitle = "Reservation Quota Price of " + model.getSpecies().get(specieIndex);
+        fisher.getDailyData().registerGatherer(dataTitle,
+                                               fisher1 -> lastLambda,
                                                Double.NaN);
 
 
@@ -57,8 +76,16 @@ public class MonoQuotaPriceGenerator implements PriceGenerator
     @Override
     public void turnOff() {
         //todo remove gatherer
+        if(receipt!=null) {
+            receipt.stop();
+            fisher.getDailyData().removeGatherer(dataTitle);
+        }
     }
 
+    @Override
+    public void step(SimState simState) {
+        lastLambda = computeLambda();
+    }
 
     public double computeLambda()
     {

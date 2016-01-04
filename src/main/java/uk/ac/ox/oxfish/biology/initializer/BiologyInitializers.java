@@ -63,6 +63,10 @@ public class BiologyInitializers {
                          OsmoseBiologyFactory::new);
         NAMES.put(OsmoseBiologyFactory.class,"Osmose Biology");
 
+        CONSTRUCTORS.put("Two Species Box",
+                         TwoSpeciesBoxFactory::new);
+        NAMES.put(TwoSpeciesBoxFactory.class,"Two Species Box");
+
 
     }
 

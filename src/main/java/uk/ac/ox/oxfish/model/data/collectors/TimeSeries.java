@@ -16,14 +16,14 @@ import java.util.function.Function;
  */
 public class TimeSeries<T> implements Steppable
 {
-    final private Map<String,DataColumn> data;
+    final private LinkedHashMap<String,DataColumn> data;
 
     final private Map<String,DataColumn> dataView;
 
     /**
      * the functions to run on studied object to gather their data
      */
-    final private Map<String,Function<T,Double>> gatherers;
+    final private LinkedHashMap<String,Function<T,Double>> gatherers;
 
     /**
      * if this is true, gather data every year. Otherwise gather data step every step
@@ -108,7 +108,7 @@ public class TimeSeries<T> implements Steppable
         this.stepOrder = stepOrder;
         data = new LinkedHashMap<>();
         dataView = Collections.unmodifiableMap(data);
-        gatherers = new HashMap<>();
+        gatherers = new LinkedHashMap<>();
     }
 
     public TimeSeries(IntervalPolicy policy) {
