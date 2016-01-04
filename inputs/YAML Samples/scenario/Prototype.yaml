@@ -51,8 +51,8 @@ Prototype:
   networkBuilder:
     Equal Out Degree:
       degree: 2
-  portPositionX: null
-  portPositionY: null
+  portPositionX: -1
+  portPositionY: -1
   ports: 1
   regulation: MPA Only
   speedInKmh: '5.0'

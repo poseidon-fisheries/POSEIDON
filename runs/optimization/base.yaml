@@ -51,6 +51,8 @@ Prototype:
     Equal Out Degree:
       degree: 2
   ports: 1
+  portPositionX: 40
+  portPositionY: 25
   regulation: MPA Only
   speedInKmh: '5.0'
   startingMPAs: [

@@ -1,14 +1,13 @@
 from __future__ import print_function
 import subprocess
 import os
-import output_to_r
 
 EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
 SPEARMINT_DIRECTORY = "/home/carrknight/code/spearmint/spearmint"
 
 
 
-def compute_results(yamlfile):
+def default_scorer(yamlfile):
     '''
     given the yaml file containing the results, extract a number representing the score for the run!
     :param yamlfile: the results.yaml created by the simulation
@@ -19,7 +18,7 @@ def compute_results(yamlfile):
 # one dimensional function
 def run_experiment(input2yaml,
                    experiment_title,
-                   scorer=compute_results,
+                   scorer=default_scorer,
                    jarfile="yamler.jar",
                    main_directory="/home/carrknight/code/oxfish/runs/optimization"):
     import os
