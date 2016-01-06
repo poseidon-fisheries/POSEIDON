@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -35,6 +33,12 @@ public class Markets {
                          CongestedMarketFactory::new
         );
         NAMES.put(CongestedMarketFactory.class,"Congested Market");
+
+        CONSTRUCTORS.put("Moving Average Congested Market",
+                         MACongestedMarketFactory::new
+        );
+        NAMES.put(MACongestedMarketFactory.class,
+                  "Moving Average Congested Market");
 
 
 

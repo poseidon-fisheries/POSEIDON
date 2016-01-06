@@ -1,8 +1,9 @@
-package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
+package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LogisticDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**

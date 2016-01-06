@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.departing.CashFlowLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.CompositeDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.WeatherLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;

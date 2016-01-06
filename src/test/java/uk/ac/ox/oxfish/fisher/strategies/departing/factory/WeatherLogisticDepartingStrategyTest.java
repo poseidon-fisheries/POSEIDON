@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.strategies.departing.WeatherLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -21,7 +22,7 @@ public class WeatherLogisticDepartingStrategyTest {
     @Test
     public void weatherDecisionTest() throws Exception {
 
-        WeatherLogisticDepartingStrategy strategy = new WeatherLogisticDepartingStrategy(1,10,1,.03,-0.02,0d);
+        WeatherLogisticDepartingStrategy strategy = new WeatherLogisticDepartingStrategy(1, 10, 1, .03, -0.02, 0d);
 
         //create randomizer
         FishState model = mock(FishState.class);

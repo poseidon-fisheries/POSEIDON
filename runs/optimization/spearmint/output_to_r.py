@@ -203,4 +203,4 @@ def plot(experiment_name=None):
     # plot(experiment_name="itq-separated")
     # plot(experiment_name="itq-mixed")
     # plot(experiment_name="unfriend")
-plot(experiment_name="kitchensink")
+plot(experiment_name="kitchensink_2")
