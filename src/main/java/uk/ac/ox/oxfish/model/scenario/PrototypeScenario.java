@@ -244,8 +244,8 @@ public class PrototypeScenario implements Scenario {
             NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
         else
         {
-            Port port = new Port(map.getSeaTile(portPositionX,portPositionY),
-                                 marketMap,0);
+            Port port = new Port("Port 0", map.getSeaTile(portPositionX, portPositionY),
+                                 marketMap, 0);
             map.addPort(port);
         }
 

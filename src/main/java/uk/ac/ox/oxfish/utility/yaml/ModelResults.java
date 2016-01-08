@@ -28,6 +28,13 @@ public class ModelResults extends HashMap<String,Object>
             modelData.put(column.getName(), column.copy());
         this.put("FishState", modelData);
 
+        //also daily data
+        //dump columns of yearly data in
+        HashMap<String, Object> dailyData = new HashMap<>(state.getDailyDataSet().getColumns().size());
+        for (DataColumn column : state.getDailyDataSet().getColumns())
+            dailyData.put(column.getName(), column.copy());
+        this.put("FishState Daily", dailyData);
+
         //Also prints out fisher's averages
         HashMap<String, Object> fisherData = new HashMap<>();
         Collection<DataColumn> fisherColumns = state.getFishers().get(0).getYearlyData().getColumns();

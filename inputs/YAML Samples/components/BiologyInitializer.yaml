@@ -50,3 +50,15 @@ Osmose Biology:
   preInitializedConfiguration: true
   preInitializedConfigurationDirectory: /home/carrknight/code/oxfish/inputs/osmose/prototype/restart
 -------
+Two Species Box:
+  boxHeight: '10.0'
+  boxWidth: '10.0'
+  differentialPercentageToMove: '0.001'
+  firstSpeciesCapacity: '5000.0'
+  lowestX: '0.0'
+  lowestY: '0.0'
+  percentageLimitOnDailyMovement: '0.01'
+  ratioFirstToSecondSpecies: '1.0'
+  species0InsideTheBox: false
+  steepness: uniform 0.6 0.8
+-------

@@ -337,7 +337,7 @@ public class NauticalMapFactory {
 
         Collections.shuffle(candidateTiles,new Random(random.nextLong()));
         for(int i=0; i<ports; i++) {
-            Port port = new Port(candidateTiles.get(i),marketFactory.apply(candidateTiles.get(i)), 0);
+            Port port = new Port("Port 0", candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)), 0);
             map.addPort(port);
         }
 

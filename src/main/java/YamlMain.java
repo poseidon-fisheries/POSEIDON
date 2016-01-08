@@ -3,7 +3,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.OneSpecieGearFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
@@ -49,18 +48,7 @@ public class YamlMain {
         while(model.getYear()<20)
             model.schedule.step(model);
 
-        FileWriter writer = new FileWriter(outputFolder.resolve("result.txt").toFile());
-        //remaining stock of species 1 + total landings of species 2
-        Double fitness = model.getLatestYearlyObservation(
-                "Biomass " + model.getSpecies().get(1).getName()) +
-                model.getYearlyDataSet().getColumn(model.getSpecies().get(0) + " " +
-                                                           AbstractMarket.LANDINGS_COLUMN_NAME).stream().reduce(0d,
-                                                                                                                (aDouble, aDouble2) -> aDouble+aDouble2);
-        writer.write(fitness.toString());
-        writer.flush();
-        writer.close();
-
-        writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
+        FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
         ModelResults results =  new ModelResults(model);
         yaml.dump(results,writer);
 

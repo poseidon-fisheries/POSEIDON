@@ -48,7 +48,7 @@ public class MovingTest
         //1 hour step
         when(fishState.getHoursPerStep()).thenReturn(1d);
         //fake port at 1,1
-        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(MarketMap.class), 0);
+        Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), mock(MarketMap.class), 0);
 
         //create fisher, it wants to go to 0,1 from 1,1
         //but it only goes at 1km per hour

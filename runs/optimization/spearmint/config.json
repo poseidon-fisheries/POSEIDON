@@ -1,65 +1,51 @@
 {
   "language": "PYTHON",
-  "main-file": "kitchensink_3.py",
-  "experiment-name": "kitchensink_3",
+  "main-file": "congested_departure.py",
+  "experiment-name": "congested_departure",
   "likelihood": "GAUSSIAN",
   "resources": {
     "my-machine": {
       "scheduler": "local",
       "max-concurrent": 3,
-      "max-finished-jobs": 600
+      "max-finished-jobs": 300
     }
   },
   "variables": {
-    "length": {
-      "type": "INT",
-      "size": 1,
-      "min": 1,
-      "max": 366
-    },
-    "first" : {
+    "intercept" : {
       "type" : "FLOAT",
       "size" : 1,
       "min"  : 1,
-      "max"  : 5000
+      "max"  : 60
     },
-    "second" : {
+    "slope" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 5000
+      "min"  : 0,
+      "max"  : 0.1
     },
-    "tradeable": {
-      "type": "enum",
-      "size": 1,
-      "options": [
-        "true",
-        "false"
-      ]
-    },
-    "height" : {
+    "average" : {
       "type" : "INT",
       "size" : 1,
-      "min"  : 0,
-      "max"  : 50
+      "min"  : 10,
+      "max"  : 60
     },
-    "width" : {
-      "type" : "INT",
+    "exploration" : {
+      "type" : "FLOAT",
       "size" : 1,
       "min"  : 0,
-      "max"  : 50
+      "max"  : 0.3
     },
-    "x" : {
-      "type" : "INT",
+    "gas_price":{
+      "type" : "FLOAT",
       "size" : 1,
-      "min"  : 0,
-      "max"  : 49
+      "min"  : 0.0001,
+      "max"  : 3
     },
-    "y" : {
-      "type" : "INT",
+     "catchability":{
+      "type" : "FLOAT",
       "size" : 1,
-      "min"  : 0,
-      "max"  : 49
+      "min"  : 0.0001,
+      "max"  : 0.01
     }
   }
 }

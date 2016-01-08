@@ -178,10 +178,15 @@ public class FishState  extends SimState{
         for(Fisher fisher : fishers)
             fisher.start(this);
         //start the markets (for each port
-        for(Port port : getPorts())
-            for(Market market : port.marketMap().getMarkets())
+        for(Port port : getPorts()) {
+            for (Market market : port.getMarketMap().getMarkets()) {
                 market.start(this);
-
+            }
+            for(Species species : biology.getSpecies())
+                dailyDataSet.registerGatherer("Price of " + species + " at " + port.getName(),
+                                              fishState -> port.getMarginalPrice(species)
+                        , Double.NaN);
+        }
         //start everything else that required to be started
         for(Startable startable : toStart)
             startable.start(this);

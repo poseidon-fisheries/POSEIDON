@@ -50,7 +50,7 @@ public class FishingTest {
         GlobalBiology biology = new GlobalBiology(species);
         when(fishState.getBiology()).thenReturn(biology);
 
-        Port port = new Port(fishState.getMap().getSeaTile(1,1),mock(MarketMap.class), 0);
+        Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), mock(MarketMap.class), 0);
 
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),anyDouble(),any())).thenReturn(new Catch(species, 50.0, biology));

@@ -38,8 +38,11 @@ public class Port {
      */
     private final MarketMap marketMap;
 
-    public Port(SeaTile location, MarketMap marketMap, double gasPricePerLiter)
+    private final String name;
+
+    public Port(String portName, SeaTile location, MarketMap marketMap, double gasPricePerLiter)
     {
+        this.name = portName;
         this.location = location;
         this.marketMap = marketMap;
         this.gasPricePerLiter = gasPricePerLiter;
@@ -114,7 +117,7 @@ public class Port {
         return "Port at " +location;
     }
 
-    public MarketMap marketMap() {
+    public MarketMap getMarketMap() {
         return marketMap;
     }
 
@@ -129,4 +132,10 @@ public class Port {
     public void setGasPricePerLiter(double gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
     }
+
+    public String getName() {
+        return name;
+    }
+
+
 }

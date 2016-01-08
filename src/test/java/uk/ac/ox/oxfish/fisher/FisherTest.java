@@ -52,7 +52,7 @@ public class FisherTest {
         final int pricePerFish = 23;
         final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
         marketMap.addMarket(species, fishmarket);
-        Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
+        Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
@@ -126,7 +126,7 @@ public class FisherTest {
         final int pricePerFish = 23;
         final FixedPriceMarket fishmarket = new FixedPriceMarket(pricePerFish);
         marketMap.addMarket(species, fishmarket);
-        Port port = new Port(fishState.getMap().getSeaTile(1,1), marketMap, gasCostPerLiter);
+        Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), marketMap, gasCostPerLiter);
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day

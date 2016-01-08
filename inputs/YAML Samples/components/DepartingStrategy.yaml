@@ -16,3 +16,9 @@ Double Logistic:
   weatherX0: '1.0'
   windspeedSensitivity: '0.03'
 -------
+Monthly Departing:
+  addYearlyAdapatation: false
+  explorationRate: '0.2'
+  mutationRate: '0.05'
+  probabilityEachMonthToGoOutFishing: '0.3'
+-------

@@ -55,9 +55,10 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
         {
             double mutationRate = this.mutationRate.apply(fishState.getRandom());
             double explorationRate = this.explorationRate.apply(fishState.getRandom());
-            //add also a counter
+            //if it's the first you are building
             if(!registeredStates.contains(fishState))
             {
+                //create data counters
                 fishState.getYearlyDataSet().
                         registerGatherer("Yearly Effort In Months",
                                          new Function<FishState, Double>() {
@@ -76,8 +77,33 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                                          Double.NaN
                         );
 
+                //do it for every month too
+                for(int month=0; month<12; month++)
+                {
+                    final int currentMonth = month;
+                    fishState.getYearlyDataSet().
+                            registerGatherer("Yearly Efforts In Month " + month,
+                                             new Function<FishState, Double>() {
+                                                 @Override
+                                                 public Double apply(FishState fishState) {
+                                                     double sum=0;
+                                                     for(Fisher fisher : fishState.getFishers())
+                                                             if(((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea()[currentMonth])
+                                                                 sum++;
+
+                                                     return sum;
+                                                 }
+                                             }
+                                    , Double.NaN);
+                }
+
+
+                //do this so that we know we have created the counters and we don't do so again
                 registeredStates.add(fishState);
 
+
+
+                //set the adaptation up (when the model starts)
                 fishState.registerStartable(new Startable() {
                     @Override
                     public void start(FishState model) {

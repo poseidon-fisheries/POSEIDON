@@ -69,7 +69,8 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
 
             return container;
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+            //because of recursion this will happen
+         //   e.printStackTrace();
             return null;
         }
 

@@ -8,3 +8,8 @@ Congested Market:
   demandSlope: '1.0E-4'
   maxPrice: '10.0'
 -------
+Moving Average Congested Market:
+  demandIntercept: '10.0'
+  demandSlope: '0.001'
+  observationWindow: '30.0'
+-------
