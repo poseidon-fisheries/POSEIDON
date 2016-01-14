@@ -72,6 +72,10 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
                     , Double.NaN);
         }
 
+        registerGatherer("Average Cash-Flow", ignored -> observed.getFishers().stream().mapToDouble(
+                value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)).sum()/
+                observed.getFishers().size(), 0d);
+
     }
 
 }

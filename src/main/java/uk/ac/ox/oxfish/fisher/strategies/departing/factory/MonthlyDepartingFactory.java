@@ -66,10 +66,10 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                                              public Double apply(FishState fishState) {
                                                  double sum=0;
                                                  for(Fisher fisher : fishState.getFishers())
-                                                 for(Boolean fishing:
-                                                     ((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea())
-                                                     if(fishing)
-                                                         sum++;
+                                                     for(Boolean fishing:
+                                                             ((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea())
+                                                         if(fishing)
+                                                             sum++;
 
                                                  return sum;
                                              }
@@ -88,8 +88,8 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                                                  public Double apply(FishState fishState) {
                                                      double sum=0;
                                                      for(Fisher fisher : fishState.getFishers())
-                                                             if(((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea()[currentMonth])
-                                                                 sum++;
+                                                         if(((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea()[currentMonth])
+                                                             sum++;
 
                                                      return sum;
                                                  }

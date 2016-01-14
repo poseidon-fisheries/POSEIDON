@@ -3,7 +3,7 @@ import subprocess
 import os
 
 EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
-SPEARMINT_DIRECTORY = "/home/carrknight/code/spearmint/spearmint"
+SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
 
 
 
