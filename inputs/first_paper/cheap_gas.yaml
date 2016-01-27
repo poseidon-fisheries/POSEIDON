@@ -1,0 +1,5 @@
+Prototype:
+  gasPricePerLiter: '0.02'
+  gear:
+    Random Catchability:
+      trawlSpeed: uniform 0 20

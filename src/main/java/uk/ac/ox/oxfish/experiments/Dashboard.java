@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
@@ -74,7 +73,7 @@ public class Dashboard
 
         for(int i=0; i<RUNS_PER_SCENARIO; i++)
         {
-            gearEvolutionDashboard(yamler, expensiveGas, i, "expensive", output);
+            gearEvolutionDashboard(yamler, expensiveGas, i, "expensive", output, System.currentTimeMillis());
         }
 
         System.out.println("    - Free Gas");
@@ -83,7 +82,7 @@ public class Dashboard
 
         for(int i=0; i<RUNS_PER_SCENARIO; i++)
         {
-            gearEvolutionDashboard(yamler, freeGas, i, "free", output);
+            gearEvolutionDashboard(yamler, freeGas, i, "free", output, System.currentTimeMillis());
         }
 
         /***
@@ -219,7 +218,7 @@ public class Dashboard
      * @param maxYearsToRun maximum years after which to cut the simulation
      * @return
      */
-    private static int disfunctionalFriendsRun(int friends, PrototypeScenario scenario,
+    public static int disfunctionalFriendsRun(int friends, PrototypeScenario scenario,
                                                final int maxYearsToRun)
     {
         System.out.println("    Friends: " + friends);
@@ -277,7 +276,7 @@ public class Dashboard
 
     }
 
-    private static void hypotheticalOneSpeciesITQRun( FishYAML yaml, String scenarioYAML, int run,
+    public static void hypotheticalOneSpeciesITQRun( FishYAML yaml, String scenarioYAML, int run,
                                                       final String outputName, final Path outputPath, final int yearsToRun)
     {
         System.out.println("    run " + run);
@@ -334,12 +333,12 @@ public class Dashboard
 
     }
 
-    private static void gearEvolutionDashboard(
+    public static void gearEvolutionDashboard(
             FishYAML yamler, String expensiveGas, int i, final String outputName,
-            final Path outputPath) throws IOException {
+            final Path outputPath, final long randomSeed) throws IOException {
         System.out.println("    run " + i);
         //create the model
-        FishState state = new FishState(System.currentTimeMillis());
+        FishState state = new FishState(randomSeed);
         //read in the scenario
         Scenario scenario = yamler.loadAs(expensiveGas,Scenario.class);
         state.setScenario(scenario);
@@ -359,8 +358,8 @@ public class Dashboard
         //run it for 10 years
         state.start();
         //make agents optimize their gear
-        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(), state, new ArrayList<>(),
-                                                             new CashFlowObjective(60));
+        GearImitationAnalysis.attachMileageGearAdaptationToEachFisher(state.getFishers(), state,
+                                                             new CashFlowObjective(60),0,20);
         while(state.getYear()<10)
             state.schedule.step(state);
 

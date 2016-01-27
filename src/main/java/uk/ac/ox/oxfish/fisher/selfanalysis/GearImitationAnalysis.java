@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -11,8 +9,6 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -116,6 +112,97 @@ public class GearImitationAnalysis implements FisherStartable
 
 
 
+    public static void attachMileageGearAdaptationToEachFisher(List<Fisher> fishers, FishState model,
+                                                               final CashFlowObjective objectiveFunction,
+                                                               final double minTrawlingSpeed,
+                                                               final double maxTrawlingSpeed)
+    {
+        //first add data gatherers
+        model.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", new Function<FishState, Double>() {
+            @Override
+            public Double apply(FishState state) {
+                double size =state.getFishers().size();
+                if(size == 0)
+                    return Double.NaN;
+                else
+                {
+                    double total = 0;
+                    for(Fisher fisher : state.getFishers())
+                        total+= ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
+                    return total/size;
+                }
+            }
+        },Double.NaN);
+
+
+        for(int i=0; i<model.getSpecies().size(); i++)
+        {
+            final int finalI = i;
+            model.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
+                                                     new Function<FishState, Double>() {
+                                                         @Override
+                                                         public Double apply(FishState state) {
+                                                             double size = state.getFishers().size();
+                                                             if (size == 0)
+                                                                 return Double.NaN;
+                                                             else {
+                                                                 double total = 0;
+                                                                 for (Fisher fisher : state.getFishers())
+                                                                     total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                                                                 return total / size;
+                                                             }
+                                                         }
+                                                     }, Double.NaN);
+        }
+
+
+        final double shock = 0.05*(maxTrawlingSpeed-minTrawlingSpeed);
+        assert  shock >=0;
+        //add adaptation
+        for(Fisher fisher : fishers)
+        {
+
+            Adaptation<RandomCatchabilityTrawl> mileagedaptation = new Adaptation<>(
+                    fisher1 -> true,
+                    new BeamHillClimbing<RandomCatchabilityTrawl>() {
+                        @Override
+                        public RandomCatchabilityTrawl randomStep(
+                                FishState state, MersenneTwisterFast random, Fisher fisher,
+                                RandomCatchabilityTrawl current) {
+                            double currentShock = random.nextDouble() * shock;
+                            if (random.nextBoolean())
+                                currentShock -= currentShock;
+                            double newMileage = current.getTrawlSpeed() + currentShock;
+                            newMileage = Math.max(newMileage, minTrawlingSpeed);
+                            newMileage = Math.min(newMileage, maxTrawlingSpeed);
+                            return new RandomCatchabilityTrawl(
+                                    current.getCatchabilityMeanPerSpecie(),
+                                    current.getCatchabilityDeviationPerSpecie(),
+                                    newMileage
+                            );
+                        }
+                    }, (fisher1, change, model1) -> fisher1.setGear(change),
+                    fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
+                    new CashFlowObjective(60), .2, .6);
+
+
+
+            model.registerStartable(new FisherStartable() {
+                @Override
+                public void start(FishState model, Fisher fisher) {
+                    fisher.addBiMonthlyAdaptation(mileagedaptation);
+                }
+
+                @Override
+                public void turnOff() {
+                    fisher.removeBiMonthlyAdaptation(mileagedaptation);
+                }
+            }, fisher);
+        }
+
+
+    }
+
 
     /**
      * utility function to add the imitation analysis to every fisher in the group
@@ -156,19 +243,19 @@ public class GearImitationAnalysis implements FisherStartable
             final int finalI = i;
             model.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
                                                      new Function<FishState, Double>() {
-                @Override
-                public Double apply(FishState state) {
-                    double size = state.getFishers().size();
-                    if (size == 0)
-                        return Double.NaN;
-                    else {
-                        double total = 0;
-                        for (Fisher fisher : state.getFishers())
-                            total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[finalI];
-                        return total / size;
-                    }
-                }
-            }, Double.NaN);
+                                                         @Override
+                                                         public Double apply(FishState state) {
+                                                             double size = state.getFishers().size();
+                                                             if (size == 0)
+                                                                 return Double.NaN;
+                                                             else {
+                                                                 double total = 0;
+                                                                 for (Fisher fisher : state.getFishers())
+                                                                     total += ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                                                                 return total / size;
+                                                             }
+                                                         }
+                                                     }, Double.NaN);
         }
     }
 
@@ -191,17 +278,17 @@ public class GearImitationAnalysis implements FisherStartable
             Adaptation<Hold> holdAdaptation = new Adaptation<Hold>(
                     fisher1 -> true,
                     new BeamHillClimbing<Hold>() {
-                @Override
-                public Hold randomStep(
-                        FishState state, MersenneTwisterFast random, Fisher fisher, Hold current) {
-                    return new Hold(fisher.getMaximumLoad() * (.8 + .4 * random.nextDouble()),
-                                    species);
-                }
-            }, (fisher1, change, model1) -> fisher1.changeHold(change),
+                        @Override
+                        public Hold randomStep(
+                                FishState state, MersenneTwisterFast random, Fisher fisher, Hold current) {
+                            return new Hold(fisher.getMaximumLoad() * (.8 + .4 * random.nextDouble()),
+                                            species);
+                        }
+                    }, (fisher1, change, model1) -> fisher1.changeHold(change),
                     fisher1 -> {
-                //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
-                return new Hold(fisher1.getMaximumLoad(),species);
-            },new CashFlowObjective(60),.15,.6);
+                        //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
+                        return new Hold(fisher1.getMaximumLoad(),species);
+                    },new CashFlowObjective(60),.15,.6);
 
 
 
@@ -241,7 +328,7 @@ public class GearImitationAnalysis implements FisherStartable
 
 
     public static void attachGoingOutProbabilityToEveryone(List<Fisher> fishers,
-                                                      FishState model)
+                                                           FishState model)
     {
         for(Fisher fisher : fishers)
         {
