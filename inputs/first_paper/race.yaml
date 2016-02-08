@@ -1,0 +1,70 @@
+Prototype:
+  biologyInitializer:
+    From Left To Right Fixed:
+      biologySmoothingIndex: '1000000.0'
+      maximumBiomass: '5000.0'
+  departingStrategy:
+    Monthly Departing:
+      addYearlyAdapatation: true
+      explorationRate: '0.423057'
+      mutationRate: '0.05'
+      probabilityEachMonthToGoOutFishing: '0.3'
+  destinationStrategy:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.8'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  engineWeight: normal 100.0 10.0
+  fishers: 100
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fuelTankSize: '100000.0'
+  gasPricePerLiter: '5.311594'
+  gear:
+    Random Catchability:
+      meanCatchabilityFirstSpecies: '0.020923'
+      meanCatchabilityOtherSpecies: '0.020923'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+      trawlSpeed: '5.0'
+  habitatInitializer: All Sand
+  holdSize: '100.0'
+  literPerKilometer: '10.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '0.0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      width: '50.0'
+  mapMakerDedicatedRandomSeed: 0
+  market:
+    Moving Average Congested Market:
+      demandIntercept: '493.591574'
+      demandSlope: '0.094375'
+      observationWindow: '5'
+  networkBuilder:
+    Equal Out Degree:
+      degree: 2
+  portPositionX: 40
+  portPositionY: 25
+  ports: 1
+  regulation: MPA Only
+  speedInKmh: '5.0'
+  startingMPAs: [
+    ]
+  usePredictors: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather

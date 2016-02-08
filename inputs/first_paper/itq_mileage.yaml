@@ -1,0 +1,67 @@
+Prototype:
+  biologyInitializer:
+    From Left To Right Fixed:
+      biologySmoothingIndex: '1000000.0'
+      maximumBiomass: '5000.0'
+  departingStrategy:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  destinationStrategy:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: false
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.8'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  engineWeight: normal 100.0 10.0
+  fishers: 100
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fuelTankSize: '100000.0'
+  gasPricePerLiter: '0.2'
+  gear:
+    Random Catchability:
+      meanCatchabilityFirstSpecies: '0.1'
+      meanCatchabilityOtherSpecies: '0.1'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+      trawlSpeed: uniform 0 20
+  habitatInitializer: All Sand
+  holdSize: '100.0'
+  literPerKilometer: '10.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      width: '50.0'
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '10.0'
+  networkBuilder:
+    Equal Out Degree:
+      degree: 2
+  portPositionX: 40
+  portPositionY: 25
+  ports: 1
+  regulation:
+    Mono-ITQ:
+      individualQuota: '4000.0'
+  speedInKmh: '5.0'
+  startingMPAs: [
+    ]
+  usePredictors: true
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather

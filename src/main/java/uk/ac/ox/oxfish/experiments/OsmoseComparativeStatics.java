@@ -41,13 +41,12 @@ public class OsmoseComparativeStatics
     public static final int YEARS_PER_SIMULATION = 30;
     public static final Path ROOT = Paths.get("runs", "osmose");
 
-    public static void secondaryEffects(String[] args)
+    public static void secondaryEffects(final Path outputPath, final int simulatedYears)
     {
-        ROOT.toFile().mkdirs();
+        outputPath.toFile().mkdirs();
         //10 times virgin
         for(int run = 0; run< RUNS; run++)
         {
-            File runFile = ROOT.resolve("virgin_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
@@ -56,11 +55,12 @@ public class OsmoseComparativeStatics
             scenario.setNetworkBuilder(new EmptyNetworkBuilder());
 
             //create and run
+            File runFile = outputPath.resolve("virgin_"+run+".csv").toFile();
             FishState fishState = new FishState(System.currentTimeMillis());
             fishState.setScenario(scenario);
 
             fishState.start();
-            while(fishState.getYear()< YEARS_PER_SIMULATION + 1)
+            while(fishState.getYear()< simulatedYears + 1)
                 fishState.schedule.step(fishState);
 
             //print out all biomasses
@@ -78,7 +78,7 @@ public class OsmoseComparativeStatics
         //10 times demersal 1
         for(int run = 0; run<RUNS; run++)
         {
-            File runFile = ROOT.resolve("dem1_"+run+".csv").toFile();
+            File runFile = outputPath.resolve("dem1_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
@@ -112,7 +112,7 @@ public class OsmoseComparativeStatics
         //10 times demersal 1
         for(int run = 0; run<RUNS; run++)
         {
-            File runFile = ROOT.resolve("dem2_"+run+".csv").toFile();
+            File runFile = outputPath.resolve("dem2_"+run+".csv").toFile();
             PrototypeScenario scenario = new PrototypeScenario();
             //osmose scenario with no fishers
             scenario.setBiologyInitializer(new OsmoseBiologyFactory());
