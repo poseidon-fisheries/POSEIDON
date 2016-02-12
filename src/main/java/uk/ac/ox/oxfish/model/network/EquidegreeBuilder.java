@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
     private int degree = 2;
 
+    private final LinkedList<NetworkPredicate> predicates = new LinkedList<>();
 
     /**
      * Applies this function to the given argument.
@@ -51,8 +53,14 @@ public class EquidegreeBuilder implements NetworkBuilder{
             while(friends.size() < degree)
             {
                 final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
-                if(candidate != fisher)
-                    friends.add(candidate);
+                if(candidate != fisher) {
+                    boolean allowed = true;
+                    for(NetworkPredicate predicate : predicates)
+                        allowed = allowed && predicate.test(fisher,candidate);
+                    if(allowed)
+                        friends.add(candidate);
+
+                }
             }
             //now make them your friends!
             for(Fisher friend : friends)
@@ -96,7 +104,13 @@ public class EquidegreeBuilder implements NetworkBuilder{
         {
             final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
             if(candidate != fisher)
-                friends.add(candidate);
+            {
+                boolean allowed = true;
+                for(NetworkPredicate predicate : predicates)
+                    allowed = allowed && predicate.test(fisher,candidate);
+                if(allowed)
+                    friends.add(candidate);
+            }
         }
         //now make them your friends!
         for(Fisher friend : friends)
@@ -115,5 +129,9 @@ public class EquidegreeBuilder implements NetworkBuilder{
     public void removeFisher(
             Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
         currentNetwork.removeVertex(toRemove);
+    }
+
+    public void addPredicate(NetworkPredicate predicate){
+        predicates.add(predicate);
     }
 }
