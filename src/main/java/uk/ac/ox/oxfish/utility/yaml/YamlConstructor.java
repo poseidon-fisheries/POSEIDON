@@ -11,10 +11,7 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.*;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
@@ -133,8 +130,14 @@ public class YamlConstructor extends  Constructor {
         if(split[0].toLowerCase().equals("normal"))
             return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
-        Preconditions.checkArgument(split[0].toLowerCase().equals("uniform"), "The parameter given is neither fixed not normal nor uniform, what is " + nodeContent + " ?");
-        return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+        if(split[0].toLowerCase().equals("uniform"))
+            return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("select"))
+            return new SelectDoubleParameter(nodeContent.trim().replace("select",""));
+
+        throw new IllegalArgumentException("Do not recognize this double parameter!");
+
     }
 
 

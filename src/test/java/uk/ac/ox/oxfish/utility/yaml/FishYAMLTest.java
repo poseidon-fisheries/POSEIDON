@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import static org.junit.Assert.assertEquals;
@@ -31,7 +32,7 @@ public class FishYAMLTest {
                         "      carryingCapacity: '14.0'\n" +
                         "      differentialPercentageToMove: '0.001'\n" +
                         "      percentageLimitOnDailyMovement: '0.01'\n" +
-                        "      steepness: 0.7\n" +
+                        "      steepness: select 0.2 0.5\n" +
                         "  departingStrategy:\n" +
                         "    Fixed Rest:\n" +
                         "      hoursBetweenEachDeparture: '12.0'\n" +
@@ -98,7 +99,9 @@ public class FishYAMLTest {
         Assert.assertTrue(factory.getCarryingCapacity() instanceof FixedDoubleParameter);
         Assert.assertEquals(((FixedDoubleParameter) factory.getCarryingCapacity()).getFixedValue(),14.0,.001);
         //reads normal doubles correctly
-        Assert.assertEquals(((FixedDoubleParameter) factory.getSteepness()).getFixedValue(), .7, .0001);
+        double[] possibleValues = ((SelectDoubleParameter) factory.getSteepness()).getPossibleValues();
+        Assert.assertEquals(possibleValues[0], .2, .0001);
+        Assert.assertEquals(possibleValues[1], .5, .0001);
         //reads anarchy factory just as well (it's a scalar algorithmFactory which is tricky)
         Assert.assertTrue(scenario.getRegulation() instanceof AnarchyFactory);
 
@@ -154,100 +157,4 @@ public class FishYAMLTest {
     }
 
 
-    @Test
-    public void mergesNicely() throws Exception {
-
-
-        String toMerge =
-                "Prototype:\n" +
-                        "  biologyInitializer:\n" +
-                        "    Diffusing Logistic:\n" +
-                        "      steepness: 0.3\n" +
-                        "  gear:\n" +
-                        "    Fixed Proportion:\n" +
-                        "      catchabilityPerHour: '0.01'";
-
-        String scenarioFile =
-                "Prototype:\n" +
-                        "  biologyInitializer:\n" +
-                        "    Diffusing Logistic:\n" +
-                        "      carryingCapacity: '14.0'\n" +
-                        "      differentialPercentageToMove: '5.0E-4'\n" +
-                        "      percentageLimitOnDailyMovement: '0.01'\n" +
-                        "      steepness: .7\n" +
-                        "  coastalRoughness: 4\n" +
-                        "  departingStrategy:\n" +
-                        "    Fixed Rest:\n" +
-                        "      hoursBetweenEachDeparture: '12.0'\n" +
-                        "  depthSmoothing: 1000000\n" +
-                        "  destinationStrategy:\n" +
-                        "    Imitator-Explorator:\n" +
-                        "      ignoreEdgeDirection: true\n" +
-                        "      probability:\n" +
-                        "        Adaptive Probability:\n" +
-                        "          explorationProbability: '0.8'\n" +
-                        "          explorationProbabilityMinimum: '0.01'\n" +
-                        "          imitationProbability: '1.0'\n" +
-                        "          incrementMultiplier: '0.02'\n" +
-                        "      stepSize: uniform 1.0 10.0\n" +
-                        "  engineWeight: normal 100.0 10.0\n" +
-                        "  fishers: 100\n" +
-                        "  fishingStrategy:\n" +
-                        "    Until Full With Day Limit:\n" +
-                        "      daysAtSea: '5.0'\n" +
-                        "  fuelTankSize: '100000.0'\n" +
-                        "  gasPricePerLiter: '0.01'\n" +
-                        "  gear:\n" +
-                        "    Random Catchability:\n" +
-                        "      meanCatchabilityFirstSpecies: '0.01'\n" +
-                        "      meanCatchabilityOtherSpecies: '0.01'\n" +
-                        "      standardDeviationCatchabilityFirstSpecies: '0.0'\n" +
-                        "      standardDeviationCatchabilityOtherSpecies: '0.0'\n" +
-                        "      trawlSpeed: '5.0'\n" +
-                        "  gridCellSizeInKm: 10.0\n" +
-                        "  habitatInitializer: All Sand\n" +
-                        "  height: 50\n" +
-                        "  holdSize: '100.0'\n" +
-                        "  literPerKilometer: '10.0'\n" +
-                        "  mapMakerDedicatedRandomSeed: null\n" +
-                        "  market:\n" +
-                        "    Fixed Price Market:\n" +
-                        "      marketPrice: '10.0'\n" +
-                        "  networkBuilder:\n" +
-                        "    Equal Out Degree:\n" +
-                        "      degree: 2\n" +
-                        "  ports: 1\n" +
-                        "  regulation: Anarchy\n" +
-                        "  speedInKmh: '5.0'\n" +
-                        "  usePredictors: false\n" +
-                        "  weatherInitializer:\n" +
-                        "    Constant Weather:\n" +
-                        "      temperature: '30.0'\n" +
-                        "      windOrientation: '0.0'\n" +
-                        "      windSpeed: '0.0'\n" +
-                        "  weatherStrategy: Ignore Weather\n" +
-                        "  width: 50\n";
-
-
-
-        String merged = toMerge + "\n"  +scenarioFile;
-   //     System.out.println(merged);
-        System.out.println("=============================================");
-        FishYAML yaml = new FishYAML();
-        PrototypeScenario scenario = yaml.loadAs(merged, PrototypeScenario.class);
-
-        System.out.println(
-                yaml.dump(scenario));
-
-        //should have read the new steepness first!
-        assertEquals(
-                ((FixedDoubleParameter) ((DiffusingLogisticFactory) ( scenario).getBiologyInitializer()).getSteepness()).getFixedValue(),
-                0.3,.0001);
-            assertEquals(
-                ((FixedDoubleParameter) ((DiffusingLogisticFactory) ( scenario).getBiologyInitializer()).getCarryingCapacity()).getFixedValue(),
-                5000.0,.0001);
-
-
-        assertTrue(scenario.getGear() instanceof FixedProportionGearFactory);
-    }
 }

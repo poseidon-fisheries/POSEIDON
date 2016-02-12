@@ -23,6 +23,8 @@ public class DoubleParameters
         names.put(NormalDoubleParameter.class,"Normal");
         parameters.put("Uniform", () -> new UniformDoubleParameter(0,1));
         names.put(UniformDoubleParameter.class,"Uniform");
+        parameters.put("Select", () -> new SelectDoubleParameter("0 1"));
+        names.put(SelectDoubleParameter.class,"Select");
 
 
 

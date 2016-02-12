@@ -76,7 +76,6 @@ public class FirstPaper
         //  optimalHeuristic();
         Log.info("Hard Switch");
         //      hardSwitch();
-        osmoseHardSwitch();
         Log.info("Directed Technological Change");
         // directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
@@ -898,115 +897,6 @@ public class FirstPaper
     }
 
 
-    private static void osmoseHardSwitch() throws IOException {
 
-        Path outputPath = OUTPUT_FOLDER.resolve("osmose_switch");
-        outputPath.toFile().mkdirs();
-        //create and run
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
-                INPUT_FOLDER.resolve("osmose.yaml")));
-        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
-
-        FishState fishState = new FishState(-1);
-
-
-        //demersal 1 and demersal 2
-        int firstSpecies = 2;
-        int secondSpecies = 3;
-
-
-        //no rules
-
-
-        RandomTrawlStringFactory option1 = new RandomTrawlStringFactory();
-        option1.setCatchabilityMap(firstSpecies+":.01");
-        RandomTrawlStringFactory option2= new RandomTrawlStringFactory();
-        option2.setCatchabilityMap(secondSpecies+":.01");
-        fishState.registerStartable(new Startable() {
-                                    @Override
-                                    public void start(FishState model) {
-
-                                        for (Fisher fisher : model.getFishers()) {
-
-                                            Adaptation<Gear> trawlAdaptation =
-                                                    new Adaptation<>(
-                                                            (Predicate<Fisher>) fisher1 -> true,
-                                                            new BeamHillClimbing<Gear>() {
-                                                                @Override
-                                                                public Gear randomStep(
-                                                                        FishState state, MersenneTwisterFast random,
-                                                                        Fisher fisher,
-                                                                        Gear current) {
-                                                                    return state.random.nextBoolean() ?
-                                                                            option1.apply(state) :
-                                                                            option2.apply(state);
-                                                                }
-                                                            },
-                                                            GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR,
-                                                            fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
-                                                            new CashFlowObjective(365),
-                                                            .1, .8);
-
-                                            //tell the fisher to use this once a year
-                                            fisher.addYearlyAdaptation(trawlAdaptation);
-                                        }
-                                        model.getYearlyDataSet().registerGatherer(model.getSpecies().get(firstSpecies)+ " Catchers", state1 -> {
-                                            double size = state1.getFishers().size();
-                                            if (size == 0)
-                                                return Double.NaN;
-                                            else {
-                                                double total = 0;
-                                                for (Fisher fisher1 : state1.getFishers())
-                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[firstSpecies]
-                                                            ;
-                                                return total / .01;
-                                            }
-                                        }, Double.NaN);
-
-
-                                        model.getYearlyDataSet().registerGatherer(model.getSpecies().get(secondSpecies) + " Catchers", state1 -> {
-                                            double size = state1.getFishers().size();
-                                            if (size == 0)
-                                                return Double.NaN;
-                                            else {
-                                                double total = 0;
-                                                for (Fisher fisher1 : state1.getFishers())
-                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[secondSpecies]
-                                                            ;
-                                                return total / .01;
-                                            }
-                                        }, Double.NaN);
-
-
-                                    }
-
-                                    /**
-                                     * tell the startable to turnoff,
-                                     */
-                                    @Override
-                                    public void turnOff() {
-
-                                    }
-                                }
-        );
-
-
-
-        //now work!
-        fishState.setScenario(scenario);
-        fishState.start();
-        while(fishState.getYear() < 45)
-            fishState.schedule.step(fishState);
-
-        FishStateUtilities.printCSVColumnsToFile(outputPath.resolve("hardswitch.csv").toFile(),
-                                                 fishState.getYearlyDataSet().getColumn(fishState.getSpecies().get(firstSpecies)+ " Catchers"),
-                                                 fishState.getYearlyDataSet().getColumn(fishState.getSpecies().get(secondSpecies)+ " Catchers"),
-                                                 fishState.getYearlyDataSet().getColumn( "Biomass " + fishState.getSpecies().get(firstSpecies).getName()),
-                                                 fishState.getYearlyDataSet().getColumn( "Biomass " + fishState.getSpecies().get(secondSpecies).getName()));
-
-
-
-    }
 
 }
