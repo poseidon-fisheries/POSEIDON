@@ -43,6 +43,10 @@ public class BiologyInitializers {
                          FromLeftToRightFactory::new);
         NAMES.put(FromLeftToRightFactory.class,"From Left To Right Fixed");
 
+        CONSTRUCTORS.put("From Left To Right Logistic",
+                         FromLeftToRightLogisticFactory::new);
+        NAMES.put(FromLeftToRightLogisticFactory.class,"From Left To Right Logistic");
+
         CONSTRUCTORS.put("Random Smoothed and Fixed",
                          RandomConstantBiologyFactory::new);
         NAMES.put(RandomConstantBiologyFactory.class,"Random Smoothed and Fixed");

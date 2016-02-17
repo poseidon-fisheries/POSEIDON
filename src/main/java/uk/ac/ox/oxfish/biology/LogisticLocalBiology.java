@@ -265,4 +265,12 @@ public class LogisticLocalBiology implements LocalBiology, Steppable, Startable 
     public Double[] getCurrentBiomass() {
         return currentBiomass;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LogisticLocalBiology{");
+        sb.append("currentBiomass=").append(Arrays.toString(currentBiomass));
+        sb.append('}');
+        return sb.toString();
+    }
 }

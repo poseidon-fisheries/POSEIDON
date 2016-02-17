@@ -281,13 +281,13 @@ public class GearImitationAnalysis implements FisherStartable
                         @Override
                         public Hold randomStep(
                                 FishState state, MersenneTwisterFast random, Fisher fisher, Hold current) {
-                            return new Hold(fisher.getMaximumLoad() * (.8 + .4 * random.nextDouble()),
+                            return new Hold(fisher.getMaximumHold() * (.8 + .4 * random.nextDouble()),
                                             species);
                         }
                     }, (fisher1, change, model1) -> fisher1.changeHold(change),
                     fisher1 -> {
                         //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
-                        return new Hold(fisher1.getMaximumLoad(),species);
+                        return new Hold(fisher1.getMaximumHold(), species);
                     },new CashFlowObjective(60),.15,.6);
 
 
@@ -316,7 +316,7 @@ public class GearImitationAnalysis implements FisherStartable
                 {
                     double total = 0;
                     for(Fisher fisher : state.getFishers())
-                        total+=  fisher.getMaximumLoad();
+                        total+=  fisher.getMaximumHold();
                     return total/size;
                 }
             }

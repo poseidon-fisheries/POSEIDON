@@ -30,7 +30,7 @@ Multi-TAC:
   firstSpeciesQuota: '500000.0'
   otherSpeciesQuota: '500000.0'
 -------
-Multi-TAC:
+Multi-TAC by List:
   yearlyQuotaMaps: 0:500000
 -------
 Kitchen Sink:

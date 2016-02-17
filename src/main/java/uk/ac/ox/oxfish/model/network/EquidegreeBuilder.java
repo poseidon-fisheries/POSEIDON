@@ -22,6 +22,9 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
     private int degree = 2;
 
+    /**
+     * list of additional conditions to pass before allowing friendship
+     */
     private final LinkedList<NetworkPredicate> predicates = new LinkedList<>();
 
     /**
@@ -131,6 +134,10 @@ public class EquidegreeBuilder implements NetworkBuilder{
         currentNetwork.removeVertex(toRemove);
     }
 
+    /**
+     * adds a condition that needs to be true for two fishers to be friends.
+     * @param predicate the condition to add
+     */
     public void addPredicate(NetworkPredicate predicate){
         predicates.add(predicate);
     }

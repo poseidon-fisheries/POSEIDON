@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
@@ -53,6 +52,5 @@ public class FuelTank {
     {
         litersOfFuelInTank-=litersOfGasConsumed;
         litersOfFuelInTank = FishStateUtilities.round(litersOfFuelInTank);
-        Preconditions.checkState(litersOfFuelInTank>=0, "a boat has run into negative fuel territory");
     }
 }

@@ -369,6 +369,10 @@ public class Fisher implements Steppable, Startable{
         return equipment.getBoat();
     }
 
+    public void setHold(Hold hold) {
+        equipment.setHold(hold);
+    }
+
     /**
      * how much time it takes to travel this many kilometers
      * @param kilometersToTravel how many kilometers to move through
@@ -413,6 +417,8 @@ public class Fisher implements Steppable, Startable{
     public void consumeFuel(double litersConsumed)
     {
         equipment.getBoat().consumeFuel(litersConsumed);
+        Preconditions.checkState(equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride(),
+                                 "a boat has run into negative fuel territory");
         memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 
@@ -505,7 +511,7 @@ public class Fisher implements Steppable, Startable{
 
         if(!status.isFuelEmergencyOverride())
             status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
-                    map.distance(status.getLocation(), getHomePort().getLocation()), 1.05));
+                    map.distance(status.getLocation(), getHomePort().getLocation()), 1.2));
 
         status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(status.isWeatherEmergencyOverride(),
                                                                                       this,
@@ -615,7 +621,7 @@ public class Fisher implements Steppable, Startable{
      * how much can this fish hold
      * @return the maximum load
      */
-    public double getMaximumLoad() {
+    public double getMaximumHold() {
         return equipment.getHold().getMaximumLoad();
     }
 
@@ -1056,4 +1062,5 @@ public class Fisher implements Steppable, Startable{
                                                  state.getRandom(),
                                                  state.getFishers());
     }
+
 }

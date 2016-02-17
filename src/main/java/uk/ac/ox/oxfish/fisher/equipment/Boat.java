@@ -81,6 +81,9 @@ public class Boat {
         return hoursTravelledToday + hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(segmentLengthInKilometers);
     }
 
+    public Engine getEngine() {
+        return engine;
+    }
 
     /**
      * adds the hours spent travelling to the hoursTravelledToday
@@ -140,7 +143,7 @@ public class Boat {
     {
 
         Preconditions.checkArgument(margin >= 1);
-        return expectedFuelConsumption(lengthInKm*margin) <= tank.getLitersOfFuelInTank();
+        return expectedFuelConsumption(lengthInKm)*margin <= tank.getLitersOfFuelInTank();
 
     }
 
