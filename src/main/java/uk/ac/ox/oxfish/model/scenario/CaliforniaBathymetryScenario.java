@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -41,11 +40,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     @Override
     public ScenarioEssentials start(FishState model) {
-        NauticalMap map = NauticalMapFactory.fromBathymetryAndShapeFiles(
-                new StraightLinePathfinder(), Paths.get("inputs", "california", "california1000.asc").toString(),
-                Paths.get("inputs", "california", "cssr_mpa", "reprojected","mpa_central.shp").toString(),
-                Paths.get("inputs", "california", "ncssr_mpa", "reprojected","mpa_north.shp").toString()
-        );
+        NauticalMap map = NauticalMapFactory.readBathymetryAndLowerItsResolution(50,50,
+                                                                                 Paths.get("inputs", "california", "california_forced.asc"));
 
         final GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
 

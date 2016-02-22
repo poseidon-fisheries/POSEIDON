@@ -22,7 +22,6 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
-import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -59,16 +58,10 @@ public class NauticalMap implements Startable
      */
     private Distance distance;
 
-    /**
-     * pre-recorded distance between cell 0,0 and 1,1. Useful to compute grid distances quickly
-     */
-    private double obliqueDistanceInKm = Double.NaN;
-    /**
-     * pre-recorded distance between cell 0,0 and 0,1
-     */
-    private double horizontalVerticalDistanceInKm = Double.NaN;
 
-
+    /**
+     * the object finding a path from A to B
+     */
     private Pathfinder pathfinder;
 
 
@@ -92,16 +85,6 @@ public class NauticalMap implements Startable
      * a map holding
      */
     private IntGrid2D dailyTrawlsMap;
-
-    /**
-     * sum of heatmap values
-     */
-    private double fishingIntensity = 0;
-
-    /**
-     * todo move to parameter list
-     */
-    final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
 
 
     /**
@@ -146,22 +129,6 @@ public class NauticalMap implements Startable
     public int getWidth() {
         return rasterBathymetry.getGridWidth();
     }
-
-    /**
-     * todo move to parameter list
-     */
-    final static private String[] DEFAULT_MPA_SOURCES = {"cssr_mpa/reprojected/mpa_central.shp",
-            "ncssr_mpa/reprojected/mpa_north.shp"};
-
-
-
-
-
-    public static NauticalMap initializeWithDefaultValues()
-    {
-        return NauticalMapFactory.fromBathymetryAndShapeFiles(new StraightLinePathfinder(), DEFAULT_BATHYMETRY_SOURCE, DEFAULT_MPA_SOURCES);
-    }
-
 
 
 
@@ -298,11 +265,21 @@ public class NauticalMap implements Startable
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
-    public Coordinate coordinate(int gridX, int gridY)
+    public Coordinate getCoordinates(int gridX, int gridY)
     {
         return rasterBathymetry.toPoint(gridX,gridY).getCoordinate();
     }
 
+    public Coordinate getCoordinates(SeaTile tile)
+    {
+        return rasterBathymetry.toPoint(tile.getGridX(),tile.getGridY()).getCoordinate();
+    }
+
+    public SeaTile getSeaTile(Coordinate coordinate)
+    {
+        return getSeaTile(rasterBathymetry.toXCoord(coordinate.x),
+                          rasterBathymetry.toYCoord(coordinate.y));
+    }
 
     public GeomGridField getRasterBathymetry() {
         return rasterBathymetry;
@@ -459,10 +436,6 @@ public class NauticalMap implements Startable
 
     public IntGrid2D getDailyTrawlsMap() {
         return dailyTrawlsMap;
-    }
-
-    public double getFishingIntensity() {
-        return fishingIntensity;
     }
 
     @VisibleForTesting

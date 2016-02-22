@@ -17,8 +17,10 @@ import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,6 +32,19 @@ import java.util.function.Function;
  */
 public class NauticalMapFactory {
 
+
+
+    /**
+     * todo move to parameter list
+     */
+    final static private String DEFAULT_BATHYMETRY_SOURCE = "california1000.asc";
+
+
+    /**
+     * california MPA
+     */
+    final static private String[] DEFAULT_MPA_SOURCES = {"cssr_mpa/reprojected/mpa_central.shp",
+            "ncssr_mpa/reprojected/mpa_north.shp"};
 
     public static NauticalMap fromBathymetryAndShapeFiles(
             Pathfinder pathfinder, String bathymetryResource, String... mpaSources)
@@ -69,6 +84,62 @@ public class NauticalMapFactory {
 
 
 
+    }
+
+
+    public static NauticalMap readBathymetryAndLowerItsResolution(
+            final int gridWidth, final int gridHeight, final Path pathToBathymetryFile)
+    {
+        //read raster bathymetry
+        GeomGridField temporaryField = GISReaders.readRaster(
+                FishStateUtilities.getAbsolutePath(
+                        pathToBathymetryFile.toString()));
+        DoubleGrid2D temporaryGrid = (DoubleGrid2D)temporaryField.getGrid(); //cast cast cast. Welcome to mason
+
+        ObjectGrid2D rasterBackingGrid = new ObjectGrid2D(gridWidth, gridHeight);
+        //put a list of altitudes in each
+        for(int i=0;i<rasterBackingGrid.getWidth(); i++)
+            for(int j=0; j<rasterBackingGrid.getHeight(); j++) {
+                rasterBackingGrid.field[i][j] = new ArrayList<Double>();
+            }
+        //now from this grid create the correct bathymetry object
+        GeomGridField rasterBathymetry = new GeomGridField(rasterBackingGrid);
+        rasterBathymetry.setPixelHeight(temporaryField.getPixelHeight());
+        rasterBathymetry.setPixelWidth(temporaryField.getPixelWidth());
+        rasterBathymetry.setMBR(temporaryField.getMBR());
+
+        //put together the california map as if the original grid was made up actually by samples over the coarser
+        //grid we are making!
+        for(int i=0;i<temporaryGrid.getWidth(); i++)
+            for(int j=0; j<temporaryGrid.getHeight(); j++)
+            {
+                int gridX = rasterBathymetry.toXCoord(temporaryField.toPoint(i,j));
+                int gridY = rasterBathymetry.toYCoord(temporaryField.toPoint(i,j));
+                System.out.println(gridX+","+gridY+","+temporaryGrid.field[i][j]);
+                ((List) rasterBackingGrid.field[gridX][gridY]).add(temporaryGrid.field[i][j]);
+            }
+
+        //now turn it into seatiles
+        for(int i=0;i<rasterBackingGrid.getWidth(); i++)
+            for(int j=0; j<rasterBackingGrid.getHeight(); j++) {
+                OptionalDouble average = ((List<Double>) rasterBackingGrid.field[i][j]).stream().filter(
+                        aDouble -> aDouble > -9999).mapToDouble(value -> value).average();
+                //if there was no observation, put a mountain there!
+                double altitude = average.isPresent() ? average.getAsDouble() : 1000;
+                rasterBackingGrid.field[i][j] = new SeaTile(i,j,altitude,new TileHabitat(0));
+            }
+
+        //read in MPAs
+        GeomVectorField mpaVectorField = new GeomVectorField();
+
+        EquirectangularDistance distance = new EquirectangularDistance(temporaryField.toXCoord(0.5),
+                                                                       temporaryField.getPixelHeight());
+
+
+        NauticalMap map = new NauticalMap(rasterBathymetry, mpaVectorField, distance, new StraightLinePathfinder());
+        for(SeaTile tile : map.getAllSeaTilesAsList())
+            tile.setBiology(new EmptyLocalBiology());
+        return map;
     }
 
 

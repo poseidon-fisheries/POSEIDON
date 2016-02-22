@@ -73,7 +73,6 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }
 
 
-        registerGatherer("Total Fishing Intensity", state1 -> state1.getMap().getFishingIntensity(),Double.NaN);
 
 
         super.start(state, observed);

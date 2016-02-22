@@ -1,9 +1,11 @@
 package uk.ac.ox.oxfish.model;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
@@ -32,6 +34,16 @@ public class NauticalMapTest {
         assertEquals(map.getSeaTile(71,35).getAltitude(), 2592,.0001);
 
 
+        Coordinate coordinates = map.getCoordinates(71, 35);
+        SeaTile tile = map.getSeaTile(coordinates);
+        assertEquals(71,tile.getGridX());
+        assertEquals(35,tile.getGridY());
+
+
+        coordinates = map.getCoordinates(12, 13);
+        tile = map.getSeaTile(coordinates);
+        assertEquals(12,tile.getGridX());
+        assertEquals(13,tile.getGridY());
 
     }
 
