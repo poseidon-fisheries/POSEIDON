@@ -1,22 +1,26 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import uk.ac.ox.oxfish.biology.ConstantLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import sim.field.geo.GeomGridField;
+import sim.field.geo.GeomVectorField;
+import sim.field.grid.ObjectGrid2D;
+import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
+import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.OptionalDouble;
 
 /**
  * Reads the bathymetry file of california and for now not much else.
@@ -24,7 +28,9 @@ import java.util.Map;
  */
 public class CaliforniaBathymetryScenario implements Scenario {
 
+    private int gridHeight = 50;
     private int numberOfSpecies;
+    private int gridWidth = 50;
 
 
     public CaliforniaBathymetryScenario(int numberOfSpecies) {
@@ -40,32 +46,79 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     @Override
     public ScenarioEssentials start(FishState model) {
-        NauticalMap map = NauticalMapFactory.readBathymetryAndLowerItsResolution(50,50,
-                                                                                 Paths.get("inputs", "california", "california_forced.asc"));
 
-        final GlobalBiology biology = GlobalBiology.genericListOfSpecies(numberOfSpecies);
+        GlobalBiology biology;
+        NauticalMap map;
 
-        final HashMap<Species, String> biomassFiles = new HashMap<>();
-        biomassFiles.put(biology.getSpecie(0), FishStateUtilities.getAbsolutePath(
-                Paths.get("inputs", "california", "soletest.asc").toString()));
-        final Map<SeaTile, double[]> speciesForEachCellFromData = NauticalMapFactory.getSpeciesForEachCellFromData(
-                biomassFiles, map);
+        try {
+            SampledMap sampledMap = new SampledMap(Paths.get("inputs", "california",
+                                                             "california.csv"),
+                                                   gridWidth, gridHeight,
+                                                   Paths.get("inputs","california","biology","spatial",
+                                                             "DoverSole.csv"),
+                                                   Paths.get("inputs","california","biology","spatial",
+                                                             "Longspine.csv"),
+                                                   Paths.get("inputs","california","biology","spatial",
+                                                             "Sablefish.csv"),
+                                                   Paths.get("inputs","california","biology","spatial",
+                                                             "Shortspine.csv"),
+                                                   Paths.get("inputs","california","biology","spatial",
+                                                             "Yelloweye.csv"));
 
+            //we want a grid of numbers but we have a grid where every cell has many observations
+            ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth,gridHeight);
+            ObjectGrid2D sampledAltitudeGrid = sampledMap.getAltitudeGrid();
+            //so for altitude we just average them out
+            for(int x=0;x<gridWidth;x++)
+                for(int y=0;y<gridHeight;y++)
+                {
+                    OptionalDouble average = ((LinkedList<Double>) sampledAltitudeGrid.get(x, y)).stream().mapToDouble(
+                            value -> value).filter(
+                            aDouble -> aDouble > -9999).average();
+                    altitudeGrid.set(x, y,
+                                     new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
+                }
 
+            LinkedList<Species> species = new LinkedList<>();
+            for(String speciesName : sampledMap.getBiologyGrids().keySet())
+                species.add(new Species(speciesName));
+            biology = new GlobalBiology(species.toArray(new Species[species.size()]));
 
+            GeomGridField unitedMap = new GeomGridField(altitudeGrid);
+            unitedMap.setMBR(sampledMap.getMbr());
+            //create the map
+            map = new NauticalMap(unitedMap, new GeomVectorField(),
+                                  new CartesianDistance(1),
+                                  new StraightLinePathfinder());
+            //now add bio information to it
+            for(int x=0;x<gridWidth;x++)
+                for(int y=0;y<gridHeight;y++)
+                {
+                    SeaTile seaTile = map.getSeaTile(x, y);
+                    if(seaTile.getAltitude() < 0) {
+                        double averages[] = new double[species.size()];
+                        int i=0;
+                        for(Map.Entry<String,ObjectGrid2D> observations :  sampledMap.getBiologyGrids().entrySet()) {
+                            assert species.get(i).getName().equals(observations.getKey());
+                            OptionalDouble average = ((LinkedList<Double>) observations.getValue().get(x, y)).stream().mapToDouble(
+                                    value -> value).average();
+                            averages[i] = average.orElse(0) * 500;
+                            i++;
+                            if (average.isPresent())
+                                seaTile.setBiology(new ConstantLocalBiology(average.getAsDouble() * 500));
+                        }
+                        seaTile.setBiology(new ConstantHeterogeneousLocalBiology(averages));
+                    }
+                    else
+                        seaTile.setBiology(new EmptyLocalBiology());
+                }
 
-        for(Map.Entry<SeaTile,double[]> tile : speciesForEachCellFromData.entrySet())
-        {
-            double totalBiomass = 0;
-            for(int i=0; i<tile.getValue().length; i++)
-                totalBiomass += tile.getValue()[i];
-            assert  totalBiomass >=0;
-            if(totalBiomass > 0)
-                tile.getKey().setBiology(new ConstantLocalBiology(totalBiomass*2000));
-            else
-                tile.getKey().setBiology(new EmptyLocalBiology());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Some files were missing!");
         }
         return new ScenarioEssentials(biology,map,new MarketMap(biology));
+
     }
 
     /**
@@ -88,6 +141,42 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     public void setNumberOfSpecies(int numberOfSpecies) {
         this.numberOfSpecies = numberOfSpecies;
+    }
+
+    /**
+     * Getter for property 'gridHeight'.
+     *
+     * @return Value for property 'gridHeight'.
+     */
+    public int getGridHeight() {
+        return gridHeight;
+    }
+
+    /**
+     * Getter for property 'gridWidth'.
+     *
+     * @return Value for property 'gridWidth'.
+     */
+    public int getGridWidth() {
+        return gridWidth;
+    }
+
+    /**
+     * Setter for property 'gridWidth'.
+     *
+     * @param gridWidth Value to set for property 'gridWidth'.
+     */
+    public void setGridWidth(int gridWidth) {
+        this.gridWidth = gridWidth;
+    }
+
+    /**
+     * Setter for property 'gridHeight'.
+     *
+     * @param gridHeight Value to set for property 'gridHeight'.
+     */
+    public void setGridHeight(int gridHeight) {
+        this.gridHeight = gridHeight;
     }
 }
 

@@ -95,7 +95,6 @@ public class NauticalMapFactory {
                 FishStateUtilities.getAbsolutePath(
                         pathToBathymetryFile.toString()));
         DoubleGrid2D temporaryGrid = (DoubleGrid2D)temporaryField.getGrid(); //cast cast cast. Welcome to mason
-
         ObjectGrid2D rasterBackingGrid = new ObjectGrid2D(gridWidth, gridHeight);
         //put a list of altitudes in each
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
@@ -107,6 +106,7 @@ public class NauticalMapFactory {
         rasterBathymetry.setPixelHeight(temporaryField.getPixelHeight());
         rasterBathymetry.setPixelWidth(temporaryField.getPixelWidth());
         rasterBathymetry.setMBR(temporaryField.getMBR());
+
 
         //put together the california map as if the original grid was made up actually by samples over the coarser
         //grid we are making!
@@ -120,12 +120,12 @@ public class NauticalMapFactory {
             }
 
         //now turn it into seatiles
-        for(int i=0;i<rasterBackingGrid.getWidth(); i++)
-            for(int j=0; j<rasterBackingGrid.getHeight(); j++) {
+        for(int i=0;i<gridWidth; i++)
+            for(int j=0; j<gridHeight; j++) {
                 OptionalDouble average = ((List<Double>) rasterBackingGrid.field[i][j]).stream().filter(
                         aDouble -> aDouble > -9999).mapToDouble(value -> value).average();
                 //if there was no observation, put a mountain there!
-                double altitude = average.isPresent() ? average.getAsDouble() : 1000;
+                double altitude = average.isPresent() ? average.getAsDouble() : -1000;
                 rasterBackingGrid.field[i][j] = new SeaTile(i,j,altitude,new TileHabitat(0));
             }
 
