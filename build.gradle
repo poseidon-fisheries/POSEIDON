@@ -125,7 +125,7 @@ task buildSampleFiles(type: JavaExec){
 def getDate() {
     if(ext.date==null) {
         def date = new Date()
-        def formattedDate = date.format('yyyy-MM-dd=HH:mm:ss')
+        def formattedDate = date.format('yyyy-MM-dd=HH-mm-ss')
         ext.date = formattedDate.toString()
     }
     return ext.date
