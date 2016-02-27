@@ -1,0 +1,48 @@
+# Annual F
+mortality.fishing.rate.sp0;0.18
+mortality.fishing.rate.sp1;0
+mortality.fishing.rate.sp2;0.35
+mortality.fishing.rate.sp3;0.15
+mortality.fishing.rate.sp4;0.05
+mortality.fishing.rate.sp5;0.00108
+mortality.fishing.rate.sp6;0.092
+mortality.fishing.rate.sp7;0.38
+mortality.fishing.rate.sp8;0.13
+mortality.fishing.rate.sp9;0.22
+
+# Recruitment age (year)
+mortality.fishing.recruitment.age.sp0;1
+mortality.fishing.recruitment.age.sp1;1
+mortality.fishing.recruitment.age.sp2;3
+mortality.fishing.recruitment.age.sp3;3
+mortality.fishing.recruitment.age.sp4;2
+mortality.fishing.recruitment.age.sp5;1
+mortality.fishing.recruitment.age.sp6;1
+mortality.fishing.recruitment.age.sp7;1
+mortality.fishing.recruitment.age.sp8;1
+mortality.fishing.recruitment.age.sp9;3
+
+# Recruitment size (cm)
+mortality.fishing.recruitment.size.sp0;null
+mortality.fishing.recruitment.size.sp1;null
+mortality.fishing.recruitment.size.sp2;null
+mortality.fishing.recruitment.size.sp3;null
+mortality.fishing.recruitment.size.sp4;null
+mortality.fishing.recruitment.size.sp5;null
+mortality.fishing.recruitment.size.sp6;null
+mortality.fishing.recruitment.size.sp7;null
+mortality.fishing.recruitment.size.sp8;null
+mortality.fishing.recruitment.size.sp9;null
+
+# Seasonality
+mortality.fishing.season.distrib.file.sp0;fishing/fishing-seasonality-smallpelagic1.csv
+mortality.fishing.season.distrib.file.sp1;fishing/fishing-seasonality-macrozooplankton.csv
+mortality.fishing.season.distrib.file.sp2;fishing/fishing-seasonality-demersal1.csv
+mortality.fishing.season.distrib.file.sp3;fishing/fishing-seasonality-demersal2.csv
+mortality.fishing.season.distrib.file.sp4;fishing/fishing-seasonality-demersal3.csv
+mortality.fishing.season.distrib.file.sp5;fishing/fishing-seasonality-mesopelagic.csv
+mortality.fishing.season.distrib.file.sp6;fishing/fishing-seasonality-smallpelagic2.csv
+mortality.fishing.season.distrib.file.sp7;fishing/fishing-seasonality-smallpelagic3.csv
+mortality.fishing.season.distrib.file.sp8;fishing/fishing-seasonality-largepelagic1.csv
+mortality.fishing.season.distrib.file.sp9;fishing/fishing-seasonality-largepelagic2.csv
+
