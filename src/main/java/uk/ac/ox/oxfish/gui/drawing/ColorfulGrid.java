@@ -65,8 +65,6 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
                 seaTile -> seaTile.getAltitude() >=0 ? Double.NaN : seaTile.getRockyPercentage(),
                 true));
 
-
-
         setSelectedEncoding("Depth");
 
         defaultFishColors.add(Color.RED);
@@ -120,7 +118,10 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         this.setMap(selected.getMap());
         this.setImmutableField(selected.isImmutable());
 
+
     }
+
+
 
 
     @Override
@@ -131,4 +132,5 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
             return new MetaInspector(wrapper.getObject(), ((FishGUI) state));
         }
     }
+
 }

@@ -39,25 +39,33 @@ public class SampledMap
     private final Envelope mbr;
 
 
+    private final int gridWith;
+
+    private final int gridHeight;
+
     /**
      * reads and combines the various map files. The envelope of the map is given by the size of the first biologyFile
      * and all the other maps are cropped to fit it
      * @param bathymetryFile bathymetry file
      * @param gridWidth width of the gridded maps
-     * @param gridHeight height of the gridded maps
      * @param biologyFiles a list of biology files
      */
     public SampledMap(
             Path bathymetryFile,
-            int gridWidth, int gridHeight,
+            int gridWidth,
             Path... biologyFiles) throws IOException {
 
         Preconditions.checkArgument(biologyFiles.length > 0);
-
+        gridWith = gridWidth;
         //read the first biological file
         GeographicalSample biologySample = new GeographicalSample(biologyFiles[0],true);
         mbr = new Envelope(biologySample.getMinEasting(), biologySample.getMaxEasting(),
                            biologySample.getMinNorthing(), biologySample.getMaxNorthing());
+        //find ratio height to width
+        double heightToWidth = mbr.getHeight()/mbr.getWidth();
+        gridHeight = (int) Math.round(gridWidth * heightToWidth);
+
+
         ObjectGrid2D backingBioGrid = new ObjectGrid2D(gridWidth,gridHeight);
         GeomGridField bioGrid = new GeomGridField(backingBioGrid);
         bioGrid.setMBR(mbr);
@@ -126,5 +134,23 @@ public class SampledMap
 
     public Envelope getMbr() {
         return mbr;
+    }
+
+    /**
+     * Getter for property 'gridWith'.
+     *
+     * @return Value for property 'gridWith'.
+     */
+    public int getGridWith() {
+        return gridWith;
+    }
+
+    /**
+     * Getter for property 'gridHeight'.
+     *
+     * @return Value for property 'gridHeight'.
+     */
+    public int getGridHeight() {
+        return gridHeight;
     }
 }

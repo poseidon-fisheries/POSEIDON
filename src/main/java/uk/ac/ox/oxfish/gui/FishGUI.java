@@ -37,8 +37,7 @@ import java.util.LinkedList;
  */
 public class FishGUI extends GUIState{
 
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
+    public static final int MIN_DIMENSION = 600;
     private Display2D display2D;
     private JFrame displayFrame;
 
@@ -94,9 +93,6 @@ public class FishGUI extends GUIState{
     public void init(Controller controller) {
         super.init(controller);
 
-
-        //create the display2d
-        display2D = new Display2D(WIDTH, HEIGHT,this);
 
 
 
@@ -191,6 +187,26 @@ public class FishGUI extends GUIState{
             }
         });
 
+
+
+        //now deal with display2d
+        //change width and height to keep correct geographical ratio
+        double width;
+        double height;
+        double heightToWidthRatio = state.getRasterBathymetry().getGridHeight()/state.getRasterBathymetry().getGridWidth();
+        if(heightToWidthRatio >= 1)
+        {
+            width = MIN_DIMENSION;
+            height = MIN_DIMENSION * heightToWidthRatio;
+        }
+        else
+        {
+            width = MIN_DIMENSION / heightToWidthRatio;
+            height = MIN_DIMENSION;
+        }
+        display2D = new Display2D(width, height,this);
+
+
         ((JComponent) display2D.getComponent(0)).add(
                 new ColorfulGridSwitcher(myPortrayal,state.getBiology(), display2D));
         display2D.reset();
@@ -276,6 +292,11 @@ public class FishGUI extends GUIState{
         display2D.attach(trails, "Boat Trails");
         display2D.attach(boats, "Boats");
         display2D.attach(ports, "Ports");
+
+
+
+
+
         displayFrame = display2D.createFrame();
         controller.registerFrame(displayFrame);
         displayFrame.setVisible(true);

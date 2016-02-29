@@ -28,7 +28,6 @@ import java.util.OptionalDouble;
  */
 public class CaliforniaBathymetryScenario implements Scenario {
 
-    private int gridHeight = 50;
     private int numberOfSpecies;
     private int gridWidth = 50;
 
@@ -53,7 +52,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
         try {
             SampledMap sampledMap = new SampledMap(Paths.get("inputs", "california",
                                                              "california.csv"),
-                                                   gridWidth, gridHeight,
+                                                   gridWidth,
                                                    Paths.get("inputs","california","biology","spatial",
                                                              "DoverSole.csv"),
                                                    Paths.get("inputs","california","biology","spatial",
@@ -66,7 +65,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                              "Yelloweye.csv"));
 
             //we want a grid of numbers but we have a grid where every cell has many observations
-            ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth,gridHeight);
+            int gridHeight = sampledMap.getGridHeight();
+            ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth, gridHeight);
             ObjectGrid2D sampledAltitudeGrid = sampledMap.getAltitudeGrid();
             //so for altitude we just average them out
             for(int x=0;x<gridWidth;x++)
@@ -117,6 +117,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
             e.printStackTrace();
             throw new RuntimeException("Some files were missing!");
         }
+
+        System.out.println("height: " +map.getHeight());
         return new ScenarioEssentials(biology,map,new MarketMap(biology));
 
     }
@@ -143,14 +145,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.numberOfSpecies = numberOfSpecies;
     }
 
-    /**
-     * Getter for property 'gridHeight'.
-     *
-     * @return Value for property 'gridHeight'.
-     */
-    public int getGridHeight() {
-        return gridHeight;
-    }
 
     /**
      * Getter for property 'gridWidth'.
@@ -170,14 +164,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.gridWidth = gridWidth;
     }
 
-    /**
-     * Setter for property 'gridHeight'.
-     *
-     * @param gridHeight Value to set for property 'gridHeight'.
-     */
-    public void setGridHeight(int gridHeight) {
-        this.gridHeight = gridHeight;
-    }
+
 }
 
 
