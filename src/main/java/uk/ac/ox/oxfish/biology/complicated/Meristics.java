@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.biology;
+package uk.ac.ox.oxfish.biology.complicated;
 
 /**
  * A container for species' parameters and computed arrays of weights, lengths, relativeFecundity and so on
@@ -163,6 +163,11 @@ public class Meristics
      */
     private final double phi[];
 
+    /**
+     * the total phi
+     */
+    private double cumulativePhi = 0d;
+
 
 
     public Meristics(
@@ -225,11 +230,16 @@ public class Meristics
         {
 
             maturity[age] = 1d/(1+Math.exp(maturitySlope*(lengthFemaleInCm[age]-maturityInflection)));
-            relativeFecundity[age] = (fecundityIntercept + fecunditySlope*weightFemaleInKg[age]);
+            relativeFecundity[age] = weightFemaleInKg[age]*(fecundityIntercept + fecunditySlope*weightFemaleInKg[age]);
             cumulativeSurvivalMale[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMMale)*cumulativeSurvivalMale[age-1];
             cumulativeSurvivalFemale[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMFemale)*cumulativeSurvivalFemale[age-1];
-            phi[age] =  maturity[age] * relativeFecundity[age] * cumulativeSurvivalMale[age];
+            double thisPhi = maturity[age] * relativeFecundity[age] * cumulativeSurvivalFemale[age];
+            phi[age] = thisPhi;
+            cumulativePhi += thisPhi;
+            assert  cumulativePhi >= 0;
+
         }
+
 
 
 
@@ -514,5 +524,15 @@ public class Meristics
      */
     public double getFecunditySlope() {
         return fecunditySlope;
+    }
+
+
+    /**
+     * Getter for property 'cumulativePhi'.
+     *
+     * @return Value for property 'cumulativePhi'.
+     */
+    public double getCumulativePhi() {
+        return cumulativePhi;
     }
 }

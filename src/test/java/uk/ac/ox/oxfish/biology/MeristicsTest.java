@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,18 +15,18 @@ public class MeristicsTest {
     public void yelloweye() throws Exception {
 
 
-        Meristics yellowEye = new Meristics(70,1,18.717,64.594,0.047,0.000017,3.03,0.045,
-                                            70,1,18.717,62.265,0.047,0.00000977,3.17,0.046,
-                                            38.78,-0.437,137900,36500);
+        Meristics yellowEye = new Meristics(70, 1, 18.717, 64.594, 0.047, 0.000017, 3.03, 0.045,
+                                            70, 1, 18.717, 62.265, 0.047, 0.00000977, 3.17, 0.046,
+                                            38.78, -0.437, 137900, 36500);
 
         //see if age 5 was computed correctly
         assertEquals(yellowEye.getLengthFemaleInCm()[5],26.4837518217,.001);
         //todo ask steve about these numbers:
-       // assertEquals(yellowEye.getLengthMaleInCm()[5],28.9073864644,.001);
+        assertEquals(yellowEye.getLengthMaleInCm()[5],26.8991271545,.001);
 
         assertEquals(yellowEye.getWeightFemaleInKg()[5],0.3167667645,.001);
         //todo ask steve about these numbers
-        //assertEquals(yellowEye.getWeightMaleInKg()[5],0.4542612295,.001);
+        assertEquals(yellowEye.getWeightMaleInKg()[5],0.365220907,.001);
 
         assertEquals(yellowEye.getMaturity()[5],0.0046166415,.0001);
         //todo ask steve about these numbers:
@@ -52,8 +53,9 @@ public class MeristicsTest {
         assertEquals(shortspine.getWeightMaleInKg()[5],0.0130770514,.001);
 
         assertEquals(shortspine.getMaturity()[5],1.32298987179355E-07,.0001);
-        assertEquals(shortspine.getRelativeFecundity()[5], 1, .001);
-        assertEquals(shortspine.getPhi()[5],1.08100831396146E-07,.001);
+        //todo correct typo
+     //   assertEquals(shortspine.getRelativeFecundity()[5], 1, .001);
+     //   assertEquals(shortspine.getPhi()[5],1.08100831396146E-07,.001);
 
     }
 
@@ -73,9 +75,13 @@ public class MeristicsTest {
         assertEquals(longspine.getWeightMaleInKg()[5],0.019880139,.001);
 
         assertEquals(longspine.getMaturity()[5],6.03332555676691E-05,.0001);
-        assertEquals(longspine.getRelativeFecundity()[5], 1, .001);
+        assertEquals(longspine.getRelativeFecundity()[5], 0.019880139, .001);
         assertEquals(longspine.getCumulativeSurvivalMale()[5], 0.5731745408, .001);
         assertEquals(longspine.getPhi()[5],3.45814860523815E-05,.001);
+
+        //todo check correct Phi
+
+    //    assertEquals(longspine.getCumulativePhi(),0.5547290727,.001);
 
     }
 
@@ -95,10 +101,9 @@ public class MeristicsTest {
         assertEquals(sablefish.getWeightMaleInKg()[5],1.3559663707,.001);
 
         assertEquals(sablefish.getMaturity()[5],0.4207762664,.0001);
-        assertEquals(sablefish.getRelativeFecundity()[5], 1, .001);
-        //todo ask steve since sablefish excel sheet starts at age 1 rather than 0
-      //  assertEquals(sablefish.getCumulativeSurvivalFemale()[5],0.7261490371,.001);
-       // assertEquals(sablefish.getPhi()[5],0.3055462806,.001);
+        assertEquals(sablefish.getRelativeFecundity()[5], 1.7258103959, .001);
+        assertEquals(sablefish.getCumulativeSurvivalFemale()[5],0.670320046,.001);
+        assertEquals(sablefish.getPhi()[5],0.4867730478,.001);
 
     }
 
@@ -119,10 +124,12 @@ public class MeristicsTest {
         assertEquals(sole.getWeightMaleInKg()[5],0.120103947,.001);
 
         assertEquals(sole.getMaturity()[5],0.0002945897,.0001);
-        //todo check this  since sole excel sheet starts at age 1 rather than 0
-        //assertEquals(sole.getRelativeFecundity()[5], 1, .001);
-        //assertEquals(sole.getCumulativeSurvivalMale()[5], 0.627507284, .001);
-        //assertEquals(sole.getPhi()[5],2.30213887774956E-05,.001);
+
+        assertEquals(sole.getRelativeFecundity()[5], 0.124536091, .001);
+        assertEquals(sole.getCumulativeSurvivalFemale()[5],0.5585003689, .001);
+        assertEquals(sole.getPhi()[5],2.04897288861722E-05,.001);
+
+        //assertEquals(sole.getCumulativePhi(),2.3584385374,.001);
 
     }
 
@@ -131,7 +138,7 @@ public class MeristicsTest {
     public void canaryRockfish() throws Exception {
 
 
-        Meristics canary = new Meristics(20,1,52.53,8.04,0.16,1.55E-05,3.03,0.06,
+        Meristics canary = new Meristics(20,1,8.04,52.53,0.16,1.55E-05,3.03,0.06,
                                          20,1,8.04,60.36,0.125,1.55E-05,3.03,0.06,
                                          40.5,-0.25,1,0);
 
@@ -140,14 +147,15 @@ public class MeristicsTest {
         assertEquals(canary.getWeightFemaleInKg()[5],0.4988476814,.001);
 
         //todo ask to steve for discrepancy
-        //assertEquals(canary.getLengthMaleInCm()[5],24.3479116018,.001);
-        //assertEquals(canary.getWeightMaleInKg()[5],0.2462128406,.001);
+        assertEquals(canary.getLengthMaleInCm()[5],30.1273037904,.001);
+        assertEquals(canary.getWeightMaleInKg()[5],0.4694413124,.001);
 
         assertEquals(canary.getMaturity()[5],0.0801270824,.0001);
-        assertEquals(canary.getRelativeFecundity()[5], 1, .001);
+       // assertEquals(canary.getRelativeFecundity()[5], 1, .001);
         assertEquals(canary.getCumulativeSurvivalFemale()[5], 0.7408182207, .001);
         assertEquals(canary.getPhi()[5],0.0593596026
                 ,.001);
 
+      //  assertEquals(canary.getCumulativePhi(),8.9617085111,.001);
     }
 }
