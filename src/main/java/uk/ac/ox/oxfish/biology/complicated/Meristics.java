@@ -207,6 +207,9 @@ public class Meristics
         {
             lengthFemaleInCm[age] = LengthParameterFemale + ((youngLengthFemale -LengthParameterFemale))*
                     Math.exp(-KParameterFemale*(age- youngAgeFemale));
+            //the formulas lead to negative lenghts for very small fish, here we just round it to 0
+            if(lengthFemaleInCm[age]<0)
+                lengthFemaleInCm[age]=0;
             weightFemaleInKg[age] = weightParameterAFemale * Math.pow(lengthFemaleInCm[age],weightParameterBFemale);
 
         }
@@ -216,6 +219,8 @@ public class Meristics
         {
             lengthMaleInCm[age] = LengthParameterMale + ((youngLengthMale- LengthParameterMale))*
                     Math.exp(-KParameterMale*(age- youngAgeMale));
+            if(lengthMaleInCm[age]<0)
+                lengthMaleInCm[age]=0;
             weightMaleInKg[age] = weightParameterAMale * Math.pow(lengthMaleInCm[age],weightParameterBMale);
 
         }

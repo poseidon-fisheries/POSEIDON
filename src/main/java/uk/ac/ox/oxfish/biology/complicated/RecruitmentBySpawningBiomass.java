@@ -19,10 +19,18 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      */
     private final double steepness;
 
+    /**
+     * if true the spawning biomass counts relative fecundity (this is true for yelloweye rockfish)
+     */
+    private final boolean addRelativeFecundityToSpawningBiomass;
 
-    public RecruitmentBySpawningBiomass(int virginRecruits, double steepness) {
+
+    public RecruitmentBySpawningBiomass(int virginRecruits,
+                                        double steepness,
+                                        boolean addRelativeFecundityToSpawningBiomass) {
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
+        this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
     }
 
     /**
@@ -48,14 +56,20 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
         for(int i=0; i< cohorts; i++)
         {
             if(meristics.getWeightFemaleInKg()[i] > 0)
-                spawningBiomass += meristics.getWeightFemaleInKg()[i] * meristics.getMaturity()[i] * femalePerAge[i];
+                if(!addRelativeFecundityToSpawningBiomass)
+                    spawningBiomass += meristics.getWeightFemaleInKg()[i] * meristics.getMaturity()[i] * femalePerAge[i];
+                else
+                    spawningBiomass += meristics.getWeightFemaleInKg()[i] * meristics.getMaturity()[i] * femalePerAge[i];
+
         }
 
         //turn it into recruits.
         return
-                (int) ((4 * steepness * virginRecruits * spawningBiomass)/
-                                ((virginRecruits*meristics.getCumulativePhi()*(1-steepness)) +
-                                        (((5*steepness)-1)*spawningBiomass)));
+                (int) (
+                        (4 * steepness * virginRecruits * spawningBiomass)/
+                        ((virginRecruits*meristics.getCumulativePhi()*(1-steepness)) +
+                                (((5*steepness)-1)*spawningBiomass))
+                );
 
 
 

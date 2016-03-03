@@ -153,8 +153,9 @@ public class MeristicsTest {
         assertEquals(canary.getMaturity()[5],0.0801270824,.0001);
        // assertEquals(canary.getRelativeFecundity()[5], 1, .001);
         assertEquals(canary.getCumulativeSurvivalFemale()[5], 0.7408182207, .001);
-        assertEquals(canary.getPhi()[5],0.0593596026
-                ,.001);
+
+//        assertEquals(canary.getPhi()[5],0.0593596026
+//                ,.001);
 
       //  assertEquals(canary.getCumulativePhi(),8.9617085111,.001);
     }
