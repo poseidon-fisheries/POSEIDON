@@ -42,7 +42,7 @@ public class OsmoseStepper implements Startable,Steppable{
 
     private double stepsLeft = 0;
 
-    private final LinkedList<LocalOsmoseBiology> toReset = new LinkedList<>();
+    private final LinkedList<LocalOsmoseByBiomassBiology> toReset = new LinkedList<>();
 
     /**
      * the stoppable receipt
@@ -92,7 +92,7 @@ public class OsmoseStepper implements Startable,Steppable{
             Log.trace("OSMOSE step!");
             osmoseSimulation.oneStep();
             stepsLeft=stepRatio; //reset
-            toReset.forEach(LocalOsmoseBiology::osmoseStep);
+            toReset.forEach(LocalOsmoseByBiomassBiology::osmoseStep);
         }
 
 
@@ -115,7 +115,7 @@ public class OsmoseStepper implements Startable,Steppable{
         return stepsPerYearInFishState;
     }
 
-    public LinkedList<LocalOsmoseBiology> getToReset() {
+    public LinkedList<LocalOsmoseByBiomassBiology> getToReset() {
         return toReset;
     }
 }

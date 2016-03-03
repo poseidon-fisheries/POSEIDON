@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.biology.OsmoseGlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseBiology;
+import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseByBiomassBiology;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -74,11 +74,11 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
         final int x = seaTile.getGridX();
         final int y = seaTile.getGridY();
 
-        final LocalOsmoseBiology local =
-                new LocalOsmoseBiology(simulation.getMortality(),
-                                       simulation.getCounter().getBiomass(x, height-y-1),
-                                       simulation.getNumberOfSpecies(),
-                                       random
+        final LocalOsmoseByBiomassBiology local =
+                new LocalOsmoseByBiomassBiology(simulation.getMortality(),
+                                                simulation.getCounter().getBiomass(x, height-y-1),
+                                                simulation.getNumberOfSpecies(),
+                                                random
                 );
         ((OsmoseGlobalBiology) biology).getStepper().getToReset().add(local);
 

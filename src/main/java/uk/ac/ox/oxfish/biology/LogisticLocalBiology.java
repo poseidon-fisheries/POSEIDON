@@ -17,7 +17,7 @@ import java.util.Arrays;
  * each year through logistic regression. There is no link/movement to other biologies.
  * Created by carrknight on 5/8/15.
  */
-public class LogisticLocalBiology implements LocalBiology, Steppable, Startable {
+public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements Steppable, Startable {
 
     /**
      * the current amount of biomass in this spot

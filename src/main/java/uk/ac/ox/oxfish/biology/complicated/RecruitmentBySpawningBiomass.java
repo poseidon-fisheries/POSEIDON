@@ -55,11 +55,14 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
         //compute the cumulative spawning biomass
         for(int i=0; i< cohorts; i++)
         {
-            if(meristics.getWeightFemaleInKg()[i] > 0)
+            if(meristics.getWeightFemaleInKg().get(i) > 0)
                 if(!addRelativeFecundityToSpawningBiomass)
-                    spawningBiomass += meristics.getWeightFemaleInKg()[i] * meristics.getMaturity()[i] * femalePerAge[i];
+                    spawningBiomass += meristics.getWeightFemaleInKg().get(i) *
+                            meristics.getMaturity().get(i) * femalePerAge[i];
                 else
-                    spawningBiomass += meristics.getWeightFemaleInKg()[i] * meristics.getMaturity()[i] * femalePerAge[i];
+                    spawningBiomass += meristics.getWeightFemaleInKg().get(i) *
+                            meristics.getMaturity().get(i) * femalePerAge[i]
+                            *  meristics.getRelativeFecundity().get(i);
 
         }
 

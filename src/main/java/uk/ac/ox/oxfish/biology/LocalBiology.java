@@ -22,14 +22,43 @@ public interface LocalBiology extends Startable
      */
     Double getBiomass(Species species);
 
-
-
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
      * @param species the species fished
      * @param biomassFished the biomass fished
      */
     void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished);
+
+    /**
+     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
+     * location
+     * @param species the species fished
+     * @param maleCatches the biomass fished
+     * @param femaleCatches
+     */
+    void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches);
+
+    /**
+     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
+     * @param species the species examined
+     * @return the male fish array.
+     */
+    int[] getNumberOfMaleFishPerAge(Species species);
+
+    /**
+     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
+     * @param species the species examined
+     * @return the female fish array.
+     */
+    int[] getNumberOfFemaleFishPerAge(Species species);
+
+    /**
+     * returns the number of fish in this seatile belonging to this species, split into age cohorts
+     * @param species the species examined
+     * @return the fish array.
+     */
+    int[] getNumberOfFishPerAge(Species species);
+
 
 
 }

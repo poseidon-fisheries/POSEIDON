@@ -3,10 +3,12 @@ package uk.ac.ox.oxfish.biology;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * This local biology has the same fixed biomass for each specie . It never gets ruined by fishing and is the same for any specie
+ * This local biology has the same fixed biomass for each specie . It never gets ruined by fishing and is the same for any specie.
+ * It doesn't represent realistically the number of fish present, rather it just divides the biomass by weight of fish
+ * at age 0 and assumes there are that many fish at age 0
  * Created by carrknight on 4/11/15.
  */
-public class ConstantLocalBiology implements LocalBiology {
+public class ConstantLocalBiology extends AbstractBiomassBasedBiology {
 
     final private Double fixedBiomass;
 
@@ -52,4 +54,6 @@ public class ConstantLocalBiology implements LocalBiology {
     public void turnOff() {
 
     }
+
+
 }

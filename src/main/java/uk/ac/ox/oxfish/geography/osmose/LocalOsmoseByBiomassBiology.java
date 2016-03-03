@@ -5,7 +5,7 @@ import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.School;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
-import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.AbstractBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -16,7 +16,7 @@ import java.util.*;
  * The local biology object that links up with the OSMOSE cell
  * Created by carrknight on 6/25/15.
  */
-public class LocalOsmoseBiology implements LocalBiology
+public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
 {
 
     private final CellBiomass counter;
@@ -29,7 +29,7 @@ public class LocalOsmoseBiology implements LocalBiology
 
     private final MersenneTwisterFast random;
 
-    public LocalOsmoseBiology(
+    public LocalOsmoseByBiomassBiology(
             ExogenousMortality mortality, CellBiomass counter,
             int numberOfSpecies, MersenneTwisterFast random)
     {

@@ -32,6 +32,43 @@ public class EmptyLocalBiology implements LocalBiology
     }
 
     /**
+     * Empty array
+     */
+    @Override
+    public int[] getNumberOfMaleFishPerAge(Species species) {
+        return new int[0];
+    }
+
+    /**
+     * Empty array
+     */
+    @Override
+    public int[] getNumberOfFemaleFishPerAge(Species species) {
+        return new int[0];
+    }
+
+    /**
+     * Empty array
+     */
+    @Override
+    public int[] getNumberOfFishPerAge(Species species) {
+        return new int[0];
+    }
+
+
+    /**
+     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
+     * location
+     *  @param species the species fished
+     * @param maleCatches the biomass fished
+     * @param femaleCatches
+     */
+    @Override
+    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
+        throw new IllegalStateException("It's impossible to catch fish in the empty biology");
+    }
+
+    /**
      * ignored
      */
     @Override

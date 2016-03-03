@@ -15,7 +15,8 @@ import uk.ac.ox.oxfish.model.StepOrder;
  *
  * Created by carrknight on 10/19/15.
  */
-public class SingleSpecieLogisticDelayGrowthBiology implements LocalBiology, Steppable, Startable
+public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBasedBiology
+        implements Steppable, Startable
 {
 
     /**

@@ -45,10 +45,10 @@ public class OsmoseMapMaker{
                 final SeaTile seaTile = cell.isLand() ?
                         new SeaTile(x, y, 200, new TileHabitat(0d)) :
                         new SeaTile(x, y, -200, new TileHabitat(0d));
-                final LocalOsmoseBiology biology = new LocalOsmoseBiology(simulation.getMortality(),
-                                                                          simulation.getCounter().getBiomass(x, height-y-1),
-                                                                          simulation.getNumberOfSpecies(),
-                                                                          random
+                final LocalOsmoseByBiomassBiology biology = new LocalOsmoseByBiomassBiology(simulation.getMortality(),
+                                                                                            simulation.getCounter().getBiomass(x, height-y-1),
+                                                                                            simulation.getNumberOfSpecies(),
+                                                                                            random
                                                                           );
                 stepper.getToReset().add(biology);
                 seaTile.setBiology(biology);

@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * total biomass even after being fished out
  * Created by carrknight on 5/6/15.
  */
-public class ConstantHeterogeneousLocalBiology implements LocalBiology {
+public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiology {
 
     private final double[] biomasses;
 
