@@ -29,8 +29,8 @@ public class NaturalMortalityProcessTest {
         assertEquals(male[1],9048);
         assertEquals(male[2],9048);
 
-        assertEquals(female[0], 4093);
-        assertEquals(female[1],3274);
+        assertEquals(female[0], 4094);
+        assertEquals(female[1],3275);
         assertEquals(female[2],2456);
 
 

@@ -45,7 +45,7 @@ public class DemographyDemo {
                 226755,196797,170796,128829,111809,97037,84216,73090,63433,55053,47779,41467,35988,18364};
 
         assert maleData.length == femaleData.length;
-        assert sole.getMaxAge() == maleData.length;
+        assert sole.getMaxAge()+1 == maleData.length;
 
         //recruitment takes n+2 years so we need some form of queue to contain it
         Queue<Integer> recruits = new LinkedList<>();

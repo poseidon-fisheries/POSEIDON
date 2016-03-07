@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.esotericsoftware.minlog.Log;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -22,10 +23,17 @@ import static org.mockito.Mockito.when;
  */
 public class ReplicateDemographyDemo {
 
+    @BeforeClass
+    public static void setUp() throws Exception {
+        if(!Files.exists(Paths.get("runs", "demography", "demography.csv")))
+            DemographyDemo.main(new String[0]);
+
+
+    }
+
     @Test
     public void replicateDemograph() throws Exception {
         Log.info("This demo tries to copy precisely the demo and csvs created by the Demography Demo, which is called at the beginning of the test");
-        DemographyDemo.main(new String[0]);
         final long startTime = System.currentTimeMillis();
 
         //Take DoverSole
@@ -53,7 +61,7 @@ public class ReplicateDemographyDemo {
                 226755,196797,170796,128829,111809,97037,84216,73090,63433,55053,47779,41467,35988,18364};
 
         assert maleData.length == femaleData.length;
-        assert sole.getMaxAge() == maleData.length;
+        assert sole.getMaxAge()+1 == maleData.length;
 
         AbundanceBasedLocalBiology biology = new AbundanceBasedLocalBiology(new GlobalBiology(species));
         for(int age=0; age<femaleData.length; age++)
@@ -107,7 +115,6 @@ public class ReplicateDemographyDemo {
     public void replicateDemographSplitInTwo() throws Exception {
         Log.info("This demo tries to copy precisely the demo and csvs created by the Demography Demo but only after splitting" +
                          "the world into 2 separate tiles (while the original demo has no geography)");
-        DemographyDemo.main(new String[0]);
         final long startTime = System.currentTimeMillis();
 
         //Take DoverSole
@@ -135,7 +142,7 @@ public class ReplicateDemographyDemo {
                 226755,196797,170796,128829,111809,97037,84216,73090,63433,55053,47779,41467,35988,18364};
 
         assert maleData.length == femaleData.length;
-        assert sole.getMaxAge() == maleData.length;
+        assert sole.getMaxAge()+1 == maleData.length;
 
         AbundanceBasedLocalBiology biology1 = new AbundanceBasedLocalBiology(new GlobalBiology(species));
         AbundanceBasedLocalBiology biology2 = new AbundanceBasedLocalBiology(new GlobalBiology(species));
