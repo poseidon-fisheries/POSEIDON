@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * Created by carrknight on 3/1/16.
@@ -48,7 +49,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     {
 
         //you need to sum up the spawning biomass of the fish:
-        int cohorts = meristics.getMaxAgeFemale() + 1;
+        int cohorts = meristics.getMaxAge() + 1;
         Preconditions.checkArgument(femalePerAge.length == cohorts,
                                     "The number of cohorts is not equal to maxAge + 1");
         double spawningBiomass = 0;
@@ -68,7 +69,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
 
         //turn it into recruits.
         return
-                (int) (
+                (int) FishStateUtilities.round(
                         (4 * steepness * virginRecruits * spawningBiomass)/
                         ((virginRecruits*meristics.getCumulativePhi()*(1-steepness)) +
                                 (((5*steepness)-1)*spawningBiomass))

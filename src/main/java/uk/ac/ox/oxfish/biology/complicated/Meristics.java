@@ -11,12 +11,13 @@ public class Meristics
 
 
     public static final Meristics FAKE_MERISTICS =
-            new Meristics(0,0,1,1,1,1,0,1,0,0,1,1,1,1,0,1,0,0,0,0);
+            new Meristics(0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0,
+                          1, 1, false);
 
     /**
      * the maximum age for a male
      */
-    private final int maxAgeMale;
+    private final int maxAge;
 
     /**
      * the minimum age for a male
@@ -57,12 +58,6 @@ public class Meristics
      * parameter governing cumulative mortality for male
      */
     private final double mortalityParameterMMale;
-
-
-    /**
-     * the maximum age for a female
-     */
-    private final int maxAgeFemale;
 
     /**
      * the minimum age for a female
@@ -174,14 +169,30 @@ public class Meristics
     private double cumulativePhi = 0d;
 
 
+    /**
+     * the expected number of recruits in the "virgin" state.
+     */
+    private final int virginRecruits;
+
+    /**
+     * the biomass steepness used for recruitment
+     */
+    private final double steepness;
+
+    /**
+     * a parameter defining the kind of recruitment process the species performs
+     */
+    private final boolean addRelativeFecundityToSpawningBiomass;
+
 
     public Meristics(
             int maxAgeMale, double youngAgeMale, double youngLengthMale, double maxLengthMale, double KParameterMale,
-            double weightParameterAMale, double weightParameterBMale, double mortalityParameterMMale, int maxAgeFemale,
+            double weightParameterAMale, double weightParameterBMale, double mortalityParameterMMale,
             double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
             double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
-            double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope) {
-        this.maxAgeMale = maxAgeMale;
+            double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
+            int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass) {
+        this.maxAge = maxAgeMale;
         this.youngAgeMale = youngAgeMale;
         this.youngLengthMale = youngLengthMale;
         this.maxLengthMale = maxLengthMale;
@@ -189,7 +200,6 @@ public class Meristics
         this.weightParameterAMale = weightParameterAMale;
         this.weightParameterBMale = weightParameterBMale;
         this.mortalityParameterMMale = mortalityParameterMMale;
-        this.maxAgeFemale = maxAgeFemale;
         this.youngAgeFemale = youngAgeFemale;
         this.youngLengthFemale = youngLengthFemale;
         this.maxLengthFemale = maxLengthFemale;
@@ -201,11 +211,14 @@ public class Meristics
         this.maturitySlope = maturitySlope;
         this.fecundityIntercept = fecundityIntercept;
         this.fecunditySlope = fecunditySlope;
+        this.virginRecruits = virginRecruits;
+        this.steepness = steepness;
+        this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
         LengthParameterFemale =
-                youngLengthFemale < maxAgeFemale
+                youngLengthFemale < maxAge
                         ?
                 youngLengthFemale +((maxLengthFemale- youngLengthFemale)/
-                (1-Math.exp(-KParameterFemale *(maxAgeFemale- youngAgeFemale))))
+                (1-Math.exp(-KParameterFemale *(maxAge- youngAgeFemale))))
                         :
                         maxLengthFemale
         ;
@@ -218,9 +231,9 @@ public class Meristics
                         maxLengthMale
         ;
 
-        Double[] weightFemaleInKgArray = new Double[maxAgeFemale+1];
-        Double[] lengthFemaleInCmArray = new Double[maxAgeFemale+1];
-        for(int age=0; age<maxAgeFemale+1; age++)
+        Double[] weightFemaleInKgArray = new Double[maxAge+1];
+        Double[] lengthFemaleInCmArray = new Double[maxAge+1];
+        for(int age=0; age<maxAge+1; age++)
         {
             lengthFemaleInCmArray[age] = LengthParameterFemale + ((youngLengthFemale -LengthParameterFemale))*
                     Math.exp(-KParameterFemale*(age- youngAgeFemale));
@@ -242,7 +255,6 @@ public class Meristics
 
         }
 
-        int maxAge = Math.max(maxAgeFemale, maxAgeMale);
         Double[] maturityArray = new Double[maxAge +1];
         Double[] relativeFecundityArray = new Double[maxAge +1];
         Double[] cumulativeSurvivalMaleArray = new Double[maxAge +1];
@@ -278,8 +290,8 @@ public class Meristics
     }
 
 
-    public int getMaxAgeMale() {
-        return maxAgeMale;
+    public int getMaxAge() {
+        return maxAge;
     }
 
     public double getYoungAgeMale() {
@@ -312,10 +324,6 @@ public class Meristics
 
     public double getMortalityParameterMMale() {
         return mortalityParameterMMale;
-    }
-
-    public int getMaxAgeFemale() {
-        return maxAgeFemale;
     }
 
     public double getYoungAgeFemale() {
@@ -408,5 +416,32 @@ public class Meristics
 
     public void setCumulativePhi(double cumulativePhi) {
         this.cumulativePhi = cumulativePhi;
+    }
+
+    /**
+     * Getter for property 'virginRecruits'.
+     *
+     * @return Value for property 'virginRecruits'.
+     */
+    public int getVirginRecruits() {
+        return virginRecruits;
+    }
+
+    /**
+     * Getter for property 'steepness'.
+     *
+     * @return Value for property 'steepness'.
+     */
+    public double getSteepness() {
+        return steepness;
+    }
+
+    /**
+     * Getter for property 'addRelativeFecundityToSpawningBiomass'.
+     *
+     * @return Value for property 'addRelativeFecundityToSpawningBiomass'.
+     */
+    public boolean isAddRelativeFecundityToSpawningBiomass() {
+        return addRelativeFecundityToSpawningBiomass;
     }
 }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * Simply culls a % of fish each year according to their mortality rate
@@ -22,8 +23,8 @@ public class NaturalMortalityProcess
         Preconditions.checkArgument(male.length==female.length);
         for(int i=0;i<male.length; i++)
         {
-            male[i] = (int) (male[i] * Math.exp(-maleMortality));
-            female[i] = (int) (female[i] * Math.exp(-femaleMortality));
+            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality) + 0.5d);
+            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality) + 0.5d);
         }
 
     }

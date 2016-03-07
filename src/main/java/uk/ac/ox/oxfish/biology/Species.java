@@ -63,8 +63,8 @@ public class Species {
     }
 
 
-    public int getMaxAgeMale() {
-        return meristics.getMaxAgeMale();
+    public int getMaxAge() {
+        return meristics.getMaxAge();
     }
 
     public double getYoungAgeMale() {
@@ -127,9 +127,6 @@ public class Species {
         return meristics.getMaxLengthMale();
     }
 
-    public int getMaxAgeFemale() {
-        return meristics.getMaxAgeFemale();
-    }
 
     public double getCumulativePhi() {
         return meristics.getCumulativePhi();

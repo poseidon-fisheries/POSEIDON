@@ -16,8 +16,10 @@ public class MeristicsTest {
 
 
         Meristics yellowEye = new Meristics(70, 1, 18.717, 64.594, 0.047, 0.000017, 3.03, 0.045,
-                                            70, 1, 18.717, 62.265, 0.047, 0.00000977, 3.17, 0.046,
-                                            38.78, -0.437, 137900, 36500);
+                                            1, 18.717, 62.265, 0.047, 0.00000977, 3.17, 0.046,
+                                            38.78, -0.437, 137900, 36500, 228149,
+                                            0.44056,
+                                            true);
 
         //see if age 5 was computed correctly
         assertEquals(yellowEye.getLengthFemaleInCm().get(5),26.4837518217,.001);
@@ -41,9 +43,10 @@ public class MeristicsTest {
     public void shortspine() throws Exception {
 
 
-        Meristics shortspine = new Meristics(100,2,7,75,0.018,4.77E-06,3.263,0.0505,
-                                             100,2,7,75,0.018,4.77E-06,3.263,0.0505,
-                                             18.2,-2.3,1,0);
+        Meristics shortspine = new Meristics(100, 2, 7, 75, 0.018, 4.77E-06, 3.263, 0.0505,
+                                             2, 7, 75, 0.018, 4.77E-06, 3.263, 0.0505,
+                                             18.2, -2.3, 1, 0, 36315502, 0.6,
+                                             false);
 
         //see if age 5 was computed correctly
         assertEquals(shortspine.getLengthFemaleInCm().get(5),11.3138255265,.001);
@@ -63,9 +66,11 @@ public class MeristicsTest {
     public void longspine() throws Exception {
 
 
-        Meristics longspine = new Meristics(40,3,8.573,27.8282,0.108505,4.30E-06,3.352,0.111313,
-                                             40,3,8.573,27.8282,0.108505,4.30E-06,3.352,0.111313,
-                                             17.826,-1.79,1,0);
+        Meristics longspine = new Meristics(40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352, 0.111313,
+                                            3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352, 0.111313,
+                                            17.826, -1.79, 1, 0,
+                                            168434124, 0.6,
+                                            false);
 
         //see if age 5 was computed correctly
         assertEquals(longspine.getLengthFemaleInCm().get(5),12.3983090675,.001);
@@ -89,9 +94,10 @@ public class MeristicsTest {
     public void sablefish() throws Exception {
 
 
-        Meristics sablefish = new Meristics(30,0.5,25.8,56.2,0.419,3.6724E-06,3.250904,0.065,
-                                            30,0.5,25.8,64,0.335,3.4487E-06,3.26681,0.08,
-                                            58,-0.13,1,0);
+        Meristics sablefish = new Meristics(30, 0.5, 25.8, 56.2, 0.419, 3.6724E-06, 3.250904, 0.065,
+                                            0.5, 25.8, 64, 0.335, 3.4487E-06, 3.26681, 0.08,
+                                            58, -0.13, 1, 0, 40741397, 0.6,
+                                            false);
 
         //see if age 5 was computed correctly
         assertEquals(sablefish.getLengthFemaleInCm().get(5),55.5416341677,.001);
@@ -112,9 +118,11 @@ public class MeristicsTest {
     public void doverSole() throws Exception {
 
 
-        Meristics sole = new Meristics(50,1,9.04,39.91,0.1713,0.000002231,3.412,0.1417,
-                                       50,1,5.4,47.81,0.1496,0.000002805,3.345,0.1165,
-                                       35,-0.775,1,0);
+        Meristics sole = new Meristics(50, 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412, 0.1417,
+                                       1, 5.4, 47.81, 0.1496, 0.000002805, 3.345, 0.1165,
+                                       35, -0.775, 1, 0, 404138330,
+                                       0.8,
+                                       false);
 
         //see if age 5 was computed correctly
         assertEquals(sole.getLengthFemaleInCm().get(5),24.5101516433,.001);
@@ -138,9 +146,11 @@ public class MeristicsTest {
     public void canaryRockfish() throws Exception {
 
 
-        Meristics canary = new Meristics(20,1,8.04,52.53,0.16,1.55E-05,3.03,0.06,
-                                         20,1,8.04,60.36,0.125,1.55E-05,3.03,0.06,
-                                         40.5,-0.25,1,0);
+        Meristics canary = new Meristics(20, 1, 8.04, 52.53, 0.16, 1.55E-05, 3.03, 0.06,
+                                         1, 8.04, 60.36, 0.125, 1.55E-05, 3.03, 0.06,
+                                         40.5, -0.25, 1, 0, 38340612,
+                                         0.511,
+                                         true);
 
         //see if age 5 was computed correctly
         assertEquals(canary.getLengthFemaleInCm().get(5),30.7375135093,.001);
@@ -166,7 +176,7 @@ public class MeristicsTest {
         Meristics placeholder = Meristics.FAKE_MERISTICS;
         assertEquals(placeholder.getWeightMaleInKg().get(0),1,.001);
         assertEquals(placeholder.getWeightFemaleInKg().get(0),1,.001);
-        assertEquals(placeholder.getMaxAgeMale(),0,.001);
+        assertEquals(placeholder.getMaxAge(), 0, .001);
 
 
     }
