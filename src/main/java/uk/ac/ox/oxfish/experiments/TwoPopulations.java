@@ -251,7 +251,6 @@ public class TwoPopulations {
 
     public static void main(String[] args) throws IOException {
 
-        guiExample();
         StringBuilder finalOutput = new StringBuilder();
         finalOutput.append("price,small,big\n");
         for(double price = 0; price<.5; price+=.01)
@@ -273,7 +272,7 @@ public class TwoPopulations {
                     }
                     else
                     {
-                        assert Math.abs(fisher.getMaximumHold()-10)<.500;
+                        assert Math.abs(fisher.getMaximumHold()-500)<.1;
                         averageBigLandings.accept(
                                 fisher.getLatestYearlyObservation(species + " " +AbstractMarket.LANDINGS_COLUMN_NAME)
                         );

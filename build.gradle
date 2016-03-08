@@ -145,13 +145,13 @@ task prepareDashBoard(type: JavaExec, dependsOn: test) {
         }
 
 task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
-    executable = 'sh'
+    executable = 'python2'
     workingDir = "${projectDir}"
-    args = [ "dashboard.sh",  date, website_folder ]
+    args = [ "dashboard.py",  date, website_folder ]
 }
 
 
-task testCSV(){
+task testCSV(dependsOn: test){
     def output = file("build/reports/multitest/" + date + ".csv")
     doLast {
         file("build/reports").mkdirs()
