@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 
@@ -19,11 +20,6 @@ import java.util.HashMap;
  */
 public class AbundanceBasedLocalBiology implements LocalBiology
 {
-
-
-    private final static int MALE = 0;
-
-    private final static int FEMALE = 1;
 
 
     /**
@@ -69,8 +65,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
         //go through all the fish and sum up their weight at given age
         for(int age=0; age<species.getMaxAge()+1; age++)
         {
-            totalWeight += maleWeights.get(age) * fish[MALE][age];
-            totalWeight += femaleWeights.get(age) * fish[FEMALE][age];
+            totalWeight += maleWeights.get(age) * fish[FishStateUtilities.MALE][age];
+            totalWeight += femaleWeights.get(age) * fish[FishStateUtilities.FEMALE][age];
         }
 
         return totalWeight;
@@ -90,13 +86,13 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     {
         final int[][] fish = abundance.get(species);
         Preconditions.checkArgument(maleCatches.length == femaleCatches.length);
-        Preconditions.checkArgument(maleCatches.length == fish[MALE].length);
+        Preconditions.checkArgument(maleCatches.length == fish[FishStateUtilities.MALE].length);
         for(int age=0; age<maleCatches.length; age++)
         {
-            fish[MALE][age]-=maleCatches[age];
-            Preconditions.checkArgument(fish[MALE][age] >=0, "There is now a negative amount of male fish left at age " + age);
-            fish[FEMALE][age]-=femaleCatches[age];
-            Preconditions.checkArgument(fish[FEMALE][age] >=0, "There is now a negative amount of female fish left at age " + age);
+            fish[FishStateUtilities.MALE][age]-=maleCatches[age];
+            Preconditions.checkArgument(fish[FishStateUtilities.MALE][age] >=0, "There is now a negative amount of male fish left at age " + age);
+            fish[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
+            Preconditions.checkArgument(fish[FishStateUtilities.FEMALE][age] >=0, "There is now a negative amount of female fish left at age " + age);
         }
     }
 
@@ -175,7 +171,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public int[] getNumberOfMaleFishPerAge(Species species) {
-        return  abundance.get(species)[MALE];
+        return  abundance.get(species)[FishStateUtilities.MALE];
     }
 
     /**
@@ -186,7 +182,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public int[] getNumberOfFemaleFishPerAge(Species species) {
-        return  abundance.get(species)[FEMALE];
+        return  abundance.get(species)[FishStateUtilities.FEMALE];
     }
 
     /**
@@ -208,7 +204,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
     private double  getWeightForThisSex(int sex, Species species, int age)
     {
-        if(sex==FEMALE)
+        if(sex== FishStateUtilities.FEMALE)
             return species.getWeightFemaleInKg().get(age);
         else
             return species.getWeightMaleInKg().get(age);

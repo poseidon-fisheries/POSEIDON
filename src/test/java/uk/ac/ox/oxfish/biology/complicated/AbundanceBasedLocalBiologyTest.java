@@ -14,11 +14,11 @@ import static org.mockito.Mockito.when;
 public class AbundanceBasedLocalBiologyTest
 {
 
-    final static private Meristics meristics=  new Meristics(40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352, 0.111313,
-                                                3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352, 0.111313,
-                                                17.826, -1.79, 1, 0,
-                                                168434124, 0.6,
-                                                false);
+    final static private Meristics meristics=  new Meristics(80,40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                             0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                             0.111313, 17.826, -1.79, 1,
+                                                             0, 168434124,
+                                                             0.6, false);
 
 
     @Test

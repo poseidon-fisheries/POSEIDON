@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -11,8 +12,8 @@ public class Meristics
 
 
     public static final Meristics FAKE_MERISTICS =
-            new Meristics(0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0,
-                          1, 1, false);
+            new Meristics(0,0 , 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0,
+                          0, 1, 1, false);
 
     /**
      * the maximum age for a male
@@ -184,15 +185,21 @@ public class Meristics
      */
     private final boolean addRelativeFecundityToSpawningBiomass;
 
+    /**
+     * age the fish is considered "old"
+     */
+    private final int ageOld;
+
 
     public Meristics(
-            int maxAgeMale, double youngAgeMale, double youngLengthMale, double maxLengthMale, double KParameterMale,
+            int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
+            double KParameterMale,
             double weightParameterAMale, double weightParameterBMale, double mortalityParameterMMale,
             double youngAgeFemale, double youngLengthFemale, double maxLengthFemale, double KParameterFemale,
             double weightParameterAFemale, double weightParameterBFemale, double mortalityParameterMFemale,
             double maturityInflection, double maturitySlope, double fecundityIntercept, double fecunditySlope,
             int virginRecruits, double steepness, boolean addRelativeFecundityToSpawningBiomass) {
-        this.maxAge = maxAgeMale;
+        this.maxAge = maxAge;
         this.youngAgeMale = youngAgeMale;
         this.youngLengthMale = youngLengthMale;
         this.maxLengthMale = maxLengthMale;
@@ -214,26 +221,32 @@ public class Meristics
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
+        this.ageOld =ageOld;
+
+        Preconditions.checkArgument(maxAge>=ageOld);
+        Preconditions.checkArgument(maxAge>=youngAgeFemale);
+        Preconditions.checkArgument(maxAge>=youngAgeMale);
+
         LengthParameterFemale =
-                youngLengthFemale < maxAge
+                youngLengthFemale < ageOld
                         ?
                 youngLengthFemale +((maxLengthFemale- youngLengthFemale)/
-                (1-Math.exp(-KParameterFemale *(maxAge- youngAgeFemale))))
+                (1-Math.exp(-KParameterFemale *(ageOld - youngAgeFemale))))
                         :
                         maxLengthFemale
         ;
         LengthParameterMale =
-                youngLengthMale < maxAgeMale
+                youngLengthMale < ageOld
                         ?
                 youngLengthMale +((maxLengthMale- youngLengthMale)/
-                (1-Math.exp(-KParameterMale *(maxAgeMale- youngAgeMale))))
+                (1-Math.exp(-KParameterMale *(ageOld- youngAgeMale))))
                         :
                         maxLengthMale
         ;
 
-        Double[] weightFemaleInKgArray = new Double[maxAge+1];
-        Double[] lengthFemaleInCmArray = new Double[maxAge+1];
-        for(int age=0; age<maxAge+1; age++)
+        Double[] weightFemaleInKgArray = new Double[this.maxAge +1];
+        Double[] lengthFemaleInCmArray = new Double[this.maxAge +1];
+        for(int age = 0; age< this.maxAge +1; age++)
         {
             lengthFemaleInCmArray[age] = LengthParameterFemale + ((youngLengthFemale -LengthParameterFemale))*
                     Math.exp(-KParameterFemale*(age- youngAgeFemale));
@@ -243,9 +256,9 @@ public class Meristics
             weightFemaleInKgArray[age] = weightParameterAFemale * Math.pow(lengthFemaleInCmArray[age],weightParameterBFemale);
 
         }
-        Double[]  weightMaleInKgArray = new Double[maxAgeMale+1];
-        Double[] lengthMaleInCmArray = new Double[maxAgeMale+1];
-        for(int age=0; age<maxAgeMale+1; age++)
+        Double[]  weightMaleInKgArray = new Double[maxAge+1];
+        Double[] lengthMaleInCmArray = new Double[maxAge+1];
+        for(int age=0; age<maxAge+1; age++)
         {
             lengthMaleInCmArray[age] = LengthParameterMale + ((youngLengthMale- LengthParameterMale))*
                     Math.exp(-KParameterMale*(age- youngAgeMale));
@@ -255,12 +268,12 @@ public class Meristics
 
         }
 
-        Double[] maturityArray = new Double[maxAge +1];
-        Double[] relativeFecundityArray = new Double[maxAge +1];
-        Double[] cumulativeSurvivalMaleArray = new Double[maxAge +1];
-        Double[] cumulativeSurvivalFemaleArray = new Double[maxAge + 1];
-        Double[] phiArray = new Double[maxAge +1];
-        for(int age=0; age<maxAge+1; age++)
+        Double[] maturityArray = new Double[this.maxAge +1];
+        Double[] relativeFecundityArray = new Double[this.maxAge +1];
+        Double[] cumulativeSurvivalMaleArray = new Double[this.maxAge +1];
+        Double[] cumulativeSurvivalFemaleArray = new Double[this.maxAge + 1];
+        Double[] phiArray = new Double[this.maxAge +1];
+        for(int age = 0; age< this.maxAge +1; age++)
         {
 
             maturityArray[age] = 1d/(1+Math.exp(maturitySlope*(lengthFemaleInCmArray[age]-maturityInflection)));

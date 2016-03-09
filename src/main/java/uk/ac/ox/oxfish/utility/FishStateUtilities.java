@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 public class FishStateUtilities {
 
     public static final double EPSILON = .01;
+    public final static int MALE = 0;
+    public final static int FEMALE = 1;
 
     private static final String JAR_NAME = "oxfish_executable.jar";
 
