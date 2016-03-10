@@ -38,12 +38,14 @@ public class OneSpecieGear implements Gear {
     @Override
     public Catch fish(
             Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
-        double poundsCaught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
-                targetedSpecies));
-        assert  poundsCaught >=0;
-        if(poundsCaught> 0)
-            where.reactToThisAmountOfBiomassBeingFished(targetedSpecies, poundsCaught);
-        return new Catch(targetedSpecies, poundsCaught, modelBiology);
+        double caught = 0;
+        if(proportionCaught>0) {
+            FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,
+                                                            proportionCaught);
+            caught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
+                    targetedSpecies));
+        }
+        return new Catch(targetedSpecies, caught, modelBiology);
     }
 
 

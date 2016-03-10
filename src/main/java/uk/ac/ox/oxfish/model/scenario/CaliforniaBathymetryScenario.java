@@ -16,11 +16,11 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.OptionalDouble;
+import java.util.*;
 
 /**
  * Reads the bathymetry file of california and for now not much else.
@@ -50,19 +50,25 @@ public class CaliforniaBathymetryScenario implements Scenario {
         NauticalMap map;
 
         try {
+            Path mainDirectory = Paths.get("inputs", "california");
+            Path bioDirectory = mainDirectory.resolve("biology");
+
+            DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
+            List<Path> spatialFiles = new LinkedList<>();
+
+            for(Path folder : folders)
+            {
+                Path file = folder.resolve("spatial.csv");
+                if(file.toFile().exists())
+                    spatialFiles.add(file);
+
+            }
+
+
             SampledMap sampledMap = new SampledMap(Paths.get("inputs", "california",
                                                              "california.csv"),
                                                    gridWidth,
-                                                   Paths.get("inputs","california","biology","spatial",
-                                                             "DoverSole.csv"),
-                                                   Paths.get("inputs","california","biology","spatial",
-                                                             "Longspine.csv"),
-                                                   Paths.get("inputs","california","biology","spatial",
-                                                             "Sablefish.csv"),
-                                                   Paths.get("inputs","california","biology","spatial",
-                                                             "Shortspine.csv"),
-                                                   Paths.get("inputs","california","biology","spatial",
-                                                             "Yelloweye.csv"));
+                                                   spatialFiles.toArray(new Path[spatialFiles.size()]));
 
             //we want a grid of numbers but we have a grid where every cell has many observations
             int gridHeight = sampledMap.getGridHeight();

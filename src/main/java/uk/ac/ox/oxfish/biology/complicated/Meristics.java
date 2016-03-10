@@ -191,6 +191,32 @@ public class Meristics
     private final int ageOld;
 
 
+    public Meristics(MeristicsInput input) {
+        this(input.getMaxAge(),
+             input.getAgeOld(),
+             input.getYoungAgeMale(),
+             input.getYoungLengthMale(),
+             input.getMaxLengthMale(),
+             input.getKParameterMale(),
+             input.getWeightParameterAMale(),
+             input.getWeightParameterBMale(),
+             input.getMortalityParameterMMale(),
+             input.getYoungAgeFemale(),
+             input.getYoungLengthFemale(),
+             input.getMaxLengthFemale(),
+             input.getKParameterFemale(),
+             input.getWeightParameterAFemale(),
+             input.getWeightParameterBFemale(),
+             input.getMortalityParameterMFemale(),
+             input.getMaturityInflection(),
+             input.getMaturitySlope(),
+             input.getFecundityIntercept(),
+             input.getFecunditySlope(),
+             input.getVirginRecruits(),
+             input.getSteepness(),
+             input.isAddRelativeFecundityToSpawningBiomass());
+    }
+
     public Meristics(
             int maxAge, int ageOld, double youngAgeMale, double youngLengthMale, double maxLengthMale,
             double KParameterMale,

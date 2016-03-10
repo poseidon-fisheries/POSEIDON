@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.utility;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -457,7 +458,9 @@ public class FishStateUtilities {
             SeaTile where, double hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
         //catch
-        double specieCatch = where.getBiomass(species) * q * hoursSpentFishing;
+        double specieCatch = FishStateUtilities.round(where.getBiomass(species) *
+                                                              q *
+                                                              hoursSpentFishing);
         //tell biomass
         if(specieCatch> 0)
             where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);
@@ -512,6 +515,31 @@ public class FishStateUtilities {
         return new Point2D.Double(latitude,longitude);
     }
 
+
+    /**
+     * weights this number of fish (split into age cohorts) into the total amount of biomass
+     * @param male
+     * @param female
+     * @param species
+     * @return
+     */
+    public static double weigh(int[] male, int[] female, Species species)
+    {
+        final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
+        final ImmutableList<Double> femaleWeights = species.getWeightFemaleInKg();
+        double totalWeight = 0;
+        //go through all the fish and sum up their weight at given age
+        for(int age=0; age<species.getMaxAge()+1; age++)
+        {
+            totalWeight += maleWeights.get(age) * male[age];
+            totalWeight += femaleWeights.get(age) * female[age];
+        }
+
+        return totalWeight;
+
+
+
+    }
 
 
 

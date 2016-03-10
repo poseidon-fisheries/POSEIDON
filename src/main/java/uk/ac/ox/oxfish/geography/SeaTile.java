@@ -189,4 +189,33 @@ public class SeaTile implements Startable{
     public void setHabitat(TileHabitat habitat) {
         this.habitat = habitat;
     }
+
+    /**
+     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
+     * location
+     * @param species the species fished
+     * @param maleCatches the biomass fished
+     * @param femaleCatches
+     */
+    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
+        biology.reactToThisAmountOfFishBeingCaught(species, maleCatches, femaleCatches);
+    }
+
+    /**
+     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
+     * @param species the species examined
+     * @return the male fish array.
+     */
+    public int[] getNumberOfMaleFishPerAge(Species species) {
+        return biology.getNumberOfMaleFishPerAge(species);
+    }
+
+    /**
+     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
+     * @param species the species examined
+     * @return the female fish array.
+     */
+    public int[] getNumberOfFemaleFishPerAge(Species species) {
+        return biology.getNumberOfFemaleFishPerAge(species);
+    }
 }

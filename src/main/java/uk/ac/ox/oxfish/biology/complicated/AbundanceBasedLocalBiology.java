@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -55,21 +54,11 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public Double getBiomass(Species species) {
-        final int[][] fish = abundance.get(species);
-        assert  species.getMaxAge()+1 == fish[0].length;
-        assert  species.getMaxAge()+1 == fish[1].length;
-
-        final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
-        final ImmutableList<Double> femaleWeights = species.getWeightFemaleInKg();
-        double totalWeight = 0;
-        //go through all the fish and sum up their weight at given age
-        for(int age=0; age<species.getMaxAge()+1; age++)
-        {
-            totalWeight += maleWeights.get(age) * fish[FishStateUtilities.MALE][age];
-            totalWeight += femaleWeights.get(age) * fish[FishStateUtilities.FEMALE][age];
-        }
-
-        return totalWeight;
+        return FishStateUtilities.weigh(
+                abundance.get(species)[FishStateUtilities.MALE],
+                abundance.get(species)[FishStateUtilities.FEMALE],
+                species
+                );
 
     }
 

@@ -21,7 +21,6 @@ public class MeristicsTest {
 
         //see if age 5 was computed correctly
         assertEquals(yellowEye.getLengthFemaleInCm().get(5),26.4837518217,.001);
-        //todo ask steve about these numbers:
         assertEquals(yellowEye.getLengthMaleInCm().get(5),26.8991271545,.001);
 
         assertEquals(yellowEye.getWeightFemaleInKg().get(5),0.3167667645,.001);
