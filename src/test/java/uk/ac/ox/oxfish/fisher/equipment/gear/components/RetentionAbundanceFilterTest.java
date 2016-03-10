@@ -9,15 +9,17 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.*;
 
-public class LogisticAbundanceFilterTest {
+
+public class RetentionAbundanceFilterTest {
+
 
 
     @Test
     public void equality() throws Exception {
 
-        AbundanceFilter first = new LogisticAbundanceFilter(20, 10, true);
-        AbundanceFilter second = new LogisticAbundanceFilter(20,  10, true);
-        AbundanceFilter third = new LogisticAbundanceFilter(200,  10, true);
+        AbundanceFilter first = new RetentionAbundanceFilter(true,10,10,10);
+        AbundanceFilter second = new RetentionAbundanceFilter(true,10,10,10);
+        AbundanceFilter third = new RetentionAbundanceFilter(true,10,10,100);
 
         assertFalse(first == second);
         assertFalse(first == third);
@@ -32,15 +34,15 @@ public class LogisticAbundanceFilterTest {
      */
     @Test
     public void computesCorrectly() throws Exception {
-        Species species = new Species("Longspine",new Meristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                0.111313, 17.826, -1.79, 1,
-                                                                0, 168434124,
-                                                                0.6, false));
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
-        double[][] selectivity = filter.getProbabilityMatrix(species);
-        assertEquals(selectivity[FishStateUtilities.MALE][5],0.1720164347,.001);
-        assertEquals(selectivity[FishStateUtilities.FEMALE][20],0.5556124037,.001);
+        Species species = new Species("Longspine", new Meristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                 0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                 0.111313, 17.826, -1.79, 1,
+                                                                 0, 168434124,
+                                                                 0.6, false));
+        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
+        double[][] probability = filter.getProbabilityMatrix(species);
+        assertEquals(probability[FishStateUtilities.MALE][5], 0.004970534, .0001);
+        assertEquals(probability[FishStateUtilities.FEMALE][20],0.8571669724,.001);
 
     }
 
@@ -55,15 +57,15 @@ public class LogisticAbundanceFilterTest {
                                                                 0.111313, 17.826, -1.79, 1,
                                                                 0, 168434124,
                                                                 0.6, false));
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
+        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
 
         int[] male = new int[81];
         int[] female = new int[81];
-        male[5] = 100;
+        male[20] = 100;
         int[][] filtered = filter.filter(male, female, species);
-        assertEquals(filtered[FishStateUtilities.MALE][5],17);
+        assertEquals(filtered[FishStateUtilities.MALE][20],86);
         assertEquals(filtered[FishStateUtilities.MALE][0],0);
-        assertEquals(filtered[FishStateUtilities.FEMALE][5],0);
+        assertEquals(filtered[FishStateUtilities.FEMALE][20],0);
 
 
     }
@@ -87,14 +89,14 @@ public class LogisticAbundanceFilterTest {
 
 
         long start = System.currentTimeMillis();
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
+        RetentionAbundanceFilter filter =new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         long end = System.currentTimeMillis();
         long durationFirst = end-start;
 
         start = System.currentTimeMillis();
-        filter = new LogisticAbundanceFilter(23.5053,9.03702,true);
+        filter =new RetentionAbundanceFilter(true,21.8035,1.7773,0.992661);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         end = System.currentTimeMillis();
@@ -107,4 +109,5 @@ public class LogisticAbundanceFilterTest {
 
 
     }
+
 }

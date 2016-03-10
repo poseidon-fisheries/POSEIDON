@@ -5,9 +5,7 @@ import uk.ac.ox.oxfish.biology.complicated.Meristics;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by carrknight on 2/19/16.
- */
+
 public class MeristicsTest {
 
 
@@ -27,15 +25,15 @@ public class MeristicsTest {
         assertEquals(yellowEye.getLengthMaleInCm().get(5),26.8991271545,.001);
 
         assertEquals(yellowEye.getWeightFemaleInKg().get(5),0.3167667645,.001);
-        //todo ask steve about these numbers
         assertEquals(yellowEye.getWeightMaleInKg().get(5),0.365220907,.001);
 
         assertEquals(yellowEye.getMaturity().get(5),0.0046166415,.0001);
-        //todo ask steve about these numbers:
         assertEquals(yellowEye.getRelativeFecundity().get(5),47344.590014727,.001);
         assertEquals(yellowEye.getPhi().get(5),173.6635925757,.001);
 
         assertEquals(yellowEye.getCumulativeSurvivalFemale().get(5),0.7945336025,.001);
+        assertEquals(yellowEye.getCumulativePhi(),8043057.98636817,.01);
+
     }
 
 
@@ -61,8 +59,7 @@ public class MeristicsTest {
        assertEquals(shortspine.getCumulativeSurvivalFemale().get(5),0.7768562128,.001);
         assertEquals(shortspine.getCumulativeSurvivalFemale().get(20),0.3642189796,.001);
         assertEquals(shortspine.getPhi().get(20),0.1111875741,.001);
-        //todo ask steve about this
-        //assertEquals(shortspine.getCumulativePhi(),10.9714561805,.001);
+        assertEquals(shortspine.getCumulativePhi(),10.9714561805,.01);
 
     }
 

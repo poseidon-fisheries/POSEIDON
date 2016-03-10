@@ -181,3 +181,14 @@ test {
 }
 
 
+idea{
+    project {
+        languageLevel = '1.8'
+    }
+    module {
+        downloadJavadoc = true // defaults to false
+        downloadSources = true
+    }
+}
+
+
