@@ -206,4 +206,4 @@ def plot(experiment_name=None):
     #plot(experiment_name="kitchensink_2")
     #plot(experiment_name="kitchensink_itq")
     #plot(experiment_name="congested_departure")
-plot(experiment_name="mixed_mpa")
+plot(experiment_name="selectivity")

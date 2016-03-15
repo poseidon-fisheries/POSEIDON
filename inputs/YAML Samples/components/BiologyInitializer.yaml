@@ -69,3 +69,8 @@ Two Species Box:
   species0InsideTheBox: false
   steepness: uniform 0.6 0.8
 -------
+Single Species Abundance:
+  folderPath: /home/carrknight/code/oxfish/inputs/california/biology/Dover Sole
+  scaling: 0.1
+  speciesName: Dover Sole
+-------

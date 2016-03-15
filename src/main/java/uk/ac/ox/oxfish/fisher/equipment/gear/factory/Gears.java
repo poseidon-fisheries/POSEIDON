@@ -52,6 +52,10 @@ public class Gears {
                          HabitatAwareGearFactory::new);
         NAMES.put(HabitatAwareGearFactory.class,"Habitat Aware Gear");
 
+        CONSTRUCTORS.put("Threshold Gear Factory",
+                         ThresholdGearFactory::new);
+        NAMES.put(ThresholdGearFactory.class,"Threshold Gear Factory");
+
     }
 
 }

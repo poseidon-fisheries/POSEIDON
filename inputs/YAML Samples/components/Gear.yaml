@@ -24,3 +24,9 @@ Habitat Aware Gear:
   standardDeviationCatchabilitySandy: '0.0'
   trawlSpeed: '5.0'
 -------
+Threshold Gear Factory:
+  catchability: '0.01'
+  litersGasPerHourFished: '5.0'
+  selectAboveThreshold: true
+  threshold: '10.0'
+-------

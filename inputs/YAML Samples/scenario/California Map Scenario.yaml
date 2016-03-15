@@ -1,2 +1,3 @@
 California Map Scenario:
+  gridWidth: 50
   numberOfSpecies: 1

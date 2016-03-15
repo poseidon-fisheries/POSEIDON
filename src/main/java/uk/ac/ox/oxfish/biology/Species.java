@@ -160,6 +160,24 @@ public class Species {
         meristics.setCumulativePhi(cumulativePhi);
     }
 
+    /**
+     * Getter for property 'virginRecruits'.
+     *
+     * @return Value for property 'virginRecruits'.
+     */
+    public int getVirginRecruits() {
+        return meristics.getVirginRecruits();
+    }
+
+    /**
+     * Getter for property 'steepness'.
+     *
+     * @return Value for property 'steepness'.
+     */
+    public double getSteepness() {
+        return meristics.getSteepness();
+    }
+
     public double getYoungLengthFemale() {
         return meristics.getYoungLengthFemale();
     }
@@ -190,5 +208,14 @@ public class Species {
 
     public double getKParameterFemale() {
         return meristics.getKParameterFemale();
+    }
+
+    /**
+     * Getter for property 'addRelativeFecundityToSpawningBiomass'.
+     *
+     * @return Value for property 'addRelativeFecundityToSpawningBiomass'.
+     */
+    public boolean isAddRelativeFecundityToSpawningBiomass() {
+        return meristics.isAddRelativeFecundityToSpawningBiomass();
     }
 }

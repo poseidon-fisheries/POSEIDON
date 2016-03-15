@@ -53,6 +53,11 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
         return filtered;
     }
 
+    /**
+     * the method that gives the probability matrix for each age class and each sex of not filtering the abundance away
+     * @param species
+     * @return
+     */
     abstract protected double[][] computeSelectivity(Species species);
 
 
