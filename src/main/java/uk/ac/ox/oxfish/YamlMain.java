@@ -1,3 +1,5 @@
+package uk.ac.ox.oxfish;
+
 import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -39,20 +41,25 @@ public class YamlMain {
         /**
          * the first two arguments are the base scenario file and a yaml overwriter
          */
-        String baseInput = args[0];
+        Path inputFolder = Paths.get(args[0]);
 
-        Path outputFolder = Paths.get("output", baseInput.split("\\.")[0]);
+        Long seed = args.length>1 ? Long.parseLong(args[1]) : System.currentTimeMillis();
+
+        String simulationName = inputFolder.getFileName().toString();
+        simulationName = simulationName.split("\\.")[0];
+        Path outputFolder = Paths.get("output", simulationName);
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
-        String fullScenario = String.join("\n",Files.readAllLines(Paths.get(baseInput)));
+        String fullScenario = String.join("\n", Files.readAllLines(inputFolder));
 
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(fullScenario,PrototypeScenario.class);
         yaml.dump(scenario,new FileWriter(outputFolder.resolve("scenario.yaml").toFile()));
 
-        FishState model = new FishState(System.currentTimeMillis());
-        Log.setLogger(new FishStateLogger(model,Paths.get(baseInput.split("\\.")[0] + "_log.txt")));
+        FishState model = new FishState(seed);
+        Log.setLogger(new FishStateLogger(model,
+                                          outputFolder.resolve(simulationName+ "_log.txt")));
         Log.set(Log.LEVEL_ERROR);
         model.setScenario(scenario);
         model.start();
@@ -63,6 +70,9 @@ public class YamlMain {
         ModelResults results =  new ModelResults(model);
         yaml.dump(results,writer);
 
+        writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
+        writer.write(Long.toString(seed));
+        writer.close();
 
     }
 

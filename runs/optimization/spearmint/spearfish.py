@@ -1,7 +1,6 @@
 from __future__ import print_function
 import subprocess
 import os
-
 EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
 SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
 
@@ -51,8 +50,8 @@ def main():
     if not os.path.exists(dbDirectory):
         os.makedirs(dbDirectory)
 
-    ##connect mongo to it
-  # subprocess.call(["mongod", "--fork", "--logpath", dbDirectory + "/log_"+experiment_name+".txt", "--dbpath", dbDirectory])
+    ##connect mongo to itx
+  # subprocess.call(["mon`god", "--fork", "--logpath", dbDirectory + "/log_"+experiment_name+".txt", "--dbpath", dbDirectory])
 
     ##now run spearmint
     os.chdir(SPEARMINT_DIRECTORY)

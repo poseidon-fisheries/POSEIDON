@@ -1,3 +1,5 @@
+package uk.ac.ox.oxfish;
+
 import com.esotericsoftware.minlog.Log;
 import com.google.common.io.Files;
 import ec.util.MersenneTwisterFast;

@@ -1,14 +1,14 @@
 {
     "language"        : "PYTHON",
     "main_file"       : "selectivity.py",
-    "experiment-name" : "selectivity_100",
+    "experiment-name" : "selectivity",
     "likelihood"      : "GAUSSIAN",
-    "acquisition"     : "PES",
+    "acquisition"     : "EI",
     "resources" : {
         "my-machine" : {
             "scheduler"         : "local",
-            "max_concurrent"    : 3,
-            "max_finished-jobs" : 100
+            "max_concurrent"    : 2,
+            "max_finished-jobs" : 150
         }
     },
     "variables" : {

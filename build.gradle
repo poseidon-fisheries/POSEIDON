@@ -86,7 +86,7 @@ task wrapper(type: Wrapper) {
 //distributed
 task fatJar(type: FatCapsule) {
     archiveName = "oxfish_executable.jar"
-    applicationClass 'Main'
+    applicationClass 'uk.ac.ox.oxfish.Main'
  //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
     capsuleManifest {
@@ -99,7 +99,7 @@ task fatJar(type: FatCapsule) {
 //distributed
 task buildHeadless(type: FatCapsule, dependsOn: test) {
     archiveName = "yamler.jar"
-    applicationClass 'YamlMain'
+    applicationClass 'uk.ac.ox.oxfish.YamlMain'
     //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
     capsuleManifest {
