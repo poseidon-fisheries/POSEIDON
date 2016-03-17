@@ -28,7 +28,7 @@ public class Scenarios {
         DESCRIPTIONS.put("Prototype", "The current model, modular and ready to use.");
 
 
-        SCENARIOS.put("California Map Scenario", new CaliforniaBathymetryScenario(1));
+        SCENARIOS.put("California Map Scenario", new CaliforniaBathymetryScenario());
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +
                 "from bathymetry data");
     }

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -27,6 +28,10 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     private final HashMap<Species,int[][]>  abundance = new HashMap<>();
 
+    /**
+     * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
+     */
+    double lastComputedBiomass[];
 
     /**
      * creates an abundance based local biology that starts off as entirely empty
@@ -43,6 +48,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             abundance.put(species, fish);
         }
         //done!
+        lastComputedBiomass = new double[biology.getSpecies().size()];
+        Arrays.fill(lastComputedBiomass,Double.NaN);
     }
 
 
@@ -54,11 +61,14 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public Double getBiomass(Species species) {
-        return FishStateUtilities.weigh(
-                abundance.get(species)[FishStateUtilities.MALE],
-                abundance.get(species)[FishStateUtilities.FEMALE],
-                species
-                );
+
+        if(Double.isNaN(lastComputedBiomass[species.getIndex()] ))
+            lastComputedBiomass[species.getIndex()]  = FishStateUtilities.weigh(
+                    abundance.get(species)[FishStateUtilities.MALE],
+                    abundance.get(species)[FishStateUtilities.FEMALE],
+                    species
+            );
+        return lastComputedBiomass[species.getIndex()];
 
     }
 
@@ -83,6 +93,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             fish[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
             Preconditions.checkArgument(fish[FishStateUtilities.FEMALE][age] >=0, "There is now a negative amount of female fish left at age " + age);
         }
+        Arrays.fill(lastComputedBiomass,Double.NaN);
     }
 
     /**
@@ -92,6 +103,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public void start(FishState model) {
+        Arrays.fill(lastComputedBiomass,Double.NaN);
 
     }
 
@@ -146,6 +158,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             if(biomassActuallyFished>=biomassToFish)
                 break;
         }
+        Arrays.fill(lastComputedBiomass,Double.NaN);
 
 
 
@@ -160,6 +173,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public int[] getNumberOfMaleFishPerAge(Species species) {
+
+        Arrays.fill(lastComputedBiomass,Double.NaN);
         return  abundance.get(species)[FishStateUtilities.MALE];
     }
 
@@ -171,6 +186,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public int[] getNumberOfFemaleFishPerAge(Species species) {
+        Arrays.fill(lastComputedBiomass,Double.NaN);
+
         return  abundance.get(species)[FishStateUtilities.FEMALE];
     }
 

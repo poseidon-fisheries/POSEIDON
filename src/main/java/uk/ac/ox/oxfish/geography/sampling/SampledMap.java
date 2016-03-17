@@ -8,10 +8,7 @@ import sim.field.grid.ObjectGrid2D;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A map made of multiple grids, one for each input file given (plus the altitude one).
@@ -53,12 +50,14 @@ public class SampledMap
     public SampledMap(
             Path bathymetryFile,
             int gridWidth,
-            Path... biologyFiles) throws IOException {
+            LinkedHashMap<String,Path> biologyFiles) throws IOException {
 
-        Preconditions.checkArgument(biologyFiles.length > 0);
+        Preconditions.checkArgument(biologyFiles.size() > 0);
         gridWith = gridWidth;
         //read the first biological file
-        GeographicalSample biologySample = new GeographicalSample(biologyFiles[0],true);
+        Iterator<Map.Entry<String, Path>> biologyIterator = biologyFiles.entrySet().iterator();
+        Map.Entry<String, Path> firstBiology = biologyIterator.next();
+        GeographicalSample biologySample = new GeographicalSample(firstBiology.getValue(), true);
         mbr = new Envelope(biologySample.getMinEasting(), biologySample.getMaxEasting(),
                            biologySample.getMinNorthing(), biologySample.getMaxNorthing());
         //find ratio height to width
@@ -72,7 +71,7 @@ public class SampledMap
 
         //now collect observations
         backingBioGrid = fileToGrid(backingBioGrid,bioGrid,biologySample);
-        biologyGrids.put(biologyFiles[0].getFileName().toString(),backingBioGrid);
+        biologyGrids.put(firstBiology.getKey(), backingBioGrid);
         //read the altitude
         //read raster bathymetry
         GeographicalSample altitudeSample = new GeographicalSample(bathymetryFile,false);
@@ -80,11 +79,12 @@ public class SampledMap
 
 
         //now do the others
-        for(int csv=1; csv<biologyFiles.length; csv++)
+        while (biologyIterator.hasNext())
         {
+            Map.Entry<String, Path> biologyFile = biologyIterator.next();
             backingBioGrid = fileToGrid(new ObjectGrid2D(gridWidth, gridHeight), bioGrid,
-                                        new GeographicalSample(biologyFiles[csv], true));
-            biologyGrids.put(biologyFiles[csv].getFileName().toString(),backingBioGrid);
+                                        new GeographicalSample(biologyFile.getValue(), true));
+            biologyGrids.put(biologyFile.getKey(),backingBioGrid);
 
         }
 

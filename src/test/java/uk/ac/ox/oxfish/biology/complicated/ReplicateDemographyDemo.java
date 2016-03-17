@@ -75,7 +75,7 @@ public class ReplicateDemographyDemo {
             biology.getNumberOfMaleFishPerAge(species)[age] = maleData[age];
         }
 
-        NaturalProcesses processes = new NaturalProcesses(mortality, recruitment);
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment,species );
         processes.add(biology);
 
         StringBuilder builder = new StringBuilder();
@@ -167,7 +167,7 @@ public class ReplicateDemographyDemo {
                     biology1.getNumberOfMaleFishPerAge(species)[age];
         }
 
-        NaturalProcesses processes = new NaturalProcesses(mortality, recruitment);
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species);
         processes.add(biology1);
         processes.add(biology2);
 

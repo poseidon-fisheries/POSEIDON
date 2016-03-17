@@ -62,6 +62,13 @@ public class GlobalBiology
         return species[order];
     }
 
+    public Species getSpecie(String name)
+    {
+        return unmodifiableView.stream().
+                filter(s -> s.getName().equals(name)).
+                findFirst().get();
+    }
+
     public int getSize()
     {
         return species.length;

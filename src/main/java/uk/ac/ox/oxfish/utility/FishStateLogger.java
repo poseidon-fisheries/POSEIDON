@@ -44,6 +44,7 @@ public class FishStateLogger extends Log.Logger{
             if(writer==null)
                 writer = new FileWriter(path.toFile());
             writer.write(builder.toString());
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

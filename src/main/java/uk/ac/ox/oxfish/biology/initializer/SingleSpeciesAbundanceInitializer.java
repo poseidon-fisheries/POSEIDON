@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -17,8 +17,9 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A biology initializer that creates a one species model with abundance biology splitting the population equally
@@ -43,16 +44,21 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     private final double scaling;
 
-    public SingleSpeciesAbundanceInitializer(Path biologicalDirectory, String speciesName, double scaling) {
+
+    /**
+     * list of all the abundance based local biologies
+     */
+    private HashMap<SeaTile,AbundanceBasedLocalBiology> locals = new HashMap<>();
+
+
+    public SingleSpeciesAbundanceInitializer(
+            Path biologicalDirectory, String speciesName, double scaling) {
         this.biologicalDirectory = biologicalDirectory;
         this.speciesName = speciesName;
         this.scaling = scaling;
     }
 
-    /**
-     * list of all the abundance based local biologies
-     */
-    private LinkedList<AbundanceBasedLocalBiology> locals = new LinkedList<>();
+
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
@@ -67,12 +73,25 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells) {
+        return generateAbundanceBiologyExceptOnLand(biology, seaTile, locals);
+    }
+
+    /**
+     * the generate local made static so the MultipleSpeciesInitializer can use it too
+     *
+     * @param biology global biology file
+     * @param seaTile seatile
+     * @param locals a map seatiles---> abundance local biologies that gets filled if this is not a land tile
+     * @return empty biology on land, abundance biology in water
+     */
+    public static LocalBiology generateAbundanceBiologyExceptOnLand(
+            GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceBasedLocalBiology> locals) {
         if(seaTile.getAltitude() >= 0)
             return new EmptyLocalBiology();
 
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
-        locals.add(local);
+        locals.put(seaTile,local);
         return local;
     }
 
@@ -90,37 +109,28 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
     {
 
-        assert biology.getSize() == 1;
+        Preconditions.checkArgument(biology.getSize() == 1, "Single Species Abudance Initializer" +
+                "used for multiple species");
         Species species = biology.getSpecie(0);
-        int maxAge = species.getMaxAge();
-        int[][] totalCount = new int[2][maxAge +1];
+
         //read in the total number of fish
         try {
-            List<String> countfile = Files.readAllLines(biologicalDirectory.resolve("count.csv"));
-            assert  countfile.size() == maxAge +2; //it's the count + title line
-            String[] titleLine = countfile.get(0).split(",");
-            //expect to be female and then male
-            Preconditions.checkArgument(titleLine.length == 2);
-            Preconditions.checkArgument(titleLine[0].trim().toLowerCase().equals("female"));
-            Preconditions.checkArgument(titleLine[1].trim().toLowerCase().equals("male"));
-
-            for(int i=1;i<countfile.size(); i++)
-            {
-                String[] line = countfile.get(i).split(","); //this is not very efficient but it's a 100 lines at most so no big deal
-                assert  line.length == 2;
-                totalCount[FishStateUtilities.FEMALE][i-1] = Integer.parseInt(line[0]);
-                totalCount[FishStateUtilities.MALE][i-1] = Integer.parseInt(line[1]);
-            }
+            int[][] totalCount = turnCountsFileIntoAbundanceArray(species, biologicalDirectory);
 
 
             //now the count is complete, let's distribute these fish uniformly throughout the seatiles
             double tiles = locals.size();
-            for(AbundanceBasedLocalBiology local : locals)
+            for(Map.Entry<SeaTile,AbundanceBasedLocalBiology> local : locals.entrySet())
             {
-                for(int i=0; i<=maxAge; i++)
+                double ratio = 1d/tiles;
+
+                for(int i=0; i<=species.getMaxAge(); i++)
                 {
-                    local.getNumberOfMaleFishPerAge(species)[i] = (int) (0.5d + scaling * totalCount[FishStateUtilities.MALE][i] /tiles);
-                    local.getNumberOfFemaleFishPerAge(species)[i] = (int) (0.5d + scaling * totalCount[FishStateUtilities.FEMALE][i] /tiles);
+
+                    local.getValue().getNumberOfMaleFishPerAge(species)[i] =
+                            (int) (0.5d + scaling * totalCount[FishStateUtilities.MALE][i] *ratio);
+                    local.getValue().getNumberOfFemaleFishPerAge(species)[i] =
+                            (int) (0.5d + scaling * totalCount[FishStateUtilities.FEMALE][i] *ratio);
                 }
             }
 
@@ -130,22 +140,70 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Log.error("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
+        initializeNaturalProcesses(model, species, locals);
 
+
+    }
+
+    /**
+     * for a specific species create the natural processes object (which will be returned)
+     * and register it as startable in the model
+     * @param model the model
+     * @param species the species you need the natural processes set up
+     * @param locals a map of all the areas where fish can live
+     * @return the already scheduled naturalProcesses object
+     */
+    public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
+            FishState model, Species species, HashMap<SeaTile, AbundanceBasedLocalBiology> locals) {
         //schedule recruitment and natural mortality
-        NaturalProcesses processes = new NaturalProcesses(
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
                 new RecruitmentBySpawningBiomassDelayed(
                         species.getVirginRecruits(),
                         species.getSteepness(),
                         species.isAddRelativeFecundityToSpawningBiomass(),
                         2
-                )
+                ),
+                species
         );
-        for(AbundanceBasedLocalBiology local : locals)
+        for(AbundanceBasedLocalBiology local : locals.values())
             processes.add(local);
-        processes.start(model);
+        model.registerStartable(processes);
+        return processes;
+    }
 
+    /**
+     * read count.csv in the biological directory and turn it into an array representing total fish
+     * abundance
+     * @param species the species object
+     * @param biologicalDirectory the biological directory
+     * @return the array containing the count split into age cohorts
+     * @throws IOException failed to read the file
+     */
+    public static int[][] turnCountsFileIntoAbundanceArray(
+            Species species, Path biologicalDirectory) throws IOException {
+        if(Log.TRACE)
+            Log.trace("Reading up " + biologicalDirectory);
+        int maxAge = species.getMaxAge();
+        int[][] totalCount = new int[2][maxAge +1];
+        List<String> countfile = Files.readAllLines(biologicalDirectory.resolve("count.csv"));
+        assert  countfile.size() >= maxAge +2; //it's the count + title line
+        //allow for one line of empty space
+        assert  countfile.size() <= maxAge +3 : "there is more than one empty space at the end of count.csv or just too many rows";
+        String[] titleLine = countfile.get(0).split(",");
+        //expect to be female and then male
+        Preconditions.checkArgument(titleLine.length == 2);
+        Preconditions.checkArgument(titleLine[0].trim().toLowerCase().equals("female"));
+        Preconditions.checkArgument(titleLine[1].trim().toLowerCase().equals("male"));
 
+        for(int i=1;i<maxAge +2; i++)
+        {
+            String[] line = countfile.get(i).split(","); //this is not very efficient but it's a 100 lines at most so no big deal
+            assert  line.length == 2;
+            totalCount[FishStateUtilities.FEMALE][i-1] = Integer.parseInt(line[0]);
+            totalCount[FishStateUtilities.MALE][i-1] = Integer.parseInt(line[1]);
+        }
+        return totalCount;
     }
 
     /**
@@ -159,12 +217,9 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     public GlobalBiology generateGlobal(
             MersenneTwisterFast random, FishState modelBeingInitialized) {
 
-        FishYAML yaml = new FishYAML();
         try {
-            String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
-            MeristicsInput input = yaml.loadAs(meristicFile,MeristicsInput.class);
-            Meristics meristics = new Meristics(input);
-            return new GlobalBiology(new Species(speciesName,meristics));
+            Species species = generateSpeciesFromFolder(biologicalDirectory, speciesName);
+            return new GlobalBiology(species);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -172,4 +227,49 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         System.exit(-1);
         return null;
     }
+
+    /**
+     * read up a folder that contains meristics.yaml and turn it into a species object
+     * @param biologicalDirectory the folder containing meristics.yaml
+     * @param speciesName the name of the species
+     * @return the new species
+     * @throws IOException
+     */
+    public static Species generateSpeciesFromFolder(Path biologicalDirectory, String speciesName) throws IOException {
+        FishYAML yaml = new FishYAML();
+        String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
+        MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
+        Meristics meristics = new Meristics(input);
+        return new Species(speciesName, meristics);
+    }
+
+
+    /**
+     * Getter for property 'biologicalDirectory'.
+     *
+     * @return Value for property 'biologicalDirectory'.
+     */
+    public Path getBiologicalDirectory() {
+        return biologicalDirectory;
+    }
+
+    /**
+     * Getter for property 'speciesName'.
+     *
+     * @return Value for property 'speciesName'.
+     */
+    public String getSpeciesName() {
+        return speciesName;
+    }
+
+    /**
+     * Getter for property 'scaling'.
+     *
+     * @return Value for property 'scaling'.
+     */
+    public double getScaling() {
+        return scaling;
+    }
+
+
 }
