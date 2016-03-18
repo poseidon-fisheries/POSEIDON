@@ -45,5 +45,15 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
                 toRefresh.repaint();
             }
         });
+
+        toRefresh.display.getViewport().addChangeListener(e -> {
+            boolean isImmutable = toModify.isImmutableField();
+            toModify.setImmutableField(false);
+            toRefresh.revalidate();
+            toRefresh.repaint();
+            toModify.setImmutableField(isImmutable);
+        });
+
+
     }
 }
