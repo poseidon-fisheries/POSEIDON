@@ -81,11 +81,11 @@ public class AStarPathfinder implements Pathfinder {
                     continue;
 
                 //check how much it would cost to move there
-                double newCost = costSoFar.get(current) + distanceFunction.distance(current,neighbor);
+                double newCost = costSoFar.get(current) + distanceFunction.distance(current,neighbor,map );
                 if(!cameFrom.containsKey(neighbor) || newCost < costSoFar.get(neighbor)) //ignore tiles that aren't in the sea or that we explored already
                 {
                     costSoFar.put(neighbor,newCost);
-                    double priority = newCost + distanceFunction.distance(end,neighbor);
+                    double priority = newCost + distanceFunction.distance(end,neighbor,map );
                     frontier.add(new FrontierElement(neighbor,priority));
                     cameFrom.put(neighbor,current);
                 }
@@ -95,12 +95,17 @@ public class AStarPathfinder implements Pathfinder {
 
         }
 
+        //if you haven't found the path, then return null
+        if(cameFrom.get(end) == null)
+            return null;
+
         //build the path
         SeaTile current = end;
         path.add(current);
         while(current != start)
         {
             current = cameFrom.get(current);
+            assert current!=null;
             path.add(current);
         }
         //reverse it

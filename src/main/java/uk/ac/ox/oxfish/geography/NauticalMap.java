@@ -303,7 +303,7 @@ public class NauticalMap implements Startable
      * @return kilometers between the two points
      */
     public double distance(int startXGrid, int startYGrid, int endXGrid, int endYGrid) {
-        return distance.distance(startXGrid, startYGrid, endXGrid, endYGrid);
+        return distance.distance(getSeaTile(startXGrid,startYGrid),getSeaTile(endXGrid,endYGrid),this);
     }
 
     /**
@@ -313,7 +313,7 @@ public class NauticalMap implements Startable
      * @return kilometers between the two
      */
     public double distance(SeaTile start, SeaTile end) {
-        return distance.distance(start, end);
+        return distance.distance(start, end, this);
     }
 
 

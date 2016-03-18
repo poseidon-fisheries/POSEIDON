@@ -302,7 +302,10 @@ public class PrototypeScenario implements Scenario {
                                           destinationStrategy.apply(model),
                                           fishingStrategy.apply(model),
                                           weatherStrategy.apply(model),
-                                          new Boat(10, 10, new Engine(engineWeight, literPerKilometer, speed),
+                                          new Boat(10, 10,
+                                                   new Engine(engineWeight,
+                                                               literPerKilometer,
+                                                              speed),
                                                    new FuelTank(fuelCapacity)),
                                           new Hold(capacity, biology.getSize()),
                                           fisherGear, model.getSpecies().size());

@@ -177,4 +177,8 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
             Function< SeaTile, Double> value) {
         return allocators.put(key, value);
     }
+
+    public int getNumberOfFishableTiles(){
+        return locals.size();
+    }
 }

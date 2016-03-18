@@ -8,10 +8,12 @@ public abstract class BaseDistance implements Distance {
 
 
     @Override
-    public double distance(SeaTile start, SeaTile end)
+    public double distance(SeaTile start, SeaTile end, NauticalMap map)
     {
         return distance(start.getGridX(),start.getGridY(),end.getGridX(),end.getGridY());
     }
+
+    protected abstract double distance(int startX, int startY, int endX, int endY);
 
 
 }

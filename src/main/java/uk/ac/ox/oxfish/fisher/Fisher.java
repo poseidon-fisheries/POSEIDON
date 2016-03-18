@@ -1063,4 +1063,12 @@ public class Fisher implements Steppable, Startable{
                                                  state.getFishers());
     }
 
+    /**
+     * force the destination to be port, this is used only if your current destination is unreachable (because it's land or landlocked)
+     */
+    public void setDestinationForPort()
+    {
+        status.setDestination(getHomePort().getLocation());
+    }
+
 }

@@ -72,6 +72,13 @@ public class Moving implements Action
         if(path==null) {
             //get the pathfinder to help
             path = map.getRoute(agent.getLocation(), agent.getDestination());
+            if(path == null)
+            {
+                //there is no path available
+                agent.setDestinationForPort();
+                return new ActionResult(new Arriving(),0);
+            }
+
             assert path.peek().equals(agent.getLocation()); //starts at the right location
             assert path.peekLast().equals(agent.getDestination()); //ends where we are
             path.poll(); //remove start, it's useless
