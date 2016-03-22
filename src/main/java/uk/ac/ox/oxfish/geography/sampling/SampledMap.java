@@ -2,11 +2,14 @@ package uk.ac.ox.oxfish.geography.sampling;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Envelope;
 import sim.field.geo.GeomGridField;
 import sim.field.grid.ObjectGrid2D;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -16,29 +19,31 @@ import java.util.*;
  *
  * Created by carrknight on 2/25/16.
  */
-public class SampledMap
+public class SampledMap implements Serializable
 {
 
 
     /**
      * collects the biological grids, each objectGrid2D is made of a LinkedList of doubles
      */
-    private final LinkedHashMap<String,ObjectGrid2D> biologyGrids = new LinkedHashMap<>();
+    private LinkedHashMap<String,Table<Integer,Integer,LinkedList<Double>>> biologyGrids = new LinkedHashMap<>();
 
     /**
      * the bathymetry file
      */
-    private final ObjectGrid2D altitudeGrid;
+    private Table<Integer,Integer,LinkedList<Double>> altitudeGrid;
 
     /**
      * the envelope containing the map
      */
-    private final Envelope mbr;
+    private Envelope mbr;
 
 
-    private final int gridWith;
+    private int gridWith;
 
-    private final int gridHeight;
+    private int gridHeight;
+
+
 
     /**
      * reads and combines the various map files. The envelope of the map is given by the size of the first biologyFile
@@ -70,21 +75,21 @@ public class SampledMap
         bioGrid.setMBR(mbr);
 
         //now collect observations
-        backingBioGrid = fileToGrid(backingBioGrid,bioGrid,biologySample);
-        biologyGrids.put(firstBiology.getKey(), backingBioGrid);
+        Table<Integer,Integer,LinkedList<Double>> backingBioTable = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid, biologySample);
+        biologyGrids.put(firstBiology.getKey(), backingBioTable);
         //read the altitude
         //read raster bathymetry
         GeographicalSample altitudeSample = new GeographicalSample(bathymetryFile,false);
-        altitudeGrid = fileToGrid(new ObjectGrid2D(gridWidth, gridHeight),bioGrid,altitudeSample);
+        altitudeGrid = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid, altitudeSample);
 
 
         //now do the others
         while (biologyIterator.hasNext())
         {
             Map.Entry<String, Path> biologyFile = biologyIterator.next();
-            backingBioGrid = fileToGrid(new ObjectGrid2D(gridWidth, gridHeight), bioGrid,
+            backingBioTable = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid,
                                         new GeographicalSample(biologyFile.getValue(), true));
-            biologyGrids.put(biologyFile.getKey(),backingBioGrid);
+            biologyGrids.put(biologyFile.getKey(),backingBioTable);
 
         }
 
@@ -99,14 +104,14 @@ public class SampledMap
      * @param preformattedCSV the data from CSV preformatted
      * @return the backing grid after it has been filled (it will be made of LinkedList objects, containing double observations
      */
-    private ObjectGrid2D fileToGrid(
-            ObjectGrid2D backingGrid,
+    private Table<Integer,Integer,LinkedList<Double>> fileToGrid(
+            Table<Integer, Integer, LinkedList<Double>> backingGrid,
             GeomGridField coordinateSpace,
-            GeographicalSample preformattedCSV ) {
+            GeographicalSample preformattedCSV) {
 
-        for(int x = 0; x<backingGrid.getWidth(); x++)
-            for(int y = 0; y<backingGrid.getHeight(); y++)
-                backingGrid.field[x][y] = new LinkedList<Double>();
+        for(int x = 0; x< getGridWith(); x++)
+            for(int y = 0; y< getGridHeight(); y++)
+                backingGrid.put(x,y,new LinkedList<Double>());
         Iterator<Double> eastings = preformattedCSV.getEastings().iterator();
         Iterator<Double> northings = preformattedCSV.getNorthings().iterator();
         Iterator<Double> observations = preformattedCSV.getObservations().iterator();
@@ -116,19 +121,19 @@ public class SampledMap
             int y = coordinateSpace.toYCoord(northings.next());
             double obs = observations.next();
             //the very edge might get cut
-            if(x>=0 && x < backingGrid.getWidth() && y >=0 && y < backingGrid.getHeight())
-                ((List) backingGrid.field[x][y]).add(obs);
+            if(x>=0 && x < getGridWith() && y >=0 && y < getGridHeight())
+                ((List) backingGrid.get(x,y)).add(obs);
             if(i % 10000 == 0 && Log.TRACE)
                 Log.trace("Transformed " +i + "  sampled lines into a grid" );
         }
         return backingGrid;
     }
 
-    public LinkedHashMap<String, ObjectGrid2D> getBiologyGrids() {
+    public LinkedHashMap<String,Table<Integer,Integer,LinkedList<Double>>> getBiologyGrids() {
         return biologyGrids;
     }
 
-    public ObjectGrid2D getAltitudeGrid() {
+    public Table<Integer,Integer,LinkedList<Double>> getAltitudeGrid() {
         return altitudeGrid;
     }
 
@@ -152,5 +157,52 @@ public class SampledMap
      */
     public int getGridHeight() {
         return gridHeight;
+    }
+
+    /**
+     * Setter for property 'biologyGrids'.
+     *
+     * @param biologyGrids Value to set for property 'biologyGrids'.
+     */
+    public void setBiologyGrids(
+            LinkedHashMap<String, Table<Integer, Integer, LinkedList<Double>>> biologyGrids) {
+        this.biologyGrids = biologyGrids;
+    }
+
+    /**
+     * Setter for property 'altitudeGrid'.
+     *
+     * @param altitudeGrid Value to set for property 'altitudeGrid'.
+     */
+    public void setAltitudeGrid(
+            Table<Integer, Integer, LinkedList<Double>> altitudeGrid) {
+        this.altitudeGrid = altitudeGrid;
+    }
+
+    /**
+     * Setter for property 'mbr'.
+     *
+     * @param mbr Value to set for property 'mbr'.
+     */
+    public void setMbr(Envelope mbr) {
+        this.mbr = mbr;
+    }
+
+    /**
+     * Setter for property 'gridWith'.
+     *
+     * @param gridWith Value to set for property 'gridWith'.
+     */
+    public void setGridWith(int gridWith) {
+        this.gridWith = gridWith;
+    }
+
+    /**
+     * Setter for property 'gridHeight'.
+     *
+     * @param gridHeight Value to set for property 'gridHeight'.
+     */
+    public void setGridHeight(int gridHeight) {
+        this.gridHeight = gridHeight;
     }
 }

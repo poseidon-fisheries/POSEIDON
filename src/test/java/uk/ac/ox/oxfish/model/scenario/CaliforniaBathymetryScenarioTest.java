@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
+import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -39,5 +40,22 @@ public class CaliforniaBathymetryScenarioTest {
         assertEquals(totalShortspineBiomass,target,target*.05);
 
 
+
+        //Morro Bay: Easting: 695337, Northing: 3915757.7
+        //San Francisco: 553454.67, 4178621.91
+        SeaTile morro = model.getMap().getSeaTile(new Coordinate(695337, 3915757.7));
+        SeaTile sf = model.getMap().getSeaTile(new Coordinate(553454.67, 4178621.91));
+        double km = model.getMap().distance(morro, sf);
+        Log.info("the distance between Morro Bay and San Francisco is about 300km, the distance calculator thinks it is "+ km);
+        assertEquals(km,300,10);
+
+
+
+        morro = model.getMap().getSeaTile(29,104);
+        for(int i=0; i<10; i++)
+        {
+            Log.info("Distance " + i + " cells away from Morro Bay is " +
+                             model.getMap().distance(morro,model.getMap().getSeaTile(29-i,104)));
+        }
     }
 }

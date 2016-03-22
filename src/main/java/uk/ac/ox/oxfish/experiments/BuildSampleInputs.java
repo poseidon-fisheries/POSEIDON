@@ -1,16 +1,20 @@
 package uk.ac.ox.oxfish.experiments;
 
+import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -69,6 +73,48 @@ public class BuildSampleInputs
 
 
         }
+
+        directory = Paths.get("inputs", "california");
+        Path bioDirectory = directory.resolve("biology");
+
+        DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
+        LinkedHashMap<String,Path> spatialFiles = new LinkedHashMap<>();
+        LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
+        //each folder is supposedly a species
+        for(Path folder : folders)
+        {
+
+            Path file = folder.resolve("spatial.csv");
+            if(file.toFile().exists())
+            {
+                String name = folder.getFileName().toString();
+                spatialFiles.put(name, file);
+                Preconditions.checkArgument(folder.resolve("count.csv").toFile().exists(),
+                                            "The folder "+ name +
+                                                    "  doesn't contain the abundance count.csv");
+
+                Preconditions.checkArgument(folder.resolve("meristics.yaml").toFile().exists(),
+                                            "The folder "+ name +
+                                                    "  doesn't contain the abundance count.csv");
+
+                folderMap.put(folder.getFileName().toString(),folder);
+            }
+            else
+            {
+                if(Log.WARN)
+                    Log.warn(folder.getFileName() + " does not have a spatial.txt file and so cannot be distributed on the map. It will be ignored");
+            }
+
+        }
+
+        SampledMap sampledMap = new SampledMap(Paths.get("inputs", "california",
+                                                         "california.csv"),
+                                               50,
+                                               spatialFiles);
+
+        ObjectOutputStream objectStream = new ObjectOutputStream(new FileOutputStream(directory.resolve("premade.data").toFile()));
+        objectStream.writeObject(sampledMap);
+        objectStream.close();
 
     }
 

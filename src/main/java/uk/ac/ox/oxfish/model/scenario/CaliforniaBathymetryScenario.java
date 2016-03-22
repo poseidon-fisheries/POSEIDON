@@ -50,7 +50,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -159,6 +161,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private MultipleSpeciesAbundanceInitializer initializer;
 
 
+    private String mainDirectory = "inputs/california/";
+
+    private boolean usePremadeInput = true;
 
 
     public CaliforniaBathymetryScenario() {
@@ -180,7 +185,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
         NauticalMap map;
 
         try {
-            Path mainDirectory = Paths.get("inputs", "california");
+            Path mainDirectory = Paths.get(this.mainDirectory);
             Path bioDirectory = mainDirectory.resolve("biology");
 
             DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
@@ -220,20 +225,36 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                   biomassScaling);
 
 
-            SampledMap sampledMap = new SampledMap(Paths.get("inputs", "california",
-                                                             "california.csv"),
-                                                   gridWidth,
-                                                   spatialFiles);
+            SampledMap sampledMap = null;
+            if(usePremadeInput) {
+                ObjectInputStream stream = new ObjectInputStream(
+                        new FileInputStream(mainDirectory.resolve("premade.data").toFile())
+                );
+                try {
+                    sampledMap = (SampledMap) stream.readObject();
+                }
+                catch (Exception e){
+                    Log.error("Failed to read the premade california scenario.");
+                    Log.error(e.toString());
+                    System.exit(-1);
+                }
+
+            }
+            else
+                sampledMap = new SampledMap(Paths.get("inputs", "california",
+                                                      "california.csv"),
+                                            gridWidth,
+                                            spatialFiles);
 
             //we want a grid of numbers but we have a grid where every cell has many observations
             int gridHeight = sampledMap.getGridHeight();
             ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth, gridHeight);
-            ObjectGrid2D sampledAltitudeGrid = sampledMap.getAltitudeGrid();
+            Table<Integer,Integer,LinkedList<Double>> sampledAltitudeGrid = sampledMap.getAltitudeGrid();
             //so for altitude we just average them out
             for(int x=0;x<gridWidth;x++)
                 for(int y=0;y<gridHeight;y++)
                 {
-                    OptionalDouble average = ((LinkedList<Double>) sampledAltitudeGrid.get(x, y)).
+                    OptionalDouble average = sampledAltitudeGrid.get(x, y).
                             stream().mapToDouble(
                             value -> value).filter(
                             aDouble -> aDouble > -9999).average();
@@ -270,11 +291,11 @@ public class CaliforniaBathymetryScenario implements Scenario {
                         int i = 0;
                         //each specie grid value is an ObjectGrid2D whose cells are themselves list of observations
                         //for each species
-                        for (Map.Entry<String, ObjectGrid2D> specieGrid : sampledMap.getBiologyGrids().entrySet()) {
+                        for (Map.Entry<String, Table<Integer,Integer,LinkedList<Double>>> specieGrid : sampledMap.getBiologyGrids().entrySet()) {
                             assert species.get(i).getName().equals(specieGrid.getKey()); //check we got the correct one
                             //average
-                            OptionalDouble average = ((LinkedList<Double>) specieGrid.getValue().get(x,
-                                                                                                     y)).stream().mapToDouble(
+                            OptionalDouble average = specieGrid.getValue().get(x,
+                                                                               y).stream().mapToDouble(
                                     value -> value).average();
                             averages[i] = average.orElse(0);
                             i++;
@@ -294,8 +315,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
             for(Species current : biology.getSpecies())
                 initializer.putAllocator(current, input ->
                         (averagesTable.get(input.getGridX(), input.getGridY())[current.getIndex()])
-                        /
-                        sums[current.getIndex()]);
+                                /
+                                sums[current.getIndex()]);
 
             initializer.processMap(biology, map, model.getRandom(), model);
 
@@ -325,6 +346,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                              location,
                              markets,
                              gasPricePerLiter.apply(model.getRandom())));
+
 
 
         return new ScenarioEssentials(biology, map, markets);
@@ -872,6 +894,34 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     public void setNumberOfFishers(int numberOfFishers) {
         this.numberOfFishers = numberOfFishers;
+    }
+
+
+
+    public boolean isUsePremadeInput() {
+        return usePremadeInput;
+    }
+
+    public void setUsePremadeInput(boolean usePremadeInput) {
+        this.usePremadeInput = usePremadeInput;
+    }
+
+    /**
+     * Getter for property 'mainDirectory'.
+     *
+     * @return Value for property 'mainDirectory'.
+     */
+    public String getMainDirectory() {
+        return mainDirectory;
+    }
+
+    /**
+     * Setter for property 'mainDirectory'.
+     *
+     * @param mainDirectory Value to set for property 'mainDirectory'.
+     */
+    public void setMainDirectory(String mainDirectory) {
+        this.mainDirectory = mainDirectory;
     }
 }
 

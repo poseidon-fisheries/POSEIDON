@@ -459,7 +459,18 @@ public class Fisher implements Steppable, Startable{
         final double litersBought = equipment.getBoat().refill();
         status.setFuelEmergencyOverride(false);
         //now pay for it
-        spendForTrip(litersBought * status.getHomePort().getGasPricePerLiter());
+        double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
+        spendForTrip(gasExpenditure);
+        memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_EXPENDITURE, gasExpenditure);
+        if(status.getHoursAtSea()>0) //if you have been somewhere at all
+            memory.getYearlyCounter().count(YearlyFisherTimeSeries.TRIPS,1);
+
+
+        //notify listeners
+        for(DockingListener listener : dockingListeners)
+        {
+            listener.dockingEvent(this,getHomePort());
+        }
 
         //finish trip!
         memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort() );
@@ -467,11 +478,7 @@ public class Fisher implements Steppable, Startable{
 
         status.setHoursAtSea(0);
         assert  isAtPort();
-        //notify listeners
-        for(DockingListener listener : dockingListeners)
-        {
-            listener.dockingEvent(this,getHomePort());
-        }
+
     }
 
     /**
@@ -667,6 +674,7 @@ public class Fisher implements Steppable, Startable{
                                                                                            status.getLocation()) * hoursSpentFishing;
         consumeFuel(litersBurned);
 
+        memory.getYearlyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);
 
 
         return catchOfTheDay;

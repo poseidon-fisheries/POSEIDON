@@ -1,0 +1,48 @@
+package uk.ac.ox.oxfish.geography;
+
+import com.esotericsoftware.minlog.Log;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+/**
+ * Created by carrknight on 3/22/16.
+ */
+public class CartesianUTMDistanceTest {
+
+    @Test
+    public void morroToSanFrancisco() throws Exception {
+        //check that distance is more or less correct
+        //Morro Bay: Easting: 695337, Northing: 3915757.7
+        //San Francisco: 553454.67, 4178621.91
+
+        SeaTile morro = mock(SeaTile.class);
+        SeaTile sf = mock(SeaTile.class);
+        NauticalMap map = mock(NauticalMap.class);
+        when(map.getCoordinates(morro)).thenReturn(new Coordinate(695337, 3915757.7));
+        when(map.getCoordinates(sf)).thenReturn(new Coordinate(553454,4178621.91));
+
+        CartesianUTMDistance distance = new CartesianUTMDistance();
+        double km = distance.distance(morro, sf, map);
+        Log.info("the distance between Morro Bay and San Francisco is about 300km, the distance calculator thinks it is "+ km);
+        assertEquals(km,300,10);
+
+        //Los Angeles: Easting: 695337, Northing: 3915757.7
+        //San Diego: 486713.98.7, 3616444.50
+
+        SeaTile la = mock(SeaTile.class);
+        SeaTile sd = mock(SeaTile.class);
+
+        when(map.getCoordinates(la)).thenReturn(new Coordinate(387515.11, 3765635.80));
+        when(map.getCoordinates(sd)).thenReturn(new Coordinate(486713.98,3616444.50));
+
+        km = distance.distance(la, sd, map);
+        Log.info("the distance between Los Angeles and San Diego is about 180km, the distance calculator thinks it is "+
+                         km);
+        assertEquals(km,180,10);
+
+    }
+}

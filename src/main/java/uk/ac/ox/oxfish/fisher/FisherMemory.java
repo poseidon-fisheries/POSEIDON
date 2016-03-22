@@ -96,6 +96,9 @@ public class FisherMemory implements Serializable, FisherStartable {
     public void start(FishState model, Fisher fisher) {
         dailyTimeSeries = new DailyFisherTimeSeries();
         yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
+        yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_EXPENDITURE);
+        yearlyCounter.addColumn(YearlyFisherTimeSeries.TRIPS);
+        yearlyCounter.addColumn(YearlyFisherTimeSeries.EFFORT);
         dailyCounter = new FisherDailyCounter(model.getSpecies().size());
 
         dailyTimeSeries.start(model, fisher);

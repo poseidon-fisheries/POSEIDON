@@ -2,10 +2,11 @@ package uk.ac.ox.oxfish.model.data;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ public class YearlyFisherTimeSeriesTest {
 
         YearlyFisherTimeSeries yearlyGatherer = new YearlyFisherTimeSeries();
         Fisher fisher = mock(Fisher.class);
+        when(fisher.getHomePort()).thenReturn(mock(Port.class));
         when(fisher.getBankBalance()).thenReturn(0d);
         yearlyGatherer.start(mock(FishState.class), fisher);
 
