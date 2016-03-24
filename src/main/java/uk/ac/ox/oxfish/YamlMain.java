@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -27,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.function.ToDoubleFunction;
 
 /**
  * Created by carrknight on 11/18/15.
@@ -54,17 +54,20 @@ public class YamlMain {
         String fullScenario = String.join("\n", Files.readAllLines(inputFolder));
 
         FishYAML yaml = new FishYAML();
-        PrototypeScenario scenario = yaml.loadAs(fullScenario,PrototypeScenario.class);
+        Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
         yaml.dump(scenario,new FileWriter(outputFolder.resolve("scenario.yaml").toFile()));
 
         FishState model = new FishState(seed);
         Log.setLogger(new FishStateLogger(model,
                                           outputFolder.resolve(simulationName+ "_log.txt")));
-        Log.set(Log.LEVEL_ERROR);
+        Log.set(Log.LEVEL_DEBUG);
         model.setScenario(scenario);
         model.start();
-        while(model.getYear()<20)
+        while(model.getYear()<20) {
             model.schedule.step(model);
+            if(Log.DEBUG && model.getDayOfTheYear()==1)
+                Log.debug("Year " + model.getYear() + " starting");
+        }
 
         FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
         ModelResults results =  new ModelResults(model);
@@ -191,7 +194,7 @@ public class YamlMain {
         model.registerStartable(new Startable() {
             @Override
             public void start(FishState model) {
-                LinkedList<Fisher> poorFishers = new LinkedList<Fisher>();
+                LinkedList<Fisher> poorFishers = new LinkedList<>();
                 for(Fisher fisher : model.getFishers())
                 {
                     if(fisher.getID() <50)
@@ -212,13 +215,8 @@ public class YamlMain {
 
                 model.getYearlyDataSet().registerGatherer("Poor Fishers Total Income",
                                                           fishState -> poorFishers.stream().
-                                                                  mapToDouble(new ToDoubleFunction<Fisher>() {
-                                                                      @Override
-                                                                      public double applyAsDouble(Fisher value) {
-                                                                          return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_COLUMN);
-                                                                      }
-                                                                  }).sum(), Double.NaN);
+                                                                  mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                          YearlyFisherTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
             }
 
             @Override

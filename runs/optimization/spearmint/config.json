@@ -1,26 +1,56 @@
 {
     "language"        : "PYTHON",
-    "main_file"       : "selectivity.py",
-    "experiment-name" : "selectivity",
+    "main_file"       : "califuel.py",
+    "experiment-name" : "califuel",
     "likelihood"      : "GAUSSIAN",
-    "acquisition"     : "EI",
+    "acquisition"     : "PES",
     "resources" : {
         "my-machine" : {
             "scheduler"         : "local",
-            "max_concurrent"    : 2,
+            "max_concurrent"    : 1,
             "max_finished-jobs" : 150
         }
     },
     "variables" : {
-        "selectivity" : {
+        "trip_costs" : {
            "type" : "FLOAT",
       	   "size" : 1,
            "min"  : 0,
-           "max"  : 48
-        }
+           "max"  : 10000
+        },
+        "exploration" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        },
+      "departing_exploration" : {
+        "type" : "FLOAT",
+        "size" : 1,
+        "min"  : 0,
+        "max"  : 1
+      },
+      "departing_shock" : {
+        "type" : "FLOAT",
+        "size" : 1,
+        "min"  : 0,
+        "max"  : 1
+      },
+      "departing_initial" : {
+        "type" : "FLOAT",
+        "size" : 1,
+        "min"  : 0,
+        "max"  : 1
+      },
+      "degree" : {
+        "type" : "int",
+        "size" : 1,
+        "min"  : 0,
+        "max"  : 20
+      }
     },
     "tasks" : {
-        "f"  : { "type" : "objective"  }
+        "error"  : { "type" : "objective"  }
     }
 }
 

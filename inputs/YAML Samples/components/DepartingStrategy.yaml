@@ -1,5 +1,11 @@
-Fixed Probability:
+Fixed Probability Departing:
   probabilityToLeavePort: '1.0'
+-------
+Adaptive Probability Departing:
+  explorationProbability: '0.6'
+  imitationProbability: '1.0'
+  initialProbabilityToLeavePort: '0.5'
+  shockSize: '0.6'
 -------
 Fixed Rest:
   hoursBetweenEachDeparture: '12.0'

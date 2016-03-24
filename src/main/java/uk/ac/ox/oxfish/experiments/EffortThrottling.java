@@ -142,7 +142,7 @@ public class EffortThrottling {
         FishState state = new FishState(seed);
         state.setScenario(scenario);
         state.start();
-        GearImitationAnalysis.attachGoingOutProbabilityToEveryone(state.getFishers(), state);
+        GearImitationAnalysis.attachGoingOutProbabilityToEveryone(state.getFishers(), state, 0.4, .2, .6);
 
    //     state.getMap().guiStart(state);
         state.schedule.step(state);

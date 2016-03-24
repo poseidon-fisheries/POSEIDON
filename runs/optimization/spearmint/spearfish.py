@@ -51,7 +51,7 @@ def main():
         os.makedirs(dbDirectory)
 
     ##connect mongo to itx
-  # subprocess.call(["mon`god", "--fork", "--logpath", dbDirectory + "/log_"+experiment_name+".txt", "--dbpath", dbDirectory])
+  # subprocess.call(["mongod", "--fork", "--logpath", dbDirectory + "/log_"+experiment_name+".txt", "--dbpath", dbDirectory])
 
     ##now run spearmint
     os.chdir(SPEARMINT_DIRECTORY)

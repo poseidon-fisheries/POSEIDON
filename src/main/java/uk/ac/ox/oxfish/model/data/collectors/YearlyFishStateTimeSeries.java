@@ -76,6 +76,25 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
                 value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)).sum()/
                 observed.getFishers().size(), 0d);
 
+
+        registerGatherer("Average Distance From Port", ignored -> observed.getFishers().stream().mapToDouble(
+                value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.FISHING_DISTANCE)).filter(Double::isFinite).sum()/
+                observed.getFishers().size(), 0d);
+
+        registerGatherer("Average Number of Trips", ignored -> observed.getFishers().stream().mapToDouble(
+                value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIPS)).sum()/
+                observed.getFishers().size(), 0d);
+
+        registerGatherer("Average Gas Expenditure", ignored -> observed.getFishers().stream().mapToDouble(
+                value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.FUEL_EXPENDITURE)).filter(Double::isFinite).sum()/
+                observed.getFishers().size(), 0d);
+
+        registerGatherer("Average Trip Duration", ignored -> observed.getFishers().stream().mapToDouble(
+                value -> value.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIP_DURATION)).filter(Double::isFinite).sum()/
+                observed.getFishers().size(), 0d);
+
     }
+
+
 
 }

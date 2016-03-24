@@ -58,7 +58,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * Reads the bathymetry file of california and for now not much else.
@@ -164,6 +163,11 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private String mainDirectory = "inputs/california/";
 
     private boolean usePremadeInput = true;
+
+    /**
+     * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
+     */
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
 
 
     public CaliforniaBathymetryScenario() {
@@ -453,22 +457,30 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                             7));
 
             fisherList.add(newFisher);
+
+            newFisher.addDockingListener(
+                    (fisher, port1) -> {
+                        if(fisher.getHoursAtSea()>0)
+                            fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
+                                                        /
+                                                        fisher.getHoursAtSea());
+                    });
         }
 
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
         FisherFactory fisherFactory = new FisherFactory(
-                (Supplier<Port>) () -> ports[0],
+                () -> ports[0],
                 regulation,
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(0,
+                () -> new Boat(10, 10, new Engine(0,
                                                                    literPerKilometer.apply(random),
                                                                    cruiseSpeedInKph.apply(random)),
                                                 new FuelTank(fuelTankInLiters.apply(random))),
-                (Supplier<Hold>) () -> new Hold(holdSizePerBoat.apply(random), biology.getSize()),
+                () -> new Hold(holdSizePerBoat.apply(random), biology.getSize()),
                 gear,
                 numberOfFishers
 
@@ -922,6 +934,24 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     public void setMainDirectory(String mainDirectory) {
         this.mainDirectory = mainDirectory;
+    }
+
+    /**
+     * Getter for property 'hourlyTravellingCosts'.
+     *
+     * @return Value for property 'hourlyTravellingCosts'.
+     */
+    public DoubleParameter getHourlyTravellingCosts() {
+        return hourlyTravellingCosts;
+    }
+
+    /**
+     * Setter for property 'hourlyTravellingCosts'.
+     *
+     * @param hourlyTravellingCosts Value to set for property 'hourlyTravellingCosts'.
+     */
+    public void setHourlyTravellingCosts(DoubleParameter hourlyTravellingCosts) {
+        this.hourlyTravellingCosts = hourlyTravellingCosts;
     }
 }
 

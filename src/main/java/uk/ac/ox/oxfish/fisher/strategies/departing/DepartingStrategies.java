@@ -28,9 +28,12 @@ public class DepartingStrategies {
     public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
             new LinkedHashMap<>();
     static{
-        CONSTRUCTORS.put("Fixed Probability",
+        CONSTRUCTORS.put("Fixed Probability Departing",
                          FixedProbabilityDepartingFactory::new);
-        NAMES.put(FixedProbabilityDepartingFactory.class,"Fixed Probability");
+        NAMES.put(FixedProbabilityDepartingFactory.class,"Fixed Probability Departing");
+        CONSTRUCTORS.put("Adaptive Probability Departing",
+                         AdaptiveProbabilityDepartingFactory::new);
+        NAMES.put(AdaptiveProbabilityDepartingFactory.class,"Adaptive Probability Departing");
         CONSTRUCTORS.put("Fixed Rest",
                          FixedRestTimeDepartingFactory::new);
         NAMES.put(FixedRestTimeDepartingFactory.class,"Fixed Rest");
