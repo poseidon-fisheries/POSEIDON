@@ -12,12 +12,17 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public interface NetworkBuilder extends AlgorithmFactory<DirectedGraph<Fisher,FriendshipEdge>>
 {
 
+    /**
+     * adds a condition that needs to be true for two fishers to be friends.
+     * @param predicate the condition to add
+     */
+    void addPredicate(NetworkPredicate predicate);
 
     /**
      * this is supposed to be called not so much when initializing the network but later on if any agent is created
      * while the model is running
      */
-    public void addFisher(Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state);
+    void addFisher(Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state);
 
     /**
      * remove fisher from network. This is to be used while the model is running to clear any ties
@@ -25,6 +30,6 @@ public interface NetworkBuilder extends AlgorithmFactory<DirectedGraph<Fisher,Fr
      * @param currentNetwork network to modify
      * @param state
      */
-    public void removeFisher(Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state);
+    void removeFisher(Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state);
 
 }

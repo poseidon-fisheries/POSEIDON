@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Builds network where everyone has the same out-degree of edges
@@ -53,7 +54,14 @@ public class EquidegreeBuilder implements NetworkBuilder{
         for(Fisher fisher : fishers)
         {
             Set<Fisher> friends = new HashSet<>(degree);
-            while(friends.size() < degree)
+
+            List<Fisher> candidates = fishers.stream().filter(candidate -> {
+                boolean allowed = candidate != fisher;
+                for (NetworkPredicate predicate : predicates)
+                    allowed = allowed && predicate.test(fisher, candidate);
+                return allowed;
+            }).collect(Collectors.toList());
+            while(friends.size() < degree && friends.size() < candidates.size())
             {
                 final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
                 if(candidate != fisher) {
@@ -64,6 +72,13 @@ public class EquidegreeBuilder implements NetworkBuilder{
                         friends.add(candidate);
 
                 }
+            }
+            if(friends.size()<degree && Log.DEBUG)
+            {
+                assert friends.size()==candidates.size();
+                Log.debug(fisher + " couldn't have " + degree + "friends because the total number of valid candidates" +
+                                  " were " + candidates.size() +
+                                  ", and the total number of friends the fisher actually has is " + friends.size());
             }
             //now make them your friends!
             for(Fisher friend : friends)

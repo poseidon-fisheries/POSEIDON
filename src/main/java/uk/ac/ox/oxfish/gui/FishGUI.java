@@ -29,6 +29,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 
 /**
@@ -53,8 +55,8 @@ public class FishGUI extends GUIState{
 
     private final GeomVectorFieldPortrayal cities = new GeomVectorFieldPortrayal(true);
 
-    private static ImageIcon portIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
-    private static ImageIcon boatIcon = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
+    private final ImageIcon portIcon;// = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
+    private final ImageIcon boatIcon;// = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
 
 
     private final LinkedList<PolicyButton> policyButtons = new LinkedList<>();
@@ -68,8 +70,8 @@ public class FishGUI extends GUIState{
      */
     public FishGUI()
     {
-        super(new FishState(System.currentTimeMillis()));
-        myPortrayal = new ColorfulGrid(guirandom);
+
+        this(new FishState(System.currentTimeMillis()));
 
     }
 
@@ -81,7 +83,9 @@ public class FishGUI extends GUIState{
     {
         super(state);
         myPortrayal = new ColorfulGrid(guirandom);
-
+        Path imagesDirectory = Paths.get("inputs", "images");
+        portIcon = new ImageIcon(imagesDirectory.resolve("anchor.png").toString());
+        boatIcon = new ImageIcon(imagesDirectory.resolve("boat.png").toString());
     }
 
 
@@ -91,6 +95,7 @@ public class FishGUI extends GUIState{
      */
     @Override
     public void init(Controller controller) {
+
         super.init(controller);
 
 

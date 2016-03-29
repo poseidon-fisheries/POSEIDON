@@ -166,6 +166,24 @@ public class TripRecord {
     }
 
     /**
+     * returns the earnings made from selling a specific species
+     * @param species the species sold
+     * @return the amount of money made on that species
+     */
+    public double getEarningsOfSpecies(int species)
+    {
+        return earningsPerSpecie[species];
+    }
+
+    public double getTotalCosts() {
+        return totalCosts;
+    }
+
+    public double getOpportunityCosts() {
+        return opportunityCosts;
+    }
+
+    /**
      * profit per specie/ catch of that specie
      * @param specie the index this specie belongs to
      * @return profit per unit of catch

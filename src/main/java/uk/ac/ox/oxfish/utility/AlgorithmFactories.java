@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -75,6 +77,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(MapInitializer.class, MapInitializers.CONSTRUCTORS);
         NAMES_MAP.put(MapInitializer.class, MapInitializers.NAMES);
+
+        CONSTRUCTOR_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.CONSTRUCTORS);
+        NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
     }
 
 

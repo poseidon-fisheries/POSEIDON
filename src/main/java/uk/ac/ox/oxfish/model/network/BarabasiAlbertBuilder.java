@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,6 +24,8 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
     private boolean parallelFriendshipsAllowed = true;
 
     private int edgesPerVertex = 2;
+
+    final private LinkedList<NetworkPredicate> predicates = new LinkedList<>();
 
     /**
      * Applies this function to the given argument.
@@ -102,11 +105,17 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
             {
                 if(fisher==newAddition)
                     continue;
-                if(random.nextBoolean(currentNetwork.degree(fisher)/(double)totalDegree))
+                if(
+                        random.nextBoolean(currentNetwork.degree(fisher)/(double)totalDegree))
                 {
-                    currentNetwork.addEdge(new FriendshipEdge(), newAddition, fisher);
-                    if(currentNetwork.degree(newAddition)==edgesPerVertex)
-                        break largeloop;
+                    boolean allowed = true;
+                    for(NetworkPredicate predicate : predicates)
+                        allowed = allowed && predicate.test(fisher,newAddition);
+                    if(allowed) {
+                        currentNetwork.addEdge(new FriendshipEdge(), newAddition, fisher);
+                        if (currentNetwork.degree(newAddition) == edgesPerVertex)
+                            break largeloop;
+                    }
                 }
 
             }
@@ -130,5 +139,16 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
         currentNetwork.removeVertex(toRemove);
         assert !currentNetwork.containsVertex(toRemove);
 
+    }
+
+
+    /**
+     * adds a condition that needs to be true for two fishers to be friends.
+     *
+     * @param predicate the condition to add
+     */
+    @Override
+    public void addPredicate(NetworkPredicate predicate) {
+        predicates.add(predicate);
     }
 }

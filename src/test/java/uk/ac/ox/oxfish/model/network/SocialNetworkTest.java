@@ -60,6 +60,14 @@ public class SocialNetworkTest {
                     Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
 
             }
+
+            /**
+             * ignored
+             */
+            @Override
+            public void addPredicate(NetworkPredicate predicate) {
+
+            }
         });
 
         //the world will be made of 3 fishers

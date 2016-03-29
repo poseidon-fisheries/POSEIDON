@@ -2,6 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.HourlyProfitObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -21,7 +24,10 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
 {
 
-    private DoubleParameter stepSize = new UniformDoubleParameter(1d,10d);
+    private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
+            new HourlyProfitObjectiveFactory();
+
+    private DoubleParameter stepSize = new UniformDoubleParameter(1d, 10d);
 
 
     private AlgorithmFactory<? extends AdaptationProbability> probability =
@@ -73,7 +79,8 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         }
         return new PerTripIterativeDestinationStrategy(
                 new FavoriteDestinationStrategy(map, random), algorithm,
-                probability.apply(state));
+                probability.apply(state),
+                objectiveFunction.apply(state));
 
 
     }
@@ -121,5 +128,25 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
     public void setAlwaysCopyBest(boolean alwaysCopyBest) {
         this.alwaysCopyBest = alwaysCopyBest;
+    }
+
+
+    /**
+     * Getter for property 'objectiveFunction'.
+     *
+     * @return Value for property 'objectiveFunction'.
+     */
+    public AlgorithmFactory<? extends ObjectiveFunction<Fisher>> getObjectiveFunction() {
+        return objectiveFunction;
+    }
+
+    /**
+     * Setter for property 'objectiveFunction'.
+     *
+     * @param objectiveFunction Value to set for property 'objectiveFunction'.
+     */
+    public void setObjectiveFunction(
+            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        this.objectiveFunction = objectiveFunction;
     }
 }

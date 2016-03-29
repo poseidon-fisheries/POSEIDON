@@ -7,26 +7,12 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.util.List;
 
 /**
- * 
- * An objective function that judges people by their latest finished trip profits per hour
- * Created by carrknight on 8/7/15.
+ * A simple abstract class that judges the objective given the last or secondlast trip. How to turn the tripRecord
+ * into a utility function depends on the subclasses
+ * Created by carrknight on 3/24/16.
  */
-public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher> 
-{
+public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fisher> {
 
-
-    /**
-     * whether we should count opportunity costs when it comes to decisions
-     */
-    private final boolean includingOpportunityCosts;
-
-    public HourlyProfitInTripFunction(boolean includingOpportunityCosts) {
-        this.includingOpportunityCosts = includingOpportunityCosts;
-    }
-
-    public HourlyProfitInTripFunction() {
-        this(true);
-    }
 
     /**
      * compute current fitness of the agent
@@ -38,7 +24,9 @@ public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher>
     public double computeCurrentFitness(Fisher observed) {
         TripRecord lastFinishedTrip = observed.getLastFinishedTrip();
         return lastFinishedTrip == null ? Double.NaN :
-                FishStateUtilities.round(lastFinishedTrip.getProfitPerHour(includingOpportunityCosts));
+                FishStateUtilities.round(
+                        extractUtilityFromTrip(lastFinishedTrip)
+                );
     }
 
     /**
@@ -54,10 +42,13 @@ public class HourlyProfitInTripFunction implements ObjectiveFunction<Fisher>
         List<TripRecord> finishedTrips = observed.getFinishedTrips();
         if(finishedTrips.size() >= 2)
             return FishStateUtilities.round(
-                    finishedTrips.get(finishedTrips.size() - 2).getProfitPerHour(includingOpportunityCosts)
+                    extractUtilityFromTrip(finishedTrips.get(finishedTrips.size() - 2))
             );
         else
             return Double.NaN;
 
     }
+
+
+    abstract protected double extractUtilityFromTrip(TripRecord tripRecord);
 }

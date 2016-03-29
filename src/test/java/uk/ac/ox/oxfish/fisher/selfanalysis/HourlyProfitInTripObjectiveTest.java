@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 8/7/15.
  */
-public class HourlyProfitInTripFunctionTest {
+public class HourlyProfitInTripObjectiveTest {
 
 
     @Test
@@ -33,7 +33,7 @@ public class HourlyProfitInTripFunctionTest {
         when(fisher.getFinishedTrips()).thenReturn(logger.getFinishedTrips());
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
-        HourlyProfitInTripFunction tripFunction = new HourlyProfitInTripFunction();
+        HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
         Assert.assertEquals(tripFunction.computeCurrentFitness(fisher),10d,.001);
         Assert.assertEquals(tripFunction.computePreviousFitness(fisher),0d,.001);
     }

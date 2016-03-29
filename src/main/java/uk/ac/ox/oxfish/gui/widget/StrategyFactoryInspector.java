@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.gui.widget;
 
-import com.esotericsoftware.minlog.Log;
 import org.metawidget.inspector.impl.BaseObjectInspector;
 import org.metawidget.inspector.impl.propertystyle.Property;
 import org.metawidget.util.CollectionUtils;
@@ -57,8 +56,8 @@ public class StrategyFactoryInspector  extends BaseObjectInspector
                         ParameterizedType type = (ParameterizedType)(propertyClass.getGenericInterfaces()[0]);
                         splitType = FishStateUtilities.removeParentheses(type.getActualTypeArguments()[0].toString()).split(" ");
                     }
-                    if(Log.TRACE)
-                        Log.trace("analyzed a strategy factory and put : '" + splitType[splitType.length - 1] + "' in" );
+                 //   if(Log.TRACE)
+               //         Log.trace("analyzed a strategy factory and put : '" + splitType[splitType.length - 1] + "' in" );
                     //store it as attribute factory_strategy="x" which we will use to build widgets on
                     attributes.put("factory_strategy", splitType[splitType.length - 1]);
 

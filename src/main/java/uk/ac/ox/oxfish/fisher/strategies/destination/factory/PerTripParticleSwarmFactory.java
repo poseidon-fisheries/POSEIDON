@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -56,7 +57,7 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
                                                                                    -map.getHeight() / 5,
                                                                                    map.getHeight() / 5)},
                                                                    random,map.getWidth(),map.getHeight()),
-                explorationProbability.apply(random),1);
+                explorationProbability.apply(random), 1, new HourlyProfitInTripObjective());
 
     }
 

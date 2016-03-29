@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -38,7 +39,8 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
         final DefaultBeamHillClimbing algorithm = new DefaultBeamHillClimbing(stepSize.apply(random).intValue(),
                                                                            20);
         return new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map, random), algorithm,1d-stayingStillProbability.apply(random),0d);
+                new FavoriteDestinationStrategy(map, random), algorithm, 1d-stayingStillProbability.apply(random), 0d,
+                new HourlyProfitInTripObjective());
 
     }
 

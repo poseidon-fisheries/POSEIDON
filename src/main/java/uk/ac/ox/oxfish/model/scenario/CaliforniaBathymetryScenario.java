@@ -49,6 +49,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -118,12 +119,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter  literPerHourOfFishing = new FixedDoubleParameter(11.652789144);
 
 
-    /**
-     * number of fishers
-     */
-    private int numberOfFishers = 50;
-
-
     private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.811008583); //grabbed online on Friday March 18
 
 
@@ -168,6 +163,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
     private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
+
+
+    private HashMap<Port,Integer> numberOfFishersPerPort;
 
 
     public CaliforniaBathymetryScenario() {
@@ -324,36 +322,44 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
             initializer.processMap(biology, map, model.getRandom(), model);
 
+
+            if(Log.TRACE)
+                Log.trace("height: " +map.getHeight());
+
+            //now put a port in there!
+            SeaTile location = map.getSeaTile(new Coordinate(697241.01, 3916987.12));
+            System.out.println(location.getGridX());
+            System.out.println(location.getGridY());
+            MarketMap markets = new MarketMap(biology);
+
+            //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
+            markets.addMarket(biology.getSpecie("Dover Sole"),new FixedPriceMarket(0.244940171));
+            markets.addMarket(biology.getSpecie("Sablefish"),new FixedPriceMarket(0.74752115));
+            markets.addMarket(biology.getSpecie("Shortspine Thornyhead"),new FixedPriceMarket(1.218804148));
+            markets.addMarket(biology.getSpecie("Longspine Thornyhead"),new FixedPriceMarket(0.167829376));
+            markets.addMarket(biology.getSpecie("Yelloweye Rockfish"),new FixedPriceMarket(0.326586895));
+
+
+            numberOfFishersPerPort = PortReader.readFile(
+                    mainDirectory.resolve("port.csv"),
+                    map,
+                    model,
+                    markets,
+                    gasPricePerLiter.apply(model.getRandom()));
+
+            for(Port port : numberOfFishersPerPort.keySet())
+                map.addPort(port);
+
+            return new ScenarioEssentials(biology, map, markets);
+
+
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Some files were missing!");
         }
 
-        if(Log.TRACE)
-            Log.trace("height: " +map.getHeight());
 
-        //now put a port in there!
-        SeaTile location = map.getSeaTile(new Coordinate(697241.01, 3916987.12));
-        System.out.println(location.getGridX());
-        System.out.println(location.getGridY());
-        MarketMap markets = new MarketMap(biology);
-
-        //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
-        markets.addMarket(biology.getSpecie("Dover Sole"),new FixedPriceMarket(0.244940171));
-        markets.addMarket(biology.getSpecie("Sablefish"),new FixedPriceMarket(0.74752115));
-        markets.addMarket(biology.getSpecie("Shortspine Thornyhead"),new FixedPriceMarket(1.218804148));
-        markets.addMarket(biology.getSpecie("Longspine Thornyhead"),new FixedPriceMarket(0.167829376));
-        markets.addMarket(biology.getSpecie("Yelloweye Rockfish"),new FixedPriceMarket(0.326586895));
-
-
-        map.addPort(new Port("Morro Bay",
-                             location,
-                             markets,
-                             gasPricePerLiter.apply(model.getRandom())));
-
-
-
-        return new ScenarioEssentials(biology, map, markets);
 
     }
 
@@ -381,115 +387,125 @@ public class CaliforniaBathymetryScenario implements Scenario {
         GlobalBiology biology = model.getBiology();
         NauticalMap map = model.getMap();
         MersenneTwisterFast random = model.getRandom();
-        Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
 
-        for(int i=0;i<numberOfFishers;i++) {
-            Port port = ports[random.nextInt(ports.length)];
-            DepartingStrategy departing = departingStrategy.apply(model);
-            final double speed = cruiseSpeedInKph.apply(random);
-            final double capacity = holdSizePerBoat.apply(random);
-            final double engineWeight = 0;
-            final double mileage = literPerKilometer.apply(random);
-            final double fuelCapacity = fuelTankInLiters.apply(random);
 
-            Gear fisherGear = gear.apply(model);
+        int fisherCounter=0;
+        for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
 
-            Fisher newFisher = new Fisher(i, port,
-                                          random,
-                                          regulation.apply(model),
-                                          departing,
-                                          destinationStrategy.apply(model),
-                                          fishingStrategy.apply(model),
-                                          weatherStrategy.apply(model),
-                                          new Boat(10, 10,
-                                                   new Engine(engineWeight,
-                                                              mileage,
-                                                              speed),
-                                                   new FuelTank(fuelCapacity)),
-                                          new Hold(capacity, biology.getSize()),
-                                          fisherGear, model.getSpecies().size());
-
-            //predictors
-            for(Species species : model.getSpecies())
+            for(int id=0;id<entry.getValue();id++)
             {
+                DepartingStrategy departing = departingStrategy.apply(model);
+                final double speed = cruiseSpeedInKph.apply(random);
+                final double capacity = holdSizePerBoat.apply(random);
+                final double engineWeight = 0;
+                final double mileage = literPerKilometer.apply(random);
+                final double fuelCapacity = fuelTankInLiters.apply(random);
 
-                //create the predictors
-
-                newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                   MovingAveragePredictor.dailyMAPredictor(
-                                                           "Predicted Daily Catches of " + species,
-                                                           fisher1 ->
-                                                                   //check the daily counter but do not input new values
-                                                                   //if you were not allowed at sea
-                                                                   fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                           species.getIndex())
-
-                                                           ,
-                                                           365));
+                Gear fisherGear = gear.apply(model);
 
 
+                Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
+                                              random,
+                                              regulation.apply(model),
+                                              departing,
+                                              destinationStrategy.apply(model),
+                                              fishingStrategy.apply(model),
+                                              weatherStrategy.apply(model),
+                                              new Boat(10, 10,
+                                                       new Engine(engineWeight,
+                                                                  mileage,
+                                                                  speed),
+                                                       new FuelTank(fuelCapacity)),
+                                              new Hold(capacity, biology.getSize()),
+                                              fisherGear, model.getSpecies().size());
+                fisherCounter++;
+                //predictors
+                for(Species species : model.getSpecies())
+                {
+
+                    //create the predictors
+
+                    newFisher.setDailyCatchesPredictor(species.getIndex(),
+                                                       MovingAveragePredictor.dailyMAPredictor(
+                                                               "Predicted Daily Catches of " + species,
+                                                               fisher1 ->
+                                                                       //check the daily counter but do not input new values
+                                                                       //if you were not allowed at sea
+                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                               species.getIndex())
+
+                                                               ,
+                                                               365));
 
 
-                newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                        "Predicted Unit Profit " + species,
-                        fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                        30));
+
+
+                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
+                            "Predicted Unit Profit " + species,
+                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
+                            30));
 
 
 
+                }
+
+
+                //daily profits predictor
+                newFisher.assignDailyProfitsPredictor(
+                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                fisher ->
+                                                                        //check the daily counter but do not input new values
+                                                                        //if you were not allowed at sea
+                                                                        fisher.isAllowedAtSea() ?
+                                                                                fisher.getDailyCounter().
+                                                                                        getColumn(
+                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                                                :
+                                                                                Double.NaN
+                                ,
+
+                                                                7));
+
+                fisherList.add(newFisher);
+
+                //add other trip costs
+                newFisher.addDockingListener(
+                        (fisher, port1) -> {
+                            if(fisher.getHoursAtSea()>0)
+                                fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
+                                                            /
+                                                            fisher.getHoursAtSea());
+                        });
             }
 
-
-            //daily profits predictor
-            newFisher.assignDailyProfitsPredictor(
-                    MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                            fisher ->
-                                                                    //check the daily counter but do not input new values
-                                                                    //if you were not allowed at sea
-                                                                    fisher.isAllowedAtSea() ?
-                                                                            fisher.getDailyCounter().
-                                                                                    getColumn(
-                                                                                            YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                                            :
-                                                                            Double.NaN
-                            ,
-
-                                                            7));
-
-            fisherList.add(newFisher);
-
-            newFisher.addDockingListener(
-                    (fisher, port1) -> {
-                        if(fisher.getHoursAtSea()>0)
-                            fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
-                                                        /
-                                                        fisher.getHoursAtSea());
-                    });
-        }
 
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
         FisherFactory fisherFactory = new FisherFactory(
-                () -> ports[0],
+                () -> numberOfFishersPerPort.keySet().iterator().next(),
                 regulation,
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
                 weatherStrategy,
                 () -> new Boat(10, 10, new Engine(0,
-                                                                   literPerKilometer.apply(random),
-                                                                   cruiseSpeedInKph.apply(random)),
-                                                new FuelTank(fuelTankInLiters.apply(random))),
+                                                  literPerKilometer.apply(random),
+                                                  cruiseSpeedInKph.apply(random)),
+                               new FuelTank(fuelTankInLiters.apply(random))),
                 () -> new Hold(holdSizePerBoat.apply(random), biology.getSize()),
                 gear,
-                numberOfFishers
+                fisherCounter
 
         );
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
-        else {
-            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
-        }
+            networkBuilder = new EmptyNetworkBuilder();
+
+        //allow friendships only within people from the same port!
+        networkBuilder.addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
+
+        return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+
+
     }
 
 
@@ -889,25 +905,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public void setRetentionAsymptote(DoubleParameter retentionAsymptote) {
         gear.setRetentionAsymptote(retentionAsymptote);
     }
-
-    /**
-     * Getter for property 'numberOfFishers'.
-     *
-     * @return Value for property 'numberOfFishers'.
-     */
-    public int getNumberOfFishers() {
-        return numberOfFishers;
-    }
-
-    /**
-     * Setter for property 'numberOfFishers'.
-     *
-     * @param numberOfFishers Value to set for property 'numberOfFishers'.
-     */
-    public void setNumberOfFishers(int numberOfFishers) {
-        this.numberOfFishers = numberOfFishers;
-    }
-
 
 
     public boolean isUsePremadeInput() {

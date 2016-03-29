@@ -42,4 +42,12 @@ public class EmptyNetworkBuilder implements NetworkBuilder
         assert !currentNetwork.containsVertex(toRemove);
 
     }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void addPredicate(NetworkPredicate predicate) {
+        //ignored
+    }
 }

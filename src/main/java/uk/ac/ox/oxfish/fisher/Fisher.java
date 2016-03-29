@@ -935,7 +935,7 @@ public class Fisher implements Steppable, Startable{
     {
         if(hoursIncrease > 0) { //0 could be an "arriving at port" before docking. Ignore that one
             Preconditions.checkArgument(hoursIncrease >= 0);
-            Preconditions.checkArgument(status.getHoursAtSea() == 0, status.getAction() + " --- " + hoursIncrease);
+            Preconditions.checkArgument(status.getHoursAtSea() == 0);
             status.setHoursAtPort(status.getHoursAtPort() + hoursIncrease);
         }
     }

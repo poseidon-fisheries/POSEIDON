@@ -6,17 +6,13 @@ import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.Pair;
-import uk.ac.ox.oxfish.utility.adaptation.*;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
-
-import java.util.Collection;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -26,10 +22,6 @@ import java.util.function.Predicate;
  * Created by carrknight on 6/19/15.
  */
 public class PerTripIterativeDestinationStrategy implements DestinationStrategy {
-
-
-
-
 
 
     /**
@@ -54,7 +46,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     public PerTripIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
-            AdaptationProbability probability)
+            AdaptationProbability probability,
+            final ObjectiveFunction<Fisher> objective)
     {
         this.delegate = delegate;
         this.algorithm = new Adaptation<SeaTile>(
@@ -76,7 +69,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                     else
                         return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
                 },
-                new HourlyProfitInTripFunction(),
+                objective,
                 probability
         );
 
@@ -86,7 +79,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
             double randomizationProbability,
-            double imitationProbability) {
+            double imitationProbability, final HourlyProfitInTripObjective objective) {
         this.delegate = delegate;
         this.algorithm = new Adaptation<SeaTile>(
                 fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
@@ -106,7 +99,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                     else
                         return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
                 },
-                new HourlyProfitInTripFunction(),randomizationProbability, imitationProbability);
+                objective, randomizationProbability, imitationProbability);
+
 
     }
 
