@@ -45,7 +45,7 @@ import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaFileFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -144,13 +144,15 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation =
+            new MultiQuotaFileFactory();
 
 
     /**
      * gear maker, for now fixed
      */
-    private final LogisticSelectivityGearFactory gear = new LogisticSelectivityGearFactory();
+    private final LogisticSelectivityGearFactory gear =
+            new LogisticSelectivityGearFactory();
 
     private MultipleSpeciesAbundanceInitializer initializer;
 
@@ -394,7 +396,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
             for(int id=0;id<entry.getValue();id++)
             {
-                DepartingStrategy departing = departingStrategy.apply(model);
                 final double speed = cruiseSpeedInKph.apply(random);
                 final double capacity = holdSizePerBoat.apply(random);
                 final double engineWeight = 0;
@@ -407,7 +408,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
                                               random,
                                               regulation.apply(model),
-                                              departing,
+                                              departingStrategy.apply(model),
                                               destinationStrategy.apply(model),
                                               fishingStrategy.apply(model),
                                               weatherStrategy.apply(model),
@@ -477,6 +478,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                             fisher.getHoursAtSea());
                         });
             }
+
 
 
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers

@@ -461,4 +461,9 @@ public class FishState  extends SimState{
 
     }
 
+
+    public int getNumberOfFishers(){
+        return fishers.size();
+    }
+
 }

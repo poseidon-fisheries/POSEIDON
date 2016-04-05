@@ -30,8 +30,8 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
-     * for species 0 and a random quota of 1 to 100 for species 2. The other species are then assumed NOT TO BE PROTECTED
-     * by the quota (and can be fished out freely)
+     * for species 0 and a random quota of 1 to 100 for species 2. The other species (like species 1)
+     * are then assumed NOT TO BE PROTECTED by the quota (and can be fished out freely)
      */
     private String yearlyQuotaMaps = "0:5000";
 

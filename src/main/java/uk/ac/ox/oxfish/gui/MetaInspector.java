@@ -84,6 +84,7 @@ public class MetaInspector extends Inspector
             widget.setWidgetBuilder(composite);
         }
 
+
         //add the processor
         //this makes the binding between ui and model possible
         widget.addWidgetProcessor(new BeanUtilsBindingProcessor(new BeanUtilsBindingProcessorConfig()));
@@ -101,5 +102,9 @@ public class MetaInspector extends Inspector
         widget.addWidgetProcessor(new StrategyFactoryWidgetProcessor());
         //creates combo-boxes for double parameters
         widget.addWidgetProcessor(new DoubleParameterWidgetProcessor());
+        widget.addWidgetProcessor(new ArrayWidgetProcessor());
+
+
+
     }
 }

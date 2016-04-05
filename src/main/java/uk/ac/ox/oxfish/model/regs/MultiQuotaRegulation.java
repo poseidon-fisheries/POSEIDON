@@ -136,6 +136,14 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     }
 
+    public void setYearlyQuota(int specieIndex, double newQuotaValue) {
+        yearlyQuota[specieIndex] = newQuotaValue;
+        if(quotaRemaining[specieIndex]>=yearlyQuota[specieIndex])
+            quotaRemaining[specieIndex]=yearlyQuota[specieIndex];
+        Preconditions.checkArgument(newQuotaValue >= -FishStateUtilities.EPSILON);
+
+    }
+
     @Override
     public double getQuotaRemaining(int specieIndex) {
         return quotaRemaining[specieIndex];

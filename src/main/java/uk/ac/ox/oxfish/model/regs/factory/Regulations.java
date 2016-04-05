@@ -67,6 +67,9 @@ public class Regulations
         CONSTRUCTORS.put("Kitchen Sink", KitchenSinkFactory::new);
         NAMES.put(KitchenSinkFactory.class,"Kitchen Sink");
 
+        CONSTRUCTORS.put("Multi-Quotas from File", MultiQuotaFileFactory::new);
+        NAMES.put(MultiQuotaFileFactory.class,"Multi-Quotas from File");
+
 
 
     }
