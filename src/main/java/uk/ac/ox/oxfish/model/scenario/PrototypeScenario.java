@@ -261,7 +261,7 @@ public class PrototypeScenario implements Scenario {
         //substitute back the original randomizer
         model.random = random;
 
-        return new ScenarioEssentials(global,map, marketMap);
+        return new ScenarioEssentials(global,map);
     }
 
 

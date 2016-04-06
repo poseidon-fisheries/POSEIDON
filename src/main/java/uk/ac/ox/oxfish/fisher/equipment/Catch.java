@@ -50,4 +50,9 @@ public class Catch {
         return Arrays.stream(catchMap).sum();
     }
 
+    @Override
+    public String toString() {
+        return Arrays.toString(catchMap);
+
+    }
 }

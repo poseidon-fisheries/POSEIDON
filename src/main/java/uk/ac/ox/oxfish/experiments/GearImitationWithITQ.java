@@ -45,13 +45,13 @@ public class GearImitationWithITQ
 
                                                        //initial distributions
                                                        FishStateUtilities.pollHistogramToFile(
-                                                               fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
                                                                state.getFishers(),
-                                                               directory.resolve("initial_red.csv").toFile());
+                                                               directory.resolve("initial_red.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
+                                                       );
                                                        FishStateUtilities.pollHistogramToFile(
-                                                               fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
                                                                state.getFishers(),
-                                                               directory.resolve("initial_blue.csv").toFile());
+                                                               directory.resolve("initial_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
+                                                       );
                                                    }
                                                }
 
@@ -59,15 +59,13 @@ public class GearImitationWithITQ
 
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
-                state.getFishers(),
-                directory.resolve("final_red.csv").toFile());
+                state.getFishers(), directory.resolve("final_red.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
+        );
 
         //initial distributions
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                state.getFishers(),
-                directory.resolve("final_blue.csv").toFile());
+                state.getFishers(), directory.resolve("final_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
+        );
 
         //show the effect on catches
         FishStateUtilities.printCSVColumnToFile(directory.resolve("red_landings.csv").toFile(),

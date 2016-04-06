@@ -27,45 +27,7 @@ public class HardGearSwitchTest {
 
         FishState model = HardGearSwitch.buildHardSwitchGearDemo(biologyInitializer, mapInitializer, 0, 1, 500, 4500);
 
-        //sanity check: you either catch 2 or 3
-        /*
-        model.registerStartable(new Startable() {
-            @Override
-            public void start(FishState model) {
-                model.scheduleEveryDay(new Steppable() {
-                    @Override
-                    public void step(SimState simState)
-                    {
 
-                        for(Fisher fisher : model.getFishers())
-                        {
-
-                            assertTrue(Double.isNaN(fisher.predictDailyCatches(0)) ^
-                                                      (fisher.predictDailyCatches(
-                                                              0) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                              1) > FishStateUtilities.EPSILON) ^
-                                                      (fisher.predictDailyCatches(
-                                                              0) < FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                              1) < FishStateUtilities.EPSILON) ^
-                                                      (fisher.predictDailyCatches(
-                                                              0) > FishStateUtilities.EPSILON && fisher.predictDailyCatches(
-                                                              1) < FishStateUtilities.EPSILON));
-
-
-
-
-
-                        }
-                    }
-                }, StepOrder.AFTER_DATA);
-            }
-
-            @Override
-            public void turnOff() {
-
-            }
-        });
-        */
         model.start();
 
 

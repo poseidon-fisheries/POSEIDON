@@ -98,9 +98,9 @@ public class LambdaEstimation {
 
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas"),
-                state.getFishers(),
-                Paths.get("runs", "lambda", "hist100.csv").toFile());
+                state.getFishers(), Paths.get("runs", "lambda", "hist100.csv").toFile(),
+                fisher -> fisher.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")
+        );
 
 
         //write second histogram
@@ -112,9 +112,9 @@ public class LambdaEstimation {
             state.schedule.step(state);
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas"),
-                state.getFishers(),
-                Paths.get("runs", "lambda", "hist360.csv").toFile());
+                state.getFishers(), Paths.get("runs", "lambda", "hist360.csv").toFile(),
+                fisher -> fisher.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas")
+        );
 
 
 

@@ -2,11 +2,11 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class PortReader {
      */
     public static final HashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
-            FishState model, MarketMap marketmap, double gasPrice) throws IOException {
+            Supplier<MarketMap> marketmap, double gasPrice) throws IOException {
 
         List<String> fileLines = Files.readAllLines(pathToFile);
         Preconditions.checkArgument(fileLines.size()>=2);
@@ -59,7 +59,7 @@ public class PortReader {
             location = correctLocation(location,map,portName);
 
             //build the port
-            Port port = new Port(portName,location,marketmap,gasPrice);
+            Port port = new Port(portName,location,marketmap.get(),gasPrice);
             toReturn.put(port,Integer.parseInt(splitLine[1]));
 
         }

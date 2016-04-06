@@ -38,33 +38,28 @@ public class CaliforniaFuelExpenditures {
         state.schedule.step(state);
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FUEL_EXPENDITURE),
-                state.getFishers(),
-                MAIN_DIRECTORY.resolve("fuel.csv").toFile()
+                state.getFishers(), MAIN_DIRECTORY.resolve("fuel.csv").toFile(),
+                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FUEL_EXPENDITURE)
 
         );
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIPS),
-                state.getFishers(),
-                MAIN_DIRECTORY.resolve("trips.csv").toFile()
+                state.getFishers(), MAIN_DIRECTORY.resolve("trips.csv").toFile(),
+                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIPS)
 
         );
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.EFFORT),
-                state.getFishers(),
-                MAIN_DIRECTORY.resolve("effort.csv").toFile()
+                state.getFishers(), MAIN_DIRECTORY.resolve("effort.csv").toFile(),
+                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.EFFORT)
 
         );
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FISHING_DISTANCE),
-                state.getFishers(),
-                MAIN_DIRECTORY.resolve("distance.csv").toFile()
+                state.getFishers(), MAIN_DIRECTORY.resolve("distance.csv").toFile(),
+                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FISHING_DISTANCE)
 
         );
         FishStateUtilities.pollHistogramToFile(
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIP_DURATION),
-                state.getFishers(),
-                MAIN_DIRECTORY.resolve("duration.csv").toFile()
+                state.getFishers(), MAIN_DIRECTORY.resolve("duration.csv").toFile(),
+                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIP_DURATION)
 
         );
 

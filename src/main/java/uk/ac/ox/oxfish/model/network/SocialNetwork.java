@@ -109,8 +109,8 @@ public class SocialNetwork
         network.addEdge(new FriendshipEdge(),agent,newFriend);
 
         //log the change, if anybody is listening
-        if(Log.INFO)
-            Log.info(agent + " changed friends from " + friendBeingReplaced + " to " + newFriend);
+        if(Log.TRACE)
+            Log.trace(agent + " changed friends from " + friendBeingReplaced + " to " + newFriend);
 
 
 

@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
@@ -47,6 +48,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
      */
     private DoubleParameter quotaOtherSpecies = new FixedDoubleParameter(5000);
 
+    private Counter opportunityCostCounter;
+
     /**
      * Applies this function to the given argument.
      *
@@ -73,7 +76,6 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
          *
          */
         buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder);
-
 
         return MultiITQFactory.opportunityCostAwareQuotaRegulation(state,quotas,orderBooks.get(state));
     }
@@ -109,7 +111,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
         {
             final int specieIndex = i; //little trick for anonymous instantiation
             //if this particular market needs to be instantiated
-            if(builders[i]== null) {
+            if(builders[i]== null)
+            {
                 //and at least this guy isn't given infinite quotas:
                 double quotaGiven = quotas[i];
                 Preconditions.checkArgument(quotaGiven >= 0);
@@ -136,6 +139,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
                         }
                     });
+
                 }
             }
         }
@@ -146,6 +150,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
     {
         return new MultiQuotaRegulation(quotas, state){
             //compute opportunity costs!
+
+
 
             @Override
             public void reactToSale(

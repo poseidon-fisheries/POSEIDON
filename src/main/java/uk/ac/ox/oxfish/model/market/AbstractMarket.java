@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
+import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -106,8 +107,12 @@ public abstract class AbstractMarket implements Market {
 
     public void recordTrade(TradeInfo info)
     {
+        if(Log.TRACE && info.getBiomassTraded() >  0)
+            Log.trace("recorded the following trade: " + info);
         dailyCounter.count(EARNINGS_COLUMN_NAME,info.getMoneyExchanged());
         dailyCounter.count(LANDINGS_COLUMN_NAME, info.getBiomassTraded());
+
+
 
     }
 

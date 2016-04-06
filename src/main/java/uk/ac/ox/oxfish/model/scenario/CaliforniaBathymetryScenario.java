@@ -332,27 +332,32 @@ public class CaliforniaBathymetryScenario implements Scenario {
             SeaTile location = map.getSeaTile(new Coordinate(697241.01, 3916987.12));
             System.out.println(location.getGridX());
             System.out.println(location.getGridY());
-            MarketMap markets = new MarketMap(biology);
 
-            //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
-            markets.addMarket(biology.getSpecie("Dover Sole"),new FixedPriceMarket(0.244940171));
-            markets.addMarket(biology.getSpecie("Sablefish"),new FixedPriceMarket(0.74752115));
-            markets.addMarket(biology.getSpecie("Shortspine Thornyhead"),new FixedPriceMarket(1.218804148));
-            markets.addMarket(biology.getSpecie("Longspine Thornyhead"),new FixedPriceMarket(0.167829376));
-            markets.addMarket(biology.getSpecie("Yelloweye Rockfish"),new FixedPriceMarket(0.326586895));
 
 
             numberOfFishersPerPort = PortReader.readFile(
                     mainDirectory.resolve("port.csv"),
                     map,
-                    model,
-                    markets,
+                    () -> {
+                        MarketMap markets = new MarketMap(biology);
+
+                        //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
+                        markets.addMarket(biology.getSpecie("Dover Sole"),new FixedPriceMarket(0.244940171));
+                        markets.addMarket(biology.getSpecie("Sablefish"),new FixedPriceMarket(0.74752115));
+                        markets.addMarket(biology.getSpecie("Shortspine Thornyhead"),new FixedPriceMarket(1.218804148));
+                        markets.addMarket(biology.getSpecie("Longspine Thornyhead"),new FixedPriceMarket(0.167829376));
+                        markets.addMarket(biology.getSpecie("Yelloweye Rockfish"),new FixedPriceMarket(0.326586895));
+                        return markets;
+                    },
                     gasPricePerLiter.apply(model.getRandom()));
 
             for(Port port : numberOfFishersPerPort.keySet())
                 map.addPort(port);
 
-            return new ScenarioEssentials(biology, map, markets);
+
+
+
+            return new ScenarioEssentials(biology, map);
 
 
 

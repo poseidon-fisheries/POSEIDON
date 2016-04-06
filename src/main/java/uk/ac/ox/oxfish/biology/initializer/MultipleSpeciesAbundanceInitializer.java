@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;

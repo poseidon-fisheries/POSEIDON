@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -111,7 +112,11 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
      */
     @Override
     public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-        quotaRemaining[species.getIndex()]-=biomass;
+        double newQuota = quotaRemaining[species.getIndex()] - biomass;
+        if(Log.TRACE)
+            Log.trace("lowering quota for " + species + " owned by " + seller + "to " +
+                              newQuota);
+        setQuotaRemaining(species.getIndex(), newQuota);
         Preconditions.checkArgument(quotaRemaining[species.getIndex()]>=- FishStateUtilities.EPSILON, quotaRemaining[species.getIndex()]);
     }
 
@@ -131,6 +136,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     @Override
     public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
+
         quotaRemaining[specieIndex] = newQuotaValue;
         Preconditions.checkArgument(newQuotaValue >= -FishStateUtilities.EPSILON);
 
@@ -139,7 +145,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     public void setYearlyQuota(int specieIndex, double newQuotaValue) {
         yearlyQuota[specieIndex] = newQuotaValue;
         if(quotaRemaining[specieIndex]>=yearlyQuota[specieIndex])
-            quotaRemaining[specieIndex]=yearlyQuota[specieIndex];
+            setQuotaRemaining(specieIndex,newQuotaValue);
         Preconditions.checkArgument(newQuotaValue >= -FishStateUtilities.EPSILON);
 
     }
@@ -159,11 +165,13 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
         return yearlyQuota;
     }
 
-    public double[] getQuotaRemaining() {
-        return quotaRemaining;
-    }
+
 
     protected FishState getState() {
         return state;
+    }
+
+    public int getNumberOfSpeciesTracked(){
+        return getYearlyQuota().length;
     }
 }

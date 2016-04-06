@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
+import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -54,8 +55,13 @@ public interface Market extends Startable {
         //find out legal biomass sold
         double biomassActuallySellable = Math.min(biomass,
                                                   regulation.maximumBiomassSellable(fisher, species, state));
+
+        if(Log.TRACE && biomassActuallySellable < biomass)
+            Log.trace("Regulations allow only " + biomassActuallySellable + " to be sold by " + fisher);
+
         if(biomassActuallySellable <=0)
             return new TradeInfo(0, species, 0);
+
 
 
         double revenue = biomassToRevenue.apply(biomassActuallySellable);

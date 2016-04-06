@@ -3,9 +3,9 @@ package uk.ac.ox.oxfish.gui.widget;
 import com.esotericsoftware.minlog.Log;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
-import org.metawidget.util.ArrayUtils;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetprocessor.iface.WidgetProcessor;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import javax.swing.*;
 import java.util.Map;
@@ -47,7 +47,8 @@ public class ArrayWidgetProcessor implements WidgetProcessor<JComponent,SwingMet
                     //current class
 
                     String toDisplay =
-                            ArrayUtils.toString(PropertyUtils.getProperty(metawidget.getToInspect(), address), " , ");
+                            FishStateUtilities.deepToStringArray(
+                                    PropertyUtils.getProperty(metawidget.getToInspect(), address), " , ","|");
 
                     System.out.println(toDisplay);
                     JLabel label = new JLabel(toDisplay);

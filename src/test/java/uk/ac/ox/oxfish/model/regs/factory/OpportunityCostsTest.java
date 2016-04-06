@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
@@ -22,7 +23,6 @@ public class OpportunityCostsTest {
     //i force the opportunity costs to be huge and the fishers will avoid specie 0 like hell!
     @Test
     public void opportunityCostsMatterSpecie0() throws Exception {
-
 
         PrototypeScenario scenario = new PrototypeScenario();
         FishState state = new FishState(System.currentTimeMillis());
@@ -73,6 +73,7 @@ public class OpportunityCostsTest {
     @Test
     public void opportunityCostsMatterSpecie1() throws Exception {
 
+        Log.set(Log.LEVEL_TRACE);
 
         PrototypeScenario scenario = new PrototypeScenario();
         FishState state = new FishState(System.currentTimeMillis());

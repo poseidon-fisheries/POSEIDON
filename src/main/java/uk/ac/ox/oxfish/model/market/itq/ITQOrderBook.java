@@ -27,11 +27,11 @@ public class ITQOrderBook implements Steppable,Startable{
     public static final String MONEY_COLUMN_NAME = "MONEY_VOLUME";
     HashMap<Fisher,PriceGenerator> pricers  = new HashMap<>();
 
-    private Queue<Quote> asks;
+    private PriorityQueue<Quote> asks;
 
-    private Queue<Quote> bids;
+    private PriorityQueue<Quote> bids;
 
-    private double markup = 0.05;
+    private double markup = 0.001;
 
     private final int yearOfImplementation;
 
@@ -45,6 +45,8 @@ public class ITQOrderBook implements Steppable,Startable{
 
 
     private final int specieIndex;
+
+    private boolean allowMultipleTradesPerFisher = false;
 
     /**
      * here we put agents who bought to prevent them from selling immediately after and avoid
@@ -117,28 +119,7 @@ public class ITQOrderBook implements Steppable,Startable{
         if(((FishState) state).getYear() >= yearOfImplementation) {
             //fill the quotes
             for (Map.Entry<Fisher, PriceGenerator> trader : traders) {
-                double price = trader.getValue().computeLambda();
-                if (Double.isFinite(price)) {
-                    double buyPrice = FishStateUtilities.round(price * (1 - markup));
-                    //do I want to buy?
-                    if (price > 0) {
-                        bids.add(new Quote(
-                                buyPrice,
-                                trader.getKey()));
-                    }
-                    //can I sell?
-                    if (((QuotaPerSpecieRegulation) trader.getKey().getRegulation()).getQuotaRemaining(
-                            specieIndex) >= unitsTradedPerMatch &&
-                            !penaltyBox.has(trader.getKey())) {
-                        double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
-                                                    buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
-                                ;
-                        assert buyPrice < salePrice;
-                        asks.add(new Quote(
-                                salePrice,
-                                trader.getKey()));
-                    }
-                }
+                generatePricesAndPutOnBook(trader.getKey(), trader.getValue(),true,true);
             }
 
             if (Log.TRACE) {
@@ -163,51 +144,101 @@ public class ITQOrderBook implements Steppable,Startable{
         }
     }
 
+    public void generatePricesAndPutOnBook(Fisher fisher, PriceGenerator priceGenerator,
+                                           boolean generateAsk, boolean generateBid) {
+        double price =  priceGenerator.computeLambda();
+        if (Double.isFinite(price)) {
+            double buyPrice = FishStateUtilities.round(price * (1 - markup));
+            //do I want to buy?
+            if (generateBid && price > 0) {
+                bids.add(new Quote(
+                        buyPrice,
+                        fisher));
+            }
+            //can I sell?
+            if ( generateAsk  &&
+                    ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
+                            specieIndex) >= unitsTradedPerMatch &&
+                    !penaltyBox.has(fisher)) {
+                double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
+                                            buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
+                        ;
+                assert buyPrice < salePrice;
+                asks.add(new Quote(
+                        salePrice,
+                        fisher));
+            }
+        }
+    }
+
     private void clearQuotes()
     {
-        if(bids.isEmpty() || asks.isEmpty())
-            return;
+        //this would work well in recursion but unfortunately if the quantity traded is very small and many traders
+        //it will go on stackoverflow
+        while(true)
 
-        Quote bestBid = bids.remove();
-        Quote bestAsk = asks.remove();
-        assert !penaltyBox.has(bestAsk.getTrader()); //seller ought not to be in the penalty box
-        //does somebody want to trade?
-        if (bestAsk.getPrice() <= bestBid.getPrice()) {
+        {
+            if(bids.isEmpty() || asks.isEmpty())
+                return;
 
-            Quote secondBestAsk = asks.peek();
-            Quote secondBestBid = bids.peek();
-            double tradingPrice = pricingPolicy.tradePrice(bestAsk.getPrice(),bestBid.getPrice(),
-                                                           secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN,
-                                                           secondBestBid != null ? secondBestBid.getPrice() : Double.NaN
-            );
-            if(Log.TRACE)
-                Log.trace( bestAsk.getPrice() + " , bid: " + bestBid.getPrice() + " ,secondBestAsk " +
-                                   (secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN)  + " , secondBestBid:  " +
-                                   (secondBestBid != null ? secondBestBid.getPrice() : Double.NaN) + " ---->" +
-                        tradingPrice
+            Quote bestBid = bids.remove();
+            Quote bestAsk = asks.remove();
+            Fisher seller = bestAsk.getTrader();
+            Fisher buyer = bestBid.getTrader();
+
+            assert !penaltyBox.has(seller); //seller ought not to be in the penalty box
+            //does somebody want to trade?
+            if (bestAsk.getPrice() <= bestBid.getPrice()) {
+
+                Quote secondBestAsk = asks.peek();
+                Quote secondBestBid = bids.peek();
+                double tradingPrice = pricingPolicy.tradePrice(bestAsk.getPrice(), bestBid.getPrice(),
+                                                               secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN,
+                                                               secondBestBid != null ? secondBestBid.getPrice() : Double.NaN
                 );
-            assert tradingPrice >= bestAsk.getPrice();
-            assert tradingPrice <=bestBid.getPrice();
+                if (Log.TRACE)
+                    Log.trace(bestAsk.getPrice() + " , bid: " + bestBid.getPrice() + " ,secondBestAsk " +
+                                      (secondBestAsk != null ? secondBestAsk.getPrice() : Double.NaN) + " , secondBestBid:  " +
+                                      (secondBestBid != null ? secondBestBid.getPrice() : Double.NaN) + " ---->" +
+                                      tradingPrice
+                    );
+                assert tradingPrice >= bestAsk.getPrice();
+                assert tradingPrice <= bestBid.getPrice();
 
-            //now trade!
-            QuotaPerSpecieRegulation buyerQuota = (QuotaPerSpecieRegulation) bestBid.getTrader().getRegulation();
-            QuotaPerSpecieRegulation sellerQuota = (QuotaPerSpecieRegulation) bestAsk.getTrader().getRegulation();
+                //now trade!
+                QuotaPerSpecieRegulation buyerQuota = (QuotaPerSpecieRegulation) buyer.getRegulation();
+                QuotaPerSpecieRegulation sellerQuota = (QuotaPerSpecieRegulation) seller.getRegulation();
 
-            buyerQuota.setQuotaRemaining(specieIndex, buyerQuota.getQuotaRemaining(specieIndex)+unitsTradedPerMatch);
-            sellerQuota.setQuotaRemaining(specieIndex, sellerQuota.getQuotaRemaining(specieIndex)-unitsTradedPerMatch);
-            bestBid.getTrader().spendExogenously(unitsTradedPerMatch * tradingPrice);
-            bestAsk.getTrader().earn(unitsTradedPerMatch * tradingPrice);
-            counter.count(QUOTA_COLUMN_NAME, unitsTradedPerMatch);
-            counter.count(MONEY_COLUMN_NAME, unitsTradedPerMatch * tradingPrice);
-            counter.count(MATCHES_COLUMN_NAME,1);
+                buyerQuota.setQuotaRemaining(specieIndex, buyerQuota.getQuotaRemaining(specieIndex) + unitsTradedPerMatch);
+                sellerQuota.setQuotaRemaining(specieIndex,
+                                              sellerQuota.getQuotaRemaining(specieIndex) - unitsTradedPerMatch);
+                buyer.spendExogenously(unitsTradedPerMatch * tradingPrice);
+                seller.earn(unitsTradedPerMatch * tradingPrice);
+                counter.count(QUOTA_COLUMN_NAME, unitsTradedPerMatch);
+                counter.count(MONEY_COLUMN_NAME, unitsTradedPerMatch * tradingPrice);
+                counter.count(MATCHES_COLUMN_NAME, 1);
 
+                if (Log.TRACE) {
+                    Log.trace(
+                            buyer + " bought " + unitsTradedPerMatch + " quotas of species " + specieIndex + " from " + seller);
+                    Log.trace(buyer + " now has " + buyerQuota.getQuotaRemaining(specieIndex) +
+                                      " quotas left while" + seller + " has " +
+                                      sellerQuota.getQuotaRemaining(specieIndex));
+                }
+                toPenalize.add(buyer);
+                lastClosingPrice = tradingPrice;
+                assert sellerQuota.getQuotaRemaining(specieIndex) >= 0;
 
-            toPenalize.add(bestBid.getTrader());
-            lastClosingPrice = tradingPrice;
-            assert sellerQuota.getQuotaRemaining(specieIndex)>=0;
-
-            //again!
-            clearQuotes();
+                //if you allow it, let buyer and seller posts more offers
+                if (allowMultipleTradesPerFisher) {
+                    generatePricesAndPutOnBook(buyer, pricers.get(buyer), false, true);
+                    generatePricesAndPutOnBook(seller, pricers.get(seller), true, false);
+                }
+                //again!
+            }
+            else {
+                return;
+            }
 
         }
     }
@@ -281,5 +312,13 @@ public class ITQOrderBook implements Steppable,Startable{
      */
     public boolean inPenaltyBox(Fisher fisher) {
         return penaltyBox.has(fisher);
+    }
+
+    public boolean isAllowMultipleTradesPerFisher() {
+        return allowMultipleTradesPerFisher;
+    }
+
+    public void setAllowMultipleTradesPerFisher(boolean allowMultipleTradesPerFisher) {
+        this.allowMultipleTradesPerFisher = allowMultipleTradesPerFisher;
     }
 }

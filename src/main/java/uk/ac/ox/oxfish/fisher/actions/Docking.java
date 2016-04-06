@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
+import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -40,6 +41,8 @@ public class Docking implements Action{
         //sell your stuff
         Catch toSell = agent.unload();
         //log it
+        if(Log.TRACE)
+            Log.trace(agent + " returns to port with catch: " + toSell);
 
         GlobalBiology biology = model.getBiology();
 
@@ -47,6 +50,8 @@ public class Docking implements Action{
         for(Species species : biology.getSpecies())
         {
             double biomass = toSell.getPoundsCaught(species);
+
+
             assert  biomass>=0;
             if(biomass>0) {
                 //this should take care of everything including transferring cash

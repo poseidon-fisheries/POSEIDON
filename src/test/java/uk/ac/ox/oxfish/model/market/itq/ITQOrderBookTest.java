@@ -181,6 +181,7 @@ public class ITQOrderBookTest {
         orderBook.start(state);
         orderBook.setMarkup(0);
         orderBook.setUnitsTradedPerMatch(100);
+        orderBook.setAllowMultipleTradesPerFisher(false);
 
         //create 5 people with delta 100,200,300,400,500
         MonoQuotaRegulation regs[] = new MonoQuotaRegulation[5];

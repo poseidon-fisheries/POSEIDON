@@ -39,7 +39,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     @SuppressWarnings("unchecked")
     public TACOpportunityCostManager(MultiQuotaRegulation quotaRegulationToUse) {
         this.quotaRegulationToUse = quotaRegulationToUse;
-        smoothedDailyLandings = new MovingAverage[quotaRegulationToUse.getQuotaRemaining().length];
+        smoothedDailyLandings = new MovingAverage[quotaRegulationToUse.getNumberOfSpeciesTracked()];
         smoothedHoursAtSea = new MovingAverage<>(MOVING_AVERAGE_SIZE);
     }
 

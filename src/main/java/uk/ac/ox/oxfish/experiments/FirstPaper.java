@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -51,7 +52,7 @@ public class FirstPaper
 {
 
     public static final Path INPUT_FOLDER = Paths.get("inputs", "first_paper");
-    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper");
+    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper2");
 
     public static final long RANDOM_SEED = 0l;
 
@@ -87,7 +88,7 @@ public class FirstPaper
         //  policyAndLocation("itq");
         //  policyAndLocation("tac");
         Log.info("Gear Choice");
-     //   policyAndGear("itq");
+        policyAndGear("itq");
      //   policyAndGear("tac");
 
 
@@ -763,6 +764,9 @@ public class FirstPaper
                                                 RandomCatchabilityTrawl current) {
                                             return gearFactory.apply(state);
                                         }
+
+
+
                                     },
                                     //otherwise just copy the best
                                     (fisher1, change, model1) -> GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR.apply(
@@ -821,30 +825,39 @@ public class FirstPaper
 
         //output initial distribution of catchability
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
-                state.getFishers(),
-                outputFolder.resolve(policy+"_start_red.csv").toFile());
+                state.getFishers(), outputFolder.resolve(policy+"_start_red.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
+        );
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                state.getFishers(),
-                outputFolder.resolve(policy+"_start_blue.csv").toFile());
+                state.getFishers(), outputFolder.resolve(policy+"_start_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
+        );
 
         //run for 10 years
-        while (state.getYear() < 20)
+        while (state.getYear() < 20) {
             state.schedule.step(state);
-
+            if(state.getYear()>0 && state.getDayOfTheYear()==1)
+                FishStateUtilities.pollFishersToFile(state.getFishers(),
+                                                     outputFolder.resolve(policy+"_"+state.getYear()+"_obs.csv").toFile(),
+                                                     fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
+                                                     fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
+                                                     fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                     );
+        }
         state.schedule.step(state);
+        FishStateUtilities.pollFishersToFile(state.getFishers(),
+                                             outputFolder.resolve(policy+"_"+state.getYear()+"_obs.csv").toFile(),
+                                             fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
+                                             fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
+                                             fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+        );
         //final distributions
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
-                state.getFishers(),
-                outputFolder.resolve(policy+"_final_red.csv").toFile());
+                state.getFishers(), outputFolder.resolve(policy+"_final_red.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0]
+        );
 
         FishStateUtilities.pollHistogramToFile(
-                fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                state.getFishers(),
-                outputFolder.resolve(policy+"_final_blue.csv").toFile());
+                state.getFishers(), outputFolder.resolve(policy+"_final_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
+        );
 
 
         //show the effect on catches
@@ -855,6 +868,19 @@ public class FirstPaper
         FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy+"_blue_landings.csv").toFile(),
                                                 state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
         );
+
+
+
+        if(policy=="itq")
+        {
+            FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy + "_red_quotas.csv").toFile(),
+                                                    state.getDailyDataSet().getColumn(
+                                                            "ITQ Last Closing Price Of " + state.getSpecies().get(
+                                                                    0).getName())
+            );
+            FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy+"_blue_quotas.csv").toFile(),
+                                                    state.getDailyDataSet().getColumn("ITQ Last Closing Price Of " + state.getSpecies().get(1).getName()));
+        }
 
     }
 

@@ -15,6 +15,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -353,8 +354,44 @@ public class FishStateUtilities {
     }
 
 
-    public static void pollHistogramToFile(Sensor<Double> poller, Collection<Fisher> fishers,
-                                           File file)
+
+
+    public static void pollFishersToFile(Collection<Fisher> fishers,
+                                           File file,Sensor<Double>... pollers)
+    {
+        // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
+        ArrayList<String> histogram = new ArrayList<>(fishers.size());
+        for(Fisher fisher : fishers)
+        {
+
+            StringBuilder row = new StringBuilder();
+            row.append(fisher.getID());
+            for(Sensor<Double> poller : pollers) {
+                row.append(",");
+                row.append(poller.scan(fisher));
+            }
+            histogram.add(
+                   row.toString());
+
+
+        }
+
+        String csvColumn = histogram.stream().reduce((t, u) -> t + "\n" + u).get();
+
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(csvColumn);
+            writer.flush();
+            writer.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void pollHistogramToFile(
+            Collection<Fisher> fishers, File file, Sensor<Double> poller)
     {
         // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         ArrayList<String> histogram = new ArrayList<>(fishers.size());
@@ -542,6 +579,42 @@ public class FishStateUtilities {
     }
 
 
+    /**
+     * this is a slight modification of ArrayUtils.toString(.) to deal with nested arrays
+     * @param array the (possibly array, possibly nested) object to display
+     * @param rowSeparator how should row elements (within same array) be seperated
+     * @param columnSeparator how should each array start and close
+     * @return
+     */
+    public static String deepToStringArray( Object array,
+                                            String rowSeparator,
+                                            String columnSeparator) {
+
+        if ( array == null ) {
+            return "";
+        }
+
+        if ( !array.getClass().isArray() ) {
+            return String.valueOf(array);
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(columnSeparator);
+        for (int i = 0, length = Array.getLength(array ); i < length; i++ ) {
+            String value = String.valueOf( Array.get( array, i ) );
+            // Concatenate the separator
+            if(i>0)
+                builder.append(rowSeparator);
+
+            // Build the string
+            builder.append( value );
+        }
+        builder.append(columnSeparator);
+
+
+        return builder.toString();
+    }
 
 
 }

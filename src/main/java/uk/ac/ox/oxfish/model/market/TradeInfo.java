@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
@@ -33,5 +34,15 @@ public class TradeInfo {
 
     public double getMoneyExchanged() {
         return moneyExchanged;
+    }
+
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("biomassTraded", biomassTraded)
+                .add("species", species)
+                .add("moneyExchanged", moneyExchanged)
+                .toString();
     }
 }

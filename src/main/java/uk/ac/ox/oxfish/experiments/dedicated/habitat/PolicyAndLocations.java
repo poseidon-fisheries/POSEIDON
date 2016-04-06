@@ -213,9 +213,8 @@ public class PolicyAndLocations
 
         if(histogramFile != null)
             FishStateUtilities.pollHistogramToFile(
-                    fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN),
-                    state.getFishers(),
-                    histogramFile
+                    state.getFishers(), histogramFile,
+                    fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
             );
 
         return new ExperimentResult(state,gridToCSV(theGrid));
