@@ -880,6 +880,14 @@ public class FirstPaper
             );
             FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy+"_blue_quotas.csv").toFile(),
                                                     state.getDailyDataSet().getColumn("ITQ Last Closing Price Of " + state.getSpecies().get(1).getName()));
+
+            FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy + "_red_quotas.csv").toFile(),
+                                                    state.getDailyDataSet().getColumn(
+                                                            "ITQ Last Closing Price Of " + state.getSpecies().get(
+                                                                    0).getName())
+            );
+            FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy+"_blue_quotas.csv").toFile(),
+                                                    state.getDailyDataSet().getColumn("ITQ Last Closing Price Of " + state.getSpecies().get(1).getName()));
         }
 
     }

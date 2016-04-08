@@ -66,6 +66,10 @@ public class ITQMarketBuilder  implements Startable
                                                  Double.NaN);
         model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of " + speciesName, state1 -> market.getLastClosingPrice(),
                                                  Double.NaN);
+        model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName, state1 -> market.getDailyQuotasExchanged(),
+                                                 Double.NaN);
+        model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName, state1 -> market.getDailyQuotasExchanged(),
+                                                 Double.NaN);
 
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers())

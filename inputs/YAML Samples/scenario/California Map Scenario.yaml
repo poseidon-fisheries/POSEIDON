@@ -11,6 +11,9 @@ California Map Scenario:
       alwaysCopyBest: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
       probability:
         Adaptive Probability:
           explorationProbability: '0.8'
@@ -21,6 +24,7 @@ California Map Scenario:
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
+  fixedRecruitmentDistribution: false
   fuelTankInLiters: '45519.577'
   gasPricePerLiter: '0.811008583'
   gridWidth: 50
@@ -32,8 +36,10 @@ California Map Scenario:
   networkBuilder:
     Equal Out Degree:
       degree: 2
-  numberOfFishers: 50
-  regulation: MPA Only
+  regulation:
+    Multi-Quotas from File:
+      itq: true
+      pathToFile: inputs/california/2015_quotas.csv
   retentionAsymptote: '0.992661'
   retentionInflection: '21.8035'
   retentionSlope: '1.7773'

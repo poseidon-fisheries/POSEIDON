@@ -17,6 +17,9 @@ Imitator-Explorator:
   alwaysCopyBest: true
   dropInUtilityNeededForUnfriend: '-1.0'
   ignoreEdgeDirection: true
+  objectiveFunction:
+    Hourly Profit Objective:
+      opportunityCosts: true
   probability:
     Adaptive Probability:
       explorationProbability: '0.8'

@@ -62,6 +62,9 @@ dependencies
 
     //yaml parser, useful for reading configuration files
     compile 'org.yaml:snakeyaml:1.15'
+    //jcommander, useful to parse command line
+    compile "com.beust:jcommander:1.48"
+
 
     //testing:
     testCompile "junit:junit:4.12"
@@ -150,6 +153,10 @@ task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
     args = [ "dashboard.py",  date, website_folder ]
 }
 
+task sample_inputs(type:JavaExec){
+    main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
+    classpath = sourceSets.main.runtimeClasspath
+}
 
 task testCSV(dependsOn: test){
     def output = file("build/reports/multitest/" + date + ".csv")

@@ -4,7 +4,9 @@ Fishing Season:
   respectMPA: true
   seasonLength: '200.0'
 -------
-MPA Only
+MPA Only:
+  startingMPAs: [
+    ]
 -------
 Mono-TAC:
   quota: '500000.0'
@@ -37,4 +39,8 @@ Kitchen Sink:
   individualTradeableQuotas: true
   seasonLength: '200.0'
   yearlyQuotaMaps: 0:5000
+-------
+Multi-Quotas from File:
+  itq: true
+  pathToFile: inputs/california/2015_quotas.csv
 -------

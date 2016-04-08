@@ -13,6 +13,9 @@ Prototype:
       alwaysCopyBest: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
       probability:
         Adaptive Probability:
           explorationProbability: '0.8'
@@ -20,7 +23,7 @@ Prototype:
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
-  engineWeight: normal 100.0 10.0
+  enginePower: normal 100.0 10.0
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:
@@ -54,7 +57,10 @@ Prototype:
   portPositionX: -1
   portPositionY: -1
   ports: 1
-  regulation: MPA Only
+  regulation:
+    MPA Only:
+      startingMPAs: [
+        ]
   speedInKmh: '5.0'
   startingMPAs: [
     ]

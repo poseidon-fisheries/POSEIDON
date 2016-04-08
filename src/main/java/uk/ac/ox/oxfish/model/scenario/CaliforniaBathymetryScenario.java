@@ -161,6 +161,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private boolean usePremadeInput = true;
 
+    private boolean fixedRecruitmentDistribution = false;
+
     /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
@@ -196,6 +198,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             LinkedHashMap<String,Path> spatialFiles = new LinkedHashMap<>();
             LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
 
+            //sort it alphabetically to insure folders are consistently ranked
 
             //each folder is supposedly a species
             for(Path folder : folders)
@@ -225,8 +228,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             }
 
 
-            initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
-                                                                  biomassScaling);
+
 
 
             SampledMap sampledMap = null;
@@ -265,6 +267,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     altitudeGrid.set(x, y,
                                      new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
                 }
+            initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
+                                                                  biomassScaling,
+                                                                  fixedRecruitmentDistribution);
 
             biology = initializer.generateGlobal(model.getRandom(),
                                                  model);
@@ -403,7 +408,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             {
                 final double speed = cruiseSpeedInKph.apply(random);
                 final double capacity = holdSizePerBoat.apply(random);
-                final double engineWeight = 0;
+                final double engineWeight = 10000;
                 final double mileage = literPerKilometer.apply(random);
                 final double fuelCapacity = fuelTankInLiters.apply(random);
 
@@ -956,6 +961,14 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     public void setHourlyTravellingCosts(DoubleParameter hourlyTravellingCosts) {
         this.hourlyTravellingCosts = hourlyTravellingCosts;
+    }
+
+    public boolean isFixedRecruitmentDistribution() {
+        return fixedRecruitmentDistribution;
+    }
+
+    public void setFixedRecruitmentDistribution(boolean fixedRecruitmentDistribution) {
+        this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
     }
 }
 

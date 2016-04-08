@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.utility.yaml;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
@@ -15,7 +14,6 @@ import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class FishYAMLTest {
@@ -26,7 +24,7 @@ public class FishYAMLTest {
     {
 
         String scenarioFile =
-                "Prototype:\n" +
+                "Abstract:\n" +
                         "  biologyInitializer:\n" +
                         "    Diffusing Logistic:\n" +
                         "      carryingCapacity: '14.0'\n" +
@@ -46,7 +44,7 @@ public class FishYAMLTest {
                         "          imitationProbability: '1.0'\n" +
                         "          incrementMultiplier: '0.02'\n" +
                         "      stepSize: uniform 1.0 10.0\n" +
-                        "  engineWeight: normal 100.0 10.0\n" +
+                        "  enginePower: normal 100.0 10.0\n" +
                         "  fishers: 100\n" +
                         "  fishingStrategy:\n" +
                         "    Until Full With Day Limit:\n" +

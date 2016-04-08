@@ -277,6 +277,10 @@ public class ITQOrderBook implements Steppable,Startable{
         return counter.getColumn(QUOTA_COLUMN_NAME);
     }
 
+    public double getDailyTradeValue(){
+        return counter.getColumn(MONEY_COLUMN_NAME);
+    }
+
     /**
      * How many buyers and sellers traded since the beginning of the day
      */

@@ -22,8 +22,8 @@ public class FixingSeedWorksOnYamler {
         String secondInput = String.join("\n", Files.readAllLines(Paths.get("inputs/replicate2.yaml")));
         assertEquals(firstInput,secondInput);
 
-        YamlMain.main(new String[]{"inputs/replicate.yaml","567"});
-        YamlMain.main(new String[]{"inputs/replicate2.yaml","567"});
+        YamlMain.main(new String[]{"inputs/replicate.yaml","--seed","567"});
+        YamlMain.main(new String[]{"inputs/replicate2.yaml","--seed","567"});
 
         String firstOutput = String.join("\n", Files.readAllLines(Paths.get("output/replicate/result.yaml")));
         String secondOutput = String.join("\n", Files.readAllLines(Paths.get("output/replicate2/result.yaml")));

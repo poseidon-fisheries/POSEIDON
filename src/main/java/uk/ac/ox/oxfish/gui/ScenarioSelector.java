@@ -53,7 +53,7 @@ public class ScenarioSelector extends JPanel implements ActionListener
         }
         radioButtonGroup.clearSelection();
         //now force the prototype
-        select("Prototype");
+        select("Abstract");
 
 
     }

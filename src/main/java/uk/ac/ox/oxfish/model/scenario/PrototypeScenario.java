@@ -125,7 +125,7 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
 
 
-    private DoubleParameter engineWeight = new NormalDoubleParameter(100,10);
+    private DoubleParameter enginePower = new NormalDoubleParameter(5000, 100);
 
     private DoubleParameter fuelTankSize = new FixedDoubleParameter(100000);
 
@@ -289,7 +289,7 @@ public class PrototypeScenario implements Scenario {
             DepartingStrategy departing = departingStrategy.apply(model);
             final double speed = speedInKmh.apply(random);
             final double capacity = holdSize.apply(random);
-            final double engineWeight = this.engineWeight.apply(random);
+            final double engineWeight = this.enginePower.apply(random);
             final double literPerKilometer = this.literPerKilometer.apply(random);
             final double  fuelCapacity = this.fuelTankSize.apply(random);
 
@@ -385,7 +385,7 @@ public class PrototypeScenario implements Scenario {
                 destinationStrategy,
                 fishingStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(engineWeight.apply(random),
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
                                                                    literPerKilometer.apply(random),
                                                                    speedInKmh.apply(random)),
                                                 new FuelTank(fuelTankSize.apply(random))),
@@ -486,12 +486,12 @@ public class PrototypeScenario implements Scenario {
         this.networkBuilder = networkBuilder;
     }
 
-    public DoubleParameter getEngineWeight() {
-        return engineWeight;
+    public DoubleParameter getEnginePower() {
+        return enginePower;
     }
 
-    public void setEngineWeight(DoubleParameter engineWeight) {
-        this.engineWeight = engineWeight;
+    public void setEnginePower(DoubleParameter enginePower) {
+        this.enginePower = enginePower;
     }
 
     public DoubleParameter getFuelTankSize() {

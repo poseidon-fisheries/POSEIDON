@@ -160,7 +160,7 @@ public class Boat {
     }
 
     public double getWeightInKg() {
-        return engine.getWeightInKg();
+        return engine.getPowerInBhp();
     }
 
     public double getSpeedInKph() {

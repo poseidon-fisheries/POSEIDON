@@ -1,56 +1,51 @@
 {
-    "language"        : "PYTHON",
-    "main_file"       : "califuel.py",
-    "experiment-name" : "califuel",
-    "likelihood"      : "GAUSSIAN",
-    "acquisition"     : "PES",
-    "resources" : {
-        "my-machine" : {
-            "scheduler"         : "local",
-            "max_concurrent"    : 1,
-            "max_finished-jobs" : 150
-        }
-    },
-    "variables" : {
-        "trip_costs" : {
-           "type" : "FLOAT",
-      	   "size" : 1,
-           "min"  : 0,
-           "max"  : 10000
-        },
-        "exploration" : {
-            "type" : "FLOAT",
-            "size" : 1,
-            "min"  : 0,
-            "max"  : 1
-        },
-      "departing_exploration" : {
-        "type" : "FLOAT",
-        "size" : 1,
-        "min"  : 0,
-        "max"  : 1
-      },
-      "departing_shock" : {
-        "type" : "FLOAT",
-        "size" : 1,
-        "min"  : 0,
-        "max"  : 1
-      },
-      "departing_initial" : {
-        "type" : "FLOAT",
-        "size" : 1,
-        "min"  : 0,
-        "max"  : 1
-      },
-      "degree" : {
-        "type" : "int",
-        "size" : 1,
-        "min"  : 0,
-        "max"  : 20
-      }
-    },
-    "tasks" : {
-        "error"  : { "type" : "objective"  }
+  "language"        : "PYTHON",
+  "main_file"       : "calitac.py",
+  "experiment-name" : "calitac",
+  "likelihood"      : "GAUSSIAN",
+  "acquisition"     : "PES",
+  "resources" : {
+    "my-machine" : {
+      "scheduler"         : "local",
+      "max_concurrent"    : 2,
+      "max_finished-jobs" : 300
     }
+  },
+  "variables" : {
+    "first" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 50000000
+    },
+    "second" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 50000000
+    },
+    "third" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 50000000
+    },
+    "fourth" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 50000000
+    },
+    "fifth" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 50000000
+    }
+
+  },
+  "tasks" : {
+    "cash"  : { "type" : "objective"  }
+  }
 }
 

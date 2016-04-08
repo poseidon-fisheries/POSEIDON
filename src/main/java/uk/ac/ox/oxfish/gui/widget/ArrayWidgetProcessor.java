@@ -36,7 +36,6 @@ public class ArrayWidgetProcessor implements WidgetProcessor<JComponent,SwingMet
             JComponent widget, String elementName, Map<String, String> attributes, SwingMetawidget metawidget) {
         Class<?> clazz = WidgetBuilderUtils.getActualClassOrType(attributes, String.class );
         if(clazz!=null) {
-            System.out.println(elementName + "   " + clazz.getName() + "   " + clazz.isArray());
             try {
                 if (clazz.isArray()) {
 

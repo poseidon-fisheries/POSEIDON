@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Diffusing Logistic:
       carryingCapacity: '5000.0'
@@ -20,7 +20,7 @@ Prototype:
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
-  engineWeight: normal 100.0 10.0
+  enginePower: normal 100.0 10.0
   fishers: 5
   fishingStrategy:
     Until Full With Day Limit:

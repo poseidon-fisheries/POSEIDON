@@ -15,7 +15,7 @@ Prototype:
       explorationProbability: '0.8'
       ignoreEdgeDirection: false
       stepSize: '5.0'
-  engineWeight: normal 100.0 10.0
+  enginePower: normal 100.0 10.0
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:

@@ -24,8 +24,8 @@ public class Scenarios {
 
     static
     {
-        SCENARIOS.put("Prototype",new PrototypeScenario());
-        DESCRIPTIONS.put("Prototype", "The current model, modular and ready to use.");
+        SCENARIOS.put("Abstract",new PrototypeScenario());
+        DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
 
 
         SCENARIOS.put("California Map Scenario", new CaliforniaBathymetryScenario());

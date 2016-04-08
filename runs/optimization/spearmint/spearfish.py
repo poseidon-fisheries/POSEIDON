@@ -19,7 +19,8 @@ def run_experiment(input2yaml,
                    experiment_title,
                    scorer=default_scorer,
                    jarfile="yamler.jar",
-                   main_directory="/home/carrknight/code/oxfish/runs/optimization"):
+                   main_directory="/home/carrknight/code/oxfish/runs/optimization",
+                   years_to_run=20):
     import os
     import subprocess
     os.chdir(main_directory)
@@ -28,7 +29,7 @@ def run_experiment(input2yaml,
     input2yaml(main_directory + "/" + experiment_title + ".yaml")
     print("calling java!")
 # feed it into the simulation and run it
-    subprocess.call(["java", "-jar", jarfile, experiment_title + ".yaml"])
+    subprocess.call(["java", "-jar", jarfile, experiment_title + ".yaml","--years", str(years_to_run)])
     # read up the results
     os.remove(experiment_title + ".yaml")
     print("reading results")

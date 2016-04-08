@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.esotericsoftware.minlog.Log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -37,6 +38,13 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private int lastRecruits = 0;
 
     private final Species species;
+
+
+    /**
+     * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
+     * on where there is more biomass
+     */
+    private HashMap<AbundanceBasedLocalBiology,Double> fixedRecruitmentWeight;
 
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
@@ -98,14 +106,28 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
                                            totalFemale, totalMale);
-        //compute where there is more biomass
-        HashMap<AbundanceBasedLocalBiology,Double> biomassWeight = new HashMap<>();
-        double totalBiomass = biologies.stream().mapToDouble(
-                value -> {
-                    Double biomass = value.getBiomass(species);
-                    biomassWeight.put(value, biomass);
-                    return biomass;
-                }).sum();
+
+        //either take the given recruitment weight or compute it as current weight
+        HashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
+        if(fixedRecruitmentWeight != null) {
+            if(Log.TRACE)
+                Log.trace("using fixed recruitment weight, total weight(should be one): " + fixedRecruitmentWeight.values().
+                        stream().mapToDouble(Double::doubleValue).sum());
+            biomassWeight = fixedRecruitmentWeight;
+        }
+        else {
+            biomassWeight = new HashMap<>();
+            //map for each biology its total weight
+            double totalBiomass = biologies.stream().mapToDouble(
+                    value -> {
+                        Double biomass = value.getBiomass(species);
+                        biomassWeight.put(value, biomass);
+                        return biomass;
+                    }).sum();
+            //reweight so they add up to 1
+            for(AbundanceBasedLocalBiology bio : biomassWeight.keySet())
+                biomassWeight.put(bio,FishStateUtilities.round5(biomassWeight.get(bio)/totalBiomass));
+        }
 
         /***
          *      __  __         _        _ _ _
@@ -149,8 +171,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         //allocate new recruits in a weighted fashion
         biomassWeight.entrySet().parallelStream().forEach(
                 biologyBiomass -> {
-                    assert biologyBiomass.getValue() <=totalBiomass;
-                    double ratio = FishStateUtilities.round5(biologyBiomass.getValue() / totalBiomass);
+                    double ratio = biologyBiomass.getValue();
                     int recruitsHere = (int) (lastRecruits * ratio);
                     biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] = recruitsHere/2;
                     biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] = recruitsHere/2;
@@ -172,5 +193,24 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
     public int getLastRecruits() {
         return lastRecruits;
+    }
+
+    /**
+     * Getter for property 'fixedRecruitmentWeight'.
+     *
+     * @return Value for property 'fixedRecruitmentWeight'.
+     */
+    public HashMap<AbundanceBasedLocalBiology, Double> getFixedRecruitmentWeight() {
+        return fixedRecruitmentWeight;
+    }
+
+    /**
+     * Setter for property 'fixedRecruitmentWeight'.
+     *
+     * @param fixedRecruitmentWeight Value to set for property 'fixedRecruitmentWeight'.
+     */
+    public void setFixedRecruitmentWeight(
+            HashMap<AbundanceBasedLocalBiology, Double> fixedRecruitmentWeight) {
+        this.fixedRecruitmentWeight = fixedRecruitmentWeight;
     }
 }

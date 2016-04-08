@@ -18,7 +18,7 @@ public class PrototypeScenarioTest {
 
 
         //make sure we can add MPAs from list
-        String override = "Prototype:\n" +
+        String override = "Abstract:\n" +
                 "  startingMPAs:\n" +
                 "  - height: 6\n" +
                 "    topLeftX: 0\n" +

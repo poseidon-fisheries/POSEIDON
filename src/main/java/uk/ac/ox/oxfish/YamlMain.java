@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -34,19 +37,36 @@ import java.util.LinkedList;
  */
 public class YamlMain {
 
+    @Parameter(names ={"--seed","-s"}, description ="random seed for simulation")
+    private Long seed = System.currentTimeMillis();
+
+    @Parameter(names={"--log","-l"},description = "the verbosity level of the logging")
+    private int logLevel = Log.LEVEL_INFO;
+
+    @Parameter(names={"--years","-t"}, description = "number of years the simulation has to run")
+    private int yearsToRun = 20;
+
     public static void main(String[] args) throws IOException {
 
 
 
         /**
-         * the first two arguments are the base scenario file and a yaml overwriter
+         * the first argument is always the scenario file
          */
         Path inputFolder = Paths.get(args[0]);
-
-        Long seed = args.length>1 ? Long.parseLong(args[1]) : System.currentTimeMillis();
-
         String simulationName = inputFolder.getFileName().toString();
         simulationName = simulationName.split("\\.")[0];
+
+        YamlMain main = new YamlMain();
+        if(args.length>1) //if there are multiple parameters, read them up!
+            new JCommander(main, Arrays.copyOfRange(args,1,args.length));
+        main.run(simulationName,inputFolder);
+
+
+    }
+
+    public void  run(String simulationName,
+                     Path inputFolder) throws IOException {
         Path outputFolder = Paths.get("output", simulationName);
         outputFolder.toFile().mkdirs();
 
@@ -60,10 +80,10 @@ public class YamlMain {
         FishState model = new FishState(seed);
         Log.setLogger(new FishStateLogger(model,
                                           outputFolder.resolve(simulationName+ "_log.txt")));
-        Log.set(Log.LEVEL_DEBUG);
+        Log.set(logLevel);
         model.setScenario(scenario);
         model.start();
-        while(model.getYear()<20) {
+        while(model.getYear()<yearsToRun) {
             model.schedule.step(model);
             if(Log.DEBUG && model.getDayOfTheYear()==1)
                 Log.debug("Year " + model.getYear() + " starting");
@@ -76,7 +96,6 @@ public class YamlMain {
         writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
         writer.write(Long.toString(seed));
         writer.close();
-
     }
 
     public static void unfriend(String[] args) throws IOException {

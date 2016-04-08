@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -34,11 +35,18 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     private final double scaling;
 
+    /**
+     * when true the recruits get redistributed according to the original geographical distribution rather than the
+     * current one
+     */
+    private final boolean fixedRecruitmentDistribution;
 
     public MultipleSpeciesAbundanceInitializer(
-            LinkedHashMap<String, Path> biologicalDirectories, double scaling) {
+            LinkedHashMap<String, Path> biologicalDirectories, double scaling,
+            boolean fixedRecruitmentDistribution) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
+        this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
     }
 
     /**
@@ -128,6 +136,8 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
                 //now allocate the count correctly
                 Function<SeaTile, Double> allocator = allocators.get(species);
+                HashMap<AbundanceBasedLocalBiology, Double> currentWeightMap = new HashMap<>(locals.size());
+                initialWeights.put(species, currentWeightMap);
                 Preconditions.checkArgument(allocator != null);
 
                 //for each tile-biology
@@ -136,7 +146,7 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
                     //find the ratio by allocator
                     double ratio = allocator.apply(local.getKey());
-
+                    currentWeightMap.put(local.getValue(),ratio);
                     for(int i=0; i<=species.getMaxAge(); i++)
                     {
 
@@ -148,7 +158,11 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
                 }
 
 
-                SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(model, species, locals);
+                SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
+                        model, species, locals);
+                //if you want to keep recruits to spawn in the same places this is the time to do it
+                if(fixedRecruitmentDistribution)
+                    process.setFixedRecruitmentWeight(currentWeightMap);
             }
         }
         catch (Exception e) {
@@ -161,16 +175,16 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
     /**
-     * Associates the specified value with the specified key in this map.
-     * If the map previously contained a mapping for the key, the old
-     * value is replaced.
-     *
-     * @param key key with which the specified value is to be associated
-     * @param value value to be associated with the specified key
-     * @return the previous value associated with <tt>key</tt>, or
-     *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
-     *         (A <tt>null</tt> return can also indicate that the map
-     *         previously associated <tt>null</tt> with <tt>key</tt>.)
+     * holds the weight given to each biology object when first created
+     */
+    private final HashMap<Species,HashMap<AbundanceBasedLocalBiology,Double>> initialWeights = new HashMap<>();
+
+
+
+
+
+    /**
+     * puts the function describing the % of biomass that will initially be allocated to this sea-tile
      */
     public Function<SeaTile, Double> putAllocator(
             Species key,
@@ -180,5 +194,14 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
     public int getNumberOfFishableTiles(){
         return locals.size();
+    }
+
+    /**
+     * Getter for property 'locals'.
+     *
+     * @return Value for property 'locals'.
+     */
+    public HashMap<AbundanceBasedLocalBiology,Double> getInitialWeights(Species species) {
+        return initialWeights.get(species);
     }
 }

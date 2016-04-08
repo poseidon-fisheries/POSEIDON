@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.demoes;
 
+import org.jfree.util.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.field.grid.IntGrid2D;
@@ -56,8 +57,9 @@ public class RespondToFines {
         }
 
         //on the line fishing make up at least 50% of all recent fishing
-        System.out.println(allHotspots + " --- " + lowerHotSpots);
-        System.out.println("percentage fished on the bottom : " + lowerHotSpots/allHotspots);
+        Log.info("all spots ---- lower spots");
+        Log.info(allHotspots + " --- " + lowerHotSpots);
+        Log.info("percentage fished on the bottom : " + lowerHotSpots/allHotspots);
         Assert.assertTrue(allHotspots * .05 >= lowerHotSpots);
         Assert.assertTrue(allHotspots > 0);
     }

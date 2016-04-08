@@ -9,9 +9,9 @@ public class Engine
 {
 
     /**
-     * the weight of the engine in kg
+     * the power of the engine in bhp. Unused.
      */
-    private final double weightInKg;
+    private final double powerInBhp;
 
     /**
      * the efficency of the engine as how many liters of gas are consumed for each kilometer travelled
@@ -25,14 +25,14 @@ public class Engine
     private final double speedInKph;
 
 
-    public Engine(double weightInKg, double efficiencyAsLitersPerKm, double speedInKph) {
-        this.weightInKg = weightInKg;
+    public Engine(double powerInBhp, double efficiencyAsLitersPerKm, double speedInKph) {
+        this.powerInBhp = powerInBhp;
         this.efficiencyAsLitersPerKm = efficiencyAsLitersPerKm;
         this.speedInKph = speedInKph;
     }
 
-    public double getWeightInKg() {
-        return weightInKg;
+    public double getPowerInBhp() {
+        return powerInBhp;
     }
 
     public double getEfficiencyAsLitersPerKm() {
