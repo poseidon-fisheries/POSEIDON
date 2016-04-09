@@ -135,7 +135,7 @@ class Main{
         buttonBox.add(filer);
 
         FishState state = new FishState(System.currentTimeMillis(),1);
-        Log.set(Log.LEVEL_INFO);
+        Log.set(Log.LEVEL_DEBUG);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();
@@ -375,7 +375,7 @@ class Main{
                                     double probability = current.getProbabilityToLeavePort();
                                     probability = probability * (0.8 + 0.4 * random.nextDouble());
                                     probability = Math.min(Math.max(0, probability), 1);
-                                    return new FixedProbabilityDepartingStrategy(probability);
+                                    return new FixedProbabilityDepartingStrategy(probability, false);
                                 }
                             },
                             (fisher1, change, model1) -> fisher1.setDepartingStrategy(change),

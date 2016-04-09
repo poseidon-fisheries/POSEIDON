@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Supplier;
 import uk.ac.ox.oxfish.biology.Species;
 
 /**
@@ -24,7 +25,11 @@ public interface RecruitmentProcess
                                  int[] malePerAge);
 
 
-
+    /**
+     * give a function to generate noise as % of recruits this year
+     * @param noiseMaker the function that generates percentage changes. 1 means no noise.
+     */
+    void addNoise(Supplier<Double> noiseMaker);
 
 
 

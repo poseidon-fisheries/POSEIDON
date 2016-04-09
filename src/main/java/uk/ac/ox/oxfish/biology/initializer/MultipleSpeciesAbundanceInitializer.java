@@ -64,6 +64,11 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
     private final HashMap<SeaTile,AbundanceBasedLocalBiology> locals = new HashMap<>();
 
 
+    /**
+     * contains all the mortality+recruitment processes of each species
+     */
+    private final HashMap<Species,SingleSpeciesNaturalProcesses> naturalProcesses = new HashMap<>();
+
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
@@ -163,6 +168,7 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution)
                     process.setFixedRecruitmentWeight(currentWeightMap);
+                naturalProcesses.put(species,process);
             }
         }
         catch (Exception e) {
@@ -203,5 +209,14 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     public HashMap<AbundanceBasedLocalBiology,Double> getInitialWeights(Species species) {
         return initialWeights.get(species);
+    }
+
+    /**
+     * Getter for property 'naturalProcesses'.
+     *
+     * @return Value for property 'naturalProcesses'.
+     */
+    public SingleSpeciesNaturalProcesses getNaturalProcesses(Species species) {
+        return naturalProcesses.get(species);
     }
 }

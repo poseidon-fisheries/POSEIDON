@@ -62,7 +62,7 @@ public class FisherTest {
         Fisher fisher = new Fisher(0, port,
                                    new MersenneTwisterFast(),
                                    new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0),
+                                   new FixedProbabilityDepartingStrategy(1.0, false),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
                                    new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)),
@@ -85,7 +85,7 @@ public class FisherTest {
         //home now
         fisher.step(fishState);
         //don' let you go out again
-        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0));
+        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0, false));
         assertEquals(fisher.getHoursAtSea(), 4, .001);
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 0,.001);
@@ -136,7 +136,7 @@ public class FisherTest {
         Fisher fisher = new Fisher(0, port,
                                    new MersenneTwisterFast(),
                                    new AnarchyFactory().apply(fishState),
-                                   new FixedProbabilityDepartingStrategy(1.0),
+                                   new FixedProbabilityDepartingStrategy(1.0, false),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
                                    new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(30)),
@@ -156,7 +156,7 @@ public class FisherTest {
         assertEquals(fisher.getFuelLeft(), 10.0, 0.0);
         //and now emergency should kick in and you should go back home
         fisher.step(fishState);
-        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0));
+        fisher.setDepartingStrategy(new FixedProbabilityDepartingStrategy(0, false));
         assertEquals(fisher.getFuelLeft(), 0.0, 0.0);
         assertTrue(fisher.isFuelEmergencyOverride());
         fisher.step(fishState);

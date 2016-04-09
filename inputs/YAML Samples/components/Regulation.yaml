@@ -18,10 +18,14 @@ Mono-ITQ:
   individualQuota: '5000.0'
 -------
 Multi-ITQ:
+  allowMultipleTrades: false
+  minimumQuotaTraded: 100
   quotaFirstSpecie: '5000.0'
   quotaOtherSpecies: '5000.0'
 -------
 Multi-ITQ by List:
+  allowMultipleTrades: false
+  minimumQuotaTraded: 100
   yearlyQuotaMaps: 0:5000
 -------
 Partial-ITQ:

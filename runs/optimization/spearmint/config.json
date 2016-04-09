@@ -1,7 +1,7 @@
 {
   "language"        : "PYTHON",
-  "main_file"       : "calitac.py",
-  "experiment-name" : "calitac",
+  "main_file"       : "caliprice.py",
+  "experiment-name" : "caliprice",
   "likelihood"      : "GAUSSIAN",
   "acquisition"     : "PES",
   "resources" : {
@@ -15,32 +15,32 @@
     "first" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 50000000
+      "min"  : 0,
+      "max"  : 5
     },
     "second" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 50000000
+      "min"  : 0,
+      "max"  : 5
     },
     "third" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 50000000
+      "min"  : 0,
+      "max"  : 5
     },
     "fourth" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 50000000
+      "min"  : 0,
+      "max"  : 5
     },
     "fifth" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 1,
-      "max"  : 50000000
+      "min"  : 0,
+      "max"  : 5
     }
 
   },

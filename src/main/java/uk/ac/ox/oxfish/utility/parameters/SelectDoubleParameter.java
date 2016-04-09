@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
 
+import java.util.Arrays;
+
 /**
  * Selects uniformly from a list of possible values. Keeps a "string" representation to be useful with the GUI
  * Created by carrknight on 2/11/16.
@@ -76,5 +78,10 @@ public class SelectDoubleParameter implements DoubleParameter {
         this.valueString = valueString;
         if(valueString.matches(".*\\d+.*")) //don't transform until there is at least a number (ugly hack to keep gui happy)
             this.possibleValues =   stringToArray(valueString);
+    }
+
+    @Override
+    public DoubleParameter makeCopy() {
+        return new SelectDoubleParameter(Arrays.copyOf(possibleValues,possibleValues.length));
     }
 }

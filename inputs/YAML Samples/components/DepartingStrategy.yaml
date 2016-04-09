@@ -2,6 +2,7 @@ Fixed Probability Departing:
   probabilityToLeavePort: '1.0'
 -------
 Adaptive Probability Departing:
+  checkOnlyOnceADay: false
   explorationProbability: '0.6'
   imitationProbability: '1.0'
   initialProbabilityToLeavePort: '0.5'

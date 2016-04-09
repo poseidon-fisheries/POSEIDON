@@ -35,6 +35,15 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
      */
     private String yearlyQuotaMaps = "0:5000";
 
+    /**
+     * can traders buy/sell multiple times in a day
+     */
+    private boolean allowMultipleTrades = false;
+
+    /**
+     * the size of quota units (kg) traded each match
+     */
+    private int minimumQuotaTraded = 100;
 
     /**
      * Applies this function to the given argument.
@@ -68,7 +77,8 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
          *
          */
 
-        MultiITQFactory.buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder);
+        MultiITQFactory.buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
+                                                allowMultipleTrades, minimumQuotaTraded);
 
 
         return MultiITQFactory.opportunityCostAwareQuotaRegulation(state,quotas,orderBooks.get(state));
@@ -84,5 +94,41 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
     public void setYearlyQuotaMaps(String yearlyQuotaMaps) {
         this.yearlyQuotaMaps = yearlyQuotaMaps;
+    }
+
+    /**
+     * Getter for property 'allowMultipleTrades'.
+     *
+     * @return Value for property 'allowMultipleTrades'.
+     */
+    public boolean isAllowMultipleTrades() {
+        return allowMultipleTrades;
+    }
+
+    /**
+     * Setter for property 'allowMultipleTrades'.
+     *
+     * @param allowMultipleTrades Value to set for property 'allowMultipleTrades'.
+     */
+    public void setAllowMultipleTrades(boolean allowMultipleTrades) {
+        this.allowMultipleTrades = allowMultipleTrades;
+    }
+
+    /**
+     * Getter for property 'minimumQuotaTraded'.
+     *
+     * @return Value for property 'minimumQuotaTraded'.
+     */
+    public int getMinimumQuotaTraded() {
+        return minimumQuotaTraded;
+    }
+
+    /**
+     * Setter for property 'minimumQuotaTraded'.
+     *
+     * @param minimumQuotaTraded Value to set for property 'minimumQuotaTraded'.
+     */
+    public void setMinimumQuotaTraded(int minimumQuotaTraded) {
+        this.minimumQuotaTraded = minimumQuotaTraded;
     }
 }

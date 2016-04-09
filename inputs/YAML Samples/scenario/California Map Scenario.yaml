@@ -36,6 +36,8 @@ California Map Scenario:
   networkBuilder:
     Equal Out Degree:
       degree: 2
+  priceMap: Dover Sole:0.244940171,Sablefish:0.74752115,Shortspine Thornyhead:1.218804148,Longspine Thornyhead:0.167829376,Yelloweye Rockfish:0.326586895
+  recruitmentNoise: '0.0'
   regulation:
     Multi-Quotas from File:
       itq: true

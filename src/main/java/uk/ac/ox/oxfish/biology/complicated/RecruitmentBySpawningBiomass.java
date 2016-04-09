@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -24,6 +25,9 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      * if true the spawning biomass counts relative fecundity (this is true for yelloweye rockfish)
      */
     private final boolean addRelativeFecundityToSpawningBiomass;
+
+
+    private Supplier<Double> noisemaker = ()->0d;
 
 
     public RecruitmentBySpawningBiomass(int virginRecruits,
@@ -70,12 +74,24 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
         //turn it into recruits.
         return
                 (int) FishStateUtilities.round(
-                        (4 * steepness * virginRecruits * spawningBiomass)/
+                        (1d+noisemaker.get()) * (
+                                (4 * steepness * virginRecruits * spawningBiomass)/
                         ((virginRecruits*meristics.getCumulativePhi()*(1-steepness)) +
                                 (((5*steepness)-1)*spawningBiomass))
+                        )
                 );
 
 
+
+    }
+
+    /**
+     * give a function to generate noise as % of recruits this year
+     *
+     * @param noiseMaker the function that generates percentage changes. 0 means no noise.
+     */
+    @Override
+    public void addNoise(Supplier<Double> noiseMaker) {
 
     }
 }

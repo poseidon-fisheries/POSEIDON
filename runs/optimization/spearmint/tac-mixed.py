@@ -43,6 +43,7 @@ def build_mpa_input(filename, x, y):
 def scorer(yamlfile):
     print(yamlfile)
     print(yamlfile["FishState"]["Species 0 Landings"])
+
     return -float(yamlfile["FishState"]["Biomass Species 1"][-1]) - sum(yamlfile["FishState"]["Species 0 Landings"])
 
 

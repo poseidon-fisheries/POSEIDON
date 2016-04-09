@@ -50,6 +50,17 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
     private Counter opportunityCostCounter;
 
+
+    /**
+     * can traders buy/sell multiple times in a day
+     */
+    private boolean allowMultipleTrades = false;
+
+    /**
+     * the size of quota units (kg) traded each day
+     */
+    private int minimumQuotaTraded = 100;
+
     /**
      * Applies this function to the given argument.
      *
@@ -75,7 +86,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
          *     |_|  |_/_/ \_\_|_\_|\_\___| |_|   |___/\___/|___|____|___/|___|_|_\|___/
          *
          */
-        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder);
+        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
+                                allowMultipleTrades, minimumQuotaTraded);
 
         return MultiITQFactory.opportunityCostAwareQuotaRegulation(state,quotas,orderBooks.get(state));
     }
@@ -88,10 +100,13 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
      * @param quotas yealy quotas of this fisher
      * @param orderBooks a map model---> ITQ markets
      * @param orderBooksBuilder a map: model---> ITQ builders
+     * @param allowMultipleTradesPerFisher whether a fisher can make multiple trades within the same step
+     * @param unitsTradedPerMatch the size of quotas exchanged at each trade (in kg)
      */
     public static void buildITQMarketsIfNeeded(
             FishState state, int numberOfSpecies, double[] quotas, Map<FishState, ITQOrderBook[]> orderBooks,
-            Map<FishState, ITQMarketBuilder[]> orderBooksBuilder) {
+            Map<FishState, ITQMarketBuilder[]> orderBooksBuilder, final boolean allowMultipleTradesPerFisher,
+            final int unitsTradedPerMatch) {
 
         if(Log.TRACE)
             Log.trace("Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
@@ -125,13 +140,16 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
                                                                                                  specieIndex,
                                                                                                  //reads the fisher regulation which we know
                                                                                                  //what it is because we are supplying it now
-                                                                                                 fisher -> ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(specieIndex)));
+                                                                                                 fisher ->
+                                                                                                         ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(specieIndex)));
                     state.registerStartable(builders[i]);
                     //after the builder starts it will create a market, copy it in the array
                     state.registerStartable(new Startable() {
                         @Override
                         public void start(FishState model) {
                             markets[specieIndex] = builders[specieIndex].getMarket();
+                            markets[specieIndex].setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
+                            markets[specieIndex].setUnitsTradedPerMatch(unitsTradedPerMatch);
                         }
 
                         @Override
@@ -187,5 +205,21 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
     public void setQuotaOtherSpecies(DoubleParameter quotaOtherSpecies) {
         this.quotaOtherSpecies = quotaOtherSpecies;
+    }
+
+    public boolean isAllowMultipleTrades() {
+        return allowMultipleTrades;
+    }
+
+    public void setAllowMultipleTrades(boolean allowMultipleTrades) {
+        this.allowMultipleTrades = allowMultipleTrades;
+    }
+
+    public int getMinimumQuotaTraded() {
+        return minimumQuotaTraded;
+    }
+
+    public void setMinimumQuotaTraded(int minimumQuotaTraded) {
+        this.minimumQuotaTraded = minimumQuotaTraded;
     }
 }

@@ -57,7 +57,7 @@ public class MovingTest
         Fisher fisher = new Fisher(0, port,
                                      new MersenneTwisterFast(),
                                      new AnarchyFactory().apply(fishState),
-                                     new FixedProbabilityDepartingStrategy(1.0),
+                                     new FixedProbabilityDepartingStrategy(1.0, false),
                                      new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                      new FishingStrategy() {
                                          @Override

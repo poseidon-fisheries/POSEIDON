@@ -29,6 +29,9 @@ public class MultiQuotaFileFactory implements AlgorithmFactory<MultiQuotaRegulat
 
     private StringBuilder representer;
 
+    private int quotaExchangedPerMatch = 100;
+
+    private boolean multipleTradesAllowed = false;
 
     //even though we only one use delegate we keep both available
     private MultiITQStringFactory itqFactory = new MultiITQStringFactory();
@@ -130,6 +133,8 @@ public class MultiQuotaFileFactory implements AlgorithmFactory<MultiQuotaRegulat
 
 
         if(itq) {
+            itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
+            itqFactory.setMinimumQuotaTraded(quotaExchangedPerMatch);
             MultiQuotaRegulation regulation = itqFactory.apply(fishState);
             //set up a startable that divide it by the number of fishers
             fishState.registerStartable(new ITQScaler(regulation));

@@ -16,11 +16,16 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     private final double probabilityToLeavePort;
 
 
-    public FixedProbabilityDepartingStrategy(double probabilityToLeavePort)
+    private double dayLastCheck = -1;
+
+    final private boolean checkOnlyOnceADay;
+
+    public FixedProbabilityDepartingStrategy(double probabilityToLeavePort, boolean checkOnlyOnceADay)
     {
         Preconditions.checkArgument(probabilityToLeavePort >= 0, "Probability can't be negative!");
         Preconditions.checkArgument(probabilityToLeavePort <= 1, "Probability can't be above 1");
         this.probabilityToLeavePort = probabilityToLeavePort;
+        this.checkOnlyOnceADay = checkOnlyOnceADay;
     }
 
 
@@ -44,6 +49,9 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     @Override
     public boolean shouldFisherLeavePort(
             FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+        if(checkOnlyOnceADay && model.getDay()==dayLastCheck) //if you already checked don't bother
+            return false;
+        dayLastCheck = model.getDay();
         return status.getRandom().nextBoolean(probabilityToLeavePort);
     }
 

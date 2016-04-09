@@ -23,6 +23,8 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
 
     private DoubleParameter imitationProbability = new FixedDoubleParameter(1);
 
+    private boolean checkOnlyOnceADay = false;
+
     private final static HashMap<FishState,Startable> adapters = new HashMap<>();
 
 
@@ -36,7 +38,7 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
     @Override
     public FixedProbabilityDepartingStrategy apply(FishState state) {
         FixedProbabilityDepartingStrategy toReturn = new FixedProbabilityDepartingStrategy(
-                initialProbabilityToLeavePort.apply(state.random));
+                initialProbabilityToLeavePort.apply(state.random), checkOnlyOnceADay);
 
         //only once per model, please
         if(adapters.get(state) == null)
@@ -98,5 +100,13 @@ public class AdaptiveProbabilityDepartingFactory implements AlgorithmFactory<Fix
 
     public static HashMap<FishState, Startable> getAdapters() {
         return adapters;
+    }
+
+    public boolean isCheckOnlyOnceADay() {
+        return checkOnlyOnceADay;
+    }
+
+    public void setCheckOnlyOnceADay(boolean checkOnlyOnceADay) {
+        this.checkOnlyOnceADay = checkOnlyOnceADay;
     }
 }

@@ -36,4 +36,9 @@ public class FixedDoubleParameter implements DoubleParameter {
     public void setFixedValue(double fixedValue) {
         this.fixedValue = fixedValue;
     }
+
+    @Override
+    public FixedDoubleParameter makeCopy() {
+        return new FixedDoubleParameter(fixedValue);
+    }
 }

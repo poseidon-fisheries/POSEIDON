@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
-import com.google.common.base.Preconditions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -132,6 +131,9 @@ public class YamlConstructor extends  Constructor {
 
         if(split[0].toLowerCase().equals("uniform"))
             return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("sin"))
+            return new SinusoidalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
 
         if(split[0].toLowerCase().equals("select"))
             return new SelectDoubleParameter(nodeContent.trim().replace("select",""));

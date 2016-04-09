@@ -50,4 +50,9 @@ public class UniformDoubleParameter implements DoubleParameter {
     public void setMaximum(double maximum) {
         this.maximum = maximum;
     }
+
+    @Override
+    public UniformDoubleParameter makeCopy() {
+        return new UniformDoubleParameter(minimum,maximum);
+    }
 }

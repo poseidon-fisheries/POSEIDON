@@ -25,6 +25,8 @@ public class DoubleParameters
         names.put(UniformDoubleParameter.class,"Uniform");
         parameters.put("Select", () -> new SelectDoubleParameter("0 1"));
         names.put(SelectDoubleParameter.class,"Select");
+        parameters.put("Sin", () -> new SinusoidalDoubleParameter(1,0.01));
+        names.put(SelectDoubleParameter.class,"Select");
 
 
 

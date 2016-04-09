@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,6 +38,7 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -70,6 +72,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
      * how much should the model biomass/abundance be given the data we read in?
      */
     private double biomassScaling = 1.0;
+
 
     private int gridWidth = 50;
 
@@ -164,6 +167,11 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private boolean fixedRecruitmentDistribution = false;
 
     /**
+     * the multiplicative error to recruitment in a year. For now it applies to all species
+     */
+    private DoubleParameter recruitmentNoise = new FixedDoubleParameter(0);
+
+    /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
     private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
@@ -171,6 +179,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private HashMap<Port,Integer> numberOfFishersPerPort;
 
+    private String priceMap = "Dover Sole:0.244940171,Sablefish:0.74752115,Shortspine Thornyhead:1.218804148,Longspine Thornyhead:0.167829376,Yelloweye Rockfish:0.326586895";
 
     public CaliforniaBathymetryScenario() {
 
@@ -275,8 +284,28 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                  model);
             List<Species> species = biology.getSpecies();
 
+            model.registerStartable(new Startable() {
+                @Override
+                public void start(FishState model) {
+                    for(Species thisSpecies : species)
+                    {
+                        DoubleParameter noise = recruitmentNoise.makeCopy();
+                        initializer.getNaturalProcesses(thisSpecies).addNoise(
+                                () -> noise.apply(model.getRandom())
+
+                        );
+                    }
+                }
+
+                @Override
+                public void turnOff() {
+
+                }
+            });
+
             GeomGridField unitedMap = new GeomGridField(altitudeGrid);
             unitedMap.setMBR(sampledMap.getMbr());
+
             //create the map
             CartesianUTMDistance distance = new CartesianUTMDistance();
             map = new NauticalMap(unitedMap, new GeomVectorField(),
@@ -345,14 +374,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     map,
                     () -> {
                         MarketMap markets = new MarketMap(biology);
-
                         //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
-                        markets.addMarket(biology.getSpecie("Dover Sole"),new FixedPriceMarket(0.244940171));
-                        markets.addMarket(biology.getSpecie("Sablefish"),new FixedPriceMarket(0.74752115));
-                        markets.addMarket(biology.getSpecie("Shortspine Thornyhead"),new FixedPriceMarket(1.218804148));
-                        markets.addMarket(biology.getSpecie("Longspine Thornyhead"),new FixedPriceMarket(0.167829376));
-                        markets.addMarket(biology.getSpecie("Yelloweye Rockfish"),new FixedPriceMarket(0.326586895));
+
+                        Map<String, String> prices = Splitter.on(",").withKeyValueSeparator(":").split(priceMap.trim());
+                        for(Map.Entry<String,String> price : prices.entrySet()) {
+                            markets.addMarket(biology.getSpecie(price.getKey()), new FixedPriceMarket(Double.valueOf(price.getValue())));
+                            if(Log.DEBUG)
+                                Log.debug(price.getKey() + " will have price " + price.getValue());
+                        }
                         return markets;
+
                     },
                     gasPricePerLiter.apply(model.getRandom()));
 
@@ -388,9 +419,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
         //compute catchability
         LinkedList<Fisher> fisherList = new LinkedList<>();
         double inputedCatchability = 0.00000074932 / (1d / initializer.getNumberOfFishableTiles());
-        Log.info("the inputed catchability is : " + inputedCatchability
-                         +", due to these many number of tiles being available"
-                         + initializer.getNumberOfFishableTiles());
+
         gear.setAverageCatchability(new FixedDoubleParameter(
                 inputedCatchability));
         gear.setLitersOfGasConsumedPerHour(literPerHourOfFishing);
@@ -514,6 +543,17 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
         //allow friendships only within people from the same port!
         networkBuilder.addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
+
+        if(Log.DEBUG)
+        {
+            Log.debug("the inputed catchability is : " + inputedCatchability
+                              +", due to these many number of tiles being available"
+                              + initializer.getNumberOfFishableTiles());
+            List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
+            for(Species species : biology.getSpecies() )
+                Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
+                allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
+        }
 
         return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
 
@@ -969,6 +1009,32 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     public void setFixedRecruitmentDistribution(boolean fixedRecruitmentDistribution) {
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
+    }
+
+    /**
+     * Getter for property 'recruitmentNoise'.
+     *
+     * @return Value for property 'recruitmentNoise'.
+     */
+    public DoubleParameter getRecruitmentNoise() {
+        return recruitmentNoise;
+    }
+
+    /**
+     * Setter for property 'recruitmentNoise'.
+     *
+     * @param recruitmentNoise Value to set for property 'recruitmentNoise'.
+     */
+    public void setRecruitmentNoise(DoubleParameter recruitmentNoise) {
+        this.recruitmentNoise = recruitmentNoise;
+    }
+
+    public String getPriceMap() {
+        return priceMap;
+    }
+
+    public void setPriceMap(String priceMap) {
+        this.priceMap = priceMap;
     }
 }
 

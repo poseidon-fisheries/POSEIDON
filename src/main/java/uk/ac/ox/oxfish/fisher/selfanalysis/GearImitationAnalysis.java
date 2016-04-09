@@ -330,7 +330,7 @@ public class GearImitationAnalysis implements FisherStartable
                             double shock = (2 *shockSize) * random.nextDouble() - shockSize;
                             probability = probability * (1+shock);
                             probability = Math.min(Math.max(0, probability), 1);
-                            return new FixedProbabilityDepartingStrategy(probability);
+                            return new FixedProbabilityDepartingStrategy(probability, false);
                         }
                     },
                     (fisher1, change, model1) -> fisher1.setDepartingStrategy(change),

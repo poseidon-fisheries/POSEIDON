@@ -50,4 +50,9 @@ public class NormalDoubleParameter implements DoubleParameter {
     public void setStandardDeviation(double standardDeviation) {
         this.standardDeviation = standardDeviation;
     }
+
+    @Override
+    public DoubleParameter makeCopy() {
+        return new NormalDoubleParameter(mean,standardDeviation);
+    }
 }
