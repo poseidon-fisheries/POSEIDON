@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.experiments.DemographyDemo;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,9 +24,11 @@ import static org.mockito.Mockito.when;
  */
 public class ReplicateDemographyDemo {
 
+    public static final Path PATH_TO_FILE = Paths.get("inputs", "tests", "demography.csv");
+
     @BeforeClass
     public static void setUp() throws Exception {
-        if(!Files.exists(Paths.get("inputs", "tests", "demography.csv")))
+        if(!Files.exists(PATH_TO_FILE))
             DemographyDemo.main(new String[0]);
 
 
@@ -106,7 +109,7 @@ public class ReplicateDemographyDemo {
         System.out.println(processes.getLastRecruits() + " recruits ");
         System.out.println(builder.toString());
 
-        String original = String.join("\n", Files.readAllLines(Paths.get("runs", "demography", "demography.csv"))) + "\n";
+        String original = String.join("\n", Files.readAllLines(PATH_TO_FILE)) + "\n";
 
         assertEquals(original,builder.toString());
 
@@ -202,7 +205,7 @@ public class ReplicateDemographyDemo {
         System.out.println(processes.getLastRecruits() + " recruits ");
         System.out.println(builder.toString());
 
-        List<String> originalData = Files.readAllLines(Paths.get("runs", "demography", "demography.csv"));
+        List<String> originalData = Files.readAllLines(PATH_TO_FILE);
 
         //unfortunately when we split the data mortality gets a bit screwy with roundings so that we can't guarantee
         //that the numbers will be precisely the same, but we can bound the error to be very small!

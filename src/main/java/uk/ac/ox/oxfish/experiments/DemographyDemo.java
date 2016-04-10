@@ -93,6 +93,7 @@ public class DemographyDemo {
         System.out.println(recruits.poll() + " recruits ");
         System.out.println(builder.toString());
         Files.write(Paths.get("runs","demography","demography.csv"),builder.toString().getBytes());
+        Files.write(Paths.get("inputs", "tests", "demography.csv"),builder.toString().getBytes());
 
     }
 }
