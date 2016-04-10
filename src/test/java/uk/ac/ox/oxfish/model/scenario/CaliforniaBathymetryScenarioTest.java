@@ -27,7 +27,7 @@ public class CaliforniaBathymetryScenarioTest {
         model.start();
         List<SeaTile> tiles = model.getMap().getAllSeaTilesAsList();
         double totalShortspineBiomass = 0;
-        assertEquals(model.getBiology().getSpecies().get(0).getName(),"Yelloweye Rockfish");
+        assertEquals(model.getBiology().getSpecies().get(0).getName(),"Dover Sole");
         Species shortSpine = model.getBiology().getSpecie("Shortspine Thornyhead");
         for(SeaTile tile : tiles)
         {

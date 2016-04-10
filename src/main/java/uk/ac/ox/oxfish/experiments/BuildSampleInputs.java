@@ -14,9 +14,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -80,8 +78,14 @@ public class BuildSampleInputs
         DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
         LinkedHashMap<String,Path> spatialFiles = new LinkedHashMap<>();
         LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
+        //sort it alphabetically to insure folders are consistently ranked
+        List<Path> sortedFolders = new LinkedList<>();
+        folders.forEach(path -> sortedFolders.add(path));
+        Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
+                                                                                          o2.getFileName().toString()));
+
         //each folder is supposedly a species
-        for(Path folder : folders)
+        for(Path folder : sortedFolders)
         {
 
             Path file = folder.resolve("spatial.csv");

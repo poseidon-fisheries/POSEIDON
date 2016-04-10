@@ -208,9 +208,13 @@ public class CaliforniaBathymetryScenario implements Scenario {
             LinkedHashMap<String, Path> folderMap = new LinkedHashMap<>();
 
             //sort it alphabetically to insure folders are consistently ranked
+            List<Path> sortedFolders = new LinkedList<>();
+            folders.forEach(path -> sortedFolders.add(path));
+            Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
+                                                                                      o2.getFileName().toString()));
 
             //each folder is supposedly a species
-            for(Path folder : folders)
+            for(Path folder : sortedFolders)
             {
 
                 Path file = folder.resolve("spatial.csv");
@@ -329,7 +333,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                         int i = 0;
                         //each specie grid value is an ObjectGrid2D whose cells are themselves list of observations
                         //for each species
-                        for (Map.Entry<String, Table<Integer,Integer,LinkedList<Double>>> specieGrid : sampledMap.getBiologyGrids().entrySet()) {
+                        for (Map.Entry<String, Table<Integer,Integer,LinkedList<Double>>> specieGrid :
+                                sampledMap.getBiologyGrids().entrySet()) {
                             assert species.get(i).getName().equals(specieGrid.getKey()); //check we got the correct one
                             //average
                             OptionalDouble average = specieGrid.getValue().get(x,
