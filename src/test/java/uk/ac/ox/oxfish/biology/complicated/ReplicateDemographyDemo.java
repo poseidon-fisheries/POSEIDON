@@ -25,7 +25,7 @@ public class ReplicateDemographyDemo {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        if(!Files.exists(Paths.get("runs", "demography", "demography.csv")))
+        if(!Files.exists(Paths.get("inputs", "tests", "demography.csv")))
             DemographyDemo.main(new String[0]);
 
 
