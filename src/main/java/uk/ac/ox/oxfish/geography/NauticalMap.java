@@ -206,6 +206,18 @@ public class NauticalMap implements Startable
         return new LinkedList<>(rasterBackingGrid.elements());
     }
 
+    private List<SeaTile> waterSeaTiles = null;
+
+    public List<SeaTile> getAllSeaTilesExcludingLandAsList()
+    {
+
+        if(waterSeaTiles == null) {
+            waterSeaTiles = getAllSeaTilesAsList();
+            waterSeaTiles.removeIf(seaTile -> seaTile.getAltitude() >=0);
+        }
+        return waterSeaTiles;
+    }
+
     /**
      * tell the startable to turnoff,
      */
@@ -228,6 +240,7 @@ public class NauticalMap implements Startable
      * for each tile if they belong to an MPA (strictly speaking if their center belongs to an MPA). If there is an MPA it is set to the tile.Bio
      */
     public void recomputeTilesMPA() {
+        waterSeaTiles = null;
         //todo this works but make a test to be sure
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
             for(int j=0; j<rasterBackingGrid.getHeight(); j++)

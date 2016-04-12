@@ -48,6 +48,16 @@ public class DestinationStrategies
                          PerTripParticleSwarmFactory::new);
         NAMES.put(PerTripParticleSwarmFactory.class,"PSO");
 
+        CONSTRUCTORS.put("Threshold Erotetic",
+                         ThresholdEroteticDestinationFactory::new);
+        NAMES.put(ThresholdEroteticDestinationFactory.class,
+                  "Threshold Erotetic");
+
+        CONSTRUCTORS.put("Better Than Average Erotetic",
+                         BetterThanAverageEroteticDestinationFactory::new);
+        NAMES.put(BetterThanAverageEroteticDestinationFactory.class,
+                  "Better Than Average Erotetic");
+
     }
 
     private DestinationStrategies() {}

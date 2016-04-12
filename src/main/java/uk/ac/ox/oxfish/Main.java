@@ -135,7 +135,7 @@ class Main{
         buttonBox.add(filer);
 
         FishState state = new FishState(System.currentTimeMillis(),1);
-        Log.set(Log.LEVEL_DEBUG);
+        Log.set(Log.LEVEL_TRACE);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();

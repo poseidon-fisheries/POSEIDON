@@ -1,16 +1,17 @@
 package uk.ac.ox.oxfish.fisher;
 
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.fisher.log.LocationMemories;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripLogger;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
+import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.data.collectors.*;
 
 import java.io.Serializable;
+import java.util.Comparator;
+import java.util.Map;
 
 public class FisherMemory implements Serializable, FisherStartable {
     /**
@@ -73,28 +74,22 @@ public class FisherMemory implements Serializable, FisherStartable {
 
 
     public FisherMemory() {
-        yearlyTimeSeries = new YearlyFisherTimeSeries();
-        yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
-        catchMemories = new LocationMemories<Catch>(.99, 300, 2);
-        tripMemories = new LocationMemories<TripRecord>(.99, 300, 2);
+        this(new LocationMemories<>(.99, 300, 2),
+             new LocationMemories<>(.99, 300, 2));
     }
 
     public FisherMemory(
-            YearlyFisherTimeSeries yearlyTimeSeries, DailyFisherTimeSeries dailyTimeSeries,
-            Counter yearlyCounter, FisherDailyCounter dailyCounter,
             LocationMemories<Catch> catchMemories,
             LocationMemories<TripRecord> tripMemories) {
-        this.yearlyTimeSeries = yearlyTimeSeries;
-        this.dailyTimeSeries = dailyTimeSeries;
-        this.yearlyCounter = yearlyCounter;
-        this.dailyCounter = dailyCounter;
+        yearlyTimeSeries = new YearlyFisherTimeSeries();
+        yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
+        this.dailyTimeSeries = new DailyFisherTimeSeries();
         this.catchMemories = catchMemories;
         this.tripMemories = tripMemories;
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        dailyTimeSeries = new DailyFisherTimeSeries();
         yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
         yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_EXPENDITURE);
         yearlyCounter.addColumn(YearlyFisherTimeSeries.TRIPS);
@@ -149,4 +144,68 @@ public class FisherMemory implements Serializable, FisherStartable {
     {
         return dailyTimeSeries.numberOfObservations();
     }
+
+    /**
+     * Ask the fisher what is the best tile with respect to catches made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForCatchesRemembered(
+            Comparator<LocationMemory<Catch>> comparator) {
+        return getCatchMemories().getBestFishingSpotInMemory(comparator);
+    }
+
+    /**
+     *
+     * @param location
+     * @return
+     */
+    public TripRecord rememberLastTripHere(SeaTile location)
+    {
+
+        return getTripMemories().getMemory(location);
+    }
+
+    public Map<SeaTile,LocationMemory<TripRecord>> rememberAllTrips()
+    {
+        return getTripMemories().getMemories();
+    }
+
+    /**
+     * Ask the fisher what is the best tile with respect to trips made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForTripsRemembered(
+            Comparator<LocationMemory<TripRecord>> comparator) {
+        return getTripMemories().getBestFishingSpotInMemory(comparator);
+    }
+
+
+
+    /**
+     * an object to extract from seatiles a feature
+     */
+    private FeatureExtractors<SeaTile> tileRepresentation = new FeatureExtractors<>();
+
+
+    public void addFeatureExtractor(
+            String nameOfFeature,
+            FeatureExtractor<SeaTile> extractor) {
+        tileRepresentation.addFeatureExtractor(nameOfFeature, extractor);
+    }
+
+    public FeatureExtractor<SeaTile> removeFeatureExtractor(String nameOfFeature) {
+        return tileRepresentation.removeFeatureExtractor(nameOfFeature);
+    }
+
+    /**
+     * Getter for property 'tileRepresentation'.
+     *
+     * @return Value for property 'tileRepresentation'.
+     */
+    public FeatureExtractors<SeaTile> getTileRepresentation() {
+        return tileRepresentation;
+    }
+
+
+
 }

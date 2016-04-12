@@ -40,6 +40,7 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("Double Logistic",
                          DoubleLogisticDepartingFactory::new);
         NAMES.put(DoubleLogisticDepartingFactory.class,"Double Logistic");
+
         CONSTRUCTORS.put("Monthly Departing",
                          MonthlyDepartingFactory::new);
         NAMES.put(MonthlyDepartingFactory.class,"Monthly Departing");

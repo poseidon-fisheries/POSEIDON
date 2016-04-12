@@ -116,6 +116,17 @@ public class LocationMemories<T> implements Startable, Steppable
         else
             return null;
     }
+
+
+    /**
+     * Getter for property 'memories'.
+     *
+     * @return Value for property 'memories'.
+     */
+    public Map<SeaTile,
+            LocationMemory<T>> getMemories() {
+        return memories;
+    }
 }
 
 

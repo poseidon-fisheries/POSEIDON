@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.metawidget.inspector.annotation.UiHidden;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -14,6 +15,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
 import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.LocationMemory;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -39,10 +42,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The boat catching all that delicious fish.
@@ -900,23 +900,6 @@ public class Fisher implements Steppable, Startable{
     }
 
 
-    /**
-     * Ask the fisher what is the best tile with respect to catches made
-     * @param comparator how should the fisher compare each tile remembered
-     */
-    public SeaTile getBestSpotForCatchesRemembered(
-            Comparator<LocationMemory<Catch>> comparator) {
-        return memory.getCatchMemories().getBestFishingSpotInMemory(comparator);
-    }
-
-    /**
-     * Ask the fisher what is the best tile with respect to trips made
-     * @param comparator how should the fisher compare each tile remembered
-     */
-    public SeaTile getBestSpotForTripsRemembered(
-            Comparator<LocationMemory<TripRecord>> comparator) {
-        return memory.getTripMemories().getBestFishingSpotInMemory(comparator);
-    }
 
 
     public double getHoursAtSea() {
@@ -1078,5 +1061,87 @@ public class Fisher implements Steppable, Startable{
     {
         status.setDestination(getHomePort().getLocation());
     }
+
+
+    /**
+     * Ask the fisher what is the best tile with respect to catches made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForCatchesRemembered(
+            Comparator<LocationMemory<Catch>> comparator) {
+        return memory.getBestSpotForCatchesRemembered(comparator);
+    }
+
+    /**
+     *
+     * @param location
+     * @return
+     */
+    public TripRecord rememberLastTripHere(SeaTile location) {
+        return memory.rememberLastTripHere(location);
+    }
+
+    public Map<SeaTile, LocationMemory<TripRecord>> rememberAllTrips() {
+        return memory.rememberAllTrips();
+    }
+
+    /**
+     * Ask the fisher what is the best tile with respect to trips made
+     * @param comparator how should the fisher compare each tile remembered
+     */
+    public SeaTile getBestSpotForTripsRemembered(
+            Comparator<LocationMemory<TripRecord>> comparator) {
+        return memory.getBestSpotForTripsRemembered(comparator);
+    }
+
+    public void addFeatureExtractor(
+            String nameOfFeature,
+            FeatureExtractor<SeaTile> extractor) {
+        memory.addFeatureExtractor(nameOfFeature, extractor);
+    }
+
+    public FeatureExtractor<SeaTile> removeFeatureExtractor(String nameOfFeature) {
+        return memory.removeFeatureExtractor(nameOfFeature);
+    }
+
+    /**
+     * Getter for property 'tileRepresentation'.
+     *
+     * @return Value for property 'tileRepresentation'.
+     */
+    public FeatureExtractors<SeaTile> getTileRepresentation() {
+        return memory.getTileRepresentation();
+    }
+
+    /**
+     * Getter for property 'status'.
+     *
+     * @return Value for property 'status'.
+     */
+    @UiHidden
+    public FisherStatus grabStatus() {
+        return status;
+    }
+
+    /**
+     * Getter for property 'memory'.
+     *
+     * @return Value for property 'memory'.
+     */
+    @UiHidden
+    public FisherMemory grabMemory() {
+        return memory;
+    }
+
+
+    /**
+     * Getter for property 'equipment'.
+     *
+     * @return Value for property 'equipment'.
+     */
+    public FisherEquipment grabEquipment() {
+        return equipment;
+    }
+
 
 }

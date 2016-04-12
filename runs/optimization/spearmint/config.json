@@ -1,7 +1,7 @@
 {
   "language"        : "PYTHON",
-  "main_file"       : "caliprice.py",
-  "experiment-name" : "caliprice",
+  "main_file"       : "caliselec.py",
+  "experiment-name" : "caliselec",
   "likelihood"      : "GAUSSIAN",
   "acquisition"     : "PES",
   "resources" : {
@@ -12,40 +12,26 @@
     }
   },
   "variables" : {
-    "first" : {
+    "selectivityA" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 0,
-      "max"  : 5
+      "min"  : 2,
+      "max"  : 50
     },
-    "second" : {
+    "selectivityB" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 0,
-      "max"  : 5
-    },
-    "third" : {
-      "type" : "FLOAT",
-      "size" : 1,
-      "min"  : 0,
-      "max"  : 5
-    },
-    "fourth" : {
-      "type" : "FLOAT",
-      "size" : 1,
-      "min"  : 0,
-      "max"  : 5
-    },
-    "fifth" : {
-      "type" : "FLOAT",
-      "size" : 1,
-      "min"  : 0,
-      "max"  : 5
+      "min"  : 2,
+      "max"  : 50
     }
 
   },
   "tasks" : {
     "cash"  : { "type" : "objective"  }
+  },
+  "database" : {
+    "address":"localhost",
+    "name" : "spearmint"
   }
 }
 
