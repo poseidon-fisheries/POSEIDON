@@ -12,6 +12,9 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
  * <ul>
@@ -34,6 +37,10 @@ public class YamlConstructor extends  Constructor {
                 if(nnode.getType().equals(DoubleParameter.class))
                     //then a simple scalar must be a fixed double parameter. Build it
                     return doubleParameterSplit((ScalarNode) nnode);
+                else
+                //if it's a path type we write and read it as string rather than with the ugly !! notation
+                    if(nnode.getType().equals(Path.class))
+                        return Paths.get(((ScalarNode) nnode).getValue());
                 else
                     //it's also possible that the scalar is an algorithm factory without any settable field
                     //this is rare which means that factories are represented as maps, but this might be one of the simple

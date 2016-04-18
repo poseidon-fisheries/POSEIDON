@@ -32,7 +32,7 @@ California Map Scenario:
   hourlyTravellingCosts: '0.0'
   literPerHourOfFishing: '11.652789144'
   literPerKilometer: '2.352150571'
-  mainDirectory: inputs/california/
+  mainDirectory: inputs/california2
   networkBuilder:
     Equal Out Degree:
       degree: 2

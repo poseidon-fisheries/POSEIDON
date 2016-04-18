@@ -160,7 +160,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private MultipleSpeciesAbundanceInitializer initializer;
 
 
-    private String mainDirectory = "inputs/california/";
+    private Path mainDirectory = Paths.get("inputs","california");
 
     private boolean usePremadeInput = true;
 
@@ -200,7 +200,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
         NauticalMap map;
 
         try {
-            Path mainDirectory = Paths.get(this.mainDirectory);
             Path bioDirectory = mainDirectory.resolve("biology");
 
             DirectoryStream<Path> folders = Files.newDirectoryStream(bioDirectory);
@@ -977,7 +976,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
      *
      * @return Value for property 'mainDirectory'.
      */
-    public String getMainDirectory() {
+    public Path getMainDirectory() {
         return mainDirectory;
     }
 
@@ -986,7 +985,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
      *
      * @param mainDirectory Value to set for property 'mainDirectory'.
      */
-    public void setMainDirectory(String mainDirectory) {
+    public void setMainDirectory(Path mainDirectory) {
         this.mainDirectory = mainDirectory;
     }
 

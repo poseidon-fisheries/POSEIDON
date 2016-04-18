@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Independent Logistic:
       carryingCapacity: 5000

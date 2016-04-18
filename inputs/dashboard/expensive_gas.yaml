@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   gasPricePerLiter: '0.2'
   gear:
     Random Catchability:

@@ -111,7 +111,15 @@ public class PortReader {
         {
             LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(originalSeatile, i));
             neighbors.removeAll(alreadyExplored);
-            Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrect(seaTile, map)).findAny();
+            Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrect(seaTile, map)).
+                    sorted(
+                    (o1, o2) -> {
+                        int comparison = Integer.compare(o1.getGridX(),o2.getGridX());
+                        if(comparison==0)
+                            return Integer.compare(o1.getGridY(),o2.getGridY());
+                        return comparison;
+                    })
+                    .findFirst();
             //found something acceptable?
             if(acceptableNeighbor.isPresent())
             {

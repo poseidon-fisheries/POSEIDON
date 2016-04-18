@@ -198,7 +198,7 @@ public class FishGUI extends GUIState{
         //change width and height to keep correct geographical ratio
         double width;
         double height;
-        double heightToWidthRatio = state.getRasterBathymetry().getGridHeight()/state.getRasterBathymetry().getGridWidth();
+        double heightToWidthRatio = ((double) state.getRasterBathymetry().getGridHeight())/state.getRasterBathymetry().getGridWidth();
         if(heightToWidthRatio >= 1)
         {
             width = MIN_DIMENSION;

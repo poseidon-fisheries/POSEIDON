@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Half Bycatch:
       steepness : '0.9'

@@ -2,19 +2,24 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
-import org.yaml.snakeyaml.nodes.*;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.*;
 
 import java.beans.IntrospectionException;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The customized representer YAML object, useful to show pretty yaml output. In reality this performs a something of a
@@ -49,6 +54,35 @@ public class YamlRepresenter extends Representer
                                           representData("uniform " +
                                                                 normal.getMinimum() + " " + normal.getMaximum());
                               });
+
+
+        this.representers.put(SelectDoubleParameter.class,
+                              data -> {
+                                  final SelectDoubleParameter select = (SelectDoubleParameter) data;
+                                  return
+                                          representData("select " +
+                                                                select.getValueString());
+                              });
+
+
+        this.representers.put(SinusoidalDoubleParameter.class,
+                              data -> {
+                                  final SinusoidalDoubleParameter sin = (SinusoidalDoubleParameter) data;
+                                  return
+                                          representData("sin " +
+                                                                sin.getAmplitude() + " " +
+                                                                sin.getFrequency());
+                              });
+
+        //do the same for the Path class
+        Represent pathRepresenter = data -> {
+            final Path path = (Path) data;
+            return
+                    representData(path.toString());
+        };
+        this.multiRepresenters.put(Path.class,
+                              pathRepresenter);
+
 
 
         //get a reference to this we can use from the outside

@@ -78,7 +78,20 @@ public class MetaInspector extends Inspector
                                     new MarketWidgetBuilder(toSyncAgainst),
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
-                                    new SwingWidgetBuilder()
+                                    new SwingWidgetBuilder(),
+                                    new PathWidgetBuilder()
+                            )
+            );
+            widget.setWidgetBuilder(composite);
+        }
+        else{
+            CompositeWidgetBuilder<JComponent, SwingMetawidget> composite = new CompositeWidgetBuilder<>(
+                    new CompositeWidgetBuilderConfig<JComponent, SwingMetawidget>().
+                            setWidgetBuilders(
+                                    new OverriddenWidgetBuilder(),
+                                    new ReadOnlyWidgetBuilder(),
+                                    new SwingWidgetBuilder(),
+                                    new PathWidgetBuilder()
                             )
             );
             widget.setWidgetBuilder(composite);
@@ -87,7 +100,8 @@ public class MetaInspector extends Inspector
 
         //add the processor
         //this makes the binding between ui and model possible
-        widget.addWidgetProcessor(new BeanUtilsBindingProcessor(new BeanUtilsBindingProcessorConfig()));
+        BeanUtilsBindingProcessorConfig config = new BeanUtilsBindingProcessorConfig();
+        widget.addWidgetProcessor(new BeanUtilsBindingProcessor(config));
         //this one makes the binding immediate
         if(toSyncAgainst == null) {
             widget.addWidgetProcessor(new ImmediateBinder());

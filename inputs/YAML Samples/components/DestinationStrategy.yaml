@@ -35,3 +35,11 @@ PSO:
   inertia: uniform 0.3 0.8
   memoryWeight: uniform 0.5 1.0
 -------
+Threshold Erotetic:
+  minimumObservations: '5.0'
+  profitThreshold: '0.0'
+-------
+Better Than Average Erotetic:
+  minimumObservations: '5.0'
+  updateInterval: uniform 5.0 15.0
+-------
