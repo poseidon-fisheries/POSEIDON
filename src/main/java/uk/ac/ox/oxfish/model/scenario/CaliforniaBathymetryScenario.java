@@ -179,7 +179,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private HashMap<Port,Integer> numberOfFishersPerPort;
 
-    private String priceMap = "Dover Sole:0.244940171,Sablefish:0.74752115,Shortspine Thornyhead:1.218804148,Longspine Thornyhead:0.167829376,Yelloweye Rockfish:0.326586895";
+    private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587";
 
     public CaliforniaBathymetryScenario() {
 
