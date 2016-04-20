@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -42,24 +43,43 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
             final String earningsColumnName = AbstractMarket.EARNINGS_COLUMN_NAME;
             registerGatherer(species + " " + landingsColumnName,
                              //so "stream" is a trick from Java 8. In this case it just sums up all the data
-                             model ->
-                                     toAggregate.stream().mapToDouble(
-                                     value -> value.getData().getLatestObservation(landingsColumnName))
-                                     .sum(), Double.NaN);
+                             new Gatherer<FishState>() {
+                                 @Override
+                                 public Double apply(FishState model) {
+                                     return toAggregate.stream().mapToDouble(
+                                             value -> value.getData().getLatestObservation(landingsColumnName))
+                                             .sum();
+                                 }
+                             }, Double.NaN);
 
             registerGatherer(species + " " + earningsColumnName,
                              //so "stream" is a trick from Java 8. In this case it just sums up all the data
-                             model -> toAggregate.stream().mapToDouble(
-                                     value -> value.getData().getLatestObservation(earningsColumnName))
-                                     .sum(), Double.NaN);
+                             new Gatherer<FishState>() {
+                                 @Override
+                                 public Double apply(FishState model) {
+                                     return toAggregate.stream().mapToDouble(
+                                             value -> value.getData().getLatestObservation(earningsColumnName))
+                                             .sum();
+                                 }
+                             }, Double.NaN);
         }
 
         final List<Fisher> fishers = state.getFishers();
         //number of fishers
-        registerGatherer("Number of Fishers", ignored -> (double) fishers.size(), 0d);
+        registerGatherer("Number of Fishers", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return (double) fishers.size();
+            }
+        }, 0d);
         //fishers who are actually out
-        registerGatherer("Fishers at Sea", ignored -> fishers.stream().mapToDouble(
-                value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum(), 0d);
+        registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return fishers.stream().mapToDouble(
+                        value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
+            }
+        }, 0d);
 
 
         final NauticalMap map = state.getMap();
@@ -68,7 +88,13 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         for(Species species : observed.getSpecies())
         {
             registerGatherer("Biomass " + species.getName(),
-                             state1 -> allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum(),
+                             new Gatherer<FishState>() {
+                                 @Override
+                                 public Double apply(FishState state1) {
+                                     return allSeaTilesAsList.stream().mapToDouble(
+                                             value -> value.getBiomass(species)).sum();
+                                 }
+                             },
                              0d);
         }
 

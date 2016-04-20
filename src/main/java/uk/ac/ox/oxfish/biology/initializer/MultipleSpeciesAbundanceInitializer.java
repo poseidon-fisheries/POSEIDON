@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
+ * Create multiple species, each abundance (count) rather than biomass based
  * Created by carrknight on 3/17/16.
  */
 public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
@@ -170,6 +171,9 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
                     process.setFixedRecruitmentWeight(currentWeightMap);
                 naturalProcesses.put(species,process);
             }
+
+            //done!
+            biologicalDirectories.clear();
         }
         catch (Exception e) {
             e.printStackTrace();

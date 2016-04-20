@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -50,7 +51,12 @@ public class BiomassDiffuser  implements Steppable {
     public void step(SimState simState) {
 
         //get all the tiles that are in the sea
-        final List<SeaTile> tiles = map.getAllSeaTilesAsList().stream().filter(tile -> tile.getAltitude()<0).collect(
+        final List<SeaTile> tiles = map.getAllSeaTilesAsList().stream().filter(new Predicate<SeaTile>() {
+            @Override
+            public boolean test(SeaTile tile) {
+                return tile.getAltitude() < 0;
+            }
+        }).collect(
                 Collectors.toList());
         //shuffle them
         Collections.shuffle(tiles, new Random(random.nextLong()));

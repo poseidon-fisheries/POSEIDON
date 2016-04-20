@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 /**
  * Just a bunch of runs that will be knitted together into a dashboard of plots to visually study the health of the model
@@ -302,7 +302,7 @@ public class Dashboard
                                                            }, Double.NaN);
 
                 model.getDailyDataSet().registerGatherer("Average Hypothetical Quota",
-                                                         new Function<FishState, Double>() {
+                                                         new Gatherer<FishState>() {
                                                              @Override
                                                              public Double apply(FishState state) {
                                                                  return state.getFishers().stream().mapToDouble(
@@ -345,7 +345,7 @@ public class Dashboard
         //just add a daily average
         DataColumn mileage =
                 state.getDailyDataSet().registerGatherer("Average Gas Consumption",
-                                                         new Function<FishState, Double>() {
+                                                         new Gatherer<FishState>() {
                                                              @Override
                                                              public Double apply(FishState state) {
                                                                  double consumption = 0;

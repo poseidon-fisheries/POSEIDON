@@ -34,7 +34,12 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     /**
      * the default state of the unfriendPredicate field
      */
-    public final static Predicate<Pair<Double,Double>> DEFAULT_DYNAMIC_NETWORK = doubleDoublePair -> false;
+    public final static Predicate<Pair<Double,Double>> DEFAULT_DYNAMIC_NETWORK = new Predicate<Pair<Double, Double>>() {
+        @Override
+        public boolean test(Pair<Double, Double> doubleDoublePair) {
+            return false;
+        }
+    };
 
     /**
      * if true imitation occurs by looking at your friend who is performing better, otherwise it

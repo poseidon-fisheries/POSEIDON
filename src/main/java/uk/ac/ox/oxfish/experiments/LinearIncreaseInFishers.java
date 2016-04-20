@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * Create and remove fishers
  * Created by carrknight on 12/14/15.
  */
 public class LinearIncreaseInFishers

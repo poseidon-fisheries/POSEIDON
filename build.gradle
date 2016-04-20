@@ -52,6 +52,9 @@ dependencies
 
     //logger:
     compile "com.esotericsoftware:minlog:1.3.0"
+    //serializer
+    compile fileTree(dir: 'libs/xstream/lib', include: '*.jar')
+    compile "org.ogce:xpp3:1.1.6"
 
 
     //jung social network:

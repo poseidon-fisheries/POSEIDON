@@ -45,8 +45,7 @@ public class DoubleLogisticDepartingFactory implements AlgorithmFactory<Composit
 
     private DoubleParameter cashflowTarget = new FixedDoubleParameter(1000);
 
-    private DoubleParameter cashflowPeriod = new FixedDoubleParameter(30);;
-
+    private DoubleParameter cashflowPeriod = new FixedDoubleParameter(30);
 
 
     /**

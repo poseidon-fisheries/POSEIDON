@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
@@ -16,7 +17,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -61,7 +61,7 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                 //create data counters
                 fishState.getYearlyDataSet().
                         registerGatherer("Yearly Effort In Months",
-                                         new Function<FishState, Double>() {
+                                         new Gatherer<FishState>() {
                                              @Override
                                              public Double apply(FishState fishState) {
                                                  double sum=0;
@@ -83,7 +83,7 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                     final int currentMonth = month;
                     fishState.getYearlyDataSet().
                             registerGatherer("Yearly Efforts In Month " + month,
-                                             new Function<FishState, Double>() {
+                                             new Gatherer<FishState>() {
                                                  @Override
                                                  public Double apply(FishState fishState) {
                                                      double sum=0;

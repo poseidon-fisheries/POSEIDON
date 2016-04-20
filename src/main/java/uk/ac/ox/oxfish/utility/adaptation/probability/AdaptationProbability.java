@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.utility.adaptation.probability;
 
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.model.Startable;
 
 /**
  * The object managing and evolving the adaptation probabilities
@@ -26,7 +25,7 @@ public interface AdaptationProbability extends FisherStartable
      * @param previousFitness pre-exploration fitness
      * @param currentFitness post-exploration fitness
      */
-    public void judgeExploration(double previousFitness, double currentFitness);
+    void judgeExploration(double previousFitness, double currentFitness);
 
 
 }

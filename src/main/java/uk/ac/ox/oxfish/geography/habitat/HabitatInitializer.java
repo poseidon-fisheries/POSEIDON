@@ -12,7 +12,7 @@ public interface HabitatInitializer
 {
 
 
-    public void applyHabitats(NauticalMap map, MersenneTwisterFast random, FishState model);
+    void applyHabitats(NauticalMap map, MersenneTwisterFast random, FishState model);
 
 
 }

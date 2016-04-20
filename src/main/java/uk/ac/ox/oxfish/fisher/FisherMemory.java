@@ -117,7 +117,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     public void turnOff() {
         tripMemories.turnOff();
         catchMemories.turnOff();
-        tripLogger.turnOff();;
+        tripLogger.turnOff();
         dailyCounter.turnOff();
         yearlyCounter.turnOff();
 

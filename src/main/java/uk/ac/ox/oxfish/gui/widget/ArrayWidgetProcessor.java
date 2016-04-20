@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.util.Map;
 
 /**
+ * Creates a string to show the content of arrays (and arrays of arrays of arrays of ...)
  * Created by carrknight on 4/5/16.
  */
 public class ArrayWidgetProcessor implements WidgetProcessor<JComponent,SwingMetawidget> {

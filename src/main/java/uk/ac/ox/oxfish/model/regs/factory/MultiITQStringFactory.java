@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
+import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
@@ -21,7 +22,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     /**
      * an array of order books for each "model" run
      */
-    private final Map<FishState,ITQOrderBook[]> orderBooks = new HashMap<>(1);
+    private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
 
     /**
      * an array of order book makers for each model run
@@ -81,7 +82,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
                                                 allowMultipleTrades, minimumQuotaTraded);
 
 
-        return MultiITQFactory.opportunityCostAwareQuotaRegulation(state,quotas,orderBooks.get(state));
+        return new MultiQuotaITQRegulation(quotas, state, orderBooks.get(state));
 
 
 

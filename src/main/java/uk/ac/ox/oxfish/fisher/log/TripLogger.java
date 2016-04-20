@@ -6,7 +6,9 @@ import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Holds a list of all previous trips + can notify listeners that a trip has ended .
@@ -30,7 +32,7 @@ public class TripLogger implements Startable
     /**
      * whatever needs to be notified that a trip is complete
      */
-    private final Set<TripListener> listeners = new HashSet<>();
+    private final List<TripListener> listeners = new LinkedList<>();
 
 
     private int numberOfSpecies = -1;
@@ -53,6 +55,7 @@ public class TripLogger implements Startable
 
     public void addTripListener(TripListener listener)
     {
+        Preconditions.checkArgument(!listeners.contains(listener));
         listeners.add(listener);
     }
 

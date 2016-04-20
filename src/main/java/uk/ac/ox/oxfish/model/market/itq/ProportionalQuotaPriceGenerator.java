@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
+import java.util.HashMap;
+
 /**
  * My first attempt at generating reservation prices in a multi-species world.
  * Basically the value of the quota is not just the value of the fish you are selling but
@@ -24,7 +26,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
     /**
      * the order book for each specie
      */
-    private final ITQOrderBook[] orderBooks;
+    private final HashMap<Integer,ITQOrderBook> orderBooks;
 
     /**
      * the index of the specie we want to compute the lambda of
@@ -60,7 +62,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
 
 
     public ProportionalQuotaPriceGenerator(
-            ITQOrderBook[] orderBooks, int specieIndex,
+            HashMap<Integer,ITQOrderBook> orderBooks, int specieIndex,
             Sensor<Double> numberOfQuotasLeftGetter) {
         this.orderBooks = orderBooks;
         this.specieIndex = specieIndex;
@@ -140,7 +142,8 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
                 continue;
 
             //quota price (0 if there is no market)
-            double quotaPrice = orderBooks[species] != null ? orderBooks[species].getLastClosingPrice() : 0;
+            ITQOrderBook market = orderBooks.get(species);
+            double quotaPrice = market != null ? market.getLastClosingPrice() : 0;
             quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
 
             multiplier += (predictedUnitProfit - quotaPrice)

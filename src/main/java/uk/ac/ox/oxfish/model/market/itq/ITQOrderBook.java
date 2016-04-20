@@ -94,8 +94,18 @@ public class ITQOrderBook implements Steppable,Startable{
     {
 
         //create the queues holding on to the quotes
-        asks = new PriorityQueue<>(100, Quote::compareTo);
-        bids = new PriorityQueue<>(100, (o1, o2) -> -o1.compareTo(o2));
+        asks = new PriorityQueue<>(100, new Comparator<Quote>() {
+            @Override
+            public int compare(Quote quote, Quote o) {
+                return quote.compareTo(o);
+            }
+        });
+        bids = new PriorityQueue<>(100, new Comparator<Quote>() {
+            @Override
+            public int compare(Quote o1, Quote o2) {
+                return -o1.compareTo(o2);
+            }
+        });
         this.specieIndex = specieIndex;
         this.yearOfImplementation = implementationYear;
         this.pricingPolicy = pricingPolicy;

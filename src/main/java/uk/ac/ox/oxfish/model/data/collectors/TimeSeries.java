@@ -6,9 +6,12 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Basically a map<String,Double> to collect data about an object of type T
@@ -23,7 +26,7 @@ public class TimeSeries<T> implements Steppable
     /**
      * the functions to run on studied object to gather their data
      */
-    final private LinkedHashMap<String,Function<T,Double>> gatherers;
+    final private LinkedHashMap<String,Gatherer<T>> gatherers;
 
     /**
      * if this is true, gather data every year. Otherwise gather data step every step
@@ -41,7 +44,7 @@ public class TimeSeries<T> implements Steppable
      * @param defaultValue the value to fill the rows with if this gatherer is added after other columns already have
      *                     some rows filled
      */
-    public DataColumn registerGatherer(String title, Function<T, Double> gatherer, double defaultValue)
+    public DataColumn registerGatherer(String title, Gatherer<T> gatherer, double defaultValue)
     {
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists");
         int size =noGatherers() ? 0 : numberOfObservations();
@@ -50,7 +53,7 @@ public class TimeSeries<T> implements Steppable
         //fill if needed
         for(int i=0; i<size; i++)
             column.add(defaultValue);
-        gatherers.put(title,gatherer);
+        gatherers.put(title,  gatherer);
 
         assert consistencyCheck();
         return column;

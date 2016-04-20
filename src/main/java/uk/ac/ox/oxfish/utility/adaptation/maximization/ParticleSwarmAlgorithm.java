@@ -259,12 +259,12 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         /**
          * turn a T into PSO coordinates
          */
-        public  Float[] toCoordinates(T variable, Fisher fisher, FishState model);
+        Float[] toCoordinates(T variable, Fisher fisher, FishState model);
 
         /**
          * turn coordinates into the variable we want to maximize
          */
-        public T fromCoordinates(Float[] variable, Fisher fisher, FishState model);
+        T fromCoordinates(Float[] variable, Fisher fisher, FishState model);
     }
 
     public PSOCoordinateTransformer<T> getTransformers() {

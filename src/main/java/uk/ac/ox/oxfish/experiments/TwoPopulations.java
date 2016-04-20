@@ -123,9 +123,7 @@ public class TwoPopulations {
                 if(f.isDirectory()) //you can open directories
                     return true;
                 String extension = com.google.common.io.Files.getFileExtension(f.getAbsolutePath()).trim().toLowerCase();
-                if(extension.equals("yaml") || extension.equals("yml"))
-                    return true;
-                return false;
+                return extension.equals("yaml") || extension.equals("yml");
             }
 
             @Override

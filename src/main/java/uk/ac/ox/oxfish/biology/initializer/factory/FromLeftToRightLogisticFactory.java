@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.function.Function;
 
 /**
+ * Create biomass slope but with diffusion
  * Created by carrknight on 2/12/16.
  */
 public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeftToRightLogisticInitializer> {

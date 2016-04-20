@@ -2,36 +2,38 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
+import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
-import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Creates individual quotas and a quota market like ITQMonoFactory but this works for multiple species
  *
  * Created by carrknight on 10/7/15.
  */
-public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
+public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation>
 {
 
 
     /**
      * an array of order books for each "model" run
      */
-    private final Map<FishState,ITQOrderBook[]> orderBooks = new HashMap<>(1);
+    private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
 
     /**
      * an array of order book makers for each model run
@@ -68,7 +70,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState state)
+    public MultiQuotaITQRegulation apply(FishState state)
     {
         int numberOfSpecies = state.getSpecies().size();
         assert numberOfSpecies>0;
@@ -89,7 +91,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
         buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
                                 allowMultipleTrades, minimumQuotaTraded);
 
-        return MultiITQFactory.opportunityCostAwareQuotaRegulation(state,quotas,orderBooks.get(state));
+        return new MultiQuotaITQRegulation(quotas,state,orderBooks.get(state));
     }
 
     /**
@@ -104,7 +106,8 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
      * @param unitsTradedPerMatch the size of quotas exchanged at each trade (in kg)
      */
     public static void buildITQMarketsIfNeeded(
-            FishState state, int numberOfSpecies, double[] quotas, Map<FishState, ITQOrderBook[]> orderBooks,
+            FishState state, int numberOfSpecies, double[] quotas,
+            Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks,
             Map<FishState, ITQMarketBuilder[]> orderBooksBuilder, final boolean allowMultipleTradesPerFisher,
             final int unitsTradedPerMatch) {
 
@@ -114,11 +117,11 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
 
         //perfect, if needed create a market container/market builder container
         if(!orderBooks.containsKey(state)) {
-            orderBooks.put(state, new ITQOrderBook[numberOfSpecies]);
+            orderBooks.put(state, new HashMap<>());
             orderBooksBuilder.put(state, new ITQMarketBuilder[numberOfSpecies]);
         }
         //grab the markets and its builders
-        ITQOrderBook[] markets = orderBooks.get(state);
+        HashMap<Integer,ITQOrderBook> markets = orderBooks.get(state);
         ITQMarketBuilder[] builders = orderBooksBuilder.get(state);
 
         //for each species
@@ -136,20 +139,31 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
                     //theeeeen build the market
                     builders[i] = new ITQMarketBuilder(i,
                                                        //create proportional quota price generator
-                                                       () -> new ProportionalQuotaPriceGenerator(markets,
-                                                                                                 specieIndex,
-                                                                                                 //reads the fisher regulation which we know
-                                                                                                 //what it is because we are supplying it now
-                                                                                                 fisher ->
-                                                                                                         ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(specieIndex)));
+                                                       new Supplier<PriceGenerator>() {
+                                                           @Override
+                                                           public PriceGenerator get() {
+                                                               return new ProportionalQuotaPriceGenerator(markets,
+                                                                                                          specieIndex,
+                                                                                                          //reads the fisher regulation which we know
+                                                                                                          //what it is because we are supplying it now
+                                                                                                          new Sensor<Double>() {
+                                                                                                              @Override
+                                                                                                              public Double scan(Fisher fisher) {
+                                                                                                                  return ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
+                                                                                                                          specieIndex);
+                                                                                                              }
+                                                                                                          });
+                                                           }
+                                                       });
                     state.registerStartable(builders[i]);
                     //after the builder starts it will create a market, copy it in the array
                     state.registerStartable(new Startable() {
                         @Override
                         public void start(FishState model) {
-                            markets[specieIndex] = builders[specieIndex].getMarket();
-                            markets[specieIndex].setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
-                            markets[specieIndex].setUnitsTradedPerMatch(unitsTradedPerMatch);
+                            ITQOrderBook market = builders[specieIndex].getMarket();
+                            markets.put(specieIndex, market);
+                            market.setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
+                            market.setUnitsTradedPerMatch(unitsTradedPerMatch);
                         }
 
                         @Override
@@ -163,32 +177,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaRegulation>
         }
     }
 
-    public static MultiQuotaRegulation opportunityCostAwareQuotaRegulation(
-            final FishState state, final double[] quotas, final ITQOrderBook[] orderBooks)
-    {
-        return new MultiQuotaRegulation(quotas, state){
-            //compute opportunity costs!
 
-
-
-            @Override
-            public void reactToSale(
-                    Species species, Fisher seller, double biomass, double revenue) {
-                super.reactToSale(species, seller, biomass, revenue);
-                if(biomass>0 && orderBooks[species.getIndex()]!= null )
-                {
-                    double lastClosingPrice = orderBooks[species.getIndex()].getLastClosingPrice();
-
-                    if(Double.isFinite(lastClosingPrice))
-                    {
-                        //you could have sold those quotas!
-                        seller.recordOpportunityCosts(lastClosingPrice * biomass);
-                    }
-
-                }
-            }
-        };
-    }
 
 
     public DoubleParameter getQuotaFirstSpecie() {

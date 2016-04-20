@@ -25,14 +25,14 @@ import java.util.LinkedList;
 
 public class MarketFirstDemo {
 
-    public static enum  MarketDemoPolicy
+    public enum  MarketDemoPolicy
     {
 
         TAC,
 
         IQ,
 
-        ITQ;
+        ITQ
 
     }
 

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,9 +21,9 @@ public class ProportionalQuotaPriceGeneratorTest {
     public void oneToOneQuota() throws Exception {
 
 
-        ITQOrderBook[] orderBooks = new ITQOrderBook[2];
-        orderBooks[0] = mock(ITQOrderBook.class);
-        orderBooks[1] = mock(ITQOrderBook.class);
+        HashMap<Integer,ITQOrderBook> orderBooks = new HashMap<>();
+        orderBooks.put(0,mock(ITQOrderBook.class));
+        orderBooks.put(1,mock(ITQOrderBook.class));
 
         FishState state = mock(FishState.class);
         when(state.getDayOfTheYear()).thenReturn(364); //one day left!
@@ -39,7 +40,7 @@ public class ProportionalQuotaPriceGeneratorTest {
 
         when(fisher.predictUnitProfit(0)).thenReturn(1d);
         when(fisher.predictUnitProfit(1)).thenReturn(2d);
-        when(orderBooks[1].getLastClosingPrice()).thenReturn(.5d);
+        when(orderBooks.get(1).getLastClosingPrice()).thenReturn(.5d);
 
         // .5 * ( 1 + (2 -.5)) = 2
         ProportionalQuotaPriceGenerator quota = new ProportionalQuotaPriceGenerator(orderBooks,

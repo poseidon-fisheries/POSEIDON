@@ -82,7 +82,7 @@ public class GearImitationWithITQ
     }
 
     public FishState gearImitationTestRun(
-            AlgorithmFactory<MultiQuotaRegulation> multiFactory, boolean checkRed,
+            AlgorithmFactory<? extends  MultiQuotaRegulation> multiFactory, boolean checkRed,
             final long seed)
     {
         System.out.println("Test starting!");

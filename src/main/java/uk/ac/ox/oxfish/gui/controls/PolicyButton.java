@@ -11,7 +11,7 @@ import javax.swing.*;
 public interface PolicyButton {
 
 
-    public JComponent buildJComponent(FishGUI gui);
+    JComponent buildJComponent(FishGUI gui);
 
 
 }

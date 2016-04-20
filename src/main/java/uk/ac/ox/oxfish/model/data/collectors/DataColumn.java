@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.data.collectors;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Spliterator;
@@ -10,7 +11,7 @@ import java.util.stream.Stream;
  * basically a linked-list for double values that cannot be modified easily
  * Created by carrknight on 6/9/15.
  */
-public class DataColumn implements Iterable<Double>{
+public class DataColumn implements Iterable<Double>, Serializable{
 
     private final LinkedList<Double> data = new LinkedList<>();
 

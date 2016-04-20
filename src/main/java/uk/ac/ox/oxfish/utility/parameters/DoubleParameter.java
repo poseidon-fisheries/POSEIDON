@@ -15,5 +15,5 @@ public interface DoubleParameter extends Function<MersenneTwisterFast,Double>
 {
 
 
-    public DoubleParameter makeCopy();
+    DoubleParameter makeCopy();
 }

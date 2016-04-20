@@ -84,7 +84,14 @@ public class Adaptation<T> implements FisherStartable {
             double imitationProbability) {
 
         this(validator,
-             decision, actuator, sensor, objective, explorationProbability, imitationProbability, input -> input.getFirst().getDirectedFriends()
+             decision, actuator, sensor, objective, explorationProbability, imitationProbability,
+             new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
+                 @Override
+                 public Collection<Fisher> apply(
+                         Pair<Fisher, MersenneTwisterFast> input) {
+                     return input.getFirst().getDirectedFriends();
+                 }
+             }
         );
 
     }
@@ -97,7 +104,13 @@ public class Adaptation<T> implements FisherStartable {
             ObjectiveFunction<Fisher> objective,
             AdaptationProbability probability) {
         this.validator = validator;
-        this.friendsExtractor = input -> input.getFirst().getDirectedFriends();
+        this.friendsExtractor = new Function<Pair<Fisher, MersenneTwisterFast>, Collection<Fisher>>() {
+            @Override
+            public Collection<Fisher> apply(
+                    Pair<Fisher, MersenneTwisterFast> input) {
+                return input.getFirst().getDirectedFriends();
+            }
+        };
         this.algorithm = decision;
         this.actuator = actuator;
         this.objective = objective;

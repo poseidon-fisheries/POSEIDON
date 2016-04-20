@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -423,9 +424,9 @@ public class FishStateUtilities {
      * @param column colun to sum over
      * @return a sum or NAN if the column is empty
      */
-    public static <T> Function<T, Double> generateYearlySum(final DataColumn column) {
+    public static <T> Gatherer<T> generateYearlySum(final DataColumn column) {
 
-        return new Function<T, Double>() {
+        return new Gatherer<T>() {
             @Override
             public Double apply(T state) {
                 //get the iterator

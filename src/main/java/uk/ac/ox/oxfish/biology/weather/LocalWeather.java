@@ -7,13 +7,13 @@ package uk.ac.ox.oxfish.biology.weather;
 public interface LocalWeather {
 
 
-    public double getTemperatureInCelsius();
+    double getTemperatureInCelsius();
 
 
-    public double getWindSpeedInKph();
+    double getWindSpeedInKph();
 
 
-    public double getWindDirection();
+    double getWindDirection();
 
 
 

@@ -12,14 +12,14 @@ public interface Predictor extends FisherStartable{
      * ask the predictor the expected value of the variable it is tracking
      * @return the expected value
      */
-    public double predict();
+    double predict();
 
     /**
      * ask the predictor what is the probability the variable it is tracking is below a given level
      * @param level the level
      * @return P(x < level)
      */
-    public double probabilityBelowThis(double level);
+    double probabilityBelowThis(double level);
 
 
     /**
@@ -29,13 +29,13 @@ public interface Predictor extends FisherStartable{
      * @param elementsInSum the number of i.i.d independent variables given by the predictor summed together
      * @return a probability value
      */
-    public double probabilitySumBelowThis(double level, int elementsInSum);
+    double probabilitySumBelowThis(double level, int elementsInSum);
 
 
     /**
      * this is called if something happens (gear change for example) that makes us think the old predictors are full of garbage
      * data and need to be reset
      */
-    public void reset();
+    void reset();
 
 }

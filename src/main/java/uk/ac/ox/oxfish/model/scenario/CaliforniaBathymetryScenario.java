@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
+import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -514,8 +515,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
                 //add other trip costs
                 newFisher.addDockingListener(
-                        (fisher, port1) -> {
-                            if(fisher.getHoursAtSea()>0)
+                        (DockingListener) (fisher, port1) -> {
+                            if (fisher.getHoursAtSea() > 0)
                                 fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
                                                             /
                                                             fisher.getHoursAtSea());
@@ -558,6 +559,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
                 allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
         }
+
 
         return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
 

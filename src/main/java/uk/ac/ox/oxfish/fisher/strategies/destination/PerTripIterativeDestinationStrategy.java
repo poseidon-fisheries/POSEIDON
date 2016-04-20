@@ -10,9 +10,13 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+
+import java.util.function.Predicate;
 
 /**
  * Like the YearlyIterativeDestinationStrategy except that rather than doing it every
@@ -51,23 +55,34 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     {
         this.delegate = delegate;
         this.algorithm = new Adaptation<SeaTile>(
-                fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
+                new Predicate<Fisher>() {
+                    @Override
+                    public boolean test(Fisher fisher) {
+                        return !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort());
+                    }
+                },
 
 
                 algorithm,
-                (fisher, change, model) -> {
-                    if (change.getAltitude() < 0) //ignores "go to land" commands
-                        delegate.setFavoriteSpot(change);
+                new Actuator<SeaTile>() {
+                    @Override
+                    public void apply(Fisher fisher, SeaTile change, FishState model) {
+                        if (change.getAltitude() < 0) //ignores "go to land" commands
+                            delegate.setFavoriteSpot(change);
+                    }
                 },
-                fisher1 -> {
-                    if (fisher1 == fisher) //if we are sensing ourselves
-                        //override to delegate
-                        return delegate.getFavoriteSpot();
-                    else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
-                            fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
-                        return null;
-                    else
-                        return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                new Sensor<SeaTile>() {
+                    @Override
+                    public SeaTile scan(Fisher fisher1) {
+                        if (fisher1 == fisher) //if we are sensing ourselves
+                            //override to delegate
+                            return delegate.getFavoriteSpot();
+                        else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
+                                fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
+                            return null;
+                        else
+                            return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                    }
                 },
                 objective,
                 probability
@@ -76,28 +91,38 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
     public PerTripIterativeDestinationStrategy(
-            FavoriteDestinationStrategy delegate,
+            final FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
             double randomizationProbability,
             double imitationProbability, final HourlyProfitInTripObjective objective) {
         this.delegate = delegate;
         this.algorithm = new Adaptation<SeaTile>(
-                fisher -> !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort()),
-                algorithm,
-                (fisher, change, model) -> {
-                    if(change.getAltitude() < 0) //ignores "go to land" commands
-                        delegate.setFavoriteSpot(change);
+                new Predicate<Fisher>() {
+
+                    public boolean test(Fisher fisher) {
+                        return !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort());
+                    }
                 },
-                fisher1 -> {
-                    if(fisher1==fisher) //if we are sensing ourselves
-                        //override to delegate
-                        return delegate.getFavoriteSpot();
-                    else
-                    if(fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
-                            fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
-                        return  null;
-                    else
-                        return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                algorithm,
+                new Actuator<SeaTile>() {
+                    @Override
+                    public void apply(Fisher fisher, SeaTile change, FishState model) {
+                        if (change.getAltitude() < 0) //ignores "go to land" commands
+                            delegate.setFavoriteSpot(change);
+                    }
+                },
+                new Sensor<SeaTile>() {
+                    @Override
+                    public SeaTile scan(Fisher fisher1) {
+                        if (fisher1 == fisher) //if we are sensing ourselves
+                            //override to delegate
+                            return delegate.getFavoriteSpot();
+                        else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
+                                fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
+                            return null;
+                        else
+                            return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                    }
                 },
                 objective, randomizationProbability, imitationProbability);
 

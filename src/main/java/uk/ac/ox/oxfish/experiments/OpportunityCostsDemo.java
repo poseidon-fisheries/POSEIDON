@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -19,7 +20,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.function.Function;
 
 /**
  * Two species, one protected by ITQ and one isn't. Depending on ITQ prices fishers tend to prefer specie one or two
@@ -108,7 +108,7 @@ public class OpportunityCostsDemo {
             }
         };
         regs.setIndividualQuota(new FixedDoubleParameter(500000)); //nonbinding
-        state.getDailyDataSet().registerGatherer("fake", new Function<FishState, Double>() {
+        state.getDailyDataSet().registerGatherer("fake", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState state) {
                 return -10 + 20 * state.getDayOfTheYear() / 365d;
@@ -136,7 +136,7 @@ public class OpportunityCostsDemo {
         };
         regs2.setIndividualQuota(new FixedDoubleParameter(500000000));
 
-        state2.getDailyDataSet().registerGatherer("fake", new Function<FishState, Double>() {
+        state2.getDailyDataSet().registerGatherer("fake", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState state) {
                 return -10 + 20 * state2.getDayOfTheYear() / 365d;
@@ -174,7 +174,7 @@ public class OpportunityCostsDemo {
         };
         regs.setIndividualQuota(new FixedDoubleParameter(5000000));
 
-        state.getDailyDataSet().registerGatherer("fake", new Function<FishState, Double>() {
+        state.getDailyDataSet().registerGatherer("fake", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState state) {
                 return state.getYear() <= 3d ? 10d : state.getYear() <= 6d ? 0 : -10d;
@@ -205,7 +205,7 @@ public class OpportunityCostsDemo {
             }
         };
         regs2.setIndividualQuota(new FixedDoubleParameter(5000000));
-        state2.getDailyDataSet().registerGatherer("fake", new Function<FishState, Double>() {
+        state2.getDailyDataSet().registerGatherer("fake", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState state) {
                 return state2.getYear() <= 3d ? 10d : state2.getYear() <= 6d ? 0 : -10d;

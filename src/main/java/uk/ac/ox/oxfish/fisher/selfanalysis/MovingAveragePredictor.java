@@ -5,8 +5,10 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.MovingVariance;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -61,7 +63,12 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
 
                 //store your prediction:
                 if(name!=null)
-                    fisher.getDailyData().registerGatherer(name, fisher1 -> this.latestAverage,Double.NaN);
+                    fisher.getDailyData().registerGatherer(name, new Gatherer<Fisher>() {
+                        @Override
+                        public Double apply(Fisher fisher1) {
+                            return latestAverage;
+                        }
+                    }, Double.NaN);
             }
         };
 
@@ -82,11 +89,22 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
             public void start(FishState model, Fisher fisher) {
 
                 this.fisher = fisher;
-                tripListener[0] = record -> step(model);
+                tripListener[0] = new TripListener() {
+                    @Override
+                    public void reactToFinishedTrip(TripRecord record) {
+                        step(model);
+                    }
+                };
                 fisher.addTripListener(tripListener[0]);
 
                 //store your prediction (still every day)
-                fisher.getDailyData().registerGatherer(this.name, fisher1 -> this.latestAverage,Double.NaN);
+                fisher.getDailyData().registerGatherer(this.name,
+                                                       new Gatherer<Fisher>() {
+                                                           @Override
+                                                           public Double apply(Fisher fisher) {
+                                                               return latestAverage;
+                                                           }
+                                                       }, Double.NaN);
             }
 
             @Override

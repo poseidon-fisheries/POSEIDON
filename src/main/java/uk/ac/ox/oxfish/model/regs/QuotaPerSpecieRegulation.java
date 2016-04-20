@@ -8,8 +8,8 @@ public interface QuotaPerSpecieRegulation extends Regulation
 {
 
 
-    public double getQuotaRemaining(int specieIndex);
+    double getQuotaRemaining(int specieIndex);
 
-    public void setQuotaRemaining(int specieIndex, double newQuotaValue);
+    void setQuotaRemaining(int specieIndex, double newQuotaValue);
 
 }

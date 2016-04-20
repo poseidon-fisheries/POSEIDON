@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
+ * Create Congested Market with Moving Average congestion
  * Created by carrknight on 1/6/16.
  */
 public class MACongestedMarketFactory implements AlgorithmFactory<MACongestedMarket>

@@ -9,8 +9,8 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 public interface FisherStartable {
 
 
-    public void start(FishState model, Fisher fisher);
+    void start(FishState model, Fisher fisher);
 
-    public void turnOff();
+    void turnOff();
 
 }

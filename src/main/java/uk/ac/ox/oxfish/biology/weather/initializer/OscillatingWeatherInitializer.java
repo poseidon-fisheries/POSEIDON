@@ -9,9 +9,9 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * A completely unrealistic weather initializer. In a fixed period the weather goes from cold to hot and from low to high wind
@@ -87,7 +87,7 @@ public class OscillatingWeatherInitializer implements WeatherInitializer {
 
 
         //also add windspeed in the model aggregate data
-        model.getDailyDataSet().registerGatherer("Model WindSpeed", new Function<FishState, Double>() {
+        model.getDailyDataSet().registerGatherer("Model WindSpeed", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState state) {
                 return singleInstance.getWindSpeedInKph();

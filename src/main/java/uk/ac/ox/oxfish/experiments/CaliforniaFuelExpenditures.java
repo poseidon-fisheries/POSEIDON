@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * Demo to check the california fuel expenditures against "real" data
  * Created by carrknight on 3/22/16.
  */
 public class CaliforniaFuelExpenditures {

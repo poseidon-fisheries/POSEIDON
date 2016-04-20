@@ -15,8 +15,9 @@ public interface RockyRectangleMaker {
      * @param map a reference to the map
      * @return the coordinates of the rectangle, the habitat initializer will fill these with rocks
      */
-    public RockyRectangle[] buildRectangles(MersenneTwisterFast random,
-                                            NauticalMap map);
+    RockyRectangle[] buildRectangles(
+            MersenneTwisterFast random,
+            NauticalMap map);
 
 
 }

@@ -6,13 +6,13 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.function.Function;
 
 /**
  * the data gatherer for a fisher that steps every year. It gathers:
@@ -50,7 +50,7 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
         registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
 
         registerGatherer(CASH_FLOW_COLUMN,
-                         new Function<Fisher, Double>() {
+                         new Gatherer<Fisher>() {
             double oldCash = observed.getBankBalance();
 
             @Override
@@ -77,7 +77,7 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
 
         //this is a set because it gets accessed by two different gatherers and can be filled by either
         registerGatherer(FISHING_DISTANCE,
-                         new Function<Fisher, Double>() {
+                         new Gatherer<Fisher>() {
                              final HashSet<TripRecord> alreadyExaminedTrips = new HashSet<>();
                              @Override
                              public Double apply(Fisher fisher) {
@@ -106,7 +106,7 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
                              }
                          }, Double.NaN);
         registerGatherer(TRIP_DURATION,
-                         new Function<Fisher, Double>() {
+                         new Gatherer<Fisher>() {
                              final HashSet<TripRecord> alreadyExaminedTrips = new HashSet<>();
 
                              @Override

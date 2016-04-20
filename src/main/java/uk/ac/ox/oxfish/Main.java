@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish;
 
+
 import com.esotericsoftware.minlog.Log;
 import com.google.common.io.Files;
 import ec.util.MersenneTwisterFast;
@@ -44,7 +45,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+
 class Main{
+
+
 
     //main
     public static void main(String[] args) throws IOException {
@@ -135,7 +139,7 @@ class Main{
         buttonBox.add(filer);
 
         FishState state = new FishState(System.currentTimeMillis(),1);
-        Log.set(Log.LEVEL_TRACE);
+        Log.set(Log.LEVEL_INFO);
         Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();
@@ -145,11 +149,13 @@ class Main{
 
 
         state.setScenario(scenarioSelector.getScenario());
-        FishGUI vid = new FishGUI(state);
-        Console c = new Console(vid);
-        c.setVisible(true);
-    }
 
+       // FishGUI vid = new FishGUI(state);
+       // Console c = new Console(vid);
+      //  c.setVisible(true);
+
+
+    }
 
 
 

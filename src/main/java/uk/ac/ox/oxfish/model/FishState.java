@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -101,8 +102,9 @@ public class FishState  extends SimState{
     /**
      * aggregate steppables for phases where there is no need for randomization
      */
-    Map<StepOrder,AggregateSteppable> aggregateYearlySteppables = new EnumMap<>(StepOrder.class);
-    Map<StepOrder,AggregateSteppable> aggregateDailySteppables = new EnumMap<>(StepOrder.class);
+    private HashMap<StepOrder,AggregateSteppable> aggregateYearlySteppables = new HashMap<>();
+
+    private HashMap<StepOrder,AggregateSteppable> aggregateDailySteppables = new HashMap<>();
 
     public int getStepsPerDay() {
         return stepsPerDay;
@@ -115,6 +117,9 @@ public class FishState  extends SimState{
         return 24.0/(double) stepsPerDay;
     }
 
+    public FishState(){
+        this(System.currentTimeMillis(),1);
+    }
 
     /**
      * create a fishstate model with one step per day
@@ -184,7 +189,12 @@ public class FishState  extends SimState{
             }
             for(Species species : biology.getSpecies())
                 dailyDataSet.registerGatherer("Price of " + species + " at " + port.getName(),
-                                              fishState -> port.getMarginalPrice(species)
+                                              new Gatherer<FishState>() {
+                                                  @Override
+                                                  public Double apply(FishState fishState) {
+                                                      return port.getMarginalPrice(species);
+                                                  }
+                                              }
                         , Double.NaN);
         }
         //start everything else that required to be started

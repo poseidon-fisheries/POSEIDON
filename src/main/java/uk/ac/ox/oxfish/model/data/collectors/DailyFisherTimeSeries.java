@@ -4,9 +4,8 @@ import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-
-import java.util.function.Function;
 
 /**
  * Dataset for each fisher being updated once a day
@@ -33,9 +32,16 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
     @Override
     public void start(FishState state, Fisher observed) {
 
-        registerGatherer(CASH_COLUMN, Fisher::getBankBalance, Double.NaN);
+        registerGatherer(CASH_COLUMN, new Gatherer<Fisher>() {
+            @Override
+            public Double apply(Fisher fisher) {
+                return fisher.getBankBalance();
+            }
+        }, Double.NaN);
+
+
         registerGatherer( YearlyFisherTimeSeries.CASH_FLOW_COLUMN,
-                          new Function<Fisher, Double>() {
+                          new Gatherer<Fisher>() {
 
                               double oldCash = observed.getBankBalance();
 
@@ -52,7 +58,12 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
 
             registerGatherer(landings,
-                             fisher -> fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex()),
+                             (new Gatherer<Fisher>() {
+                                 @Override
+                                 public Double apply(Fisher fisher) {
+                                     return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
+                                 }
+                             }),
                              Double.NaN);
 
         }

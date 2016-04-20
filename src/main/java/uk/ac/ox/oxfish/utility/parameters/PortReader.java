@@ -30,7 +30,7 @@ public class PortReader {
      *@param gasPrice  @return
      * @throws IOException
      */
-    public static final HashMap<Port,Integer> readFile(
+    public static HashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
             Supplier<MarketMap> marketmap, double gasPrice) throws IOException {
 
@@ -78,7 +78,7 @@ public class PortReader {
      * @param map the nautical map
      * @return
      */
-    private final static boolean isCorrect(SeaTile tile, NauticalMap map)
+    private static boolean isCorrect(SeaTile tile, NauticalMap map)
     {
         if(tile.getAltitude()>=0)
         {
@@ -95,7 +95,7 @@ public class PortReader {
      * @param map
      * @return
      */
-    private static final SeaTile correctLocation(SeaTile originalSeatile,NauticalMap map, String portName)
+    private static SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
     {
         //if it's fine, don't move it
         if(isCorrect(originalSeatile,map))

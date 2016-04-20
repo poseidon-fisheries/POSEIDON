@@ -15,5 +15,5 @@ public interface NetworkPredicate {
      * @param to destination
      * @return true if the connection can be built
      */
-    public boolean test(Fisher from, Fisher to);
+    boolean test(Fisher from, Fisher to);
 }

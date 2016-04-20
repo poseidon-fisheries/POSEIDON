@@ -19,7 +19,7 @@ public interface Pathfinder {
      * @param end the ending tile
      * @return a queue of steps from start to end or null if it isn't possible to go from start to end
      */
-    public Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end);
+    Deque<SeaTile> getRoute(NauticalMap map, SeaTile start, SeaTile end);
 
 
 

@@ -19,8 +19,9 @@ public interface WeatherEmergencyStrategy extends FisherStartable{
      * @param location where the fisher is currently
      * @return true if the fisher needs to stop what he's doing and go home
      */
-    public boolean updateWeatherEmergencyFlag(boolean currentEmergencyFlag, Fisher fisher,
-                                              SeaTile location);
+    boolean updateWeatherEmergencyFlag(
+            boolean currentEmergencyFlag, Fisher fisher,
+            SeaTile location);
 
 
 

@@ -7,6 +7,8 @@ import com.google.common.collect.Table;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -179,12 +181,12 @@ public class NauticalMap implements Startable
         Preconditions.checkArgument(receipt==null);
         //reset fished map count
         receipt =
-                model.scheduleEveryDay(simState -> {
-
-                    dailyTrawlsMap.setTo(0);
-
-
-                }, StepOrder.DAWN);
+                model.scheduleEveryDay(new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+                        dailyTrawlsMap.setTo(0);
+                    }
+                },StepOrder.DAWN);
 
     }
 
