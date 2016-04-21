@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -27,7 +26,12 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     private final boolean addRelativeFecundityToSpawningBiomass;
 
 
-    private Supplier<Double> noisemaker = ()->0d;
+    private NoiseMaker noisemaker = new NoiseMaker() {
+        @Override
+        public Double get() {
+            return 0d;
+        }
+    };
 
 
     public RecruitmentBySpawningBiomass(int virginRecruits,
@@ -91,7 +95,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      * @param noiseMaker the function that generates percentage changes. 0 means no noise.
      */
     @Override
-    public void addNoise(Supplier<Double> noiseMaker) {
-
+    public void addNoise(NoiseMaker noiseMaker) {
+            this.noisemaker = noiseMaker;
     }
 }

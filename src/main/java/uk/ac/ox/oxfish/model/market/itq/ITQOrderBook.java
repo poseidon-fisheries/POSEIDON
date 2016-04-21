@@ -31,7 +31,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
     private PriorityQueue<Quote> bids;
 
-    private double markup = 0.001;
+    private double markup = 0.01;
 
     private final int yearOfImplementation;
 
@@ -121,10 +121,15 @@ public class ITQOrderBook implements Steppable,Startable{
 
     public void step(SimState state)
     {
+
+
         penaltyBox.step(state); //tell the penalty box to update durations
         MersenneTwisterFast random = ((FishState) state).getRandom();
         List<Map.Entry<Fisher,PriceGenerator>> traders = new ArrayList<>(pricers.entrySet());
+        //sort from hash before shuffling or the randomization might not be the same even if the seed is left constant
+        traders.sort((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID()));
         Collections.shuffle(traders,new Random(random.nextLong()));
+
 
         if(((FishState) state).getYear() >= yearOfImplementation) {
             //fill the quotes
@@ -136,6 +141,8 @@ public class ITQOrderBook implements Steppable,Startable{
                 Log.trace(specieIndex + " ask size : " + asks.size() + " ---- " + bids.size());
                 Log.trace(specieIndex + " asks: " + asks.toString());
                 Log.trace(specieIndex + " bids: " + bids.toString());
+
+
             }
 
 
@@ -152,6 +159,9 @@ public class ITQOrderBook implements Steppable,Startable{
                 penaltyBox.registerTrader(trader);
             toPenalize.clear();
         }
+
+
+
     }
 
     public void generatePricesAndPutOnBook(Fisher fisher, PriceGenerator priceGenerator,
@@ -186,7 +196,6 @@ public class ITQOrderBook implements Steppable,Startable{
         //this would work well in recursion but unfortunately if the quantity traded is very small and many traders
         //it will go on stackoverflow
         while(true)
-
         {
             if(bids.isEmpty() || asks.isEmpty())
                 return;
@@ -216,17 +225,20 @@ public class ITQOrderBook implements Steppable,Startable{
                 assert tradingPrice <= bestBid.getPrice();
 
                 //now trade!
+
                 QuotaPerSpecieRegulation buyerQuota = (QuotaPerSpecieRegulation) buyer.getRegulation();
                 QuotaPerSpecieRegulation sellerQuota = (QuotaPerSpecieRegulation) seller.getRegulation();
 
+
                 buyerQuota.setQuotaRemaining(specieIndex, buyerQuota.getQuotaRemaining(specieIndex) + unitsTradedPerMatch);
-                sellerQuota.setQuotaRemaining(specieIndex,
-                                              sellerQuota.getQuotaRemaining(specieIndex) - unitsTradedPerMatch);
+                sellerQuota.setQuotaRemaining(specieIndex,sellerQuota.getQuotaRemaining(specieIndex) - unitsTradedPerMatch);
+
                 buyer.spendExogenously(unitsTradedPerMatch * tradingPrice);
                 seller.earn(unitsTradedPerMatch * tradingPrice);
                 counter.count(QUOTA_COLUMN_NAME, unitsTradedPerMatch);
                 counter.count(MONEY_COLUMN_NAME, unitsTradedPerMatch * tradingPrice);
                 counter.count(MATCHES_COLUMN_NAME, 1);
+
 
                 if (Log.TRACE) {
                     Log.trace(
@@ -235,15 +247,18 @@ public class ITQOrderBook implements Steppable,Startable{
                                       " quotas left while" + seller + " has " +
                                       sellerQuota.getQuotaRemaining(specieIndex));
                 }
+
                 toPenalize.add(buyer);
                 lastClosingPrice = tradingPrice;
                 assert sellerQuota.getQuotaRemaining(specieIndex) >= 0;
+
 
                 //if you allow it, let buyer and seller posts more offers
                 if (allowMultipleTradesPerFisher) {
                     generatePricesAndPutOnBook(buyer, pricers.get(buyer), false, true);
                     generatePricesAndPutOnBook(seller, pricers.get(seller), true, false);
                 }
+
                 //again!
             }
             else {

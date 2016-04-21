@@ -6,10 +6,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A utility class that keeps track of who has traded and forbids him to trade for a fixed number of days
@@ -21,7 +17,7 @@ public class PenaltyBox implements Steppable{
     /**
      * we keep here all the fishers that need to stay out of trading
      */
-    private final HashMap<Fisher,AtomicInteger> penaltyBox = new HashMap<>();
+    private final HashMap<Fisher,Integer> penaltyBox = new HashMap<>();
 
 
     /**
@@ -45,7 +41,7 @@ public class PenaltyBox implements Steppable{
     public void registerTrader(Fisher trader)
     {
         if(duration > 0)
-            penaltyBox.put(trader,new AtomicInteger(duration));
+            penaltyBox.put(trader,duration);
     }
 
 
@@ -68,16 +64,12 @@ public class PenaltyBox implements Steppable{
         if(duration ==0)
             return;
 
-
-        List<Fisher> toRemove = new LinkedList<>();
-        for (Map.Entry<Fisher, AtomicInteger> penitent : penaltyBox.entrySet())
+        //List<Fisher> toRemove = new LinkedList<>();
+        for (Fisher fisher : penaltyBox.keySet())
         {
-            int remainingDuration = penitent.getValue().decrementAndGet();
-            assert remainingDuration>=0;
-            if(remainingDuration==0)
-                toRemove.add(penitent.getKey());
+            penaltyBox.merge(fisher,0,(c,one)-> c - 1);
         }
-        penaltyBox.keySet().removeAll(toRemove);
+        penaltyBox.entrySet().removeIf(entry -> entry.getValue()<=0);
 
     }
 }

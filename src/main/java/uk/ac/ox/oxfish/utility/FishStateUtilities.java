@@ -38,12 +38,21 @@ public class FishStateUtilities {
     private static final String JAR_NAME = "oxfish_executable.jar";
 
 
-
+    /**
+     * round to 2nd decimal value
+     * @param value
+     * @return
+     */
     public static double round(double value) {
 
         return (double)Math.round(value*100)/100;
     }
 
+    /**
+     * round to 5th decimal place
+     * @param value
+     * @return
+     */
     public static double round5(double value) {
 
         return (double)Math.round(value*100000)/100000;
@@ -617,6 +626,20 @@ public class FishStateUtilities {
         return builder.toString();
     }
 
+
+    public static String getFilenameExtension(File file){
+
+        String fileName = file.getName();
+        String extension = "";
+
+        int i = fileName.lastIndexOf('.');
+        int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+
+        if (i > p) {
+            extension = fileName.substring(i+1);
+        }
+        return extension;
+    }
 
 }
 

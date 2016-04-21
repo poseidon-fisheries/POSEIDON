@@ -67,7 +67,9 @@ public class SerializeTest {
                       state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                      .001);
 
-
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                     .001);
     }
 
 
@@ -79,8 +81,9 @@ public class SerializeTest {
 
 
 
-        FishState state = new FishState(0);
-        state.setScenario(new CaliforniaBathymetryScenario());
+        FishState state = new FishState(System.currentTimeMillis());
+        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        state.setScenario(scenario);
         state.start();
         for(int i=0; i<400; i++)
             state.schedule.step(state);
@@ -101,22 +104,47 @@ public class SerializeTest {
                      state2.random.nextDouble(),
                      .001);
 
-        for(int i=0; i<400; i++) {
-            state.schedule.step(state);
-            state2.schedule.step(state2);
-            //the randomizers are linked!
-            assertEquals(state.random.nextDouble(),
-                         state2.random.nextDouble(),
+        for(int id=0; id<134; id++)
+        {
+            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                         state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                          .001);
         }
 
-        assertEquals(100,state.getFishers().size());
-        assertEquals(100,state2.getFishers().size());
+        for(int i=0; i<400; i++) {
+            Log.setLogger(new FishStateLogger(state,Paths.get("log1.log")));
+            Log.set(Log.LEVEL_TRACE);
+            state.schedule.step(state);
+      //      Log.trace("-----------------------------------------");
+            Log.setLogger(new FishStateLogger(state2,Paths.get("log2.log")));
+            Log.set(Log.LEVEL_TRACE);
+            state2.schedule.step(state2);
+            //the randomizers are linked!
+
+            for(int id=0; id<134; id++)
+            {
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                             .001);
+            }
+
+            assertEquals(state.random.nextDouble(),
+                         state2.random.nextDouble(),
+                         .001);
+
+        }
+
+        assertEquals(134,state.getFishers().size());
+        assertEquals(134,state2.getFishers().size());
         assertEquals(800,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(800,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
         assertEquals(state.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                      state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                     .001);
+
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                      .001);
     }
 

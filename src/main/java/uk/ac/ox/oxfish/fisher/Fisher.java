@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.metawidget.inspector.annotation.UiHidden;
@@ -311,6 +312,10 @@ public class Fisher implements Steppable, Startable{
     @Override
     public void step(SimState simState) {
         FishState model = (FishState) simState;
+
+        if(Log.TRACE) {
+            Log.trace("Fisher " + fisherID + " is going to start his step");
+        }
 
         //tell equipment!
         equipment.getBoat().newStep();

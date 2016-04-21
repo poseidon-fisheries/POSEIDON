@@ -12,6 +12,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.fisher.DockingListener;
@@ -295,7 +296,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     {
                         DoubleParameter noise = recruitmentNoise.makeCopy();
                         initializer.getNaturalProcesses(thisSpecies).addNoise(
-                                () -> noise.apply(model.getRandom())
+                                new NoiseMaker() {
+                                    @Override
+                                    public Double get() {
+                                        return noise.apply(model.getRandom());
+                                    }
+                                }
 
                         );
                     }

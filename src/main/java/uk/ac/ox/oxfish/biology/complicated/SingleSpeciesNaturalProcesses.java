@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Supplier;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -219,7 +218,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      * give a function to generate noise as % of recruits this year
      * @param noiseMaker the function that generates percentage changes. 1 means no noise.
      */
-    public void addNoise(Supplier<Double> noiseMaker) {
+    public void addNoise(NoiseMaker noiseMaker) {
         recruitment.addNoise(noiseMaker);
     }
 }

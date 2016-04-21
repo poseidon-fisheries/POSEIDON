@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ITQSpecificFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -54,6 +55,10 @@ class Main{
     public static void main(String[] args) throws IOException {
 
 
+        //this is relatively messy, as all GUI functions are
+        //basically it creates a widget to choose the scenario object and its parameters
+        //once that's done you create a new Fisherstate and give it the  scenario
+        //the you pass the FisherState to the FishGui and the model starts.
 
         final JDialog scenarioSelection = new JDialog((JFrame)null,true);
         final ScenarioSelector scenarioSelector = new ScenarioSelector();
@@ -96,8 +101,8 @@ class Main{
         });
 
 
-        final JButton filer = new JButton("Open from File");
-        filer.addActionListener(
+        final JButton readFromFileButton = new JButton("Open from File");
+        readFromFileButton.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -106,7 +111,7 @@ class Main{
                         if (chooser.showOpenDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION)
                         {
                             File file = chooser.getSelectedFile();
-                            //This is where a real application would open the file.
+                            //log that you are about to write
                             Log.info("opened file " + file);
                             FishYAML yaml = new FishYAML();
                             try{
@@ -136,7 +141,45 @@ class Main{
 
 
         );
-        buttonBox.add(filer);
+        final JButton writeToFileButton = new JButton("Save to file");
+        writeToFileButton.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+
+                        if (chooser.showSaveDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION)
+                        {
+                            File file = chooser.getSelectedFile();
+                            String currentExtension = FishStateUtilities.getFilenameExtension(file);
+                            //if the extension is not correct
+                            if(!(currentExtension.equalsIgnoreCase("yaml") | currentExtension.equalsIgnoreCase("yml") ))
+                            {
+                                //force it!
+                                file = new File(file.toString() + ".yaml");
+                            }
+
+                            //log that you are about to write
+                            Log.info("going to save config to file " + file);
+                            FishYAML yaml = new FishYAML();
+                            String toWrite = yaml.dump(scenarioSelector.getScenario());
+                            try {
+                                Files.write(toWrite.getBytes(),file);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                                Log.error("Failed to write to " + file);
+                                Log.error(e1.getMessage());
+                            }
+                        } else {
+                            Log.info("open file cancelled");
+                        }
+                    }
+                }
+
+
+        );
+        buttonBox.add(readFromFileButton);
+        buttonBox.add(writeToFileButton);
 
         FishState state = new FishState(System.currentTimeMillis(),1);
         Log.set(Log.LEVEL_INFO);
@@ -150,9 +193,9 @@ class Main{
 
         state.setScenario(scenarioSelector.getScenario());
 
-       // FishGUI vid = new FishGUI(state);
-       // Console c = new Console(vid);
-      //  c.setVisible(true);
+        FishGUI vid = new FishGUI(state);
+        Console c = new Console(vid);
+        c.setVisible(true);
 
 
     }

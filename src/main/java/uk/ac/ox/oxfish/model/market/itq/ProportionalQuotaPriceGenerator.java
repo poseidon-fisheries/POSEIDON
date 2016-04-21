@@ -122,6 +122,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
         if(probability < FishStateUtilities.EPSILON) //if the probability is very low, skip computations, you value it nothing
             return 0d;
 
+        probability = FishStateUtilities.round5(probability);
 
         double multiplier = fisher.predictUnitProfit(specieIndex);
         if(Double.isNaN(multiplier))
@@ -141,6 +142,8 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
                     Double.isNaN(predictedUnitProfit))
                 continue;
 
+            predictedCatches = FishStateUtilities.round5(predictedCatches);
+            predictedUnitProfit = FishStateUtilities.round5(predictedUnitProfit);
             //quota price (0 if there is no market)
             ITQOrderBook market = orderBooks.get(species);
             double quotaPrice = market != null ? market.getLastClosingPrice() : 0;
