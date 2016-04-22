@@ -101,7 +101,7 @@ class Main{
         });
 
 
-        final JButton readFromFileButton = new JButton("Open from File");
+        final JButton readFromFileButton = new JButton("Open scenario from file");
         readFromFileButton.addActionListener(
                 new ActionListener() {
                     @Override
@@ -141,7 +141,7 @@ class Main{
 
 
         );
-        final JButton writeToFileButton = new JButton("Save to file");
+        final JButton writeToFileButton = new JButton("Save scenario to file");
         writeToFileButton.addActionListener(
                 new ActionListener() {
                     @Override
@@ -171,7 +171,7 @@ class Main{
                                 Log.error(e1.getMessage());
                             }
                         } else {
-                            Log.info("open file cancelled");
+                            Log.info("save cancelled");
                         }
                     }
                 }
@@ -189,9 +189,8 @@ class Main{
         scenarioSelection.setVisible(true);
 
 
-
-
         state.setScenario(scenarioSelector.getScenario());
+
 
         FishGUI vid = new FishGUI(state);
         Console c = new Console(vid);

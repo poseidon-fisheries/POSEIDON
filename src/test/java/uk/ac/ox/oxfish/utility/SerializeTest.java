@@ -27,7 +27,7 @@ public class SerializeTest {
 
 
 
-        FishState state = new FishState(0);
+        FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(new PrototypeScenario());
         state.start();
         for(int i=0; i<400; i++)
@@ -38,11 +38,11 @@ public class SerializeTest {
         Log.info(state.timeString());
         Log.info("Writing to file!");
         String xml = xstream.toXML(state);
+        Files.write(Paths.get("save.checkpoint"),xml.getBytes());
+
+
         Log.info("Reading from File");
-
-
-        Files.write(Paths.get("checkpoint.save"),xml.getBytes());
-        xml = new String(Files.readAllBytes(Paths.get("checkpoint.save")));
+        xml = new String(Files.readAllBytes(Paths.get("save.checkpoint")));
         FishState state2 = (FishState) xstream.fromXML(xml);
         Log.info("Read");
         assertEquals(state.random.nextDouble(),
@@ -70,6 +70,15 @@ public class SerializeTest {
         assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                      state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                      .001);
+
+
+        /*
+        FishGUI vid = new FishGUI(state);
+        Console c = ((Console) vid.createController());
+        c.doOpen();
+        c.setVisible(true);
+        Thread.sleep(50000);
+        */
     }
 
 
@@ -96,8 +105,8 @@ public class SerializeTest {
         Log.info("Reading from File");
 
 
-        Files.write(Paths.get("checkpoint.save"),xml.getBytes());
-        xml = new String(Files.readAllBytes(Paths.get("checkpoint.save")));
+        Files.write(Paths.get("save.checkpoint"),xml.getBytes());
+        xml = new String(Files.readAllBytes(Paths.get("save.checkpoint")));
         FishState state2 = (FishState) xstream.fromXML(xml);
         Log.info("Read");
         assertEquals(state.random.nextDouble(),
@@ -150,7 +159,7 @@ public class SerializeTest {
 
     @After
     public void tearDown() throws Exception {
-        Files.delete(Paths.get("checkpoint.save"));
+        Files.delete(Paths.get("save.checkpoint"));
 
     }
 }

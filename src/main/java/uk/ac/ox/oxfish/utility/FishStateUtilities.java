@@ -1,7 +1,10 @@
 package uk.ac.ox.oxfish.utility;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -20,6 +23,7 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Function;
@@ -367,7 +371,7 @@ public class FishStateUtilities {
 
 
     public static void pollFishersToFile(Collection<Fisher> fishers,
-                                           File file,Sensor<Double>... pollers)
+                                         File file,Sensor<Double>... pollers)
     {
         // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         ArrayList<String> histogram = new ArrayList<>(fishers.size());
@@ -381,7 +385,7 @@ public class FishStateUtilities {
                 row.append(poller.scan(fisher));
             }
             histogram.add(
-                   row.toString());
+                    row.toString());
 
 
         }
@@ -639,6 +643,38 @@ public class FishStateUtilities {
             extension = fileName.substring(i+1);
         }
         return extension;
+    }
+
+
+    public static FishState readFromFile(File file)
+    {
+        Log.info("Reading from File");
+        XStream xstream = new XStream(new StaxDriver());
+        String xml = null;
+        try {
+            xml = new String(Files.readAllBytes(file.toPath()));
+            return  (FishState) xstream.fromXML(xml);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.error("Failed to read file " + file);
+            return null;
+        }
+    }
+
+
+    public static void writeToFile(File file, FishState state)
+    {
+        XStream xstream = new XStream(new StaxDriver());
+        Log.info("Writing to file!");
+        String xml = xstream.toXML(state);
+
+        try {
+            Files.write(file.toPath(),xml.getBytes());
+            Log.info("State saved at " + file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.error("Failed to write file " + file + "with error: " + e.getMessage());
+        }
     }
 
 }

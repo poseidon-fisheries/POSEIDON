@@ -7,7 +7,6 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.grid.FastObjectGridPortrayal2D;
 import sim.util.gui.SimpleColorMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
 
 import java.awt.*;
@@ -67,7 +66,8 @@ public class TrawlingHeatMap implements Steppable{
         heatMapPortrayal.setField(smoothedHeatMap);
         heatMapPortrayal.setMap(new SimpleColorMap(0,maximum,new Color(0,0,0,0),Color.RED));
 
-        model.scheduleEveryDay(this, StepOrder.DATA_RESET);
+
+
     }
 
 
