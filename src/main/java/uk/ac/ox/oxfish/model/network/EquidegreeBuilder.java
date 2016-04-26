@@ -9,11 +9,7 @@ import javafx.collections.ObservableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Builds network where everyone has the same out-degree of edges
@@ -51,28 +47,36 @@ public class EquidegreeBuilder implements NetworkBuilder{
             Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
 
         }
+        Log.trace("random before populating " + state.getRandom().nextDouble());
         for(Fisher fisher : fishers)
         {
-            Set<Fisher> friends = new HashSet<>(degree);
+            List<Fisher> friends = new LinkedList<>();
 
-            List<Fisher> candidates = fishers.stream().filter(candidate -> {
-                boolean allowed = candidate != fisher;
+            List<Fisher> candidates = new LinkedList<>();
+            for(Fisher candidate : fishers)
+            {
+                boolean allowed = candidate!=fisher;
                 for (NetworkPredicate predicate : predicates)
                     allowed = allowed && predicate.test(fisher, candidate);
-                return allowed;
-            }).collect(Collectors.toList());
+                if(allowed)
+                    candidates.add(candidate);
+            }
+
+
+            Collections.sort(candidates, (o1, o2) -> Integer.compare(o1.getID(), o2.getID()));
+
             while(friends.size() < degree && friends.size() < candidates.size())
             {
-                final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
-                if(candidate != fisher) {
-                    boolean allowed = true;
-                    for(NetworkPredicate predicate : predicates)
-                        allowed = allowed && predicate.test(fisher,candidate);
-                    if(allowed)
-                        friends.add(candidate);
+                int randomConnection = state.getRandom().nextInt(candidates.size());
+                final Fisher candidate = candidates.get(randomConnection);
+                assert (candidate != fisher);
 
-                }
+                if(!friends.contains(candidate))
+                    friends.add(candidate);
+
+
             }
+
             if(friends.size()<degree && Log.DEBUG)
             {
                 assert friends.size()==candidates.size();
@@ -80,7 +84,11 @@ public class EquidegreeBuilder implements NetworkBuilder{
                                   " were " + candidates.size() +
                                   ", and the total number of friends the fisher actually has is " + friends.size());
             }
+
+
+
             //now make them your friends!
+
             for(Fisher friend : friends)
                 toReturn.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
 

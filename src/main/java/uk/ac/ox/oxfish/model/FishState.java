@@ -151,6 +151,7 @@ public class FishState  extends SimState{
      */
     @Override
     public void start() {
+
         Preconditions.checkState(!started, "Already started!");
         super.start();
 
@@ -172,16 +173,19 @@ public class FishState  extends SimState{
         biology = initialization.getBiology();
 
 
+
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
         fisherFactory = scenarioPopulation.getFactory();
         fishers = FXCollections.observableList(scenarioPopulation.getPopulation());
+
         socialNetwork = scenarioPopulation.getNetwork();
         socialNetwork.populate(this);
-
         map.start(this);
+
         //start the fishers
         for(Fisher fisher : fishers)
             fisher.start(this);
+
         //start the markets (for each port
         for(Port port : getPorts()) {
             for (Market market : port.getMarketMap().getMarkets()) {
@@ -197,9 +201,11 @@ public class FishState  extends SimState{
                                               }
                         , Double.NaN);
         }
+
         //start everything else that required to be started
         for(Startable startable : toStart)
             startable.start(this);
+
         for( Pair<Fisher,FisherStartable> startable : fisherStartables)
             startable.getSecond().start(this,startable.getFirst());
         dailyDataSet.start(this,this);
@@ -333,6 +339,42 @@ public class FishState  extends SimState{
         return schedule.scheduleRepeating(steppable,order.ordinal(), stepsPerDay * periodInDays);
     }
 
+
+    /**
+     * after x days pass step this object once and forget it
+     * @param steppable steppable
+     * @param order order at which to step it
+     * @param daysFromNow how many days from now
+     */
+    public void scheduleOnceInXDays(Steppable steppable, StepOrder order, int daysFromNow)
+    {
+        schedule.scheduleOnceIn(stepsPerDay*daysFromNow,steppable,order.ordinal());
+    }
+
+
+    /**
+     * will step this object only once when the specific year starts. If that year is in the past, it won't step.
+     * Implementation wise unfortunately I just check every year to see whether to step this or not. It's quite silly.
+     * @param steppable
+     * @param order
+     * @param year
+     */
+    public Stoppable scheduleOnceAtTheBeginningOfYear(Steppable steppable,StepOrder order, int year)
+    {
+
+        final Steppable container = new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                if(((FishState) simState).getYear() == year) {
+                    steppable.step(simState);
+                }
+
+            }
+        };
+        return scheduleEveryYear(container,order);
+
+    }
+
     public Stoppable schedulePerPolicy(Steppable steppable, StepOrder order, IntervalPolicy policy)
     {
         switch (policy){
@@ -345,6 +387,7 @@ public class FishState  extends SimState{
             default:
                 Preconditions.checkState(false,"Reset Policy not found");
         }
+
         return null;
     }
 

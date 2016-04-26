@@ -24,7 +24,9 @@ public class FunctionalFriendsDemo {
 
         long seed = System.currentTimeMillis();
         int stepsAlone = stepsItTook(Double.NaN, 0, 3500, seed, true);
+        stepsAlone += stepsItTook(Double.NaN, 0, 3500, seed, true);
         int stepsWithFewFriends = stepsItTook(.9, 3, 3500, seed, true);
+        stepsWithFewFriends += stepsItTook(.9, 3, 3500, seed, true);
 
 
 

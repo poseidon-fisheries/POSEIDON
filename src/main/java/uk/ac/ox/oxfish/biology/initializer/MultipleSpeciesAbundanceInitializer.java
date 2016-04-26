@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -17,9 +16,10 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 /**
- * Create multiple species, each abundance (count) rather than biomass based
+ * Create multiple species, each abundance (count) based rather than biomass based
  * Created by carrknight on 3/17/16.
  */
 public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
@@ -69,6 +69,17 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
      * contains all the mortality+recruitment processes of each species
      */
     private final HashMap<Species,SingleSpeciesNaturalProcesses> naturalProcesses = new HashMap<>();
+
+
+    /**
+     * holds the "total count" of fish as initially read from data
+     */
+    private final HashMap<Species, int[][]> initialAbundance = new HashMap<>();
+
+    public int[][] getInitialAbundance (Species species)
+    {
+        return initialAbundance.get(species);
+    }
 
 
     /**
@@ -139,31 +150,22 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
             for (Species species : biology.getSpecies()) {
                 int[][] totalCount = SingleSpeciesAbundanceInitializer.
                         turnCountsFileIntoAbundanceArray(species, biologicalDirectories.get(species.getName()));
+                initialAbundance.put(species,totalCount);
 
-                //now allocate the count correctly
-                Function<SeaTile, Double> allocator = allocators.get(species);
+                //prepare the map biology-->ratio of fish to put there
                 HashMap<AbundanceBasedLocalBiology, Double> currentWeightMap = new HashMap<>(locals.size());
                 initialWeights.put(species, currentWeightMap);
-                Preconditions.checkArgument(allocator != null);
+                //we start with location--->ratio of fish so we need to go location--->biology through the allocator
+                turnLocationRatioMaptoBiologyRatioMap(species, currentWeightMap);
 
-                //for each tile-biology
-                for(Map.Entry<SeaTile,AbundanceBasedLocalBiology> local : locals.entrySet())
-                {
+                //we should have covered all locations by now
+                assert locals.values().containsAll(currentWeightMap.keySet());
+                assert currentWeightMap.keySet().containsAll(locals.values());
 
-                    //find the ratio by allocator
-                    double ratio = allocator.apply(local.getKey());
-                    currentWeightMap.put(local.getValue(),ratio);
-                    for(int i=0; i<=species.getMaxAge(); i++)
-                    {
+                //now that we have the ratio and the count for each biology object assign the correct number of fish to each!
+                resetAllLocalBiologies(species, totalCount, currentWeightMap);
 
-                        local.getValue().getNumberOfMaleFishPerAge(species)[i] =
-                                (int) (0.5d + scaling * totalCount[FishStateUtilities.MALE][i] *ratio);
-                        local.getValue().getNumberOfFemaleFishPerAge(species)[i] =
-                                (int) (0.5d + scaling * totalCount[FishStateUtilities.FEMALE][i] *ratio);
-                    }
-                }
-
-
+                //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
                         model, species, locals);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
@@ -182,6 +184,48 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
         }
 
 
+    }
+
+    private void turnLocationRatioMaptoBiologyRatioMap(
+            Species species, HashMap<AbundanceBasedLocalBiology, Double> currentWeightMap) {
+        Function<SeaTile, Double> allocator = allocators.get(species);
+        Preconditions.checkArgument(allocator != null);
+        //fill in the location
+        for(Map.Entry<SeaTile,AbundanceBasedLocalBiology> local : locals.entrySet())
+        {
+
+            //find the ratio by allocator
+            double ratio = allocator.apply(local.getKey());
+            currentWeightMap.put(local.getValue(),ratio);
+        }
+    }
+
+
+    public void resetAllLocalBiologies(
+            Species speciesToReset, int[][] newTotalFishCount,
+            HashMap<AbundanceBasedLocalBiology, Double> biologyToProportionOfFishThere)
+    {
+        Preconditions.checkArgument(locals.values().containsAll(biologyToProportionOfFishThere.keySet()),
+                                    "Some local biologies in the proportion map are not present in the initializer list");
+        Preconditions.checkArgument(biologyToProportionOfFishThere.keySet().containsAll(locals.values()),
+                                    "Some local biologies in the masterlist are not present in the proportion map");
+        for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : biologyToProportionOfFishThere.entrySet())
+        {
+
+            //get the ratio back
+            AbundanceBasedLocalBiology local = ratio.getKey();
+            for(int i=0; i<=speciesToReset.getMaxAge(); i++)
+            {
+
+                local.getNumberOfMaleFishPerAge(speciesToReset)[i] =
+                        (int) (0.5d + scaling * newTotalFishCount[FishStateUtilities.MALE][i] *ratio.getValue());
+                local.getNumberOfFemaleFishPerAge(speciesToReset)[i] =
+                        (int) (0.5d + scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] *ratio.getValue());
+            }
+        }
+        if(Log.DEBUG)
+            Log.debug(speciesToReset + " resetted to total biomass: " +
+                         locals.values().stream().mapToDouble(value -> value.getBiomass(speciesToReset)).sum());
     }
 
     /**

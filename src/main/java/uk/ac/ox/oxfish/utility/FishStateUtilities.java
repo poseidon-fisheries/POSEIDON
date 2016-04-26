@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -616,7 +617,12 @@ public class FishStateUtilities {
 
         builder.append(columnSeparator);
         for (int i = 0, length = Array.getLength(array ); i < length; i++ ) {
-            String value = String.valueOf( Array.get( array, i ) );
+            String value;
+            Object toRepresent = Array.get(array, i);
+            if(!toRepresent.getClass().isArray())
+                value = String.valueOf(toRepresent);
+            else
+                value = deepToStringArray(toRepresent,rowSeparator,columnSeparator);
             // Concatenate the separator
             if(i>0)
                 builder.append(rowSeparator);
@@ -646,7 +652,7 @@ public class FishStateUtilities {
     }
 
 
-    public static FishState readFromFile(File file)
+    public static FishState readModelFromFile(File file)
     {
         Log.info("Reading from File");
         XStream xstream = new XStream(new StaxDriver());
@@ -662,7 +668,7 @@ public class FishStateUtilities {
     }
 
 
-    public static void writeToFile(File file, FishState state)
+    public static void writeModelToFile(File file, FishState state)
     {
         XStream xstream = new XStream(new StaxDriver());
         Log.info("Writing to file!");
@@ -677,5 +683,16 @@ public class FishStateUtilities {
         }
     }
 
+
+
+    public static void deleteRecursively(File f) throws IOException
+    {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                deleteRecursively(c);
+        }
+        if (!f.delete())
+            throw new FileNotFoundException("Failed to delete file: " + f);
+    }
 }
 

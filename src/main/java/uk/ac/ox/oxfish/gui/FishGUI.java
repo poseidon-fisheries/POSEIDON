@@ -109,7 +109,7 @@ public class FishGUI extends GUIState{
     public boolean readNewStateFromCheckpoint(
             File file) throws IOException, ClassNotFoundException, OptionalDataException, ClassCastException, Exception
     {
-        FishState currentState = FishStateUtilities.readFromFile(file);
+        FishState currentState = FishStateUtilities.readModelFromFile(file);
         if(currentState == null)
             return false;
         else

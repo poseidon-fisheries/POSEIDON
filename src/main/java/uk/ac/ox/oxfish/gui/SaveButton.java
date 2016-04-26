@@ -71,7 +71,7 @@ public class SaveButton extends JButton implements ActionListener{
             {
 
                 gui.preCheckPoint();
-                FishStateUtilities.writeToFile(file, (FishState) gui.state);
+                FishStateUtilities.writeModelToFile(file, (FishState) gui.state);
                 gui.postCheckPoint();
             }
 

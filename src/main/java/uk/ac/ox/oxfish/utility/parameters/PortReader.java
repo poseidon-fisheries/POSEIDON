@@ -30,14 +30,14 @@ public class PortReader {
      *@param gasPrice  @return
      * @throws IOException
      */
-    public static HashMap<Port,Integer> readFile(
+    public static LinkedHashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
             Supplier<MarketMap> marketmap, double gasPrice) throws IOException {
 
         List<String> fileLines = Files.readAllLines(pathToFile);
         Preconditions.checkArgument(fileLines.size()>=2);
 
-        HashMap<Port,Integer> toReturn = new HashMap<>();
+        LinkedHashMap<Port,Integer> toReturn = new LinkedHashMap<>();
 
         //the first line is heading
         Iterator<String> rowIterator = fileLines.iterator();

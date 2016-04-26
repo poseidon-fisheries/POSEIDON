@@ -15,11 +15,17 @@ public class Quote implements Comparable<Quote>{
 
     final private Fisher trader;
 
+    private static int counter = 0;
+
+    final private int splitter;
+
 
     public Quote(double price, Fisher trader) {
         Preconditions.checkArgument(price >=0);
         this.price = price;
         this.trader = trader;
+        splitter = counter++;
+
     }
 
     /**
@@ -27,7 +33,9 @@ public class Quote implements Comparable<Quote>{
      */
     @Override
     public int compareTo(Quote o) {
-        return Double.compare(this.price, o.price);
+        int compare = Double.compare(this.price, o.price);
+        return compare == 0 ?
+                Integer.compare(this.splitter, o.splitter) : compare;
     }
 
     public double getPrice() {

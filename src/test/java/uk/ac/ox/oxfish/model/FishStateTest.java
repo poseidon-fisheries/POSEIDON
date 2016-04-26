@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
+import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
@@ -95,5 +96,58 @@ public class FishStateTest {
 
 
 
+    }
+
+    @Test
+    public void testSteppables() throws Exception {
+
+        Log.info("testing that the `scheduleOnce()` calls are actually just called once");
+        final int stepCounter[] = new int[2];
+        stepCounter[0]=0;
+        stepCounter[1]=0;
+
+        FishState state = new FishState();
+        state.setScenario(mock(Scenario.class,RETURNS_DEEP_STUBS));
+        state.start();
+        //increase array after 300 days
+        state.scheduleOnceInXDays(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                stepCounter[0]++;
+            }
+        },StepOrder.DAWN,300);
+        //increase array after 800 days
+        state.scheduleOnceInXDays(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                stepCounter[0]++;
+            }
+        },StepOrder.DAWN,800);
+        //increase array at the end of year 1
+        state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                stepCounter[1]++;
+            }
+        },StepOrder.DAWN,0);
+
+        for(int day=0;day<350; day++)
+        {
+            state.schedule.step(state);
+        }
+        assertEquals(stepCounter[0],1);
+        assertEquals(stepCounter[1],0);
+        for(int day=0;day<350; day++)
+        {
+            state.schedule.step(state);
+        }
+        assertEquals(stepCounter[0],1);
+        assertEquals(stepCounter[1],1);
+        for(int day=0;day<350; day++)
+        {
+            state.schedule.step(state);
+        }
+        assertEquals(stepCounter[0],2);
+        assertEquals(stepCounter[1],1);
     }
 }

@@ -185,7 +185,10 @@ public class GearImitationWithITQ
 
         while (state.getYear() < 1)
             state.schedule.step(state);
-
+        Double blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
+        Double red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
+        if(state.getDayOfTheYear()==1)
+            Log.info("Red catchability: " + red + " --- Blue Catchability: " + blue);
         state.schedule.step(state);
         double earlyRedLandings = state.getYearlyDataSet().getLatestObservation(state.getSpecies().get(0) + " " +
                                                                                         AbstractMarket.LANDINGS_COLUMN_NAME);
@@ -203,14 +206,19 @@ public class GearImitationWithITQ
             //         Assert.assertTrue(earlyRedLandings < .5 * totalRedQuotas);
         }
 
-        while (state.getYear() < 20)
+        while (state.getYear() < 20) {
             state.schedule.step(state);
+            blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
+            red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
+            if(state.getDayOfTheYear()==1)
+                Log.info("Red catchability: " + red + " --- Blue Catchability: " + blue);
+        }
 
 
         state.schedule.step(state);
-        Double blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
-        Double red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
-        System.out.println(red + " --- " + blue);
+        blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
+        red = state.getYearlyDataSet().getLatestObservation("Red Catchability");
+        System.out.println("Red catchability: " + red + " --- Blue Catchability: " + blue);
 
         assertTrue(red > .01);
         assertTrue(blue < .01);

@@ -5,8 +5,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
@@ -41,6 +42,7 @@ import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -127,6 +129,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.811008583); //grabbed online on Friday March 18
 
 
+    /**
+     * if this number is positive non-zero then at the given year the biology/abundance will be reset to the original values
+     */
+    private int resetBiologyAtYear = -1;
 
     /**
      * factory to produce departing strategy
@@ -179,7 +185,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
 
 
-    private HashMap<Port,Integer> numberOfFishersPerPort;
+    private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
 
     private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587";
 
@@ -210,9 +216,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
             //sort it alphabetically to insure folders are consistently ranked
             List<Path> sortedFolders = new LinkedList<>();
-            folders.forEach(path -> sortedFolders.add(path));
+            folders.forEach(sortedFolders::add);
             Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
                                                                                       o2.getFileName().toString()));
+
 
             //each folder is supposedly a species
             for(Path folder : sortedFolders)
@@ -236,7 +243,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 else
                 {
                     if(Log.WARN)
-                        Log.warn(folder.getFileName() + " does not have a spatial.txt file and so cannot be distributed on the map. It will be ignored");
+                        Log.warn(folder.getFileName() + " does not have a spatial.txt file and so cannot be distributed on the map. " +
+                                         "It will be ignored");
                 }
 
             }
@@ -261,8 +269,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
             }
             else
-                sampledMap = new SampledMap(Paths.get("inputs", "california",
-                                                      "california.csv"),
+                sampledMap = new SampledMap(mainDirectory.resolve("california.csv"),
                                             gridWidth,
                                             spatialFiles);
 
@@ -270,6 +277,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             int gridHeight = sampledMap.getGridHeight();
             ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidth, gridHeight);
             Table<Integer,Integer,LinkedList<Double>> sampledAltitudeGrid = sampledMap.getAltitudeGrid();
+
             //so for altitude we just average them out
             for(int x=0;x<gridWidth;x++)
                 for(int y=0;y<gridHeight;y++)
@@ -323,6 +331,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                   new AStarPathfinder(distance));
             //for all species, find the total observations you get
 
+
             //this table contains for each x-y an array telling for each specie what is the average observation at x,y
             final Table<Integer,Integer,double[]> averagesTable = HashBasedTable.create(gridWidth,gridHeight);
             //go through the map
@@ -370,13 +379,25 @@ public class CaliforniaBathymetryScenario implements Scenario {
             initializer.processMap(biology, map, model.getRandom(), model);
 
 
+            //set yourself up to reset the biology at the given year if needed
+            if(resetBiologyAtYear>0)
+                model.scheduleOnceAtTheBeginningOfYear(new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+                        Log.info("Resetting all local biologies");
+                        for(Species current : biology.getSpecies()) {
+                            initializer.resetAllLocalBiologies(current,
+                                                               initializer.getInitialAbundance(current),
+                                                               initializer.getInitialWeights(current));
+
+                        }
+                    }
+                }, StepOrder.DAWN,resetBiologyAtYear);
+
             if(Log.TRACE)
                 Log.trace("height: " +map.getHeight());
 
-            //now put a port in there!
-            SeaTile location = map.getSeaTile(new Coordinate(697241.01, 3916987.12));
-            System.out.println(location.getGridX());
-            System.out.println(location.getGridY());
+
 
 
 
@@ -565,6 +586,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
                 allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
         }
+
 
 
         return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
@@ -1047,6 +1069,24 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     public void setPriceMap(String priceMap) {
         this.priceMap = priceMap;
+    }
+
+    /**
+     * Getter for property 'resetBiologyAtYear'.
+     *
+     * @return Value for property 'resetBiologyAtYear'.
+     */
+    public int getResetBiologyAtYear() {
+        return resetBiologyAtYear;
+    }
+
+    /**
+     * Setter for property 'resetBiologyAtYear'.
+     *
+     * @param resetBiologyAtYear Value to set for property 'resetBiologyAtYear'.
+     */
+    public void setResetBiologyAtYear(int resetBiologyAtYear) {
+        this.resetBiologyAtYear = resetBiologyAtYear;
     }
 }
 

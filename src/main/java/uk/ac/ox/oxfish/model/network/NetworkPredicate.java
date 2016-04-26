@@ -2,11 +2,13 @@ package uk.ac.ox.oxfish.model.network;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 
+import java.io.Serializable;
+
 /**
  * A true/false check on whether a connection is allowed
  * Created by carrknight on 2/12/16.
  */
-public interface NetworkPredicate {
+public interface NetworkPredicate extends Serializable {
 
 
     /**

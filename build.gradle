@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'application'
     id "us.kirchmeier.capsule" version "1.0.1"
+    id "jacoco"
 }
 
 

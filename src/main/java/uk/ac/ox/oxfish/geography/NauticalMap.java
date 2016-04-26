@@ -28,10 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -205,8 +202,19 @@ public class NauticalMap implements Startable
     public List<SeaTile> getAllSeaTilesAsList()
     {
 
-        return new LinkedList<>(rasterBackingGrid.elements());
+        if(allTiles == null) {
+            allTiles = new LinkedList<>(rasterBackingGrid.elements());
+            Collections.sort(allTiles, (o1, o2) -> {
+                int xComparison = Integer.compare(o1.getGridX(), o2.getGridX());
+                if(xComparison == 0)
+                    return Integer.compare(o1.getGridY(),o2.getGridY());
+                else
+                    return xComparison;
+            });
+        }
+        return allTiles;
     }
+    private List<SeaTile> allTiles = null;
 
     private List<SeaTile> waterSeaTiles = null;
 
@@ -214,7 +222,7 @@ public class NauticalMap implements Startable
     {
 
         if(waterSeaTiles == null) {
-            waterSeaTiles = getAllSeaTilesAsList();
+            waterSeaTiles = new LinkedList<>(getAllSeaTilesAsList());
             waterSeaTiles.removeIf(seaTile -> seaTile.getAltitude() >=0);
         }
         return waterSeaTiles;
@@ -243,6 +251,7 @@ public class NauticalMap implements Startable
      */
     public void recomputeTilesMPA() {
         waterSeaTiles = null;
+        allTiles = null;
         //todo this works but make a test to be sure
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
             for(int j=0; j<rasterBackingGrid.getHeight(); j++)
