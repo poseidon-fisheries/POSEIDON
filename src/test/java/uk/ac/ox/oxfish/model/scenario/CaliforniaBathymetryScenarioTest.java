@@ -3,13 +3,18 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.esotericsoftware.minlog.Log;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by carrknight on 3/17/16.
@@ -36,7 +41,7 @@ public class CaliforniaBathymetryScenarioTest {
 
         //different by at most 5%
         Log.info("From data we know that the shortspine biomass is " + target + ", after many transformations our" +
-                "model has " + totalShortspineBiomass + " in the model  ");
+                         "model has " + totalShortspineBiomass + " in the model  ");
         Log.info("They differ by " + 100*Math.abs(totalShortspineBiomass-target)/target + "% the maximum allowed is 5%");
         assertEquals(totalShortspineBiomass,target,target*.05);
 
@@ -58,5 +63,57 @@ public class CaliforniaBathymetryScenarioTest {
             Log.info("Distance " + i + " cells away from Morro Bay is " +
                              model.getMap().distance(morro,model.getMap().getSeaTile(29-i,104)));
         }
+    }
+
+
+    @Test
+    public void spinsUpCorrectly() throws Exception {
+
+
+        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        scenario.setResetBiologyAtYear(1);
+        FishState state = new FishState(System.currentTimeMillis());
+
+        state.setScenario(scenario);
+        state.start();
+        NauticalMap map = state.getMap();
+
+        Species sole = state.getBiology().getSpecie("Dover Sole");
+        final double initialBiomasses = map.getAllSeaTilesAsList().stream().mapToDouble(
+                value -> value.getBiomass(sole)).sum();
+
+
+        state.scheduleOnceInXDays(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                double biomass = map.getAllSeaTilesAsList().stream().mapToDouble(
+                        value -> value.getBiomass(sole)).sum();
+
+                assertNotEquals(initialBiomasses,
+                                biomass,
+                                .0001 * initialBiomasses
+                );
+
+            }
+        }, StepOrder.FISHER_PHASE, 364);
+
+
+        state.scheduleOnceInXDays(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                assertEquals(initialBiomasses,
+                             map.getAllSeaTilesAsList().stream().mapToDouble(
+                                     value -> value.getBiomass(sole)).sum(),
+                             .0001 * initialBiomasses
+                );
+
+            }
+        }, StepOrder.FISHER_PHASE, 365);
+
+
+        for (int i = 0; i < 366; i++)
+            state.schedule.step(state);
+
+
     }
 }

@@ -365,7 +365,8 @@ public class FishState  extends SimState{
         final Steppable container = new Steppable() {
             @Override
             public void step(SimState simState) {
-                if(((FishState) simState).getYear() == year) {
+                //the plus one is because when this is stepped it's the 365th day
+                if(((FishState) simState).getYear()+1 == year) {
                     steppable.step(simState);
                 }
 
@@ -519,4 +520,12 @@ public class FishState  extends SimState{
         return fishers.size();
     }
 
+    /**
+     * Getter for property 'started'.
+     *
+     * @return Value for property 'started'.
+     */
+    public boolean isStarted() {
+        return started;
+    }
 }

@@ -72,6 +72,7 @@ import java.util.*;
  */
 public class CaliforniaBathymetryScenario implements Scenario {
 
+    private final boolean mortalityAt100PercentForOldestFish = false;
     /**
      * how much should the model biomass/abundance be given the data we read in?
      */
@@ -130,7 +131,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
 
     /**
-     * if this number is positive non-zero then at the given year the biology/abundance will be reset to the original values
+     * if this number is positive  then at the given year the biology/abundance will be reset to the original values
      */
     private int resetBiologyAtYear = -1;
 
@@ -291,7 +292,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 }
             initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
                                                                   biomassScaling,
-                                                                  fixedRecruitmentDistribution);
+                                                                  fixedRecruitmentDistribution,
+                                                                  mortalityAt100PercentForOldestFish);
 
             biology = initializer.generateGlobal(model.getRandom(),
                                                  model);

@@ -140,7 +140,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Log.error("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
-        initializeNaturalProcesses(model, species, locals);
+        initializeNaturalProcesses(model, species, locals, false);
 
 
     }
@@ -151,10 +151,12 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      * @param model the model
      * @param species the species you need the natural processes set up
      * @param locals a map of all the areas where fish can live
+     * @param preserveLastAge
      * @return the already scheduled naturalProcesses object
      */
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
-            FishState model, Species species, HashMap<SeaTile, AbundanceBasedLocalBiology> locals) {
+            FishState model, Species species, HashMap<SeaTile, AbundanceBasedLocalBiology> locals,
+            final boolean preserveLastAge) {
         //schedule recruitment and natural mortality
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
@@ -164,8 +166,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                         species.isAddRelativeFecundityToSpawningBiomass(),
                         2
                 ),
-                species
-        );
+                species,
+                preserveLastAge);
         for(AbundanceBasedLocalBiology local : locals.values())
             processes.add(local);
         model.registerStartable(processes);

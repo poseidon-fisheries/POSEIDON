@@ -41,6 +41,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
 
     /**
+     * when this is true mortality rate of the oldest class is 100%
+     */
+    private final boolean preserveLastAge;
+
+
+    /**
      * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
      * on where there is more biomass
      */
@@ -48,10 +54,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
-            RecruitmentProcess recruitment, Species species) {
+            RecruitmentProcess recruitment, Species species,
+            boolean preserveLastAge) {
         this.species = species;
         this.mortalityProcess = mortalityProcess;
         this.recruitment = recruitment;
+        this.preserveLastAge = preserveLastAge;
     }
 
     private final LinkedList<AbundanceBasedLocalBiology> biologies = new LinkedList<>();
@@ -155,8 +163,18 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
                 int[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
                 int[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
+
+                int oldestMale = males[males.length-1];
+                int oldestFemale = females[females.length-1];
+
                 System.arraycopy(males,0,males,1,males.length-1);
                 System.arraycopy(females,0,females,1,females.length-1);
+                if(preserveLastAge)
+                {
+                    males[males.length - 1] += oldestMale;
+                    females[females.length - 1] += oldestFemale;
+
+                }
             }
         });
 

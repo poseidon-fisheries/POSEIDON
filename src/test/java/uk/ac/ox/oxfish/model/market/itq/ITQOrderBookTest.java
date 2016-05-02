@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
 import ec.util.MersenneTwisterFast;
+import org.jfree.util.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
@@ -209,6 +210,66 @@ public class ITQOrderBookTest {
         assertEquals(orderBook.getDailyQuotasExchanged(),200,.0001);
 
 
+
+
+    }
+
+    @Test
+    public void multiCrossing2(){
+
+        Log.info("If somebody places a bid, buys a bunch of quota and then is allowed to trade again in the " +
+                         "same turn, he shouldn't be able to sell within the same step");
+
+        ITQOrderBook orderBook = new ITQOrderBook(0, 0, (ask, bids,ignored1,ignore2d) -> ask, 7);
+        FishState state = mock(FishState.class); when(state.getYear()).thenReturn(0);
+        when(state.getRandom()).thenReturn(new MersenneTwisterFast());
+        orderBook.start(state);
+        orderBook.setMarkup(.1);
+        orderBook.setUnitsTradedPerMatch(100);
+        orderBook.setAllowMultipleTradesPerFisher(true);
+
+        //first guy values quota 100 at first, but only 1 the second time!
+        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(500, state);
+        Fisher buyer = mock(Fisher.class);
+        when(buyer.getRegulation()).thenReturn(buyerReg);
+        MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
+        when(buyerGenerator.computeLambda()).thenReturn(100d,1d);
+        orderBook.registerTrader(buyer,buyerGenerator);
+
+        //the second guy values quota 10: he will buy for 9 and sell for 11
+        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(500, state);
+        Fisher seller = mock(Fisher.class);
+        when(seller.getRegulation()).thenReturn(sellerReg);
+        MonoQuotaPriceGenerator sellerGenerator = mock(MonoQuotaPriceGenerator.class);
+        when(sellerGenerator.computeLambda()).thenReturn(10d);
+        orderBook.registerTrader(seller, sellerGenerator);
+
+        orderBook.step(state);
+        //they should have traded only once!
+        assertEquals(buyerReg.getQuotaRemaining(0), 600,.0001);
+        assertEquals(sellerReg.getQuotaRemaining(0),400,.0001);
+        assertEquals(orderBook.getDailyMatches(),1,.0001);
+        assertEquals(orderBook.getDailyAveragePrice(), 11, .0001);
+        assertEquals(orderBook.getDailyQuotasExchanged(),100,.0001);
+        //should have asked about the buyer twice though
+        verify(buyerGenerator,times(2)).computeLambda();
+        //they should have traded  (assuming they use seller quote)
+        verify(buyer).spendExogenously( 11 * 100);
+        verify(seller).earn( 11 * 100);
+
+        assertTrue(orderBook.inPenaltyBox(buyer));
+        assertTrue(!orderBook.inPenaltyBox(seller));
+
+        //even if I step it now there isn't any trade occurring because the penalty box is there
+        sellerReg.step(state); assertEquals(sellerReg.getQuotaRemaining(0),500,.0001);
+        buyerReg.step(state); assertEquals(buyerReg.getQuotaRemaining(0),500,.0001);
+        //reverse the prices so that buyer would like to sell now
+        when(buyerGenerator.computeLambda()).thenReturn(10d);
+        when(sellerGenerator.computeLambda()).thenReturn(10d);
+        orderBook.step(state);
+        //they shouldn't have traded
+        assertEquals(buyerReg.getQuotaRemaining(0), 500,.0001);
+        assertEquals(sellerReg.getQuotaRemaining(0),500,.0001);
 
 
     }

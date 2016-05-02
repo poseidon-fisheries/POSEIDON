@@ -89,7 +89,6 @@ public class SerializeTest {
                          "They should have the same results");
 
 
-        Log.set(Log.LEVEL_TRACE);
         long seed = System.currentTimeMillis();
         FishState state = new FishState(seed);
         FishState state2 = new FishState(seed);

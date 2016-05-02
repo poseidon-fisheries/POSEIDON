@@ -41,13 +41,15 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
      * current one
      */
     private final boolean fixedRecruitmentDistribution;
+    private final boolean preserveLastAge;
 
     public MultipleSpeciesAbundanceInitializer(
             LinkedHashMap<String, Path> biologicalDirectories, double scaling,
-            boolean fixedRecruitmentDistribution) {
+            boolean fixedRecruitmentDistribution, final boolean preserveLastAge) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
+        this.preserveLastAge = preserveLastAge;
     }
 
     /**
@@ -167,7 +169,7 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                        model, species, locals);
+                        model, species, locals, preserveLastAge);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution)
                     process.setFixedRecruitmentWeight(currentWeightMap);

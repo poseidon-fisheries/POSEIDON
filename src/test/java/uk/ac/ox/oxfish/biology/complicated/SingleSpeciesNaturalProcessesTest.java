@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -51,8 +52,8 @@ public class SingleSpeciesNaturalProcessesTest {
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 culler,
                 recruiter,
-                fakeSpecies
-        );
+                fakeSpecies,
+                false);
 
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
@@ -110,8 +111,8 @@ public class SingleSpeciesNaturalProcessesTest {
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 culler,
                 recruiter,
-                fakeSpecies
-        );
+                fakeSpecies,
+                false);
 
         HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
@@ -144,6 +145,73 @@ public class SingleSpeciesNaturalProcessesTest {
         assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1]);
         assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[1]);
 
+
+
+    }
+
+
+    @Test
+    public void lastClassMortality() throws Exception {
+
+        Log.info("if you set preserve old age to false, the last class has mortality of 100%");
+        RecruitmentProcess recruitment = mock(RecruitmentProcess.class);
+        when(recruitment.recruit(any(),any(),any(),any())).thenReturn(1000); //always create a 1000 new fish
+
+        //grab a fake species
+        Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
+        SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(
+                testInput, "fake", 2.0);
+        GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
+        Species species = biology.getSpecie(0);
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
+                new NaturalMortalityProcess(),
+                recruitment,
+                species,
+                false
+        );
+
+
+        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
+        //there are 500 male/female in each category oldest and 0  for second oldest
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        processes.add(local);
+
+        //when false the oldest all die
+        FishState model = mock(FishState.class);
+        when(model.getSpecies()).thenReturn(Collections.singletonList(species));
+        processes.step(model);
+        assertEquals(0,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);
+        assertEquals(0,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]);
+
+
+        //but when I set it to true, they don't all die
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        processes = new SingleSpeciesNaturalProcesses(
+                new NaturalMortalityProcess(),
+                recruitment,
+                species,
+                true
+        );
+        processes.add(local);
+        processes.step(model);
+        assertEquals(447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);
+        assertEquals(447,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]);
+
+
+        //in fact they mingle with the new oldest fish
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
+        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=500;
+        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=500;
+        processes.step(model);
+        assertEquals(447+447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);
+        assertEquals(447+447,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]);
 
 
     }

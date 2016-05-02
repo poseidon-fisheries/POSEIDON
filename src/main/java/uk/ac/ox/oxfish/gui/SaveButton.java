@@ -59,10 +59,10 @@ public class SaveButton extends JButton implements ActionListener{
             File file = chooser.getSelectedFile();
             String currentExtension = FishStateUtilities.getFilenameExtension(file);
             //if the extension is not correct
-            if(!(currentExtension.equalsIgnoreCase("xml")  ))
+            if(!(currentExtension.equalsIgnoreCase("checkpoint")  ))
             {
                 //force it!
-                file = new File(file.toString() + ".xml");
+                file = new File(file.toString() + ".checkpoint");
             }
 
             //log that you are about to write

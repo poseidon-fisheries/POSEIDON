@@ -129,7 +129,7 @@ public class FishStateTest {
             public void step(SimState simState) {
                 stepCounter[1]++;
             }
-        },StepOrder.DAWN,0);
+        },StepOrder.DAWN,1);
 
         for(int day=0;day<350; day++)
         {
