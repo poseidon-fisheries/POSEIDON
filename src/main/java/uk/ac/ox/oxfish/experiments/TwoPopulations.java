@@ -176,7 +176,7 @@ public class TwoPopulations {
         buttonBox.add(filer);
 
 
-        Log.set(Log.LEVEL_TRACE);
+        Log.set(Log.LEVEL_INFO);
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();
         scenarioSelection.setVisible(true);

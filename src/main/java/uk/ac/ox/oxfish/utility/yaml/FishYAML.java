@@ -21,7 +21,6 @@ public class FishYAML extends Yaml{
 
         super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
 
-
     }
 
     private static DumperOptions dumperOptions() {

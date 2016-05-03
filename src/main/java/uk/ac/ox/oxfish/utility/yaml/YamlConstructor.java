@@ -6,6 +6,7 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import uk.ac.ox.oxfish.model.scenario.PolicyScript;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -14,6 +15,7 @@ import uk.ac.ox.oxfish.utility.parameters.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Constructor useful to implement YAML objects back into the Fishstate. I modify it so that it does the following things:
@@ -91,7 +93,8 @@ public class YamlConstructor extends  Constructor {
                         //this either means it's badly written somehow or more likely it's written in a "prettyfied" style
 
                         //grab first element, ought to be the name of the scenario
-                        final  Scenario scenario = Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+                        final  Scenario scenario =
+                                Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly
@@ -106,6 +109,31 @@ public class YamlConstructor extends  Constructor {
                     }
                 }
 
+                //again for policy scripts
+                if(PolicyScript.class.isAssignableFrom(node.getType()) ||
+                        Objects.equals(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue(),
+                                       "PolicyScript"))
+                {
+                    try{
+                        //might have been written correctly as it is!
+                        return super.construct(node);
+                    }
+                    catch (YAMLException e)
+                    {
+
+                        //now we can deal with filling it through beans
+                        //first allocate subnodes correctly
+                        ((MappingNode) node).setValue(
+                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        //set type correctly
+                        node.setType(PolicyScript.class);
+                        PolicyScript script = new PolicyScript();
+                        constructJavaBean2ndStep((MappingNode) node, script);
+                        return script;
+
+
+                    }
+                }
 
                 else
                     return super.construct(node);

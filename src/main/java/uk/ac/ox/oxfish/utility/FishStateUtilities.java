@@ -510,9 +510,10 @@ public class FishStateUtilities {
             SeaTile where, double hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
         //catch
-        double specieCatch = FishStateUtilities.round(where.getBiomass(species) *
+        double specieCatch = Math.min(FishStateUtilities.round(where.getBiomass(species) *
                                                               q *
-                                                              hoursSpentFishing);
+                                                              hoursSpentFishing),
+                where.getBiomass(species));
         //tell biomass
         if(specieCatch> 0)
             where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);

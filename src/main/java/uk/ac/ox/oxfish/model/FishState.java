@@ -506,6 +506,25 @@ public class FishState  extends SimState{
         return newborn;
     }
 
+
+    /**
+     * Getter for property 'fisherFactory'.
+     *
+     * @return Value for property 'fisherFactory'.
+     */
+    public FisherFactory getFisherFactory() {
+        return fisherFactory;
+    }
+
+    /**
+     * Setter for property 'fisherFactory'.
+     *
+     * @param fisherFactory Value to set for property 'fisherFactory'.
+     */
+    public void setFisherFactory(FisherFactory fisherFactory) {
+        this.fisherFactory = fisherFactory;
+    }
+
     public void killRandomFisher()
     {
         Preconditions.checkState(fishers.size()>0, "There are no more fishers left to kill");

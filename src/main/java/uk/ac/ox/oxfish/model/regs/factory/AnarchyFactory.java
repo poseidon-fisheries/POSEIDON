@@ -20,4 +20,13 @@ public class AnarchyFactory implements AlgorithmFactory<Anarchy>
     public Anarchy apply(FishState state) {
         return singleton;
     }
+
+    /**
+     * Getter for property 'singleton'.
+     *
+     * @return Value for property 'singleton'.
+     */
+    public static Anarchy getSingleton() {
+        return singleton;
+    }
 }

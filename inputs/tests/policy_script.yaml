@@ -1,0 +1,12 @@
+1:
+  PolicyScript:
+    gear:
+      Fixed Proportion:
+        catchabilityPerHour: '0.0'
+2:
+  PolicyScript:
+    changeInNumberOfFishers: 10
+    regulation: Anarchy
+    gear:
+          Fixed Proportion:
+            catchabilityPerHour: '0.5'

@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
+import uk.ac.ox.oxfish.model.scenario.PolicyScript;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -81,7 +82,7 @@ public class YamlRepresenter extends Representer
                     representData(path.toString());
         };
         this.multiRepresenters.put(Path.class,
-                              pathRepresenter);
+                                   pathRepresenter);
 
 
 
@@ -124,53 +125,87 @@ public class YamlRepresenter extends Representer
             });
         }
 
+        //do it for the policy script too
+        //this is easier in the sense that you don't need factories and the like
+        //just plain PolicyScript
 
-            //get all the scenarios
-            final List<Scenario> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
-            //for each scenario create a representer that shows it as a map
-            for(Scenario s : scenarios) {
-                this.addClassTag(s.getClass(), Tag.MAP);
+        this.addClassTag(PolicyScript.class,Tag.MAP);
+        this.representers.put(PolicyScript.class,
+                              data -> {
+                                  try {
+                                      Node node;
+                                      //prepare the node
+                                      final Set<Property> properties;
+                                      properties = getProperties(PolicyScript.class);
+                                      if (properties.size() == 0)
+                                          node = outer.representData(data);
+                                      else {
+                                          List<NodeTuple> value = new ArrayList<>(
+                                                  properties.size());
+                                          Tag tag = Tag.MAP;
+                                          node = new MappingNode(tag, value, false);
 
-                this.representers.put(s.getClass(),
-                                      new Represent() {
-                                          @Override
-                                          public Node representData(Object data) {
-                                              try {
-                                                  Node node;
+                                          value.add(new NodeTuple(
+                                                  outer.representData("PolicyScript"),
+                                                  representJavaBean(properties, data)));
+                                      }
+                                      node.setType(PolicyScript.class);
+                                      return node;
+                                  } catch (IntrospectionException e)
+                                  {
+                                      throw  new YAMLException(e);
+                                  }});
 
 
-                                                  //prepare the node
-                                                  final Set<Property> properties;
+        //get all the scenarios
+        final List<Scenario> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
+        //for each scenario create a representer that shows it as a map
+        for(Scenario s : scenarios) {
+            this.addClassTag(s.getClass(), Tag.MAP);
 
-                                                  properties = getProperties(s.getClass());
+            this.representers.put(s.getClass(),
+                                  new Represent()
+                                  {
+                                      @Override
+                                      public Node representData(Object data) {
+                                          try {
+                                              Node node;
 
 
-                                                  //if you have no properties don't bother making a map, just return your full name
-                                                  if (properties.size() == 0)
-                                                      //just return your name in the constructor master-list as a string
-                                                      node = outer.representData(data);
-                                                  else {
-                                                      //otherwise print as map
-                                                      //first prepare the "value" which is just a node map representing our properties
-                                                      List<NodeTuple> value = new ArrayList<>(
-                                                              properties.size());
-                                                      //tag yourself as MAP, which means there will be no visible tag but just "name":
-                                                      Tag tag = Tag.MAP;
-                                                      //create the holding node
-                                                      node = new MappingNode(tag, value, false);
-                                                      //here's the trick: this mapping contains a single node which is just the name of this factory
-                                                      //in the constructor master list and then all the java-bean magic is a submap.
-                                                      value.add(new NodeTuple(
-                                                              outer.representData(Scenarios.SCENARIOS.inverse().get(s)),
-                                                              representJavaBean(properties, data)));
-                                                  }
-                                                  return node;
-                                              } catch (IntrospectionException e)
-                                              {
-                                                  throw  new YAMLException(e);
-                                              }}});
+                                              //prepare the node
+                                              final Set<Property> properties;
 
-            }
+                                              properties = getProperties(s.getClass());
+
+
+                                              //if you have no properties don't bother making a map, just return your full name
+                                              if (properties.size() == 0)
+                                                  //just return your name in the constructor master-list as a string
+                                                  node = outer.representData(data);
+                                              else {
+                                                  //otherwise print as map
+                                                  //first prepare the "value" which is just a node map representing our properties
+                                                  List<NodeTuple> value = new ArrayList<>(
+                                                          properties.size());
+                                                  //tag yourself as MAP, which means there will be no visible tag but just "name":
+                                                  Tag tag = Tag.MAP;
+                                                  //create the holding node
+                                                  node = new MappingNode(tag, value, false);
+                                                  //here's the trick: this mapping contains a single node which is just the name of this factory
+                                                  //in the constructor master list and then all the java-bean magic is a submap.
+                                                  value.add(new NodeTuple(
+                                                          outer.representData(Scenarios.SCENARIOS.inverse().get(s)),
+                                                          representJavaBean(properties, data)));
+                                              }
+                                              return node;
+                                          } catch (IntrospectionException e)
+                                          {
+                                              throw  new YAMLException(e);
+                                          }}
+                                  }
+            );
+
+        }
 
 
     }

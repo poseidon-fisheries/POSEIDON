@@ -49,7 +49,10 @@ public class ModelResults extends HashMap<String,Object>
 
                 DoubleSummaryStatistics stats = new DoubleSummaryStatistics();
                 for(Fisher fisher : state.getFishers())
-                    stats.accept(fisher.getYearlyData().getColumn(column.getName()).get(year));
+                    if(fisher.getYearlyData().numberOfObservations()>year)
+                        stats.accept(fisher.getYearlyData().getColumn(column.getName()).get(year));
+                    else
+                        stats.accept(Double.NaN);
                 HashMap<String,Object> yearData = new HashMap<>();
                 columnData.put(Integer.toString(year),yearData);
                 yearData.put("Average",stats.getAverage());

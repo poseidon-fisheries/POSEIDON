@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
@@ -39,6 +40,7 @@ public class BetterThanAverageEroteticDestinationFactoryTest
             final boolean adaptive) {
 
 
+        Log.set(Log.LEVEL_INFO);
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new IndependentLogisticFactory()); //skip migration which should make this faster.
         scenario.setFishers(300);

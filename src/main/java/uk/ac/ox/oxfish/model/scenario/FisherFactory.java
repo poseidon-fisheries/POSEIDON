@@ -24,23 +24,27 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
 
     private int nextID;
 
-    private final Supplier<Port> portSupplier;
+    private Supplier<Port> portSupplier;
 
-    private final AlgorithmFactory<? extends Regulation> regulations;
+    private AlgorithmFactory<? extends Regulation> regulations;
 
-    private final AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
 
-    private final AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
 
-    private final AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
 
-    private final AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
 
-    private final Supplier<Boat> boatSupplier;
+    private Supplier<Boat> boatSupplier;
 
-    private final Supplier<Hold> holdSupplier;
+    private Supplier<Hold> holdSupplier;
 
-    private final AlgorithmFactory<? extends Gear> gear;
+    private AlgorithmFactory<? extends Gear> gear;
+
+
+    private FisherFactory() {
+    }
 
     public FisherFactory(
             Supplier<Port> portSupplier,
@@ -91,4 +95,152 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
     }
 
 
+    /**
+     * Getter for property 'regulations'.
+     *
+     * @return Value for property 'regulations'.
+     */
+    public AlgorithmFactory<? extends Regulation> getRegulations() {
+        return regulations;
+    }
+
+    /**
+     * Setter for property 'regulations'.
+     *
+     * @param regulations Value to set for property 'regulations'.
+     */
+    public void setRegulations(
+            AlgorithmFactory<? extends Regulation> regulations) {
+        this.regulations = regulations;
+    }
+
+    /**
+     * Getter for property 'departingStrategy'.
+     *
+     * @return Value for property 'departingStrategy'.
+     */
+    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
+        return departingStrategy;
+    }
+
+    /**
+     * Setter for property 'departingStrategy'.
+     *
+     * @param departingStrategy Value to set for property 'departingStrategy'.
+     */
+    public void setDepartingStrategy(
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        this.departingStrategy = departingStrategy;
+    }
+
+    /**
+     * Getter for property 'destinationStrategy'.
+     *
+     * @return Value for property 'destinationStrategy'.
+     */
+    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
+        return destinationStrategy;
+    }
+
+    /**
+     * Setter for property 'destinationStrategy'.
+     *
+     * @param destinationStrategy Value to set for property 'destinationStrategy'.
+     */
+    public void setDestinationStrategy(
+            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        this.destinationStrategy = destinationStrategy;
+    }
+
+    /**
+     * Getter for property 'fishingStrategy'.
+     *
+     * @return Value for property 'fishingStrategy'.
+     */
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
+        return fishingStrategy;
+    }
+
+    /**
+     * Setter for property 'fishingStrategy'.
+     *
+     * @param fishingStrategy Value to set for property 'fishingStrategy'.
+     */
+    public void setFishingStrategy(
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        this.fishingStrategy = fishingStrategy;
+    }
+
+    /**
+     * Getter for property 'weatherStrategy'.
+     *
+     * @return Value for property 'weatherStrategy'.
+     */
+    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
+        return weatherStrategy;
+    }
+
+    /**
+     * Setter for property 'weatherStrategy'.
+     *
+     * @param weatherStrategy Value to set for property 'weatherStrategy'.
+     */
+    public void setWeatherStrategy(
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        this.weatherStrategy = weatherStrategy;
+    }
+
+    /**
+     * Getter for property 'boatSupplier'.
+     *
+     * @return Value for property 'boatSupplier'.
+     */
+    public Supplier<Boat> getBoatSupplier() {
+        return boatSupplier;
+    }
+
+    /**
+     * Setter for property 'boatSupplier'.
+     *
+     * @param boatSupplier Value to set for property 'boatSupplier'.
+     */
+    public void setBoatSupplier(Supplier<Boat> boatSupplier) {
+        this.boatSupplier = boatSupplier;
+    }
+
+    /**
+     * Getter for property 'holdSupplier'.
+     *
+     * @return Value for property 'holdSupplier'.
+     */
+    public Supplier<Hold> getHoldSupplier() {
+        return holdSupplier;
+    }
+
+    /**
+     * Setter for property 'holdSupplier'.
+     *
+     * @param holdSupplier Value to set for property 'holdSupplier'.
+     */
+    public void setHoldSupplier(Supplier<Hold> holdSupplier) {
+        this.holdSupplier = holdSupplier;
+    }
+
+    /**
+     * Getter for property 'gear'.
+     *
+     * @return Value for property 'gear'.
+     */
+    public AlgorithmFactory<? extends Gear> getGear() {
+        return gear;
+    }
+
+    /**
+     * Setter for property 'gear'.
+     *
+     * @param gear Value to set for property 'gear'.
+     */
+    public void setGear(AlgorithmFactory<? extends Gear> gear) {
+        this.gear = gear;
+    }
 }

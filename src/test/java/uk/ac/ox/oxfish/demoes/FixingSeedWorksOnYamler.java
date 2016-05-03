@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.YamlMain;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 3/16/16.
@@ -40,6 +42,29 @@ public class FixingSeedWorksOnYamler {
         if(filesInOutputFolder == null || filesInOutputFolder.length==0)
             Paths.get("output").toFile().delete();
 
+
+    }
+
+    @Test
+    public void policyScriptWorksAsGodIntended() throws Exception {
+        Path inputPath = Paths.get("inputs", "tests", "replicate.yaml");
+        Path policyPath = Paths.get("inputs", "tests", "policy_script.yaml");
+        YamlMain.main(new String[]{inputPath.toString(),"--years","3","--policy",policyPath.toString(),"--save"});
+
+        //run the model, save it and then read it back so that we test checkpointing too.
+        FishState state = FishStateUtilities.readModelFromFile(
+                Paths.get("output", "replicate", "replicate.checkpoint").toFile());
+
+        assertEquals(state.getFishers().size(),15);
+        //should there be no fishing on year 1, however some people might return to port from previous day fishing
+        //so that while gear effectivness is 0, landings is some small hundreds
+        assertTrue(state.getYearlyDataSet().getColumn("Species 0 Landings").get(1)<
+                           state.getYearlyDataSet().getColumn("Species 0 Landings").get(0)*.1);
+        assertTrue(state.getYearlyDataSet().getColumn("Species 0 Landings").get(1)<
+                           state.getYearlyDataSet().getColumn("Species 0 Landings").get(2)*.1);
+        assertTrue(state.getYearlyDataSet().getColumn("Species 0 Landings").get(2)>1000d);
+
+        FishStateUtilities.deleteRecursively(Paths.get("output","replicate").toFile());
 
     }
 }
