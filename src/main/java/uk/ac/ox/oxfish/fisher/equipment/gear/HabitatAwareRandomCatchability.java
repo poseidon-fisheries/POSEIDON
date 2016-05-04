@@ -46,7 +46,7 @@ public class HabitatAwareRandomCatchability implements Gear {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         List<Species> species = modelBiology.getSpecies();
         double[] totalCatch = new double[modelBiology.getSize()];
         for(Species specie : species)

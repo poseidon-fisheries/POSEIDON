@@ -15,7 +15,7 @@ public interface Gear {
     Catch fish(
             Fisher fisher,
             SeaTile where,
-            double hoursSpentFishing,
+            int hoursSpentFishing,
             GlobalBiology modelBiology);
 
     /**

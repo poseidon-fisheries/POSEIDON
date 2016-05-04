@@ -19,7 +19,7 @@ public class Fishing implements Action
      */
     private final double accruedHours;
     //todo make this gear specific
-    public static final double MINIMUM_HOURS_TO_PRODUCE_A_CATCH = 1;
+    public static final int MINIMUM_HOURS_TO_PRODUCE_A_CATCH = 1;
 
     public Fishing() {
         accruedHours=-1;

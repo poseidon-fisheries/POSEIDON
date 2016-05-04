@@ -44,7 +44,10 @@ Kitchen Sink:
   seasonLength: '200.0'
   yearlyQuotaMaps: 0:5000
 -------
-Multi-Quotas from File:
+Multi-Quotas from Map:
+  initialQuotas: {
+    }
   itq: true
-  pathToFile: inputs/california/2015_quotas.csv
+  multipleTradesAllowed: false
+  quotaExchangedPerMatch: 100
 -------

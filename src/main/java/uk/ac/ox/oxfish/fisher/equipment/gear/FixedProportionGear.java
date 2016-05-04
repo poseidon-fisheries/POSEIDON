@@ -28,7 +28,7 @@ public class FixedProportionGear implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
 
         double[] caught = new double[modelBiology.getSize()];
         for (Species species : modelBiology.getSpecies())

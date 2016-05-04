@@ -23,7 +23,6 @@ public class PathWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             String elementName, Map<String, String> attributes, SwingMetawidget metawidget)
     {
         final Class<?> actualClass = WidgetBuilderUtils.getActualClassOrType(attributes, String.class);
-        //if it is a primitive or not a MarketMap we have no use for it
         if(actualClass == null || !Path.class.isAssignableFrom(actualClass))
             return null;
 

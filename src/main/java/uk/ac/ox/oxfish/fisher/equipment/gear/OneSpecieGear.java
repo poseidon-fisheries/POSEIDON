@@ -33,11 +33,11 @@ public class OneSpecieGear implements Gear {
      * @param fisher the fisher
      * @param where where the fisher is fishing
      * @param hoursSpentFishing
-     *@param modelBiology the biology (list of available species)  @return the catch
+     * @param modelBiology the biology (list of available species)  @return the catch
      */
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         double caught = 0;
         if(proportionCaught>0) {
             FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,

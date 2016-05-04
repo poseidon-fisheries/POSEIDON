@@ -39,9 +39,18 @@ California Map Scenario:
   priceMap: Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587
   recruitmentNoise: '0.0'
   regulation:
-    Multi-Quotas from File:
+    Multi-Quotas from Map:
+      initialQuotas:
+        Dover sole: 2.2231E7
+        Shortspine thornyhead: 1196999.874
+        Sablefish: 2494999.8
+        Yelloweye rockfish: 1000.0
+        Longspine Thornyhead: 1811399.811
+        Canary rockfish: 41100.0
       itq: true
-      pathToFile: inputs/california/2015_quotas.csv
+      multipleTradesAllowed: false
+      quotaExchangedPerMatch: 100
+  resetBiologyAtYear: -1
   retentionAsymptote: '0.992661'
   retentionInflection: '21.8035'
   retentionSlope: '1.7773'

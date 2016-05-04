@@ -79,7 +79,8 @@ public class MetaInspector extends Inspector
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
                                     new SwingWidgetBuilder(),
-                                    new PathWidgetBuilder()
+                                    new PathWidgetBuilder(),
+                                    new HashMapWidgetBuilder()
                             )
             );
             widget.setWidgetBuilder(composite);
@@ -91,7 +92,8 @@ public class MetaInspector extends Inspector
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
                                     new SwingWidgetBuilder(),
-                                    new PathWidgetBuilder()
+                                    new PathWidgetBuilder(),
+                                    new HashMapWidgetBuilder()
                             )
             );
             widget.setWidgetBuilder(composite);

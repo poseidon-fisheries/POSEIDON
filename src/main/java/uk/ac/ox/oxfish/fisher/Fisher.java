@@ -655,7 +655,7 @@ public class Fisher implements Steppable, Startable{
      * @param state the model
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Catch fishHere(GlobalBiology modelBiology, double hoursSpentFishing, FishState state)
+    public Catch fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state)
     {
         Preconditions.checkState(status.getLocation().getAltitude() < 0, "can't fish on land!");
 

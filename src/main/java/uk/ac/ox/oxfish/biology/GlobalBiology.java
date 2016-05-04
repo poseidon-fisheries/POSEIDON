@@ -65,7 +65,7 @@ public class GlobalBiology
     public Species getSpecie(String name)
     {
         return unmodifiableView.stream().
-                filter(s -> s.getName().equals(name)).
+                filter(s -> s.getName().trim().equalsIgnoreCase(name.trim())).
                 findFirst().get();
     }
 

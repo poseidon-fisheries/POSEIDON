@@ -51,8 +51,9 @@ import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaFileFactory;
+import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
@@ -157,7 +158,14 @@ public class CaliforniaBathymetryScenario implements Scenario {
             new IgnoreWeatherFactory();
 
     private AlgorithmFactory<? extends Regulation> regulation =
-            new MultiQuotaFileFactory();
+            new MultiQuotaMapFactory(true,
+                                     new Pair<>("Yelloweye rockfish",1000d),
+                                     new Pair<>("Canary rockfish",41100d),
+                                     new Pair<>("Dover sole",22231000d),
+                                     new Pair<>("Longspine Thornyhead",1811399.811),
+                                     new Pair<>("Sablefish",2494999.8),
+                                     new Pair<>("Shortspine thornyhead",1196999.874)
+                                     );
 
 
     /**

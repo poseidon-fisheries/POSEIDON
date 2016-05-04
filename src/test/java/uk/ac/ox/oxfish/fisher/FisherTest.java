@@ -22,7 +22,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,7 @@ public class FisherTest {
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(species, 1, biology));
+        when(gear.fish(any(), any(), anyInt(), any())).thenReturn(new Catch(species, 1, biology));
         //9 liters each time you fish
         when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(9d);
         Fisher fisher = new Fisher(0, port,
@@ -130,7 +130,7 @@ public class FisherTest {
 
         Gear gear = mock(Gear.class);
         //catch 1 pound of fish a day
-        when(gear.fish(any(), any(), anyDouble(), any())).thenReturn(new Catch(species, 1, biology));
+        when(gear.fish(any(), any(), anyInt(), any())).thenReturn(new Catch(species, 1, biology));
         //10 liters each time you fish
         when(gear.getFuelConsumptionPerHourOfFishing(any(),any(),any())).thenReturn(10d);
         Fisher fisher = new Fisher(0, port,

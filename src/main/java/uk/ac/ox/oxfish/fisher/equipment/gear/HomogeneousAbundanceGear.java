@@ -44,17 +44,15 @@ public class HomogeneousAbundanceGear implements Gear {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, double hoursSpentFishing, GlobalBiology modelBiology)
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
     {
-        //round it for justice
-        hoursSpentFishing = FishStateUtilities.round(hoursSpentFishing);
 
         //create array containing biomass
         double[] biomassCaught = new  double[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
             //you are going to fish every hour until you are done
-            double hoursSpentFishingThisSpecies = hoursSpentFishing;
+            int hoursSpentFishingThisSpecies = hoursSpentFishing;
             while (hoursSpentFishingThisSpecies>0)
             {
                 int[][] fish = new int[2][];
@@ -88,7 +86,7 @@ public class HomogeneousAbundanceGear implements Gear {
                                                              fish[FishStateUtilities.FEMALE]);
 
                 //you've spent one hour (or less fishing)
-                hoursSpentFishingThisSpecies = FishStateUtilities.round(hoursSpentFishingThisSpecies-1);
+                hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
             }
         }
         return new Catch(biomassCaught);

@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -244,57 +245,6 @@ public class FishStateUtilities {
     }
 
 
-    /*
-     //if you have no friends, keep doing what you currently are doing
-        if(friends.isEmpty())
-            return current;
-
-        //associate a fitness to each friend and compute the maxFitness
-        final double[] maxFitness = {fitness};
-        Set<Map.Entry<Fisher, Double>> friendsFitnesses = friends.stream().
-                //ignore friends who we can't imitate
-                        filter(fisher -> sensor.scan(fisher) != null).
-                        collect(
-                                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
-                                    @Override
-                                    public Double apply(Fisher fisher) {
-                                        //get your friend fitness
-                                        double friendFitness = objectiveFunction.computeCurrentFitness(fisher);
-                                        //if it is finite check if it is better than what we already have
-                                        if(Double.isFinite(friendFitness))
-                                            maxFitness[0] = Math.max(maxFitness[0], friendFitness);
-                                        //return it
-                                        return friendFitness;
-                                    }
-                                })).entrySet();
-
-        //make sure it's finite and at least as good as our current fitness
-        assert Double.isFinite(maxFitness[0]);
-        assert maxFitness[0] >= fitness;
-
-        //if you are doing better than your friends, keep doing what you are doing
-        if(Math.abs(maxFitness[0] -fitness)<EPSILON)
-            return current;
-
-        //prepare to store the possible imitation options
-        List<T> bestOptions = new LinkedList<>();
-        //take all your friends
-        friendsFitnesses.stream().
-                //choose only the ones with the highest fitness
-                filter(fisherDoubleEntry -> Math.abs(maxFitness[0] - fisherDoubleEntry.getValue()) < EPSILON).
-                // sort them by id (we need to kill the hashing randomization which we can't control)
-                        sorted((o1, o2) -> Integer.compare(o1.getKey().getID(), o2.getKey().getID())).
-                //now put in the best option list by scanning
-                        forEachOrdered(fisherDoubleEntry -> bestOptions.add(sensor.scan(fisherDoubleEntry.getKey())));
-
-
-
-        //return a random best option
-        return bestOptions.size() == 1  ?
-                bestOptions.get(0) :
-                bestOptions.get(random.nextInt(bestOptions.size()));
-
-     */
 
     /**
      * stolen from here:
@@ -507,8 +457,9 @@ public class FishStateUtilities {
     }
 
     public static double catchSpecieGivenCatchability(
-            SeaTile where, double hoursSpentFishing, Species species, double q) {
+            SeaTile where, int hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
+        Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch
         double specieCatch = Math.min(FishStateUtilities.round(where.getBiomass(species) *
                                                               q *

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.demoes;
 
+import org.junit.After;
 import org.junit.Test;
 import uk.ac.ox.oxfish.YamlMain;
 import uk.ac.ox.oxfish.model.FishState;
@@ -38,9 +39,7 @@ public class FixingSeedWorksOnYamler {
 
         FishStateUtilities.deleteRecursively(Paths.get("output","replicate").toFile());
         FishStateUtilities.deleteRecursively(Paths.get("output","replicate2").toFile());
-        File[] filesInOutputFolder = Paths.get("output").toFile().listFiles();
-        if(filesInOutputFolder == null || filesInOutputFolder.length==0)
-            Paths.get("output").toFile().delete();
+
 
 
     }
@@ -66,5 +65,13 @@ public class FixingSeedWorksOnYamler {
 
         FishStateUtilities.deleteRecursively(Paths.get("output","replicate").toFile());
 
+    }
+
+    @After
+    public void tearDown() throws Exception {
+
+        File[] filesInOutputFolder = Paths.get("output").toFile().listFiles();
+        if(filesInOutputFolder == null || filesInOutputFolder.length==0)
+            Paths.get("output").toFile().delete();
     }
 }

@@ -64,11 +64,12 @@ public class Regulations
         CONSTRUCTORS.put("Multi-TAC by List", MultiTACStringFactory::new);
         NAMES.put(MultiTACStringFactory.class,"Multi-TAC by List");
 
+
         CONSTRUCTORS.put("Kitchen Sink", KitchenSinkFactory::new);
         NAMES.put(KitchenSinkFactory.class,"Kitchen Sink");
 
-        CONSTRUCTORS.put("Multi-Quotas from File", MultiQuotaFileFactory::new);
-        NAMES.put(MultiQuotaFileFactory.class,"Multi-Quotas from File");
+        CONSTRUCTORS.put("Multi-Quotas from Map", MultiQuotaMapFactory::new);
+        NAMES.put(MultiQuotaMapFactory.class, "Multi-Quotas from Map");
 
 
 
