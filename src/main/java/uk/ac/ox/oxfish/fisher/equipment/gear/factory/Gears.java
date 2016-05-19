@@ -56,6 +56,18 @@ public class Gears {
                          ThresholdGearFactory::new);
         NAMES.put(ThresholdGearFactory.class,"Threshold Gear Factory");
 
+        CONSTRUCTORS.put("Logistic Selectivity Gear",
+                         LogisticSelectivityGearFactory::new);
+        NAMES.put(LogisticSelectivityGearFactory.class,"Logistic Selectivity Gear");
+
+        CONSTRUCTORS.put("Double Normal Selectivity Gear",
+                         DoubleNormalGearFactory::new);
+        NAMES.put(DoubleNormalGearFactory.class,"Double Normal Selectivity Gear");
+
+        CONSTRUCTORS.put("Heterogeneous Selectivity Gear",
+                         HeterogeneousGearFactory::new);
+        NAMES.put(HeterogeneousGearFactory.class,"Heterogeneous Selectivity Gear");
+
     }
 
 }

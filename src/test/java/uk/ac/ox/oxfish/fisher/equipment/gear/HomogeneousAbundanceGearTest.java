@@ -45,7 +45,7 @@ public class HomogeneousAbundanceGearTest
 
 
     @Test
-    public void halfAnHour() throws Exception {
+    public void oneHour() throws Exception {
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
@@ -67,7 +67,7 @@ public class HomogeneousAbundanceGearTest
     }
 
     @Test
-    public void oneHourAndAHalf() throws Exception {
+    public void twoHours() throws Exception {
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,

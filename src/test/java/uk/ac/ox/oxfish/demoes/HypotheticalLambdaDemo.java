@@ -76,9 +76,9 @@ public class HypotheticalLambdaDemo {
                 value -> Math.max(0,value.getDailyData().getLatestObservation("Reservation Lambda Owning 1000 quotas"))).sum() / 100;
 
 
-        //lambda estimated is higher than 4
+        //lambda estimated is higher than 3
         System.out.println("mid year lambda: " + averageLambda);
-        assertTrue(averageLambda > 4);
+        assertTrue(averageLambda > 3);
 
         while(state.getDayOfTheYear() != 360)
             state.schedule.step(state);

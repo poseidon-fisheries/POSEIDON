@@ -123,6 +123,9 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
             T current) {
         if(unfriendPredicate.test(new Pair<>(fitnessBeforeImitating, fitnessAfterImitating)) )
             agent.replaceFriend(friendImitated,true);
-        return null;
+        if(fitnessBeforeImitating > fitnessAfterImitating)
+            return previous;
+        else
+            return current;
     }
 }

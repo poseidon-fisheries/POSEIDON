@@ -24,6 +24,9 @@ import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.DoubleNormalGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HeterogeneousGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HomogeneousGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.LogisticSelectivityGearFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -121,12 +124,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     // 2.352150571 liters per km
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(2.352150571);
 
-    /*
-     * the speed when fishing is 4.9541 kilometers per hour (2.675 knots) so that we can
-     * guess that an hour consumes 11.652789144 liters of fuel
-     */
-    private DoubleParameter  literPerHourOfFishing = new FixedDoubleParameter(11.652789144);
-
 
     private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.811008583); //grabbed online on Friday March 18
 
@@ -165,14 +162,52 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                      new Pair<>("Longspine Thornyhead",1811399.811),
                                      new Pair<>("Sablefish",2494999.8),
                                      new Pair<>("Shortspine thornyhead",1196999.874)
-                                     );
+            );
 
-
+        /*
+       * the speed when fishing is 4.9541 kilometers per hour (2.675 knots) so that we can
+       * guess that an hour consumes 11.652789144 liters of fuel
+       */
+    private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 11.652789144d;
     /**
      * gear maker, for now fixed
      */
-    private final LogisticSelectivityGearFactory gear =
-            new LogisticSelectivityGearFactory();
+    private HeterogeneousGearFactory gear =
+            new HeterogeneousGearFactory(
+                    new Pair<>("Dover Sole",
+                               new DoubleNormalGearFactory(38.953,-1.483,3.967,
+                                                           -0.764,Double.NaN,-2.259,
+                                                           0d,50d,1d,26.962,1.065,0.869,
+                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,0d)),
+                    new Pair<>("Longspine Thornyhead",
+                               new LogisticSelectivityGearFactory(23.5035,
+                                                                  9.03702,
+                                                                  21.8035,
+                                                                  1.7773,
+                                                                  0.992661,
+                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                  0d)),
+                    //todo change this
+                    new Pair<>("Sablefish",
+                               new LogisticSelectivityGearFactory(23.5035,
+                                                                  9.03702,
+                                                                  21.8035,
+                                                                  1.7773,
+                                                                  0.992661,
+                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                  0d)),
+                    new Pair<>("Shortspine Thornyhead",
+                               new DoubleNormalGearFactory(28.05,-0.3,4.25,
+                                                           4.85,Double.NaN,Double.NaN,
+                                                           0d,75d,1d,23.74,2.42,1d,
+                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                           0d)),
+                    new Pair<>("Yelloweye Rockfish",
+                               new LogisticSelectivityGearFactory(36.364,14.009,
+                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,0d)
+                    )
+
+            );
 
     private MultipleSpeciesAbundanceInitializer initializer;
 
@@ -227,7 +262,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             List<Path> sortedFolders = new LinkedList<>();
             folders.forEach(sortedFolders::add);
             Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
-                                                                                      o2.getFileName().toString()));
+                                                                                              o2.getFileName().toString()));
 
 
             //each folder is supposedly a species
@@ -462,9 +497,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
         LinkedList<Fisher> fisherList = new LinkedList<>();
         double inputedCatchability = 0.00000074932 / (1d / initializer.getNumberOfFishableTiles());
 
-        gear.setAverageCatchability(new FixedDoubleParameter(
-                inputedCatchability));
-        gear.setLitersOfGasConsumedPerHour(literPerHourOfFishing);
+        for(HomogeneousGearFactory factory : gear.getGears().values())
+            factory.setAverageCatchability(new FixedDoubleParameter(
+                    inputedCatchability));
 
 
         GlobalBiology biology = model.getBiology();
@@ -594,7 +629,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
             for(Species species : biology.getSpecies() )
                 Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
-                allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
+                                  allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
         }
 
 
@@ -771,24 +806,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     }
 
     /**
-     * Getter for property 'literPerHourOfFishing'.
-     *
-     * @return Value for property 'literPerHourOfFishing'.
-     */
-    public DoubleParameter getLiterPerHourOfFishing() {
-        return literPerHourOfFishing;
-    }
-
-    /**
-     * Setter for property 'literPerHourOfFishing'.
-     *
-     * @param literPerHourOfFishing Value to set for property 'literPerHourOfFishing'.
-     */
-    public void setLiterPerHourOfFishing(DoubleParameter literPerHourOfFishing) {
-        this.literPerHourOfFishing = literPerHourOfFishing;
-    }
-
-    /**
      * Getter for property 'gasPricePerLiter'.
      *
      * @return Value for property 'gasPricePerLiter'.
@@ -806,15 +823,19 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
-    /**
-     * Getter for property 'gear'.
-     *
-     * @return Value for property 'gear'.
-     */
-    public LogisticSelectivityGearFactory getGear() {
+
+    public HeterogeneousGearFactory getGear() {
         return gear;
     }
 
+    /**
+     * Setter for property 'gear'.
+     *
+     * @param gear Value to set for property 'gear'.
+     */
+    public void setGear(HeterogeneousGearFactory gear) {
+        this.gear = gear;
+    }
 
     /**
      * Getter for property 'departingStrategy'.
@@ -912,95 +933,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
     }
 
 
-    /**
-     * Getter for property 'selectivityAParameter'.
-     *
-     * @return Value for property 'selectivityAParameter'.
-     */
-    public DoubleParameter getSelectivityAParameter() {
-        return gear.getSelectivityAParameter();
-    }
 
-    /**
-     * Setter for property 'selectivityAParameter'.
-     *
-     * @param selectivityAParameter Value to set for property 'selectivityAParameter'.
-     */
-    public void setSelectivityAParameter(DoubleParameter selectivityAParameter) {
-        gear.setSelectivityAParameter(selectivityAParameter);
-    }
 
-    /**
-     * Getter for property 'selectivityBParameter'.
-     *
-     * @return Value for property 'selectivityBParameter'.
-     */
-    public DoubleParameter getSelectivityBParameter() {
-        return gear.getSelectivityBParameter();
-    }
 
-    /**
-     * Setter for property 'selectivityBParameter'.
-     *
-     * @param selectivityBParameter Value to set for property 'selectivityBParameter'.
-     */
-    public void setSelectivityBParameter(DoubleParameter selectivityBParameter) {
-        gear.setSelectivityBParameter(selectivityBParameter);
-    }
-
-    /**
-     * Getter for property 'retentionInflection'.
-     *
-     * @return Value for property 'retentionInflection'.
-     */
-    public DoubleParameter getRetentionInflection() {
-        return gear.getRetentionInflection();
-    }
-
-    /**
-     * Setter for property 'retentionInflection'.
-     *
-     * @param retentionInflection Value to set for property 'retentionInflection'.
-     */
-    public void setRetentionInflection(DoubleParameter retentionInflection) {
-        gear.setRetentionInflection(retentionInflection);
-    }
-
-    /**
-     * Getter for property 'retentionSlope'.
-     *
-     * @return Value for property 'retentionSlope'.
-     */
-    public DoubleParameter getRetentionSlope() {
-        return gear.getRetentionSlope();
-    }
-
-    /**
-     * Setter for property 'retentionSlope'.
-     *
-     * @param retentionSlope Value to set for property 'retentionSlope'.
-     */
-    public void setRetentionSlope(DoubleParameter retentionSlope) {
-        gear.setRetentionSlope(retentionSlope);
-    }
-
-    /**
-     * Getter for property 'retentionAsymptote'.
-     *
-     * @return Value for property 'retentionAsymptote'.
-     */
-    public DoubleParameter getRetentionAsymptote() {
-        return gear.getRetentionAsymptote();
-    }
-
-    /**
-     * Setter for property 'retentionAsymptote'.
-     *
-     * @param retentionAsymptote Value to set for property 'retentionAsymptote'.
-     */
-    public void setRetentionAsymptote(DoubleParameter retentionAsymptote) {
-        gear.setRetentionAsymptote(retentionAsymptote);
-    }
 
 
     public boolean isUsePremadeInput() {

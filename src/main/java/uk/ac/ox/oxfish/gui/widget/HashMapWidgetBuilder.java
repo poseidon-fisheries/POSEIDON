@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
+ * Transform an HashMap into a JTable
  * Created by carrknight on 5/4/16.
  */
 public class HashMapWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidget>
@@ -50,7 +51,7 @@ public class HashMapWidgetBuilder implements WidgetBuilder<JComponent,SwingMetaw
             final Map inspected  = ((Map) PropertyUtils.getProperty(
                     //the container: the scenario probably
                     metawidget.getToInspect(),
-                    //the name of the field
+                    //the address of the field
                     address
             ));
 

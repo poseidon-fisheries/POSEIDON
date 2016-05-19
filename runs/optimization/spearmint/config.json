@@ -1,14 +1,14 @@
 {
   "language"        : "PYTHON",
-  "main_file"       : "caliselec.py",
-  "experiment-name" : "caliselec",
+  "main_file"       : "front.py",
+  "experiment-name" : "front",
   "likelihood"      : "GAUSSIAN",
   "acquisition"     : "PES",
   "resources" : {
     "my-machine" : {
       "scheduler"         : "local",
       "max_concurrent"    : 2,
-      "max_finished-jobs" : 300
+      "max_finished-jobs" : 800
     }
   },
   "variables" : {

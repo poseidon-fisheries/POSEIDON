@@ -55,43 +55,55 @@ public class HomogeneousAbundanceGear implements Gear {
             int hoursSpentFishingThisSpecies = hoursSpentFishing;
             while (hoursSpentFishingThisSpecies>0)
             {
-                int[][] fish = new int[2][];
-                fish[FishStateUtilities.MALE] = where.getNumberOfMaleFishPerAge(species);
-                fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
-                //filter until you get the catch
-                for (AbundanceFilter filter : filters)
-                    fish = filter.filter(fish[FishStateUtilities.MALE],
-                                         fish[FishStateUtilities.FEMALE],
-                                         species);
-
-                //if you spent less than 1 hour fishing, then filter everything down even further
-                if(hoursSpentFishingThisSpecies<1)
-                {
-                    FixedProportionFilter hourFilter = new FixedProportionFilter(hoursSpentFishingThisSpecies);
-                    fish = hourFilter.filter(fish[FishStateUtilities.MALE],
-                                             fish[FishStateUtilities.FEMALE],
-                                             species);
-                }
-
-                //now turn the catch into total biomass caught
                 biomassCaught[species.getIndex()] +=
-                        FishStateUtilities.weigh(fish[FishStateUtilities.MALE],
-                                                 fish[FishStateUtilities.FEMALE],
-                                                 species);
-
-                //tell the biology to react to it
-                if (biomassCaught[species.getIndex()] > 0)
-                    where.reactToThisAmountOfFishBeingCaught(species,
-                                                             fish[FishStateUtilities.MALE],
-                                                             fish[FishStateUtilities.FEMALE]);
-
-                //you've spent one hour (or less fishing)
+                        fishThisSpecies(where, species, hoursSpentFishingThisSpecies);
                 hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
             }
         }
         return new Catch(biomassCaught);
 
 
+    }
+
+    /**
+     * fish for one hour targeting one species and returns the biomass
+     * @param where
+     * @param species
+     * @param hoursSpentFishingThisSpecies
+     * @return
+     */
+    public double fishThisSpecies(
+            SeaTile where, Species species, int hoursSpentFishingThisSpecies) {
+        int[][] fish = new int[2][];
+        fish[FishStateUtilities.MALE] = where.getNumberOfMaleFishPerAge(species);
+        fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
+        //filter until you get the catch
+        for (AbundanceFilter filter : filters)
+            fish = filter.filter(fish[FishStateUtilities.MALE],
+                                 fish[FishStateUtilities.FEMALE],
+                                 species);
+
+        //if you spent less than 1 hour fishing, then filter everything down even further
+        if(hoursSpentFishingThisSpecies<1)
+        {
+            FixedProportionFilter hourFilter = new FixedProportionFilter(hoursSpentFishingThisSpecies);
+            fish = hourFilter.filter(fish[FishStateUtilities.MALE],
+                                     fish[FishStateUtilities.FEMALE],
+                                     species);
+        }
+
+        //now turn the catch into total biomass caught
+        double weightCaught = FishStateUtilities.weigh(fish[FishStateUtilities.MALE],
+                                                fish[FishStateUtilities.FEMALE],
+                                                species);
+        //tell the biology to react to it
+        if (weightCaught > 0)
+            where.reactToThisAmountOfFishBeingCaught(species,
+                                                     fish[FishStateUtilities.MALE],
+                                                     fish[FishStateUtilities.FEMALE]);
+
+        //you've spent one hour (or less fishing)
+        return weightCaught;
     }
 
     /**

@@ -22,7 +22,7 @@ Imitator-Explorator:
       opportunityCosts: true
   probability:
     Adaptive Probability:
-      explorationProbability: '0.8'
+      explorationProbability: '0.2'
       explorationProbabilityMinimum: '0.01'
       imitationProbability: '1.0'
       incrementMultiplier: '0.02'

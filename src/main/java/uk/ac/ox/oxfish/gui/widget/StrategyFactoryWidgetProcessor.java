@@ -47,7 +47,9 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 //find it what are you building
                 Class strategyClass = Class.forName(attributes.get("factory_strategy"));
                 //get list of constructors
-                Map<String,? extends Supplier<? extends AlgorithmFactory>> constructors = AlgorithmFactories.CONSTRUCTOR_MAP.get(strategyClass);
+                Map<String,? extends Supplier<? extends AlgorithmFactory>>
+                        constructors =
+                        AlgorithmFactories.CONSTRUCTOR_MAP.get(strategyClass);
                 Map<? extends Class<? extends AlgorithmFactory>,String> names = AlgorithmFactories.NAMES_MAP.get(strategyClass);
 
                 final Object beingInspected = metawidget.getToInspect();
@@ -58,6 +60,8 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 //build JComponent
                 final JComboBox<String> factoryBox = new JComboBox<>();
                 //fill it with the strings from the constructor masterlist
+                if(constructors == null)
+                    return widget;
                 constructors.keySet().forEach(factoryBox::addItem);
                 factoryBox.setSelectedIndex(-1);
                 //find out which strategy factory is currently selected and try to show it in the combo-box

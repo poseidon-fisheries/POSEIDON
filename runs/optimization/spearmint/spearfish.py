@@ -1,7 +1,8 @@
 from __future__ import print_function
 import subprocess
 import os
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/fronts"
 SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
 
 
@@ -20,7 +21,8 @@ def run_experiment(input2yaml,
                    scorer=default_scorer,
                    jarfile="yamler.jar",
                    main_directory="/home/carrknight/code/oxfish/runs/optimization",
-                   years_to_run=20):
+                   years_to_run=20,
+                   additional_data=False):
     import os
     import subprocess
     os.chdir(main_directory)
@@ -29,7 +31,10 @@ def run_experiment(input2yaml,
     input2yaml(main_directory + "/" + experiment_title + ".yaml")
     print("calling java!")
 # feed it into the simulation and run it
-    subprocess.call(["java", "-jar", jarfile, experiment_title + ".yaml","--years", str(years_to_run)])
+    args = ["java", "-jar", jarfile, experiment_title + ".yaml", "--years", str(years_to_run)]
+    if additional_data:
+        args.append("--data")
+    subprocess.call(args)
     # read up the results
     os.remove(experiment_title + ".yaml")
     print("reading results")
@@ -47,9 +52,7 @@ def main():
     os.chdir(EXPERIMENT_DIRECTORY)
     experiment_name = json.load(open("config.json"))["experiment-name"]
     print("starting " + experiment_name)
-    dbDirectory = EXPERIMENT_DIRECTORY + "/tac"
-    if not os.path.exists(dbDirectory):
-        os.makedirs(dbDirectory)
+
 
     ##connect mongo to itx
   # subprocess.call(["mongod", "--fork", "--logpath", dbDirectory + "/log_"+experiment_name+".txt", "--dbpath", dbDirectory])

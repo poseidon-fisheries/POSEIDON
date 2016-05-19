@@ -164,42 +164,46 @@ public class Adaptation<T> implements FisherStartable {
             assert imitationStart == null;
 
 
-
+            Double previousFitness = explorationStart.getSecond();
+            T previous = explorationStart.getFirst();
             T decision = this.algorithm.judgeRandomization(random, toAdapt,
-                                                           explorationStart.getSecond(),
+                                                           previousFitness,
                                                            fitness,
-                                                           explorationStart.getFirst(),
+                                                           previous,
                                                            current);
 
-            this.probability.judgeExploration(explorationStart.getSecond(),fitness);
+            this.probability.judgeExploration(previousFitness, fitness);
 
             explorationStart = null;
 
 
-            if(decision != null)
-            {
-
-                act(toAdapt, decision);
-                return;
+            if(decision!=null) {
+                if(decision == previous )
+                    fitness = previousFitness;
+                current = decision;
             }
+            assert current != null;
         }
 
         //if you imitated in the previous step
         else if(imitationStart != null)
         {
             assert explorationStart == null;
-            T decision = this.algorithm.judgeImitation(random,toAdapt,
+            double previousFitness = imitationStart.getPreviousFitness();
+            T previous = imitationStart.getPreviousDecision();
+            T decision = this.algorithm.judgeImitation(random, toAdapt,
                                                        imitationStart.getFriend(),
-                                                       imitationStart.getPreviousFitness(),
+                                                       previousFitness,
                                                        fitness,
-                                                       imitationStart.getPreviousDecision(),
+                                                       previous,
                                                        current);
 
             imitationStart = null;
-            if(decision != null)
-            {
-                act(toAdapt, decision);
-                return;
+            if(decision!=null) {
+                if(decision == previous )
+                    fitness = previousFitness;
+                current = decision;
+
             }
 
         }
@@ -229,8 +233,8 @@ public class Adaptation<T> implements FisherStartable {
 
 
             Pair<T, Fisher> imitation = algorithm.imitate(random,
-                                                        toAdapt, fitness, current,
-                                                        friends, objective, sensor);
+                                                          toAdapt, fitness, current,
+                                                          friends, objective, sensor);
             if(imitation.getSecond() != null)
                 imitationStart = new ImitationStart<>(imitation.getSecond(),fitness,imitation.getFirst());
 

@@ -52,7 +52,7 @@ public class FirstPaper
 {
 
     public static final Path INPUT_FOLDER = Paths.get("inputs", "first_paper");
-    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper2");
+    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper");
 
     public static final long RANDOM_SEED = 0l;
 
@@ -62,7 +62,7 @@ public class FirstPaper
         OUTPUT_FOLDER.toFile().mkdirs();
 
         Log.info("Moving Front Image Starting");
-        //      fronts();
+        fronts();
         Log.info("Oil Price Changes");
 //        oils(1);
 //        oils(2);
@@ -88,7 +88,7 @@ public class FirstPaper
         //  policyAndLocation("itq");
         //  policyAndLocation("tac");
         Log.info("Gear Choice");
-        policyAndGear("itq");
+   //     policyAndGear("itq");
      //   policyAndGear("tac");
 
 
@@ -181,9 +181,6 @@ public class FirstPaper
         double[][] fishing = new double[state.getMap().getWidth()][state.getMap().getHeight()];
         //here we store the biomass
         double[][] biomass = new double[state.getMap().getWidth()][state.getMap().getHeight()];
-
-
-
 
 
         for(int snapshot=1;snapshot<5;snapshot++)
@@ -774,7 +771,7 @@ public class FirstPaper
                                     fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
                                     //judge in terms of yearly profits
                                     new CashFlowObjective(365),
-                                    //epsilon = 10%
+                                    //epsilon = 20%
                                     .2, 1);
 
                     //tell the fisher to use this once a year
@@ -867,6 +864,13 @@ public class FirstPaper
 
         FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(policy+"_blue_landings.csv").toFile(),
                                                 state.getYearlyDataSet().getColumn(state.getSpecies().get(1) + " " + AbstractMarket.LANDINGS_COLUMN_NAME)
+        );
+
+        FishStateUtilities.printCSVColumnToFile(outputFolder.resolve("blue_catchability.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn("Blue Catchability")
+        );
+        FishStateUtilities.printCSVColumnToFile(outputFolder.resolve("red_catchability.csv").toFile(),
+                                                state.getYearlyDataSet().getColumn("Red Catchability")
         );
 
 

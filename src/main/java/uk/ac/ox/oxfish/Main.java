@@ -27,6 +27,7 @@ class Main{
 
 
 
+
     //main
     public static void main(String[] args) throws IOException {
 
@@ -196,6 +197,7 @@ class Main{
 
             state.setScenario(scenarioSelector.getScenario());
 
+            state.attachAdditionalGatherers();
 
             FishGUI vid = new FishGUI(state);
             Console c = new Console(vid);

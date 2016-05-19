@@ -3,7 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.*;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -47,7 +48,7 @@ public class YearlyIterativeDestinationStrategyTest {
         //cashflow is x+y
         doAnswer(invocation -> delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot().getGridY()).when(
                 fisher).getBankBalance();
-
+        when(fisher.balanceXDaysAgo(360)).thenReturn(0d);
 
 
         //step the hill-climber
@@ -55,15 +56,14 @@ public class YearlyIterativeDestinationStrategyTest {
         hill.getAlgorithm().start(fishState, mock(Fisher.class));
 
         //give it 1000 years!
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<2000; i++)
         {
             double bankBalance = fisher.getBankBalance();
             hill.getAlgorithm().adapt(fisher, new MersenneTwisterFast());
-            when(fisher.balanceXDaysAgo(360)).thenReturn(bankBalance);
+
 
         }
         //should be very high
-        System.out.print(delegate.getFavoriteSpot());
         Assert.assertTrue(delegate.getFavoriteSpot().getGridY() > 95);
         Assert.assertTrue(delegate.getFavoriteSpot().getGridX() > 95);
 

@@ -38,6 +38,10 @@ public class YamlMain {
     @Parameter(names = {"--policy","-p"},description = "path to policy script file")
     private String policyScript = null;
 
+
+    @Parameter(names={"--data"},description = "gathers additional data for the model")
+    private boolean additionalData = false;
+
     public static void main(String[] args) throws IOException {
 
         /**
@@ -73,6 +77,11 @@ public class YamlMain {
         Log.set(logLevel);
         model.setScenario(scenario);
         model.start();
+
+        if(additionalData) {
+            Log.info("adding additional data");
+            model.attachAdditionalGatherers();
+        }
 
         //if you have a policy script, then follow it
         if(policyScript != null)

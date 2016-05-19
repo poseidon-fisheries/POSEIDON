@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticAbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.RetentionAbundanceFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -15,7 +14,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * The default numbers refer to the thornyhead gear
  * Created by carrknight on 3/18/16.
  */
-public class LogisticSelectivityGearFactory implements AlgorithmFactory<HomogeneousAbundanceGear> {
+public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
 
 
     /**
@@ -34,14 +33,14 @@ public class LogisticSelectivityGearFactory implements AlgorithmFactory<Homogene
     private DoubleParameter retentionInflection = new FixedDoubleParameter(21.8035);
 
 
- /**
+    /**
      * retention slope parameter
      */
     private DoubleParameter retentionSlope = new FixedDoubleParameter(1.7773);
 
 
     /**
-     * retention slope parameter
+     * retention slope parameter: if null retention is ignored
      */
     private DoubleParameter retentionAsymptote = new FixedDoubleParameter(0.992661);
 
@@ -50,6 +49,37 @@ public class LogisticSelectivityGearFactory implements AlgorithmFactory<Homogene
 
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
+
+    public LogisticSelectivityGearFactory() {
+    }
+
+    public LogisticSelectivityGearFactory(
+            Double selectivityAParameter, Double selectivityBParameter,
+            Double retentionInflection, Double retentionSlope,
+            Double retentionAsymptote,
+            Double litersOfGasConsumedPerHour,
+            Double averageCatchability) {
+        this.selectivityAParameter = new FixedDoubleParameter(selectivityAParameter);
+        this.selectivityBParameter = new FixedDoubleParameter(selectivityBParameter);
+        this.retentionInflection = new FixedDoubleParameter(retentionInflection);
+        this.retentionSlope = new FixedDoubleParameter(retentionSlope);
+        this.retentionAsymptote = new FixedDoubleParameter(retentionAsymptote);
+        this.litersOfGasConsumedPerHour = new FixedDoubleParameter(litersOfGasConsumedPerHour);
+        this.averageCatchability = new FixedDoubleParameter(averageCatchability);
+    }
+
+    public LogisticSelectivityGearFactory(
+            Double selectivityAParameter, Double selectivityBParameter,
+            Double litersOfGasConsumedPerHour,
+            Double averageCatchability) {
+        this.selectivityAParameter = new FixedDoubleParameter(selectivityAParameter);
+        this.selectivityBParameter = new FixedDoubleParameter(selectivityBParameter);
+        this.retentionInflection = null;
+        this.retentionSlope = null;
+        this.retentionAsymptote = null;
+        this.litersOfGasConsumedPerHour = new FixedDoubleParameter(litersOfGasConsumedPerHour);
+        this.averageCatchability = new FixedDoubleParameter(averageCatchability);
+    }
 
     /**
      * Applies this function to the given argument.
@@ -60,16 +90,25 @@ public class LogisticSelectivityGearFactory implements AlgorithmFactory<Homogene
     @Override
     public HomogeneousAbundanceGear apply(FishState fishState) {
         MersenneTwisterFast random = fishState.getRandom();
-        return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                            new FixedProportionFilter(averageCatchability.apply(random)),
-                                            new LogisticAbundanceFilter(selectivityAParameter.apply(random),
-                                                                        selectivityBParameter.apply(random),
-                                                                        true),
-                                            new RetentionAbundanceFilter(true,
-                                                                         retentionInflection.apply(random),
-                                                                         retentionSlope.apply(random),
-                                                                         retentionAsymptote.apply(random))
-                                            );
+        if(retentionAsymptote != null)
+            return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
+                                                new FixedProportionFilter(averageCatchability.apply(random)),
+                                                new LogisticAbundanceFilter(selectivityAParameter.apply(random),
+                                                                            selectivityBParameter.apply(random),
+                                                                            true),
+                                                new RetentionAbundanceFilter(true,
+                                                                             retentionInflection.apply(random),
+                                                                             retentionSlope.apply(random),
+                                                                             retentionAsymptote.apply(random))
+            );
+        else
+        {
+            return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
+                                                new FixedProportionFilter(averageCatchability.apply(random)),
+                                                new LogisticAbundanceFilter(selectivityAParameter.apply(random),
+                                                                            selectivityBParameter.apply(random),
+                                                                            true));
+        }
     }
 
 

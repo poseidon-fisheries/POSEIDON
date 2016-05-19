@@ -15,14 +15,17 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.*;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
@@ -546,5 +549,42 @@ public class FishState  extends SimState{
      */
     public boolean isStarted() {
         return started;
+    }
+
+
+    /**
+     * //todo move this to a config file rather than an all or nothing switch
+     */
+    public void attachAdditionalGatherers()
+    {
+        //keep track of average X location at the end of the year
+        DataColumn dailyX = this.dailyDataSet.registerGatherer("Average X Towed", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState state) {
+                double sum = 0;
+                double observations = 0;
+                for (Fisher fisher : getFishers()) {
+                    TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                    if(lastFinishedTrip != null) {
+                        SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
+                        if (mostFishedTileInTrip != null) {
+                            sum += mostFishedTileInTrip.getGridX();
+                            observations++;
+                        }
+                    }
+                }
+                if (observations == 0)
+                    return Double.NaN;
+                return sum / observations;
+            }
+        }, Double.NaN);
+
+        //yearly you account for the average
+        this.yearlyDataSet.registerGatherer("Average X Towed",
+                                            FishStateUtilities.generateYearlyAverage(dailyX),
+                                            Double.NaN)
+        ;
+
+
     }
 }

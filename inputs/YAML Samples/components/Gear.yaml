@@ -30,3 +30,31 @@ Threshold Gear Factory:
   selectAboveThreshold: true
   threshold: '10.0'
 -------
+Logistic Selectivity Gear:
+  averageCatchability: '0.0'
+  litersOfGasConsumedPerHour: '0.0'
+  retentionAsymptote: '0.992661'
+  retentionInflection: '21.8035'
+  retentionSlope: '1.7773'
+  selectivityAParameter: '23.5035'
+  selectivityBParameter: '9.03702'
+-------
+Double Normal Selectivity Gear:
+  ascWidth: '3.77'
+  averageCatchability: '0.0'
+  binMax: '75.0'
+  binMin: '0.0'
+  binWidth: '1.0'
+  dscWidth: '6.78'
+  finalScaling: .NaN
+  initialScaling: .NaN
+  peak: '23.53'
+  retentionAsymptote: '1.0'
+  retentionInflection: '28.11'
+  retentionSlope: '3.43'
+  top: '-7.0'
+-------
+Heterogeneous Selectivity Gear:
+  gears: {
+    }
+-------

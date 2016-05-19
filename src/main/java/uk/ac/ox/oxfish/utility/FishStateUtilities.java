@@ -411,6 +411,39 @@ public class FishStateUtilities {
     }
 
 
+
+    /**
+     * takes a column of daily observations and sum them up to generate a yearly observation
+     * @param column colun to sum over
+     * @return a sum or NAN if the column is empty
+     */
+    public static <T> Gatherer<T> generateYearlyAverage(final DataColumn column) {
+
+        return new Gatherer<T>() {
+            @Override
+            public Double apply(T state) {
+                //get the iterator
+                final Iterator<Double> iterator = column.descendingIterator();
+                if(!iterator.hasNext()) //not ready/year 1
+                    return Double.NaN;
+                DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+                for(int i=0; i<365; i++) {
+                    //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                    //and only has a partially filled collection
+                    if(iterator.hasNext()) {
+                        Double next = iterator.next();
+                        if(Double.isFinite(next))
+                            statistics.accept(next);
+                    }
+                }
+
+                return statistics.getAverage();
+            }
+        };
+    }
+
+
+
     /**
      * taken from the c++ version here: http://www.codeproject.com/Articles/49723/Linear-correlation-and-statistical-functions
      * which explains the minimalistic naming convention
