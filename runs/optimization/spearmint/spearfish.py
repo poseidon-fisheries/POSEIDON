@@ -2,7 +2,10 @@ from __future__ import print_function
 import subprocess
 import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/fronts"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/fronts"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/mpa"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/hyperstability"
+
 SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
 
 

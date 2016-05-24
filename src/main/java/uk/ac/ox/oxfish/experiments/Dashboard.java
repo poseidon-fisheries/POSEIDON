@@ -350,7 +350,7 @@ public class Dashboard
                                                              public Double apply(FishState state) {
                                                                  double consumption = 0;
                                                                  for (Fisher f : state.getFishers())
-                                                                     consumption += ((RandomCatchabilityTrawl) f.getGear()).getTrawlSpeed();
+                                                                     consumption += ((RandomCatchabilityTrawl) f.getGear()).getGasPerHourFished();
                                                                  return consumption / state.getFishers().size();
                                                              }
                                                          }, Double.NaN);

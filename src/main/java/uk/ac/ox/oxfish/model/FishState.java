@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  *
@@ -579,6 +580,9 @@ public class FishState  extends SimState{
             }
         }, Double.NaN);
 
+
+
+
         //yearly you account for the average
         this.yearlyDataSet.registerGatherer("Average X Towed",
                                             FishStateUtilities.generateYearlyAverage(dailyX),
@@ -586,5 +590,63 @@ public class FishState  extends SimState{
         ;
 
 
+        //keep track of average X location at the end of the year
+        this.dailyDataSet.registerGatherer("Average Distance From Port",
+                                           new Gatherer<FishState>() {
+                                               @Override
+                                               public Double apply(FishState state) {
+                                                   double sum = 0;
+                                                   double observations = 0;
+                                                   for (Fisher fisher : getFishers()) {
+                                                       TripRecord lastFinishedTrip = fisher.getLastFinishedTrip();
+                                                       if(lastFinishedTrip != null) {
+                                                           SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
+                                                           if (mostFishedTileInTrip != null) {
+                                                               sum +=
+                                                                       Math.pow(mostFishedTileInTrip.getGridX()-fisher.getHomePort().getLocation().getGridX(),2)
+                                                                               + Math.pow(mostFishedTileInTrip.getGridY()-fisher.getHomePort().getLocation().getGridY(),2);
+                                                               observations++;
+                                                           }
+                                                       }
+                                                   }
+                                                   if (observations == 0)
+                                                       return Double.NaN;
+                                                   return sum / observations;
+                                               }
+                                           }, Double.NaN);
+
+
+        this.dailyDataSet.registerGatherer("% of Tows on the Line",
+                                           new Gatherer<FishState>() {
+                                               @Override
+                                               public Double apply(FishState state) {
+
+                                                   double trawlsSum = 0;
+                                                   double lineSum = 0;
+                                                   NauticalMap map = state.getMap();
+                                                   for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
+                                                   {
+                                                       int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
+                                                                                           tile.getGridY());
+                                                       trawlsSum += trawlsHere;
+                                                       if(!tile.isProtected() && map.getMooreNeighbors(tile,1).stream().anyMatch(
+                                                               new Predicate() {
+                                                                   @Override
+                                                                   public boolean test(Object o) {
+                                                                       return ((SeaTile) o).isProtected();
+                                                                   }
+                                                               }))
+                                                       {
+                                                           lineSum +=trawlsHere;
+                                                       }
+                                                   }
+                                                   if(trawlsSum == 0)
+                                                       return Double.NaN;
+                                                   assert trawlsSum>=lineSum;
+                                                   return lineSum/trawlsSum;
+
+                                               }
+                                           }
+                , Double.NaN);
     }
 }

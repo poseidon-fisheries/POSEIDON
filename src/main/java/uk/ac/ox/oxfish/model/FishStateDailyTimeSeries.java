@@ -7,10 +7,12 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Aggregate data. Goes through all the ports and all the markets and
@@ -62,6 +64,9 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                                              .sum();
                                  }
                              }, Double.NaN);
+
+
+
         }
 
         final List<Fisher> fishers = state.getFishers();
@@ -78,6 +83,19 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
             public Double apply(FishState ignored) {
                 return fishers.stream().mapToDouble(
                         value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
+            }
+        }, 0d);
+
+        registerGatherer("Total Effort", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getDailyCounter().getColumn(YearlyFisherTimeSeries.EFFORT);
+                            }
+                        }).sum();
             }
         }, 0d);
 

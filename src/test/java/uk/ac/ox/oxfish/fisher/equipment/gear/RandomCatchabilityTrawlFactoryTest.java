@@ -28,13 +28,12 @@ public class RandomCatchabilityTrawlFactoryTest {
                                                                        100);
 
         Boat boat = mock(Boat.class);
-        when(boat.expectedFuelConsumption(100)).thenReturn(123d);
         SeaTile tile = mock(SeaTile.class);
         double fuelConsumed = thrawl.getFuelConsumptionPerHourOfFishing(mock,
                                                                         boat,
                                                                         tile);
 
-        assertEquals(fuelConsumed, 123d, .0001d);
+        assertEquals(fuelConsumed, 100d, .0001d);
 
 
 

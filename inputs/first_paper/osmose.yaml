@@ -31,8 +31,8 @@ Prototype:
     Random Catchability By List:
       catchabilityMap: '3:0.01'
       standardDeviationMap: ''
-      trawlSpeed: '5.0'
-      trawlSpeed: '5.0'
+      gasPerHourFished: '5.0'
+      gasPerHourFished: '5.0'
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'

@@ -31,7 +31,7 @@ Prototype:
       meanCatchabilityOtherSpecies: '0.1'
       standardDeviationCatchabilityFirstSpecies: '0.0'
       standardDeviationCatchabilityOtherSpecies: '0.0'
-      trawlSpeed: uniform 0 20
+      gasPerHourFished: uniform 0 20
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'

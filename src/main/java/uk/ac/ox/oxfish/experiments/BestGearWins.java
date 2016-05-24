@@ -36,7 +36,7 @@ public class BestGearWins {
         scenario.setFishers(100);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
-        gear.setTrawlSpeed(new UniformDoubleParameter(0,20));
+        gear.setGasPerHourFished(new UniformDoubleParameter(0, 20));
         scenario.setGear(gear);
         //start everything
         FishState state = new FishState(seed);
@@ -50,7 +50,7 @@ public class BestGearWins {
         double average = 0;
         for(Fisher fisher : state.getFishers())
         {
-            average += ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
   //      System.out.println(average);
@@ -62,7 +62,7 @@ public class BestGearWins {
         average = 0;
         for(Fisher fisher : state.getFishers())
         {
-            average += ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed();
+            average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
      //   System.out.println(average);

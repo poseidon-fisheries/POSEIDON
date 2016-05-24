@@ -66,7 +66,7 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
                                   " options with features: too few compared to the minimum of " + minimumNumberOfObservations);
             return null;
         }
-        else
+         else
         {
             //you have enough! take only the ones that pass the threshold
             LinkedList<T> passTheTest = new LinkedList<>();

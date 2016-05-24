@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
@@ -41,6 +42,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -62,8 +65,14 @@ public class FirstPaper
         OUTPUT_FOLDER.toFile().mkdirs();
 
         Log.info("Moving Front Image Starting");
-        fronts();
+       // fronts();
+       // frontsSensitivity(Paths.get("fronts.yaml"));
+       // frontsSensitivity(Paths.get("sensitivity","fronts","fronts_worst.yaml"));
+      //  frontsSensitivity(Paths.get("sensitivity","fronts","fronts_flat.yaml"));
+        Log.info("Hyperstability");
+        hyperStability();
         Log.info("Oil Price Changes");
+  //      oilCheck();
 //        oils(1);
 //        oils(2);
         Log.info("Fishing the Line");
@@ -88,8 +97,8 @@ public class FirstPaper
         //  policyAndLocation("itq");
         //  policyAndLocation("tac");
         Log.info("Gear Choice");
-   //     policyAndGear("itq");
-     //   policyAndGear("tac");
+        //     policyAndGear("itq");
+        //   policyAndGear("tac");
 
 
     }
@@ -164,6 +173,26 @@ public class FirstPaper
         );
     }
 
+    public static void frontsSensitivity(Path pathToYaml) throws IOException {
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                INPUT_FOLDER.resolve(pathToYaml)));
+
+        Path outputFolder = OUTPUT_FOLDER.resolve(Paths.get("sensitivity","fronts"));
+        outputFolder.toFile().mkdirs();
+        Scenario scenario = yaml.loadAs(scenarioYaml, Scenario.class);
+        FishState state = new FishState(RANDOM_SEED);
+        state.setScenario(scenario);
+        state.start();
+        state.attachAdditionalGatherers();
+        while(state.getYear()<3)
+        {
+            state.schedule.step(state);
+        }
+        FishStateUtilities.printCSVColumnToFile(outputFolder.resolve(pathToYaml.getFileName() + ".csv").toFile(),
+                                                state.getDailyDataSet().getColumn("Average Distance From Port"));
+    }
+
     public static void fronts() throws IOException {
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
@@ -217,6 +246,112 @@ public class FirstPaper
 
 
 
+    }
+
+
+    public static void hyperStability() throws IOException {
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                INPUT_FOLDER.resolve("hyperstability.yaml")));
+
+        Path outputFolder = OUTPUT_FOLDER.resolve(Paths.get("hyperstability"));
+        outputFolder.toFile().mkdirs();
+        Scenario scenario = yaml.loadAs(scenarioYaml, Scenario.class);
+        FishState state = new FishState(RANDOM_SEED);
+        state.setScenario(scenario);
+        state.start();
+        while(state.getYear()<40)
+        {
+            state.schedule.step(state);
+        }
+        FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve("hyperstability.csv").toFile(),
+                                                 state.getYearlyDataSet().getColumn("Total Effort"),
+                                                 state.getYearlyDataSet().getColumn("Species 0 Landings"),
+                                                 state.getYearlyDataSet().getColumn("Biomass Species 0"));
+
+
+        scenarioYaml = String.join("\n", Files.readAllLines(
+                INPUT_FOLDER.resolve("fronts.yaml")));
+
+
+        scenario = yaml.loadAs(scenarioYaml, Scenario.class);
+        state = new FishState(RANDOM_SEED);
+        state.setScenario(scenario);
+        state.start();
+        while(state.getYear()<40)
+        {
+            state.schedule.step(state);
+        }
+        FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve("baseline.csv").toFile(),
+                                                 state.getYearlyDataSet().getColumn("Total Effort"),
+                                                 state.getYearlyDataSet().getColumn("Species 0 Landings"),
+                                                 state.getYearlyDataSet().getColumn("Biomass Species 0"));
+    }
+
+
+    private final static double MIN_GAS_PRICE = 0;
+    private final static double MAX_GAS_PRICE = 5;
+    private final static double GAS_PRICE_INCREMENT = 0.01;
+
+
+
+    public static void oilCheck() throws IOException {
+        //tracks the changes in distance to port given price changes
+        List<String> lines = new LinkedList<>();
+        lines.add("price,type,distance,landings,consumed");
+        for(double gasPrice = MIN_GAS_PRICE; gasPrice<= MAX_GAS_PRICE; gasPrice+=GAS_PRICE_INCREMENT)
+        {
+            gasPrice = FishStateUtilities.round5(gasPrice);
+            double[] result = oil(gasPrice, "oil_travel.yaml");
+            String line = gasPrice + "," + "oil_travel" + "," + result[0] + "," + result[1]
+                    + "," + result[2];
+            Log.info(line);
+            lines.add(line);
+        }
+        for(double gasPrice = MIN_GAS_PRICE; gasPrice<= MAX_GAS_PRICE; gasPrice+=GAS_PRICE_INCREMENT)
+        {
+            gasPrice = FishStateUtilities.round5(gasPrice);
+            double[] result = oil(gasPrice, "oil_trawl.yaml");
+            String line = gasPrice + "," + "oil_trawl" + "," + result[0] + "," + result[1]
+                    + "," + result[2];
+            Log.info(line);
+            lines.add(line);
+        }
+        Path outputFolder = OUTPUT_FOLDER.resolve("oil");
+        outputFolder.toFile().mkdirs();
+        Files.write(outputFolder.resolve("oil_grid.csv"),lines);
+
+
+    }
+
+    public static double[] oil(double gasPrice,String yamlFile) throws IOException {
+        /**
+         * first oil
+         */
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                INPUT_FOLDER.resolve(yamlFile)));
+        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+        scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
+        FishState state = new FishState(RANDOM_SEED);
+        state.setScenario(scenario);
+        state.attachAdditionalGatherers();
+        state.start();
+
+        double[] results = new double[3];
+        while(state.getYear()<2)
+            state.schedule.step(state);
+        state.schedule.step(state);
+        //count the landings
+        results[1] = state.getYearlyDataSet().getLatestObservation("Species 0 Landings");
+        results[2] = state.getYearlyDataSet().getLatestObservation(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
+        //and the average distance to port on the last 30 days!
+        DataColumn distances = state.getDailyDataSet().getColumn("Average Distance From Port");
+        results[0]=distances.stream().skip(distances.size()-30).
+                filter(distance -> Double.isFinite(distance)).
+                mapToDouble(value -> value).average().getAsDouble();
+
+        return results;
     }
 
     public static void oils(int i) throws IOException {
@@ -638,7 +773,7 @@ public class FirstPaper
         for(Fisher fisher : state.getFishers())
         {
             mileageOutput = mileageOutput +
-                    "tac," + ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed() + ","
+                    "tac," + ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished() + ","
                     + fisher.getLatestYearlyObservation("Species 0 Landings") + "\n";
         }
 
@@ -659,7 +794,7 @@ public class FirstPaper
         for(Fisher fisher : state.getFishers())
         {
             mileageOutput = mileageOutput +
-                    "itq," + ((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed() + ","
+                    "itq," + ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished() + ","
                     + fisher.getLatestYearlyObservation("Species 0 Landings") + "\n";
         }
 
@@ -838,7 +973,7 @@ public class FirstPaper
                                                      fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
                                                      fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
                                                      fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                     );
+                );
         }
         state.schedule.step(state);
         FishStateUtilities.pollFishersToFile(state.getFishers(),

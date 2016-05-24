@@ -34,7 +34,7 @@ public class ExpensiveGasMakesYouFishAtHome
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
 
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
-        gear.setTrawlSpeed(new FixedDoubleParameter(0));
+        gear.setGasPerHourFished(new FixedDoubleParameter(0));
         scenario.setGear(gear);
 
 

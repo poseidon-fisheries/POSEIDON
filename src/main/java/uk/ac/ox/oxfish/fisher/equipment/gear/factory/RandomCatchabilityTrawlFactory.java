@@ -24,7 +24,7 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
     private DoubleParameter standardDeviationCatchabilityOtherSpecies = new FixedDoubleParameter(0);
 
 
-    private DoubleParameter trawlSpeed = new FixedDoubleParameter(5);
+    private DoubleParameter gasPerHourFished = new FixedDoubleParameter(5);
 
 
     public RandomCatchabilityTrawlFactory() {
@@ -52,7 +52,7 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
             std[i] = standardDeviationCatchabilityOtherSpecies.apply(state.getRandom());
         }
 
-        return new RandomCatchabilityTrawl(means,std,trawlSpeed.apply(state.getRandom()));
+        return new RandomCatchabilityTrawl(means, std, gasPerHourFished.apply(state.getRandom()));
 
 
     }
@@ -93,12 +93,12 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
         this.standardDeviationCatchabilityOtherSpecies = standardDeviationCatchabilityOtherSpecies;
     }
 
-    public DoubleParameter getTrawlSpeed() {
-        return trawlSpeed;
+    public DoubleParameter getGasPerHourFished() {
+        return gasPerHourFished;
     }
 
-    public void setTrawlSpeed(DoubleParameter trawlSpeed) {
-        this.trawlSpeed = trawlSpeed;
+    public void setGasPerHourFished(DoubleParameter gasPerHourFished) {
+        this.gasPerHourFished = gasPerHourFished;
     }
 
 

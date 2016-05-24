@@ -39,7 +39,7 @@ public class TACNotCaresAboutMileage {
         int i=0;
         for(Fisher fisher : state.getFishers())
         {
-            mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed());
+            mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished());
             catches[i] = fisher.getLatestYearlyObservation(
                     species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 

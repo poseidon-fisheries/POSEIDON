@@ -43,7 +43,7 @@ public class ITQCaresAboutMileage {
         int i=0;
         for(Fisher fisher : state.getFishers())
         {
-            mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed());
+            mileage[i] = (((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished());
             catches[i] = fisher.getLatestYearlyObservation(
                     species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
 
@@ -51,7 +51,9 @@ public class ITQCaresAboutMileage {
         }
 
         System.out.println("seed " + seed);
-        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.6);
+        System.out.println("Correlation: " +
+                         Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
+        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.5);
         //efficiency is 100%
         assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 

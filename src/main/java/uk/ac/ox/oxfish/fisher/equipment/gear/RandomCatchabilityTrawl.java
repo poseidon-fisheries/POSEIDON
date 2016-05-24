@@ -28,16 +28,16 @@ public class RandomCatchabilityTrawl implements Gear
     /**
      * speed (used for fuel consumption) of thrawling
      */
-    private  final double trawlSpeed;
+    private  final double gasPerHourFished;
 
 
     public RandomCatchabilityTrawl(
             double[] catchabilityMeanPerSpecie,
             double[] catchabilityDeviationPerSpecie,
-            double trawlSpeed) {
+            double gasPerHourFished) {
         this.catchabilityMeanPerSpecie = catchabilityMeanPerSpecie;
         this.catchabilityDeviationPerSpecie = catchabilityDeviationPerSpecie;
-        this.trawlSpeed = trawlSpeed;
+        this.gasPerHourFished = gasPerHourFished;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class RandomCatchabilityTrawl implements Gear
     @Override
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
-        return boat.expectedFuelConsumption(trawlSpeed);
+        return gasPerHourFished;
     }
 
     public double[] getCatchabilityMeanPerSpecie() {
@@ -81,11 +81,11 @@ public class RandomCatchabilityTrawl implements Gear
     public Gear makeCopy() {
         return new RandomCatchabilityTrawl(Arrays.copyOf(catchabilityMeanPerSpecie,catchabilityMeanPerSpecie.length),
                                             Arrays.copyOf(catchabilityDeviationPerSpecie,catchabilityMeanPerSpecie.length),
-                                           trawlSpeed);
+                                           gasPerHourFished);
     }
 
-    public double getTrawlSpeed() {
-        return trawlSpeed;
+    public double getGasPerHourFished() {
+        return gasPerHourFished;
     }
 
 
@@ -93,6 +93,6 @@ public class RandomCatchabilityTrawl implements Gear
     public String toString() {
         return "RandomCatchabilityTrawl{" + "catchabilityMeanPerSpecie=" + Arrays.toString(
                 catchabilityMeanPerSpecie) + ", catchabilityDeviationPerSpecie=" + Arrays.toString(
-                catchabilityDeviationPerSpecie) + ", trawlSpeed=" + trawlSpeed + '}';
+                catchabilityDeviationPerSpecie) + ", gasPerHourFished=" + gasPerHourFished + '}';
     }
 }

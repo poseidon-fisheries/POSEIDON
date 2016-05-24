@@ -56,7 +56,7 @@ public class TwoPopulations {
 
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
-        gear.setTrawlSpeed(new FixedDoubleParameter(0d));
+        gear.setGasPerHourFished(new FixedDoubleParameter(0d));
         scenario.setGear(gear);
         SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setCellSizeInKilometers(new FixedDoubleParameter(2));

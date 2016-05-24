@@ -50,7 +50,7 @@ public class MarketFirstDemo {
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
         gear.setMeanCatchabilityOtherSpecies(catchabilityMean);
         gear.setMeanCatchabilityFirstSpecies(catchabilityMean);
-        gear.setTrawlSpeed(gasInefficiency);
+        gear.setGasPerHourFished(gasInefficiency);
         scenario.setGear(gear);
         //make gas expensive!
         scenario.setGasPricePerLiter(new FixedDoubleParameter(0.2));
@@ -170,7 +170,7 @@ public class MarketFirstDemo {
                 list.add(String.valueOf
                         (((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0])
                                  + "," +
-                                 (((RandomCatchabilityTrawl) fisher.getGear()).getTrawlSpeed())
+                                 (((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished())
                                  + "," +
                                  String.valueOf(
                                          fisher.getLatestYearlyObservation(

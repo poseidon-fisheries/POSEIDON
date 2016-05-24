@@ -125,7 +125,7 @@ public class GearImitationAnalysis implements FisherStartable
             {
                 double total = 0;
                 for(Fisher fisher1 : state.getFishers())
-                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getTrawlSpeed();
+                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
                 return total/size;
             }
         }, Double.NaN);
@@ -165,7 +165,7 @@ public class GearImitationAnalysis implements FisherStartable
                             double currentShock = random.nextDouble() * shock;
                             if (random.nextBoolean())
                                 currentShock -= currentShock;
-                            double newMileage = current.getTrawlSpeed() + currentShock;
+                            double newMileage = current.getGasPerHourFished() + currentShock;
                             newMileage = Math.max(newMileage, minTrawlingSpeed);
                             newMileage = Math.min(newMileage, maxTrawlingSpeed);
                             return new RandomCatchabilityTrawl(
@@ -222,7 +222,7 @@ public class GearImitationAnalysis implements FisherStartable
             {
                 double total = 0;
                 for(Fisher fisher1 : state.getFishers())
-                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getTrawlSpeed();
+                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
                 return total/size;
             }
         }, Double.NaN);

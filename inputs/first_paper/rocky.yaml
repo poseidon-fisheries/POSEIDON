@@ -33,7 +33,7 @@ Prototype:
       meanCatchabilitySandy: '0.01'
       standardDeviationCatchabilityRocky: '0.0'
       standardDeviationCatchabilitySandy: '0.0'
-      trawlSpeed: '5.0'
+      gasPerHourFished: '5.0'
   habitatInitializer:
     Rocky Rectangles:
       numberOfRectangles: '5.0'

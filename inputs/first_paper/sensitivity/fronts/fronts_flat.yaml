@@ -1,32 +1,30 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Diffusing Logistic:
       carryingCapacity: '5000.0'
       differentialPercentageToMove: '0.001'
-      percentageLimitOnDailyMovement: '0.01'
-      steepness: uniform 0.6 0.8
+      percentageLimitOnDailyMovement: '0.1'
+      steepness: 0.7
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
   destinationStrategy:
     Imitator-Explorator:
-      alwaysCopyBest: true
-      dropInUtilityNeededForUnfriend: '-1.0'
-      ignoreEdgeDirection: false
-      probability:
-        Adaptive Probability:
-          explorationProbability: '0.8'
-          explorationProbabilityMinimum: '0.01'
-          imitationProbability: '1.0'
-          incrementMultiplier: '0.02'
-      stepSize: uniform 1.0 10.0
-  enginePower: normal 100.0 10.0
+          alwaysCopyBest: true
+          dropInUtilityNeededForUnfriend: '-1.0'
+          ignoreEdgeDirection: false
+          probability:
+            Fixed Probability:
+              explorationProbability: '0.2'
+              imitationProbability: '1.0'
+          stepSize: uniform 1.0 10.0
+  enginePower: normal 5000.0 100.0
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
   fuelTankSize: '100000.0'
-  gasPricePerLiter: '0.01'
+  gasPricePerLiter: '10'
   gear:
     Random Catchability:
       meanCatchabilityFirstSpecies: '0.01'
@@ -44,7 +42,6 @@ Prototype:
       depthSmoothing: '1000000.0'
       height: '50.0'
       width: '50.0'
-  mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
       marketPrice: '10.0'
@@ -54,7 +51,10 @@ Prototype:
   portPositionX: 40
   portPositionY: 25
   ports: 1
-  regulation: Anarchy
+  regulation:
+    MPA Only:
+      startingMPAs: [
+        ]
   speedInKmh: '5.0'
   startingMPAs: [
     ]
@@ -65,3 +65,5 @@ Prototype:
       windOrientation: '0.0'
       windSpeed: '0.0'
   weatherStrategy: Ignore Weather
+
+

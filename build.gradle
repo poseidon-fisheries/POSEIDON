@@ -6,6 +6,9 @@ plugins {
     id "jacoco"
 }
 
+jacoco {
+    toolVersion = "0.7.5+"
+}
 
 mainClassName = 'uk.ac.ox.oxfish.Main'
 

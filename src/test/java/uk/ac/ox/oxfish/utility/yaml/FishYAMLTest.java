@@ -57,7 +57,7 @@ public class FishYAMLTest {
                         "      meanCatchabilityOtherSpecies: '0.01'\n" +
                         "      standardDeviationCatchabilityFirstSpecies: '0.0'\n" +
                         "      standardDeviationCatchabilityOtherSpecies: '0.0'\n" +
-                        "      trawlSpeed: '5.0'\n" +
+                        "      gasPerHourFished: '5.0'\n" +
                         "  habitatInitializer: All Sand\n" +
                         "  holdSize: '100.0'\n" +
                         "  literPerKilometer: '10.0'\n" +

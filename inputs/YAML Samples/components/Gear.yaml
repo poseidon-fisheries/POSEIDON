@@ -10,19 +10,19 @@ Random Catchability:
   meanCatchabilityOtherSpecies: '0.01'
   standardDeviationCatchabilityFirstSpecies: '0.0'
   standardDeviationCatchabilityOtherSpecies: '0.0'
-  trawlSpeed: '5.0'
+  gasPerHourFished: '5.0'
 -------
 Random Catchability By List:
   catchabilityMap: '0:0.01'
   standardDeviationMap: ''
-  trawlSpeed: '5.0'
+  gasPerHourFished: '5.0'
 -------
 Habitat Aware Gear:
   meanCatchabilityRocky: '0.01'
   meanCatchabilitySandy: '0.01'
   standardDeviationCatchabilityRocky: '0.0'
   standardDeviationCatchabilitySandy: '0.0'
-  trawlSpeed: '5.0'
+  gasPerHourFished: '5.0'
 -------
 Threshold Gear Factory:
   catchability: '0.01'

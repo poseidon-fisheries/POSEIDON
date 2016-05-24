@@ -2,4 +2,4 @@ Abstract:
   gasPricePerLiter: '0.2'
   gear:
     Random Catchability:
-      trawlSpeed: uniform 0 20
+      gasPerHourFished: uniform 0 20

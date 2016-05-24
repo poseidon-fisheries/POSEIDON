@@ -680,6 +680,7 @@ public class Fisher implements Steppable, Startable{
         consumeFuel(litersBurned);
 
         memory.getYearlyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);
+        memory.getDailyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);
 
 
         return catchOfTheDay;
