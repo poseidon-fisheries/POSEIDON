@@ -147,8 +147,8 @@ public class MovingTest
         //lots of crap to initialize.
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(), any(),any() ,
-                                        any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
+        when(strategy.chooseDestination( any(),
+                                          any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
 
         Fisher fisher = new Fisher(0, port,
                                      new MersenneTwisterFast(), new Anarchy(),
@@ -181,7 +181,7 @@ public class MovingTest
         //lots of crap to initialize.
         Port port = mock(Port.class); when(port.getLocation()).thenReturn(map.getSeaTile(0, 0));
         DestinationStrategy strategy = mock(DestinationStrategy.class);
-        when(strategy.chooseDestination(any(), any(), any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
+        when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(),
                 mock(DepartingStrategy.class), strategy,
                                      mock(FishingStrategy.class),

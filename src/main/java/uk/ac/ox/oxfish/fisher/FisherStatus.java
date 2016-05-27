@@ -5,6 +5,7 @@ import org.metawidget.inspector.annotation.UiHidden;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -253,5 +254,27 @@ public class FisherStatus implements Serializable {
                                                  bankBalance,
                                                  fuelEmergencyOverride,
                                                  network);
+    }
+
+    /**
+     * Can this fisher be at sea?
+     * @param fisher the  fisher
+     * @param model the model
+     * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
+     * at sea
+     */
+    public boolean isAllowedAtSea(Fisher fisher, FishState model) {
+        return regulation.allowedAtSea(fisher, model);
+    }
+
+    /**
+     * can the agent fish at this location?
+     * @param agent the agent that wants to fish
+     * @param tile the tile the fisher is trying to fish on
+     * @param model a link to the model
+     * @return true if the fisher can fish
+     */
+    public boolean isAllowedToFishHere(Fisher agent, SeaTile tile, FishState model) {
+        return regulation.canFishHere(agent, tile, model);
     }
 }

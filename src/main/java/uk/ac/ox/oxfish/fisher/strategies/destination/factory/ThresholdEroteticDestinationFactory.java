@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureFilter;
 import uk.ac.ox.oxfish.fisher.erotetic.ThresholdFilter;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.ThresholdEroteticDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -32,7 +32,7 @@ public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<Thr
                 new ThresholdFilter<>(
                         minimumObservations.apply(state.getRandom()).intValue(),
                         minimumObservations.apply(state.getRandom()),
-                        FeatureFilter.LAST_PROFIT_FEATURE
+                        SNALSARutilities.PROFIT_FEATURE
                 ),
                 new FavoriteDestinationStrategy(state.getMap(),state.getRandom())
 

@@ -16,8 +16,8 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureFilter;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -315,7 +315,7 @@ public class PrototypeScenario implements Scenario {
 
             //todo move this somewhere else
             newFisher.addFeatureExtractor(
-                    FeatureFilter.LAST_PROFIT_FEATURE,
+                    SNALSARutilities.PROFIT_FEATURE,
                     new RememberedProfitsExtractor(true)
             );
 

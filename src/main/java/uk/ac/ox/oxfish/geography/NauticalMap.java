@@ -484,4 +484,14 @@ public class NauticalMap implements Startable
     public Deque<SeaTile> getRoute(SeaTile start, SeaTile end) {
         return pathfinder.getRoute(this, start, end);
     }
+
+
+    public Bag getFishersAtLocation(int x, int y) {
+        return fishersMap.getObjectsAtLocation(x, y);
+    }
+
+    public Bag getFishersAtLocation(SeaTile tile) {
+        return getFishersAtLocation(tile.getGridX(),
+                                               tile.getGridY());
+    }
 }

@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
@@ -38,23 +36,19 @@ public class FeatureExtractors<T> {
      * @param featureName the name of the feature to extract
      * @param toRepresent the list of object from which to extract a feature
      * @param model the model to represent
-     * @param equipment
-     *@param status
-     * @param memory @return a map of toRepresent ---> feature (as double); could be empty. For all elements that were present as parameters
-     * but not in the output this extractor could not find the correct feature for them.
-     */
+     * @param fisher
+     * */
     public HashMap<T,Double> extractFeature(
             String featureName,
             Collection<T> toRepresent,
-            FishState model, FisherEquipment equipment, FisherStatus status,
-            FisherMemory memory)
+            FishState model, Fisher fisher)
     {
         FeatureExtractor<T> extractor = extractors.get(featureName);
         //if there is no extractor then there is no feature to extract
         if(extractor==null)
             return null;
 
-        return extractor.extractFeature(toRepresent, model,equipment , status, memory);
+        return extractor.extractFeature(toRepresent, model,fisher);
 
     }
 

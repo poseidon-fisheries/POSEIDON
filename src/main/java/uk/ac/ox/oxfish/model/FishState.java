@@ -11,6 +11,7 @@ import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
+import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -603,8 +604,8 @@ public class FishState  extends SimState{
                                                            SeaTile mostFishedTileInTrip = lastFinishedTrip.getMostFishedTileInTrip();
                                                            if (mostFishedTileInTrip != null) {
                                                                sum +=
-                                                                       Math.pow(mostFishedTileInTrip.getGridX()-fisher.getHomePort().getLocation().getGridX(),2)
-                                                                               + Math.pow(mostFishedTileInTrip.getGridY()-fisher.getHomePort().getLocation().getGridY(),2);
+                                                                       map.distance(fisher.getHomePort().getLocation(),
+                                                                                    mostFishedTileInTrip);
                                                                observations++;
                                                            }
                                                        }
@@ -648,5 +649,14 @@ public class FishState  extends SimState{
                                                }
                                            }
                 , Double.NaN);
+    }
+
+
+    public Bag getFishersAtLocation(int x, int y) {
+        return map.getFishersAtLocation(x, y);
+    }
+
+    public Bag getFishersAtLocation(SeaTile tile) {
+        return map.getFishersAtLocation(tile);
     }
 }

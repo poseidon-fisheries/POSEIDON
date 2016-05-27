@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import com.esotericsoftware.minlog.Log;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
@@ -36,17 +34,14 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
      * @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation the set of all feature extractors available
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
-     * @param equipment
-     * @param status
-     * @param memory
+     * @param fisher
      */
     @Override
     public List<T> filterOptions(
-            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, FisherEquipment equipment,
-            FisherStatus status, FisherMemory memory) {
+            List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
         HashMap<T, Double> features = representation.extractFeature(featureName,
                                                                     currentOptions,
-                                                                    state, equipment, status,memory );
+                                                                    state, fisher);
         //no feature, indifference
         if(features == null || features.isEmpty())
         {

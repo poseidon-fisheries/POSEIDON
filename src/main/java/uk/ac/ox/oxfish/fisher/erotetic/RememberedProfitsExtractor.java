@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.LocationMemory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -31,22 +29,20 @@ public class RememberedProfitsExtractor implements FeatureExtractor<SeaTile>{
     /**
      * Method called to extract the feature from the object toRepresent, given the observer and the overall model
      *
-     * @param toRepresent the list of object from which to extract a feature
-     * @param model       the model to represent
-     * @param equipment
-     *@param status
-     * @param fisherMemory @return a map of toRepresent ---> feature (as double); could be empty or null.
+     * @return a map of toRepresent ---> feature (as double); could be empty or null.
      * For all elements that were present as parameters
      * but not in the output this extractor could not find the correct feature for them.
-     */
+     * @param toRepresent the list of object from which to extract a feature
+     * @param model       the model to represent
+     * @param fisher
+     * */
     @Override
     public HashMap<SeaTile, Double> extractFeature(
             Collection<SeaTile> toRepresent,
-            FishState model, FisherEquipment equipment, FisherStatus status,
-            FisherMemory fisherMemory)
+            FishState model, Fisher fisher)
     {
 
-        Map<SeaTile, LocationMemory<TripRecord>> memories = fisherMemory.rememberAllTrips();
+        Map<SeaTile, LocationMemory<TripRecord>> memories = fisher.rememberAllTrips();
         HashMap<SeaTile,Double> features = new HashMap<>();
         for(Map.Entry<SeaTile, LocationMemory<TripRecord>> memory : memories.entrySet())
         {

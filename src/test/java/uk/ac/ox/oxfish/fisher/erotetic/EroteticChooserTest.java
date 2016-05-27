@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -35,12 +33,12 @@ public class EroteticChooserTest
 
         FeatureFilter<SeaTile> fakeFilterOne = mock(FeatureFilter.class);
         List<SeaTile> fakeChoiceOne = Collections.singletonList(one);
-        when(fakeFilterOne.filterOptions(anyList(), any(), any(),any() , any(),any() )).thenReturn(fakeChoiceOne);
+        when(fakeFilterOne.filterOptions(anyList(), any(), any(),  any())).thenReturn(fakeChoiceOne);
 
 
         FeatureFilter<SeaTile> fakeFilterTwo = mock(FeatureFilter.class);
         List<SeaTile> fakeChoiceTwo = Collections.singletonList(two);
-        when(fakeFilterTwo.filterOptions(anyList(), any(), any(), any(), any(), any())).thenReturn(fakeChoiceTwo);
+        when(fakeFilterTwo.filterOptions(anyList(), any(), any(),  any())).thenReturn(fakeChoiceTwo);
 
         EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
         //priority to one, one should be choosen
@@ -50,7 +48,7 @@ public class EroteticChooserTest
                 one,
                 chooser.filterOptions(toChoose,
                                       mock(FeatureExtractors.class),
-                                      mock(FishState.class),mock(FisherEquipment.class) ,mock(FisherStatus.class) ,mock(FisherMemory.class) )
+                                      mock(FishState.class), mock(Fisher.class))
         );
 
 
@@ -63,7 +61,7 @@ public class EroteticChooserTest
                 two,
                 chooser.filterOptions(toChoose,
                                       mock(FeatureExtractors.class),
-                                      mock(FishState.class),mock(FisherEquipment.class) ,mock(FisherStatus.class) ,mock(FisherMemory.class) )
+                                      mock(FishState.class),mock(Fisher.class))
         );
 
 
@@ -82,7 +80,7 @@ public class EroteticChooserTest
                     @Override
                     public List<SeaTile> filterOptions(
                             List<SeaTile> currentOptions, FeatureExtractors<SeaTile> representation,
-                            FishState state, FisherEquipment equipment, FisherStatus status, FisherMemory memory) {
+                            FishState state, Fisher fisher) {
                         LinkedList<SeaTile> choices = new LinkedList<>(currentOptions);
                         choices.remove(0);
                         return choices;
@@ -107,7 +105,7 @@ public class EroteticChooserTest
                 three,
                 chooser.filterOptions(toChoose,
                                       mock(FeatureExtractors.class),
-                                      mock(FishState.class), mock(FisherEquipment.class) ,mock(FisherStatus.class) ,mock(FisherMemory.class) )
+                                      mock(FishState.class),mock(Fisher.class))
         );
 
 

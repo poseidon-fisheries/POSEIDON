@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.erotetic.AdaptiveThresholdFilter;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureFilter;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.ThresholdEroteticDestinationStrategy;
@@ -41,7 +41,7 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
                 new AdaptiveThresholdFilter<>(
                         minimumObservations.apply(state.getRandom()).intValue(),
                         0d,
-                        FeatureFilter.LAST_PROFIT_FEATURE,
+                        SNALSARutilities.PROFIT_FEATURE,
                         new Function<FishState, Double>() {
                             @Override
                             public Double apply(FishState simState) {

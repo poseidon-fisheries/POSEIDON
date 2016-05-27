@@ -3,7 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.*;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
@@ -42,10 +43,9 @@ public class PerTripIterativeDestinationStrategyTest {
         when(port.getLocation()).thenReturn(mock(SeaTile.class));
         when(fisher.getHomePort()).thenReturn(port);
 
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getLocation()).thenReturn(delegate.getFavoriteSpot());
-        when(status.isGoingToPort()).thenReturn(false);
-        when(status.getHomePort()).thenReturn(port);
+        when(fisher.getLocation()).thenReturn(delegate.getFavoriteSpot());
+        when(fisher.isGoingToPort()).thenReturn(false);
+        when(fisher.getHomePort()).thenReturn(port);
 
 
 
@@ -57,8 +57,8 @@ public class PerTripIterativeDestinationStrategyTest {
             TripRecord record = mock(TripRecord.class);
             when(record.isCompleted()).thenReturn(true);
             when(record.isCutShort()).thenReturn(true);
-            favoriteSpot = hill.chooseDestination(mock(FisherEquipment.class),
-                                                  status, mock(FisherMemory.class) , random, fishState, new Moving());
+            favoriteSpot = hill.chooseDestination(fisher,
+                                                    random, fishState, new Moving());
             when(record.getProfitPerHour(true)).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
             hill.getAlgorithm().adapt(fisher,random);

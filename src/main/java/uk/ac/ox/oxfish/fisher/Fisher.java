@@ -511,7 +511,7 @@ public class Fisher implements Steppable, Startable{
             status.setDestination(status.getHomePort().getLocation());
         else
             status.setDestination(
-                    destinationStrategy.chooseDestination(equipment,status,memory , status.getRandom(), model, currentAction));
+                    destinationStrategy.chooseDestination(this, status.getRandom(), model, currentAction));
         Preconditions.checkNotNull(status.getDestination(), "Destination can never be null!");
     }
 
@@ -1150,4 +1150,13 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    /**
+     * can the agent fish at this location?
+     * @param tile the tile the fisher is trying to fish on
+     * @param model a link to the model
+     * @return true if the fisher can fish
+     */
+    public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
+        return status.isAllowedToFishHere(this, tile, model);
+    }
 }

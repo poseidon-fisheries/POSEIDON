@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.fisher.erotetic;
 import org.jfree.util.Log;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
@@ -17,9 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-/**
- * Created by carrknight on 5/2/16.
- */
+
 public class ThresholdFilterTest {
 
 
@@ -36,8 +32,7 @@ public class ThresholdFilterTest {
         extractor.addFeatureExtractor("feature", new FeatureExtractor<Double>() {
             @Override
             public HashMap<Double, Double> extractFeature(
-                    Collection<Double> toRepresent, FishState model, FisherEquipment equipment, FisherStatus status,
-                    FisherMemory memory) {
+                    Collection<Double> toRepresent, FishState model, Fisher fisher) {
                 HashMap<Double,Double> toReturn = new HashMap<>();
                 for(Double number : toRepresent)
                     toReturn.put(number,number);
@@ -62,9 +57,7 @@ public class ThresholdFilterTest {
                 options,
                 extractor,
                 mock(FishState.class),
-                mock(FisherEquipment.class),
-                mock(FisherStatus.class),
-                mock(FisherMemory.class)
+                mock(Fisher.class)
         );
 
         assertTrue(selected == null || selected.isEmpty());
@@ -88,9 +81,7 @@ public class ThresholdFilterTest {
                 options,
                 extractor,
                 mock(FishState.class),
-                mock(FisherEquipment.class),
-                mock(FisherStatus.class),
-                mock(FisherMemory.class)
+                mock(Fisher.class)
         );
 
         assertTrue(selected == null || selected.isEmpty());
@@ -114,9 +105,8 @@ public class ThresholdFilterTest {
                 options,
                 extractor,
                 mock(FishState.class),
-                mock(FisherEquipment.class),
-                mock(FisherStatus.class),
-                mock(FisherMemory.class)
+                mock(Fisher.class)
+
         );
 
         assertEquals(selected.size(),3);
@@ -139,9 +129,7 @@ public class ThresholdFilterTest {
                 options,
                 extractor,
                 mock(FishState.class),
-                mock(FisherEquipment.class),
-                mock(FisherStatus.class),
-                mock(FisherMemory.class)
+                mock(Fisher.class)
         );
 
         assertEquals(selected.size(),1);

@@ -1,8 +1,6 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -24,20 +22,16 @@ public interface FeatureFilter<T> extends Startable
      * @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation the set of all feature extractors available
      * @param state the model   @return a list of acceptable options or null if there is pure indifference among them
-     * @param equipment
-     * @param status
-     * @param memory */
+     * @param fisher   */
     List<T> filterOptions(
             List<T> currentOptions,
             FeatureExtractors<T> representation,
-            FishState state, FisherEquipment equipment, FisherStatus status, FisherMemory memory);
+            FishState state,
+            Fisher fisher);
 
 
 
 
-    /*
-    * What follow is a list of names of features. Keep them all here to avoid typo errors
-     */
 
-    String LAST_PROFIT_FEATURE = "Last Profit Feature";
+
 }

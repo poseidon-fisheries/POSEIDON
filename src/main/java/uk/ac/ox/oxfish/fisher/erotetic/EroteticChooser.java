@@ -2,9 +2,7 @@ package uk.ac.ox.oxfish.fisher.erotetic;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.*;
@@ -32,13 +30,11 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param options list of options, possibly already filtered by others. It is <b>unmodifiable</b>
      * @param representation the set of all feature extractors available
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
-     * @param equipment
-     * @param status
-     * @param memory
+     * @param fisher
      */
     public T filterOptions(
-            List<? extends T> options, FeatureExtractors<T> representation, FishState state, FisherEquipment equipment,
-            FisherStatus status, FisherMemory memory) {
+            List<? extends T> options, FeatureExtractors<T> representation, FishState state,
+            Fisher fisher) {
         Preconditions.checkArgument(!options.isEmpty(), "Cannot choose if there are no options");
         if(options.size()==1) //if only one option is avaiable, then return it!
             return options.get(0);
@@ -47,7 +43,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
             //filter
             List<? extends T> newOptions = filter.filterOptions(Collections.unmodifiableList(options),
                                                                 representation,
-                                                                state,equipment ,status ,memory );
+                                                                state, fisher);
             //if filter returns null or is empty, means it is indifferent!
             if(newOptions == null || newOptions.isEmpty())
                 continue;
@@ -63,8 +59,9 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
         assert options != null && options.size()>1; //otherwise the for loop would have returned
         //use default chooser!
         List<? extends T> finalChoice = defaultFilter.filterOptions(Collections.unmodifiableList(options),
-                                                           representation,
-                                                                    state,equipment ,status ,memory);
+                                                                    representation,
+                                                                    state,
+                                                                    fisher);
         Preconditions.checkArgument(finalChoice != null && finalChoice.size()==1, "Default chooser didn't select one option");
         if(Log.TRACE)
             Log.trace("ended up choosing " + finalChoice.get(0));

@@ -70,11 +70,11 @@ public class FirstPaper
        // frontsSensitivity(Paths.get("sensitivity","fronts","fronts_worst.yaml"));
       //  frontsSensitivity(Paths.get("sensitivity","fronts","fronts_flat.yaml"));
         Log.info("Hyperstability");
-        hyperStability();
+        //hyperStability();
         Log.info("Oil Price Changes");
-  //      oilCheck();
-//        oils(1);
-//        oils(2);
+        oilCheck();
+        oils(1);
+        oils(2);
         Log.info("Fishing the Line");
         //        mpa();
         Log.info("Optimal Network");

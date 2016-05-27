@@ -2,9 +2,6 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -18,27 +15,22 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
     /**
      *  if the fisher is at port, picks a sea-location at random. If the fisher is at sea, it chooses the same destination until it arrives.
      * Once it has arrived, it chooses to go back to port.
-     * @param equipment
-     * @param status
-     * @param memory
+     * @param fisher
      * @param random        the randomizer
      * @param model         the model link
-     * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination
-     * */
+     * @param currentAction what action is the fisher currently taking that prompted to check for destination   @return the destination   */
     @Override
     public SeaTile chooseDestination(
-            FisherEquipment equipment,
-            FisherStatus status,
-            FisherMemory memory, MersenneTwisterFast random,
+            Fisher fisher, MersenneTwisterFast random,
             FishState model,
             Action currentAction) {
 
         //if the fisher is at port
-        if(status.isAtPort())
+        if(fisher.isAtPort())
         {
             //they are probably docked
             assert currentAction instanceof AtPort;
-            assert status.isGoingToPort(); //I assume at port your destination is still the port
+            assert fisher.isGoingToPort(); //I assume at port your destination is still the port
 
             //that's where we are headed!
             return model.getMap().getRandomBelowWaterLineSeaTile(random);
@@ -48,10 +40,10 @@ public class RandomThenBackToPortDestinationStrategy implements DestinationStrat
             //we are not at port
             assert ! (currentAction instanceof AtPort);
             //are we there yet?
-            if(status.getLocation() == status.getDestination())
-                return status.getHomePort().getLocation(); //return home
+            if(fisher.getLocation() == fisher.getDestination())
+                return fisher.getHomePort().getLocation(); //return home
             else
-                return status.getDestination(); //stay the course!
+                return fisher.getDestination(); //stay the course!
         }
 
 
