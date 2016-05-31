@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.erotetic.ThresholdFilter;
+import uk.ac.ox.oxfish.fisher.erotetic.ThresholdAnswer;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.ThresholdEroteticDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.SimpleEroteticDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 4/11/16.
  */
-public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<ThresholdEroteticDestinationStrategy> {
+public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<SimpleEroteticDestinationStrategy> {
 
 
     private DoubleParameter minimumObservations = new FixedDoubleParameter(5);
@@ -27,9 +27,9 @@ public class ThresholdEroteticDestinationFactory implements AlgorithmFactory<Thr
      * @return the function result
      */
     @Override
-    public ThresholdEroteticDestinationStrategy apply(FishState state) {
-        return new ThresholdEroteticDestinationStrategy(
-                new ThresholdFilter<>(
+    public SimpleEroteticDestinationStrategy apply(FishState state) {
+        return new SimpleEroteticDestinationStrategy(
+                new ThresholdAnswer<>(
                         minimumObservations.apply(state.getRandom()).intValue(),
                         minimumObservations.apply(state.getRandom()),
                         SNALSARutilities.PROFIT_FEATURE

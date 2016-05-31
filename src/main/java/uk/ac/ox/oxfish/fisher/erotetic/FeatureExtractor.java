@@ -25,4 +25,8 @@ public interface  FeatureExtractor<T> {
 
 
 
+    //common names:
+    String AVERAGE_PROFIT_FEATURE = "Average Fishery Profits Per Trip";
+
+
 }

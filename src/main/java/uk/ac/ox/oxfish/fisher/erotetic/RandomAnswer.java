@@ -12,7 +12,7 @@ import java.util.List;
  * Simplest strategy, ignores all representations and just pick at random from all the options
  * Created by carrknight on 4/10/16.
  */
-public class RandomOptionFilter<T> implements FeatureFilter<T>
+public class RandomAnswer<T> implements EroteticAnswer<T>
 {
 
     /**
@@ -38,7 +38,7 @@ public class RandomOptionFilter<T> implements FeatureFilter<T>
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
      * @param fisher   */
     @Override
-    public List<T> filterOptions(
+    public List<T> answer(
             List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
         Preconditions.checkArgument(!currentOptions.isEmpty());
         if(Log.TRACE)

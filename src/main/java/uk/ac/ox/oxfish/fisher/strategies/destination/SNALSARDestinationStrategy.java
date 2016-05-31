@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.erotetic.EroteticAnswer;
 import uk.ac.ox.oxfish.fisher.erotetic.EroteticChooser;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureFilter;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -43,11 +43,11 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
 
 
     public SNALSARDestinationStrategy(
-            FeatureFilter<SeaTile> safetyFilter,
-            FeatureFilter<SeaTile> notKnownToFailProfitFilter,
-            FeatureFilter<SeaTile> legalFilter,
-            FeatureFilter<SeaTile> sociallyAppropriateFilter,
-            FeatureFilter<SeaTile> knownToHaveAcceptableProfits,
+            EroteticAnswer<SeaTile> safetyFilter,
+            EroteticAnswer<SeaTile> notKnownToFailProfitFilter,
+            EroteticAnswer<SeaTile> legalFilter,
+            EroteticAnswer<SeaTile> sociallyAppropriateFilter,
+            EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
             FavoriteDestinationStrategy delegate) {
         this.chooser = new EroteticChooser<>();
         this.chooser.add(safetyFilter);
@@ -93,9 +93,9 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     public void reactToFinishedTrip(TripRecord record) {
         //all choices
         List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
-        delegate.setFavoriteSpot(chooser.filterOptions(options,
-                                                       fisher.getTileRepresentation(),
-                                                       model, fisher
+        delegate.setFavoriteSpot(chooser.answer(options,
+                                                fisher.getTileRepresentation(),
+                                                model, fisher
                                  )
         );
     }

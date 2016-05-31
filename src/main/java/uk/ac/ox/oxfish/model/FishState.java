@@ -659,4 +659,8 @@ public class FishState  extends SimState{
     public Bag getFishersAtLocation(SeaTile tile) {
         return map.getFishersAtLocation(tile);
     }
+
+
+
+
 }

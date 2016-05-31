@@ -16,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
@@ -29,11 +30,13 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -46,10 +49,13 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -317,6 +323,18 @@ public class PrototypeScenario implements Scenario {
             newFisher.addFeatureExtractor(
                     SNALSARutilities.PROFIT_FEATURE,
                     new RememberedProfitsExtractor(true)
+            );
+            newFisher.addFeatureExtractor(
+                    FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                    new FeatureExtractor<SeaTile>() {
+                        @Override
+                        public HashMap<SeaTile, Double> extractFeature(
+                                Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+                            double averageProfits = model.getLatestDailyObservation(
+                                    FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
+                            return new FixedMap<SeaTile, Double>(averageProfits) ;
+                        }
+                    }
             );
 
 

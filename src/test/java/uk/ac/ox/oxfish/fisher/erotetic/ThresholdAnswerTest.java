@@ -10,17 +10,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-/**
- * Created by carrknight on 5/2/16.
- */
-public class AdaptiveThresholdFilterTest {
+
+public class ThresholdAnswerTest {
+
 
     private LinkedList<Double> options;
     private FeatureExtractors<Double> extractor;
@@ -44,60 +41,98 @@ public class AdaptiveThresholdFilterTest {
         });
     }
 
+    @Test
+    public void tooLow() throws Exception {
+
+
+        Log.info("needs numbers to be above 10, will not select any");
+        ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
+                2,
+                10,
+                "feature"
+        );
+
+
+        List<Double> selected = filter.answer(
+                options,
+                extractor,
+                mock(FishState.class),
+                mock(Fisher.class)
+        );
+
+        assertTrue(selected == null || selected.isEmpty());
+
+    }
+
 
     @Test
-    public void adapt() throws Exception {
+    public void tooFew() throws Exception {
 
 
         Log.info("needs at least 4 observations, has only 3");
-        Function<FishState,Double> adaptor = mock(Function.class);
-        when(adaptor.apply(any())).thenReturn(1d,2d,3d);
-        AdaptiveThresholdFilter<Double> filter =
-                new AdaptiveThresholdFilter<>(
-                        3,
-                        0,
-                        "feature",
-                        adaptor,
-                        1
-                );
+        ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
+                4,
+                0,
+                "feature"
+        );
 
 
+        List<Double> selected = filter.answer(
+                options,
+                extractor,
+                mock(FishState.class),
+                mock(Fisher.class)
+        );
 
-        List<Double> selected = filter.filterOptions(
+        assertTrue(selected == null || selected.isEmpty());
+
+    }
+
+
+    @Test
+    public void allGood() throws Exception {
+
+
+        Log.info("needs at least 4 observations, has only 3");
+        ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
+                3,
+                0,
+                "feature"
+        );
+
+
+        List<Double> selected = filter.answer(
                 options,
                 extractor,
                 mock(FishState.class),
                 mock(Fisher.class)
 
         );
+
         assertEquals(selected.size(),3);
-        filter.step(mock(FishState.class));
 
-        selected = filter.filterOptions(
+    }
+
+    @Test
+    public void oneGood() throws Exception {
+
+
+        Log.info("needs at least 4 observations, has only 3");
+        ThresholdAnswer<Double> filter = new ThresholdAnswer<>(
+                3,
+                3,
+                "feature"
+        );
+
+
+        List<Double> selected = filter.answer(
                 options,
                 extractor,
                 mock(FishState.class),
                 mock(Fisher.class)
         );
-        assertEquals(selected.size(),3);
-        filter.step(mock(FishState.class));
 
-        selected = filter.filterOptions(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
-        );
-        assertEquals(selected.size(),2);
-        filter.step(mock(FishState.class));
-
-        selected = filter.filterOptions(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
-        );
         assertEquals(selected.size(),1);
-        filter.step(mock(FishState.class));
+
     }
 }

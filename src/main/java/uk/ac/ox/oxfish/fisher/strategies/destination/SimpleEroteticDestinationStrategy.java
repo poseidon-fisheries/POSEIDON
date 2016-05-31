@@ -3,9 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.erotetic.EroteticAnswer;
 import uk.ac.ox.oxfish.fisher.erotetic.EroteticChooser;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureFilter;
-import uk.ac.ox.oxfish.fisher.erotetic.ThresholdFilter;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -14,10 +13,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.List;
 
 /**
- * First erotetic strategy: works first by threshold and secondly at random
+ * Simple erotetic strategy: works first by given answer strategy and otherwise at random random
  * Created by carrknight on 4/11/16.
  */
-public class ThresholdEroteticDestinationStrategy implements DestinationStrategy,
+public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
         TripListener{
 
     private final EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
@@ -41,8 +40,8 @@ public class ThresholdEroteticDestinationStrategy implements DestinationStrategy
      * the work is done almost exclusively by the argument passed, which contains all the important parameters
      * @param thresholder
      */
-    public ThresholdEroteticDestinationStrategy(
-            ThresholdFilter<SeaTile> thresholder,
+    public SimpleEroteticDestinationStrategy(
+            EroteticAnswer<SeaTile> thresholder,
             FavoriteDestinationStrategy delegate
     ) {
         chooser.add(thresholder);
@@ -69,9 +68,9 @@ public class ThresholdEroteticDestinationStrategy implements DestinationStrategy
     public void reactToFinishedTrip(TripRecord record) {
         //all choices
         List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
-        delegate.setFavoriteSpot(chooser.filterOptions(options,
-                                     fisher.getTileRepresentation(),
-                                     model, fisher
+        delegate.setFavoriteSpot(chooser.answer(options,
+                                                fisher.getTileRepresentation(),
+                                                model, fisher
                                  )
         );
     }
@@ -83,7 +82,7 @@ public class ThresholdEroteticDestinationStrategy implements DestinationStrategy
         this.fisher = fisher;
         this.model = model;
         fisher.addTripListener(this);
-        for(FeatureFilter<SeaTile> filter : chooser)
+        for(EroteticAnswer<SeaTile> filter : chooser)
             filter.start(model);
     }
 
@@ -91,7 +90,7 @@ public class ThresholdEroteticDestinationStrategy implements DestinationStrategy
     @Override
     public void turnOff() {
         fisher.removeTripListener(this);
-        for(FeatureFilter<SeaTile> filter : chooser)
+        for(EroteticAnswer<SeaTile> filter : chooser)
             filter.turnOff();
         fisher=null;
     }

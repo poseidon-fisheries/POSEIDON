@@ -12,17 +12,17 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 /**
- * This is the class holding a set of filters, going through each of them in order.
+ * This is the class holding a list of answers, going through each of them in order.
  * If one filter returns only 1 option then that option is chosen. If after all the filters are called
  * there are multiple options, one of them is chosen at random
  * Created by carrknight on 4/11/16.
  */
-public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
+public class EroteticChooser<T> implements Iterable<EroteticAnswer<T>> {
 
 
-    private final LinkedList<FeatureFilter<T>> featureFilters = new LinkedList<>();
+    private final LinkedList<EroteticAnswer<T>> eroteticAnswers = new LinkedList<>();
 
-    private final FeatureFilter<T> defaultFilter = new RandomOptionFilter<>();
+    private final EroteticAnswer<T> defaultFilter = new RandomAnswer<>();
 
 
     /**
@@ -32,18 +32,19 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param state          the model   @return a list of acceptable options or null if there is pure indifference among them
      * @param fisher
      */
-    public T filterOptions(
-            List<? extends T> options, FeatureExtractors<T> representation, FishState state,
+    public T answer(
+            List<? extends T> options,
+            FeatureExtractors<T> representation, FishState state,
             Fisher fisher) {
         Preconditions.checkArgument(!options.isEmpty(), "Cannot choose if there are no options");
         if(options.size()==1) //if only one option is avaiable, then return it!
             return options.get(0);
-        for(FeatureFilter<T> filter : featureFilters)
+        for(EroteticAnswer<T> filter : eroteticAnswers)
         {
             //filter
-            List<? extends T> newOptions = filter.filterOptions(Collections.unmodifiableList(options),
-                                                                representation,
-                                                                state, fisher);
+            List<? extends T> newOptions = filter.answer(Collections.unmodifiableList(options),
+                                                         representation,
+                                                         state, fisher);
             //if filter returns null or is empty, means it is indifferent!
             if(newOptions == null || newOptions.isEmpty())
                 continue;
@@ -58,10 +59,10 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
         }
         assert options != null && options.size()>1; //otherwise the for loop would have returned
         //use default chooser!
-        List<? extends T> finalChoice = defaultFilter.filterOptions(Collections.unmodifiableList(options),
-                                                                    representation,
-                                                                    state,
-                                                                    fisher);
+        List<? extends T> finalChoice = defaultFilter.answer(Collections.unmodifiableList(options),
+                                                             representation,
+                                                             state,
+                                                             fisher);
         Preconditions.checkArgument(finalChoice != null && finalChoice.size()==1, "Default chooser didn't select one option");
         if(Log.TRACE)
             Log.trace("ended up choosing " + finalChoice.get(0));
@@ -76,8 +77,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the first element in this list
      * @throws NoSuchElementException if this list is empty
      */
-    public FeatureFilter<T> getFirst() {
-        return featureFilters.getFirst();
+    public EroteticAnswer<T> getFirst() {
+        return eroteticAnswers.getFirst();
     }
 
     /**
@@ -88,19 +89,19 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *     this list is empty
      * @since 1.6
      */
-    public FeatureFilter<T> pollFirst() {
-        return featureFilters.pollFirst();
+    public EroteticAnswer<T> pollFirst() {
+        return eroteticAnswers.pollFirst();
     }
 
     /**
      * Inserts the specified element at the front of this list.
      *
-     * @param tFeatureFilter the element to insert
+     * @param tEroteticAnswer the element to insert
      * @return {@code true} (as specified by {@link Deque#offerFirst})
      * @since 1.6
      */
-    public boolean offerFirst(FeatureFilter<T> tFeatureFilter) {
-        return featureFilters.offerFirst(tFeatureFilter);
+    public boolean offerFirst(EroteticAnswer<T> tEroteticAnswer) {
+        return eroteticAnswers.offerFirst(tEroteticAnswer);
     }
 
     /**
@@ -132,19 +133,19 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         (<a href="Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    public void replaceAll(UnaryOperator<FeatureFilter<T>> operator) {
-        featureFilters.replaceAll(operator);
+    public void replaceAll(UnaryOperator<EroteticAnswer<T>> operator) {
+        eroteticAnswers.replaceAll(operator);
     }
 
     /**
      * Adds the specified element as the tail (last element) of this list.
      *
-     * @param tFeatureFilter the element to add
+     * @param tEroteticAnswer the element to add
      * @return {@code true} (as specified by {@link Queue#offer})
      * @since 1.5
      */
-    public boolean offer(FeatureFilter<T> tFeatureFilter) {
-        return featureFilters.offer(tFeatureFilter);
+    public boolean offer(EroteticAnswer<T> tEroteticAnswer) {
+        return eroteticAnswers.offer(tEroteticAnswer);
     }
 
     /**
@@ -152,10 +153,10 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *
      * <p>This method is equivalent to {@link #add}.
      *
-     * @param tFeatureFilter the element to add
+     * @param tEroteticAnswer the element to add
      */
-    public void addLast(FeatureFilter<T> tFeatureFilter) {
-        featureFilters.addLast(tFeatureFilter);
+    public void addLast(EroteticAnswer<T> tEroteticAnswer) {
+        eroteticAnswers.addLast(tEroteticAnswer);
     }
 
     /**
@@ -166,8 +167,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *     this list is empty
      * @since 1.6
      */
-    public FeatureFilter<T> pollLast() {
-        return featureFilters.pollLast();
+    public EroteticAnswer<T> pollLast() {
+        return eroteticAnswers.pollLast();
     }
 
     /**
@@ -176,8 +177,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the last element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public FeatureFilter<T> removeLast() {
-        return featureFilters.removeLast();
+    public EroteticAnswer<T> removeLast() {
+        return eroteticAnswers.removeLast();
     }
 
     /**
@@ -186,11 +187,11 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *
      * <p>This method is equivalent to {@link #addFirst}.
      *
-     * @param tFeatureFilter the element to push
+     * @param tEroteticAnswer the element to push
      * @since 1.6
      */
-    public void push(FeatureFilter<T> tFeatureFilter) {
-        featureFilters.push(tFeatureFilter);
+    public void push(EroteticAnswer<T> tEroteticAnswer) {
+        eroteticAnswers.push(tEroteticAnswer);
     }
 
     /**
@@ -205,7 +206,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         this list, or -1 if this list does not contain the element
      */
     public int indexOf(Object o) {
-        return featureFilters.indexOf(o);
+        return eroteticAnswers.indexOf(o);
     }
 
     /**
@@ -222,14 +223,14 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return {@code true} if this list contained the specified element
      */
     public boolean remove(Object o) {
-        return featureFilters.remove(o);
+        return eroteticAnswers.remove(o);
     }
 
     /**
      * @since 1.6
      */
-    public Iterator<FeatureFilter<T>> descendingIterator() {
-        return featureFilters.descendingIterator();
+    public Iterator<EroteticAnswer<T>> descendingIterator() {
+        return eroteticAnswers.descendingIterator();
     }
 
     /**
@@ -251,8 +252,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws NullPointerException if the specified action is null
      * @since 1.8
      */
-    public void forEach(Consumer<? super FeatureFilter<T>> action) {
-        featureFilters.forEach(action);
+    public void forEach(Consumer<? super EroteticAnswer<T>> action) {
+        eroteticAnswers.forEach(action);
     }
 
     /**
@@ -264,8 +265,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public FeatureFilter<T> remove(int index) {
-        return featureFilters.remove(index);
+    public EroteticAnswer<T> remove(int index) {
+        return eroteticAnswers.remove(index);
     }
 
     /**
@@ -274,8 +275,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the head of this list, or {@code null} if this list is empty
      * @since 1.5
      */
-    public FeatureFilter<T> poll() {
-        return featureFilters.poll();
+    public EroteticAnswer<T> poll() {
+        return eroteticAnswers.poll();
     }
 
     /**
@@ -290,7 +291,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         this list, or -1 if this list does not contain the element
      */
     public int lastIndexOf(Object o) {
-        return featureFilters.lastIndexOf(o);
+        return eroteticAnswers.lastIndexOf(o);
     }
 
     /**
@@ -314,8 +315,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
-    public ListIterator<FeatureFilter<T>> listIterator(int index) {
-        return featureFilters.listIterator(index);
+    public ListIterator<EroteticAnswer<T>> listIterator(int index) {
+        return eroteticAnswers.listIterator(index);
     }
 
     /**
@@ -324,7 +325,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the number of elements in this list
      */
     public int size() {
-        return featureFilters.size();
+        return eroteticAnswers.size();
     }
 
     /**
@@ -332,11 +333,11 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *
      * <p>This method is equivalent to {@link #addLast}.
      *
-     * @param tFeatureFilter element to be appended to this list
+     * @param tEroteticAnswer element to be appended to this list
      * @return {@code true} (as specified by {@link Collection#add})
      */
-    public boolean add(FeatureFilter<T> tFeatureFilter) {
-        return featureFilters.add(tFeatureFilter);
+    public boolean add(EroteticAnswer<T> tEroteticAnswer) {
+        return eroteticAnswers.add(tEroteticAnswer);
     }
 
     /**
@@ -346,8 +347,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws NoSuchElementException if this list is empty
      * @since 1.5
      */
-    public FeatureFilter<T> element() {
-        return featureFilters.element();
+    public EroteticAnswer<T> element() {
+        return eroteticAnswers.element();
     }
 
     /**
@@ -358,8 +359,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         if this list is empty
      * @since 1.6
      */
-    public FeatureFilter<T> peekLast() {
-        return featureFilters.peekLast();
+    public EroteticAnswer<T> peekLast() {
+        return eroteticAnswers.peekLast();
     }
 
     /**
@@ -367,17 +368,17 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * predicate.  Errors or runtime exceptions thrown during iteration or by
      * the predicate are relayed to the caller.
      */
-    public boolean removeIf(Predicate<? super FeatureFilter<T>> filter) {
-        return featureFilters.removeIf(filter);
+    public boolean removeIf(Predicate<? super EroteticAnswer<T>> filter) {
+        return eroteticAnswers.removeIf(filter);
     }
 
     /**
      * Inserts the specified element at the beginning of this list.
      *
-     * @param tFeatureFilter the element to add
+     * @param tEroteticAnswer the element to add
      */
-    public void addFirst(FeatureFilter<T> tFeatureFilter) {
-        featureFilters.addFirst(tFeatureFilter);
+    public void addFirst(EroteticAnswer<T> tEroteticAnswer) {
+        eroteticAnswers.addFirst(tEroteticAnswer);
     }
 
     /**
@@ -387,8 +388,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws NoSuchElementException if this list is empty
      * @since 1.5
      */
-    public FeatureFilter<T> remove() {
-        return featureFilters.remove();
+    public EroteticAnswer<T> remove() {
+        return eroteticAnswers.remove();
     }
 
     /**
@@ -397,8 +398,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the last element in this list
      * @throws NoSuchElementException if this list is empty
      */
-    public FeatureFilter<T> getLast() {
-        return featureFilters.getLast();
+    public EroteticAnswer<T> getLast() {
+        return eroteticAnswers.getLast();
     }
 
     /**
@@ -407,8 +408,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the first element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public FeatureFilter<T> removeFirst() {
-        return featureFilters.removeFirst();
+    public EroteticAnswer<T> removeFirst() {
+        return eroteticAnswers.removeFirst();
     }
 
     /**
@@ -421,7 +422,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @since 1.6
      */
     public boolean removeLastOccurrence(Object o) {
-        return featureFilters.removeLastOccurrence(o);
+        return eroteticAnswers.removeLastOccurrence(o);
     }
 
     /**
@@ -432,8 +433,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         if this list is empty
      * @since 1.6
      */
-    public FeatureFilter<T> peekFirst() {
-        return featureFilters.peekFirst();
+    public EroteticAnswer<T> peekFirst() {
+        return eroteticAnswers.peekFirst();
     }
 
     /**
@@ -441,7 +442,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * The list will be empty after this call returns.
      */
     public void clear() {
-        featureFilters.clear();
+        eroteticAnswers.clear();
     }
 
     /**
@@ -453,8 +454,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public FeatureFilter<T> set(int index, FeatureFilter<T> element) {
-        return featureFilters.set(index, element);
+    public EroteticAnswer<T> set(int index, EroteticAnswer<T> element) {
+        return eroteticAnswers.set(index, element);
     }
 
     /**
@@ -467,7 +468,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @since 1.6
      */
     public boolean removeFirstOccurrence(Object o) {
-        return featureFilters.removeFirstOccurrence(o);
+        return eroteticAnswers.removeFirstOccurrence(o);
     }
 
     /**
@@ -485,8 +486,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean addAll(int index, Collection<? extends FeatureFilter<T>> c) {
-        return featureFilters.addAll(index, c);
+    public boolean addAll(int index, Collection<? extends EroteticAnswer<T>> c) {
+        return eroteticAnswers.addAll(index, c);
     }
 
     /**
@@ -501,8 +502,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return {@code true} if this list changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean addAll(Collection<? extends FeatureFilter<T>> c) {
-        return featureFilters.addAll(c);
+    public boolean addAll(Collection<? extends EroteticAnswer<T>> c) {
+        return eroteticAnswers.addAll(c);
     }
 
     /**
@@ -515,7 +516,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return {@code true} if this list contains the specified element
      */
     public boolean contains(Object o) {
-        return featureFilters.contains(o);
+        return eroteticAnswers.contains(o);
     }
 
     /**
@@ -535,8 +536,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * collection
      * @since 1.8
      */
-    public Stream<FeatureFilter<T>> parallelStream() {
-        return featureFilters.parallelStream();
+    public Stream<EroteticAnswer<T>> parallelStream() {
+        return eroteticAnswers.parallelStream();
     }
 
     /**
@@ -597,8 +598,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      *         contract
      * @since 1.8
      */
-    public void sort(Comparator<? super FeatureFilter<T>> c) {
-        featureFilters.sort(c);
+    public void sort(Comparator<? super EroteticAnswer<T>> c) {
+        eroteticAnswers.sort(c);
     }
 
     /**
@@ -616,19 +617,19 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return a sequential {@code Stream} over the elements in this collection
      * @since 1.8
      */
-    public Stream<FeatureFilter<T>> stream() {
-        return featureFilters.stream();
+    public Stream<EroteticAnswer<T>> stream() {
+        return eroteticAnswers.stream();
     }
 
     /**
      * Inserts the specified element at the end of this list.
      *
-     * @param tFeatureFilter the element to insert
+     * @param tEroteticAnswer the element to insert
      * @return {@code true} (as specified by {@link Deque#offerLast})
      * @since 1.6
      */
-    public boolean offerLast(FeatureFilter<T> tFeatureFilter) {
-        return featureFilters.offerLast(tFeatureFilter);
+    public boolean offerLast(EroteticAnswer<T> tEroteticAnswer) {
+        return eroteticAnswers.offerLast(tEroteticAnswer);
     }
 
     /**
@@ -637,8 +638,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the head of this list, or {@code null} if this list is empty
      * @since 1.5
      */
-    public FeatureFilter<T> peek() {
-        return featureFilters.peek();
+    public EroteticAnswer<T> peek() {
+        return eroteticAnswers.peek();
     }
 
     /**
@@ -652,8 +653,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @throws NoSuchElementException if this list is empty
      * @since 1.6
      */
-    public FeatureFilter<T> pop() {
-        return featureFilters.pop();
+    public EroteticAnswer<T> pop() {
+        return eroteticAnswers.pop();
     }
 
     /**
@@ -665,8 +666,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param element element to be inserted
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public void add(int index, FeatureFilter<T> element) {
-        featureFilters.add(index, element);
+    public void add(int index, EroteticAnswer<T> element) {
+        eroteticAnswers.add(index, element);
     }
 
     /**
@@ -676,8 +677,8 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public FeatureFilter<T> get(int index) {
-        return featureFilters.get(index);
+    public EroteticAnswer<T> get(int index) {
+        return eroteticAnswers.get(index);
     }
 
     /**
@@ -703,7 +704,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param c
      */
     public boolean removeAll(Collection<?> c) {
-        return featureFilters.removeAll(c);
+        return eroteticAnswers.removeAll(c);
     }
 
     /**
@@ -729,7 +730,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param c
      */
     public boolean retainAll(Collection<?> c) {
-        return featureFilters.retainAll(c);
+        return eroteticAnswers.retainAll(c);
     }
 
     /**
@@ -746,7 +747,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @param c
      */
     public boolean containsAll(Collection<?> c) {
-        return featureFilters.containsAll(c);
+        return eroteticAnswers.containsAll(c);
     }
 
     /**
@@ -758,7 +759,7 @@ public class EroteticChooser<T> implements Iterable<FeatureFilter<T>> {
      * @return an iterator over the elements in this list (in proper sequence)
      */
     @Override
-    public Iterator<FeatureFilter<T>> iterator() {
-        return featureFilters.iterator();
+    public Iterator<EroteticAnswer<T>> iterator() {
+        return eroteticAnswers.iterator();
     }
 }

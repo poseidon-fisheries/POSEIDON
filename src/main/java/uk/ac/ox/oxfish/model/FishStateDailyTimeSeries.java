@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
@@ -21,6 +22,8 @@ import java.util.function.ToDoubleFunction;
  */
 public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
+
+    public static final String AVERAGE_LAST_TRIP_PROFITS = "Average Last Trip Profits";
 
     public FishStateDailyTimeSeries() {
         super(IntervalPolicy.EVERY_DAY,StepOrder.YEARLY_DATA_GATHERING);
@@ -96,6 +99,23 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                                 return value.getDailyCounter().getColumn(YearlyFisherTimeSeries.EFFORT);
                             }
                         }).sum();
+            }
+        }, 0d);
+
+        registerGatherer(AVERAGE_LAST_TRIP_PROFITS, new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                TripRecord lastTrip = value.getLastFinishedTrip();
+                                if(lastTrip == null || !Double.isFinite(lastTrip.getProfitPerHour(true) ))
+                                    return 0d;
+                                else
+                                    return lastTrip.getProfitPerHour(true);
+                            }
+                        }).average().orElse(0d);
             }
         }, 0d);
 

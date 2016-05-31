@@ -11,7 +11,7 @@ import java.util.List;
  * if there is no way to give preference to any strategy
  * Created by carrknight on 4/10/16.
  */
-public interface FeatureFilter<T> extends Startable
+public interface EroteticAnswer<T> extends Startable
 {
 
 
@@ -23,7 +23,7 @@ public interface FeatureFilter<T> extends Startable
      * @param representation the set of all feature extractors available
      * @param state the model   @return a list of acceptable options or null if there is pure indifference among them
      * @param fisher   */
-    List<T> filterOptions(
+    List<T> answer(
             List<T> currentOptions,
             FeatureExtractors<T> representation,
             FishState state,

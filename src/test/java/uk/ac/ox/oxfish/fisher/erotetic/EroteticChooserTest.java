@@ -31,14 +31,14 @@ public class EroteticChooserTest
         SeaTile three =mock(SeaTile.class);
         List<SeaTile> toChoose = Arrays.asList(one,two,three);
 
-        FeatureFilter<SeaTile> fakeFilterOne = mock(FeatureFilter.class);
+        EroteticAnswer<SeaTile> fakeFilterOne = mock(EroteticAnswer.class);
         List<SeaTile> fakeChoiceOne = Collections.singletonList(one);
-        when(fakeFilterOne.filterOptions(anyList(), any(), any(),  any())).thenReturn(fakeChoiceOne);
+        when(fakeFilterOne.answer(anyList(), any(), any(), any())).thenReturn(fakeChoiceOne);
 
 
-        FeatureFilter<SeaTile> fakeFilterTwo = mock(FeatureFilter.class);
+        EroteticAnswer<SeaTile> fakeFilterTwo = mock(EroteticAnswer.class);
         List<SeaTile> fakeChoiceTwo = Collections.singletonList(two);
-        when(fakeFilterTwo.filterOptions(anyList(), any(), any(),  any())).thenReturn(fakeChoiceTwo);
+        when(fakeFilterTwo.answer(anyList(), any(), any(), any())).thenReturn(fakeChoiceTwo);
 
         EroteticChooser<SeaTile> chooser = new EroteticChooser<>();
         //priority to one, one should be choosen
@@ -46,9 +46,9 @@ public class EroteticChooserTest
         chooser.add(fakeFilterTwo);
         assertEquals(
                 one,
-                chooser.filterOptions(toChoose,
-                                      mock(FeatureExtractors.class),
-                                      mock(FishState.class), mock(Fisher.class))
+                chooser.answer(toChoose,
+                               mock(FeatureExtractors.class),
+                               mock(FishState.class), mock(Fisher.class))
         );
 
 
@@ -59,9 +59,9 @@ public class EroteticChooserTest
         chooser.add(fakeFilterOne);
         assertEquals(
                 two,
-                chooser.filterOptions(toChoose,
-                                      mock(FeatureExtractors.class),
-                                      mock(FishState.class),mock(Fisher.class))
+                chooser.answer(toChoose,
+                               mock(FeatureExtractors.class),
+                               mock(FishState.class), mock(Fisher.class))
         );
 
 
@@ -75,10 +75,10 @@ public class EroteticChooserTest
         SeaTile three =mock(SeaTile.class);
         List<SeaTile> toChoose = Arrays.asList(one,two,three);
 
-        FeatureFilter<SeaTile> fakeFilterOne =
-                new FeatureFilter<SeaTile>() {
+        EroteticAnswer<SeaTile> fakeFilterOne =
+                new EroteticAnswer<SeaTile>() {
                     @Override
-                    public List<SeaTile> filterOptions(
+                    public List<SeaTile> answer(
                             List<SeaTile> currentOptions, FeatureExtractors<SeaTile> representation,
                             FishState state, Fisher fisher) {
                         LinkedList<SeaTile> choices = new LinkedList<>(currentOptions);
@@ -103,9 +103,9 @@ public class EroteticChooserTest
         chooser.add(fakeFilterOne);
         assertEquals(
                 three,
-                chooser.filterOptions(toChoose,
-                                      mock(FeatureExtractors.class),
-                                      mock(FishState.class),mock(Fisher.class))
+                chooser.answer(toChoose,
+                               mock(FeatureExtractors.class),
+                               mock(FishState.class), mock(Fisher.class))
         );
 
 

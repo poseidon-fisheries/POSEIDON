@@ -8,13 +8,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Simple filter: only take elements that are above the threshold but only as long as you have minimumNumberOfObservations
  * observations
  * Created by carrknight on 4/10/16.
  */
-public class ThresholdFilter<T> implements FeatureFilter<T>
+public class ThresholdAnswer<T> implements EroteticAnswer<T>
 {
 
     private final int minimumNumberOfObservations;
@@ -23,7 +24,9 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
 
     private final String featureName;
 
-    public ThresholdFilter(int minimumNumberOfObservations, double minimumThreshold, String featureName) {
+    public ThresholdAnswer(int minimumNumberOfObservations,
+                           double minimumThreshold,
+                           String featureName) {
         this.minimumNumberOfObservations = minimumNumberOfObservations;
         this.minimumThreshold = minimumThreshold;
         this.featureName = featureName;
@@ -37,11 +40,32 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
      * @param fisher
      */
     @Override
-    public List<T> filterOptions(
+    public List<T> answer(
             List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
+
         HashMap<T, Double> features = representation.extractFeature(featureName,
                                                                     currentOptions,
                                                                     state, fisher);
+        return thresholdAnswer(currentOptions,
+                               features,
+                               t -> minimumThreshold,
+                               minimumNumberOfObservations);
+    }
+
+    /**
+     * generic method to be shared between ThresholdAnswer and FeatureThresholdAnswer
+     @param currentOptions list of options, possibly already filtered by others. It is <b>unmodifiable</b>
+      * @param thresholdExtractor the function returning the threshold for any option we are testing
+     * @param minimumNumberOfObservations the minimum number of observations we need before this answer applies
+     * @param <T> the type of candidate we are thresholding on
+     * @return the list of all the acceptable candidates (or null if none apply)
+     */
+    public static <T> List<T> thresholdAnswer (List<T> currentOptions,
+                                               HashMap<T, Double> features,
+                                               Function<T,Double> thresholdExtractor,
+                                               int minimumNumberOfObservations)
+    {
+
         //no feature, indifference
         if(features == null || features.isEmpty())
         {
@@ -61,13 +85,15 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
                                   " options with features: too few compared to the minimum of " + minimumNumberOfObservations);
             return null;
         }
-         else
+        else
         {
             //you have enough! take only the ones that pass the threshold
             LinkedList<T> passTheTest = new LinkedList<>();
             for(Map.Entry<T,Double> feature : features.entrySet())
             {
-                if(actualOptions.contains(feature.getKey()) &&
+                double minimumThreshold = thresholdExtractor.apply(feature.getKey());
+                if(Double.isFinite(minimumThreshold) &&
+                        actualOptions.contains(feature.getKey()) &&
                         feature.getValue() >= minimumThreshold)
                     passTheTest.add(feature.getKey());
             }
@@ -78,6 +104,7 @@ public class ThresholdFilter<T> implements FeatureFilter<T>
             return passTheTest;
         }
     }
+
 
     /**
      * ignored

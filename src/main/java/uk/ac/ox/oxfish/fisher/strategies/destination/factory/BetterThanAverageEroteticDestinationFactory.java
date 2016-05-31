@@ -1,23 +1,21 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.erotetic.AdaptiveThresholdFilter;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureThresholdAnswer;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.ThresholdEroteticDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.SimpleEroteticDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import java.util.function.Function;
-
 /**
  * The Threshold Erotetic Destination Strategy where the threshold is the average
  * Created by carrknight on 4/11/16.
  */
-public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFactory<ThresholdEroteticDestinationStrategy>
+public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFactory<SimpleEroteticDestinationStrategy>
 {
 
 
@@ -35,30 +33,13 @@ public class BetterThanAverageEroteticDestinationFactory implements AlgorithmFac
      * @return the function result
      */
     @Override
-    public ThresholdEroteticDestinationStrategy apply(FishState state)
+    public SimpleEroteticDestinationStrategy apply(FishState state)
     {
-        return new ThresholdEroteticDestinationStrategy(
-                new AdaptiveThresholdFilter<>(
+        return new SimpleEroteticDestinationStrategy(
+                new FeatureThresholdAnswer<>(
                         minimumObservations.apply(state.getRandom()).intValue(),
-                        0d,
                         SNALSARutilities.PROFIT_FEATURE,
-                        new Function<FishState, Double>() {
-                            @Override
-                            public Double apply(FishState simState) {
-                                return simState.getFishers().stream().mapToDouble(
-                                        value -> {
-                                            TripRecord lastTrip = value.getLastFinishedTrip();
-                                            if(lastTrip == null || !Double.isFinite(lastTrip.getProfitPerHour(true) ))
-                                                return 0d;
-                                            else
-                                                return lastTrip.getProfitPerHour(true);
-                                        }
-                                ).average().getAsDouble();
-                            }
-                        },
-                        updateInterval.apply(state.getRandom()).intValue()
-
-                ),
+                        FeatureExtractor.AVERAGE_PROFIT_FEATURE),
                 new FavoriteDestinationStrategy(state.getMap(),state.getRandom())
 
         );

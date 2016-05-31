@@ -12,12 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-
-public class ThresholdFilterTest {
-
+/**
+ * Created by carrknight on 5/2/16.
+ */
+public class AdaptiveThresholdAnswerTest {
 
     private LinkedList<Double> options;
     private FeatureExtractors<Double> extractor;
@@ -41,98 +44,63 @@ public class ThresholdFilterTest {
         });
     }
 
-    @Test
-    public void tooLow() throws Exception {
-
-
-        Log.info("needs numbers to be above 10, will not select any");
-        ThresholdFilter<Double> filter = new ThresholdFilter<>(
-                2,
-                10,
-                "feature"
-        );
-
-
-        List<Double> selected = filter.filterOptions(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
-        );
-
-        assertTrue(selected == null || selected.isEmpty());
-
-    }
-
 
     @Test
-    public void tooFew() throws Exception {
+    public void adapt() throws Exception {
 
 
         Log.info("needs at least 4 observations, has only 3");
-        ThresholdFilter<Double> filter = new ThresholdFilter<>(
-                4,
-                0,
-                "feature"
-        );
+        FeatureExtractor<Double> adaptor = mock(FeatureExtractor.class);
+        extractor.addFeatureExtractor("threshold",
+                                      adaptor);
 
+        HashMap<Double,Double> adaptorAnswer = mock(HashMap.class);
+        when(adaptor.extractFeature(anyCollection(),
+                                      any(), any())).thenReturn(adaptorAnswer);
 
-        List<Double> selected = filter.filterOptions(
-                options,
-                extractor,
-                mock(FishState.class),
-                mock(Fisher.class)
-        );
-
-        assertTrue(selected == null || selected.isEmpty());
-
-    }
-
-
-    @Test
-    public void allGood() throws Exception {
-
-
-        Log.info("needs at least 4 observations, has only 3");
-        ThresholdFilter<Double> filter = new ThresholdFilter<>(
+        FeatureThresholdAnswer<Double> filter = new FeatureThresholdAnswer<>(
                 3,
-                0,
-                "feature"
+                "feature",
+                "threshold"
         );
 
 
-        List<Double> selected = filter.filterOptions(
+        when(adaptorAnswer.get(any())).thenReturn(0d);
+
+        List<Double> selected = filter.answer(
                 options,
                 extractor,
                 mock(FishState.class),
                 mock(Fisher.class)
 
         );
-
         assertEquals(selected.size(),3);
 
-    }
-
-    @Test
-    public void oneGood() throws Exception {
-
-
-        Log.info("needs at least 4 observations, has only 3");
-        ThresholdFilter<Double> filter = new ThresholdFilter<>(
-                3,
-                3,
-                "feature"
-        );
-
-
-        List<Double> selected = filter.filterOptions(
+        when(adaptorAnswer.get(any())).thenReturn(1d);
+        selected = filter.answer(
                 options,
                 extractor,
                 mock(FishState.class),
                 mock(Fisher.class)
         );
+        assertEquals(selected.size(),3);
 
+        when(adaptorAnswer.get(any())).thenReturn(2d);
+        selected = filter.answer(
+                options,
+                extractor,
+                mock(FishState.class),
+                mock(Fisher.class)
+        );
+        assertEquals(selected.size(),2);
+
+        when(adaptorAnswer.get(any())).thenReturn(3d);
+        selected = filter.answer(
+                options,
+                extractor,
+                mock(FishState.class),
+                mock(Fisher.class)
+        );
         assertEquals(selected.size(),1);
-
     }
 }

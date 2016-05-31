@@ -4,8 +4,8 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/spearmint"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/fronts"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/mpa"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/hyperstability"
-#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/gas_prices"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/hyperstability"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/gas_prices"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
 
@@ -26,7 +26,8 @@ def run_experiment(input2yaml,
                    jarfile="yamler.jar",
                    main_directory="/home/carrknight/code/oxfish/runs/optimization",
                    years_to_run=20,
-                   additional_data=False):
+                   additional_data=False,
+                   policy_file = None):
     import os
     import subprocess
     os.chdir(main_directory)
@@ -38,6 +39,9 @@ def run_experiment(input2yaml,
     args = ["java", "-jar", jarfile, experiment_title + ".yaml", "--years", str(years_to_run)]
     if additional_data:
         args.append("--data")
+    if policy_file is not None:
+        args.append("--policy")
+        args.append(policy_file)
     subprocess.call(args)
     # read up the results
     os.remove(experiment_title + ".yaml")
