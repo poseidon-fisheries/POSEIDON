@@ -7,10 +7,8 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +17,7 @@ import java.util.Map;
  */
 public class PolicyScripts implements Steppable,Startable{
 
-    final private HashMap<Integer,PolicyScript> scripts;
+    private HashMap<Integer,PolicyScript> scripts;
 
 
     public PolicyScripts(HashMap<Integer, PolicyScript> scripts) {
@@ -27,16 +25,39 @@ public class PolicyScripts implements Steppable,Startable{
     }
 
 
-    public static PolicyScripts fromYaml(FishYAML yaml, String toRead)
+    public PolicyScripts() {
+        this.scripts = new HashMap<>();
+    }
+
+
+    /*
+    public static PolicyScripts fromYaml(MappingNode node)
     {
-        LinkedHashMap<Integer,LinkedHashMap> temp = (LinkedHashMap<Integer, LinkedHashMap>) yaml.load(toRead);
-        HashMap<Integer,PolicyScript> read = new HashMap<>();
-        for(Map.Entry<Integer,LinkedHashMap> entry : temp.entrySet())
-            //turn value into string and read it back forcing it as a policy script
-            read.put(entry.getKey(),yaml.loadAs(yaml.dump(entry.getValue()),PolicyScript.class));
-        return new PolicyScripts(read);
+
+        PolicyScripts scripts = new PolicyScripts();
+
+
+        assert node.getValue().size()==1;
+        assert node.getValue().get(0).getKeyNode() instanceof ScalarNode;
+        assert ((ScalarNode) node.getValue().get(0).getKeyNode()).getValue().equalsIgnoreCase("scripts");
+
+        List<NodeTuple> scriptList = ((MappingNode) node.getValue().get(0).getValueNode()).getValue();
+        FishYAML yamler = new FishYAML();
+        for(NodeTuple script : scriptList)
+        {
+            Integer key = Integer.parseInt(((ScalarNode) script.getKeyNode()).getValue());
+            Node value = script.getValueNode();
+            value.setType(PolicyScript.class);
+
+            String dumped = yamler.dump(value);
+            PolicyScript toAdd = yamler.loadAs(dumped,PolicyScript.class);
+            scripts.getScripts().put(key,toAdd);
+        }
+
+        return scripts;
 
     }
+    */
 
     @Override
     public void step(SimState simState)
@@ -79,5 +100,9 @@ public class PolicyScripts implements Steppable,Startable{
      */
     public HashMap<Integer, PolicyScript> getScripts() {
         return scripts;
+    }
+
+    public void setScripts(HashMap<Integer, PolicyScript> scripts) {
+        this.scripts = scripts;
     }
 }

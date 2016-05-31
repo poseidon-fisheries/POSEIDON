@@ -32,7 +32,7 @@ public class ITQCaresAboutMileage {
                                                          new FixedDoubleParameter(.1),
                                                          new UniformDoubleParameter(0, 20),
                                                          Paths.get("runs", "market1", "itqOil.csv").toFile(),
-                                                         5, seed);
+                                                         5, seed, true);
 
         //the correlation ought to be very small
         Species species = state.getSpecies().get(0);
@@ -53,7 +53,7 @@ public class ITQCaresAboutMileage {
         System.out.println("seed " + seed);
         System.out.println("Correlation: " +
                          Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
-        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.5);
+        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
         //efficiency is 100%
         assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 

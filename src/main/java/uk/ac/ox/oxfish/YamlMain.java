@@ -87,7 +87,7 @@ public class YamlMain {
         if(policyScript != null)
         {
             String policyScript = new String(Files.readAllBytes(Paths.get(this.policyScript)));
-            PolicyScripts scripts = PolicyScripts.fromYaml(yaml,policyScript);
+            PolicyScripts scripts = yaml.loadAs(policyScript,PolicyScripts.class);
             model.registerStartable(scripts);
             Files.write(outputFolder.resolve("policy_script.yaml"),
                         yaml.dump(scripts.getScripts()).getBytes());

@@ -1,7 +1,12 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -13,9 +18,31 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class PolicyScript
 {
 
-    private AlgorithmFactory<? extends Regulation> regulation = null;
+    private AlgorithmFactory<? extends Gear> gear;
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
 
-    private AlgorithmFactory<? extends Gear> gear = null;
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
+    /**
+     * factory to produce fishing strategy
+     */
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
+    /**
+     * factory to produce when agents do not want to deal with weather
+     */
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
+
+    /**
+     * factory to produce new regulations everybody ought to follow
+     */
+    private AlgorithmFactory<? extends Regulation> regulation;
+
+    private Double gasPricePerLiter = null;
 
     private Integer changeInNumberOfFishers = null;
 
@@ -42,6 +69,41 @@ public class PolicyScript
             //new fishers will use the new gear
             state.getFisherFactory().setGear(gear);
         }
+
+        if(departingStrategy != null) {
+            for (Fisher fisher : state.getFishers()) {
+                fisher.setDepartingStrategy(departingStrategy.apply(state));
+            }
+            //new fishers will use the new gear
+            state.getFisherFactory().setGear(gear);
+        }
+
+        if(destinationStrategy != null) {
+            for (Fisher fisher : state.getFishers()) {
+                fisher.setDestinationStrategy(destinationStrategy.apply(state));
+            }
+            //new fishers will use the new gear
+            state.getFisherFactory().setGear(gear);
+        }
+
+        if(fishingStrategy != null) {
+            for (Fisher fisher : state.getFishers()) {
+                fisher.setFishingStrategy(fishingStrategy.apply(state));
+            }
+            //new fishers will use the new gear
+            state.getFisherFactory().setGear(gear);
+        }
+
+        if(weatherStrategy != null) {
+            for (Fisher fisher : state.getFishers()) {
+                fisher.setWeatherStrategy(weatherStrategy.apply(state));
+            }
+            //new fishers will use the new gear
+            state.getFisherFactory().setGear(gear);
+        }
+
+
+
         //create new fishers if needed
         if(changeInNumberOfFishers != null) {
             if(changeInNumberOfFishers>0)
@@ -52,6 +114,12 @@ public class PolicyScript
                 for (int i = 0; i < -changeInNumberOfFishers; i++)
                     state.killRandomFisher();
             }
+        }
+
+        if(gasPricePerLiter!=null)
+        {
+            for(Port port : state.getPorts())
+                port.setGasPricePerLiter(gasPricePerLiter);
         }
     }
 
@@ -81,4 +149,79 @@ public class PolicyScript
     }
 
 
+    /**
+     * Getter for property 'departingStrategy'.
+     *
+     * @return Value for property 'departingStrategy'.
+     */
+    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
+        return departingStrategy;
+    }
+
+    /**
+     * Setter for property 'departingStrategy'.
+     *
+     * @param departingStrategy Value to set for property 'departingStrategy'.
+     */
+    public void setDepartingStrategy(
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
+        this.departingStrategy = departingStrategy;
+    }
+
+    /**
+     * Getter for property 'destinationStrategy'.
+     *
+     * @return Value for property 'destinationStrategy'.
+     */
+    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
+        return destinationStrategy;
+    }
+
+    /**
+     * Setter for property 'destinationStrategy'.
+     *
+     * @param destinationStrategy Value to set for property 'destinationStrategy'.
+     */
+    public void setDestinationStrategy(
+            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+        this.destinationStrategy = destinationStrategy;
+    }
+
+    /**
+     * Getter for property 'fishingStrategy'.
+     *
+     * @return Value for property 'fishingStrategy'.
+     */
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
+        return fishingStrategy;
+    }
+
+    /**
+     * Setter for property 'fishingStrategy'.
+     *
+     * @param fishingStrategy Value to set for property 'fishingStrategy'.
+     */
+    public void setFishingStrategy(
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
+        this.fishingStrategy = fishingStrategy;
+    }
+
+    /**
+     * Getter for property 'weatherStrategy'.
+     *
+     * @return Value for property 'weatherStrategy'.
+     */
+    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
+        return weatherStrategy;
+    }
+
+    /**
+     * Setter for property 'weatherStrategy'.
+     *
+     * @param weatherStrategy Value to set for property 'weatherStrategy'.
+     */
+    public void setWeatherStrategy(
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
+        this.weatherStrategy = weatherStrategy;
+    }
 }

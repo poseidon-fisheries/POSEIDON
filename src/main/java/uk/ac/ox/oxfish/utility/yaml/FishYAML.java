@@ -10,6 +10,8 @@ import org.yaml.snakeyaml.Yaml;
 public class FishYAML extends Yaml{
 
 
+    private final YamlConstructor customConstructor;
+
 
     /**
      * Create Yaml instance. It is safe to create a few instances and use them
@@ -20,6 +22,7 @@ public class FishYAML extends Yaml{
 
 
         super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
+        this.customConstructor = ((YamlConstructor) super.constructor);
 
     }
 
@@ -30,6 +33,9 @@ public class FishYAML extends Yaml{
         options.setDefaultScalarStyle(DumperOptions.ScalarStyle.PLAIN);
         return options;
     }
+
+
+
 
 
 

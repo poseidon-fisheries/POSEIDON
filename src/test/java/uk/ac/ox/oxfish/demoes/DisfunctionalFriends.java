@@ -23,15 +23,11 @@ public class DisfunctionalFriends {
 
         for(int i=0; i<2; i++) {
             long seed = System.currentTimeMillis();
-            int stepsAlone = stepsItTook(.2, 1, 5000, seed, true);
-            int stepsWithManyFriends = stepsItTook(.2, 20, 5000, seed, true);
+            int stepsAlone = stepsItTook(.2, 1, 5000, seed, true, .1);
+            int stepsWithManyFriends = stepsItTook(.2, 20, 5000, seed, true, .1);
 
             System.out.println(stepsAlone + " ---- " + stepsWithManyFriends);
-            Assert.assertTrue(stepsAlone + " ---- " + stepsWithManyFriends, stepsAlone <= stepsWithManyFriends);
-            //equal implies stepsAlone=5000:
-            Assert.assertTrue( (stepsAlone!=stepsWithManyFriends) || stepsAlone==5000);
-            //in fact with many friends you don't even clear all the map after 4000 days
-            Assert.assertTrue(stepsWithManyFriends > 4000);
+
             totalStepsAlone += stepsAlone;
             totalStepsManyFriends +=stepsWithManyFriends;
         }

@@ -23,10 +23,10 @@ public class FunctionalFriendsDemo {
 
 
         long seed = System.currentTimeMillis();
-        int stepsAlone = stepsItTook(Double.NaN, 0, 5000, seed, true);
-        stepsAlone += stepsItTook(Double.NaN, 0, 3500, seed, true);
-        int stepsWithFewFriends = stepsItTook(.2, 3, 3500, seed, true);
-        stepsWithFewFriends += stepsItTook(.2, 3, 3500, seed, true);
+        int stepsAlone = stepsItTook(Double.NaN, 0, 5000, seed, true, .05);
+        stepsAlone += stepsItTook(Double.NaN, 0, 3500, seed, true, .05);
+        int stepsWithFewFriends = stepsItTook(.2, 3, 3500, seed, true, .05);
+        stepsWithFewFriends += stepsItTook(.2, 3, 3500, seed, true, .05);
 
 
 
@@ -45,7 +45,7 @@ public class FunctionalFriendsDemo {
     public static int stepsItTook(
             double explorationProbability,
             int friends,
-            int maxSteps, final long seed, final boolean alwaysCopyBest) {
+            int maxSteps, final long seed, final boolean alwaysCopyBest, final double percentageComplete) {
 
 
         PrototypeScenario scenario = new PrototypeScenario();
@@ -69,7 +69,7 @@ public class FunctionalFriendsDemo {
         state.start();
         Species onlySpecies = state.getBiology().getSpecie(0);
         final double minimumBiomass = state.getTotalBiomass(
-                onlySpecies) * .05; //how much does it take to eat 95% of all the fish?
+                onlySpecies) * percentageComplete; //how much does it take to eat 95% of all the fish?
 
 
         int steps = 0;

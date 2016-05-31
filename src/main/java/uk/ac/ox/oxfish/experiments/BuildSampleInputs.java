@@ -2,7 +2,12 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
+import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
+import uk.ac.ox.oxfish.model.scenario.PolicyScript;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -50,6 +55,21 @@ public class BuildSampleInputs
             writer.close();
         }
 
+        //write a sample policy script
+        { //put it in a bracket for no reason at all except to recycle the variable names later
+            PolicyScripts scripts = new PolicyScripts();
+            scripts.getScripts().put(1, mockYear1Script);
+            scripts.getScripts().put(10, mockYear2Script);
+            final Path file = directory.resolve("sample policy script.yaml");
+            final String dump = yaml.dump(scripts);
+            FileWriter writer = new FileWriter(file.toFile());
+            writer.write(dump);
+            writer.close();
+
+        }
+
+
+
         directory = Paths.get("inputs", "YAML Samples","components");
         directory.toFile().mkdirs();
         //the same for all
@@ -71,6 +91,7 @@ public class BuildSampleInputs
 
 
         }
+
 
         directory = Paths.get("inputs", "california");
         Path bioDirectory = directory.resolve("biology");
@@ -123,4 +144,13 @@ public class BuildSampleInputs
     }
 
 
+
+    private final static PolicyScript mockYear1Script = new PolicyScript();
+    private final static PolicyScript mockYear2Script = new PolicyScript();
+    static {
+        mockYear1Script.setChangeInNumberOfFishers(100);
+        mockYear1Script.setGear(new FixedProportionGearFactory());
+        mockYear2Script.setRegulation(new ITQMonoFactory());
+        mockYear2Script.setDepartingStrategy(new FixedRestTimeDepartingFactory());
+    }
 }

@@ -2,11 +2,9 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.MappingNode;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.NodeId;
-import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.*;
 import uk.ac.ox.oxfish.model.scenario.PolicyScript;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -114,12 +112,6 @@ public class YamlConstructor extends  Constructor {
                         Objects.equals(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue(),
                                        "PolicyScript"))
                 {
-                    try{
-                        //might have been written correctly as it is!
-                        return super.construct(node);
-                    }
-                    catch (YAMLException e)
-                    {
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly
@@ -132,7 +124,29 @@ public class YamlConstructor extends  Constructor {
                         return script;
 
 
-                    }
+
+                }
+
+                if(PolicyScripts.class.isAssignableFrom(node.getType()))
+                {
+
+                        //now we can deal with filling it through beans
+                        //first allocate subnodes correctly
+
+                        //set type correctly
+
+                        node.setType(PolicyScripts.class);
+                        for(NodeTuple partialScript : ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue())
+                        {
+                            partialScript.getKeyNode().setType(Integer.class);
+                            partialScript.getValueNode().setType(PolicyScript.class);
+                        }
+                        PolicyScripts script = new PolicyScripts();
+                        constructJavaBean2ndStep((MappingNode) node, script);
+                        return script;
+
+
+
                 }
 
                 else

@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -13,6 +14,7 @@ import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -44,7 +46,7 @@ public class MarketFirstDemo {
             final MarketDemoPolicy policy,
             final DoubleParameter catchabilityMean,
             final DoubleParameter gasInefficiency,
-            final long seed) {
+            final long seed, boolean imitate) {
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
@@ -55,6 +57,11 @@ public class MarketFirstDemo {
         //make gas expensive!
         scenario.setGasPricePerLiter(new FixedDoubleParameter(0.2));
 
+        if(!imitate) {
+
+            ((ExplorationPenaltyProbabilityFactory) ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).
+                    getProbability()).setImitationProbability(new FixedDoubleParameter(0d));
+        }
 
         if (policy.equals(MarketDemoPolicy.TAC)) {
             TACMonoFactory regulation = new TACMonoFactory();
@@ -90,54 +97,54 @@ public class MarketFirstDemo {
 
 
 
-        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new FixedDoubleParameter(.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","itqFixed.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
-        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new FixedDoubleParameter(.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC, new FixedDoubleParameter(.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","tacFixed.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
-        generateAndRunMarketDemo(MarketDemoPolicy.IQ,new FixedDoubleParameter(.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.IQ, new FixedDoubleParameter(.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","iqFixed.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
 
 
-        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new UniformDoubleParameter(0.01,0.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new UniformDoubleParameter(0.01,0.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","itqSmooth.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
-        generateAndRunMarketDemo(MarketDemoPolicy.TAC,new UniformDoubleParameter(0.01,0.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.TAC, new UniformDoubleParameter(0.01,0.1),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","tacSmooth.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
-        generateAndRunMarketDemo(MarketDemoPolicy.IQ,new UniformDoubleParameter(0.05,0.3),
+        generateAndRunMarketDemo(MarketDemoPolicy.IQ, new UniformDoubleParameter(0.05,0.3),
                                  new FixedDoubleParameter(5),
                                  Paths.get("runs","market1","iqSmooth.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
 
 
-        generateAndRunMarketDemo(MarketDemoPolicy.ITQ,new FixedDoubleParameter(.1),
+        generateAndRunMarketDemo(MarketDemoPolicy.ITQ, new FixedDoubleParameter(.1),
                                  new UniformDoubleParameter(0,20),
                                  Paths.get("runs","market1","itqOil.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
         generateAndRunMarketDemo(MarketDemoPolicy.TAC, new FixedDoubleParameter(.1),
                                  new UniformDoubleParameter(0, 20),
                                  Paths.get("runs", "market1", "tacOil.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
         generateAndRunMarketDemo(MarketDemoPolicy.IQ, new FixedDoubleParameter(.1),
                                  new UniformDoubleParameter(0, 20),
                                  Paths.get("runs", "market1", "iqOil.csv").toFile(),
-                                 10, 0);
+                                 10, 0, true);
 
 
 
@@ -154,9 +161,9 @@ public class MarketFirstDemo {
             final DoubleParameter gasInefficiency,
             final File file, //nullable
             final int yearsToRun,
-            final long seed) throws IOException {
+            final long seed, final boolean imitate) throws IOException {
         FishState state = MarketFirstDemo.generateMarketedModel(policy, catchabilityMean,
-                                                                gasInefficiency, seed);
+                                                                gasInefficiency, seed, imitate);
         state.start();
         while(state.getYear()< yearsToRun)
             state.schedule.step(state);

@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 import uk.ac.ox.oxfish.model.scenario.PolicyScript;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.model.scenario.Scenarios;
 import uk.ac.ox.oxfish.utility.AlgorithmFactories;
@@ -155,6 +156,9 @@ public class YamlRepresenter extends Representer
                                   {
                                       throw  new YAMLException(e);
                                   }});
+
+        this.addClassTag(PolicyScripts.class, Tag.MAP);
+
 
 
         //get all the scenarios

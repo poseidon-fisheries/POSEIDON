@@ -27,12 +27,12 @@ public class Boat {
     /**
      * the engine: holding speed and weight and efficiency
      */
-    private final Engine engine;
+    private Engine engine;
 
     /**
      * fuel counter
      */
-    private final FuelTank tank;
+    private FuelTank tank;
 
 
 
@@ -169,5 +169,25 @@ public class Boat {
 
     public double getEfficiencyAsLitersPerKm() {
         return engine.getEfficiencyAsLitersPerKm();
+    }
+
+
+    /**
+     * Setter for property 'engine'.
+     *
+     * @param engine Value to set for property 'engine'.
+     */
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+
+    }
+
+    /**
+     * Setter for property 'hoursTravelledToday'.
+     *
+     * @param hoursTravelledToday Value to set for property 'hoursTravelledToday'.
+     */
+    public void setHoursTravelledToday(double hoursTravelledToday) {
+        this.hoursTravelledToday = hoursTravelledToday;
     }
 }

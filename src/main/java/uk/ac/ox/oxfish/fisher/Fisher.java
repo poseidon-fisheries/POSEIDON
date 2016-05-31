@@ -341,6 +341,7 @@ public class Fisher implements Steppable, Startable{
             status.setAction(result.getNextState());
 
 
+
             //if you are out of time, continue tomorrow
             if(hoursLeft <= 0)
             {

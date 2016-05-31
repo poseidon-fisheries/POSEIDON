@@ -52,6 +52,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.isAtPort()).thenReturn(true);
+        when(fisher.isGoingToPort()).thenReturn(true);
         RandomThenBackToPortDestinationStrategy strategy = new RandomThenBackToPortDestinationStrategy();
         Action action = new AtPort();
         for(int i=0; i<100; i++)

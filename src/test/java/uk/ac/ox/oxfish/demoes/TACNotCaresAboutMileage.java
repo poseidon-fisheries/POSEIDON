@@ -28,7 +28,7 @@ public class TACNotCaresAboutMileage {
                                                          new FixedDoubleParameter(.1),
                                                          new UniformDoubleParameter(0, 20),
                                                          Paths.get("runs", "market1", "tacOil.csv").toFile(),
-                                                         5, System.currentTimeMillis());
+                                                         5, System.currentTimeMillis(), true);
 
         //the correlation ought to be very small
         Species species = state.getSpecies().get(0);

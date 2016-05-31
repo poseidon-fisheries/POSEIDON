@@ -1,9 +1,13 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.junit.Assert;
 import org.junit.Test;
 import sim.engine.Stoppable;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.HashMap;
 
@@ -63,6 +67,75 @@ public class PolicyScriptsTest {
         verify(tenYear,times(2)).apply(state);
         verify(twentyYear,times(1)).apply(state);
 
+
+
+
+
+
+    }
+
+
+    @Test
+    public void fromYamlCorrectly(){
+
+        String yaml= "scripts:\n" +
+                "  1:\n" +
+                "    PolicyScript:\n" +
+                "      changeInNumberOfFishers: 100\n" +
+                "      departingStrategy: null\n" +
+                "      destinationStrategy: null\n" +
+                "      fishingStrategy: null\n" +
+                "      gear:\n" +
+                "        Fixed Proportion:\n" +
+                "          catchabilityPerHour: '0.06'\n" +
+                "      regulation: null\n" +
+                "      weatherStrategy: null\n" +
+                "  10:\n" +
+                "    PolicyScript:\n" +
+                "      departingStrategy:\n" +
+                "        Fixed Rest:\n" +
+                "          hoursBetweenEachDeparture: '12.0'\n" +
+                "      regulation:\n" +
+                "        Mono-ITQ:\n" +
+                "          individualQuota: '5000.0'\n";
+        FishYAML yamler = new FishYAML();
+        PolicyScripts scripts = yamler.loadAs(yaml, PolicyScripts.class);
+        Assert.assertEquals(scripts.getScripts().size(),2);
+        PolicyScript firstYearPolicyScript = scripts.getScripts().get(1);
+        PolicyScript secondYearPolicyScript = scripts.getScripts().get(10);
+        Assert.assertNull(firstYearPolicyScript.getFishingStrategy());
+        Assert.assertNull(secondYearPolicyScript.getFishingStrategy());
+        Assert.assertTrue(firstYearPolicyScript.getGear() instanceof FixedProportionGearFactory);
+        Assert.assertEquals(
+                ((FixedDoubleParameter) ((FixedProportionGearFactory) firstYearPolicyScript.getGear()).getCatchabilityPerHour()).getFixedValue()
+                ,.06,.0001);
+
+
+
+
+
+    }
+
+    @Test
+    public void fromYamlCorrectlyOneScript(){
+
+        String yaml= "PolicyScript:\n" +
+                "  changeInNumberOfFishers: 100\n" +
+                "  departingStrategy: null\n" +
+                "  destinationStrategy: null\n" +
+                "  fishingStrategy: null\n" +
+                "  gear:\n" +
+                "    Fixed Proportion:\n" +
+                "      catchabilityPerHour: '0.06'\n" +
+                "  regulation: null\n" +
+                "  weatherStrategy: null";
+        FishYAML yamler = new FishYAML();
+        PolicyScript script = yamler.loadAs(yaml, PolicyScript.class);
+        Assert.assertNull(script.getFishingStrategy());
+        Assert.assertTrue(script.getGear() instanceof FixedProportionGearFactory);
+        Assert.assertEquals(
+                ((FixedDoubleParameter) ((FixedProportionGearFactory) script.getGear()).getCatchabilityPerHour()).getFixedValue()
+                ,.06,.0001);
 
 
 
