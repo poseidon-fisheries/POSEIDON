@@ -4,7 +4,6 @@ import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
     public List<T> answer(
             List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
 
-        HashMap<T, Double> features = representation.extractFeature(featureName,
+        Map<T, Double> features = representation.extractFeature(featureName,
                                                                     currentOptions,
                                                                     state, fisher);
         return thresholdAnswer(currentOptions,
@@ -61,7 +60,7 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
      * @return the list of all the acceptable candidates (or null if none apply)
      */
     public static <T> List<T> thresholdAnswer (List<T> currentOptions,
-                                               HashMap<T, Double> features,
+                                               Map<T, Double> features,
                                                Function<T,Double> thresholdExtractor,
                                                int minimumNumberOfObservations)
     {

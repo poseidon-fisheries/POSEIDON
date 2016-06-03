@@ -224,4 +224,22 @@ public class PolicyScript
             AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
         this.weatherStrategy = weatherStrategy;
     }
+
+    /**
+     * Getter for property 'gasPricePerLiter'.
+     *
+     * @return Value for property 'gasPricePerLiter'.
+     */
+    public Double getGasPricePerLiter() {
+        return gasPricePerLiter;
+    }
+
+    /**
+     * Setter for property 'gasPricePerLiter'.
+     *
+     * @param gasPricePerLiter Value to set for property 'gasPricePerLiter'.
+     */
+    public void setGasPricePerLiter(Double gasPricePerLiter) {
+        this.gasPricePerLiter = gasPricePerLiter;
+    }
 }

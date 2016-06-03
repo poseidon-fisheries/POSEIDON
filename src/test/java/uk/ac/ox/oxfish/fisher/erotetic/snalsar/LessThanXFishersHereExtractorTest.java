@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class NumberOfFishersHereExtractorTest {
+public class LessThanXFishersHereExtractorTest {
 
 
     @Test
@@ -45,14 +45,14 @@ public class NumberOfFishersHereExtractorTest {
         when(model.getFishersAtLocation(full)).thenReturn(fullBag);
 
 
-        NumberOfFishersHereExtractor safe = new NumberOfFishersHereExtractor();
+        LessThanXFishersHereExtractor safe = new LessThanXFishersHereExtractor(5);
         HashMap<SeaTile, Double> safetyReport = safe.extractFeature(toRepresent, model,
                                                                     mock(Fisher.class)
         );
 
-        assertTrue(safetyReport.get(empty)==0);
-        assertTrue(safetyReport.get(halfFull)==3);
-        assertTrue(safetyReport.get(full)==5);
+        assertTrue(safetyReport.get(empty)>0);
+        assertTrue(safetyReport.get(halfFull)>0);
+        assertTrue(safetyReport.get(full)<=0);
 
 
     }

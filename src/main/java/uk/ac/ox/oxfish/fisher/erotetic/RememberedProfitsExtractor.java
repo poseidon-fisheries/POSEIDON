@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.erotetic;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.ProfitFeatureExtractor;
 import uk.ac.ox.oxfish.fisher.log.LocationMemory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -14,7 +15,8 @@ import java.util.Map;
  * Extract profits from a seatile by checking your memory.
  * Created by carrknight on 4/10/16.
  */
-public class RememberedProfitsExtractor implements FeatureExtractor<SeaTile>{
+public class RememberedProfitsExtractor implements
+        ProfitFeatureExtractor<SeaTile> {
 
 
     private final boolean includingOpportunityCosts;

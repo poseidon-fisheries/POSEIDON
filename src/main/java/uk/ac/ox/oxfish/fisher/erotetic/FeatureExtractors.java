@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The hub where we store all methods fishers use to extract features from objects of class T
@@ -38,7 +39,7 @@ public class FeatureExtractors<T> {
      * @param model the model to represent
      * @param fisher
      * */
-    public HashMap<T,Double> extractFeature(
+    public Map<T,Double> extractFeature(
             String featureName,
             Collection<T> toRepresent,
             FishState model, Fisher fisher)

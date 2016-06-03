@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.fisher.erotetic;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Like threshold filter but the threshold is just another feature
@@ -46,10 +46,10 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
     @Override
     public List<T> answer(
             List<T> currentOptions, FeatureExtractors<T> representation, FishState state, Fisher fisher) {
-        HashMap<T, Double> features = representation.extractFeature(featureName,
-                                                                    currentOptions,
-                                                                    state, fisher);
-        HashMap<T, Double> thresholds = representation.extractFeature(thresholdFeatureName,
+        Map<T, Double> features = representation.extractFeature(featureName,
+                                                                currentOptions,
+                                                                state, fisher);
+        Map<T, Double> thresholds = representation.extractFeature(thresholdFeatureName,
                                                                     currentOptions,
                                                                     state, fisher);
 
@@ -58,7 +58,7 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
         return ThresholdAnswer.thresholdAnswer(
                 currentOptions,
                 features,
-                t -> thresholds.get(t),
+                thresholds::get,
                 minimumNumberOfObservations
         );
     }

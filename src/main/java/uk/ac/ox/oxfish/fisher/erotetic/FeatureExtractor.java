@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A function used by agents to extract/represent a feature of the object of class T they want to examine
@@ -19,7 +19,7 @@ public interface  FeatureExtractor<T> {
      * @param model the model to represent
      * @param fisher
      * */
-    HashMap<T,Double> extractFeature(
+    Map<T,Double> extractFeature(
             Collection<T> toRepresent, FishState model, Fisher fisher);
 
 

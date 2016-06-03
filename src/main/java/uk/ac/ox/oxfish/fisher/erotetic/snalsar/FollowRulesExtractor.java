@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Properly follow all the rules (am I allowed at sea? am I allowed THERE?)
@@ -21,7 +22,7 @@ public class FollowRulesExtractor implements LegalityFeatureExtractor<SeaTile>
      * @param fisher
      */
     @Override
-    public HashMap<SeaTile, Double> extractFeature(
+    public Map<SeaTile, Double> extractFeature(
             Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
         HashMap<SeaTile,Double> toReturn = new HashMap<>();
         for(SeaTile tile : toRepresent)

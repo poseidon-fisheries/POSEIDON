@@ -30,7 +30,7 @@ public class ITQCaresAboutMileage {
         FishState state=
                 MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
                                                          new FixedDoubleParameter(.1),
-                                                         new UniformDoubleParameter(0, 20),
+                                                         new UniformDoubleParameter(0, 100),
                                                          Paths.get("runs", "market1", "itqOil.csv").toFile(),
                                                          5, seed, true);
 

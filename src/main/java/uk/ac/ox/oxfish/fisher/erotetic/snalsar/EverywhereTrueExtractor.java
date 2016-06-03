@@ -3,9 +3,10 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FixedMap;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Returns 1.0 to everything
@@ -19,16 +20,14 @@ public class EverywhereTrueExtractor implements SafetyFeatureExtractor<SeaTile>,
      * Returns a map where everything is assigned value 1 (safe)
      */
     @Override
-    public HashMap<SeaTile, Double> extractFeature(
+    public Map<SeaTile, Double> extractFeature(
             Collection<SeaTile> toRepresent,
             FishState model, Fisher fisher)
     {
 
-        HashMap<SeaTile,Double> toReturn = new HashMap<>(toRepresent.size());
-        for(SeaTile tile : toRepresent)
-            toReturn.put(tile,1.0);
 
-        return toReturn;
+
+        return new FixedMap<>(1.0);
 
     }
 }
