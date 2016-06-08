@@ -58,6 +58,11 @@ public class DestinationStrategies
         NAMES.put(BetterThanAverageEroteticDestinationFactory.class,
                   "Better Than Average Erotetic");
 
+        CONSTRUCTORS.put("SNALSAR",
+                         SNALSARDestinationFactory::new);
+        NAMES.put(SNALSARDestinationFactory.class,
+                  "SNALSAR");
+
     }
 
     private DestinationStrategies() {}

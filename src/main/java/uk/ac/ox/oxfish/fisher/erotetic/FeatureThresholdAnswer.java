@@ -22,15 +22,26 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
 
     private final String thresholdFeatureName;
 
+    private final boolean goodAboveTrue;
 
     public FeatureThresholdAnswer(
             int minimumNumberOfObservations,
             String featureName,
             String thresholdFeatureName)
     {
+        this(minimumNumberOfObservations, featureName, thresholdFeatureName,true);
+    }
+
+    public FeatureThresholdAnswer(
+            int minimumNumberOfObservations,
+            String featureName,
+            String thresholdFeatureName,
+            boolean goodAboveTrue)
+    {
         this.minimumNumberOfObservations = minimumNumberOfObservations;
         this.featureName = featureName;
         this.thresholdFeatureName = thresholdFeatureName;
+        this.goodAboveTrue = goodAboveTrue;
     }
 
 
@@ -59,7 +70,8 @@ public class FeatureThresholdAnswer<T>  implements EroteticAnswer<T>
                 currentOptions,
                 features,
                 thresholds::get,
-                minimumNumberOfObservations
+                minimumNumberOfObservations,
+                goodAboveTrue
         );
     }
 

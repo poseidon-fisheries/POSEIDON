@@ -35,10 +35,12 @@ public class SafetyFeatureExtractors {
         NAMES.put(EverywhereTrueExtractorFactory.class,
                   "Safe Everywhere");
 
-        CONSTRUCTORS.put("Less Than X Fishers Is Safe",
+        CONSTRUCTORS.put("Less Than X Fishers Currently Here Is Safe",
                          LessThanXFishersHereExtractorFactory::new);
         NAMES.put(LessThanXFishersHereExtractorFactory.class,
-                  "Safe Everywhere");
+                  "Less Than X Fishers Currently Here Is Safe");
+
+
 
 
     }

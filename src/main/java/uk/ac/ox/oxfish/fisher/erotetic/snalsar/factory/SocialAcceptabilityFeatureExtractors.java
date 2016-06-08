@@ -37,7 +37,13 @@ public class SocialAcceptabilityFeatureExtractors
         CONSTRUCTORS.put("No Friends Fish Here",
                          NoFriendsHereExtractorFactory::new);
         NAMES.put(NoFriendsHereExtractorFactory.class,
-                  "Safe Everywhere");
+                  "No Friends Fish Here");
+
+
+        CONSTRUCTORS.put("Nobody Fishes Here",
+                         NobodyFishesHereFactory::new);
+        NAMES.put(NobodyFishesHereFactory.class,
+                  "Nobody Fishes Here");
 
 
     }

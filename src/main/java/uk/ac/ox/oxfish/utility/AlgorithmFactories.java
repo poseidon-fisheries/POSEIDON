@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -80,6 +82,20 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.CONSTRUCTORS);
         NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
+
+
+
+
+        CONSTRUCTOR_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.CONSTRUCTORS);
+        NAMES_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(SocialAcceptabilityFeatureExtractor.class, SocialAcceptabilityFeatureExtractors.CONSTRUCTORS);
+        NAMES_MAP.put(SocialAcceptabilityFeatureExtractor.class, SocialAcceptabilityFeatureExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(SafetyFeatureExtractor.class, SafetyFeatureExtractors.CONSTRUCTORS);
+        NAMES_MAP.put(SafetyFeatureExtractor.class, SafetyFeatureExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.CONSTRUCTORS);
+        NAMES_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.CONSTRUCTORS);
+        NAMES_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.NAMES);
     }
 
 

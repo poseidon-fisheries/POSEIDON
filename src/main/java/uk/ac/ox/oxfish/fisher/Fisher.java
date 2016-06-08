@@ -1111,6 +1111,7 @@ public class Fisher implements Steppable, Startable{
         return memory.removeFeatureExtractor(nameOfFeature);
     }
 
+
     /**
      * Getter for property 'tileRepresentation'.
      *

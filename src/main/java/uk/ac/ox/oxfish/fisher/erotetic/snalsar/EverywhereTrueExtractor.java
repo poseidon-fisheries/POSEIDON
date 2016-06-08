@@ -27,7 +27,7 @@ public class EverywhereTrueExtractor implements SafetyFeatureExtractor<SeaTile>,
 
 
 
-        return new FixedMap<>(1.0);
+        return new FixedMap<>(1.0, toRepresent);
 
     }
 }

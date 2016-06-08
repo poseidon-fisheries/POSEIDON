@@ -332,7 +332,8 @@ public class PrototypeScenario implements Scenario {
                                 Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
                             double averageProfits = model.getLatestDailyObservation(
                                     FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
-                            return new FixedMap<SeaTile, Double>(averageProfits) ;
+                            return new FixedMap<SeaTile, Double>(averageProfits,
+                                                                 toRepresent) ;
                         }
                     }
             );

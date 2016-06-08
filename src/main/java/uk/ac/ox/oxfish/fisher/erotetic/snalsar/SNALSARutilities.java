@@ -31,5 +31,19 @@ public class SNALSARutilities
 
 
 
+    /**
+     * threshold below which profits are usually considered a failure
+     */
+    public static final String FAILURE_THRESHOLD = "Non-Failure Threshold Feature";
+
+
+
+    /**
+     * threshold above which profits are considered acceptable
+     */
+    public static final String ACCEPTABLE_THRESHOLD = "Acceptable Threshold Feature";
+
+
+
 
 }

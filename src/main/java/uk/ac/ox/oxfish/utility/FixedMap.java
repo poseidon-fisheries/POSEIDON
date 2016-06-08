@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -12,12 +13,13 @@ public class FixedMap<K,V> extends HashMap<K,V> {
 
     protected V defaultValue;
 
-    public FixedMap(V defaultValue) {
+
+    public FixedMap(V defaultValue, Collection<K> keys) {
+
         this.defaultValue = defaultValue;
-    }
-    @Override
-    public V get(Object k) {
-        return containsKey(k) ? super.get(k) : defaultValue;
+
+        for(K key : keys)
+            put(key,defaultValue);
     }
 
 }

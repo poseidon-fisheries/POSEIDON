@@ -23,12 +23,20 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
 
     private final String featureName;
 
+    private final boolean goodAboveThreshold;
+
     public ThresholdAnswer(int minimumNumberOfObservations,
                            double minimumThreshold,
                            String featureName) {
+        this(minimumNumberOfObservations, minimumThreshold, featureName, true);
+    }
+
+    public ThresholdAnswer(
+            int minimumNumberOfObservations, double minimumThreshold, String featureName, boolean goodAboveThreshold) {
         this.minimumNumberOfObservations = minimumNumberOfObservations;
-        this.minimumThreshold = minimumThreshold;
         this.featureName = featureName;
+        this.goodAboveThreshold = goodAboveThreshold;
+        this.minimumThreshold = minimumThreshold;
     }
 
     /**
@@ -48,7 +56,8 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
         return thresholdAnswer(currentOptions,
                                features,
                                t -> minimumThreshold,
-                               minimumNumberOfObservations);
+                               minimumNumberOfObservations,
+                               goodAboveThreshold);
     }
 
     /**
@@ -62,7 +71,8 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
     public static <T> List<T> thresholdAnswer (List<T> currentOptions,
                                                Map<T, Double> features,
                                                Function<T,Double> thresholdExtractor,
-                                               int minimumNumberOfObservations)
+                                               int minimumNumberOfObservations,
+                                               boolean goodAboveThreshold)
     {
 
         //no feature, indifference
@@ -92,8 +102,9 @@ public class ThresholdAnswer<T> implements EroteticAnswer<T>
             {
                 double minimumThreshold = thresholdExtractor.apply(feature.getKey());
                 if(Double.isFinite(minimumThreshold) &&
-                        actualOptions.contains(feature.getKey()) &&
-                        feature.getValue() >= minimumThreshold)
+                        actualOptions.contains(feature.getKey()))
+                    if( (goodAboveThreshold  && feature.getValue() >= minimumThreshold ) ||
+                            (!goodAboveThreshold  && feature.getValue() <= minimumThreshold )   )
                     passTheTest.add(feature.getKey());
             }
             if(Log.TRACE)

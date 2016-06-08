@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FisherStartable;
 
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
      */
     private final FavoriteDestinationStrategy delegate;
 
+    private final FisherStartable startable;
+
 
     public SNALSARDestinationStrategy(
             EroteticAnswer<SeaTile> safetyFilter,
@@ -48,7 +51,8 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
             EroteticAnswer<SeaTile> legalFilter,
             EroteticAnswer<SeaTile> sociallyAppropriateFilter,
             EroteticAnswer<SeaTile> knownToHaveAcceptableProfits,
-            FavoriteDestinationStrategy delegate) {
+            FavoriteDestinationStrategy delegate,
+            FisherStartable startable) {
         this.chooser = new EroteticChooser<>();
         this.chooser.add(safetyFilter);
         this.chooser.add(notKnownToFailProfitFilter);
@@ -56,6 +60,7 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
         this.chooser.add(sociallyAppropriateFilter);
         this.chooser.add(knownToHaveAcceptableProfits);
         this.delegate = delegate;
+        this.startable =startable;
     }
 
     /**
@@ -79,7 +84,9 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
 
     @Override
     public void start(FishState model, Fisher fisher) {
+        startable.start(model,fisher);
         this.model=model;
+        this.fisher=fisher;
         fisher.addTripListener(this);
         delegate.start(model,fisher);
     }
@@ -100,4 +107,8 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
         );
     }
 
+
+    public SeaTile getFavoriteSpot() {
+        return delegate.getFavoriteSpot();
+    }
 }

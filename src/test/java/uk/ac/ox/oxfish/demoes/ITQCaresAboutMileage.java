@@ -12,7 +12,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.stream.DoubleStream;
 
@@ -23,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class ITQCaresAboutMileage {
 
     @Test
-    public void itqNotCaresAboutMileage() throws Exception {
+    public void l() throws Exception {
 
 
         long seed = System.currentTimeMillis();
@@ -31,7 +30,7 @@ public class ITQCaresAboutMileage {
                 MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
                                                          new FixedDoubleParameter(.1),
                                                          new UniformDoubleParameter(0, 100),
-                                                         Paths.get("runs", "market1", "itqOil.csv").toFile(),
+                                                         null,
                                                          5, seed, true);
 
         //the correlation ought to be very small

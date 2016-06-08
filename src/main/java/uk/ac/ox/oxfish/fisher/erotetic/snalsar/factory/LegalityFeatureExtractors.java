@@ -35,8 +35,8 @@ public class LegalityFeatureExtractors {
                   "Ignore Rules");
 
         CONSTRUCTORS.put("Follow the Rules",
-                         EverywhereTrueExtractorFactory::new);
-        NAMES.put(EverywhereTrueExtractorFactory.class,
+                         FollowRulesExtractorFactory::new);
+        NAMES.put(FollowRulesExtractorFactory.class,
                   "Follow the Rules");
 
     }
