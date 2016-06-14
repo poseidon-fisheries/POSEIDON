@@ -24,7 +24,6 @@ public class FishTheRockyLineDemo {
     {
 
 
-        double borderTows = 0;
 
         int rockyAreas = 0;
         FishState state;
@@ -41,7 +40,9 @@ public class FishTheRockyLineDemo {
             //for an ineffectual measure to test against. Instead with 200 fishers i have never seen the percentage of effort
             //spent in the border to be below 60%
             scenario.setGear(gear);
-            scenario.setBiologyInitializer(new RockyLogisticFactory());
+            RockyLogisticFactory biologyInitializer = new RockyLogisticFactory();
+            scenario.setBiologyInitializer(biologyInitializer);
+            biologyInitializer.setSandyCarryingCapacity(new FixedDoubleParameter(1000)); //make depletion faster
             SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
             simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(2d));
             scenario.setMapInitializer(simpleMap);

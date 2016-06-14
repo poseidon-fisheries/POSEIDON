@@ -12,10 +12,8 @@ import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -32,6 +30,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -45,7 +44,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * A series of runs and outputs that will turn hopefully into the paper
@@ -72,25 +70,25 @@ public class FirstPaper
         Log.info("Hyperstability");
         //hyperStability();
         Log.info("Oil Price Changes");
-        oilCheck();
-        oils(1);
-        oils(2);
+        //oilCheck();
+       // oils(1);
+        //oils(2);
         Log.info("Fishing the Line");
         //        mpa();
         Log.info("Optimal Network");
-        //  disfunctionalFriends();
-        //   functionalFriends();
+        //disfunctionalFriends();
+       // functionalFriends();
         Log.info("OSMOSE");
         //osmoseDemersal2(50);
         Log.info("Best Heuristic");
         //  optimalHeuristic();
         Log.info("Hard Switch");
-        //      hardSwitch();
+        hardSwitch();
         Log.info("Directed Technological Change");
         // directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
-        //  catchesPerPolicyCatchability();
-        //  catchesPerPolicyMileage();
+       // catchesPerPolicyCatchability();
+       // catchesPerPolicyMileage();
         Log.info("Race to Fish");
         // raceToFish();
         Log.info("Location Choice");
@@ -479,74 +477,6 @@ public class FirstPaper
     }
 
 
-    /**
-     * this method calls a static method from Dashboard
-     * Dashboard is made up of a set of visual tests we run every day or so to keep track of subtle changes in results
-     * of our simulation.
-     * @throws IOException
-     */
-    public static void disfunctionalFriends() throws IOException {
-
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
-                INPUT_FOLDER.resolve("disfunctional_friends.yaml")));
-        String toOutput = "friends,steps\n";
-        //check how much it takes in days to consume 95% of all the biomass
-        for(int friends =0; friends<30;friends++) {
-            Log.info("Disfunctional Friends " + friends );
-
-            int steps = 0;
-            for (int run = 0; run < 10; run++) {
-                Log.info("----- run " + run );
-                //this will change the network builder to be of "friends" degree
-                steps +=Dashboard.disfunctionalFriendsRun(friends,
-                                                          yaml.loadAs(scenarioYaml, PrototypeScenario.class),
-                                                          15);
-            }
-            double average = ((double)steps)/10.0;
-            toOutput = toOutput + friends + "," + average + "\n";
-        }
-
-        Path outputFolder = OUTPUT_FOLDER.resolve("disfunctional");
-        outputFolder.toFile().mkdirs();
-
-        Files.write(outputFolder.resolve("disfunctional.csv"), toOutput.getBytes());
-
-    }
-
-
-    public static void functionalFriends() throws IOException {
-
-        FishYAML yaml = new FishYAML();
-        String scenarioYaml = String.join("\n", Files.readAllLines(
-                INPUT_FOLDER.resolve("disfunctional_friends.yaml")));
-        String toOutput = "friends,steps\n";
-        //check how much it takes in days to consume 95% of all the biomass
-        for(int friends =0; friends<30;friends++) {
-            Log.info("Functional Friends " + friends );
-
-            int steps = 0;
-            for (int run = 0; run < 10; run++) {
-                Log.info("----- run " + run );
-                //to be FUNCTIONAL the only difference is that exploratory probability is higher!
-                PrototypeScenario scenario = yaml.loadAs(scenarioYaml, PrototypeScenario.class);
-                ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setProbability(
-                        new ExplorationPenaltyProbabilityFactory(.8, 1d, .00, .01));
-
-                steps +=Dashboard.disfunctionalFriendsRun(friends,
-                                                          scenario,
-                                                          15);
-            }
-            double average = ((double)steps)/10.0;
-            toOutput = toOutput + friends + "," + average + "\n";
-        }
-
-        Path outputFolder = OUTPUT_FOLDER.resolve("disfunctional");
-        outputFolder.toFile().mkdirs();
-
-        Files.write(outputFolder.resolve("functional.csv"), toOutput.getBytes());
-
-    }
 
 
     public static void optimalHeuristic() throws IOException{
@@ -617,45 +547,10 @@ public class FirstPaper
         PrototypeScenario scenario = yaml.loadAs(scenarioYaml,PrototypeScenario.class);
 
 
-        //we force the gear to change and in particular we allow two options: either you catch species 0 or species 1
-        //no alternative!
-        RandomTrawlStringFactory gear = new RandomTrawlStringFactory();
-        gear.setCatchabilityMap(firstSpecies+":.01");
-        scenario.setGear(gear);
-
-
-        RandomTrawlStringFactory option1 = new RandomTrawlStringFactory();
-        option1.setCatchabilityMap(firstSpecies+":.01");
-        RandomTrawlStringFactory option2= new RandomTrawlStringFactory();
-        option2.setCatchabilityMap(secondSpecies+":.01");
+        //add special data
         state.registerStartable(new Startable() {
                                     @Override
                                     public void start(FishState model) {
-
-                                        for (Fisher fisher : model.getFishers()) {
-
-                                            Adaptation<Gear> trawlAdaptation =
-                                                    new Adaptation<>(
-                                                            (Predicate<Fisher>) fisher1 -> true,
-                                                            new BeamHillClimbing<Gear>() {
-                                                                @Override
-                                                                public Gear randomStep(
-                                                                        FishState state, MersenneTwisterFast random,
-                                                                        Fisher fisher,
-                                                                        Gear current) {
-                                                                    return state.random.nextBoolean() ?
-                                                                            option1.apply(state) :
-                                                                            option2.apply(state);
-                                                                }
-                                                            },
-                                                            GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR,
-                                                            fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
-                                                            new CashFlowObjective(365),
-                                                            .1, .8);
-
-                                            //tell the fisher to use this once a year
-                                            fisher.addYearlyAdaptation(trawlAdaptation);
-                                        }
                                         model.getYearlyDataSet().registerGatherer(model.getSpecies().get(firstSpecies)+ " Catchers", state1 -> {
                                             double size = state1.getFishers().size();
                                             if (size == 0)
@@ -693,8 +588,7 @@ public class FirstPaper
                                     public void turnOff() {
 
                                     }
-                                }
-        );
+                                });
 
 
 
@@ -727,6 +621,7 @@ public class FirstPaper
         output.toFile().mkdirs();
         //putting initial scenario back means that the new yaml will override the old one
 
+
         for(int i=0; i<10; i++)
         {
             Dashboard.gearEvolutionDashboard(new FishYAML(), expensiveGas, i, "expensive", output,
@@ -747,6 +642,17 @@ public class FirstPaper
         for(int i=0; i<10; i++)
         {
             Dashboard.gearEvolutionDashboard(new FishYAML(), cheapGas, i, "cheap", output, RANDOM_SEED+i);
+        }
+
+        Log.info("    - Sensitivity Results");
+        String random_gas = String.join("\n", Files.readAllLines(
+                INPUT_FOLDER.resolve("sensitivity").resolve("gearopt").resolve("random_walk.yaml")));
+
+        for(int i=0; i<10; i++)
+        {
+            Dashboard.gearEvolutionDashboard(new FishYAML(), random_gas, i, "ant",
+                                             INPUT_FOLDER.resolve("sensitivity").resolve("gearopt"),
+                                             RANDOM_SEED+i);
         }
     }
 
@@ -887,19 +793,20 @@ public class FirstPaper
                     Adaptation<RandomCatchabilityTrawl> trawlAdaptation =
                             new Adaptation<>(
                                     fisher1 -> true,
-                                    new BeamHillClimbing<RandomCatchabilityTrawl>()
-                                    {
-                                        //on random steps just create completely new gear
-                                        @Override
-                                        public RandomCatchabilityTrawl randomStep(
-                                                FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                RandomCatchabilityTrawl current) {
-                                            return gearFactory.apply(state);
-                                        }
+                                    new BeamHillClimbing<RandomCatchabilityTrawl>(
+                                            new RandomStep<RandomCatchabilityTrawl>() {
+                                                //on random steps just create completely new gear
+                                                @Override
+                                                public RandomCatchabilityTrawl randomStep(
+                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
+                                                        RandomCatchabilityTrawl current) {
+                                                    return gearFactory.apply(state);
+                                                }
 
 
-
-                                    },
+                                            }
+                                    )
+                                   ,
                                     //otherwise just copy the best
                                     (fisher1, change, model1) -> GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR.apply(
                                             fisher1, change, model1),

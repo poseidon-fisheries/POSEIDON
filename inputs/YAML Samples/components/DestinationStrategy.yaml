@@ -43,3 +43,17 @@ Better Than Average Erotetic:
   minimumObservations: '5.0'
   updateInterval: uniform 5.0 15.0
 -------
+SNALSAR:
+  acceptableThreshold:
+    Average Profits Threshold:
+      scale: '1.0'
+  failureThreshold:
+    Fixed Threshold:
+      fixedThreshold: '0.0'
+  legal: Follow the Rules
+  profit:
+    Remembered Profits:
+      includeOpportunityCosts: true
+  safety: Socially Acceptable Everywhere
+  sociallyAcceptable: Nobody Fishes Here
+-------

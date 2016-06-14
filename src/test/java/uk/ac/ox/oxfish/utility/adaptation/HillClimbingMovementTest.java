@@ -6,8 +6,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -24,13 +25,15 @@ public class HillClimbingMovementTest {
 
 
         //if new is better than old, go random
-        BeamHillClimbing<SeaTile> algo = new BeamHillClimbing<SeaTile>() {
-            @Override
-            public SeaTile randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
-                return newTile;
-            }
-        };
+        BeamHillClimbing<SeaTile> algo = new BeamHillClimbing<SeaTile>(
+                new RandomStep<SeaTile>() {
+                    @Override
+                    public SeaTile randomStep(
+                            FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
+                        return newTile;
+                    }
+                }
+        );
 
         assertEquals(newTile,algo.randomize(random,mock(Fisher.class),0,current));
 

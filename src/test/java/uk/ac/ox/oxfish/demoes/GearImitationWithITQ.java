@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -108,14 +109,16 @@ public class GearImitationWithITQ
                     Adaptation<RandomCatchabilityTrawl> trawlAdaptation =
                             new Adaptation<>(
                                     fisher1 -> true,
-                                    new BeamHillClimbing<RandomCatchabilityTrawl>() {
-                                        @Override
-                                        public RandomCatchabilityTrawl randomStep(
-                                                FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                RandomCatchabilityTrawl current) {
-                                            return gearFactory.apply(state);
-                                        }
-                                    },
+                                    new BeamHillClimbing<RandomCatchabilityTrawl>(
+                                            new RandomStep<RandomCatchabilityTrawl>() {
+                                                @Override
+                                                public RandomCatchabilityTrawl randomStep(
+                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
+                                                        RandomCatchabilityTrawl current) {
+                                                    return gearFactory.apply(state);
+                                                }
+                                            }
+                                    ),
                                     (fisher1, change, model1) -> GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR.apply(
                                             fisher1, change, model1),
                                     fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),

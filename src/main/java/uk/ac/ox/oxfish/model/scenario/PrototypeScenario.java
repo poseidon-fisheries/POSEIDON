@@ -26,6 +26,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -158,6 +160,9 @@ public class PrototypeScenario implements Scenario {
      */
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
             new MaximumStepsFactory();
+
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
+            new FixedGearStrategyFactory();
 
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
@@ -309,14 +314,14 @@ public class PrototypeScenario implements Scenario {
                                           departing,
                                           destinationStrategy.apply(model),
                                           fishingStrategy.apply(model),
+                                          gearStrategy.apply(model),
                                           weatherStrategy.apply(model),
                                           new Boat(10, 10,
                                                    new Engine(engineWeight,
                                                                literPerKilometer,
                                                               speed),
                                                    new FuelTank(fuelCapacity)),
-                                          new Hold(capacity, biology.getSize()),
-                                          fisherGear, model.getSpecies().size());
+                                          new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
 
 
             //todo move this somewhere else
@@ -408,6 +413,7 @@ public class PrototypeScenario implements Scenario {
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
+                gearStrategy,
                 weatherStrategy,
                 (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
                                                                    literPerKilometer.apply(random),
@@ -643,5 +649,25 @@ public class PrototypeScenario implements Scenario {
 
     public void setPortPositionY(Integer portPositionY) {
         this.portPositionY = portPositionY;
+    }
+
+
+    /**
+     * Getter for property 'gearStrategy'.
+     *
+     * @return Value for property 'gearStrategy'.
+     */
+    public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
+        return gearStrategy;
+    }
+
+    /**
+     * Setter for property 'gearStrategy'.
+     *
+     * @param gearStrategy Value to set for property 'gearStrategy'.
+     */
+    public void setGearStrategy(
+            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        this.gearStrategy = gearStrategy;
     }
 }

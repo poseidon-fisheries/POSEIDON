@@ -4,6 +4,7 @@ package uk.ac.ox.oxfish.demoes;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -102,7 +103,7 @@ public class TwoSpeciesITQSplit
         multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
         multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
 
-        HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
+        SplitInitializerFactory biologyFactory = new SplitInitializerFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
         biologyFactory.setSteepness(new FixedDoubleParameter(.9));
         biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
@@ -114,6 +115,7 @@ public class TwoSpeciesITQSplit
         //world split in half
         scenario.setBiologyInitializer(biologyFactory);
         scenario.setRegulation(multiFactory);
+
 
         SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
         simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));

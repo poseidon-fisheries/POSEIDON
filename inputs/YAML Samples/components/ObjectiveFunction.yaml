@@ -1,0 +1,10 @@
+Cash Flow Objective:
+  period: '365.0'
+-------
+Hourly Profit Objective:
+  opportunityCosts: true
+-------
+Target Species Hourly Profit:
+  opportunityCosts: true
+  speciesIndex: 0
+-------

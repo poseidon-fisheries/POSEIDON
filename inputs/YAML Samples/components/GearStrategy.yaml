@@ -1,0 +1,23 @@
+Never Change Gear
+-------
+Periodic Gear Update from List:
+  availableGears: [
+    ]
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '0.6'
+  yearly: true
+-------
+Periodic Gear Update Mileage:
+  availableGears: [
+    ]
+  maximumGasPerLiter: '20.0'
+  minimumGasPerLiter: '0.0'
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '0.6'
+  shockSize: '0.05'
+  yearly: false
+-------

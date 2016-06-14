@@ -27,6 +27,8 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -133,6 +135,12 @@ public class Fisher implements Steppable, Startable{
 
 
     /**
+     * the strategy to choose what gear to use when going out.
+     */
+    private GearStrategy gearStrategy = new FixedGearStrategy()    ;
+
+
+    /**
      * the turnOff switch to call when the fisher is turned off
      */
     private Stoppable receipt;
@@ -190,6 +198,7 @@ public class Fisher implements Steppable, Startable{
      * @param departingStrategy how the fisher decides how to leave the port
      * @param destinationStrategy how the fisher decides where to go
      * @param fishingStrategy how the fisher decides how much to fish
+     * @param gearStrategy
      * @param weatherStrategy
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
@@ -204,9 +213,10 @@ public class Fisher implements Steppable, Startable{
             DepartingStrategy departingStrategy,
             DestinationStrategy destinationStrategy,
             FishingStrategy fishingStrategy,
+            GearStrategy gearStrategy,
             WeatherEmergencyStrategy weatherStrategy,
             //equipment:
-             Boat boat, Hold hold, Gear gear,
+            Boat boat, Hold hold, Gear gear,
             int numberOfSpecies) {
         this.fisherID = id;
 
@@ -220,6 +230,7 @@ public class Fisher implements Steppable, Startable{
         this.departingStrategy = departingStrategy;
         this.destinationStrategy =destinationStrategy;
         this.fishingStrategy = fishingStrategy;
+        this.gearStrategy=gearStrategy;
         this.weatherStrategy = weatherStrategy;
 
 
@@ -264,6 +275,7 @@ public class Fisher implements Steppable, Startable{
         destinationStrategy.start(state,this);
         fishingStrategy.start(state,this);
         departingStrategy.start(state,this);
+        gearStrategy.start(state,this);
         weatherStrategy.start(state,this);
 
         //start the adaptations
@@ -1160,5 +1172,46 @@ public class Fisher implements Steppable, Startable{
      */
     public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
         return status.isAllowedToFishHere(this, tile, model);
+    }
+
+    /**
+     * Getter for property 'gearStrategy'.
+     *
+     * @return Value for property 'gearStrategy'.
+     */
+    public GearStrategy getGearStrategy() {
+        return gearStrategy;
+    }
+
+    /**
+     * Setter for property 'gearStrategy'.
+     *
+     * @param gearStrategy Value to set for property 'gearStrategy'.
+     */
+    public void setGearStrategy(GearStrategy gearStrategy) {
+
+        if(state != null && this.gearStrategy != gearStrategy)
+            this.gearStrategy.turnOff();
+
+
+
+        this.gearStrategy = gearStrategy;
+        if(state!=null)
+            this.gearStrategy.start(state,this);
+
+    }
+
+    /**
+     * Check if you want to change your gear now!
+     * @param random randomizer
+     * @param model the model
+     * @param currentAction the current action
+     */
+    public void updateGear( MersenneTwisterFast random,
+                            FishState model,
+                            Action currentAction)
+    {
+        Preconditions.checkState(isAtPort(), "Changing Gear out of Port. Not expected!");
+        gearStrategy.updateGear(this,random,model,currentAction);
     }
 }

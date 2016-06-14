@@ -26,6 +26,9 @@ public class AtPort implements Action {
                 &&
                 agent.shouldFisherLeavePort(model))
         {
+
+            //departing!
+            agent.updateGear(model.getRandom(),model,this);
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
             agent.undock();

@@ -87,6 +87,7 @@ California Map Scenario:
             retentionSlope: '1.7773'
             selectivityAParameter: '23.5035'
             selectivityBParameter: '9.03702'
+  gearStrategy: Never Change Gear
   gridWidth: 50
   holdSizePerBoat: '40000.0'
   hourlyTravellingCosts: '0.0'

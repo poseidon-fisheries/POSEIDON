@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.utility.FishStateLogger;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,17 +188,19 @@ public class OsmoseComparativeStatics
                                             Adaptation<Gear> trawlAdaptation =
                                                     new Adaptation<>(
                                                             (Predicate<Fisher>) fisher1 -> true,
-                                                            new BeamHillClimbing<Gear>() {
-                                                                @Override
-                                                                public Gear randomStep(
-                                                                        FishState state, MersenneTwisterFast random,
-                                                                        Fisher fisher,
-                                                                        Gear current) {
-                                                                    return state.random.nextBoolean() ?
-                                                                            option1.apply(state) :
-                                                                            option2.apply(state);
-                                                                }
-                                                            },
+                                                            new BeamHillClimbing<Gear>(
+                                                                    new RandomStep<Gear>() {
+                                                                        @Override
+                                                                        public Gear randomStep(
+                                                                                FishState state, MersenneTwisterFast random,
+                                                                                Fisher fisher,
+                                                                                Gear current) {
+                                                                            return state.random.nextBoolean() ?
+                                                                                    option1.apply(state) :
+                                                                                    option2.apply(state);
+                                                                        }
+                                                                    }
+                                                            ),
                                                             GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR,
                                                             fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
                                                             new CashFlowObjective(365),

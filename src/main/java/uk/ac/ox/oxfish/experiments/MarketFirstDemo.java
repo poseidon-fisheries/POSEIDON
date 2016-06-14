@@ -55,7 +55,8 @@ public class MarketFirstDemo {
         gear.setGasPerHourFished(gasInefficiency);
         scenario.setGear(gear);
         //make gas expensive!
-        scenario.setGasPricePerLiter(new FixedDoubleParameter(0.2));
+        scenario.setGasPricePerLiter(new FixedDoubleParameter(1));
+        scenario.setLiterPerKilometer(new FixedDoubleParameter(0));
 
         if(!imitate) {
 

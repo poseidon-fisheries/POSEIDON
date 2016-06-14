@@ -17,12 +17,15 @@ import java.util.function.Predicate;
  * It is abstract as it expects a method to randomize a new step
  * Created by carrknight on 8/6/15.
  */
-public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
+public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
 {
 
 
 
-    abstract public T randomStep(FishState state,MersenneTwisterFast random, Fisher fisher, T current);
+    public T randomStep(FishState state,MersenneTwisterFast random, Fisher fisher, T current){
+        return randomStep.randomStep(state,random,fisher,current);
+
+    };
 
     private FishState model;
 
@@ -55,14 +58,24 @@ public abstract class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     private final Predicate<Pair<Double,Double>> unfriendPredicate;
 
 
-    public BeamHillClimbing(boolean copyAlwaysBest, Predicate<Pair<Double,Double>> unfriendPredicate) {
+    /**
+     * what is the result of an exploration step
+     */
+    private final RandomStep<T> randomStep;
+
+    public BeamHillClimbing(boolean copyAlwaysBest,
+                            Predicate<Pair<Double,Double>> unfriendPredicate,
+                            RandomStep<T> randomStep) {
         this.copyAlwaysBest = copyAlwaysBest;
         this.unfriendPredicate = unfriendPredicate;
+        this.randomStep = randomStep;
+
     }
 
-    public BeamHillClimbing() {
+    public BeamHillClimbing(RandomStep<T> randomStep) {
         this(DEFAULT_ALWAYS_COPY_BEST,
-             DEFAULT_DYNAMIC_NETWORK);
+             DEFAULT_DYNAMIC_NETWORK,
+             randomStep);
     }
 
     @Override

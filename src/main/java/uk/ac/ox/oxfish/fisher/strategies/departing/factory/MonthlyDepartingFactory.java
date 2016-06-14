@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -111,19 +112,21 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                             fisher.addYearlyAdaptation(new Adaptation(
                                     (Predicate<Fisher>) fisher1 -> true,
                                     //beam hill-climber with random mutation chance for each month
-                                    new BeamHillClimbing<MonthlyDepartingStrategy>() {
-                                        @Override
-                                        public MonthlyDepartingStrategy randomStep(
-                                                FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                MonthlyDepartingStrategy current) {
-                                            boolean[] months = Arrays.copyOf(current.getAllowedAtSea(), 12);
-                                            for (int i = 0; i < 12; i++)
-                                                if (random.nextBoolean(mutationRate))
-                                                    months[i] = !current.getAllowedAtSea()[i];
+                                    new BeamHillClimbing<MonthlyDepartingStrategy>(
+                                            new RandomStep<MonthlyDepartingStrategy>() {
+                                                @Override
+                                                public MonthlyDepartingStrategy randomStep(
+                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
+                                                        MonthlyDepartingStrategy current) {
+                                                    boolean[] months = Arrays.copyOf(current.getAllowedAtSea(), 12);
+                                                    for (int i = 0; i < 12; i++)
+                                                        if (random.nextBoolean(mutationRate))
+                                                            months[i] = !current.getAllowedAtSea()[i];
 
-                                            return new MonthlyDepartingStrategy(months);
-                                        }
-                                    },
+                                                    return new MonthlyDepartingStrategy(months);
+                                                }
+                                            }
+                                    ),
                                     (Actuator<MonthlyDepartingStrategy>) (fisher1, change, model1) -> {
                                         fisher1.setDepartingStrategy(change);
                                     },

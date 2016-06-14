@@ -22,7 +22,26 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
 
     public DefaultBeamHillClimbing(
             boolean copyAlwaysBest, Predicate<Pair<Double,Double>> unfriendPredicate, int maxStep, int attempts) {
-        super(copyAlwaysBest, unfriendPredicate);
+        super(copyAlwaysBest, unfriendPredicate,
+              new RandomStep<SeaTile>() {
+                  @Override
+                  public SeaTile randomStep(
+                          FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current)
+                  {
+                      for(int i=0; i<attempts; i++)
+                      {
+                          int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
+                          int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
+                          SeaTile candidate = state.getMap().getSeaTile(x,y);
+                          if(candidate!=null && current!= candidate && candidate.getAltitude()<0
+                                  &&!fisher.getHomePort().getLocation().equals(candidate) )
+                              return candidate;
+                      }
+
+                      //stay where you are
+                      return current;
+                  }
+              });
         this.maxStep = maxStep;
         this.attempts = attempts;
     }
@@ -46,23 +65,7 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
                                            attempts);
     }
 
-    @Override
-    public SeaTile randomStep(
-            FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current)
-    {
-        for(int i=0; i<attempts; i++)
-        {
-            int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
-            int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
-            SeaTile candidate = state.getMap().getSeaTile(x,y);
-            if(candidate!=null && current!= candidate && candidate.getAltitude()<0
-                    &&!fisher.getHomePort().getLocation().equals(candidate) )
-                return candidate;
-        }
 
-        //stay where you are
-        return current;
-    }
 
     public int getAttempts() {
         return attempts;

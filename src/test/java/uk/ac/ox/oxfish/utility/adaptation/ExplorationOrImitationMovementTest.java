@@ -8,13 +8,15 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
+import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -41,13 +43,15 @@ public class ExplorationOrImitationMovementTest
         final SeaTile[] newObjective = {null};
 
         //imitate best friend
-        AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>() {
-            @Override
-            public SeaTile randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
-                return null;
-            }
-        });
+        AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>(
+                new RandomStep<SeaTile>() {
+                    @Override
+                    public SeaTile randomStep(
+                            FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
+                        return null;
+                    }
+                }
+        ));
 
         Adaptation<SeaTile> test = new Adaptation<SeaTile>(
                 (Predicate<Fisher>) fisher -> true,
@@ -108,13 +112,16 @@ public class ExplorationOrImitationMovementTest
         final SeaTile randomized = mock(SeaTile.class);
 
         //imitate best friend
-        AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>() {
-            @Override
-            public SeaTile randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
-                return randomized;
-            }
-        });
+        AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>(
+                new RandomStep<SeaTile>() {
+                    @Override
+                    public SeaTile randomStep(
+                            FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
+                        return randomized;
+                    }
+                }
+
+        ));
 
         Adaptation<SeaTile> test = new Adaptation<>(
                 fisher -> true,
@@ -167,13 +174,17 @@ public class ExplorationOrImitationMovementTest
         final SeaTile randomized = mock(SeaTile.class);
 
         //imitate best friend
-        AdaptationAlgorithm<SeaTile> algorithm = spy(new BeamHillClimbing<SeaTile>() {
-            @Override
-            public SeaTile randomStep(
-                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
-                return randomized;
-            }
-        });
+        AdaptationAlgorithm<SeaTile> algorithm = spy(
+                new BeamHillClimbing<SeaTile>(
+                        new RandomStep<SeaTile>() {
+                            @Override
+                            public SeaTile randomStep(
+                                    FishState state, MersenneTwisterFast random, Fisher fisher, SeaTile current) {
+                                return randomized;
+                            }
+                        }
+                )
+        );
 
         Adaptation<SeaTile> test = new Adaptation<>(
                 fisher -> true,

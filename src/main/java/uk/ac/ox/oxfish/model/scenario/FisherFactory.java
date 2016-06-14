@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -34,6 +35,8 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
 
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
 
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy;
+
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
 
     private Supplier<Boat> boatSupplier;
@@ -52,6 +55,7 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
             AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
             AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
             AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+            AlgorithmFactory<? extends GearStrategy> gearStrategy,
             AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
             Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
             AlgorithmFactory<? extends Gear> gear, int nextID) {
@@ -60,6 +64,7 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
         this.departingStrategy = departingStrategy;
         this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
+        this.gearStrategy = gearStrategy;
         this.weatherStrategy = weatherStrategy;
         this.boatSupplier = boatSupplier;
         this.holdSupplier = holdSupplier;
@@ -81,12 +86,12 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
                                    departingStrategy.apply(fishState),
                                    destinationStrategy.apply(fishState),
                                    fishingStrategy.apply(fishState),
+                                   gearStrategy.apply(fishState),
                                    weatherStrategy.apply(fishState),
                                    boatSupplier.get(),
                                    holdSupplier.get(),
                                    gear.apply(fishState),
-                                   fishState.getSpecies().size()
-                                   );
+                                   fishState.getSpecies().size());
         nextID++;
         fishState.getFishers().add(fisher);
         fishState.getSocialNetwork().addFisher(fisher,fishState);
@@ -242,5 +247,24 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
      */
     public void setGear(AlgorithmFactory<? extends Gear> gear) {
         this.gear = gear;
+    }
+
+    /**
+     * Getter for property 'gearStrategy'.
+     *
+     * @return Value for property 'gearStrategy'.
+     */
+    public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
+        return gearStrategy;
+    }
+
+    /**
+     * Setter for property 'gearStrategy'.
+     *
+     * @param gearStrategy Value to set for property 'gearStrategy'.
+     */
+    public void setGearStrategy(
+            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        this.gearStrategy = gearStrategy;
     }
 }

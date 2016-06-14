@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Well-Mixed:
       capacityRatioSecondToFirst: '1'
@@ -15,11 +15,9 @@ Prototype:
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: false
       probability:
-        Adaptive Probability:
-          explorationProbability: '0.8'
-          explorationProbabilityMinimum: '0.01'
+        Fixed Probability:
+          explorationProbability: '0.2'
           imitationProbability: '1.0'
-          incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
   enginePower: normal 100.0 10.0
   fishers: 100
@@ -29,12 +27,26 @@ Prototype:
   fuelTankSize: '100000.0'
   gasPricePerLiter: '0.01'
   gear:
-    Random Catchability:
-      meanCatchabilityFirstSpecies: '0.01'
-      meanCatchabilityOtherSpecies: '0.01'
-      standardDeviationCatchabilityFirstSpecies: '0.0'
-      standardDeviationCatchabilityOtherSpecies: '0.0'
-      gasPerHourFished: '5.0'
+    Random Catchability By List:
+      catchabilityMap: '0:0.01'
+      standardDeviationMap: ''
+      trawlSpeed: '5.0'
+  gearStrategy:
+    Periodic Gear Update from List:
+      availableGears:
+        - Random Catchability By List:
+            catchabilityMap: '0:0.01'
+            standardDeviationMap: ''
+            trawlSpeed: '5.0'
+        - Random Catchability By List:
+            catchabilityMap: '1:0.01'
+            standardDeviationMap: ''
+            trawlSpeed: '5.0'
+      probability:
+        Fixed Probability:
+          explorationProbability: '0.2'
+          imitationProbability: '1'
+      yearly: true
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'

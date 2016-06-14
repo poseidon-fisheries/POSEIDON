@@ -17,6 +17,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.GearStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
@@ -83,6 +85,8 @@ public class AlgorithmFactories {
         CONSTRUCTOR_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.CONSTRUCTORS);
         NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
 
+        CONSTRUCTOR_MAP.put(GearStrategy.class, GearStrategies.CONSTRUCTORS);
+        NAMES_MAP.put(GearStrategy.class, GearStrategies.NAMES);
 
 
 
@@ -96,6 +100,9 @@ public class AlgorithmFactories {
         NAMES_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.NAMES);
         CONSTRUCTOR_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.NAMES);
+
+
+
     }
 
 

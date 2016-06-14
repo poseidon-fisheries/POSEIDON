@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
@@ -65,8 +66,10 @@ public class FisherTest {
                                    new FixedProbabilityDepartingStrategy(1.0, false),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
-                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)),
-                                   new Hold(2, 1), gear, 1);
+                                   new FixedGearStrategy(),
+                                   new IgnoreWeatherStrategy(),
+                                   new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(1000000)), new Hold(2, 1),
+                                   gear, 1);
         fisher.start(fishState);
         fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
@@ -139,8 +142,10 @@ public class FisherTest {
                                    new FixedProbabilityDepartingStrategy(1.0, false),
                                    new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
                                    new FishUntilFullStrategy(1.0),
-                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(30)),
-                                   new Hold(2, 1), gear, 1);
+                                   new FixedGearStrategy(),
+                                   new IgnoreWeatherStrategy(),
+                                   new Boat(1,1,new Engine(1,litersPerKm,kph),new FuelTank(30)), new Hold(2, 1), gear,
+                                   1);
 
 
 

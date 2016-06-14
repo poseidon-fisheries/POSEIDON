@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
@@ -55,31 +56,32 @@ public class FishingTest {
         Gear gear = mock(Gear.class);
         when(gear.fish(any(),any(),anyInt(),any())).thenReturn(new Catch(species, 50.0, biology));
         Fisher fisher = new Fisher(0, port,
-                                     new MersenneTwisterFast(),
-                                     new AnarchyFactory().apply(fishState),
-                                     new FixedProbabilityDepartingStrategy(1.0, false),
-                                     new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
-                                     new FishingStrategy() {
-                                         @Override
-                                         public boolean shouldFish(
-                                                 FisherEquipment equipment, FisherStatus status,
-                                                 FisherMemory memory, MersenneTwisterFast random,
-                                                 FishState model) {
-                                             return true;
-                                         }
+                                   new MersenneTwisterFast(),
+                                   new AnarchyFactory().apply(fishState),
+                                   new FixedProbabilityDepartingStrategy(1.0, false),
+                                   new FavoriteDestinationStrategy(fishState.getMap().getSeaTile(0, 1)),
+                                   new FishingStrategy() {
+                                       @Override
+                                       public boolean shouldFish(
+                                               FisherEquipment equipment, FisherStatus status,
+                                               FisherMemory memory, MersenneTwisterFast random,
+                                               FishState model) {
+                                           return true;
+                                       }
 
-                                         @Override
-                                         public void start(FishState model,Fisher fisher) {
+                                       @Override
+                                       public void start(FishState model,Fisher fisher) {
 
-                                         }
+                                       }
 
-                                         @Override
-                                         public void turnOff() {
+                                       @Override
+                                       public void turnOff() {
 
-                                         }
-                                     },
-                                   new IgnoreWeatherStrategy(), new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)),
-                                     new Hold(100.0, 1), gear, 1);
+                                       }
+                                   },
+                                   new FixedGearStrategy(),
+                                   new IgnoreWeatherStrategy(),
+                                   new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)), new Hold(100.0, 1), gear, 1);
         fisher.start(fishState);
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);

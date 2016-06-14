@@ -31,7 +31,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
     private PriorityQueue<Quote> bids;
 
-    private double markup = 0.01;
+    private double markup = 0.05;
 
     private final int yearOfImplementation;
 

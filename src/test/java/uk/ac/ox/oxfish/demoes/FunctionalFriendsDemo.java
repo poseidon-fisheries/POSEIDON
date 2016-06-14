@@ -5,12 +5,12 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripIterativeDestinationFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 
 public class FunctionalFriendsDemo {
@@ -23,10 +23,10 @@ public class FunctionalFriendsDemo {
 
 
         long seed = System.currentTimeMillis();
-        int stepsAlone = stepsItTook(Double.NaN, 0, 5000, seed, true, .05);
-        stepsAlone += stepsItTook(Double.NaN, 0, 3500, seed, true, .05);
-        int stepsWithFewFriends = stepsItTook(.2, 3, 3500, seed, true, .05);
-        stepsWithFewFriends += stepsItTook(.2, 3, 3500, seed, true, .05);
+        int stepsAlone = stepsItTook(.4, 0, 5000, seed, true, .05);
+        stepsAlone += stepsItTook(.4, 0, 3500, seed, true, .05);
+        int stepsWithFewFriends = stepsItTook(.4, 3, 3500, seed, true, .05);
+        stepsWithFewFriends += stepsItTook(.4, 3, 3500, seed, true, .05);
 
 
 
@@ -34,9 +34,6 @@ public class FunctionalFriendsDemo {
         //the first is a little bit finicky. It would work better as an average of 5 runs, but it takes very long to perform
         Assert.assertTrue(stepsAlone + " ---- " + stepsWithFewFriends, stepsAlone > stepsWithFewFriends);
 
-        //now that I tuned it better having many friends is not a big issue
-        // int stepsWithManyFriends = stepsItTook(.9,40,3500, seed);
-        //Assert.assertTrue(stepsWithFewFriends + " ---- " + stepsWithManyFriends, stepsWithManyFriends >  stepsWithFewFriends);
 
 
     }
@@ -49,11 +46,15 @@ public class FunctionalFriendsDemo {
 
 
         PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setBiologyInitializer(new IndependentLogisticFactory()); //skip migration which should make this faster.
+        IndependentLogisticFactory biologyInitializer = new IndependentLogisticFactory();
+        biologyInitializer.setCarryingCapacity(new FixedDoubleParameter(1000)); //make the biology smaller should increase speed.
+        scenario.setBiologyInitializer(biologyInitializer); //skip migration which should make this faster.
         scenario.setFishers(300);
         if (friends == 0) {
             scenario.setNetworkBuilder(new EmptyNetworkBuilder());
-            scenario.setDestinationStrategy(new PerTripIterativeDestinationFactory());
+            PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
+            destinationStrategy.setProbability(new FixedProbabilityFactory(explorationProbability,0d));
+            scenario.setDestinationStrategy(destinationStrategy);
         } else {
             final EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
             networkBuilder.setDegree(friends);

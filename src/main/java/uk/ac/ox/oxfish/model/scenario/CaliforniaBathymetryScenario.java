@@ -35,6 +35,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.CartesianUTMDistance;
@@ -150,6 +152,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
             new MaximumStepsFactory();
 
+
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
+            new FixedGearStrategyFactory();
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
@@ -527,14 +532,15 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                               departingStrategy.apply(model),
                                               destinationStrategy.apply(model),
                                               fishingStrategy.apply(model),
+                                              gearStrategy.apply(model),
                                               weatherStrategy.apply(model),
                                               new Boat(10, 10,
                                                        new Engine(engineWeight,
                                                                   mileage,
                                                                   speed),
                                                        new FuelTank(fuelCapacity)),
-                                              new Hold(capacity, biology.getSize()),
-                                              fisherGear, model.getSpecies().size());
+                                              new Hold(capacity, biology.getSize()), fisherGear,
+                                              model.getSpecies().size());
                 fisherCounter++;
                 //predictors
                 for(Species species : model.getSpecies())
@@ -605,6 +611,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
+                gearStrategy,
                 weatherStrategy,
                 () -> new Boat(10, 10, new Engine(0,
                                                   literPerKilometer.apply(random),
@@ -1032,6 +1039,15 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     public void setResetBiologyAtYear(int resetBiologyAtYear) {
         this.resetBiologyAtYear = resetBiologyAtYear;
+    }
+
+    public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
+        return gearStrategy;
+    }
+
+    public void setGearStrategy(
+            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
+        this.gearStrategy = gearStrategy;
     }
 }
 

@@ -22,14 +22,14 @@ import static org.junit.Assert.assertTrue;
 public class ITQCaresAboutMileage {
 
     @Test
-    public void l() throws Exception {
+    public void itqCaresAboutMileage() throws Exception {
 
 
         long seed = System.currentTimeMillis();
         FishState state=
                 MarketFirstDemo.generateAndRunMarketDemo(MarketFirstDemo.MarketDemoPolicy.ITQ,
                                                          new FixedDoubleParameter(.1),
-                                                         new UniformDoubleParameter(0, 100),
+                                                         new UniformDoubleParameter(0, 20),
                                                          null,
                                                          5, seed, true);
 

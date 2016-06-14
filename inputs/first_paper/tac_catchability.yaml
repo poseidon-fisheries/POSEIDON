@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     From Left To Right Fixed:
       biologySmoothingIndex: '1000000.0'
@@ -12,11 +12,9 @@ Prototype:
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: false
       probability:
-        Adaptive Probability:
-          explorationProbability: '0.8'
-          explorationProbabilityMinimum: '0.01'
+        Fixed Probability:
+          explorationProbability: '0.2'
           imitationProbability: '1.0'
-          incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
   enginePower: normal 100.0 10.0
   fishers: 100

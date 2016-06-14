@@ -4,11 +4,11 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.PeriodicUpdateFromListFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
@@ -17,7 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 /**
  * Testing that imitation gets the best gear
@@ -38,13 +37,45 @@ public class BestGearWins {
         RandomCatchabilityTrawlFactory gear = new RandomCatchabilityTrawlFactory();
         gear.setGasPerHourFished(new UniformDoubleParameter(0, 20));
         scenario.setGear(gear);
+        PeriodicUpdateFromListFactory gearStrategy = new PeriodicUpdateFromListFactory();
+        gearStrategy.setProbability(new FixedProbabilityFactory(.05,.25));
+        gearStrategy.setYearly(false);
+        scenario.setGearStrategy(gearStrategy);
         //start everything
         FishState state = new FishState(seed);
         state.setScenario(scenario);
         state.start();
-        //attach analysis
-        GearImitationAnalysis.attachGearAnalysisToEachFisher(state.getFishers(), state, new ArrayList<>(),
-                                                             new CashFlowObjective(60));
+
+        state.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", model -> {
+            double size =state.getFishers().size();
+            if(size == 0)
+                return Double.NaN;
+            else
+            {
+                double total = 0;
+                for(Fisher fisher1 : state.getFishers())
+                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
+                return total/size;
+            }
+        }, Double.NaN);
+
+
+        for(int i=0; i<state.getSpecies().size(); i++)
+        {
+            final int finalI = i;
+            state.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
+                                                     model -> {
+                                                         double size = state.getFishers().size();
+                                                         if (size == 0)
+                                                             return Double.NaN;
+                                                         else {
+                                                             double total = 0;
+                                                             for (Fisher fisher1 : state.getFishers())
+                                                                 total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
+                                                             return total / size;
+                                                         }
+                                                     }, Double.NaN);
+        }
 
         //pre-run average efficiency
         double average = 0;
@@ -53,7 +84,7 @@ public class BestGearWins {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
-  //      System.out.println(average);
+        //      System.out.println(average);
 
         while(state.getYear() < simulationYears)
             state.schedule.step(state);
@@ -65,7 +96,7 @@ public class BestGearWins {
             average += ((RandomCatchabilityTrawl) fisher.getGear()).getGasPerHourFished();
         }
         average/=100;
-     //   System.out.println(average);
+        //   System.out.println(average);
         return state.getDailyDataSet().getColumn("Thrawling Fuel Consumption");
 
     }
