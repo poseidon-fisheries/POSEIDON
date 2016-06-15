@@ -83,7 +83,13 @@ public class FirstPaper
         Log.info("Best Heuristic");
         //  optimalHeuristic();
         Log.info("Hard Switch");
-        hardSwitch();
+        hardSwitch(INPUT_FOLDER.resolve("hardswitch.yaml"),
+                   OUTPUT_FOLDER.resolve("hardswitch").resolve("hardswitch.csv"));
+
+        hardSwitch(INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch"). //sensitivity
+                resolve("large_difference.yaml"),
+                   INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch").
+                           resolve("large_difference.csv"));
         Log.info("Directed Technological Change");
         // directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
@@ -533,12 +539,12 @@ public class FirstPaper
 
 
 
-    public static void hardSwitch() throws IOException {
+    public static void hardSwitch(final Path inputPath, final Path outputFile) throws IOException {
 
 
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(
-                INPUT_FOLDER.resolve("hardswitch.yaml")));
+                inputPath));
         FishState state = new FishState(RANDOM_SEED);
 
 
@@ -557,10 +563,12 @@ public class FirstPaper
                                                 return Double.NaN;
                                             else {
                                                 double total = 0;
-                                                for (Fisher fisher1 : state1.getFishers())
-                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[firstSpecies]
-                                                            ;
-                                                return total / .01;
+                                                for (Fisher fisher1 : state1.getFishers()) {
+                                                    if(((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[firstSpecies]>0)
+                                                        total ++;
+
+                                                }
+                                                return total;
                                             }
                                         }, Double.NaN);
 
@@ -571,10 +579,12 @@ public class FirstPaper
                                                 return Double.NaN;
                                             else {
                                                 double total = 0;
-                                                for (Fisher fisher1 : state1.getFishers())
-                                                    total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[secondSpecies]
-                                                            ;
-                                                return total / .01;
+                                                for (Fisher fisher1 : state1.getFishers()) {
+                                                    if(((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[secondSpecies]>0)
+                                                        total ++;
+
+                                                }
+                                                return total;
                                             }
                                         }, Double.NaN);
 
@@ -598,10 +608,9 @@ public class FirstPaper
         while(state.getYear() < 45)
             state.schedule.step(state);
 
-        Path outputFolder = OUTPUT_FOLDER.resolve("hardswitch");
-        outputFolder.toFile().mkdirs();
 
-        FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve("hardswitch.csv").toFile(),
+        outputFile.toFile().getParentFile().mkdirs();
+        FishStateUtilities.printCSVColumnsToFile(outputFile.toFile(),
                                                  state.getYearlyDataSet().getColumn(state.getSpecies().get(firstSpecies)+ " Catchers"),
                                                  state.getYearlyDataSet().getColumn(state.getSpecies().get(secondSpecies)+ " Catchers"),
                                                  state.getYearlyDataSet().getColumn( "Biomass " + state.getSpecies().get(firstSpecies).getName()),

@@ -3,6 +3,12 @@
 Temporary as we are still unversioned but I figured we'd keep track of everything that changed here
 
 
+## 2016-06-15
+
+### Added
+- Another ANT test for hard-switch example. This was the last conceptual result needing an ANT. Next up is policy results.
+
+
 ## 2016-06-13
 ### Added
 - Gear Adaptation Strategy which should make it possible to add/remove gear adaptation from YAML
