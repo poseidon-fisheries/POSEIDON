@@ -6,6 +6,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.HashSet;
+
 /**
  * Create RandomCatchabilityTrawlGear
  * Created by carrknight on 9/30/15.
@@ -26,6 +28,10 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
 
     private DoubleParameter gasPerHourFished = new FixedDoubleParameter(5);
 
+    /**
+     * here so that we know for which model we started gathering data
+     */
+    private final HashSet<FishState> models = new HashSet<>();
 
     public RandomCatchabilityTrawlFactory() {
     }
@@ -39,6 +45,7 @@ public class RandomCatchabilityTrawlFactory implements AlgorithmFactory<RandomCa
      */
     @Override
     public RandomCatchabilityTrawl apply(FishState state) {
+
         int species = state.getSpecies().size();
         double[] means = new double[species];
         double[] std = new double[species];

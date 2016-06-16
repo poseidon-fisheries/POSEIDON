@@ -106,8 +106,6 @@ public class TwoSpeciesITQSplit
         SplitInitializerFactory biologyFactory = new SplitInitializerFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
         biologyFactory.setSteepness(new FixedDoubleParameter(.9));
-        biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
-        biologyFactory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(.2));
 
 
         PrototypeScenario scenario = new PrototypeScenario();

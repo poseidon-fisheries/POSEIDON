@@ -40,7 +40,6 @@ Abstract:
       depthSmoothing: '1000000.0'
       height: '50.0'
       width: '50.0'
-  mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
       marketPrice: '10.0'

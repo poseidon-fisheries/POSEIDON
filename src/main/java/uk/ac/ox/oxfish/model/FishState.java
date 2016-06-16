@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Doubles;
 import ec.util.MersenneTwisterFast;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +17,8 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -645,6 +648,41 @@ public class FishState  extends SimState{
                                                        return Double.NaN;
                                                    assert trawlsSum>=lineSum;
                                                    return lineSum/trawlsSum;
+
+                                               }
+                                           }
+                , Double.NaN);
+
+
+        this.yearlyDataSet.registerGatherer("Mileage-Catch Correlation",
+                                           new Gatherer<FishState>() {
+                                               @Override
+                                               public Double apply(FishState state) {
+
+                                                   LinkedList<Double> mileage = new LinkedList<Double>();
+                                                   LinkedList<Double> catches = new LinkedList<Double>();
+
+                                                   Species first = biology.getSpecie(0);
+
+                                                   for(Fisher fisher : fishers)
+                                                   {
+                                                       Gear gear = fisher.getGear();
+                                                       if(gear instanceof RandomCatchabilityTrawl)
+                                                       {
+                                                           mileage.add(((RandomCatchabilityTrawl) gear).getGasPerHourFished());
+                                                           catches.add(fisher.getLatestYearlyObservation(first.getName() + " Landings"));
+                                                       }
+                                                   }
+
+                                                   if(mileage.size()>0)
+                                                       return FishStateUtilities.computeCorrelation(
+                                                               Doubles.toArray(mileage),
+                                                               Doubles.toArray(catches)
+                                                       );
+                                                   else
+                                                       return Double.NaN;
+
+
 
                                                }
                                            }

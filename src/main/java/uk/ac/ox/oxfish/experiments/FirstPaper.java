@@ -83,18 +83,16 @@ public class FirstPaper
         Log.info("Best Heuristic");
         //  optimalHeuristic();
         Log.info("Hard Switch");
-        hardSwitch(INPUT_FOLDER.resolve("hardswitch.yaml"),
-                   OUTPUT_FOLDER.resolve("hardswitch").resolve("hardswitch.csv"));
+        //hardSwitch(INPUT_FOLDER.resolve("hardswitch.yaml"), OUTPUT_FOLDER.resolve("hardswitch").resolve("hardswitch.csv"));
 
-        hardSwitch(INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch"). //sensitivity
-                resolve("large_difference.yaml"),
-                   INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch").
-                           resolve("large_difference.csv"));
+       //hardSwitch(INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch"). //sensitivity
+       //         resolve("large_difference.yaml"), INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch").resolve("large_difference.csv"));
+
         Log.info("Directed Technological Change");
         // directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
-       // catchesPerPolicyCatchability();
-       // catchesPerPolicyMileage();
+        catchesPerPolicyCatchability();
+        catchesPerPolicyMileage();
         Log.info("Race to Fish");
         // raceToFish();
         Log.info("Location Choice");
