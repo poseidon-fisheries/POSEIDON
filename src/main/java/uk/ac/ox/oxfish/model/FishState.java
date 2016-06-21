@@ -196,7 +196,7 @@ public class FishState  extends SimState{
 
         //start the markets (for each port
         for(Port port : getPorts()) {
-            for (Market market : port.getMarketMap().getMarkets()) {
+            for (Market market : port.getDefaultMarketMap().getMarkets()) {
                 market.start(this);
             }
             for(Species species : biology.getSpecies())
@@ -447,7 +447,7 @@ public class FishState  extends SimState{
         //now get for each port, its markets
         for (Port port : getPorts())
         {
-            final Market market = port.getMarket(species);
+            final Market market = port.getDefaultMarketMap().getMarket(species);
             if (market != null)
                 toAggregate.add(market);
         }

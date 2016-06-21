@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     From Left To Right Fixed:
       biologySmoothingIndex: '1000000.0'

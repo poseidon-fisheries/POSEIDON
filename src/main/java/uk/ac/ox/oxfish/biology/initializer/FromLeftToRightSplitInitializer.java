@@ -72,6 +72,7 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
         List<Species> species = biology.getSpecies();
 
+        //call the smoother
         ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
         for (int i = 0; i < biologySmoothingIndex; i++) {
             int width = map.getWidth();

@@ -72,7 +72,7 @@ public class EffortThrottling {
         //print out the price!
         FishStateUtilities.printCSVColumnToFile(
                 root.resolve("variable_price.csv").toFile(),
-                state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
+                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
                 ));
 
@@ -89,7 +89,7 @@ public class EffortThrottling {
 
         FishStateUtilities.printCSVColumnToFile(
                 root.resolve("variable_price2.csv").toFile(),
-                state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
+                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
                 ));
         //self-regulating from above
@@ -102,7 +102,7 @@ public class EffortThrottling {
 
         FishStateUtilities.printCSVColumnToFile(
                 root.resolve("variable_price3.csv").toFile(),
-                state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
+                state.getPorts().iterator().next().getDefaultMarketMap().getMarket(state.getBiology().getSpecie(0)).getData().getColumn(
                         AbstractMarket.PRICE_COLUMN_NAME
                 ));
 

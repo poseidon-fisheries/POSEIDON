@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,15 +37,20 @@ public class Port {
     /**
      *  the markets available at this port
      */
-    private final MarketMap marketMap;
+    private final MarketMap defaultMarketMap;
+
+    /**
+     * the markets that ara available only to a selected few.
+     */
+    private final HashMap<Fisher,MarketMap> specializedMarketMaps = new HashMap<>();
 
     private final String name;
 
-    public Port(String portName, SeaTile location, MarketMap marketMap, double gasPricePerLiter)
+    public Port(String portName, SeaTile location, MarketMap defaultMarketMap, double gasPricePerLiter)
     {
         this.name = portName;
         this.location = location;
-        this.marketMap = marketMap;
+        this.defaultMarketMap = defaultMarketMap;
         this.gasPricePerLiter = gasPricePerLiter;
         fishersHere = new HashSet<>();
 
@@ -90,7 +96,7 @@ public class Port {
      */
     public double getMarginalPrice(Species species)
     {
-        return marketMap.getMarket(species).getMarginalPrice();
+        return defaultMarketMap.getMarket(species).getMarginalPrice();
     }
 
     /**
@@ -117,12 +123,18 @@ public class Port {
         return "Port at " +location;
     }
 
-    public MarketMap getMarketMap() {
-        return marketMap;
+    public MarketMap getMarketMap(Fisher fisher) {
+
+        return specializedMarketMaps.getOrDefault(fisher,defaultMarketMap);
+
     }
 
-    public Market getMarket(Species species) {
-        return marketMap.getMarket(species);
+    public MarketMap getDefaultMarketMap() {
+        return defaultMarketMap;
+    }
+
+    public Market getMarket(Fisher fisher, Species species) {
+        return getMarketMap(fisher).getMarket(species);
     }
 
     public double getGasPricePerLiter() {
@@ -135,6 +147,15 @@ public class Port {
 
     public String getName() {
         return name;
+    }
+
+    public void addSpecializedMarketMap(Fisher fisher, MarketMap specializedMarketMap){
+        specializedMarketMaps.put(fisher,specializedMarketMap);
+    }
+
+    public void removeSpecializedMarketMap(Fisher fisher)
+    {
+        specializedMarketMaps.remove(fisher);
     }
 
 

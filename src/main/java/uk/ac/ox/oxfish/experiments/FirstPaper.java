@@ -91,10 +91,10 @@ public class FirstPaper
         Log.info("Directed Technological Change");
         // directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
-        catchesPerPolicyCatchability();
-        catchesPerPolicyMileage();
+        //catchesPerPolicyCatchability();
+        //catchesPerPolicyMileage();
         Log.info("Race to Fish");
-        // raceToFish();
+        raceToFish();
         Log.info("Location Choice");
         //  policyAndLocation("itq");
         //  policyAndLocation("tac");
@@ -166,7 +166,7 @@ public class FirstPaper
     private static void raceToFish() throws IOException {
         Path outputFolder = OUTPUT_FOLDER.resolve("race");
         outputFolder.toFile().mkdirs();
-        RaceToFish.policySweepRaceToFish("race",
+        RaceToFish.policySweepRaceToFish("race2",
                                          INPUT_FOLDER,
                                          50,
                                          outputFolder,

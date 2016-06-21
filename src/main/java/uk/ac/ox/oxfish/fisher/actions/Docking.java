@@ -46,7 +46,7 @@ public class Docking implements Action{
 
         GlobalBiology biology = model.getBiology();
 
-        MarketMap marketMap =port.getMarketMap();
+        MarketMap marketMap =port.getMarketMap(agent);
         for(Species species : biology.getSpecies())
         {
             double biomass = toSell.getPoundsCaught(species);
