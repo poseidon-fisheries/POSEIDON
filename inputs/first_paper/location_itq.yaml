@@ -1,10 +1,10 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Split in Half:
       carryingCapacity: '5000.0'
-      differentialPercentageToMove: '5.0E-4'
-      percentageLimitOnDailyMovement: '0.01'
-      steepness: uniform 0.6 0.8
+      differentialPercentageToMove: '0.001'
+      percentageLimitOnDailyMovement: '0.1'
+      steepness: 0.7
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
@@ -14,13 +14,11 @@ Prototype:
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: false
       probability:
-        Adaptive Probability:
-          explorationProbability: '0.8'
-          explorationProbabilityMinimum: '0.01'
+        Fixed Probability:
+          explorationProbability: '0.2'
           imitationProbability: '1.0'
-          incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
-  enginePower: normal 100.0 10.0
+  enginePower: normal 5000.0 100.0
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:
@@ -44,7 +42,6 @@ Prototype:
       depthSmoothing: '1000000.0'
       height: '50.0'
       width: '50.0'
-  mapMakerDedicatedRandomSeed: null
   market:
     Fixed Price Market:
       marketPrice: '10.0'

@@ -6,7 +6,6 @@ import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
-import uk.ac.ox.oxfish.model.regs.TACOpportunityCostManager;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
@@ -75,8 +74,8 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
         MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
-        TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
-        state.registerStartable(manager);
+      //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
+      //  state.registerStartable(manager);
 
         return regulations;
     }

@@ -10,8 +10,6 @@ Periodic Gear Update from List:
   yearly: true
 -------
 Periodic Gear Update Mileage:
-  availableGears: [
-    ]
   maximumGasPerLiter: '20.0'
   minimumGasPerLiter: '0.0'
   probability:
@@ -20,4 +18,14 @@ Periodic Gear Update Mileage:
       imitationProbability: '0.6'
   shockSize: '0.05'
   yearly: false
+-------
+Periodic Gear Update Catchability:
+  maximumCatchability: '0.2'
+  minimumCatchability: '0.01'
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '1.0'
+  shockSize: '0.05'
+  yearly: true
 -------

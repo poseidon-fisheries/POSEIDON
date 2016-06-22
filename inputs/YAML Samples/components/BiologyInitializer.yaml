@@ -27,6 +27,12 @@ From Left To Right Logistic:
   percentageLimitOnDailyMovement: '0.01'
   steepness: uniform 0.6 0.8
 -------
+From Left To Right Well-Mixed:
+  firstSpeciesName: Species 0
+  maximumBiomass: '5000.0'
+  proportionSecondSpeciesToFirst: '1.0'
+  secondSpeciesName: Species 1
+-------
 Random Smoothed and Fixed:
   biologySmoothingIndex: '1000000.0'
   maxBiomass: 5000.0

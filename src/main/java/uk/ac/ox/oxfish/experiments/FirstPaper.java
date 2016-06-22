@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
-import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -14,8 +13,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -28,9 +25,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -94,13 +88,13 @@ public class FirstPaper
         //catchesPerPolicyCatchability();
         //catchesPerPolicyMileage();
         Log.info("Race to Fish");
-        raceToFish();
+        //raceToFish();
         Log.info("Location Choice");
-        //  policyAndLocation("itq");
-        //  policyAndLocation("tac");
+        //policyAndLocation("itq");
+        //policyAndLocation("tac");
         Log.info("Gear Choice");
-        //     policyAndGear("itq");
-        //   policyAndGear("tac");
+        policyAndGear("itq");
+        policyAndGear("tac");
 
 
     }
@@ -793,41 +787,6 @@ public class FirstPaper
         state.registerStartable(new Startable() {
             @Override
             public void start(FishState model) {
-
-                //for each fisher
-                for (Fisher fisher : model.getFishers()) {
-                    //create an hill climber
-                    Adaptation<RandomCatchabilityTrawl> trawlAdaptation =
-                            new Adaptation<>(
-                                    fisher1 -> true,
-                                    new BeamHillClimbing<RandomCatchabilityTrawl>(
-                                            new RandomStep<RandomCatchabilityTrawl>() {
-                                                //on random steps just create completely new gear
-                                                @Override
-                                                public RandomCatchabilityTrawl randomStep(
-                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                        RandomCatchabilityTrawl current) {
-                                                    return gearFactory.apply(state);
-                                                }
-
-
-                                            }
-                                    )
-                                   ,
-                                    //otherwise just copy the best
-                                    (fisher1, change, model1) -> GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR.apply(
-                                            fisher1, change, model1),
-                                    fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
-                                    //judge in terms of yearly profits
-                                    new CashFlowObjective(365),
-                                    //epsilon = 20%
-                                    .2, 1);
-
-                    //tell the fisher to use this once a year
-                    fisher.addYearlyAdaptation(trawlAdaptation);
-
-
-                }
 
                 //start collecting red catchability and blue catchability
                 model.getYearlyDataSet().registerGatherer("Red Catchability", state1 -> {

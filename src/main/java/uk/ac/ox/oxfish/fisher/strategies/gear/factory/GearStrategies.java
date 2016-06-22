@@ -34,6 +34,11 @@ public class GearStrategies {
 
 
 
+        CONSTRUCTORS.put("Periodic Gear Update Catchability", PeriodicUpdateCatchabilityFactory::new);
+        NAMES.put(PeriodicUpdateCatchabilityFactory.class,"Periodic Gear Update Catchability");
+
+
+
 
 
     }

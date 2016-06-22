@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
-import uk.ac.ox.oxfish.model.regs.TACOpportunityCostManager;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -70,8 +69,8 @@ public class TACMultiFactory implements AlgorithmFactory<MultiQuotaRegulation>
         }
         MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
         //now create the opportunity costs manager
-        TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
-        state.registerStartable(manager);
+     //   TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
+    //    state.registerStartable(manager);
 
 
         return regulations;

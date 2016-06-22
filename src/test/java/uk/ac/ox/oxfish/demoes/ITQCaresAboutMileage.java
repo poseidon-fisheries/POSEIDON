@@ -58,7 +58,7 @@ public class ITQCaresAboutMileage {
 
 
         //make sure the same number of landings is recorded in the market
-        DataColumn marketData = state.getPorts().iterator().next().getMarket(species).getData().getColumn(
+        DataColumn marketData = state.getAllMarketsForThisSpecie(species).get(0).getData().getColumn(
                 AbstractMarket.LANDINGS_COLUMN_NAME);
         Iterator<Double> doubleIterator = marketData.descendingIterator();
         double landedCatches = 0;

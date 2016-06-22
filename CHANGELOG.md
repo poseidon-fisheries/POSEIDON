@@ -2,6 +2,25 @@
 
 Temporary as we are still unversioned but I figured we'd keep track of everything that changed here
 
+
+## 2016-06-21
+
+### Fixed
+- Removed from use the TACOpportunityCostManager. It's a cute idea but over-engineered and I think pushes
+TAC users towards very strong results. It is easier to remove than to explain anyway. It's great because
+I think it captures the incentive to go catch the protected quota but I don't know how realistic it is.
+
+### Added
+- Sensitivity analysis for locational choices under ITQ
+
+## 2016-06-20
+
+### Added
+- New demo inklings for a heterogeneous ITQ model
+- Biology initializer with left to right 2 well-mixed species.
+
+
+
 ## 2016-06-16
 
 ### Changed

@@ -14,51 +14,49 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFa
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 /**
- * Gear Strategy  needed to update mileage over time
- * Created by carrknight on 6/13/16.
+ * A periodic gear updater that only looks at catchablity (for all species!)
+ * Created by carrknight on 6/21/16.
  */
-public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
-
+public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<PeriodicUpdateGearStrategy> {
 
 
     private AlgorithmFactory<? extends AdaptationProbability>
-            probability = new FixedProbabilityFactory(.2, .6);
+            probability = new FixedProbabilityFactory(.2, 1);
 
 
-    private boolean yearly = false;
+    private boolean yearly = true;
 
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
 
-    private DoubleParameter minimumGasPerLiter = new FixedDoubleParameter(0);
+    private DoubleParameter minimumCatchability = new FixedDoubleParameter(0.01);
 
-    private DoubleParameter maximumGasPerLiter = new FixedDoubleParameter(20);
+    private DoubleParameter maximumCatchability = new FixedDoubleParameter(0.2);
 
     /**
-     * maximum change per update as a proportion of (maximumGasPerLiter-minimumGasPerLiter)
+     * maximum change per update as a proportion of (maximumCatchability-minimumCatchability)
      */
     private DoubleParameter shockSize = new FixedDoubleParameter(0.05);
 
 
     /**
-     * Applies this function to the given argument.
-     *
-     * @param model the function argument
-     * @return the function result
+     * Creates the gear
      */
     @Override
     public PeriodicUpdateGearStrategy apply(FishState model) {
 
+        //size of our delta
         final double shock = shockSize.apply(model.getRandom());
-        final double minTrawlingSpeed = minimumGasPerLiter.apply(model.getRandom());
-        final double maxTrawlingSpeed = maximumGasPerLiter.apply(model.getRandom());
+        final double minCatchability = minimumCatchability.apply(model.getRandom());
+        final double maxCatchability = maximumCatchability.apply(model.getRandom());
 
         //add data gathering if necessary
         if(!weakStateMap.contains(model))
@@ -80,16 +78,22 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
                         assert current1.getClass().equals(RandomCatchabilityTrawl.class);
                         RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 
-                        double currentShock = random.nextDouble() * shock * (maxTrawlingSpeed-minTrawlingSpeed);
-                        if (random.nextBoolean())
-                            currentShock -= currentShock;
-                        double newMileage = current.getGasPerHourFished() + currentShock;
-                        newMileage = Math.max(newMileage, minTrawlingSpeed);
-                        newMileage = Math.min(newMileage, maxTrawlingSpeed);
+                        double[] original = current.getCatchabilityMeanPerSpecie();
+                        double[] catchability = Arrays.copyOf(original, original.length);
+                        for(int i = 0; i< original.length; i++)
+                        {
+                            double currentShock = random.nextDouble() * shock * (maxCatchability-minCatchability);
+                            if (random.nextBoolean())
+                                currentShock -= currentShock;
+                            catchability[i] = original[i] + currentShock;
+                            catchability[i] = Math.max(catchability[i], minCatchability);
+                            catchability[i] = Math.min(catchability[i], maxCatchability);
+
+                        }
                         return new RandomCatchabilityTrawl(
-                                current.getCatchabilityMeanPerSpecie(),
+                                catchability,
                                 current.getCatchabilityDeviationPerSpecie(),
-                                newMileage
+                                current.getGasPerHourFished()
                         );
                     }
                 }
@@ -100,38 +104,25 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
     }
 
     private void addDataGatherers(FishState model) {
-        //first add data gatherers
-        model.getDailyDataSet().registerGatherer("Thrawling Fuel Consumption", state -> {
-            double size =state.getFishers().size();
-            if(size == 0)
-                return Double.NaN;
-            else
-            {
-                double total = 0;
-                for(Fisher fisher1 : state.getFishers())
-                    total+= ((RandomCatchabilityTrawl) fisher1.getGear()).getGasPerHourFished();
-                return total/size;
-            }
-        }, Double.NaN);
+        //start collecting red catchability and blue catchability
+        for(int species = 0; species<model.getSpecies().size(); species++) {
+            int i = species;
+            model.getYearlyDataSet().registerGatherer(model.getSpecies().get(species)+ " Catchability", state1 -> {
+                double size = state1.getFishers().size();
+                if (size == 0)
+                    return Double.NaN;
+                else {
+                    double total = 0;
+                    for (Fisher fisher1 : state1.getFishers())
+                        total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[i]
+                                ;
+                    return total / size;
+                }
+            }, Double.NaN);
 
-
-        for(int i=0; i<model.getSpecies().size(); i++)
-        {
-            final int finalI = i;
-            model.getDailyDataSet().registerGatherer("Trawling Efficiency for Species " + i,
-                                                     state -> {
-                                                         double size = state.getFishers().size();
-                                                         if (size == 0)
-                                                             return Double.NaN;
-                                                         else {
-                                                             double total = 0;
-                                                             for (Fisher fisher1 : state.getFishers())
-                                                                 total += ((RandomCatchabilityTrawl) fisher1.getGear()).getCatchabilityMeanPerSpecie()[finalI];
-                                                             return total / size;
-                                                         }
-                                                     }, Double.NaN);
         }
     }
+
 
     /**
      * Getter for property 'probability'.
@@ -171,39 +162,48 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
     }
 
     /**
-     * Getter for property 'minimumGasPerLiter'.
+     * Getter for property 'weakStateMap'.
      *
-     * @return Value for property 'minimumGasPerLiter'.
+     * @return Value for property 'weakStateMap'.
      */
-    public DoubleParameter getMinimumGasPerLiter() {
-        return minimumGasPerLiter;
+    public Set<FishState> getWeakStateMap() {
+        return weakStateMap;
     }
 
     /**
-     * Setter for property 'minimumGasPerLiter'.
+     * Getter for property 'minimumCatchability'.
      *
-     * @param minimumGasPerLiter Value to set for property 'minimumGasPerLiter'.
+     * @return Value for property 'minimumCatchability'.
      */
-    public void setMinimumGasPerLiter(DoubleParameter minimumGasPerLiter) {
-        this.minimumGasPerLiter = minimumGasPerLiter;
+    public DoubleParameter getMinimumCatchability() {
+        return minimumCatchability;
     }
 
     /**
-     * Getter for property 'maximumGasPerLiter'.
+     * Setter for property 'minimumCatchability'.
      *
-     * @return Value for property 'maximumGasPerLiter'.
+     * @param minimumCatchability Value to set for property 'minimumCatchability'.
      */
-    public DoubleParameter getMaximumGasPerLiter() {
-        return maximumGasPerLiter;
+    public void setMinimumCatchability(DoubleParameter minimumCatchability) {
+        this.minimumCatchability = minimumCatchability;
     }
 
     /**
-     * Setter for property 'maximumGasPerLiter'.
+     * Getter for property 'maximumCatchability'.
      *
-     * @param maximumGasPerLiter Value to set for property 'maximumGasPerLiter'.
+     * @return Value for property 'maximumCatchability'.
      */
-    public void setMaximumGasPerLiter(DoubleParameter maximumGasPerLiter) {
-        this.maximumGasPerLiter = maximumGasPerLiter;
+    public DoubleParameter getMaximumCatchability() {
+        return maximumCatchability;
+    }
+
+    /**
+     * Setter for property 'maximumCatchability'.
+     *
+     * @param maximumCatchability Value to set for property 'maximumCatchability'.
+     */
+    public void setMaximumCatchability(DoubleParameter maximumCatchability) {
+        this.maximumCatchability = maximumCatchability;
     }
 
     /**

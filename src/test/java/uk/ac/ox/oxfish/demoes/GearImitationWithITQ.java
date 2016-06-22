@@ -2,16 +2,14 @@ package uk.ac.ox.oxfish.demoes;
 
 
 import com.esotericsoftware.minlog.Log;
-import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.selfanalysis.GearImitationAnalysis;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.PeriodicUpdateCatchabilityFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -21,9 +19,6 @@ import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -98,38 +93,17 @@ public class GearImitationWithITQ
         scenario.setMapInitializer(simpleMap);
         scenario.forcePortPosition(new int[]{40, 25});
 
+        PeriodicUpdateCatchabilityFactory gearStrategy = new PeriodicUpdateCatchabilityFactory();
+        gearStrategy.setMaximumCatchability(new FixedDoubleParameter(.02));
+        gearStrategy.setMinimumCatchability(new FixedDoubleParameter(.001));
+        scenario.setGearStrategy(gearStrategy);
+
         scenario.setUsePredictors(true);
 
 
         state.registerStartable(new Startable() {
             @Override
             public void start(FishState model) {
-
-                for (Fisher fisher : model.getFishers()) {
-                    Adaptation<RandomCatchabilityTrawl> trawlAdaptation =
-                            new Adaptation<>(
-                                    fisher1 -> true,
-                                    new BeamHillClimbing<RandomCatchabilityTrawl>(
-                                            new RandomStep<RandomCatchabilityTrawl>() {
-                                                @Override
-                                                public RandomCatchabilityTrawl randomStep(
-                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                        RandomCatchabilityTrawl current) {
-                                                    return gearFactory.apply(state);
-                                                }
-                                            }
-                                    ),
-                                    (fisher1, change, model1) -> GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR.apply(
-                                            fisher1, change, model1),
-                                    fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
-                                    new CashFlowObjective(365),
-                                    .2, 1);
-
-                    //tell the fisher to use this once a year
-                    fisher.addYearlyAdaptation(trawlAdaptation);
-
-
-                }
 
                 model.getYearlyDataSet().registerGatherer("Red Catchability", state1 -> {
                     double size = state1.getFishers().size();

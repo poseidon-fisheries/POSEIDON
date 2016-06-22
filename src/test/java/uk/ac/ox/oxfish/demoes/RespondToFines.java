@@ -30,7 +30,7 @@ public class RespondToFines {
         state.setScenario(scenario);
         state.start();
         //make fishing specie 1 very expensive
-        ((FixedPriceMarket) state.getPorts().iterator().next().getMarket(state.getBiology().getSpecie(1))).setPrice(-50);
+        ((FixedPriceMarket) state.getAllMarketsForThisSpecie((state.getBiology().getSpecie(1))).get(0)).setPrice(-50);
 
         //run it for 1000 steps
         for(int i=0; i<1000; i++)
