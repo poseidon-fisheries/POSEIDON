@@ -9,6 +9,7 @@ Temporary as we are still unversioned but I figured we'd keep track of everythin
 - Removed from use the TACOpportunityCostManager. It's a cute idea but over-engineered and I think pushes
 TAC users towards very strong results. It is easier to remove than to explain anyway. It's great because
 I think it captures the incentive to go catch the protected quota but I don't know how realistic it is.
+- locational ITQ and TAC scenario parameters
 
 ### Added
 - Sensitivity analysis for locational choices under ITQ

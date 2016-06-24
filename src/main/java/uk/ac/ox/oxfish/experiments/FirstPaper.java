@@ -73,7 +73,7 @@ public class FirstPaper
         //disfunctionalFriends();
        // functionalFriends();
         Log.info("OSMOSE");
-        //osmoseDemersal2(50);
+        osmoseDemersal2(50);
         Log.info("Best Heuristic");
         //  optimalHeuristic();
         Log.info("Hard Switch");
@@ -93,8 +93,8 @@ public class FirstPaper
         //policyAndLocation("itq");
         //policyAndLocation("tac");
         Log.info("Gear Choice");
-        policyAndGear("itq");
-        policyAndGear("tac");
+        //policyAndGear("itq");
+        //policyAndGear("tac");
 
 
     }
@@ -837,8 +837,8 @@ public class FirstPaper
                 state.getFishers(), outputFolder.resolve(policy+"_start_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
         );
 
-        //run for 10 years
-        while (state.getYear() < 20) {
+        //run for 50 years
+        while (state.getYear() < 50) {
             state.schedule.step(state);
             if(state.getYear()>0 && state.getDayOfTheYear()==1)
                 FishStateUtilities.pollFishersToFile(state.getFishers(),

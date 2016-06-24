@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Osmose Biology:
       numberOfOsmoseStepsToPulseBeforeSimulationStart: 100
@@ -12,13 +12,11 @@ Prototype:
     Imitator-Explorator:
       alwaysCopyBest: true
       dropInUtilityNeededForUnfriend: '-1.0'
-      ignoreEdgeDirection: true
+      ignoreEdgeDirection: false
       probability:
-        Adaptive Probability:
-          explorationProbability: '0.8'
-          explorationProbabilityMinimum: '0.01'
+        Fixed Probability:
+          explorationProbability: '0.2'
           imitationProbability: '1.0'
-          incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
   enginePower: normal 100.0 10.0
   fishers: 100
@@ -31,8 +29,7 @@ Prototype:
     Random Catchability By List:
       catchabilityMap: '3:0.01'
       standardDeviationMap: ''
-      gasPerHourFished: '5.0'
-      gasPerHourFished: '5.0'
+      trawlSpeed: '5.0'
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'

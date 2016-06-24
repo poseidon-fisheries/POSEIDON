@@ -1,11 +1,11 @@
 Abstract:
   biologyInitializer:
     Well-Mixed:
-      capacityRatioSecondToFirst: '0.3'
+      capacityRatioSecondToFirst: '1'
       differentialPercentageToMove: '0.001'
       firstSpeciesCapacity: '5000.0'
       percentageLimitOnDailyMovement: '0.01'
-      steepness: uniform 0.6 0.8
+      steepness: 0.7
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
