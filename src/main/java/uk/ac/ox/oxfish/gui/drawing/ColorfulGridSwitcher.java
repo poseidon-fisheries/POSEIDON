@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.gui.drawing;
 
+import javafx.collections.MapChangeListener;
 import sim.display.Display2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -12,9 +12,12 @@ import java.awt.event.ActionListener;
  * Custom combo-box to switch what is displayed
  * Created by carrknight on 4/22/15.
  */
-public class ColorfulGridSwitcher extends JComboBox<String>{
+public class ColorfulGridSwitcher extends JComboBox<String> implements ActionListener,MapChangeListener<String, ColorEncoding>{
 
 
+    private final  ColorfulGrid toModify;
+
+    private final Display2D toRefresh;
 
     /**
      * Creates a <code>JComboBox</code> with a default data model.
@@ -25,26 +28,21 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
      * @see DefaultComboBoxModel
      */
     public ColorfulGridSwitcher(ColorfulGrid toModify, GlobalBiology biology, Display2D toRefresh) {
-        //add defaults
-        String initialSelection = "Depth";
-        addItem(initialSelection);
-        addItem("Habitat");
-        for(Species species : biology.getSpecies()) {
-            addItem(species.getName());
-        }
-        setSelectedItem(initialSelection);
+
+        this.toModify = toModify;
+        this.toRefresh =toRefresh;
+
+
+        toModify.getEncodings().addListener(this);
+
+        for(String key: toModify.getEncodings().keySet())
+            addItem(key);
+        setSelectedItem(toModify.getSelectedName());
 
         JComboBox<String> reference = this;
 
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
+        addActionListener(this);
 
-                toModify.setSelectedEncoding(reference.getSelectedItem().toString());
-                toRefresh.repaint();
-            }
-        });
 
         toRefresh.display.getViewport().addChangeListener(e -> {
             boolean isImmutable = toModify.isImmutableField();
@@ -55,5 +53,28 @@ public class ColorfulGridSwitcher extends JComboBox<String>{
         });
 
 
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+
+        toModify.setSelectedEncoding(getSelectedItem().toString());
+        toRefresh.repaint();
+    }
+
+    @Override
+    public void onChanged(
+            Change<? extends String, ? extends ColorEncoding> change) {
+
+        removeActionListener(this);
+
+        removeAllItems();
+        for(String key: toModify.getEncodings().keySet())
+            addItem(key);
+        setSelectedItem(toModify.getSelectedName());
+
+        addActionListener(this);
     }
 }

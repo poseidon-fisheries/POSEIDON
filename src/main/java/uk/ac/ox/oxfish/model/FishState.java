@@ -125,6 +125,12 @@ public class FishState  extends SimState{
         return 24.0/(double) stepsPerDay;
     }
 
+
+    public double getHoursSinceStart()
+    {
+        return getStep() * getHoursPerStep();
+    }
+
     public FishState(){
         this(System.currentTimeMillis(),1);
     }

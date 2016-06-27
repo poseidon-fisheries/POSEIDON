@@ -2,6 +2,13 @@
 
 Temporary as we are still unversioned but I figured we'd keep track of everything that changed here
 
+## 2016-06-27
+
+### Added
+- Kernel Regression and the interface for Geographical Regressions
+- Basic elements for a possibly unworkable Hidden Markov Chain guesstimator.
+
+
 
 ## 2016-06-21
 

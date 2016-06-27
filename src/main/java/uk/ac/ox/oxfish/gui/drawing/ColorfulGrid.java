@@ -1,6 +1,9 @@
 package uk.ac.ox.oxfish.gui.drawing;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import org.metawidget.inspector.annotation.UiHidden;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
@@ -16,9 +19,7 @@ import uk.ac.ox.oxfish.gui.MetaInspector;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -29,9 +30,11 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
 
 
-    private Map<String,ColorEncoding> encodings;
+    private ObservableMap<String,ColorEncoding> encodings;
 
     private ColorEncoding selected;
+
+    private String selectedName;
 
     /**
      * the default encoder just returns altitude
@@ -52,7 +55,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     public ColorfulGrid(MersenneTwisterFast random)
     {
-        encodings = new HashMap<>();
+        encodings = FXCollections.observableHashMap();
         this.random = random;
         //add the default color map showing depth
         encodings.put("Depth", new ColorEncoding(
@@ -113,6 +116,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      */
     public void setSelectedEncoding(String encodingName) {
 
+        selectedName = encodingName;
         selected = encodings.get(encodingName);
         assert selected != null;
         this.setMap(selected.getMap());
@@ -121,6 +125,14 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     }
 
+
+    public void addEnconding(String encodingName,ColorEncoding encoding)
+    {
+
+        Preconditions.checkArgument(!encodings.containsKey(encodingName), "Already present color encoding!");
+        encodings.put(encodingName,encoding);
+
+    }
 
 
 
@@ -133,4 +145,17 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         }
     }
 
+
+    /**
+     * Getter for property 'encodings'.
+     *
+     * @return Value for property 'encodings'.
+     */
+    public ObservableMap<String, ColorEncoding> getEncodings() {
+        return encodings;
+    }
+
+    public String getSelectedName() {
+        return selectedName;
+    }
 }
