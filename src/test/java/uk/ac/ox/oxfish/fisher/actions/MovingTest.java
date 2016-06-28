@@ -286,6 +286,24 @@ public class MovingTest
         return model;
     }
 
+    //all sea tiles!
+    public static FishState generateSimple50x50Map() {
+        ObjectGrid2D grid2D = new ObjectGrid2D(50,50);
+        //2x2, first column sea, second  column land
+        for(int i=0;i<50;i++)
+            for(int j=0;j<50;j++)
+                grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
+
+        //great
+        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
+                                          new EquirectangularDistance(0.0,1), new StraightLinePathfinder());
+        FishState model = mock(FishState.class);
+        when(model.getMap()).thenReturn(map);
+        when(model.getStepsPerDay()).thenReturn(1);
+        when(model.getHoursPerStep()).thenReturn(24d);
+        return model;
+    }
+
 
 
 }

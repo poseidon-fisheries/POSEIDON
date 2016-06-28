@@ -2,6 +2,12 @@
 
 Temporary as we are still unversioned but I figured we'd keep track of everything that changed here
 
+## 2016-06-28
+
+### Added
+- Kernel Regression Space + Time
+- Acquisition Functions
+
 ## 2016-06-27
 
 ### Added
