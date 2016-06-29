@@ -38,7 +38,7 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
         double time = state.getHoursSinceStart();
 
         //start at a random location
-        List<SeaTile> tiles = map.getAllSeaTilesAsList();
+        List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         SeaTile location = tiles.get(state.getRandom().nextInt(tiles.size()));
         Bag mooreNeighbors =new Bag(map.getMooreNeighbors(location, stepSize));
         mooreNeighbors.shuffle(state.getRandom());
@@ -49,7 +49,8 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
             //remove a neighbor
             SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
-            if(regression.predict(location,time) < regression.predict(option,time)) {
+            if(option.getAltitude()<0 &&
+                    regression.predict(location,time) < regression.predict(option,time)) {
                 location = option;
                 mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
                 mooreNeighbors.shuffle(state.getRandom());

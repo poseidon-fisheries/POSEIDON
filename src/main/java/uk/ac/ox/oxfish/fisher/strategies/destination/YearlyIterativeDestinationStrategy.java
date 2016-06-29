@@ -97,15 +97,4 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
         return algorithm;
     }
 
-    public void setMaxStep(int maxStep) {
-        adaptationAlgorithm.setMaxStep(maxStep);
-    }
-
-    public int getMaxStep() {
-        return adaptationAlgorithm.getMaxStep();
-    }
-
-    public int getAttempts() {
-        return adaptationAlgorithm.getAttempts();
-    }
 }

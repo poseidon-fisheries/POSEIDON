@@ -47,8 +47,8 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
-        SeaTile option2 = mock(SeaTile.class);
+        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
+        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
         defaultSetup(model, strategy,options);
@@ -81,8 +81,8 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
-        SeaTile option2 = mock(SeaTile.class);
+        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
+        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
         FeatureExtractors extractors = defaultSetup(model, strategy,options);
 
@@ -126,9 +126,9 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class);
-        SeaTile option2 = mock(SeaTile.class);
-        SeaTile option3 = mock(SeaTile.class);
+        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
+        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
+        SeaTile option3 = mock(SeaTile.class);when(option3.getAltitude()).thenReturn(-100d);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2,option3);
         FeatureExtractors extractors = defaultSetup(model, strategy,options);
 
@@ -182,8 +182,8 @@ public class SNALSARDestinationStrategyTest {
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
 
-        SeaTile option1 = mock(SeaTile.class);
-        SeaTile option2 = mock(SeaTile.class);
+        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
+        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
         FeatureExtractors extractors = defaultSetup(model, strategy,options);

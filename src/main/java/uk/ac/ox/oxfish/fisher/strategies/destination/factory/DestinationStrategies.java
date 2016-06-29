@@ -63,6 +63,11 @@ public class DestinationStrategies
         NAMES.put(SNALSARDestinationFactory.class,
                   "SNALSAR");
 
+        CONSTRUCTORS.put("Heatmap Based",
+                         HeatmapDestinationFactory::new);
+        NAMES.put(HeatmapDestinationFactory.class,
+                  "Heatmap Based");
+
     }
 
     private DestinationStrategies() {}

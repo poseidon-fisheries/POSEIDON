@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
@@ -86,6 +87,8 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
 
     public void setFavoriteSpot(SeaTile favoriteSpot) {
         this.favoriteSpot = favoriteSpot;
+
+        Preconditions.checkArgument(this.favoriteSpot.getAltitude()<0);
     }
 
 
