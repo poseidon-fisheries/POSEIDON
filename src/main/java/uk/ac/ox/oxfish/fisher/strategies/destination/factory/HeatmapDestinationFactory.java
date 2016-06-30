@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.HillClimberAcquisitionFunction;
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.TimeAndSpaceKernelRegression;
+import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.ExhaustiveAcquisitionFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.NearestNeighborRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -10,10 +10,12 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFa
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
+
 /**
  * Created by carrknight on 6/29/16.
  */
 public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestinationStrategy>{
+
 
 
     private boolean ignoreFailedTrips = false;
@@ -32,8 +34,10 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     @Override
     public HeatmapDestinationStrategy apply(FishState state) {
         return new HeatmapDestinationStrategy(
-                new TimeAndSpaceKernelRegression(24*7,5,100),
-                new HillClimberAcquisitionFunction(3),
+                new NearestNeighborRegression(1,500, 5),
+               // new TimeAndSpaceKernelRegression(10000000,5,100),
+                //new SpaceOnlyKernelRegression(100, 5),
+                new ExhaustiveAcquisitionFunction(),
                 ignoreFailedTrips,
                 probability.apply(state),
                 state.getMap(),

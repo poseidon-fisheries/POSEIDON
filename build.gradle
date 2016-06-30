@@ -60,6 +60,8 @@ dependencies
     compile fileTree(dir: 'libs/xstream/lib', include: '*.jar')
     compile "org.ogce:xpp3:1.1.6"
 
+    //kd tree
+    compile fileTree(dir: 'libs/rednaxela', include: '*.jar')
 
     //jung social network:
     compile "net.sf.jung:jung-api:2.0.1"

@@ -4,21 +4,26 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
+import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.GeographicalRegression;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
-import uk.ac.ox.oxfish.gui.MetaInspector;
-import uk.ac.ox.oxfish.model.market.Market;
-import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.gui.TriColorMap;
+import uk.ac.ox.oxfish.gui.drawing.ColorEncoding;
+import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
- * Grabs a MarketMap object and drill down into its components
- * Created by carrknight on 7/31/15.
+ * Created by carrknight on 6/30/16.
  */
-public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidget>
+public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,SwingMetawidget>
 {
+
+
 
 
     /**
@@ -27,7 +32,7 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
     private final FishGUI gui;
 
 
-    public MarketWidgetBuilder(FishGUI gui) {
+    public GeographicalRegressionWidget(FishGUI gui) {
         this.gui = gui;
     }
 
@@ -43,40 +48,39 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
 
         final Class<?> actualClass = WidgetBuilderUtils.getActualClassOrType(attributes, String.class);
         //if it is a primitive or not a MarketMap we have no use for it
-        if(actualClass == null || !MarketMap.class.isAssignableFrom(actualClass))
+        if(actualClass == null || !GeographicalRegression.class.isAssignableFrom(actualClass))
             return null;
 
         //it's a MarketMap
         try {
-
-
             String[] path = metawidget.getPath().split("/");
             //nested address? no problem
             String address = path.length == 2? path[1] + "." + attributes.get("name") :
                     attributes.get("name");
-            MarketMap marketMap = ((MarketMap) PropertyUtils.getProperty(metawidget.getToInspect(),
-                                                                   address));
-
-            //get list of marketMap
-            JPanel container = new JPanel();
-            container.setLayout(new BoxLayout(container,BoxLayout.Y_AXIS));
-            //for each market, please create a new sub-inspector to deal with it
-            for(Market market : marketMap.getMarkets())
-            {
-                container.add(new MetaInspector(market,gui));
-                container.add(new JSeparator(JSeparator.HORIZONTAL));
-            }
-
-            return container;
+            GeographicalRegression regression = ((GeographicalRegression)
+                    PropertyUtils.getProperty(metawidget.getToInspect(),
+                                              address));
+            gui.getMainPortrayal().addEnconding(
+                    metawidget.getPath(),
+                    new ColorEncoding(
+                    new TriColorMap(0, 10, 100, Color.RED, Color.WHITE, Color.BLUE),
+                    new Function<SeaTile, Double>() {
+                        @Override
+                        public Double apply(SeaTile tile) {
+                            return regression.predict(tile, ((FishState) gui.state).getHoursSinceStart());
+                        }
+                    },
+                    false)
+            );
+            return null;
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             //because of recursion this will happen
-         //   e.printStackTrace();
+            //   e.printStackTrace();
             return null;
         }
 
 
     }
-
 
 
 

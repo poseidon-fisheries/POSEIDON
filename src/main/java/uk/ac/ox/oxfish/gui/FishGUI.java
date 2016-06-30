@@ -48,7 +48,7 @@ public class FishGUI extends GUIState{
     private Display2D display2D;
     private JFrame displayFrame;
 
-    private final ColorfulGrid myPortrayal;
+    private final ColorfulGrid mainPortrayal;
     private CoordinateTransformer transformer;
 
 
@@ -86,7 +86,7 @@ public class FishGUI extends GUIState{
     public FishGUI(SimState state)
     {
         super(state);
-        myPortrayal = new ColorfulGrid(guirandom);
+        mainPortrayal = new ColorfulGrid(guirandom);
 
         portIcon = new ImageIcon(IMAGES_PATH.resolve("anchor.png").toString());
         boatIcon = new ImageIcon(IMAGES_PATH.resolve("boat.png").toString());
@@ -145,7 +145,7 @@ public class FishGUI extends GUIState{
     private void initialize() {
         final FishGUI self = this; //for anon classes
         FishState state = (FishState) this.state;
-        myPortrayal.initializeGrid(state.getBiology());
+        mainPortrayal.initializeGrid(state.getBiology());
 
 
         //the console label is a pain in the ass so we need to really use a wrecking ball to modify the way
@@ -170,8 +170,8 @@ public class FishGUI extends GUIState{
             }
         });
 
-        myPortrayal.setField(state.getRasterBathymetry().getGrid());
-        myPortrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
+        mainPortrayal.setField(state.getRasterBathymetry().getGrid());
+        mainPortrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
         //MPAs portrayal
         mpaPortrayal.setField(state.getMpaVectorField());
         mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLACK, true));
@@ -244,7 +244,7 @@ public class FishGUI extends GUIState{
 
 
         ((JComponent) display2D.getComponent(0)).add(
-                new ColorfulGridSwitcher(myPortrayal, state.getBiology(), display2D));
+                new ColorfulGridSwitcher(mainPortrayal, state.getBiology(), display2D));
         display2D.reset();
         display2D.setBackdrop(Color.WHITE);
         display2D.repaint();
@@ -312,7 +312,7 @@ public class FishGUI extends GUIState{
         transformer = new CoordinateTransformer(display2D, state.getMap());
 
         MPADrawer drawer = new MPADrawer(display2D, transformer, state.getMap(),
-                                         myPortrayal, this);
+                                         mainPortrayal, this);
 
 
         ((Console) controller).getTabPane().add("Policies",new RegulationTab(this, drawer) );
@@ -323,7 +323,7 @@ public class FishGUI extends GUIState{
         scheduleRepeatingImmediatelyAfter(heatMap);
 
         //attach it the portrayal
-        display2D.attach(myPortrayal,"Bathymetry");
+        display2D.attach(mainPortrayal, "Bathymetry");
         //    display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(heatMap.getHeatMapPortrayal(), "Fishing Hotspots");
         display2D.attach(trails, "Boat Trails");
@@ -387,5 +387,14 @@ public class FishGUI extends GUIState{
 
     public LinkedList<PolicyButton> getPolicyButtons() {
         return policyButtons;
+    }
+
+    /**
+     * Getter for property 'mainPortrayal'.
+     *
+     * @return Value for property 'mainPortrayal'.
+     */
+    public ColorfulGrid getMainPortrayal() {
+        return mainPortrayal;
     }
 }

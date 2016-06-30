@@ -76,6 +76,7 @@ public class MetaInspector extends Inspector
                             setWidgetBuilders(
                                     new DataWidgetBuilder(toSyncAgainst),
                                     new MarketWidgetBuilder(toSyncAgainst),
+                                    new GeographicalRegressionWidget(toSyncAgainst),
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
                                     new SwingWidgetBuilder(),

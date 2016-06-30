@@ -9,7 +9,8 @@ import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.SpaceOnlyKernelRegression;
+import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.drawing.ColorEncoding;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
@@ -43,7 +44,7 @@ public class HeatmapTester extends GUIState
     private final ColorfulGrid copy;
     private CoordinateTransformer transformer;
 
-    private SpaceOnlyKernelRegression regression = new SpaceOnlyKernelRegression(100,10);
+    private GeographicalRegression regression = new NearestNeighborRegression(1, 24*7, 5);
     private MouseListener heatmapClicker;
 
     /**
@@ -144,6 +145,7 @@ public class HeatmapTester extends GUIState
                 },
                 false
         ));
+
 
 
         //add heatmapper

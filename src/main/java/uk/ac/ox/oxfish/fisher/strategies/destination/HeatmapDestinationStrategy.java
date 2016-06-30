@@ -87,7 +87,10 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         this.fisher = fisher;
         this.model=model;
 
-        lastFriendTripRecorded = new HashMap<>(fisher.getDirectedFriends().size());
+        if(fisher.getDirectedFriends() != null)
+            lastFriendTripRecorded = new HashMap<>(fisher.getDirectedFriends().size());
+        else
+            lastFriendTripRecorded = new HashMap<>(0);
         fisher.addTripListener(this);
     }
 
@@ -114,26 +117,27 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
         //go through your friends and add their observations if they are new
         // (with imitation probability)
-        for(Fisher friend : fisher.getDirectedFriends())
-        {
-            TripRecord friendTrip = friend.getLastFinishedTrip();
-            //if you have already been through this don't worry
-            if(lastFriendTripRecorded.get(friend) == friendTrip)
-                continue;
-            lastFriendTripRecorded.put(friend,friendTrip);
-            tile = friendTrip.getMostFishedTileInTrip();
-            if(tile!=null)
+        if(fisher.getDirectedFriends()!=null)
+            for(Fisher friend : fisher.getDirectedFriends())
+            {
+                TripRecord friendTrip = friend.getLastFinishedTrip();
+                //if you have already been through this don't worry
+                if(lastFriendTripRecorded.get(friend) == friendTrip)
+                    continue;
+                lastFriendTripRecorded.put(friend,friendTrip);
+                tile = friendTrip.getMostFishedTileInTrip();
+                if(tile!=null)
 
-                if(!record.isCutShort() || ignoreFailedTrips)
-                if(model.getRandom().nextDouble()<=probability.getImitationProbability())
-                    profitRegression.addObservation(new GeographicalObservation(
-                            tile.getGridX(),
-                            tile.getGridY(),
-                            model.getHoursSinceStart(),
-                            friendTrip.getProfitPerHour(true)
-                    ));
+                    if(!record.isCutShort() || ignoreFailedTrips)
+                        if(model.getRandom().nextDouble()<=probability.getImitationProbability())
+                            profitRegression.addObservation(new GeographicalObservation(
+                                    tile.getGridX(),
+                                    tile.getGridY(),
+                                    model.getHoursSinceStart(),
+                                    friendTrip.getProfitPerHour(true)
+                            ));
 
-        }
+            }
 
         //find the optimal
         SeaTile optimal = acquisition.pick(model.getMap(), profitRegression, model);

@@ -95,7 +95,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     public double predict(SeaTile tile, double time) {
 
         if(tile.getAltitude()>=0)
-            return 0;
+            return Double.NaN;
         else
             return predict(tile.getGridX(),tile.getGridY(),time);
     }

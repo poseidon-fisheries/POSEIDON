@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,12 +28,16 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
             NauticalMap map, GeographicalRegression regression,
             FishState state) {
 
-        List<SeaTile> seaTiles = map.getAllSeaTilesAsList();
-        return seaTiles.parallelStream().max(
-                (o1, o2) -> Double.compare(
-                        regression.predict(o1,state.getHoursSinceStart()),
-                        regression.predict(o2,state.getHoursSinceStart()))
-        ).get();
+        List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
+        Collections.shuffle(seaTiles);
+        SeaTile seaTile = seaTiles.parallelStream().
+                max(
+                        (o1, o2) -> Double.compare(
+                                regression.predict(o1, state.getHoursSinceStart()),
+                                regression.predict(o2, state.getHoursSinceStart()))
+                ).get();
+        System.out.println(regression.predict(seaTile,state.getHoursSinceStart()));
+        return seaTile;
 
 
     }
