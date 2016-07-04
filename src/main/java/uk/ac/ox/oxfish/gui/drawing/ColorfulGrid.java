@@ -134,6 +134,11 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
     }
 
+    public void removeEncoding(String encodingName)
+    {
+        encodings.remove(encodingName);
+    }
+
 
 
     @Override

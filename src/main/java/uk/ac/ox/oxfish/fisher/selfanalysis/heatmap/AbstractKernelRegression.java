@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
 
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.PriorityQueue;
 
@@ -41,7 +42,6 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     }
 
 
-    @Override
     public double predict(int x, int y, double time)
     {
 
@@ -92,7 +92,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
 
 
     @Override
-    public double predict(SeaTile tile, double time) {
+    public double predict(SeaTile tile, double time, FishState state) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;

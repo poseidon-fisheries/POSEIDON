@@ -17,11 +17,9 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
     /**
      * Goes through all the possible seatiles and picks the highest one
-     *
-     * @param map        the map to pick from
+     *  @param map        the map to pick from
      * @param regression the geographical regression
-     * @param state
-     * @return a choice
+     * @param state  @return a choice
      */
     @Override
     public SeaTile pick(
@@ -33,10 +31,10 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         SeaTile seaTile = seaTiles.parallelStream().
                 max(
                         (o1, o2) -> Double.compare(
-                                regression.predict(o1, state.getHoursSinceStart()),
-                                regression.predict(o2, state.getHoursSinceStart()))
+                                regression.predict(o1, state.getHoursSinceStart(), state),
+                                regression.predict(o2, state.getHoursSinceStart(), state ))
                 ).get();
-        System.out.println(regression.predict(seaTile,state.getHoursSinceStart()));
+        System.out.println(regression.predict(seaTile, state.getHoursSinceStart(), state ));
         return seaTile;
 
 

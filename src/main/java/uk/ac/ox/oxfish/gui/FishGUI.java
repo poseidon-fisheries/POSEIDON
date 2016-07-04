@@ -114,7 +114,7 @@ public class FishGUI extends GUIState{
             return false;
         else
         {
-           this.load(currentState);
+            this.load(currentState);
             return true;
         }
     }
@@ -145,7 +145,6 @@ public class FishGUI extends GUIState{
     private void initialize() {
         final FishGUI self = this; //for anon classes
         FishState state = (FishState) this.state;
-        mainPortrayal.initializeGrid(state.getBiology());
 
 
         //the console label is a pain in the ass so we need to really use a wrecking ball to modify the way
@@ -170,8 +169,9 @@ public class FishGUI extends GUIState{
             }
         });
 
-        mainPortrayal.setField(state.getRasterBathymetry().getGrid());
-        mainPortrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
+        display2D = setupPortrayal(mainPortrayal);
+
+
         //MPAs portrayal
         mpaPortrayal.setField(state.getMpaVectorField());
         mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLACK, true));
@@ -225,29 +225,6 @@ public class FishGUI extends GUIState{
         });
 
 
-        //now deal with display2d
-        //change width and height to keep correct geographical ratio
-        double width;
-        double height;
-        double heightToWidthRatio = ((double) state.getRasterBathymetry().getGridHeight())/state.getRasterBathymetry().getGridWidth();
-        if(heightToWidthRatio >= 1)
-        {
-            width = MIN_DIMENSION;
-            height = MIN_DIMENSION * heightToWidthRatio;
-        }
-        else
-        {
-            width = MIN_DIMENSION / heightToWidthRatio;
-            height = MIN_DIMENSION;
-        }
-        display2D = new Display2D(width, height, this);
-
-
-        ((JComponent) display2D.getComponent(0)).add(
-                new ColorfulGridSwitcher(mainPortrayal, state.getBiology(), display2D));
-        display2D.reset();
-        display2D.setBackdrop(Color.WHITE);
-        display2D.repaint();
 
 
         //build aggregate data
@@ -264,7 +241,7 @@ public class FishGUI extends GUIState{
                 button.addActionListener(e -> {
                     scheduleImmediatelyBefore(
                             state1->
-                    state.createFisher()
+                                    state.createFisher()
                     );
 
                 });
@@ -322,6 +299,8 @@ public class FishGUI extends GUIState{
         heatMap = new TrawlingHeatMap(state.getDailyTrawlsMap(),state, 30);
         scheduleRepeatingImmediatelyAfter(heatMap);
 
+        displayFrame = setupDisplay2D(mainPortrayal, display2D,
+                                      "Bathymetry", true);
         //attach it the portrayal
         display2D.attach(mainPortrayal, "Bathymetry");
         //    display2D.attach(mpaPortrayal,"MPAs");
@@ -330,9 +309,6 @@ public class FishGUI extends GUIState{
         display2D.attach(boats, "Boats");
         display2D.attach(ports, "Ports");
 
-
-        displayFrame = display2D.createFrame();
-        controller.registerFrame(displayFrame);
         displayFrame.setVisible(true);
 
     }
@@ -397,4 +373,54 @@ public class FishGUI extends GUIState{
     public ColorfulGrid getMainPortrayal() {
         return mainPortrayal;
     }
+
+
+
+
+    public Display2D setupPortrayal(final ColorfulGrid portrayal) {
+        FishState model = (FishState) state;
+        portrayal.initializeGrid(model.getBiology());
+
+        portrayal.setField(model.getRasterBathymetry().getGrid());
+        portrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
+
+        //now deal with display2d
+        //change width and height to keep correct geographical ratio
+        double width;
+        double height;
+        double heightToWidthRatio = ((double) model.getRasterBathymetry().getGridHeight())/model.getRasterBathymetry().getGridWidth();
+        if(heightToWidthRatio >= 1)
+        {
+            width = MIN_DIMENSION;
+            height = MIN_DIMENSION * heightToWidthRatio;
+        }
+        else
+        {
+            width = MIN_DIMENSION / heightToWidthRatio;
+            height = MIN_DIMENSION;
+        }
+        return new Display2D(width, height, this);
+    }
+
+    public JFrame setupDisplay2D(
+            final ColorfulGrid portrayal,
+            final Display2D display, final String title,
+            boolean addColorSwitcher) {
+        FishState model = (FishState) state;
+        if(addColorSwitcher)
+            ((JComponent) display.getComponent(0)).add(
+                    new ColorfulGridSwitcher(portrayal, model.getBiology(), display));
+        display.reset();
+        display.setBackdrop(Color.WHITE);
+        display.repaint();
+        //attach it the portrayal
+        display.attach(portrayal, "Bathymetry");
+
+        displayFrame = display.createFrame();
+        controller.registerFrame(displayFrame);
+        displayFrame.setTitle(title);
+
+        return displayFrame;
+    }
+
 }

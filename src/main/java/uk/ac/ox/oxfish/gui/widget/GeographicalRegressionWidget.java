@@ -4,15 +4,19 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
+import sim.display.Display2D;
 import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 import uk.ac.ox.oxfish.gui.drawing.ColorEncoding;
+import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.function.Function;
@@ -60,19 +64,11 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
             GeographicalRegression regression = ((GeographicalRegression)
                     PropertyUtils.getProperty(metawidget.getToInspect(),
                                               address));
-            gui.getMainPortrayal().addEnconding(
-                    metawidget.getPath(),
-                    new ColorEncoding(
-                    new TriColorMap(0, 10, 100, Color.RED, Color.WHITE, Color.BLUE),
-                    new Function<SeaTile, Double>() {
-                        @Override
-                        public Double apply(SeaTile tile) {
-                            return regression.predict(tile, ((FishState) gui.state).getHoursSinceStart());
-                        }
-                    },
-                    false)
-            );
-            return null;
+
+
+
+
+           return new GeographicalRegressionJButton(gui,regression);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             //because of recursion this will happen
             //   e.printStackTrace();
@@ -82,6 +78,54 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
 
     }
 
+
+    static class GeographicalRegressionJButton extends JButton implements ActionListener
+    {
+
+        private final FishGUI gui;
+
+        private final GeographicalRegression regression;
+
+
+        /**
+         * Creates a button with no set text or icon.
+         */
+        public GeographicalRegressionJButton(
+                FishGUI gui, GeographicalRegression regression) {
+            this.gui = gui;
+            this.regression = regression;
+            this.setText("Show Heatmap");
+            this.addActionListener(this);
+        }
+
+        /**
+         * Invoked when an action occurs.
+         *
+         * @param e
+         */
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+
+            ColorfulGrid heatmapPortrayal = new ColorfulGrid(gui.guirandom);
+            heatmapPortrayal.addEnconding(
+                "Heatmap",
+                new ColorEncoding(
+                        new TriColorMap(0, 10, 100, Color.RED, Color.WHITE, Color.BLUE),
+                        new Function<SeaTile, Double>() {
+                            @Override
+                            public Double apply(SeaTile tile) {
+                                return regression.predict(tile, ((FishState) gui.state).
+                                        getHoursSinceStart(),(FishState) gui.state );
+                            }
+                        },
+                        false));
+            Display2D heatmapDisplay = gui.setupPortrayal(heatmapPortrayal);
+            JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap",false);
+            heatmapPortrayal.setSelectedEncoding("Heatmap");
+            heatmapFrame.setVisible(true);
+        }
+    }
 
 
 }

@@ -4,6 +4,7 @@ import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 
 /**
@@ -72,7 +73,7 @@ public class NearestNeighborRegression implements GeographicalRegression {
     }
 
     @Override
-    public double predict(SeaTile tile, double time) {
+    public double predict(SeaTile tile, double time, FishState state) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;
@@ -83,7 +84,6 @@ public class NearestNeighborRegression implements GeographicalRegression {
 
 
 
-    @Override
     public double predict(int x, int y, double time) {
 
         if(nearestNeighborTree.size()<1)

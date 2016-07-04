@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
 
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Anything that predicts over a geographical map
@@ -10,10 +11,9 @@ public interface GeographicalRegression
 {
 
 
-    public double predict(SeaTile tile, double time);
-
-    public double predict(int x, int y,double time);
+    public double predict(SeaTile tile, double time, FishState state);
 
     public void  addObservation(GeographicalObservation observation);
+
 
 }

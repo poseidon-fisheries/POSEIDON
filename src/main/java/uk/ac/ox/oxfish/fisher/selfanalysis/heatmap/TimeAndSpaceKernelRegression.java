@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
 
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Created by carrknight on 6/28/16.
@@ -29,7 +30,7 @@ public class TimeAndSpaceKernelRegression implements GeographicalRegression {
     }
 
     @Override
-    public double predict(SeaTile tile, double time) {
+    public double predict(SeaTile tile, double time, FishState state) {
 
         if(tile.getAltitude()>=0)
             return 0;
@@ -38,7 +39,6 @@ public class TimeAndSpaceKernelRegression implements GeographicalRegression {
     }
 
 
-    @Override
     public double predict(int x, int y, double time) {
 
         double[] timePrediction = timeRegression.generatePrediction(x, y, time);

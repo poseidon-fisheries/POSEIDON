@@ -15,8 +15,7 @@ public interface AcquisitionFunction
      * The acquisition function main task: to pick a tile from the map given geographical regression
      * @param map the map to pick from
      * @param regression the geographical regression
-     * @param state
-     * @return a choice
+     * @param state  @return a choice
      */
     public SeaTile pick(NauticalMap map, GeographicalRegression regression, FishState state);
 

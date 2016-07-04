@@ -24,11 +24,9 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
 
     /**
      * The acquisition function main task: to pick a tile from the map given geographical regression
-     *
-     * @param map        the map to pick from
+     *  @param map        the map to pick from
      * @param regression the geographical regression
-     * @param state
-     * @return a choice
+     * @param state  @return a choice
      */
     @Override
     public SeaTile pick(
@@ -50,7 +48,7 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
             SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
             if(option.getAltitude()<0 &&
-                    regression.predict(location,time) < regression.predict(option,time)) {
+                    regression.predict(location, time, state ) < regression.predict(option, time, state )) {
                 location = option;
                 mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
                 mooreNeighbors.shuffle(state.getRandom());
