@@ -1,8 +1,6 @@
-package uk.ac.ox.oxfish.fisher.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.assertEquals;
@@ -10,10 +8,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by carrknight on 7/1/16.
+ * Created by carrknight on 7/5/16.
  */
-public class NearestNeighborRegressionTest {
-
+public class NearestNeighborTransductionTest {
 
     @Test
     public void correctNeighbor() throws Exception
@@ -42,4 +39,5 @@ public class NearestNeighborRegressionTest {
 
 
     }
+
 }

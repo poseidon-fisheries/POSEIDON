@@ -42,6 +42,11 @@ public class GeographicalRegressions {
         NAMES.put(NearestNeighborRegressionFactory.class,"Nearest Neighbor");
 
 
+        CONSTRUCTORS.put("Nearest Neighbor Transduction",
+                         NearestNeighborTransductionFactory::new);
+        NAMES.put(NearestNeighborTransductionFactory.class,"Nearest Neighbor Transduction");
+
+
 
     }
 }

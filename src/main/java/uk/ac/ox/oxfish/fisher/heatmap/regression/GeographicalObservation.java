@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import uk.ac.ox.oxfish.geography.SeaTile;
+
 import java.util.Objects;
 
 /**
@@ -9,17 +11,14 @@ import java.util.Objects;
 public class GeographicalObservation implements Comparable<GeographicalObservation>
 {
 
-    private final double x;
-
-    private final double y;
-
     private final double time;
 
     private final double value;
 
-    public GeographicalObservation(double x, double y, double time, double value) {
-        this.x = x;
-        this.y = y;
+    private final SeaTile tile;
+
+    public GeographicalObservation(SeaTile tile, double time, double value) {
+        this.tile=tile;
         this.time = time;
         this.value = value;
     }
@@ -31,7 +30,7 @@ public class GeographicalObservation implements Comparable<GeographicalObservati
      * @return Value for property 'x'.
      */
     public double getX() {
-        return x;
+        return tile.getGridX();
     }
 
     /**
@@ -40,7 +39,7 @@ public class GeographicalObservation implements Comparable<GeographicalObservati
      * @return Value for property 'y'.
      */
     public double getY() {
-        return y;
+        return tile.getGridY();
     }
 
     /**
@@ -70,19 +69,27 @@ public class GeographicalObservation implements Comparable<GeographicalObservati
         return Double.compare(this.getTime(),o.getTime());
     }
 
+    /**
+     * Getter for property 'tile'.
+     *
+     * @return Value for property 'tile'.
+     */
+    public SeaTile getTile() {
+        return tile;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GeographicalObservation that = (GeographicalObservation) o;
-        return Double.compare(that.x, x) == 0 &&
-                Double.compare(that.y, y) == 0 &&
-                Double.compare(that.time, time) == 0 &&
-                Double.compare(that.value, value) == 0;
+        return Double.compare(that.time, time) == 0 &&
+                Double.compare(that.value, value) == 0 &&
+                Objects.equals(tile, that.tile);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, time, value);
+        return Objects.hash(time, value, tile);
     }
 }

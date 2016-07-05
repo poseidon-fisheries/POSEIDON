@@ -109,8 +109,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         if(tile!=null)
             if(!record.isCutShort() || ignoreFailedTrips)
                 profitRegression.addObservation(new GeographicalObservation(
-                        tile.getGridX(),
-                        tile.getGridY(),
+                        tile,
                         model.getHoursSinceStart(),
                         record.getProfitPerHour(true)
                 ));
@@ -131,8 +130,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
                     if(!record.isCutShort() || ignoreFailedTrips)
                         if(model.getRandom().nextDouble()<=probability.getImitationProbability())
                             profitRegression.addObservation(new GeographicalObservation(
-                                    tile.getGridX(),
-                                    tile.getGridY(),
+                                    tile,
                                     model.getHoursSinceStart(),
                                     friendTrip.getProfitPerHour(true)
                             ));

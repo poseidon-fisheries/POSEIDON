@@ -172,8 +172,7 @@ public class HeatmapTester extends GUIState
                 Double observation = state.getMap().getSeaTile(gridPosition.getX(),
                                                                gridPosition.getY()).
                         getBiomass(state.getSpecies().get(0));
-                regression.addObservation(new GeographicalObservation(gridPosition.getX(),
-                                                                      gridPosition.getY(),
+                regression.addObservation(new GeographicalObservation(state.getMap().getSeaTile(gridPosition.getX(),gridPosition.getY()),
                                                                       state.getHoursSinceStart(),
                                                                       observation));
 
