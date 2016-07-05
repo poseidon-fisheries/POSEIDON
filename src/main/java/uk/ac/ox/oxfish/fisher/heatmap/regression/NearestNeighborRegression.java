@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;

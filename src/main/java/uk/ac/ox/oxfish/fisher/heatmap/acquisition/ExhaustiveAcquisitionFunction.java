@@ -1,5 +1,6 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap.acquisition;
 
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -28,7 +29,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
         Collections.shuffle(seaTiles);
-        SeaTile seaTile = seaTiles.parallelStream().
+        SeaTile seaTile = seaTiles.stream().
                 max(
                         (o1, o2) -> Double.compare(
                                 regression.predict(o1, state.getHoursSinceStart(), state),

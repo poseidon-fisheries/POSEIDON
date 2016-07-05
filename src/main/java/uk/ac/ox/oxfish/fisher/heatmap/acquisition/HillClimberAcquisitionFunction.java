@@ -1,6 +1,7 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap.acquisition;
 
 import sim.util.Bag;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;

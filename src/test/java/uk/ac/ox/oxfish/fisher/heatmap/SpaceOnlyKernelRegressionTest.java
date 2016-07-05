@@ -1,6 +1,8 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.SpaceOnlyKernelRegression;
 
 import static org.junit.Assert.assertTrue;
 
@@ -15,9 +17,9 @@ public class SpaceOnlyKernelRegressionTest
     public void regress1d() throws Exception {
 
 
-        SpaceOnlyKernelRegression regression = new SpaceOnlyKernelRegression(10,3);
+        SpaceOnlyKernelRegression regression = new SpaceOnlyKernelRegression(10, 3);
 
-        regression.addObservation(new GeographicalObservation(0,0,0,100));
+        regression.addObservation(new GeographicalObservation(0, 0, 0, 100));
         regression.addObservation(new GeographicalObservation(10,0,0,150));
         regression.addObservation(new GeographicalObservation(7,0,0,110));
         regression.addObservation(new GeographicalObservation(15,0,0,200));

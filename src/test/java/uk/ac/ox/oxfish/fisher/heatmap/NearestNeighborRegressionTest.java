@@ -1,6 +1,8 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.NearestNeighborRegression;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,9 +16,9 @@ public class NearestNeighborRegressionTest {
     public void correctNeighbor() throws Exception
     {
 
-        NearestNeighborRegression regression = new NearestNeighborRegression(1,10000,1);
+        NearestNeighborRegression regression = new NearestNeighborRegression(1, 10000, 1);
 
-        regression.addObservation(new GeographicalObservation(10,10,0,100));
+        regression.addObservation(new GeographicalObservation(10, 10, 0, 100));
         regression.addObservation(new GeographicalObservation(0,0,0,1));
         assertEquals(regression.predict(0,0,0),1,.001);
         assertEquals(regression.predict(1,0,0),1,.001);

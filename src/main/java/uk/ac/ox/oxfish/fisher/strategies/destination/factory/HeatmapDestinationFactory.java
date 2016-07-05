@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.ExhaustiveAcquisitionFunction;
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.NearestNeighborRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -20,10 +22,29 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
 
     private boolean ignoreFailedTrips = false;
 
+
+    /**
+     * step size when exploring
+     */
+    private DoubleParameter explorationStepSize = new UniformDoubleParameter(1, 10);
+
+    /**
+     * probability of exploring (imitating here means using other people observations as your own)
+     */
     private AlgorithmFactory<? extends AdaptationProbability> probability =
             new FixedProbabilityFactory(.2,1d);
 
-    private DoubleParameter stepSize = new UniformDoubleParameter(1,10);
+    /**
+     * the regression object (the one that builds the actual heatmap)
+     */
+    private AlgorithmFactory<? extends GeographicalRegression> regression =
+            new NearestNeighborRegressionFactory();
+
+    /**
+     *
+     */
+    private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
+
 
     /**
      * Applies this function to the given argument.
@@ -34,15 +55,13 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     @Override
     public HeatmapDestinationStrategy apply(FishState state) {
         return new HeatmapDestinationStrategy(
-                new NearestNeighborRegression(1,500, 5),
-               // new TimeAndSpaceKernelRegression(10000000,5,100),
-                //new SpaceOnlyKernelRegression(100, 5),
-                new ExhaustiveAcquisitionFunction(),
+                regression.apply(state),
+                acquisition.apply(state),
                 ignoreFailedTrips,
                 probability.apply(state),
                 state.getMap(),
                 state.getRandom(),
-                stepSize.apply(state.getRandom()).intValue()
+                explorationStepSize.apply(state.getRandom()).intValue()
         );
     }
 
@@ -87,20 +106,59 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     }
 
     /**
-     * Getter for property 'stepSize'.
+     * Getter for property 'explorationStepSize'.
      *
-     * @return Value for property 'stepSize'.
+     * @return Value for property 'explorationStepSize'.
      */
-    public DoubleParameter getStepSize() {
-        return stepSize;
+    public DoubleParameter getExplorationStepSize() {
+        return explorationStepSize;
     }
 
     /**
-     * Setter for property 'stepSize'.
+     * Setter for property 'explorationStepSize'.
      *
-     * @param stepSize Value to set for property 'stepSize'.
+     * @param explorationStepSize Value to set for property 'explorationStepSize'.
      */
-    public void setStepSize(DoubleParameter stepSize) {
-        this.stepSize = stepSize;
+    public void setExplorationStepSize(DoubleParameter explorationStepSize) {
+        this.explorationStepSize = explorationStepSize;
+    }
+
+
+    /**
+     * Getter for property 'regression'.
+     *
+     * @return Value for property 'regression'.
+     */
+    public AlgorithmFactory<? extends GeographicalRegression> getRegression() {
+        return regression;
+    }
+
+    /**
+     * Setter for property 'regression'.
+     *
+     * @param regression Value to set for property 'regression'.
+     */
+    public void setRegression(
+            AlgorithmFactory<? extends GeographicalRegression> regression) {
+        this.regression = regression;
+    }
+
+    /**
+     * Getter for property 'acquisition'.
+     *
+     * @return Value for property 'acquisition'.
+     */
+    public AlgorithmFactory<? extends AcquisitionFunction> getAcquisition() {
+        return acquisition;
+    }
+
+    /**
+     * Setter for property 'acquisition'.
+     *
+     * @param acquisition Value to set for property 'acquisition'.
+     */
+    public void setAcquisition(
+            AlgorithmFactory<? extends AcquisitionFunction> acquisition) {
+        this.acquisition = acquisition;
     }
 }

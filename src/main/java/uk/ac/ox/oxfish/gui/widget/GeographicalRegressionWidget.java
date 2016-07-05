@@ -5,7 +5,7 @@ import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import sim.display.Display2D;
-import uk.ac.ox.oxfish.fisher.selfanalysis.heatmap.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.TriColorMap;

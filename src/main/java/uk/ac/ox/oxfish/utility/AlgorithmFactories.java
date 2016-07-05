@@ -9,6 +9,10 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.AcquisitionFunctions;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.GeographicalRegressions;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -72,24 +76,16 @@ public class AlgorithmFactories {
         NAMES_MAP.put(WeatherInitializer.class, WeatherInitializers.NAMES);
         CONSTRUCTOR_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.CONSTRUCTORS);
         NAMES_MAP.put(WeatherEmergencyStrategy.class, WeatherStrategies.NAMES);
-
         CONSTRUCTOR_MAP.put(HabitatInitializer.class, HabitatInitializers.CONSTRUCTORS);
         NAMES_MAP.put(HabitatInitializer.class, HabitatInitializers.NAMES);
-
         CONSTRUCTOR_MAP.put(Gear.class, Gears.CONSTRUCTORS);
         NAMES_MAP.put(Gear.class, Gears.NAMES);
-
         CONSTRUCTOR_MAP.put(MapInitializer.class, MapInitializers.CONSTRUCTORS);
         NAMES_MAP.put(MapInitializer.class, MapInitializers.NAMES);
-
         CONSTRUCTOR_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.CONSTRUCTORS);
         NAMES_MAP.put(ObjectiveFunction.class, ObjectiveFunctions.NAMES);
-
         CONSTRUCTOR_MAP.put(GearStrategy.class, GearStrategies.CONSTRUCTORS);
         NAMES_MAP.put(GearStrategy.class, GearStrategies.NAMES);
-
-
-
         CONSTRUCTOR_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.CONSTRUCTORS);
         NAMES_MAP.put(ProfitThresholdExtractor.class, ProfitThresholdsExtractors.NAMES);
         CONSTRUCTOR_MAP.put(SocialAcceptabilityFeatureExtractor.class, SocialAcceptabilityFeatureExtractors.CONSTRUCTORS);
@@ -100,6 +96,10 @@ public class AlgorithmFactories {
         NAMES_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.NAMES);
         CONSTRUCTOR_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.NAMES);
+        CONSTRUCTOR_MAP.put(GeographicalRegression.class, GeographicalRegressions.CONSTRUCTORS);
+        NAMES_MAP.put(GeographicalRegression.class, GeographicalRegressions.NAMES);
+        CONSTRUCTOR_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.CONSTRUCTORS);
+        NAMES_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.NAMES);
 
 
 

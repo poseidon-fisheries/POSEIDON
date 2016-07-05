@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import java.util.Objects;
 

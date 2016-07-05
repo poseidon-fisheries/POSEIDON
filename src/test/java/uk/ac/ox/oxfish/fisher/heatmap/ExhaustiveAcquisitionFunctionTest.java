@@ -1,9 +1,11 @@
-package uk.ac.ox.oxfish.fisher.selfanalysis.heatmap;
+package uk.ac.ox.oxfish.fisher.heatmap;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.ExhaustiveAcquisitionFunction;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -16,14 +18,12 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 6/28/16.
  */
-public class HillClimberAcquisitionFunctionTest {
+public class ExhaustiveAcquisitionFunctionTest {
 
-
-    //best spot is 25x25
 
 
     @Test
-    public void hillclimbsTo2525() throws Exception {
+    public void finds2525() throws Exception {
 
 
         MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
@@ -31,8 +31,7 @@ public class HillClimberAcquisitionFunctionTest {
         when(state.getRandom()).thenReturn(random);
         when(state.getHoursSinceStart()).thenReturn(120d);
 
-        HillClimberAcquisitionFunction acquisitionFunction = new HillClimberAcquisitionFunction(1);
-        HillClimberAcquisitionFunction acquisitionFunction2 = new HillClimberAcquisitionFunction(3);
+        ExhaustiveAcquisitionFunction acquisitionFunction = new ExhaustiveAcquisitionFunction();
 
         GeographicalRegression regression = mock(GeographicalRegression.class);
         when(regression.predict(any(SeaTile.class), eq(120d),any() )).thenAnswer((Answer<Double>) invocation -> {
@@ -46,10 +45,9 @@ public class HillClimberAcquisitionFunctionTest {
         assertEquals(pick.getGridX(),25);
         assertEquals(pick.getGridY(),25);
 
-        pick = acquisitionFunction2.pick(state.getMap(), regression, state);
-        assertEquals(pick.getGridX(),25);
-        assertEquals(pick.getGridY(),25);
+
 
 
     }
+
 }
