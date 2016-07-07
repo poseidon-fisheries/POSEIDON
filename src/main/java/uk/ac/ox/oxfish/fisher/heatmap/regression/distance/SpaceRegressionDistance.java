@@ -1,36 +1,25 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
- * Created by carrknight on 7/5/16.
+ * space only regression distance
+ * Created by carrknight on 7/7/16.
  */
-public class SpaceTimeRegressionDistance implements RegressionDistance
-{
+public class SpaceRegressionDistance  implements RegressionDistance{
 
 
-    /**
-     * the time bandwidth
-     */
-    private final double timeBandwidth;
-
-    /**
-     * the space bandwidth
-     */
-    private final double spaceBandwidth;
+    final public double spaceBandwidth;
 
 
-    public SpaceTimeRegressionDistance(double timeBandwidth,
-                                       double spaceBandwidth) {
-        this.timeBandwidth = timeBandwidth;
+    public SpaceRegressionDistance(double spaceBandwidth) {
         this.spaceBandwidth = spaceBandwidth;
     }
-
 
     @Override
     public double distance(
             SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
-
         double distance = 0;
         double spaceDistance = tile.getGridX() - observation.getTile().getGridX();
         if (spaceDistance != 0)
@@ -38,9 +27,16 @@ public class SpaceTimeRegressionDistance implements RegressionDistance
         spaceDistance = tile.getGridY() - observation.getTile().getGridY();
         if (spaceDistance != 0)
             distance += (spaceDistance*spaceDistance)/spaceBandwidth;
-
-        final double timeDistance = Math.abs(currentTimeInHours-observation.getTime());
-        distance += (timeDistance)/timeBandwidth;
         return distance;
+    }
+
+
+    /**
+     * Getter for property 'spaceBandwidth'.
+     *
+     * @return Value for property 'spaceBandwidth'.
+     */
+    public double getSpaceBandwidth() {
+        return spaceBandwidth;
     }
 }

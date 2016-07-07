@@ -1,5 +1,6 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**

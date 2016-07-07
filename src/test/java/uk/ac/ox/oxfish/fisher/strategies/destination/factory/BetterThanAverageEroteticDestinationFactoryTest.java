@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -21,18 +20,13 @@ public class BetterThanAverageEroteticDestinationFactoryTest
     @Test
     public void plainThresholdDoesNotClearMap() throws Exception {
 
-        int steps = stepsItTookErotetic(2000, System.currentTimeMillis(), false);
-        assertEquals(2000,steps);
+        long seed = System.currentTimeMillis();
+        int steps = stepsItTookErotetic(2000, seed, false);
+        int steps2 = stepsItTookErotetic(2000, seed, true);
+        assertTrue(steps>steps2);
 
     }
 
-    @Test
-    public void outdoingAverageWorks() throws Exception {
-
-        int steps = stepsItTookErotetic(2000, System.currentTimeMillis(), true);
-        assertTrue(2000>steps);
-
-    }
 
     public static int stepsItTookErotetic(
             int maxSteps,
@@ -57,7 +51,7 @@ public class BetterThanAverageEroteticDestinationFactoryTest
         state.start();
         Species onlySpecies = state.getBiology().getSpecie(0);
         final double minimumBiomass = state.getTotalBiomass(
-                onlySpecies) * .05; //how much does it take to eat 95% of all the fish?
+                onlySpecies) * .1; //how much does it take to eat 90% of all the fish?
 
 
         int steps;

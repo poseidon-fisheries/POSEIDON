@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -23,7 +24,10 @@ public class NearestNeighborTransduction implements GeographicalRegression {
 
     private final RegressionDistance distance;
 
-    public NearestNeighborTransduction(NauticalMap map, RegressionDistance distance) {
+
+    public NearestNeighborTransduction(double exponentialWeight,
+                                       NauticalMap map,
+                                       RegressionDistance distance) {
 
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         closestNeighborForNow = new HashMap<>(tiles.size());

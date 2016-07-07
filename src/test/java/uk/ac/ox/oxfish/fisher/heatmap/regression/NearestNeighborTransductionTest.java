@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.fisher.actions.MovingTest;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceTimeRegressionDistance;
+import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by carrknight on 7/5/16.
@@ -16,22 +16,18 @@ public class NearestNeighborTransductionTest {
     public void correctNeighbor() throws Exception
     {
 
-        NearestNeighborRegression regression = new NearestNeighborRegression(1, 10000, 1);
+        FishState state = MovingTest.generateSimple50x50Map();
+        NearestNeighborTransduction regression = new NearestNeighborTransduction(1d, state.getMap(),
+                                                                                 new SpaceTimeRegressionDistance(10000, 1) );
+        regression.addObservation(new GeographicalObservation(state.getMap().getSeaTile(10,10), 0, 100));
+        regression.addObservation(new GeographicalObservation(state.getMap().getSeaTile(0,0),0,1));
+        assertEquals(regression.predict(state.getMap().getSeaTile(0,0),0,state),1,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(1,0),0,state),1,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(0,1),0,state),1,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(3,3),0,state),1,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(6,6),0,state),100,.001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(30,30),0,state),100,.001);
 
-        SeaTile tenten = mock(SeaTile.class);
-        when(tenten.getGridX()).thenReturn(10);
-        when(tenten.getGridY()).thenReturn(10);
-        SeaTile zero = mock(SeaTile.class);
-        when(zero.getGridX()).thenReturn(0);
-        when(zero.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation(tenten, 0, 100));
-        regression.addObservation(new GeographicalObservation(zero,0,1));
-        assertEquals(regression.predict(0,0,0),1,.001);
-        assertEquals(regression.predict(1,0,0),1,.001);
-        assertEquals(regression.predict(0,1,0),1,.001);
-        assertEquals(regression.predict(3,3,0),1,.001);
-        assertEquals(regression.predict(6,6,0),100,.001);
-        assertEquals(regression.predict(30,30,0),100,.001);
 
 
 

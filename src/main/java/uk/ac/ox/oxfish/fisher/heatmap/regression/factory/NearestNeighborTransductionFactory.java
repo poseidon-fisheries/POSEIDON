@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.NearestNeighborTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.SpaceTimeRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceTimeRegressionDistance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -20,6 +20,7 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
     private DoubleParameter spaceBandwidth = new FixedDoubleParameter(5d);
 
 
+    private DoubleParameter exponentialWeight = new FixedDoubleParameter(1d);
 
 
     /**
@@ -31,12 +32,12 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
     @Override
     public NearestNeighborTransduction apply(FishState state) {
         return new NearestNeighborTransduction(
+                exponentialWeight.apply(state.getRandom()),
                 state.getMap(),
                 new SpaceTimeRegressionDistance(
                         timeBandwidth.apply(state.getRandom()),
                         spaceBandwidth.apply(state.getRandom())
-                )
-        );
+                ));
     }
 
 
@@ -77,4 +78,21 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
     }
 
 
+    /**
+     * Getter for property 'exponentialWeight'.
+     *
+     * @return Value for property 'exponentialWeight'.
+     */
+    public DoubleParameter getExponentialWeight() {
+        return exponentialWeight;
+    }
+
+    /**
+     * Setter for property 'exponentialWeight'.
+     *
+     * @param exponentialWeight Value to set for property 'exponentialWeight'.
+     */
+    public void setExponentialWeight(DoubleParameter exponentialWeight) {
+        this.exponentialWeight = exponentialWeight;
+    }
 }
