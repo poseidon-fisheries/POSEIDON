@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.acquisition;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -30,14 +31,15 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
     /**
      * Goes through all the possible seatiles and picks the highest one
-     *  @param map        the map to pick from
+     * @param map        the map to pick from
      * @param regression the geographical regression
      * @param state  @return a choice
+     * @param fisher
      */
     @Override
     public SeaTile pick(
             NauticalMap map, GeographicalRegression regression,
-            FishState state) {
+            FishState state, Fisher fisher) {
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
         Collections.shuffle(seaTiles);
@@ -49,8 +51,8 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         return tileStream.
                 max(
                         (o1, o2) -> Double.compare(
-                                regression.predict(o1, state.getHoursSinceStart(), state),
-                                regression.predict(o2, state.getHoursSinceStart(), state))
+                                regression.predict(o1, state.getHoursSinceStart(), state, fisher),
+                                regression.predict(o2, state.getHoursSinceStart(), state, fisher))
                 ).orElse(seaTiles.get(random.nextInt(seaTiles.size())));
 
     }

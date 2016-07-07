@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.acquisition;
 
 import sim.util.Bag;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -25,14 +26,15 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
 
     /**
      * The acquisition function main task: to pick a tile from the map given geographical regression
-     *  @param map        the map to pick from
+     * @param map        the map to pick from
      * @param regression the geographical regression
      * @param state  @return a choice
+     * @param fisher
      */
     @Override
     public SeaTile pick(
             NauticalMap map, GeographicalRegression regression,
-            FishState state) {
+            FishState state, Fisher fisher) {
 
         double time = state.getHoursSinceStart();
 
@@ -49,7 +51,8 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
             SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
             if(option.getAltitude()<0 &&
-                    regression.predict(location, time, state ) < regression.predict(option, time, state )) {
+                    regression.predict(location, time, state,fisher )
+                            < regression.predict(option, time, state,fisher )) {
                 location = option;
                 mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
                 mooreNeighbors.shuffle(state.getRandom());

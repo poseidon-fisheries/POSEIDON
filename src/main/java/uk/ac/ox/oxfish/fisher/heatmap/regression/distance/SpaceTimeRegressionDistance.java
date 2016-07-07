@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -27,9 +28,9 @@ public class SpaceTimeRegressionDistance implements RegressionDistance
 
     @Override
     public double distance(
-            SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
+            Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
 
 
-        return delegate.distance(tile,currentTimeInHours,observation);
+        return delegate.distance(fisher, tile, currentTimeInHours, observation);
     }
 }

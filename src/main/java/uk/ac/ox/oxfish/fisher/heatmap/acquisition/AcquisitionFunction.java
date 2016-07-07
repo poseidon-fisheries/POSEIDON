@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.acquisition;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -17,8 +18,9 @@ public interface AcquisitionFunction
      * @param map the map to pick from
      * @param regression the geographical regression
      * @param state  @return a choice
+     * @param fisher
      */
-    public SeaTile pick(NauticalMap map, GeographicalRegression regression, FishState state);
+    public SeaTile pick(NauticalMap map, GeographicalRegression regression, FishState state, Fisher fisher);
 
 
 

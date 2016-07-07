@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -31,12 +32,12 @@ public class CompositeRegressionDistance implements RegressionDistance
 
     @Override
     public double distance(
-            SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
+            Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
 
 
         double sum =0;
         for(RegressionDistance distance : components)
-            sum+= distance.distance(tile,currentTimeInHours,observation);
+            sum+= distance.distance(fisher, tile, currentTimeInHours, observation);
 
         return sum;
 

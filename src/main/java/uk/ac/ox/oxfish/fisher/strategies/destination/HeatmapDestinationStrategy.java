@@ -112,7 +112,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
                         tile,
                         model.getHoursSinceStart(),
                         record.getProfitPerHour(true)
-                ));
+                ),fisher );
 
         //go through your friends and add their observations if they are new
         // (with imitation probability)
@@ -133,12 +133,12 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
                                     tile,
                                     model.getHoursSinceStart(),
                                     friendTrip.getProfitPerHour(true)
-                            ));
+                            ),fisher );
 
             }
 
         //find the optimal
-        SeaTile optimal = acquisition.pick(model.getMap(), profitRegression, model);
+        SeaTile optimal = acquisition.pick(model.getMap(), profitRegression, model,fisher );
         Preconditions.checkState(optimal.getAltitude()<0);
         if(model.getRandom().nextDouble()<=probability.getExplorationProbability()) {
             optimal = explorationStep.randomStep(model, model.getRandom(), fisher, optimal);

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -25,9 +26,9 @@ public class NearestNeighborTransduction implements GeographicalRegression {
     private final RegressionDistance distance;
 
 
-    public NearestNeighborTransduction(double exponentialWeight,
-                                       NauticalMap map,
-                                       RegressionDistance distance) {
+    public NearestNeighborTransduction(
+            NauticalMap map,
+            RegressionDistance distance) {
 
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         closestNeighborForNow = new HashMap<>(tiles.size());
@@ -43,14 +44,14 @@ public class NearestNeighborTransduction implements GeographicalRegression {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, FishState state) {
+    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
 
         return closestNeighborForNow.getOrDefault(tile,PLACEHOLDER).getValue();
     }
 
 
     @Override
-    public void addObservation(GeographicalObservation newObservation) {
+    public void addObservation(GeographicalObservation newObservation, Fisher fisher) {
 
         //go through all the tiles
         for(SeaTile tile : closestNeighborForNow.keySet())
@@ -58,8 +59,8 @@ public class NearestNeighborTransduction implements GeographicalRegression {
             //if the new observation is closer than the old one this is your new closest observation
             GeographicalObservation oldObservation = closestNeighborForNow.get(tile);
             if(oldObservation == PLACEHOLDER || (
-                    distance.distance(tile,newObservation.getTime() , newObservation) <
-                            distance.distance(tile,newObservation.getTime() , oldObservation)))
+                    distance.distance(fisher, tile, newObservation.getTime(), newObservation) <
+                            distance.distance(fisher, tile, newObservation.getTime(), oldObservation)))
                 closestNeighborForNow.put(tile,newObservation);
         }
     }

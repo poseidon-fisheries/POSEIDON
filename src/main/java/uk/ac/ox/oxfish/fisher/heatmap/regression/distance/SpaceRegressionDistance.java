@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -19,15 +20,9 @@ public class SpaceRegressionDistance  implements RegressionDistance{
 
     @Override
     public double distance(
-            SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
-        double distance = 0;
-        double spaceDistance = tile.getGridX() - observation.getTile().getGridX();
-        if (spaceDistance != 0)
-            distance += (spaceDistance*spaceDistance)/spaceBandwidth;
-        spaceDistance = tile.getGridY() - observation.getTile().getGridY();
-        if (spaceDistance != 0)
-            distance += (spaceDistance*spaceDistance)/spaceBandwidth;
-        return distance;
+            Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
+
+        return cellDistance(tile,observation.getTile())/spaceBandwidth;
     }
 
 
@@ -39,4 +34,16 @@ public class SpaceRegressionDistance  implements RegressionDistance{
     public double getSpaceBandwidth() {
         return spaceBandwidth;
     }
+
+
+    final public static double cellDistance(SeaTile first, SeaTile second)
+    {
+        double distance = 0;
+        double spaceDistance = first.getGridX() - second.getGridX();
+        distance += (spaceDistance*spaceDistance);
+        spaceDistance = first.getGridY() - second.getGridY();
+        distance += (spaceDistance*spaceDistance);
+        return distance;
+    }
+
 }

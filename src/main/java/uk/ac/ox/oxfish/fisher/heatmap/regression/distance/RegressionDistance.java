@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -10,8 +11,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  */
 public interface RegressionDistance {
 
-    public double distance(SeaTile tile, double currentTimeInHours,
-                           GeographicalObservation observation);
+    public double distance(
+            Fisher fisher, SeaTile tile, double currentTimeInHours,
+            GeographicalObservation observation);
 
 
 }

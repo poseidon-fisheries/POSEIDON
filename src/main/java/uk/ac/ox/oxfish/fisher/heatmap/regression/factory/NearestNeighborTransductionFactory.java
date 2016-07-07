@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.NearestNeighborTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceTimeRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDifferenceRegressionDistance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -32,12 +32,8 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
     @Override
     public NearestNeighborTransduction apply(FishState state) {
         return new NearestNeighborTransduction(
-                exponentialWeight.apply(state.getRandom()),
                 state.getMap(),
-                new SpaceTimeRegressionDistance(
-                        timeBandwidth.apply(state.getRandom()),
-                        spaceBandwidth.apply(state.getRandom())
-                ));
+                new PortDifferenceRegressionDistance(5d));
     }
 
 

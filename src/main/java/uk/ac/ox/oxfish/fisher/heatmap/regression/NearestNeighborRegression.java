@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -73,7 +74,7 @@ public class NearestNeighborRegression implements GeographicalRegression {
     }
 
     @Override
-    public double predict(SeaTile tile, double time, FishState state) {
+    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;
@@ -107,7 +108,7 @@ public class NearestNeighborRegression implements GeographicalRegression {
     }
 
     @Override
-    public void addObservation(GeographicalObservation observation) {
+    public void addObservation(GeographicalObservation observation, Fisher fisher) {
 
         nearestNeighborTree.addPoint(new double[]{observation.getX(),observation.getY(),observation.getTime()},
                                      observation.getValue());

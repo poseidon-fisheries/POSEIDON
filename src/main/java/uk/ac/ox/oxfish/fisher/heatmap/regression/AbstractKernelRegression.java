@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -30,9 +31,10 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     /**
      * adds an observation and if there are too many removes the oldest one
      * @param observation
+     * @param fisher
      */
     @Override
-    public void addObservation(GeographicalObservation observation) {
+    public void addObservation(GeographicalObservation observation, Fisher fisher) {
         observations.add(observation);
         if(observations.size()>maximumNumberOfObservations)
         {
@@ -92,7 +94,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
 
 
     @Override
-    public double predict(SeaTile tile, double time, FishState state) {
+    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;

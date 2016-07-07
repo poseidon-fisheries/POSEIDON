@@ -46,7 +46,7 @@ public class HeatmapDestinationStrategyTest {
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.getAltitude()).thenReturn(-100d);
-        when(optimizer.pick(any(), any(), any())).thenReturn(optimal);
+        when(optimizer.pick(any(), any(), any(),any() )).thenReturn(optimal);
 
         strategy.start(model,user);
 
@@ -54,16 +54,16 @@ public class HeatmapDestinationStrategyTest {
 
         //should add two observations!
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(2)).addObservation(any());
+        verify(regression,times(2)).addObservation(any(),any() );
 
         //one only now because we already added our friend's
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(3)).addObservation(any());
+        verify(regression,times(3)).addObservation(any(),any() );
 
         //and now two more
         when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(5)).addObservation(any());
+        verify(regression,times(5)).addObservation(any(),any() );
 
     }
 
@@ -92,7 +92,7 @@ public class HeatmapDestinationStrategyTest {
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.getAltitude()).thenReturn(-100d);
-        when(optimizer.pick(any(), any(), any())).thenReturn(optimal);
+        when(optimizer.pick(any(), any(), any(),any() )).thenReturn(optimal);
 
         strategy.start(model,user);
 
@@ -100,16 +100,16 @@ public class HeatmapDestinationStrategyTest {
 
         //should add one observations (ignore friend)
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(1)).addObservation(any());
+        verify(regression,times(1)).addObservation(any(),any() );
 
         //one only now because we already checked our friend's latest
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(2)).addObservation(any());
+        verify(regression,times(2)).addObservation(any(),any() );
 
         //and now ignore your friend again
         when(friend.getLastFinishedTrip()).thenReturn(mock(TripRecord.class,RETURNS_DEEP_STUBS));
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
-        verify(regression,times(3)).addObservation(any());
+        verify(regression,times(3)).addObservation(any(),any() );
 
     }
 
@@ -141,7 +141,7 @@ public class HeatmapDestinationStrategyTest {
         assertNotEquals(strategy.getFavoriteSpot(),
                         optimal);
         when(optimal.getAltitude()).thenReturn(-100d);
-        when(optimizer.pick(any(), any(), any())).thenReturn(optimal);
+        when(optimizer.pick(any(), any(), any(),any() )).thenReturn(optimal);
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
         assertEquals(strategy.getFavoriteSpot(),
                      optimal);

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -11,9 +12,9 @@ public interface GeographicalRegression
 {
 
 
-    public double predict(SeaTile tile, double time, FishState state);
+    public double predict(SeaTile tile, double time, FishState state, Fisher fisher);
 
-    public void  addObservation(GeographicalObservation observation);
+    public void  addObservation(GeographicalObservation observation, Fisher fisher);
 
 
 }

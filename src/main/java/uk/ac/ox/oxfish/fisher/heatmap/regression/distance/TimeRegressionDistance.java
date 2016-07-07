@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -19,7 +20,7 @@ public class TimeRegressionDistance implements RegressionDistance
 
     @Override
     public double distance(
-            SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
+            Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
         return Math.abs(currentTimeInHours-observation.getTime())/timeBandwidth;
     }
 

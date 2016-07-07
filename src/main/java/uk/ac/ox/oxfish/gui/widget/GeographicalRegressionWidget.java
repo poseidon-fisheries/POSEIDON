@@ -5,6 +5,7 @@ import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import sim.display.Display2D;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
@@ -68,7 +69,8 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
 
 
 
-           return new GeographicalRegressionJButton(gui,regression);
+           return new GeographicalRegressionJButton(gui,regression,
+                                                    metawidget.getToInspect());
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             //because of recursion this will happen
             //   e.printStackTrace();
@@ -86,16 +88,18 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
 
         private final GeographicalRegression regression;
 
+        private final Fisher fisher;
 
         /**
          * Creates a button with no set text or icon.
          */
         public GeographicalRegressionJButton(
-                FishGUI gui, GeographicalRegression regression) {
+                FishGUI gui, GeographicalRegression regression, Fisher fisher) {
             this.gui = gui;
             this.regression = regression;
             this.setText("Show Heatmap");
             this.addActionListener(this);
+            this.fisher=fisher;
         }
 
         /**
@@ -116,7 +120,8 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                             @Override
                             public Double apply(SeaTile tile) {
                                 return regression.predict(tile, ((FishState) gui.state).
-                                        getHoursSinceStart(),(FishState) gui.state );
+                                        getHoursSinceStart(),(FishState) gui.state,
+                                                          fisher);
                             }
                         },
                         false));
