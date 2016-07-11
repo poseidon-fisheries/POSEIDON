@@ -28,12 +28,12 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     /**
      * geographical regression to learn and predict where you make most money
      */
-    private final GeographicalRegression profitRegression;
+    private GeographicalRegression profitRegression;
 
     /**
      * the strategy used to scan the profit regression to look for the "best"
      */
-    private final AcquisitionFunction acquisition;
+    private AcquisitionFunction acquisition;
 
     /**
      * should we ignore trips that were cut short?
@@ -180,5 +180,32 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
     public SeaTile getFavoriteSpot() {
         return delegate.getFavoriteSpot();
+    }
+
+    /**
+     * Setter for property 'profitRegression'.
+     *
+     * @param profitRegression Value to set for property 'profitRegression'.
+     */
+    public void setProfitRegression(GeographicalRegression profitRegression) {
+        this.profitRegression = profitRegression;
+    }
+
+    /**
+     * Getter for property 'acquisition'.
+     *
+     * @return Value for property 'acquisition'.
+     */
+    public AcquisitionFunction getAcquisition() {
+        return acquisition;
+    }
+
+    /**
+     * Setter for property 'acquisition'.
+     *
+     * @param acquisition Value to set for property 'acquisition'.
+     */
+    public void setAcquisition(AcquisitionFunction acquisition) {
+        this.acquisition = acquisition;
     }
 }

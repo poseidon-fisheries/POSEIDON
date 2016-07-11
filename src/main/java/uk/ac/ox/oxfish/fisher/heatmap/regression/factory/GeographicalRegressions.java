@@ -47,6 +47,17 @@ public class GeographicalRegressions {
         NAMES.put(NearestNeighborTransductionFactory.class,"Nearest Neighbor Transduction");
 
 
+        CONSTRUCTORS.put("Kernel Transduction",
+                         KernelTransductionFactory::new);
+        NAMES.put(KernelTransductionFactory.class,
+                  "Kernel Transduction");
+
+        CONSTRUCTORS.put("5 Parameters Kernel Transduction",
+                         FiveParametersKernelTransductionFactory::new);
+        NAMES.put(FiveParametersKernelTransductionFactory.class,
+                  "5 Parameters Kernel Transduction");
+
+
 
     }
 }

@@ -35,5 +35,12 @@ public class PortDifferenceRegressionDistance implements RegressionDistance {
 
     }
 
-
+    /**
+     * Getter for property 'bandwidth'.
+     *
+     * @return Value for property 'bandwidth'.
+     */
+    public double getBandwidth() {
+        return bandwidth;
+    }
 }

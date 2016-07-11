@@ -47,7 +47,7 @@ public class StrategyWidgetProcessor implements WidgetProcessor<JComponent,Swing
     public JComponent processWidget(
             JComponent widget, String elementName, Map<String, String> attributes, SwingMetawidget metawidget) {
 
-        if(!attributes.containsKey(StrategyInspector.KEY))
+        if(!attributes.containsKey(StrategyInspector.KEY) || !(widget instanceof SwingMetawidget) )
             return widget;
 
         try {

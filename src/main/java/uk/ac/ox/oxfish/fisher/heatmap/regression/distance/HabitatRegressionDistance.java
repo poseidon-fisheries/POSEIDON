@@ -25,4 +25,13 @@ public class HabitatRegressionDistance implements RegressionDistance {
         double distance = tile.getRockyPercentage() - observation.getTile().getRockyPercentage();
         return distance*distance/habitatBandwidth;
     }
+
+    /**
+     * Getter for property 'habitatBandwidth'.
+     *
+     * @return Value for property 'habitatBandwidth'.
+     */
+    public double getHabitatBandwidth() {
+        return habitatBandwidth;
+    }
 }

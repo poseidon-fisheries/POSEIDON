@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 public class SpaceRegressionDistance  implements RegressionDistance{
 
 
-    final public double spaceBandwidth;
+    final private double spaceBandwidth;
 
 
     public SpaceRegressionDistance(double spaceBandwidth) {
