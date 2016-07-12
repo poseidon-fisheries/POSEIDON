@@ -57,44 +57,41 @@ public class FirstPaper
         OUTPUT_FOLDER.toFile().mkdirs();
 
         Log.info("Moving Front Image Starting");
-       // fronts();
+        fronts();
        // frontsSensitivity(Paths.get("fronts.yaml"));
        // frontsSensitivity(Paths.get("sensitivity","fronts","fronts_worst.yaml"));
       //  frontsSensitivity(Paths.get("sensitivity","fronts","fronts_flat.yaml"));
         Log.info("Hyperstability");
-        //hyperStability();
+        hyperStability();
         Log.info("Oil Price Changes");
-        //oilCheck();
-       // oils(1);
-        //oils(2);
+        oilCheck();
+        oils(1);
+        oils(2);
         Log.info("Fishing the Line");
-        //        mpa();
-        Log.info("Optimal Network");
-        //disfunctionalFriends();
-       // functionalFriends();
+        mpa();
         Log.info("OSMOSE");
         osmoseDemersal2(50);
         Log.info("Best Heuristic");
-        //  optimalHeuristic();
+        optimalHeuristic();
         Log.info("Hard Switch");
-        //hardSwitch(INPUT_FOLDER.resolve("hardswitch.yaml"), OUTPUT_FOLDER.resolve("hardswitch").resolve("hardswitch.csv"));
+        hardSwitch(INPUT_FOLDER.resolve("hardswitch.yaml"), OUTPUT_FOLDER.resolve("hardswitch").resolve("hardswitch.csv"));
 
        //hardSwitch(INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch"). //sensitivity
        //         resolve("large_difference.yaml"), INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch").resolve("large_difference.csv"));
 
         Log.info("Directed Technological Change");
-        // directedTechnologicalChange();
+        directedTechnologicalChange();
         Log.info("TAC vs ITQ 1 Species");
-        //catchesPerPolicyCatchability();
-        //catchesPerPolicyMileage();
+        catchesPerPolicyCatchability();
+        catchesPerPolicyMileage();
         Log.info("Race to Fish");
-        //raceToFish();
+        raceToFish();
         Log.info("Location Choice");
-        //policyAndLocation("itq");
-        //policyAndLocation("tac");
+        policyAndLocation("itq");
+        policyAndLocation("tac");
         Log.info("Gear Choice");
-        //policyAndGear("itq");
-        //policyAndGear("tac");
+        policyAndGear("itq");
+        policyAndGear("tac");
 
 
     }

@@ -90,7 +90,7 @@ public class TwoPopulations {
      */
 
 
-    public static void guiExample() throws IOException {
+    public static void main(String[] args) throws IOException {
 
 
 
@@ -163,6 +163,8 @@ public class TwoPopulations {
                             }
                             catch (Exception yamlError)
                             {
+                                Log.warn(yamlError.getMessage());
+                                Log.warn(yamlError.toString());
                                 Log.warn(file + " is not a valid YAML scenario!");
                             }
                         } else {
@@ -247,7 +249,7 @@ public class TwoPopulations {
 
 
 
-    public static void main(String[] args) throws IOException {
+    public static void itq_sweep(String[] args) throws IOException {
 
         StringBuilder finalOutput = new StringBuilder();
         finalOutput.append("price,small,big\n");

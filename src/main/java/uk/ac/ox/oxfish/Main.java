@@ -114,6 +114,7 @@ class Main{
                             }
                             catch (Exception yamlError)
                             {
+                                Log.warn(yamlError.getMessage());
                                 Log.warn(file + " is not a valid YAML scenario!");
                             }
                         } else {

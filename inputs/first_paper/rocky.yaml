@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Diffusing Logistic:
       carryingCapacity: '5000.0'
@@ -26,14 +26,13 @@ Prototype:
     Until Full With Day Limit:
       daysAtSea: '5.0'
   fuelTankSize: '100000.0'
-  gasPricePerLiter: '0.01'
   gear:
     Habitat Aware Gear:
       meanCatchabilityRocky: '0'
       meanCatchabilitySandy: '0.01'
       standardDeviationCatchabilityRocky: '0.0'
       standardDeviationCatchabilitySandy: '0.0'
-      gasPerHourFished: '5.0'
+      trawlSpeed: '5.0'
   habitatInitializer:
     Rocky Rectangles:
       numberOfRectangles: '5.0'

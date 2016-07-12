@@ -32,9 +32,9 @@ public class PopulationLearnedBandwidth {
 
 
     private static final UniformDoubleParameter SPACE_BANDWIDTH = new UniformDoubleParameter(0.1, 100000);
-    private static final UniformDoubleParameter HABITAT_BANDWIDTH = new UniformDoubleParameter(0.1, 100000);
-    private static final UniformDoubleParameter PORT_BANDWIDTH = new UniformDoubleParameter(0.1, 100000);
-    private static final UniformDoubleParameter RANDOM_BANDWDTH = new UniformDoubleParameter(0.1, 100000);
+    private static final UniformDoubleParameter HABITAT_BANDWIDTH = new UniformDoubleParameter(100000, 100000);
+    private static final UniformDoubleParameter PORT_BANDWIDTH = new UniformDoubleParameter(100000, 100000);
+    private static final UniformDoubleParameter RANDOM_BANDWDTH = new UniformDoubleParameter(100000, 100000);
     private static final UniformDoubleParameter FORGETTING = new UniformDoubleParameter(0.7, 1);
 
 
