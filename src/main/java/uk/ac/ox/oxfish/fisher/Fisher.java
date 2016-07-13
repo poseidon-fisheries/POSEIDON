@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher;
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.metawidget.inspector.annotation.UiHidden;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -422,6 +421,7 @@ public class Fisher implements Steppable, Startable{
         equipment.getBoat().recordTravel(distanceTravelled); //tell the boat
         //consume gas!
         consumeFuel(equipment.getBoat().expectedFuelConsumption(distanceTravelled));
+        getCurrentTrip().addToDistanceTravelled(distanceTravelled);
         //arrive at new position
         status.setLocation(newPosition);
         map.recordFisherLocation(this,newPosition.getGridX(),newPosition.getGridY());
@@ -435,6 +435,7 @@ public class Fisher implements Steppable, Startable{
     public void consumeFuel(double litersConsumed)
     {
         equipment.getBoat().consumeFuel(litersConsumed);
+        getCurrentTrip().recordGasConsumption(litersConsumed);
         Preconditions.checkState(equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride(),
                                  "a boat has run into negative fuel territory");
         memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_CONSUMPTION, litersConsumed);
@@ -864,9 +865,6 @@ public class Fisher implements Steppable, Startable{
         memory.getTripLogger().recordEarnings(specieIndex, biomass, newEarnings);
     }
 
-    public void recordCosts(double newCosts) {
-        memory.getTripLogger().recordCosts(newCosts);
-    }
 
     public List<TripRecord> getFinishedTrips() {
         return memory.getTripLogger().getFinishedTrips();
@@ -1131,36 +1129,6 @@ public class Fisher implements Steppable, Startable{
      */
     public FeatureExtractors<SeaTile> getTileRepresentation() {
         return memory.getTileRepresentation();
-    }
-
-    /**
-     * Getter for property 'status'.
-     *
-     * @return Value for property 'status'.
-     */
-    @UiHidden
-    public FisherStatus grabStatus() {
-        return status;
-    }
-
-    /**
-     * Getter for property 'memory'.
-     *
-     * @return Value for property 'memory'.
-     */
-    @UiHidden
-    public FisherMemory grabMemory() {
-        return memory;
-    }
-
-
-    /**
-     * Getter for property 'equipment'.
-     *
-     * @return Value for property 'equipment'.
-     */
-    public FisherEquipment grabEquipment() {
-        return equipment;
     }
 
 

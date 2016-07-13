@@ -2,9 +2,10 @@ package uk.ac.ox.oxfish.experiments;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.DefaultKernelTransduction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.FiveParametersKernelTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.KernelTransduction;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
@@ -31,7 +32,7 @@ import java.util.function.Predicate;
 public class PopulationLearnedBandwidth {
 
 
-    private static final UniformDoubleParameter SPACE_BANDWIDTH = new UniformDoubleParameter(0.1, 100000);
+    private static final UniformDoubleParameter SPACE_BANDWIDTH = new UniformDoubleParameter(0.1, 200);
     private static final UniformDoubleParameter HABITAT_BANDWIDTH = new UniformDoubleParameter(100000, 100000);
     private static final UniformDoubleParameter PORT_BANDWIDTH = new UniformDoubleParameter(100000, 100000);
     private static final UniformDoubleParameter RANDOM_BANDWDTH = new UniformDoubleParameter(100000, 100000);
@@ -44,19 +45,16 @@ public class PopulationLearnedBandwidth {
         PrototypeScenario scenario = new PrototypeScenario();
         HeatmapDestinationFactory destinationStrategy = new HeatmapDestinationFactory();
         scenario.setDestinationStrategy(destinationStrategy);
-        FiveParametersKernelTransductionFactory factory = new FiveParametersKernelTransductionFactory();
+        KernelTransductionFactory factory = new KernelTransductionFactory();
         destinationStrategy.setRegression(factory);
 
-        factory.setDistanceFromPortBandwidth(PORT_BANDWIDTH);
         factory.setForgettingFactor(FORGETTING);
-        factory.setHabitatBandwidth(HABITAT_BANDWIDTH);
         factory.setSpaceBandwidth(SPACE_BANDWIDTH);
-        factory.setRandomBandwidth(RANDOM_BANDWDTH);
 
         state.setScenario(scenario);
 
-        Sensor<DefaultKernelTransduction> sensor = (Sensor<DefaultKernelTransduction>) fisher ->
-                ((DefaultKernelTransduction) ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getProfitRegression());
+        Sensor<KernelTransduction> sensor = (Sensor<KernelTransduction>) fisher ->
+                ((KernelTransduction) ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getProfitRegression());
 
         //add adaptation
         state.registerStartable(new Startable() {
@@ -65,39 +63,46 @@ public class PopulationLearnedBandwidth {
                 for (Fisher fisher : model.getFishers()) {
 
 
-                    fisher.addYearlyAdaptation(new Adaptation<DefaultKernelTransduction>(
+                    fisher.addYearlyAdaptation(new Adaptation<KernelTransduction>(
                             new Predicate<Fisher>() {
                                 @Override
                                 public boolean test(Fisher fisher) {
                                     return true;
                                 }
                             },
-                            new BeamHillClimbing<DefaultKernelTransduction>(
-                                    new RandomStep<DefaultKernelTransduction>() {
+                            new BeamHillClimbing<KernelTransduction>(
+                                    new RandomStep<KernelTransduction>() {
                                         @Override
-                                        public DefaultKernelTransduction randomStep(
+                                        public KernelTransduction randomStep(
                                                 FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                DefaultKernelTransduction current) {
-                                            return factory.apply(state);
+                                                KernelTransduction current) {
+
+                                            return new KernelTransduction(
+                                                    state.getMap(),
+                                                    current.getForgettingFactor(),
+                                                    new SpaceRegressionDistance(
+                                                            ((SpaceRegressionDistance) current.getDistances().iterator().next()).getSpaceBandwidth() *
+                                                                    (1d+ (random.nextDouble()*.1-.05))
+
+                                                    )
+                                            );
                                         }
                                     }
                             ),
-                            new Actuator<DefaultKernelTransduction>() {
+                            new Actuator<KernelTransduction>() {
                                 @Override
-                                public void apply(Fisher fisher, DefaultKernelTransduction change, FishState model) {
-                                    DefaultKernelTransduction newish = new DefaultKernelTransduction
+                                public void apply(Fisher fisher, KernelTransduction change, FishState model) {
+                                    KernelTransduction newish = new KernelTransduction
                                             (
                                                     model.getMap(),
                                                     change.getForgettingFactor(),
-                                                    change.getSpace(),
-                                                    change.getPort(),
-                                                    change.getHabitat(),
-                                                    change.getRandom()
+                                                    (SpaceRegressionDistance) change.getDistances().iterator().next()
                                             );
                                     ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).setProfitRegression(
                                             newish
                                     );
                                     //go through all your memory and retrain the model
+
                                     for (TripRecord record : fisher.getFinishedTrips()) {
                                         if (record.getMostFishedTileInTrip() != null)
                                             newish.addObservation(
@@ -107,6 +112,7 @@ public class PopulationLearnedBandwidth {
                                                     fisher
                                             );
                                     }
+
 
                                 }
                             },
@@ -129,10 +135,10 @@ public class PopulationLearnedBandwidth {
         state.getYearlyDataSet().registerGatherer(
                 "Space Bandwidth",
                 (Gatherer<FishState>) ignored -> state.getFishers().stream().mapToDouble(
-                        value -> sensor.scan(value).getSpace().getSpaceBandwidth()).sum() /
+                        value -> ((SpaceRegressionDistance) sensor.scan(value).getDistances().iterator().next()).getSpaceBandwidth()).sum() /
                         state.getFishers().size(), Double.NaN);
 
-        state.getYearlyDataSet().registerGatherer(
+     /*   state.getYearlyDataSet().registerGatherer(
                 "Habitat Bandwidth",
                 (Gatherer<FishState>) ignored -> state.getFishers().stream().mapToDouble(
                         value -> sensor.scan(value).getHabitat().getHabitatBandwidth()).sum() /
@@ -152,7 +158,7 @@ public class PopulationLearnedBandwidth {
                         value -> 1d/sensor.scan(value).getRandom().getMaxNoise()).sum() /
                         state.getFishers().size(), Double.NaN);
 
-
+*/
 
         state.getYearlyDataSet().registerGatherer(
                 "Forgetting Factor",
@@ -170,11 +176,16 @@ public class PopulationLearnedBandwidth {
 
         FishStateUtilities.printCSVColumnsToFile(Paths.get("runs","pop_learning.csv").toFile(),
                                                  state.getYearlyDataSet().getColumn("Space Bandwidth"),
-                                                 state.getYearlyDataSet().getColumn("Habitat Bandwidth"),
-                                                 state.getYearlyDataSet().getColumn("Port Bandwidth"),
-                                                 state.getYearlyDataSet().getColumn("Random Bandwidth"),
+                                                 //state.getYearlyDataSet().getColumn("Habitat Bandwidth"),
+                                                 //state.getYearlyDataSet().getColumn("Port Bandwidth"),
+                                                 //state.getYearlyDataSet().getColumn("Random Bandwidth"),
                                                  state.getYearlyDataSet().getColumn("Forgetting Factor"));
 
+        FishStateUtilities.pollHistogramToFile(
+                state.getFishers(),
+                Paths.get("runs", "pop_hist.csv").toFile(),
+                (Sensor<Double>) fisher -> ((SpaceRegressionDistance) sensor.scan(fisher).getDistances().iterator().next()).getSpaceBandwidth()
+        );
 
 
         /*

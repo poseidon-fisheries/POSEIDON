@@ -124,7 +124,7 @@ public class EffortThrottling {
         biologyInitializer.setMaximumBiomass(new FixedDoubleParameter(1000d));
         scenario.setBiologyInitializer(biologyInitializer);
 
-        //change distances
+        //change getDistances
         SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
         simpleMap.setCellSizeInKilometers(new FixedDoubleParameter(1d));
         scenario.setMapInitializer(simpleMap);

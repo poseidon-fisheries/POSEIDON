@@ -19,12 +19,14 @@ public class KernelTransduction implements GeographicalRegression {
 
     private final HashMap<SeaTile,KernelTilePredictor> kernels;
 
+    private final double forgettingFactor;
 
     public KernelTransduction(
             NauticalMap map,
             double forgettingFactor,
             RegressionDistance... distance) {
 
+        this.forgettingFactor = forgettingFactor;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         kernels = new HashMap<>(tiles.size());
         for(SeaTile tile : tiles)
@@ -62,6 +64,15 @@ public class KernelTransduction implements GeographicalRegression {
            kernel.addObservation(newObservation,fisher);
         }
     }
+
+    public double getForgettingFactor() {
+        return forgettingFactor;
+    }
+
+    public List<RegressionDistance> getDistances(){
+        return         kernels.values().iterator().next().getDistances();
+    }
+
 
 
 }

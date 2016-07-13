@@ -167,6 +167,7 @@ public class MovingTest
         fisher.start(mock(FishState.class));
 
         //should move and spend 20 hours doing so
+        fisher.undock();
         move.act(simple, fisher, new Anarchy(),24);
         assertEquals(fisher.getHoursTravelledToday(), 20, .001);
         assertEquals(fisher.getLocation(), map.getSeaTile(2, 0));
@@ -193,6 +194,7 @@ public class MovingTest
                                    mock(Gear.class), 1);
 
         fisher.start(mock(FishState.class));
+        fisher.undock();
 
         //should move and spend 20 hours doing so
         move.act(simple,fisher,new Anarchy() ,24);

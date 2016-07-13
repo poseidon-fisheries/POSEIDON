@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.DoubleStream;
 
@@ -51,26 +52,31 @@ public class TripRecord {
 
 
     /**
-     * the places where fishing occured
+     * the places where fishing occured (and the hours spent fishing there)
      */
     private final HashMap<SeaTile,Integer> tilesFished = new HashMap<>();
 
 
+
+    private double litersOfGasConsumed = 0;
+
     /**
      * the weight/biomass of everything that was sold at the end of the trip
      */
-    private final double[] finalCatch;
+    private final double[] soldCatch;
 
     /**
      * the total earnings per specie
      */
     private final double[] earningsPerSpecie;
 
+    private double distanceTravelled = 0;
+
     private Port terminal;
 
     public TripRecord(int numberOfSpecies, double hoursSpentAtPort)
     {
-        finalCatch = new double[numberOfSpecies];
+        soldCatch = new double[numberOfSpecies];
         earningsPerSpecie = new double[numberOfSpecies];
         this.hoursSinceLastTrip = hoursSpentAtPort;
     }
@@ -82,7 +88,7 @@ public class TripRecord {
     public void recordEarnings(int specieIndex, double biomass, double earnings)
     {
 
-        finalCatch[specieIndex] += biomass;
+        soldCatch[specieIndex] += biomass;
         earningsPerSpecie[specieIndex] += earnings;
     }
 
@@ -93,7 +99,7 @@ public class TripRecord {
     {
 
         Integer timesFished = tilesFished.getOrDefault(record.getTileFished(), 0);
-        tilesFished.put(record.getTileFished(),timesFished+1);
+        tilesFished.put(record.getTileFished(),timesFished+record.getHoursSpentFishing());
 
     }
 
@@ -107,7 +113,7 @@ public class TripRecord {
     public void recordOpportunityCosts(double opportunityCosts)
     {
         //it's possible for opportunity costs to be computed at the end of the trip
-       // Preconditions.checkState(!completed);
+        // Preconditions.checkState(!completed);
         this.opportunityCosts+=opportunityCosts;
     }
 
@@ -149,12 +155,12 @@ public class TripRecord {
      */
     public  double getProfitPerSpecie(int specie, boolean countOpportunityCosts)
     {
-        if(finalCatch[specie]<= FishStateUtilities.EPSILON)
+        if(soldCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
-        double totalCatch = DoubleStream.of(finalCatch).sum();
+        double totalCatch = DoubleStream.of(soldCatch).sum();
         assert  totalCatch > 0;
-        assert totalCatch >= finalCatch[specie];
-        double catchProportion = finalCatch[specie]/totalCatch;
+        assert totalCatch >= soldCatch[specie];
+        double catchProportion = soldCatch[specie]/totalCatch;
         assert  catchProportion > 0;
         assert catchProportion <=1.0;
 
@@ -190,10 +196,10 @@ public class TripRecord {
      */
     public double getUnitProfitPerSpecie(int specie)
     {
-        if(finalCatch[specie]<= FishStateUtilities.EPSILON)
+        if(soldCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
         else
-            return getProfitPerSpecie(specie, false)/finalCatch[specie];
+            return getProfitPerSpecie(specie, false)/ soldCatch[specie];
     }
 
     public double getTotalTripProfit()
@@ -220,7 +226,7 @@ public class TripRecord {
      */
     public double getImplicitPriceReceived(int species)
     {
-        return earningsPerSpecie[species]/finalCatch[species];
+        return earningsPerSpecie[species]/ soldCatch[species];
     }
 
     public boolean isCutShort() {
@@ -235,6 +241,10 @@ public class TripRecord {
         return tilesFished.keySet();
     }
 
+    public Set<Map.Entry<SeaTile,Integer>> getTilesFishedPerHour() {
+        return tilesFished.entrySet();
+    }
+
     public SeaTile getMostFishedTileInTrip()
     {
 
@@ -244,8 +254,8 @@ public class TripRecord {
 
     }
 
-    public double[] getFinalCatch() {
-        return finalCatch;
+    public double[] getSoldCatch() {
+        return soldCatch;
     }
 
 
@@ -259,5 +269,47 @@ public class TripRecord {
 
     public double getHoursSinceLastTrip() {
         return hoursSinceLastTrip;
+    }
+
+
+
+    public int getEffort() {
+
+        int sum = 0;
+        for(Integer hours : tilesFished.values())
+            sum+=hours;
+        return sum;
+    }
+
+    public double[] getEarningsPerSpecie() {
+        return earningsPerSpecie;
+    }
+
+    /**
+     * Getter for property 'distanceTravelled'.
+     *
+     * @return Value for property 'distanceTravelled'.
+     */
+    public double getDistanceTravelled() {
+        return distanceTravelled;
+    }
+
+    public void addToDistanceTravelled(double distance)
+    {
+        distanceTravelled+=distance;
+    }
+
+
+    /**
+     * Getter for property 'litersOfGasConsumed'.
+     *
+     * @return Value for property 'litersOfGasConsumed'.
+     */
+    public double getLitersOfGasConsumed() {
+        return litersOfGasConsumed;
+    }
+
+    public void recordGasConsumption(double litersConsumed){
+        litersOfGasConsumed+= litersConsumed;
     }
 }

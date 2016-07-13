@@ -36,19 +36,19 @@ public class TACOpportunityCostManagerTest {
         TripRecord record = mock(TripRecord.class);
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(10d);
         when(record.getDurationInHours()).thenReturn(10d);
-        when(record.getFinalCatch()).thenReturn(new double[1]);
+        when(record.getSoldCatch()).thenReturn(new double[1]);
         manager.reactToFinishedTrip(record);
         manager.step(model);
 
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(20d);
         when(record.getDurationInHours()).thenReturn(20d);
-        when(record.getFinalCatch()).thenReturn(new double[1]);
+        when(record.getSoldCatch()).thenReturn(new double[1]);
         manager.reactToFinishedTrip(record);
         manager.step(model);
 
         when(model.getLatestDailyObservation("dummy " + AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(30d);
         when(record.getDurationInHours()).thenReturn(30d);
-        when(record.getFinalCatch()).thenReturn(new double[1]);
+        when(record.getSoldCatch()).thenReturn(new double[1]);
         manager.reactToFinishedTrip(record);
         manager.step(model);
 
@@ -59,7 +59,7 @@ public class TACOpportunityCostManagerTest {
         //now tell him that this dude has caught 10 fish in 20 hours
         TripRecord newRecord = mock(TripRecord.class);
         when(newRecord.getDurationInHours()).thenReturn(20d);
-        when(newRecord.getFinalCatch()).thenReturn(new double[]{10d});
+        when(newRecord.getSoldCatch()).thenReturn(new double[]{10d});
         when(newRecord.getImplicitPriceReceived(species)).thenReturn(20d);
         manager.reactToFinishedTrip(newRecord);
         //opportunity costs predicted 0.5 fish per hour; you've been out 20 hours and each unit of fish is worth 20$

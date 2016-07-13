@@ -65,16 +65,27 @@ public class Hold {
 
 
 
-        assert tonnesCarried > maximumLoad;
-        double proportionToKeep = 1.0 / getPercentageFilled();
-        assert proportionToKeep < 1 && proportionToKeep > 0;
-        tonnesCarried = 0;
+        throwOverboard(fishHold,maximumLoad);
+        tonnesCarried = maximumLoad;
+        assert Math.abs(tonnesCarried -maximumLoad)<=.001;
+        assert Math.abs(getPercentageFilled() -1.0)<=.001;
+    }
+
+    /**
+     * CAREFUL: modifies the argument!
+     * @param fishHold
+     * @param maximumLoad
+     */
+    public static void throwOverboard(double[] fishHold,double maximumLoad)
+    {
+        double currentLoad=  Arrays.stream(fishHold).sum();
+        double proportionToKeep = maximumLoad/currentLoad;
+        assert proportionToKeep <= 1 && proportionToKeep >= 0;
         for(int i=0;i< fishHold.length; i++)
         {
             fishHold[i] *= proportionToKeep;
-
-            tonnesCarried += fishHold[i];
         }
+
     }
 
     public double getTotalPoundsCarried() {

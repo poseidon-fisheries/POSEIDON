@@ -4,13 +4,8 @@ package uk.ac.ox.oxfish.demoes;
 import com.esotericsoftware.minlog.Log;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.gear.factory.PeriodicUpdateCatchabilityFactory;
-import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
@@ -19,9 +14,12 @@ import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
 
@@ -60,51 +58,22 @@ public class GearImitationWithITQ
 
     public FishState gearImitationTestRun(
             AlgorithmFactory<? extends  MultiQuotaRegulation> multiFactory, boolean checkRed,
-            final long seed)
-    {
-        System.out.println("Test starting!");
-        final FishState state = new FishState(seed);
-
-
-
-        //biomass ratio: 70-30
-        WellMixedBiologyFactory biologyFactory = new WellMixedBiologyFactory();
-        biologyFactory.setCapacityRatioSecondToFirst(new FixedDoubleParameter(.3));
-
-
-        PrototypeScenario scenario = new PrototypeScenario();
+            final long seed) throws IOException {
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                Paths.get("inputs","first_paper","gear_itq.yaml")));
+        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+        FishState state = new FishState();
         state.setScenario(scenario);
-        scenario.setBiologyInitializer(biologyFactory);
+
         scenario.setRegulation(multiFactory);
 
-        final RandomCatchabilityTrawlFactory gearFactory = new RandomCatchabilityTrawlFactory();
-        gearFactory.setMeanCatchabilityFirstSpecies(new UniformDoubleParameter(.001, .02));
-        gearFactory.setMeanCatchabilityOtherSpecies(new UniformDoubleParameter(.001, .02));
-        scenario.setGear(gearFactory);
-
-        //because imitation is poor when everybody has different gears, we will turn it off
-        PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
-        destinationStrategy.setProbability(new ExplorationPenaltyProbabilityFactory(.2,0d,1.02d,0.05d));
-        scenario.setDestinationStrategy(destinationStrategy);
-
-
-        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
-        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
-        scenario.setMapInitializer(simpleMap);
-        scenario.forcePortPosition(new int[]{40, 25});
-
-        PeriodicUpdateCatchabilityFactory gearStrategy = new PeriodicUpdateCatchabilityFactory();
-        gearStrategy.setMaximumCatchability(new FixedDoubleParameter(.02));
-        gearStrategy.setMinimumCatchability(new FixedDoubleParameter(.001));
-        scenario.setGearStrategy(gearStrategy);
-
-        scenario.setUsePredictors(true);
-
-
+        //set up the gear adaptation:
         state.registerStartable(new Startable() {
             @Override
             public void start(FishState model) {
 
+                //start collecting red catchability and blue catchability
                 model.getYearlyDataSet().registerGatherer("Red Catchability", state1 -> {
                     double size = state1.getFishers().size();
                     if (size == 0)
@@ -140,12 +109,10 @@ public class GearImitationWithITQ
 
             }
         });
-        /*
 
 
-
-         */
         state.start();
+
 
         while (state.getYear() < 1)
             state.schedule.step(state);
@@ -173,7 +140,7 @@ public class GearImitationWithITQ
         double lateRedLandings;
         double lateBlueLandings;
 
-        while (state.getYear() < 20) {
+        while (state.getYear() < 30) {
             state.schedule.step(state);
             blue = state.getYearlyDataSet().getLatestObservation("Blue Catchability");
             red = state.getYearlyDataSet().getLatestObservation("Red Catchability");

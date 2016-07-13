@@ -12,7 +12,6 @@ import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -775,10 +774,6 @@ public class FirstPaper
         PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
         FishState state = new FishState(RANDOM_SEED);
         state.setScenario(scenario);
-
-        //we need a link to the gear factory
-        //in order to randomly create more gear later on!
-        RandomCatchabilityTrawlFactory gearFactory = (RandomCatchabilityTrawlFactory) scenario.getGear();
 
         //set up the gear adaptation:
         state.registerStartable(new Startable() {

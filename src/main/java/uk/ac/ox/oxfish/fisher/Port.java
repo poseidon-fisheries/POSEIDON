@@ -99,6 +99,17 @@ public class Port {
         return defaultMarketMap.getMarket(species).getMarginalPrice();
     }
 
+
+    /**
+     * get the marginal price of the market associated with this species
+     * @param species
+     * @return
+     */
+    public double getMarginalPrice(Species species, Fisher fisher)
+    {
+        return getMarketMap(fisher).getMarket(species).getMarginalPrice();
+    }
+
     /**
      * returns an immutable view of the fishers listed here
      * @return the set of fishers here

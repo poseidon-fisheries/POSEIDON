@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A bunch of distances one on top of the other
+ * A bunch of getDistances one on top of the other
  * Created by carrknight on 7/7/16.
  */
 public class CompositeRegressionDistance implements RegressionDistance

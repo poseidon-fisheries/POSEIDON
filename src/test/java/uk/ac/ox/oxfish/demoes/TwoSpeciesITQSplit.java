@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -11,6 +10,10 @@ import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class TwoSpeciesITQSplit
 {
@@ -27,30 +30,15 @@ public class TwoSpeciesITQSplit
 
 
 
-        final FishState state = new FishState(System.currentTimeMillis());
-        //world split in half
-
-        MultiITQFactory multiFactory = new MultiITQFactory();
-        //quota ratios: 90-10
-        multiFactory.setQuotaFirstSpecie(new FixedDoubleParameter(4500));
-        multiFactory.setQuotaOtherSpecies(new FixedDoubleParameter(500));
-
-        HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
-        biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
-
-
-        PrototypeScenario scenario = new PrototypeScenario();
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                Paths.get("inputs", "first_paper", "location_itq.yaml")));
+        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+        FishState state = new FishState();
         state.setScenario(scenario);
-        //world split in half
-        scenario.setBiologyInitializer(biologyFactory);
-        scenario.setRegulation(multiFactory);
 
-        SimpleMapInitializerFactory simpleMap = new SimpleMapInitializerFactory();
-        simpleMap.setCoastalRoughness(new FixedDoubleParameter(0d));
-        scenario.setMapInitializer(simpleMap);
-        scenario.forcePortPosition(new int[]{40, 25});
 
-        scenario.setUsePredictors(true);
+
 
 
         long towsNorth = 0;

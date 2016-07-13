@@ -142,7 +142,7 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
 
 
             //hourly average catches * trip length (including portside preparation)
-            double actualTripCatches = record.getFinalCatch()[selectedSpecies.getIndex()];
+            double actualTripCatches = record.getSoldCatch()[selectedSpecies.getIndex()];
             assert actualTripCatches >=0;
 
             double actualHourlyCatches = actualTripCatches / record.getDurationInHours();

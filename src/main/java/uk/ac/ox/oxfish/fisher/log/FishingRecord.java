@@ -16,7 +16,7 @@ public class FishingRecord
     /**
      * hours spent fishing.
      */
-    final private double hoursSpentFishing;
+    final private int hoursSpentFishing;
 
     /**
      * the gear used
@@ -46,7 +46,7 @@ public class FishingRecord
 
 
     public FishingRecord(
-            double hoursSpentFishing, Gear gearUsed, SeaTile tileFished, Catch fishCaught,
+            int hoursSpentFishing, Gear gearUsed, SeaTile tileFished, Catch fishCaught,
             Fisher fisher, int step) {
         this.hoursSpentFishing = hoursSpentFishing;
         this.gearUsed = gearUsed;
@@ -56,7 +56,7 @@ public class FishingRecord
         this.step = step;
     }
 
-    public double getHoursSpentFishing() {
+    public int getHoursSpentFishing() {
         return hoursSpentFishing;
     }
 

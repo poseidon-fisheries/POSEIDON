@@ -15,7 +15,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
     private DoubleParameter spaceBandwidth = new FixedDoubleParameter(5);
 
 
-    private DoubleParameter forgettingFactory = new FixedDoubleParameter(1);
+    private DoubleParameter forgettingFactor = new FixedDoubleParameter(1);
 
 
     /**
@@ -28,7 +28,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
     public KernelTransduction apply(FishState state) {
         return new KernelTransduction(
                 state.getMap(),
-                forgettingFactory.apply(state.getRandom()),
+                forgettingFactor.apply(state.getRandom()),
                 new SpaceRegressionDistance(
                         spaceBandwidth.apply(state.getRandom())
                 )
@@ -44,12 +44,12 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
         this.spaceBandwidth = spaceBandwidth;
     }
 
-    public DoubleParameter getForgettingFactory() {
-        return forgettingFactory;
+    public DoubleParameter getForgettingFactor() {
+        return forgettingFactor;
     }
 
-    public void setForgettingFactory(DoubleParameter forgettingFactory) {
-        this.forgettingFactory = forgettingFactory;
+    public void setForgettingFactor(DoubleParameter forgettingFactor) {
+        this.forgettingFactor = forgettingFactor;
     }
 }
 

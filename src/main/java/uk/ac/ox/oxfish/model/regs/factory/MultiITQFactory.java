@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
@@ -50,7 +49,6 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
      */
     private DoubleParameter quotaOtherSpecies = new FixedDoubleParameter(5000);
 
-    private Counter opportunityCostCounter;
 
 
     /**
