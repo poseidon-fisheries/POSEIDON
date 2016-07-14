@@ -8,16 +8,16 @@ import java.util.Objects;
  * An immutable object useful for regression. It is compared with respect to time
  * Created by carrknight on 6/27/16.
  */
-public class GeographicalObservation implements Comparable<GeographicalObservation>
+public class GeographicalObservation<V> implements Comparable<GeographicalObservation<V>>
 {
 
     private final double time;
 
-    private final double value;
+    private final V value;
 
     private final SeaTile tile;
 
-    public GeographicalObservation(SeaTile tile, double time, double value) {
+    public GeographicalObservation(SeaTile tile, double time, V value) {
         this.tile=tile;
         this.time = time;
         this.value = value;
@@ -56,7 +56,7 @@ public class GeographicalObservation implements Comparable<GeographicalObservati
      *
      * @return Value for property 'value'.
      */
-    public double getValue() {
+    public V getValue() {
         return value;
     }
 
@@ -82,9 +82,9 @@ public class GeographicalObservation implements Comparable<GeographicalObservati
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GeographicalObservation that = (GeographicalObservation) o;
+        GeographicalObservation<V> that = (GeographicalObservation) o;
         return Double.compare(that.time, time) == 0 &&
-                Double.compare(that.value, value) == 0 &&
+                Objects.equals(that.value, value)  &&
                 Objects.equals(tile, that.tile);
     }
 

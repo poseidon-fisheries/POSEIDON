@@ -1,7 +1,10 @@
 package uk.ac.ox.oxfish.fisher.log;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
@@ -28,6 +31,9 @@ public class TripLoggerTest
         assertNotNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
 
+        logger.recordFishing(new FishingRecord(1,null,mock(SeaTile.class),
+                                               new Catch(new double[]{100,100}),
+                                               mock(Fisher.class),0));
         logger.recordEarnings(0,100,100);
         logger.recordCosts(200);
         logger.finishTrip(10, mock(Port.class));

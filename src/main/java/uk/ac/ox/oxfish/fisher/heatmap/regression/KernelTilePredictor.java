@@ -39,7 +39,7 @@ public class KernelTilePredictor{
             distances.add(distance);
     }
 
-    public void addObservation(GeographicalObservation observation, Fisher fisher)
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher)
     {
         //compute kernel
         double kernel = 1;

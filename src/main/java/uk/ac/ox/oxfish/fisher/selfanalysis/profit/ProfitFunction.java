@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.function.Function;
 
 /**
- *
+ * A container to judge the profits of a trip after the trip is over or to simulate a trip and guess profits that way
  * Created by carrknight on 7/13/16.
  */
 public class ProfitFunction {
@@ -31,17 +31,22 @@ public class ProfitFunction {
     /**
      * needed to predict profits from trip
      */
-    private final LameTripSimulator simulator = new LameTripSimulator();
+    private final LameTripSimulator simulator;
 
     private final double maxHours;
 
-    private final Function<SeaTile,double[]> expectationBuilder;
 
 
     public ProfitFunction(
-            double maxHours, Function<SeaTile, double[]> expectationBuilder) {
+            LameTripSimulator simulator, double maxHours) {
+        this.simulator = simulator;
         this.maxHours = maxHours;
-        this.expectationBuilder = expectationBuilder;
+    }
+
+    public ProfitFunction(
+            double maxHours) {
+
+        this(new LameTripSimulator(),maxHours);
     }
 
     /**
@@ -60,17 +65,26 @@ public class ProfitFunction {
         for(Species species : state.getSpecies())
             earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species,fisher);
         double costs = 0;
-        costs += oilCosts.cost(fisher,state,trip,earnings);
-        for(Cost otherCost : additionalCosts)
-            costs+= otherCost.cost(fisher,state,trip,earnings);
+        costs = computeCosts(fisher, trip, state, earnings, costs);
 
         return (earnings-costs)/ trip.getDurationInHours();
     }
 
-    public double hourlyProfitFromHypotheticalTripHere(Fisher fisher, SeaTile where, FishState state)
+    private double computeCosts(Fisher fisher, TripRecord trip, FishState state, double earnings, double costs) {
+        costs += oilCosts.cost(fisher,state,trip,earnings);
+        for(Cost otherCost : additionalCosts)
+            costs+= otherCost.cost(fisher,state,trip,earnings);
+        return costs;
+    }
+
+    public double hourlyProfitFromHypotheticalTripHere(Fisher fisher, SeaTile where, FishState state,
+                                                       Function<SeaTile,double[]> catchExpectations)
     {
         return hourlyProfitFromThisTrip(fisher,
-                                        simulator.simulateRecord(fisher,where,state,maxHours,expectationBuilder.apply(where)),
+                                        simulator.simulateRecord(fisher,
+                                                                 where,
+                                                                 state,
+                                                                 maxHours,catchExpectations.apply(where)),
                                         state);
     }
 
@@ -78,4 +92,8 @@ public class ProfitFunction {
     public LinkedList<Cost> getAdditionalCosts() {
         return additionalCosts;
     }
+
+
+
+
 }

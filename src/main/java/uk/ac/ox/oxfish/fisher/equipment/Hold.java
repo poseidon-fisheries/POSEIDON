@@ -53,7 +53,7 @@ public class Hold {
 
         assert tonnesCarried >=0;
         assert consistencyCheck();
-        if(tonnesCarried > maximumLoad)
+        if(tonnesCarried > maximumLoad + FishStateUtilities.EPSILON/2)
             throwOverboard();
         assert  maximumLoad >= tonnesCarried || Math.abs(maximumLoad-tonnesCarried) <= FishStateUtilities.EPSILON;
     }
@@ -66,9 +66,9 @@ public class Hold {
 
 
         throwOverboard(fishHold,maximumLoad);
-        tonnesCarried = maximumLoad;
-        assert Math.abs(tonnesCarried -maximumLoad)<=.001;
-        assert Math.abs(getPercentageFilled() -1.0)<=.001;
+        tonnesCarried = Arrays.stream(fishHold).sum();
+        assert Math.abs(tonnesCarried -maximumLoad)<=FishStateUtilities.EPSILON;
+        assert Math.abs(getPercentageFilled() -1.0)<=FishStateUtilities.EPSILON;
     }
 
     /**

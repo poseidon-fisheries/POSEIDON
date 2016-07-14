@@ -14,7 +14,7 @@ import java.util.List;
  * step a lot faster (even though the new observation step will be worse)
  * Created by carrknight on 7/8/16.
  */
-public class KernelTransduction implements GeographicalRegression {
+public class KernelTransduction implements GeographicalRegression<Double> {
 
 
     private final HashMap<SeaTile,KernelTilePredictor> kernels;

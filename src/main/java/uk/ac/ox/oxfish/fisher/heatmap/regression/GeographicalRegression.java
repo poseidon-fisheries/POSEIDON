@@ -8,13 +8,13 @@ import uk.ac.ox.oxfish.model.FishState;
  * Anything that predicts over a geographical map
  * Created by carrknight on 6/27/16.
  */
-public interface GeographicalRegression
+public interface GeographicalRegression<V>
 {
 
 
     public double predict(SeaTile tile, double time, FishState state, Fisher fisher);
 
-    public void  addObservation(GeographicalObservation observation, Fisher fisher);
+    public void  addObservation(GeographicalObservation<V> observation, Fisher fisher);
 
 
 }

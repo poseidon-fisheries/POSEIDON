@@ -70,7 +70,8 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
 
 
            return new GeographicalRegressionJButton(gui,regression,
-                                                    metawidget.getToInspect());
+                                                    metawidget.getToInspect(),
+                                                    attributes.get("name"));
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             //because of recursion this will happen
             //   e.printStackTrace();
@@ -94,12 +95,13 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
          * Creates a button with no set text or icon.
          */
         public GeographicalRegressionJButton(
-                FishGUI gui, GeographicalRegression regression, Fisher fisher) {
+                FishGUI gui, GeographicalRegression regression, Fisher fisher, String name) {
             this.gui = gui;
             this.regression = regression;
             this.setText("Show Heatmap");
             this.addActionListener(this);
             this.fisher=fisher;
+            setText("Show " + name);
         }
 
         /**
@@ -126,7 +128,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                         },
                         false));
             Display2D heatmapDisplay = gui.setupPortrayal(heatmapPortrayal);
-            JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap",false);
+            JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap" + getText(),false);
             heatmapPortrayal.setSelectedEncoding("Heatmap");
             heatmapFrame.setVisible(true);
         }

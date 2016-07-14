@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/28/16.
  */
-public class TimeAndSpaceKernelRegression implements GeographicalRegression {
+public class TimeAndSpaceKernelRegression implements GeographicalRegression<Double> {
 
 
     private final TimeOnlyKernelRegression timeRegression;

@@ -102,17 +102,24 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         model=null;
     }
 
+
+    protected void learnFromTripRecord(
+            TripRecord record, SeaTile mostFishedTile, final Fisher fisher, final FishState model)
+    {
+        profitRegression.addObservation(new GeographicalObservation(
+                mostFishedTile,
+                model.getHoursSinceStart(),
+                record.getProfitPerHour(true)
+        ), fisher);
+    }
+
     @Override
     public void reactToFinishedTrip(TripRecord record)
     {
         SeaTile tile = record.getMostFishedTileInTrip();
         if(tile!=null)
             if(!record.isCutShort() || ignoreFailedTrips)
-                profitRegression.addObservation(new GeographicalObservation(
-                        tile,
-                        model.getHoursSinceStart(),
-                        record.getProfitPerHour(true)
-                ),fisher );
+                learnFromTripRecord(record, tile, fisher, model);
 
         //go through your friends and add their observations if they are new
         // (with imitation probability)
@@ -129,11 +136,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
                     if(!record.isCutShort() || ignoreFailedTrips)
                         if(model.getRandom().nextDouble()<=probability.getImitationProbability())
-                            profitRegression.addObservation(new GeographicalObservation(
-                                    tile,
-                                    model.getHoursSinceStart(),
-                                    friendTrip.getProfitPerHour(true)
-                            ),fisher );
+                            learnFromTripRecord(friendTrip, tile, fisher, model);
 
             }
 

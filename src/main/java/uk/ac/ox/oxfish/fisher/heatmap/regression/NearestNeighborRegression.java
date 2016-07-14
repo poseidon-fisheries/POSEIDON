@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/30/16.
  */
-public class NearestNeighborRegression implements GeographicalRegression {
+public class NearestNeighborRegression implements GeographicalRegression<Double> {
 
 
     /**
@@ -108,7 +108,7 @@ public class NearestNeighborRegression implements GeographicalRegression {
     }
 
     @Override
-    public void addObservation(GeographicalObservation observation, Fisher fisher) {
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher) {
 
         nearestNeighborTree.addPoint(new double[]{observation.getX(),observation.getY(),observation.getTime()},
                                      observation.getValue());

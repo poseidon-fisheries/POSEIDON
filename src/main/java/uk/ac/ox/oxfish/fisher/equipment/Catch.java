@@ -43,6 +43,9 @@ public class Catch {
         return catchMap[index];
     }
 
+    public int numberOfSpecies(){
+        return catchMap.length;
+    }
 
 
     public double totalCatchWeight()

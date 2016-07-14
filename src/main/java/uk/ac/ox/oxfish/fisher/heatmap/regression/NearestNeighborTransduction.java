@@ -15,13 +15,13 @@ import java.util.List;
  * That's the idea here
  * Created by carrknight on 7/5/16.
  */
-public class NearestNeighborTransduction implements GeographicalRegression {
+public class NearestNeighborTransduction implements GeographicalRegression<Double> {
 
 
 
-    private final HashMap<SeaTile,GeographicalObservation> closestNeighborForNow;
+    private final HashMap<SeaTile,GeographicalObservation<Double>> closestNeighborForNow;
 
-    private final static GeographicalObservation PLACEHOLDER = new GeographicalObservation(null,-1,Double.NaN);
+    private final static GeographicalObservation<Double> PLACEHOLDER = new GeographicalObservation<Double>(null,-1d,Double.NaN);
 
     private final RegressionDistance distance;
 
@@ -51,7 +51,7 @@ public class NearestNeighborTransduction implements GeographicalRegression {
 
 
     @Override
-    public void addObservation(GeographicalObservation newObservation, Fisher fisher) {
+    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher) {
 
         //go through all the tiles
         for(SeaTile tile : closestNeighborForNow.keySet())

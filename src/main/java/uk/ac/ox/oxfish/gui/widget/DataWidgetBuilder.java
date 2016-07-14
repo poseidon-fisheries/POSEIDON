@@ -56,7 +56,7 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                 //todo figure out to make this nested
 
                 return buildDataSetPanel((TimeSeries) PropertyUtils.getNestedProperty(metawidget.getToInspect(),
-                                                                                   attributes.get("name")));
+                                                                                      attributes.get("name")));
 
             }
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
@@ -85,9 +85,11 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                 }
 
             }
-        } catch (InvocationTargetException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+
+        } catch(ClassNotFoundException e){}
+        catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
-            System.err.println("failed to instantiate charting buttons!");
+            System.err.println("failed to instantiate charting buttons at " + elementName);
         }
 
         //now imagine it's a map of data-sets
@@ -158,7 +160,7 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         int i=0;
         for(Map.Entry<?, TimeSeries> d : datasets.entrySet())
         {
-                many.add(d.getKey().toString(),buildDataSetPanel(d.getValue()));
+            many.add(d.getKey().toString(),buildDataSetPanel(d.getValue()));
         }
         return many;
     }

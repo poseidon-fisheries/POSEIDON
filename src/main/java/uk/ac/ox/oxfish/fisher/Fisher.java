@@ -88,7 +88,6 @@ public class Fisher implements Steppable, Startable{
 
 
 
-
     /***
      *      ___           _                    _
      *     | __|__ _ _  _(_)_ __ _ __  ___ _ _| |_
@@ -680,7 +679,7 @@ public class Fisher implements Steppable, Startable{
         FishingRecord record = new FishingRecord(hoursSpentFishing, equipment.getGear(),
                                                  status.getLocation(),catchOfTheDay,this,
                                                  state.getStep());
-        getCurrentTrip().recordFishing(record);
+        memory.getTripLogger().recordFishing(record);
         memory.getCatchMemories().memorize(catchOfTheDay, status.getLocation());
 
         //now let regulations and the hold deal with it
@@ -1182,4 +1181,6 @@ public class Fisher implements Steppable, Startable{
         Preconditions.checkState(isAtPort(), "Changing Gear out of Port. Not expected!");
         gearStrategy.updateGear(this,random,model,currentAction);
     }
+
+
 }

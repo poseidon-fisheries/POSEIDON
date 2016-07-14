@@ -25,34 +25,34 @@ public class KernelTilePredictorTest {
                 new SpaceRegressionDistance(1d)
         );
         predictor.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(20,20),
                         0d,
-                        80
+                        80d
                 ),
                 null
         );
         predictor.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(22,22),
                         0d,
-                        90
+                        90d
                 ),
                 null
         );
         predictor.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(28,28),
                         0d,
-                        110
+                        110d
                 ),
                 null
         );
         predictor.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(30,30),
                         0d,
-                        130
+                        130d
                 ),
                 null
         );
@@ -76,35 +76,35 @@ public class KernelTilePredictorTest {
                 new SpaceRegressionDistance(1d)
         );
         forgetting.addObservation(
-                 new GeographicalObservation(
+                 new GeographicalObservation<>(
                         map.getSeaTile(25,25),
                         0d,
-                        80
+                        80d
                 ),
                 null
         );
         notForgetting.addObservation(
-                 new GeographicalObservation(
+                 new GeographicalObservation<>(
                         map.getSeaTile(25,25),
                         0d,
-                        80
+                        80d
                 ),
                 null
         );
 
         forgetting.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(25,25),
                         0d,
-                        100
+                        100d
                 ),
                 null
         );
         notForgetting.addObservation(
-                new GeographicalObservation(
+                new GeographicalObservation<>(
                         map.getSeaTile(25,25),
                         0d,
-                        100
+                        100d
                 ),
                 null
         );

@@ -9,7 +9,7 @@ import java.util.PriorityQueue;
 /**
  * Created by carrknight on 6/28/16.
  */
-public abstract class AbstractKernelRegression implements GeographicalRegression {
+public abstract class AbstractKernelRegression implements GeographicalRegression<Double> {
 
 
 
@@ -18,7 +18,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     private double bandwidth;
 
 
-    private final PriorityQueue<GeographicalObservation> observations;
+    private final PriorityQueue<GeographicalObservation<Double>> observations;
 
 
     public AbstractKernelRegression(int maximumNumberOfObservations,
@@ -44,11 +44,11 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     }
 
 
-    public double predict(int x, int y, double time)
+    public Double predict(int x, int y, double time)
     {
 
         if(getObservations().size()==0)
-            return 0;
+            return 0d;
         if(getObservations().size()==1)
             return getObservations().peek().getValue();
 
@@ -72,7 +72,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
     {
         double kernelSum = 0;
         double numerator = 0;
-        for(GeographicalObservation observation : getObservations())
+        for(GeographicalObservation<Double> observation : getObservations())
         {
             double distance = distance(observation.getX(),
                                        observation.getY(),
@@ -113,7 +113,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      *
      * @return Value for property 'observations'.
      */
-    public PriorityQueue<GeographicalObservation> getObservations() {
+    public PriorityQueue<GeographicalObservation<Double>> getObservations() {
         return observations;
     }
 

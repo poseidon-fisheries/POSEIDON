@@ -66,6 +66,11 @@ public class TripRecord {
     private final double[] soldCatch;
 
     /**
+     * the weight of everything caught
+     */
+    private final double[] totalCatch;
+
+    /**
      * the total earnings per specie
      */
     private final double[] earningsPerSpecie;
@@ -78,6 +83,7 @@ public class TripRecord {
     {
         soldCatch = new double[numberOfSpecies];
         earningsPerSpecie = new double[numberOfSpecies];
+        totalCatch = new double[numberOfSpecies];
         this.hoursSinceLastTrip = hoursSpentAtPort;
     }
 
@@ -100,7 +106,8 @@ public class TripRecord {
 
         Integer timesFished = tilesFished.getOrDefault(record.getTileFished(), 0);
         tilesFished.put(record.getTileFished(),timesFished+record.getHoursSpentFishing());
-
+        for(int i=0; i<totalCatch.length; i++)
+            totalCatch[i]+=record.getFishCaught().getPoundsCaught(i);
     }
 
     public void recordCosts(double newCosts)
@@ -155,12 +162,13 @@ public class TripRecord {
      */
     public  double getProfitPerSpecie(int specie, boolean countOpportunityCosts)
     {
+        assert soldCatch[specie] <= totalCatch[specie]; //never sells more than it has!
         if(soldCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
-        double totalCatch = DoubleStream.of(soldCatch).sum();
-        assert  totalCatch > 0;
-        assert totalCatch >= soldCatch[specie];
-        double catchProportion = soldCatch[specie]/totalCatch;
+        double totalWeightSold = DoubleStream.of(soldCatch).sum();
+        assert  totalWeightSold > 0;
+        assert totalWeightSold >= soldCatch[specie];
+        double catchProportion = soldCatch[specie]/totalWeightSold;
         assert  catchProportion > 0;
         assert catchProportion <=1.0;
 
@@ -311,5 +319,9 @@ public class TripRecord {
 
     public void recordGasConsumption(double litersConsumed){
         litersOfGasConsumed+= litersConsumed;
+    }
+
+    public double[] getTotalCatch() {
+        return totalCatch;
     }
 }

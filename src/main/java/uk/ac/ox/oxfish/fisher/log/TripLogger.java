@@ -102,7 +102,9 @@ public class TripLogger implements Startable
         currentTrip.recordCosts(newCosts);
     }
 
-
+    public void recordFishing(FishingRecord record) {
+        currentTrip.recordFishing(record);
+    }
 
     public void recordTripCutShort() {
         currentTrip.recordTripCutShort();
