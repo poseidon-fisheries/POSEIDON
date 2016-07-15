@@ -68,6 +68,11 @@ public class DestinationStrategies
         NAMES.put(HeatmapDestinationFactory.class,
                   "Heatmap Based");
 
+        CONSTRUCTORS.put("Heatmap Planning",
+                         PlanningHeatmapDestinationFactory::new);
+        NAMES.put(PlanningHeatmapDestinationFactory.class,
+                  "Heatmap Planning");
+
     }
 
     private DestinationStrategies() {}

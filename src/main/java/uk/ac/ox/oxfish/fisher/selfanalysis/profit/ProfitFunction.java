@@ -20,7 +20,7 @@ public class ProfitFunction {
     /**
      * separate from the other because they are always there
      */
-    private Cost oilCosts;
+    private Cost oilCosts = new GasCost();
 
     /**
      * additional costs (including opportunity ones)

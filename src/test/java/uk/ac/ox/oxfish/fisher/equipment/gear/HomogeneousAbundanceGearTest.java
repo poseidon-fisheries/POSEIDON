@@ -66,6 +66,30 @@ public class HomogeneousAbundanceGearTest
 
     }
 
+
+
+    @Test
+    public void expectationKillsNoFish() throws Exception {
+
+
+        HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
+                                                                     new FixedProportionFilter(1),
+                                                                     new FixedProportionFilter(.5));
+
+        SeaTile tile = mock(SeaTile.class);
+        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
+        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        Species species = new Species("test",Meristics.FAKE_MERISTICS);
+        GlobalBiology biology = new GlobalBiology(species);
+
+        double fish[] = gear.expectedHourlyCatch(mock(Fisher.class), tile,1, biology);
+
+        assertEquals(fish[0], FishStateUtilities.weigh(new int[]{0},new int[]{50},species),.001);
+        verify(tile,never()).reactToThisAmountOfFishBeingCaught(species,new int[]{0},new int[]{50});
+
+
+    }
+
     @Test
     public void twoHours() throws Exception {
 

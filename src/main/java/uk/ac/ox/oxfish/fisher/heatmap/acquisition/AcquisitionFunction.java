@@ -19,8 +19,10 @@ public interface AcquisitionFunction
      * @param regression the geographical regression
      * @param state  @return a choice
      * @param fisher
+     * @param current
      */
-    public SeaTile pick(NauticalMap map, GeographicalRegression regression, FishState state, Fisher fisher);
+    public SeaTile pick(
+            NauticalMap map, GeographicalRegression regression, FishState state, Fisher fisher, SeaTile current);
 
 
 

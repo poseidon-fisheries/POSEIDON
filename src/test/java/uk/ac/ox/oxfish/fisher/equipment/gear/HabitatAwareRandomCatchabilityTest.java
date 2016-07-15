@@ -9,8 +9,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class HabitatAwareRandomCatchabilityTest
@@ -40,6 +39,7 @@ public class HabitatAwareRandomCatchabilityTest
         Fisher fisher = mock(Fisher.class);
         when(fisher.grabRandomizer()).thenReturn(new MersenneTwisterFast());
         Catch fishCaught = gear.fish(fisher, tile, 1, biology);
+        verify(tile).reactToThisAmountOfBiomassBeingFished(species,20d);
 
         Assert.assertEquals(20, fishCaught.getPoundsCaught(species), .01);
         when(tile.getRockyPercentage()).thenReturn(0d);
@@ -52,4 +52,32 @@ public class HabitatAwareRandomCatchabilityTest
 
 
     }
+
+    @Test
+    public void expectationsDoNotKillFish() throws Exception {
+
+
+        HabitatAwareRandomCatchability gear = new HabitatAwareRandomCatchability(
+                new double[]{.1},
+                new double[]{0},
+                new double[]{.2},
+                new double[]{0},
+                1
+        );
+
+
+        SeaTile tile = mock(SeaTile.class);
+        Species species = new Species("0");
+        GlobalBiology biology = new GlobalBiology(species);
+        when(tile.getBiomass(species)).thenReturn(100d);
+        when(tile.getRockyPercentage()).thenReturn(1d);
+
+
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.grabRandomizer()).thenReturn(new MersenneTwisterFast());
+        double[] fishCaught = gear.expectedHourlyCatch(fisher, tile, 1, biology);
+        verify(tile, never()).reactToThisAmountOfBiomassBeingFished(any(), any());
+        Assert.assertEquals(20, fishCaught[0], .01);
+    }
+
 }

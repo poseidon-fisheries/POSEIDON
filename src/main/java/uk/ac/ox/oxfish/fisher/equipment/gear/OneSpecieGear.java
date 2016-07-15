@@ -15,9 +15,9 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  */
 public class OneSpecieGear implements Gear {
 
-    final Species targetedSpecies;
+    private final Species targetedSpecies;
 
-    final double proportionCaught;
+    private final double proportionCaught;
 
     public OneSpecieGear(Species targetedSpecies, double proportionCaught)
     {
@@ -32,22 +32,42 @@ public class OneSpecieGear implements Gear {
      * catches a fixed proportion of the targeted specie and nothing of all the others
      * @param fisher the fisher
      * @param where where the fisher is fishing
-     * @param hoursSpentFishing
-     * @param modelBiology the biology (list of available species)  @return the catch
+     * @param hoursSpentFishing hours spent fishing
+     * @param modelBiology the biology (list of available species)
+     * @return the catch
      */
     @Override
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        double caught = 0;
-        if(proportionCaught>0) {
-            FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,
-                                                            proportionCaught);
-            caught = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
-                    targetedSpecies));
-        }
-        return new Catch(targetedSpecies, caught, modelBiology);
+        double[] caught = catchesAsArray(where, hoursSpentFishing, modelBiology, false);
+        return new Catch(caught);
     }
 
+    private double[] catchesAsArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, final boolean safeMode) {
+        double[] caught = new double[modelBiology.getSize()];
+        if(proportionCaught>0) {
+            FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,
+                                                            proportionCaught, safeMode);
+            caught[targetedSpecies.getIndex()] = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
+                    targetedSpecies));
+        }
+        return caught;
+    }
+
+    /**
+     *  the hypothetical catch coming from catching one
+     * @param fisher the fisher
+     * @param where where the fisher is fishing
+     * @param hoursSpentFishing hours spent fishing
+     * @param modelBiology the biology (list of available species)
+     * @return the catch
+     */
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesAsArray(where,1,modelBiology,true);
+    }
 
     /**
      * get how much gas is consumed by fishing a spot with this gear

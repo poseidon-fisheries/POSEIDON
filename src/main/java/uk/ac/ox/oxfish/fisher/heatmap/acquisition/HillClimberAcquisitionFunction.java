@@ -7,7 +7,9 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * hill climbs at one random direction until it can't climb further and pick that as its spot
@@ -30,33 +32,36 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
      * @param regression the geographical regression
      * @param state  @return a choice
      * @param fisher
+     * @param current
      */
     @Override
     public SeaTile pick(
             NauticalMap map, GeographicalRegression regression,
-            FishState state, Fisher fisher) {
+            FishState state, Fisher fisher, SeaTile current) {
 
         double time = state.getHoursSinceStart();
 
         //start at a random location
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
-        SeaTile location = tiles.get(state.getRandom().nextInt(tiles.size()));
-        Bag mooreNeighbors =new Bag(map.getMooreNeighbors(location, stepSize));
+        //start at current best if you have it
+        SeaTile location = current == null ?tiles.get(state.getRandom().nextInt(tiles.size())): current;
+        Bag mooreNeighbors =  new Bag(map.getMooreNeighbors(location, stepSize)) ;
         mooreNeighbors.shuffle(state.getRandom());
-
+        Set<SeaTile> checkedAlready = new HashSet<>();
         //as long as there are neighbors you aren't done
         while(!mooreNeighbors.isEmpty())
         {
             //remove a neighbor
             SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
-            if(option.getAltitude()<0 &&
+            if(option.getAltitude()<0 && !checkedAlready.contains(option) &&
                     regression.predict(location, time, state,fisher )
                             < regression.predict(option, time, state,fisher )) {
                 location = option;
                 mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
                 mooreNeighbors.shuffle(state.getRandom());
             }
+            checkedAlready.add(option);
         }
 
         return location;

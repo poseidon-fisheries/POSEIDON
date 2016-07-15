@@ -489,8 +489,17 @@ public class FishStateUtilities {
 
     }
 
+    /**
+     * catch with fixed proportion
+     * @param where location fished
+     * @param hoursSpentFishing hours spent fishing
+     * @param species species targeted
+     * @param q catchability
+     * @param safeMode when true no fish actually dies
+     * @return
+     */
     public static double catchSpecieGivenCatchability(
-            SeaTile where, int hoursSpentFishing, Species species, double q) {
+            SeaTile where, int hoursSpentFishing, Species species, double q, boolean safeMode) {
         Preconditions.checkState(q >= 0);
         Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch
@@ -499,7 +508,7 @@ public class FishStateUtilities {
                                                               hoursSpentFishing),
                 where.getBiomass(species));
         //tell biomass
-        if(specieCatch> 0)
+        if(!safeMode && specieCatch> 0)
             where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);
 
         return specieCatch;

@@ -3,8 +3,10 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
+import uk.ac.ox.oxfish.fisher.strategies.destination.PlanningHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
@@ -14,7 +16,7 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 
 
-public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestinationStrategy>{
+public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<PlanningHeatmapDestinationStrategy>{
 
 
 
@@ -33,10 +35,16 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
             new FixedProbabilityFactory(.2,1d);
 
     /**
-     * the regression object (the one that builds the actual heatmap)
+     * the regression object (used primarily for species regression)
      */
     private AlgorithmFactory<? extends GeographicalRegression> regression =
             new NearestNeighborRegressionFactory();
+
+
+
+    private boolean almostPerfectKnowledge = false;
+
+
 
     /**
      *
@@ -51,16 +59,32 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @return the function result
      */
     @Override
-    public HeatmapDestinationStrategy apply(FishState state) {
-        return new HeatmapDestinationStrategy(
-                regression.apply(state),
-                acquisition.apply(state),
-                ignoreFailedTrips,
-                probability.apply(state),
-                state.getMap(),
-                state.getRandom(),
-                explorationStepSize.apply(state.getRandom()).intValue()
-        );
+    public PlanningHeatmapDestinationStrategy apply(FishState state) {
+        if(!almostPerfectKnowledge)
+            return new PlanningHeatmapDestinationStrategy(
+                    new ProfitFunctionRegression(
+                            new ProfitFunction(24*5),
+                            regression,
+                            state
+                    ),
+                    acquisition.apply(state),
+                    ignoreFailedTrips,
+                    probability.apply(state),
+                    state.getMap(),
+                    state.getRandom(),
+                    explorationStepSize.apply(state.getRandom()).intValue()
+            );
+        else
+            return PlanningHeatmapDestinationStrategy.AlmostPerfectKnowledge(
+                    24*5,
+                    state.getSpecies().size(),
+                    acquisition.apply(state),
+                    ignoreFailedTrips,
+                    probability.apply(state),
+                    state.getMap(),
+                    state.getRandom(),
+                    explorationStepSize.apply(state.getRandom()).intValue()
+            );
     }
 
 
@@ -158,5 +182,23 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     public void setAcquisition(
             AlgorithmFactory<? extends AcquisitionFunction> acquisition) {
         this.acquisition = acquisition;
+    }
+
+    /**
+     * Getter for property 'almostPerfectKnowledge'.
+     *
+     * @return Value for property 'almostPerfectKnowledge'.
+     */
+    public boolean isAlmostPerfectKnowledge() {
+        return almostPerfectKnowledge;
+    }
+
+    /**
+     * Setter for property 'almostPerfectKnowledge'.
+     *
+     * @param almostPerfectKnowledge Value to set for property 'almostPerfectKnowledge'.
+     */
+    public void setAlmostPerfectKnowledge(boolean almostPerfectKnowledge) {
+        this.almostPerfectKnowledge = almostPerfectKnowledge;
     }
 }

@@ -30,5 +30,13 @@ public interface Gear {
             SeaTile where);
 
 
+    double[] expectedHourlyCatch(
+            Fisher fisher,
+            SeaTile where,
+            int hoursSpentFishing,
+            GlobalBiology modelBiology
+    );
+
+
     Gear makeCopy();
 }

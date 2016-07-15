@@ -10,7 +10,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,9 +29,9 @@ public class HeterogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear1 = mock(HomogeneousAbundanceGear.class);
-        when(gear1.fishThisSpecies(any(),any(),anyInt())).thenReturn(100d);
+        when(gear1.fishThisSpecies(any(),any(),anyBoolean())).thenReturn(100d);
         HomogeneousAbundanceGear gear2 = mock(HomogeneousAbundanceGear.class);
-        when(gear2.fishThisSpecies(any(),any(),anyInt())).thenReturn(200d);
+        when(gear2.fishThisSpecies(any(),any(),anyBoolean())).thenReturn(200d);
 
         HeterogeneousAbundanceGear gear = new HeterogeneousAbundanceGear(
                 new Pair<>(species1,gear1),

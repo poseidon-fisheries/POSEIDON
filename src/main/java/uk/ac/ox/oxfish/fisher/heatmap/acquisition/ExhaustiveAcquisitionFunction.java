@@ -35,11 +35,12 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
      * @param regression the geographical regression
      * @param state  @return a choice
      * @param fisher
+     * @param current
      */
     @Override
     public SeaTile pick(
             NauticalMap map, GeographicalRegression regression,
-            FishState state, Fisher fisher) {
+            FishState state, Fisher fisher, SeaTile current) {
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
         Collections.shuffle(seaTiles);
@@ -48,12 +49,19 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         if(proportionSearched<=1d)
             tileStream = tileStream.filter(tile -> random.nextDouble()<=proportionSearched);
 
-        return tileStream.
+
+        SeaTile possibleBest = tileStream.
                 max(
                         (o1, o2) -> Double.compare(
                                 regression.predict(o1, state.getHoursSinceStart(), state, fisher),
                                 regression.predict(o2, state.getHoursSinceStart(), state, fisher))
                 ).orElse(seaTiles.get(random.nextInt(seaTiles.size())));
+        if(current==null || current == possibleBest ||
+                regression.predict(possibleBest,state.getHoursSinceStart(),state,fisher) >
+                regression.predict(current,state.getHoursSinceStart(),state,fisher))
+            return possibleBest;
+        else
+            return current;
 
     }
 }

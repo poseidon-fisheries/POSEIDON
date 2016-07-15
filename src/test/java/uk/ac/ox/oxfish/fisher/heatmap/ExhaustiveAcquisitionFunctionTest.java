@@ -41,7 +41,7 @@ public class ExhaustiveAcquisitionFunctionTest {
         });
 
 
-        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state,null );
+        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state,null,null );
         assertEquals(pick.getGridX(),25);
         assertEquals(pick.getGridY(),25);
 

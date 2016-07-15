@@ -7,6 +7,7 @@ import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import sim.display.Display2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.TriColorMap;
@@ -68,10 +69,29 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
 
 
 
+            if(actualClass == ProfitFunctionRegression.class)
+            {
 
-           return new GeographicalRegressionJButton(gui,regression,
-                                                    metawidget.getToInspect(),
-                                                    attributes.get("name"));
+                JPanel panel = new JPanel(null);
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                panel.add(
+                 new GeographicalRegressionJButton(gui, regression,
+                                                         metawidget.getToInspect(),
+                                                         attributes.get("name")
+                ));
+                //now add all the species
+                panel.add(new JSeparator());
+                GeographicalRegression[] regressions = ((ProfitFunctionRegression) regression).catchesRegression();
+                for(int i=0; i<regressions.length; i++)
+                    panel.add(new GeographicalRegressionJButton(gui,regressions[i],metawidget.getToInspect(),
+                                                                "Expected Catches Species " + i));
+                return panel;
+            }
+            else {
+                return new GeographicalRegressionJButton(gui, regression,
+                                                         metawidget.getToInspect(),
+                                                         attributes.get("name"));
+            }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             //because of recursion this will happen
             //   e.printStackTrace();
@@ -82,7 +102,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
     }
 
 
-    static class GeographicalRegressionJButton extends JButton implements ActionListener
+    private static class GeographicalRegressionJButton extends JButton implements ActionListener
     {
 
         private final FishGUI gui;
@@ -94,7 +114,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
         /**
          * Creates a button with no set text or icon.
          */
-        public GeographicalRegressionJButton(
+        GeographicalRegressionJButton(
                 FishGUI gui, GeographicalRegression regression, Fisher fisher, String name) {
             this.gui = gui;
             this.regression = regression;
@@ -107,7 +127,6 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
         /**
          * Invoked when an action occurs.
          *
-         * @param e
          */
         @Override
         public void actionPerformed(ActionEvent e)

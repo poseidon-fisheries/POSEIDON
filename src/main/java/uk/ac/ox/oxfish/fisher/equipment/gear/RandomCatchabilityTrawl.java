@@ -44,6 +44,11 @@ public class RandomCatchabilityTrawl implements Gear
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
     {
+        return new Catch(catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, false));
+    }
+
+    private double[] catchesAsArray(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, final boolean safeMode) {
         List<Species> species = modelBiology.getSpecies();
         double[] totalCatch = new double[modelBiology.getSize()];
         for(Species specie : species)
@@ -51,9 +56,16 @@ public class RandomCatchabilityTrawl implements Gear
             double q = fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[specie.getIndex()]
                     + catchabilityMeanPerSpecie[specie.getIndex()];
             totalCatch[specie.getIndex()] =
-                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
+                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q, safeMode);
         }
-        return new Catch(totalCatch);
+        return totalCatch;
+    }
+
+
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, true);
     }
 
     /**

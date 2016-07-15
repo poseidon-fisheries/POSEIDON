@@ -44,11 +44,11 @@ public class HillClimberAcquisitionFunctionTest {
         });
 
 
-        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state, null);
+        SeaTile pick = acquisitionFunction.pick(state.getMap(), regression, state, null,null );
         assertEquals(pick.getGridX(),25);
         assertEquals(pick.getGridY(),25);
 
-        pick = acquisitionFunction2.pick(state.getMap(), regression, state, null );
+        pick = acquisitionFunction2.pick(state.getMap(), regression, state, null,null );
         assertEquals(pick.getGridX(),25);
         assertEquals(pick.getGridY(),25);
 

@@ -28,6 +28,7 @@ public class HeterogeneousAbundanceGear implements Gear
 
 
 
+    @SafeVarargs
     public HeterogeneousAbundanceGear(Pair<Species,HomogeneousAbundanceGear>... gearPairs) {
         gears = new HashMap<>();
         for(Pair<Species,HomogeneousAbundanceGear> gearPair : gearPairs)
@@ -47,6 +48,11 @@ public class HeterogeneousAbundanceGear implements Gear
     {
         Preconditions.checkArgument(hoursSpentFishing>0);
         //create array containing biomass
+        return new Catch(catchesAsArray(where, hoursSpentFishing, modelBiology, false));
+    }
+
+    private double[] catchesAsArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, final boolean safeMode) {
         double[] biomassCaught = new  double[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
@@ -55,11 +61,17 @@ public class HeterogeneousAbundanceGear implements Gear
             while (hoursSpentFishingThisSpecies>0)
             {
                 biomassCaught[species.getIndex()] +=
-                        gears.get(species).fishThisSpecies(where, species, hoursSpentFishingThisSpecies);
+                        gears.get(species).fishThisSpecies(where, species, safeMode);
                 hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
             }
         }
-        return new Catch(biomassCaught);
+        return biomassCaught;
+    }
+
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesAsArray(where,hoursSpentFishing,modelBiology,true);
     }
 
     /**

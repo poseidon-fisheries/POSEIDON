@@ -1,8 +1,6 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -43,6 +41,14 @@ public class ProfitFunctionRegression implements GeographicalRegression<TripReco
 
     }
 
+    public ProfitFunctionRegression(ProfitFunction function,
+                                    GeographicalRegression<Double>[] catches)
+    {
+        this.catches=catches;
+        this.profit=function;
+
+    }
+
     @Override
     public double predict(
             SeaTile tile, double time, FishState state, Fisher fisher) {
@@ -77,9 +83,14 @@ public class ProfitFunctionRegression implements GeographicalRegression<TripReco
         for(int i=0; i<catches.length; i++)
             catches[i].addObservation(
                     new GeographicalObservation<>(observation.getTile(),observation.getTime(),
-                                                  observation.getValue().getTotalCatch()[i]),
+                                                  observation.getValue().getTotalCatch()[i] /
+                                                          observation.getValue().getEffort()),
                     fisher
             );
 
+    }
+
+    public GeographicalRegression<Double>[] catchesRegression() {
+        return catches;
     }
 }

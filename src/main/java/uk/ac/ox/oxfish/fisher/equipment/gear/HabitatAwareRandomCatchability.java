@@ -48,6 +48,17 @@ public class HabitatAwareRandomCatchability implements Gear {
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         List<Species> species = modelBiology.getSpecies();
+        double[] totalCatch = catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, species, false);
+        return new Catch(totalCatch);
+
+
+    }
+
+    private double[] catchesAsArray(
+            Fisher fisher, SeaTile where, int hoursSpentFishing,
+            GlobalBiology modelBiology,
+            List<Species> species,
+            final boolean safeMode) {
         double[] totalCatch = new double[modelBiology.getSize()];
         for(Species specie : species)
         {
@@ -57,13 +68,17 @@ public class HabitatAwareRandomCatchability implements Gear {
                     + rockCatchabilityMeanPerSpecie[specie.getIndex()];
 
             double q = sandyQ * (1d-where.getRockyPercentage()) + rockyQ * where.getRockyPercentage();
-            
+
             totalCatch[specie.getIndex()] =
-                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
+                    FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q, safeMode);
         }
-        return new Catch(totalCatch);
+        return totalCatch;
+    }
 
-
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, modelBiology.getSpecies(), true);
     }
 
     /**

@@ -30,19 +30,32 @@ public class FixedProportionGear implements Gear
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
 
-        double[] caught = new double[modelBiology.getSize()];
-        for (Species species : modelBiology.getSpecies())
-        {
-            if(proportionFished>0) {
-                double poundsCaught = FishStateUtilities.catchSpecieGivenCatchability(
-                        where,hoursSpentFishing,species,proportionFished);
-                caught[species.getIndex()] = poundsCaught;
-            }
-
-        }
-        return new Catch(caught);
+        return new Catch(catchesToArray(where, hoursSpentFishing, modelBiology, proportionFished, false));
     }
 
+
+    private double[] catchesToArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished, boolean safeMode)
+    {
+        //catch fish
+        double[] caught = new double[modelBiology.getSize()];
+        //for each species, same operation
+        for (Species species : modelBiology.getSpecies()) {
+            if (proportionFished > 0)
+                caught[species.getIndex()] = FishStateUtilities.catchSpecieGivenCatchability(
+                    where, hoursSpentFishing, species, proportionFished, safeMode);
+
+        }
+        return caught;
+    }
+
+
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesToArray(where, hoursSpentFishing, modelBiology, proportionFished, true);
+
+    }
 
     @Override
     public String toString() {

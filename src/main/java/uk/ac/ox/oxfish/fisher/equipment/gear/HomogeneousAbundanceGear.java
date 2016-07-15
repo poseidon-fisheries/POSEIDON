@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -46,34 +45,50 @@ public class HomogeneousAbundanceGear implements Gear {
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
     {
+        double[] biomassCaught = catchesToArray(where, hoursSpentFishing, modelBiology, false);
 
+
+        return new Catch(biomassCaught);
+
+
+    }
+
+    private double[] catchesToArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology,
+            final boolean safeMode) {
         //create array containing biomass
         double[] biomassCaught = new  double[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
             //you are going to fish every hour until you are done
             int hoursSpentFishingThisSpecies = hoursSpentFishing;
+
             while (hoursSpentFishingThisSpecies>0)
             {
                 biomassCaught[species.getIndex()] +=
-                        fishThisSpecies(where, species, hoursSpentFishingThisSpecies);
+                        fishThisSpecies(where, species, safeMode);
                 hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
             }
         }
-        return new Catch(biomassCaught);
+        return biomassCaught;
+    }
 
 
+    @Override
+    public double[] expectedHourlyCatch(
+            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        return catchesToArray(where,hoursSpentFishing,modelBiology,true);
     }
 
     /**
      * fish for one hour targeting one species and returns the biomass
-     * @param where
-     * @param species
-     * @param hoursSpentFishingThisSpecies
+     * @param where where the fishing occurs
+     * @param species the species considered
      * @return
      */
-    public double fishThisSpecies(
-            SeaTile where, Species species, int hoursSpentFishingThisSpecies) {
+    protected double fishThisSpecies(
+            SeaTile where, Species species,
+            boolean safeMode) {
         int[][] fish = new int[2][];
         fish[FishStateUtilities.MALE] = where.getNumberOfMaleFishPerAge(species);
         fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
@@ -83,21 +98,14 @@ public class HomogeneousAbundanceGear implements Gear {
                                  fish[FishStateUtilities.FEMALE],
                                  species);
 
-        //if you spent less than 1 hour fishing, then filter everything down even further
-        if(hoursSpentFishingThisSpecies<1)
-        {
-            FixedProportionFilter hourFilter = new FixedProportionFilter(hoursSpentFishingThisSpecies);
-            fish = hourFilter.filter(fish[FishStateUtilities.MALE],
-                                     fish[FishStateUtilities.FEMALE],
-                                     species);
-        }
+
 
         //now turn the catch into total biomass caught
         double weightCaught = FishStateUtilities.weigh(fish[FishStateUtilities.MALE],
                                                 fish[FishStateUtilities.FEMALE],
                                                 species);
         //tell the biology to react to it
-        if (weightCaught > 0)
+        if (weightCaught > 0 && !safeMode)
             where.reactToThisAmountOfFishBeingCaught(species,
                                                      fish[FishStateUtilities.MALE],
                                                      fish[FishStateUtilities.FEMALE]);

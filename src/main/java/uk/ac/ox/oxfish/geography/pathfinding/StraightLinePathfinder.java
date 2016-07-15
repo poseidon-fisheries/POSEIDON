@@ -1,8 +1,11 @@
 package uk.ac.ox.oxfish.geography.pathfinding;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -11,6 +14,11 @@ import java.util.LinkedList;
  * Created by carrknight on 11/4/15.
  */
 public class StraightLinePathfinder implements Pathfinder {
+
+
+
+    private Table<SeaTile,SeaTile,LinkedList<SeaTile>> precomputedPaths = HashBasedTable.create();
+
     /**
      * builds a path from start to end. No weird pathfinding here, simply move diagonally then horizontally-vertically when that's not possible anymore
      * @param map the nautical map
@@ -26,7 +34,19 @@ public class StraightLinePathfinder implements Pathfinder {
         int x = start.getGridX(); int endX = end.getGridX();
         int y = start.getGridY(); int endY =end.getGridY();
 
-        LinkedList<SeaTile> path = new LinkedList<>();
+
+        LinkedList<SeaTile> path = precomputedPaths.get(start,end);
+        if(path!=null)
+            return new LinkedList<>(path);
+
+        //maybe it's available in reverse
+        path = precomputedPaths.get(end,start);
+        if(path != null) {
+            LinkedList<SeaTile> reverse = new LinkedList<>(path);
+            Collections.reverse(reverse);
+            return reverse;
+        }
+        path = new LinkedList<>();
         path.add(start);
 
         while( x != endX || y!= endY)
@@ -67,6 +87,8 @@ public class StraightLinePathfinder implements Pathfinder {
 
         assert path.peekLast().equals(end);
         assert path.peekFirst().equals(start);
+
+        precomputedPaths.put(start,end,new LinkedList<>(path));
 
         return path;
 

@@ -38,7 +38,8 @@ public class LameTripSimulator {
         Port homePort = fisher.getHomePort();
         Deque<SeaTile> routeToAndFrom = state.getMap().getRoute(homePort.getLocation(), fishingSpot);
         //you need to go there
-        double distanceTravelled = pathDistance(routeToAndFrom,state.getMap());
+        double tripDistance = pathDistance(routeToAndFrom, state.getMap());
+        double distanceTravelled = tripDistance;
 
         timeSpentAtSea+= distanceTravelled/fisher.getBoat().getSpeedInKph();
         gasConsumed+= fisher.getBoat().expectedFuelConsumption(distanceTravelled);
@@ -80,8 +81,8 @@ public class LameTripSimulator {
         }
 
         //you need to come back
-        double returnTrip = pathDistance(state.getMap().getRoute(fishingSpot, homePort.getLocation()), state.getMap());
-        distanceTravelled+= returnTrip;
+        double returnTrip = tripDistance;
+        distanceTravelled+=returnTrip;
         timeSpentAtSea+= returnTrip/fisher.getBoat().getSpeedInKph();
         gasConsumed+= fisher.getBoat().expectedFuelConsumption(returnTrip);
 
