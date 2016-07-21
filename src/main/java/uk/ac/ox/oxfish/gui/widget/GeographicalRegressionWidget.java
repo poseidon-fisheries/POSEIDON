@@ -5,20 +5,25 @@ import org.metawidget.swing.SwingMetawidget;
 import org.metawidget.util.WidgetBuilderUtils;
 import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import sim.display.Display2D;
+import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.ProfitFunctionRegression;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.TriColorMap;
 import uk.ac.ox.oxfish.gui.drawing.ColorEncoding;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
+import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
 import uk.ac.ox.oxfish.model.FishState;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.function.Function;
@@ -132,6 +137,8 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
         public void actionPerformed(ActionEvent e)
         {
 
+            final FishState state = (FishState) gui.state;
+
             ColorfulGrid heatmapPortrayal = new ColorfulGrid(gui.guirandom);
             heatmapPortrayal.addEnconding(
                 "Heatmap",
@@ -140,13 +147,56 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                         new Function<SeaTile, Double>() {
                             @Override
                             public Double apply(SeaTile tile) {
-                                return regression.predict(tile, ((FishState) gui.state).
-                                        getHoursSinceStart(),(FishState) gui.state,
+                                return regression.predict(tile, state.
+                                        getHoursSinceStart(), state,
                                                           fisher);
                             }
                         },
                         false));
             Display2D heatmapDisplay = gui.setupPortrayal(heatmapPortrayal);
+
+            //add printout to clicks
+            NauticalMap map = ((FishState) gui.state).getMap();
+            CoordinateTransformer transformer = new CoordinateTransformer(heatmapDisplay,
+                                                                          map);
+            MouseListener heatmapClicker = new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    Int2D gridPosition = transformer.guiToGridPosition(e.getX(), e.getY());
+                    double predict = regression.predict(
+                            map.getSeaTile(gridPosition.getX(),gridPosition.getY()),
+                            state.getHoursSinceStart(),
+                            state,
+                            fisher);
+
+                    System.out.println(gridPosition +":---> " + predict );
+                    System.out.println(e.getX() + " --- " + e.getY());
+                    System.out.println("----------------------------------------------");
+
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            };
+            heatmapDisplay.insideDisplay.addMouseListener(heatmapClicker);
+
             JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap" + getText(),false);
             heatmapPortrayal.setSelectedEncoding("Heatmap");
             heatmapFrame.setVisible(true);

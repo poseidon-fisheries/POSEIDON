@@ -14,13 +14,10 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class NearestNeighborTransductionFactory implements AlgorithmFactory<NearestNeighborTransduction> {
 
 
-    private DoubleParameter timeBandwidth = new FixedDoubleParameter(500d);
+    private DoubleParameter timeBandwidth = new FixedDoubleParameter(1000d);
 
 
     private DoubleParameter spaceBandwidth = new FixedDoubleParameter(5d);
-
-
-    private DoubleParameter exponentialWeight = new FixedDoubleParameter(1d);
 
 
     /**
@@ -78,21 +75,4 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
     }
 
 
-    /**
-     * Getter for property 'exponentialWeight'.
-     *
-     * @return Value for property 'exponentialWeight'.
-     */
-    public DoubleParameter getExponentialWeight() {
-        return exponentialWeight;
-    }
-
-    /**
-     * Setter for property 'exponentialWeight'.
-     *
-     * @param exponentialWeight Value to set for property 'exponentialWeight'.
-     */
-    public void setExponentialWeight(DoubleParameter exponentialWeight) {
-        this.exponentialWeight = exponentialWeight;
-    }
 }

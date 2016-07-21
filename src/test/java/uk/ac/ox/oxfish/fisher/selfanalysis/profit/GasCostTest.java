@@ -41,6 +41,7 @@ public class GasCostTest {
                                                                       state, 24 * 5,
                                                                       new double[]{record.getSoldCatch()[0] / record.getEffort()});
                         assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
+                        assertEquals(simulated.getDurationInHours(),record.getDurationInHours(),.1d);
                         assertEquals(simulated.getEffort(),record.getEffort(),.001d);
                         assertEquals(simulated.getLitersOfGasConsumed(),record.getLitersOfGasConsumed(),.001d);
                     }

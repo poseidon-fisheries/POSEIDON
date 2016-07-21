@@ -66,7 +66,7 @@ public class Boat {
      */
     public double hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(double kilometersToTravel)
     {
-        Preconditions.checkArgument(kilometersToTravel > 0);
+      //  Preconditions.checkArgument(kilometersToTravel > 0);
         return kilometersToTravel/ engine.getSpeedInKph();
     }
 

@@ -62,7 +62,7 @@ public class ProfitFunctionRegression implements GeographicalRegression<TripReco
     }
 
     /**
-     * Applies this function to the given argument.
+     * Returns all the prediction of catches per hour in an array (indexed for species)
      *
      * @param tile the function argument
      * @return the function result

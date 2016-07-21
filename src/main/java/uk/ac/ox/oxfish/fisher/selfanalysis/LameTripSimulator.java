@@ -41,12 +41,12 @@ public class LameTripSimulator {
         double tripDistance = pathDistance(routeToAndFrom, state.getMap());
         double distanceTravelled = tripDistance;
 
-        timeSpentAtSea+= distanceTravelled/fisher.getBoat().getSpeedInKph();
+        timeSpentAtSea+= fisher.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distanceTravelled);
         gasConsumed+= fisher.getBoat().expectedFuelConsumption(distanceTravelled);
         //while there is still time, fish
         double maxWeight = fisher.getMaximumHold();
-        double expectedCatchesPerHour = Arrays.stream(expectedHourlyCatches).sum();
-        int hoursNeededToFillBoat = expectedCatchesPerHour>0? (int)Math.ceil(Math.round(maxWeight/expectedCatchesPerHour)) :
+        double expectedTotalCatchesPerHour = Arrays.stream(expectedHourlyCatches).sum();
+        int hoursNeededToFillBoat = expectedTotalCatchesPerHour>0? (int)Math.ceil(maxWeight/expectedTotalCatchesPerHour) :
                 (int)maxHoursOut;
         double fishingHours = Math.min(maxHoursOut-timeSpentAtSea,hoursNeededToFillBoat );
 
@@ -55,7 +55,7 @@ public class LameTripSimulator {
             double[] catches = new double[numberOfSpecies];
             for(int i=0; i<numberOfSpecies; i++)
             {
-                catches[i] = expectedCatchesPerHour * fishingHours;
+                catches[i] = expectedHourlyCatches[i] * fishingHours;
             }
             Hold.throwOverboard(catches,maxWeight);
             assert Arrays.stream(catches).sum() <= maxWeight;
@@ -80,11 +80,11 @@ public class LameTripSimulator {
             }
         }
 
+
         //you need to come back
-        double returnTrip = tripDistance;
-        distanceTravelled+=returnTrip;
-        timeSpentAtSea+= returnTrip/fisher.getBoat().getSpeedInKph();
-        gasConsumed+= fisher.getBoat().expectedFuelConsumption(returnTrip);
+        distanceTravelled+= tripDistance;
+        timeSpentAtSea+= fisher.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(tripDistance);
+        gasConsumed+= fisher.getBoat().expectedFuelConsumption(tripDistance);
 
         record.addToDistanceTravelled(distanceTravelled);
         record.recordGasConsumption(gasConsumed);
