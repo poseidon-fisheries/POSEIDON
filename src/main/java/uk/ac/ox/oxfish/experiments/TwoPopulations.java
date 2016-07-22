@@ -212,6 +212,11 @@ public class TwoPopulations {
                         fisher.setRegulation(new Anarchy());
                         poorFishers.add(fisher);
                     }
+                    else {
+                        fisher.getTags().add("ship");
+                        fisher.getTags().add("red");
+
+                    }
                 }
 
                 model.getYearlyDataSet().registerGatherer("Poor Fishers Total Income",

@@ -19,10 +19,7 @@ import sim.portrayal.simple.TrailedPortrayal2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
-import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
-import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
-import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
-import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
+import uk.ac.ox.oxfish.gui.drawing.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -60,7 +57,7 @@ public class FishGUI extends GUIState{
 
 
     private final ImageIcon portIcon;// = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
-    private final ImageIcon boatIcon;// = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/boat.png"));
+    private BoatPortrayalFactory boatPortrayalFactory;
     private final LinkedList<PolicyButton> policyButtons = new LinkedList<>();
 
 
@@ -89,7 +86,12 @@ public class FishGUI extends GUIState{
         mainPortrayal = new ColorfulGrid(guirandom);
 
         portIcon = new ImageIcon(IMAGES_PATH.resolve("anchor.png").toString());
-        boatIcon = new ImageIcon(IMAGES_PATH.resolve("boat.png").toString());
+
+        try {
+            boatPortrayalFactory = new BoatPortrayalFactory(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -181,18 +183,10 @@ public class FishGUI extends GUIState{
         trails.setPortrayalForAll(null);
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForRemainder(null);
-        SimplePortrayal2D boatPortrayal = new ImagePortrayal2D(boatIcon) {
-            @Override
-            public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
-                return wrapper == null ? null :
-                        new MetaInspector(wrapper.getObject(), self);
-            }
 
-
-        };
 
         for(Fisher o : state.getFishers()) {
-            assignPortrayalToFisher(boatPortrayal, o);
+            assignPortrayalToFisher(boatPortrayalFactory.build(o), o);
         }
         //start listening to the model for changes, but keep track of this because you need to stop listening
         //in the case of savings
@@ -206,7 +200,7 @@ public class FishGUI extends GUIState{
                     }
                     if (c.wasAdded())
                         for (Fisher fisher : c.getAddedSubList())
-                            assignPortrayalToFisher(boatPortrayal, fisher);
+                            assignPortrayalToFisher(boatPortrayalFactory.build(fisher), fisher);
 
                 }
             }

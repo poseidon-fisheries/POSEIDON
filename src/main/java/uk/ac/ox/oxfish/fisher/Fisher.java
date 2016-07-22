@@ -69,6 +69,10 @@ public class Fisher implements Steppable, Startable{
     private final int fisherID;
 
 
+    /**
+     * "tags" that can be added or removed at will. They have no explicit meaning or effect.
+     */
+    private final List<String> tags = new LinkedList<>();
 
     /**
      * contains most transitory variables related to the fisher
@@ -1183,4 +1187,12 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    /**
+     * Getter for property 'tags'.
+     *
+     * @return Value for property 'tags'.
+     */
+    public List<String> getTags() {
+        return tags;
+    }
 }

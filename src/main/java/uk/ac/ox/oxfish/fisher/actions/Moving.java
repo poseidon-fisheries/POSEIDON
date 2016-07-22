@@ -126,6 +126,8 @@ public class Moving implements Action
 
         if(!next.equals(agent.getLocation())) //if you have time to make at least one step
         {
+
+            assert  Math.abs(totalDistance/agent.getBoat().getSpeedInKph()- timeSpentTravelling)< FishStateUtilities.EPSILON;
             assert hoursLeft >= timeSpentTravelling;
             hoursLeft = hoursLeft - timeSpentTravelling;
             hoursLeft = Math.abs(hoursLeft) < FishStateUtilities.EPSILON ? 0 : hoursLeft;

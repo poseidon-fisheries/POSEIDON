@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
@@ -24,6 +25,8 @@ public class GasCostTest {
         scenario.setFishers(1);
         FishState state = new FishState();
         state.setScenario(scenario);
+        MaximumStepsFactory fishingStrategy = new MaximumStepsFactory();
+        scenario.setFishingStrategy(fishingStrategy);
         state.start();
 
 
@@ -41,6 +44,7 @@ public class GasCostTest {
                                                                       state, 24 * 5,
                                                                       new double[]{record.getSoldCatch()[0] / record.getEffort()});
                         assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
+                        assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
                         assertEquals(simulated.getDurationInHours(),record.getDurationInHours(),.1d);
                         assertEquals(simulated.getEffort(),record.getEffort(),.001d);
                         assertEquals(simulated.getLitersOfGasConsumed(),record.getLitersOfGasConsumed(),.001d);
