@@ -63,7 +63,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * This is the scenario that recreates the NETLOGO prototype model. This means a fake generated sea and coast
+ * This is the most general conceptual scenario we have. Almost everything is pluggable
  * Created by carrknight on 4/20/15.
  */
 public class PrototypeScenario implements Scenario {

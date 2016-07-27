@@ -13,14 +13,14 @@ import uk.ac.ox.oxfish.model.FishState;
 public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulation{
 
 
-    private final ProtectedAreasOnly mpaRules;
+    private final TemporaryProtectedArea mpaRules;
 
     private final FishingSeason fishingSeason;
 
     private final QuotaPerSpecieRegulation quotas;
 
     public KitchenSinkRegulation(
-            ProtectedAreasOnly mpaRules, FishingSeason fishingSeason,
+            TemporaryProtectedArea mpaRules, FishingSeason fishingSeason,
             QuotaPerSpecieRegulation quotas) {
         this.mpaRules = mpaRules;
         this.fishingSeason = fishingSeason;
@@ -100,7 +100,7 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public Regulation makeCopy() {
-        return new KitchenSinkRegulation(((ProtectedAreasOnly) mpaRules.makeCopy()),
+        return new KitchenSinkRegulation(((TemporaryProtectedArea) mpaRules.makeCopy()),
                                          ((FishingSeason) fishingSeason.makeCopy()),
                                          ((QuotaPerSpecieRegulation) quotas.makeCopy())
         );

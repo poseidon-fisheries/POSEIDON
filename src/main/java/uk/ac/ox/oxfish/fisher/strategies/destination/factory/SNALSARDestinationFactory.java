@@ -20,6 +20,15 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestinationStrategy> {
 
 
+
+    //1:safe
+    //2: not known to have failed
+    //3: legal
+    //4: appropriate
+    //5: known to have acceptable profits
+    //6: randomize
+
+
     /**
      * how does the agent choose what's safe and what isn't
      */

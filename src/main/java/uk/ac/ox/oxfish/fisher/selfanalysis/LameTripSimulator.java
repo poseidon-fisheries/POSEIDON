@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 import java.util.Deque;
@@ -46,9 +47,10 @@ public class LameTripSimulator {
         //while there is still time, fish
         double maxWeight = fisher.getMaximumHold();
         double expectedTotalCatchesPerHour = Arrays.stream(expectedHourlyCatches).sum();
-        int hoursNeededToFillBoat = expectedTotalCatchesPerHour>0? (int)Math.ceil(maxWeight/expectedTotalCatchesPerHour) :
+        int hoursNeededToFillBoat = expectedTotalCatchesPerHour>0? (int)
+                Math.ceil((maxWeight- FishStateUtilities.EPSILON)/expectedTotalCatchesPerHour) :
                 (int)maxHoursOut;
-        double fishingHours = Math.min(maxHoursOut-timeSpentAtSea,hoursNeededToFillBoat );
+        int fishingHours = (int) Math.min(maxHoursOut+1-timeSpentAtSea, hoursNeededToFillBoat );
 
         if(fishingHours>0)
         {
@@ -64,8 +66,8 @@ public class LameTripSimulator {
                             fisher,fisher.getBoat(),fishingSpot
                     ) * fishingHours;
 
-            record.recordFishing(new FishingRecord((int)fishingHours,fisher.getGear(),
-                                                   fishingSpot,new Catch(catches),
+            record.recordFishing(new FishingRecord(fishingHours, fisher.getGear(),
+                                                   fishingSpot, new Catch(catches),
                                                    fisher,
                                                    state.getStep()));
             //now check what can actually be sold

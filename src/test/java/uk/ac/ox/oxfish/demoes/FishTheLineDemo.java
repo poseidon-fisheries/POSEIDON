@@ -1,17 +1,15 @@
 package uk.ac.ox.oxfish.demoes;
 
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import sim.field.grid.IntGrid2D;
-import sim.util.geo.MasonGeometry;
-import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
-import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
+import uk.ac.ox.oxfish.experiments.FirstPaper;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * I write here in unit-test format the results of the demoes I show on the website. This will help make sure
@@ -29,48 +27,36 @@ public class FishTheLineDemo {
     //create an MPA, after people fish everything else there is to fish, they'll mostly fish just at the border of
     //the MPA
     @Test
-    public void fishTheLine()
-    {
+    public void fishTheLine() throws IOException {
 
-        int yearsBeforeCheck = 15;
-        int MPAx = 20;
-        int MPAy=20;
-        int MPAheight=10;
-        int MPAwidth = 10;
 
-        PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setBiologyInitializer(BiologyInitializers.CONSTRUCTORS.get("Diffusing Logistic").get());
-        scenario.setRegulation(new ProtectedAreasOnlyFactory());
-        scenario.setFishers(300);
-
-        FishState state = new FishState(System.currentTimeMillis(), 1);
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                FirstPaper.INPUT_FOLDER.resolve("mpa.yaml")));
+        Scenario scenario =  yaml.loadAs(scenarioYaml, Scenario.class);
+        FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
+
         state.start();
-        state.schedule.step(state);
-        CoordinateTransformer transformer = new CoordinateTransformer(null,state.getMap());
+        double[][] theGrid = new double[state.getMap().getWidth()][state.getMap().getHeight()];
 
-        //create the MPA
-        GeometricShapeFactory geometryFactory = new GeometricShapeFactory();
-        Point base = transformer.gridToJTSPoint(MPAx, MPAy);
-        Point end = transformer.gridToJTSPoint(MPAx+MPAwidth, MPAy + MPAheight);
-        geometryFactory.setBase( base.getCoordinate());
-        geometryFactory.setHeight(end.getY() - base.getY());
-        geometryFactory.setWidth(end.getX() - base.getX());
-        final Polygon rectangle = geometryFactory.createRectangle();
-        state.getMap().getMpaVectorField().addGeometry(new MasonGeometry(rectangle));
-        state.getMap().recomputeTilesMPA();
-
-
-        //make sure it drew correctly
-        Assert.assertTrue(state.getMap().getSeaTile(MPAx,MPAy).isProtected());
-        Assert.assertTrue(state.getMap().getSeaTile(MPAx+MPAwidth,MPAy+MPAwidth).isProtected());
-        Assert.assertFalse(state.getMap().getSeaTile(MPAx-1,MPAy-1).isProtected());
-        Assert.assertFalse(state.getMap().getSeaTile(MPAx+MPAwidth+1,MPAy+MPAwidth+1).isProtected());
-
-
-        //run it for a long time
-        while(state.getYear() <= yearsBeforeCheck)
+        while(state.getYear()<20)
+        {
             state.schedule.step(state);
+            IntGrid2D trawls = state.getMap().getDailyTrawlsMap();
+            for(int x =0; x<state.getMap().getWidth(); x++)
+            {
+                for (int y = 0; y < state.getMap().getHeight(); y++)
+                {
+                    theGrid[x][state.getMap().getHeight()-y-1] += trawls.get(x, y);
+                }
+            }
+        }
+
+        int mpaWidth= 15;
+        int topLeftX = 15;
+        int topLeftY = 10;
+        int height = 30;
 
         //now check the hotspots
         double allHotspots = 0;
@@ -82,10 +68,10 @@ public class FishTheLineDemo {
             {
                 double hotspot = hotspots.get(x, y);
                 allHotspots += hotspot;
-                if(x >=  MPAx - 1 && x <= MPAx + 1 + MPAwidth && y>= MPAy-1  && y<=MPAy + 1 + MPAheight)
+                if(x >=  topLeftX - 1 && x <= topLeftX + 1 + mpaWidth && y>= topLeftY-1  && y<=topLeftY + 1 + height)
                     onTheLine+= hotspot;
                 //also hotspot should be 0 in the MPA itself
-                if(x >=  MPAx && x <= MPAx + MPAwidth && y>= MPAy  && y<=MPAy  + MPAheight)
+                if(x >=  topLeftX && x <= topLeftX + mpaWidth && y>= topLeftY  && y<=topLeftY  + height)
                     Assert.assertEquals(0,hotspot,.0001);
             }
 

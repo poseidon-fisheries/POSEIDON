@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.KitchenSinkRegulation;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
+import uk.ac.ox.oxfish.model.regs.TemporaryProtectedArea;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -17,7 +17,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
     boolean individualTradeableQuotas = true;
 
 
-    final private ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
+    final private TemporaryProtectedAreasFactory mpa = new TemporaryProtectedAreasFactory();
 
     final private FishingSeasonFactory seasons = new FishingSeasonFactory();
 
@@ -39,7 +39,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      */
     @Override
     public KitchenSinkRegulation apply(FishState fishState) {
-        ProtectedAreasOnly subcomponent1 = mpa.apply(fishState);
+        TemporaryProtectedArea subcomponent1 = mpa.apply(fishState);
         FishingSeason subcomponent2 = seasons.apply(fishState);
         MultiQuotaRegulation subcomponent3;
         if(individualTradeableQuotas)
@@ -57,7 +57,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         return seasons;
     }
 
-    public ProtectedAreasOnlyFactory getMpa() {
+    public TemporaryProtectedAreasFactory getMpa() {
         return mpa;
     }
 

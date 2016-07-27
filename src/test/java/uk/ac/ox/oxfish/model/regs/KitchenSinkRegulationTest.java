@@ -15,7 +15,7 @@ public class KitchenSinkRegulationTest {
     @Test
     public void simpleChecks() throws Exception {
 
-        ProtectedAreasOnly mpa = mock(ProtectedAreasOnly.class);
+        TemporaryProtectedArea mpa = mock(TemporaryProtectedArea.class);
         FishingSeason season = mock(FishingSeason.class);
         QuotaPerSpecieRegulation quota = mock(QuotaPerSpecieRegulation.class);
 

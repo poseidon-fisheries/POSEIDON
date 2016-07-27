@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions;
 
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
 /**
  * Every action returns the next action to take and a boolean telling whether the action takes place this turn
  * or the next
@@ -15,7 +13,7 @@ public class ActionResult
 
     public ActionResult(Action nextState, double hoursLeft) {
         this.nextState = nextState;
-        this.hoursLeft = FishStateUtilities.round(hoursLeft);
+        this.hoursLeft = hoursLeft;
     }
 
     public Action getNextState() {

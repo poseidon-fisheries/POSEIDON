@@ -31,5 +31,10 @@ public class Scenarios {
         SCENARIOS.put("California Map Scenario", new CaliforniaBathymetryScenario());
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +
                 "from bathymetry data");
+
+
+        SCENARIOS.put("Abstract 2 Populations",new TwoPopulationsScenario());
+        DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
+
     }
 }

@@ -79,13 +79,14 @@ public class Hold {
     public static void throwOverboard(double[] fishHold,double maximumLoad)
     {
         double currentLoad=  Arrays.stream(fishHold).sum();
-        double proportionToKeep = maximumLoad/currentLoad;
-        assert proportionToKeep <= 1 && proportionToKeep >= 0;
-        for(int i=0;i< fishHold.length; i++)
+        if(currentLoad>maximumLoad)
         {
-            fishHold[i] *= proportionToKeep;
+            double proportionToKeep = maximumLoad / (currentLoad);
+            assert proportionToKeep <= 1 && proportionToKeep >= 0 : proportionToKeep;
+            for (int i = 0; i < fishHold.length; i++) {
+                fishHold[i] *= proportionToKeep;
+            }
         }
-
     }
 
     public double getTotalPoundsCarried() {

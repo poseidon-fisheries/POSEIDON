@@ -119,4 +119,49 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     public int getNumberOfSpecies() {
         return numberOfSpecies;
     }
+
+    /**
+     * Getter for property 'rockyCarryingCapacity'.
+     *
+     * @return Value for property 'rockyCarryingCapacity'.
+     */
+    public DoubleParameter getRockyCarryingCapacity() {
+        return rockyCarryingCapacity;
+    }
+
+    /**
+     * Getter for property 'sandyCarryingCapacity'.
+     *
+     * @return Value for property 'sandyCarryingCapacity'.
+     */
+    public DoubleParameter getSandyCarryingCapacity() {
+        return sandyCarryingCapacity;
+    }
+
+    /**
+     * Getter for property 'steepness'.
+     *
+     * @return Value for property 'steepness'.
+     */
+    public DoubleParameter getSteepness() {
+        return steepness;
+    }
+
+    /**
+     * Getter for property 'percentageLimitOnDailyMovement'.
+     *
+     * @return Value for property 'percentageLimitOnDailyMovement'.
+     */
+    public double getPercentageLimitOnDailyMovement() {
+        return percentageLimitOnDailyMovement;
+    }
+
+    /**
+     * Getter for property 'differentialPercentageToMove'.
+     *
+     * @return Value for property 'differentialPercentageToMove'.
+     */
+    public double getDifferentialPercentageToMove() {
+        return differentialPercentageToMove;
+    }
 }

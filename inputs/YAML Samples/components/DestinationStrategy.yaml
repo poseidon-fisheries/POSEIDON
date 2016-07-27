@@ -57,3 +57,36 @@ SNALSAR:
   safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
+Heatmap Based:
+  acquisition:
+    Exhaustive Search:
+      proportionSearched: '1.0'
+  explorationStepSize: uniform 1.0 10.0
+  ignoreFailedTrips: false
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '1.0'
+  regression:
+    Nearest Neighbor:
+      neighbors: '1.0'
+      spaceBandwidth: '5.0'
+      timeBandwidth: '500.0'
+-------
+Heatmap Planning:
+  acquisition:
+    Exhaustive Search:
+      proportionSearched: '1.0'
+  almostPerfectKnowledge: false
+  explorationStepSize: uniform 1.0 10.0
+  ignoreFailedTrips: false
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '1.0'
+  regression:
+    Nearest Neighbor:
+      neighbors: '1.0'
+      spaceBandwidth: '5.0'
+      timeBandwidth: '500.0'
+-------

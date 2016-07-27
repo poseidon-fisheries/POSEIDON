@@ -38,6 +38,10 @@ public class BiologyInitializers {
                          RockyLogisticFactory::new);
         NAMES.put(RockyLogisticFactory.class,"Habitat-Aware Diffusing Logistic");
 
+        CONSTRUCTORS.put("Habitat-Aware 2 Species",
+                         TwoSpeciesRockyLogisticFactory::new);
+        NAMES.put(TwoSpeciesRockyLogisticFactory.class,"Habitat-Aware 2 Species");
+
 
         CONSTRUCTORS.put("From Left To Right Fixed",
                          FromLeftToRightFactory::new);
