@@ -16,6 +16,13 @@ Habitat-Aware Diffusing Logistic:
   sandyCarryingCapacity: '2000.0'
   steepness: uniform 0.6 0.8
 -------
+Habitat-Aware 2 Species:
+  differentialPercentageToMove: '0.001'
+  percentageLimitOnDailyMovement: '0.01'
+  rockyCarryingCapacity: '10000.0'
+  sandyCarryingCapacity: '2000.0'
+  steepness: uniform 0.6 0.8
+-------
 From Left To Right Fixed:
   biologySmoothingIndex: '1000000.0'
   maximumBiomass: '5000.0'

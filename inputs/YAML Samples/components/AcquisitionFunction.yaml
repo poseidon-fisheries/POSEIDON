@@ -1,0 +1,6 @@
+Exhaustive Search:
+  proportionSearched: '1.0'
+-------
+Hill-Climber Acquisition:
+  stepSize: '1.0'
+-------

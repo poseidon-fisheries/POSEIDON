@@ -22,7 +22,7 @@ public class AtPort implements Action {
     public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft)
     {
 
-        if(regulation.allowedAtSea(agent, model)
+        if( (regulation.allowedAtSea(agent, model) || agent.isCheater() )
                 &&
                 agent.shouldFisherLeavePort(model))
         {

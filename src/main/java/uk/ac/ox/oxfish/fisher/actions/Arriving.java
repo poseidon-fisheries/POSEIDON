@@ -25,7 +25,7 @@ public class Arriving implements Action{
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
             return new ActionResult(new Docking(),hoursLeft);
 
-        if(regulation.canFishHere(agent,agent.getLocation(), model)
+        if( (regulation.canFishHere(agent,agent.getLocation(), model) || agent.isCheater())
                 &&
                 agent.shouldIFish(model) ) //if you want to fish
             return new ActionResult(new Fishing(),hoursLeft);

@@ -91,6 +91,12 @@ public class Fisher implements Steppable, Startable{
     private FishState state;
 
 
+    /**
+     * when true the agent can ignore the rules (depending on what the strategies tell him to do)
+     */
+    private boolean cheater = false;
+
+
 
     /***
      *      ___           _                    _
@@ -524,7 +530,9 @@ public class Fisher implements Steppable, Startable{
 
 
         //if you are not allowed at sea or you are running out of gas, go home
-        if(!status.getRegulation().allowedAtSea(this, model) || status.isAnyEmergencyFlagOn())
+        if(
+                (!status.getRegulation().allowedAtSea(this, model) && !cheater )
+                        || status.isAnyEmergencyFlagOn())
             status.setDestination(status.getHomePort().getLocation());
         else
             status.setDestination(
@@ -1194,5 +1202,23 @@ public class Fisher implements Steppable, Startable{
      */
     public List<String> getTags() {
         return tags;
+    }
+
+    /**
+     * Getter for property 'cheater'.
+     *
+     * @return Value for property 'cheater'.
+     */
+    public boolean isCheater() {
+        return cheater;
+    }
+
+    /**
+     * Setter for property 'cheater'.
+     *
+     * @param cheater Value to set for property 'cheater'.
+     */
+    public void setCheater(boolean cheater) {
+        this.cheater = cheater;
     }
 }

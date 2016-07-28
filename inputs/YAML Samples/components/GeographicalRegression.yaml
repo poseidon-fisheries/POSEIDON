@@ -1,0 +1,29 @@
+Space Only Kernel:
+  maximumNumberOfObservations: '100.0'
+  spaceBandwidth: '5.0'
+-------
+Space and Time Kernel:
+  maximumNumberOfObservations: '100.0'
+  spaceBandwidth: '5.0'
+  timeBandwidth: '1000.0'
+-------
+Nearest Neighbor:
+  neighbors: '1.0'
+  spaceBandwidth: '5.0'
+  timeBandwidth: '500.0'
+-------
+Nearest Neighbor Transduction:
+  spaceBandwidth: '5.0'
+  timeBandwidth: '1000.0'
+-------
+Kernel Transduction:
+  forgettingFactor: '1.0'
+  spaceBandwidth: '5.0'
+-------
+5 Parameters Kernel Transduction:
+  distanceFromPortBandwidth: '1.0'
+  forgettingFactor: '0.95'
+  habitatBandwidth: '1.0'
+  randomBandwidth: '100000.0'
+  spaceBandwidth: '5.0'
+-------

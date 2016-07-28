@@ -94,6 +94,12 @@ public class PrototypeScenario implements Scenario {
     private int fishers = 100;
 
 
+    /**
+     * are agents allowed to cheat?
+     */
+    private boolean cheaters = false;
+
+
 
     /**
      * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
@@ -324,6 +330,7 @@ public class PrototypeScenario implements Scenario {
                                           new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
 
 
+            newFisher.setCheater(cheaters);
             //todo move this somewhere else
             newFisher.addFeatureExtractor(
                     SNALSARutilities.PROFIT_FEATURE,
@@ -337,8 +344,8 @@ public class PrototypeScenario implements Scenario {
                                 Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
                             double averageProfits = model.getLatestDailyObservation(
                                     FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
-                            return new FixedMap<SeaTile, Double>(averageProfits,
-                                                                 toRepresent) ;
+                            return new FixedMap<>(averageProfits,
+                                                  toRepresent) ;
                         }
                     }
             );
@@ -669,5 +676,23 @@ public class PrototypeScenario implements Scenario {
     public void setGearStrategy(
             AlgorithmFactory<? extends GearStrategy> gearStrategy) {
         this.gearStrategy = gearStrategy;
+    }
+
+    /**
+     * Getter for property 'cheaters'.
+     *
+     * @return Value for property 'cheaters'.
+     */
+    public boolean isCheaters() {
+        return cheaters;
+    }
+
+    /**
+     * Setter for property 'cheaters'.
+     *
+     * @param cheaters Value to set for property 'cheaters'.
+     */
+    public void setCheaters(boolean cheaters) {
+        this.cheaters = cheaters;
     }
 }

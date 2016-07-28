@@ -44,11 +44,12 @@ public class Fishing implements Action
         Preconditions.checkArgument(agent.isAtDestination()); //you arrived
         Preconditions.checkArgument(agent.getLocation().getAltitude() <= 0); //you are at sea
         Preconditions.checkState(
-                regulation.canFishHere(agent, agent.getLocation(), model) || accruedHours > 0); //i should be allowed to fish here!
+                regulation.canFishHere(agent, agent.getLocation(), model) || accruedHours > 0 ||
+        agent.isCheater()); //i should be allowed to fish here!
 
         //there is a possibility that you were allowed to fish last step but you didn't have enough time to do it
         //you waited till this new step but now the season is over. Tough luck, I am afraid it's time to go home
-        if(!regulation.canFishHere(agent,agent.getLocation(),model))
+        if(!regulation.canFishHere(agent,agent.getLocation(),model) && !agent.isCheater())
         {
             assert  accruedHours > 0;
             return new ActionResult(new Arriving(),hoursLeft);

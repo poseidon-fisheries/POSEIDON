@@ -40,8 +40,10 @@ Multi-TAC by List:
   yearlyQuotaMaps: 0:500000
 -------
 Kitchen Sink:
+  duration: '300.0'
   individualTradeableQuotas: true
   seasonLength: '200.0'
+  startDay: '0.0'
   yearlyQuotaMaps: 0:5000
 -------
 Multi-Quotas from Map:

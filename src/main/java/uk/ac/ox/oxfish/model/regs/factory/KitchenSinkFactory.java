@@ -86,4 +86,40 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         itqFactory.setYearlyQuotaMaps(yearlyQuotaMaps);
         tacFactory.setYearlyQuotaMaps(yearlyQuotaMaps);
     }
+
+    /**
+     * Getter for property 'startDay'.
+     *
+     * @return Value for property 'startDay'.
+     */
+    public DoubleParameter getStartDay() {
+        return getMpa().getStartDay();
+    }
+
+    /**
+     * Setter for property 'startDay'.
+     *
+     * @param startDay Value to set for property 'startDay'.
+     */
+    public void setStartDay(DoubleParameter startDay) {
+        getMpa().setStartDay(startDay);
+    }
+
+    /**
+     * Getter for property 'duration'.
+     *
+     * @return Value for property 'duration'.
+     */
+    public DoubleParameter getDuration() {
+        return getMpa().getDuration();
+    }
+
+    /**
+     * Setter for property 'duration'.
+     *
+     * @param duration Value to set for property 'duration'.
+     */
+    public void setDuration(DoubleParameter duration) {
+        getMpa().setDuration(duration);
+    }
 }

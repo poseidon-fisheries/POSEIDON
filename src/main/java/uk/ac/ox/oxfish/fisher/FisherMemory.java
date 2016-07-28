@@ -74,8 +74,8 @@ public class FisherMemory implements Serializable, FisherStartable {
 
 
     public FisherMemory() {
-        this(new LocationMemories<>(.99, 300, 2),
-             new LocationMemories<>(.99, 300, 2));
+        this(new LocationMemories<>(.99, 3000, 2),
+             new LocationMemories<>(.99, 3000, 2));
     }
 
     public FisherMemory(
