@@ -28,6 +28,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
     public KitchenSinkFactory() {
         //we are going to sync them
         tacFactory.setYearlyQuotaMaps(itqFactory.getYearlyQuotaMaps());
+
     }
 
 
@@ -41,6 +42,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
     public KitchenSinkRegulation apply(FishState fishState) {
         TemporaryProtectedArea subcomponent1 = mpa.apply(fishState);
         FishingSeason subcomponent2 = seasons.apply(fishState);
+
         MultiQuotaRegulation subcomponent3;
         if(individualTradeableQuotas)
             subcomponent3 = itqFactory.apply(fishState);

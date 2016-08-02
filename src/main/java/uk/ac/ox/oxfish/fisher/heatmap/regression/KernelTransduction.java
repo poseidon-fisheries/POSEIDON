@@ -73,6 +73,17 @@ public class KernelTransduction implements GeographicalRegression<Double> {
         return         kernels.values().iterator().next().getDistances();
     }
 
+    //ignored
 
+    @Override
+    public void start(FishState model) {
 
+    }
+
+    //ignored
+
+    @Override
+    public void turnOff() {
+
+    }
 }

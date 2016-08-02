@@ -144,6 +144,22 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
         this.bandwidth = bandwidth;
     }
 
+    /**
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+     * or just to percolate a reference to the model
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(FishState model) {
+        
+    }
 
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
 
+    }
 }

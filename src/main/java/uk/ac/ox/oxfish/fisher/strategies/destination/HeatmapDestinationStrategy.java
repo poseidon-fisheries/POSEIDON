@@ -92,6 +92,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         else
             lastFriendTripRecorded = new HashMap<>(0);
         fisher.addTripListener(this);
+        profitRegression.start(model);
     }
 
     @Override
@@ -100,13 +101,15 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         lastFriendTripRecorded.clear();
         fisher=null;
         model=null;
+        profitRegression.turnOff();
+        profitRegression = null;
     }
 
 
     protected void learnFromTripRecord(
             TripRecord record, SeaTile mostFishedTile, final Fisher fisher, final FishState model)
     {
-        profitRegression.addObservation(new GeographicalObservation(
+        profitRegression.addObservation(new GeographicalObservation<>(
                 mostFishedTile,
                 model.getHoursSinceStart(),
                 record.getProfitPerHour(true)

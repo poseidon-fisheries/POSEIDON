@@ -23,6 +23,7 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
             TemporaryProtectedArea mpaRules, FishingSeason fishingSeason,
             QuotaPerSpecieRegulation quotas) {
         this.mpaRules = mpaRules;
+        fishingSeason.setRespectMPAs(false);
         this.fishingSeason = fishingSeason;
         this.quotas = quotas;
     }
@@ -45,8 +46,8 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
             Fisher agent, SeaTile tile, FishState model) {
         return
                 mpaRules.canFishHere(agent,tile,model) &&
-                        fishingSeason.canFishHere(agent,tile,model) &&
-                        quotas.canFishHere(agent,tile,model);
+                        fishingSeason.allowedAtSea(agent,model) &&
+                        quotas.allowedAtSea(agent,model);
 
     }
 

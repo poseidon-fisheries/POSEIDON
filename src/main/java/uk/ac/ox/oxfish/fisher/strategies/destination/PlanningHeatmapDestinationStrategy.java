@@ -92,5 +92,18 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
                 GeographicalObservation<Double> observation, Fisher fisher) {
 
         }
+
+        //ignored
+
+        @Override
+        public void start(FishState model) {
+
+        }
+
+        //ignored
+        @Override
+        public void turnOff() {
+
+        }
     }
 }

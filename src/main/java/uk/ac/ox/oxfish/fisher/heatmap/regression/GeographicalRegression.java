@@ -3,12 +3,13 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
 
 /**
  * Anything that predicts over a geographical map
  * Created by carrknight on 6/27/16.
  */
-public interface GeographicalRegression<V>
+public interface GeographicalRegression<V> extends Startable
 {
 
 

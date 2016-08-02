@@ -100,4 +100,13 @@ public class FishingSeason implements Regulation
     public Regulation makeCopy() {
         return new FishingSeason(respectMPAs,daysOpened);
     }
+
+    /**
+     * Setter for property 'respectMPAs'.
+     *
+     * @param respectMPAs Value to set for property 'respectMPAs'.
+     */
+    public void setRespectMPAs(boolean respectMPAs) {
+        this.respectMPAs = respectMPAs;
+    }
 }

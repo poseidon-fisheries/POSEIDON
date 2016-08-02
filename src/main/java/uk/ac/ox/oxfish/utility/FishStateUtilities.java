@@ -688,5 +688,20 @@ public class FishStateUtilities {
         if (!f.delete())
             throw new FileNotFoundException("Failed to delete file: " + f);
     }
+
+
+    public static Function<Double,Double> normalPDF(double mean, double standardDeviation)
+    {
+        return new Function<Double,Double>(){
+
+
+            @Override
+            public Double apply(Double x) {
+                return Math.exp(-Math.pow(x - mean, 2) / (2 * standardDeviation * standardDeviation)) /
+                        Math.sqrt(2 * standardDeviation * standardDeviation * Math.PI);
+
+            }
+        };
+    }
 }
 

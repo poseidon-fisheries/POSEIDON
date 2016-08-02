@@ -58,6 +58,12 @@ public class GeographicalRegressions {
                   "5 Parameters Kernel Transduction");
 
 
+        CONSTRUCTORS.put("Particle Filter Regression",
+                         ParticleFilterRegressionFactory::new);
+        NAMES.put(ParticleFilterRegressionFactory.class,
+                  "Particle Filter Regression");
+
+
 
     }
 }

@@ -23,6 +23,13 @@ public class KitchenSinkRegulationTest {
                                                                season,
                                                                quota);
 
+        //same exact process for "can I be out?"
+        when(mpa.allowedAtSea(any(),any())).thenReturn(true);
+        when(season.allowedAtSea(any(),any())).thenReturn(true);
+        when(quota.allowedAtSea(any(),any())).thenReturn(true);
+        assertTrue(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
+        when(mpa.allowedAtSea(any(),any())).thenReturn(false);
+        assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
 
         //all true, return true
         when(mpa.canFishHere(any(),any(),any())).thenReturn(true);
@@ -40,13 +47,7 @@ public class KitchenSinkRegulationTest {
 
 
 
-        //same exact process for "can I be out?"
-        when(mpa.allowedAtSea(any(),any())).thenReturn(true);
-        when(season.allowedAtSea(any(),any())).thenReturn(true);
-        when(quota.allowedAtSea(any(),any())).thenReturn(true);
-        assertTrue(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
-        when(quota.allowedAtSea(any(),any())).thenReturn(false);
-        assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
+
 
         when(season.allowedAtSea(any(),any())).thenReturn(false);
         assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));

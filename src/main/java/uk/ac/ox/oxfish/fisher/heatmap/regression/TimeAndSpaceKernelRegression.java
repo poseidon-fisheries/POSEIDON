@@ -104,4 +104,16 @@ public class TimeAndSpaceKernelRegression implements GeographicalRegression<Doub
     public int getMaximumNumberOfObservationsSpace() {
         return spaceRegression.getMaximumNumberOfObservations();
     }
+
+
+    @Override
+    public void start(FishState model) {
+
+    }
+
+
+    @Override
+    public void turnOff() {
+
+    }
 }

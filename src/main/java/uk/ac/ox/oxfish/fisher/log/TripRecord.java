@@ -141,7 +141,7 @@ public class TripRecord {
      * @return profits/days
      * @param includingOpportunityCosts
      */
-    public double getProfitPerHour(boolean includingOpportunityCosts)
+    public Double getProfitPerHour(boolean includingOpportunityCosts)
     {
 
         double totalEarnings = DoubleStream.of(earningsPerSpecie).sum();

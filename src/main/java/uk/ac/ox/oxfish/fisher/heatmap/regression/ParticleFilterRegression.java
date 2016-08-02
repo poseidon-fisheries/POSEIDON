@@ -1,0 +1,194 @@
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
+
+import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.engine.Stoppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.Belief;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.ParticleFilter;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+/**
+ *A geographical regression which at its core is just a long hash map of separate
+ *
+ * Created by carrknight on 8/1/16.
+ */
+public class ParticleFilterRegression implements GeographicalRegression<Double> {
+
+
+    private final HashMap<SeaTile,ParticleFilter<Double>> filters = new HashMap<>();
+
+
+    /**
+     * the % increase per unit of distance in evidence variance
+     */
+    private final double distanceNoise;
+
+    /**
+     * the standard deviation  of p(e|X)~N(observation,.)
+     */
+    private final double evidenceDeviation;
+
+    /**
+     * standard deviation of the daily shock to each particle applied
+     */
+    private final double temporalDrift;
+
+    private final int filterSizes;
+
+    private final NauticalMap map;
+
+    private final MersenneTwisterFast random;
+
+    private final double minValue;
+
+    private final double maxValue;
+    private Stoppable receipt;
+
+
+    public ParticleFilterRegression(
+            double distanceNoise, double evidenceDeviation, double temporalDrift, int filterSizes,
+            NauticalMap map, MersenneTwisterFast random, double minValue, double maxValue) {
+        this.distanceNoise = distanceNoise;
+        this.evidenceDeviation = evidenceDeviation;
+        this.temporalDrift = temporalDrift;
+        this.filterSizes = filterSizes;
+        this.map = map;
+        this.random = random;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+
+        List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
+        for(SeaTile tile : tiles)
+            filters.put(tile,ParticleFilter.defaultParticleFilter(minValue,
+                                                           maxValue,
+                                                           temporalDrift,
+                                                           filterSizes,
+                                                           random));
+    }
+
+    /**
+     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+     * or just to percolate a reference to the model
+     *
+     * @param model the model
+     */
+    @Override
+    public void start(FishState model) {
+
+        //every morning drift out a bit
+        receipt = model.scheduleEveryDay(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                for (ParticleFilter<Double> filter : filters.values())
+                    filter.drift(random);
+            }
+        }, StepOrder.DAWN);
+
+    }
+
+    /**
+     * tell the startable to turnoff,
+     */
+    @Override
+    public void turnOff() {
+        if(receipt!=null)
+            receipt.stop();
+    }
+
+    @Override
+    public double predict(
+            SeaTile tile, double time, FishState state, Fisher fisher) {
+        return getMean(tile);
+    }
+
+    @Override
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher) {
+
+        for(Map.Entry<SeaTile,ParticleFilter<Double>> filter : filters.entrySet())
+        {
+            double distance = map.distance(observation.getTile(),filter.getKey());
+            double totalDeviation = evidenceDeviation * (1 + distanceNoise * distance);
+            Function<Double, Double> evidenceProbability = FishStateUtilities.normalPDF(
+                    observation.getValue(), totalDeviation
+            );
+            //if there is a meaningful difference between probability max and min then there is some value in this
+            if(totalDeviation < (maxValue-minValue)/2)
+                filter.getValue().updateGivenEvidence(
+                        evidenceProbability, random);
+
+        }
+
+    }
+
+    public double getMean(SeaTile tile){
+        ParticleFilter<Double> filter = filters.get(tile);
+        if(filter == null)
+            return Double.NaN;
+        else
+        {
+            Belief<Double> belief = filter.getBelief();
+            if(belief.getTotalWeight()<=0)
+                return Double.NaN;
+            double mean = 0;
+            for (Map.Entry<Double, Double> temp : belief.getCdf().entrySet())
+            {
+                mean += temp.getKey() * temp.getValue();
+            }
+            return mean;
+        }
+
+
+    }
+
+    public double getStandardDeviation(SeaTile tile){
+        ParticleFilter<Double> filter = filters.get(tile);
+        return Belief.getSummaryStatistics(filter.getBelief())[1];
+
+
+    }
+
+    public double getDistanceNoise() {
+        return distanceNoise;
+    }
+
+    public double getEvidenceDeviation() {
+        return evidenceDeviation;
+    }
+
+    public double getTemporalDrift() {
+        return temporalDrift;
+    }
+
+    public int getFilterSizes() {
+        return filterSizes;
+    }
+
+    public NauticalMap getMap() {
+        return map;
+    }
+
+    public MersenneTwisterFast getRandom() {
+        return random;
+    }
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
+    }
+
+
+}

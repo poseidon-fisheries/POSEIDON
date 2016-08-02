@@ -93,4 +93,19 @@ public class ProfitFunctionRegression implements GeographicalRegression<TripReco
     public GeographicalRegression<Double>[] catchesRegression() {
         return catches;
     }
+
+
+    //ignored
+
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    //ignored
+
+    @Override
+    public void turnOff() {
+
+    }
 }

@@ -28,6 +28,8 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     private final FishState state;
 
+    private boolean respectMPA = true;
+
     public MultiQuotaRegulation(double[] yearlyQuota, FishState state) {
         this.yearlyQuota = Arrays.copyOf(yearlyQuota,yearlyQuota.length);
         this.quotaRemaining = Arrays.copyOf(yearlyQuota,yearlyQuota.length);
@@ -131,7 +133,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     @Override
     public boolean canFishHere(
             Fisher agent, SeaTile tile, FishState model) {
-        return isFishingStillAllowed() && !tile.isProtected();
+        return isFishingStillAllowed() && (!tile.isProtected() || !respectMPA);
     }
 
     @Override
@@ -173,5 +175,24 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     public int getNumberOfSpeciesTracked(){
         return getYearlyQuota().length;
+    }
+
+
+    /**
+     * Getter for property 'respectMPA'.
+     *
+     * @return Value for property 'respectMPA'.
+     */
+    public boolean isRespectMPA() {
+        return respectMPA;
+    }
+
+    /**
+     * Setter for property 'respectMPA'.
+     *
+     * @param respectMPA Value to set for property 'respectMPA'.
+     */
+    public void setRespectMPA(boolean respectMPA) {
+        this.respectMPA = respectMPA;
     }
 }

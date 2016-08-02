@@ -64,4 +64,18 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
                 closestNeighborForNow.put(tile,newObservation);
         }
     }
+
+    //ignored
+
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    //ignored
+
+    @Override
+    public void turnOff() {
+
+    }
 }
