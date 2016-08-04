@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.HabitatRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDifferenceRegressionDistance;

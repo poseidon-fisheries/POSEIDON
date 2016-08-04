@@ -77,14 +77,15 @@ public class ProfitFunction {
         return costs;
     }
 
-    public double hourlyProfitFromHypotheticalTripHere(Fisher fisher, SeaTile where, FishState state,
-                                                       Function<SeaTile,double[]> catchExpectations)
+    public double hourlyProfitFromHypotheticalTripHere(
+            Fisher fisher, SeaTile where, FishState state,
+            Function<SeaTile, double[]> catchExpectations, boolean verbose)
     {
         return hourlyProfitFromThisTrip(fisher,
                                         simulator.simulateRecord(fisher,
                                                                  where,
                                                                  state,
-                                                                 maxHours,catchExpectations.apply(where)),
+                                                                 maxHours, catchExpectations.apply(where), verbose),
                                         state);
     }
 

@@ -50,13 +50,12 @@ public class ArrayWidgetProcessor implements WidgetProcessor<JComponent,SwingMet
                             FishStateUtilities.deepToStringArray(
                                     PropertyUtils.getProperty(metawidget.getToInspect(), address), " , ","|");
 
-                    System.out.println(toDisplay);
                     JLabel label = new JLabel(toDisplay);
 
                     widget.add(label);
                 }
             } catch (Exception e) {
-                Log.error("cannot display " + elementName);
+                Log.trace("cannot display " + attributes.get("name"));
 
             }
         }

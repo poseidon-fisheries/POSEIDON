@@ -7,8 +7,8 @@ import org.metawidget.widgetbuilder.iface.WidgetBuilder;
 import sim.display.Display2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.ProfitFunctionRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.FishGUI;
@@ -25,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -62,7 +63,6 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
         if(actualClass == null || !GeographicalRegression.class.isAssignableFrom(actualClass))
             return null;
 
-        //it's a MarketMap
         try {
             String[] path = metawidget.getPath().split("/");
             //nested address? no problem
@@ -80,10 +80,10 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                 JPanel panel = new JPanel(null);
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
                 panel.add(
-                 new GeographicalRegressionJButton(gui, regression,
-                                                         metawidget.getToInspect(),
-                                                         attributes.get("name")
-                ));
+                        new GeographicalRegressionJButton(gui, regression,
+                                                          metawidget.getToInspect(),
+                                                          attributes.get("name")
+                        ));
                 //now add all the species
                 panel.add(new JSeparator());
                 GeographicalRegression[] regressions = ((ProfitFunctionRegression) regression).catchesRegression();
@@ -140,19 +140,29 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
             final FishState state = (FishState) gui.state;
 
             ColorfulGrid heatmapPortrayal = new ColorfulGrid(gui.guirandom);
+            java.util.List<SeaTile> tiles = state.getMap().getAllSeaTilesExcludingLandAsList();
+            DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+            for(SeaTile tile : tiles) {
+                double predict = regression.predict(tile, state.getHoursSinceStart(), state, fisher);
+                if(Double.isFinite(predict))
+                    statistics.accept(predict);
+            }
+
             heatmapPortrayal.addEnconding(
-                "Heatmap",
-                new ColorEncoding(
-                        new TriColorMap(0, 10, 100, Color.RED, Color.WHITE, Color.BLUE),
-                        new Function<SeaTile, Double>() {
-                            @Override
-                            public Double apply(SeaTile tile) {
-                                return regression.predict(tile, state.
-                                        getHoursSinceStart(), state,
-                                                          fisher);
-                            }
-                        },
-                        false));
+                    "Heatmap",
+                    new ColorEncoding(
+                            new TriColorMap(statistics.getMin(),
+                                            statistics.getAverage(),
+                                            statistics.getMax(), Color.RED, Color.WHITE, Color.BLUE),
+                            new Function<SeaTile, Double>() {
+                                @Override
+                                public Double apply(SeaTile tile) {
+                                    return regression.predict(tile, state.
+                                                                      getHoursSinceStart(), state,
+                                                              fisher);
+                                }
+                            },
+                            false));
             Display2D heatmapDisplay = gui.setupPortrayal(heatmapPortrayal);
 
             //add printout to clicks
@@ -163,11 +173,22 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     Int2D gridPosition = transformer.guiToGridPosition(e.getX(), e.getY());
-                    double predict = regression.predict(
-                            map.getSeaTile(gridPosition.getX(),gridPosition.getY()),
-                            state.getHoursSinceStart(),
-                            state,
-                            fisher);
+                    double predict;
+                    if(regression instanceof ProfitFunctionRegression)
+                    {
+                        predict = ((ProfitFunctionRegression) regression).predict(
+                                map.getSeaTile(gridPosition.getX(),gridPosition.getY()),
+                                state.getHoursSinceStart(),
+                                state,
+                                fisher,true);
+                    }
+                    else{
+                        predict = regression.predict(
+                                map.getSeaTile(gridPosition.getX(),gridPosition.getY()),
+                                state.getHoursSinceStart(),
+                                state,
+                                fisher);
+                    }
 
                     System.out.println(gridPosition +":---> " + predict );
                     System.out.println(e.getX() + " --- " + e.getY());

@@ -3,6 +3,8 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceTimeRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;

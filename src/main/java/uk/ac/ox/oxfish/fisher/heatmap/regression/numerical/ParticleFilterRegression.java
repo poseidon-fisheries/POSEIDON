@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
@@ -23,7 +23,7 @@ import java.util.function.Function;
  *
  * Created by carrknight on 8/1/16.
  */
-public class ParticleFilterRegression implements GeographicalRegression<Double> {
+public class ParticleFilterRegression implements NumericalGeographicalRegression {
 
 
     private final HashMap<SeaTile,ParticleFilter<Double>> filters = new HashMap<>();

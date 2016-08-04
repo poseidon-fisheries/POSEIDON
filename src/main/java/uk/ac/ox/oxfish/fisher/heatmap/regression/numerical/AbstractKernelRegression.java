@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -9,7 +9,7 @@ import java.util.PriorityQueue;
 /**
  * Created by carrknight on 6/28/16.
  */
-public abstract class AbstractKernelRegression implements GeographicalRegression<Double> {
+public abstract class AbstractKernelRegression implements NumericalGeographicalRegression {
 
 
 

@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 /**
  * Created by carrknight on 6/28/16.

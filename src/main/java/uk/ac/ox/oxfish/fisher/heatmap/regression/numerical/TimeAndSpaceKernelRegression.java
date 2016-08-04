@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/28/16.
  */
-public class TimeAndSpaceKernelRegression implements GeographicalRegression<Double> {
+public class TimeAndSpaceKernelRegression implements NumericalGeographicalRegression {
 
 
     private final TimeOnlyKernelRegression timeRegression;

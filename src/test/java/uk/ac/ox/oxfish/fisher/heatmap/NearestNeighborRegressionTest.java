@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher.heatmap;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.NearestNeighborRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.assertEquals;

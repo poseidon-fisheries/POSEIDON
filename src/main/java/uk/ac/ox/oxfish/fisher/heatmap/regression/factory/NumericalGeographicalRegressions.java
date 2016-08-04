@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -10,16 +10,16 @@ import java.util.function.Supplier;
 /**
  * Created by carrknight on 7/5/16.
  */
-public class GeographicalRegressions {
+public class NumericalGeographicalRegressions {
 
 
-    private GeographicalRegressions() {
+    private NumericalGeographicalRegressions() {
     }
 
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends GeographicalRegression>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends NumericalGeographicalRegression>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
@@ -62,6 +62,12 @@ public class GeographicalRegressions {
                          ParticleFilterRegressionFactory::new);
         NAMES.put(ParticleFilterRegressionFactory.class,
                   "Particle Filter Regression");
+
+
+        CONSTRUCTORS.put("Simple Kalman",
+                         SimpleKalmanRegressionFactory::new);
+        NAMES.put(SimpleKalmanRegressionFactory.class,
+                  "Simple Kalman");
 
 
 

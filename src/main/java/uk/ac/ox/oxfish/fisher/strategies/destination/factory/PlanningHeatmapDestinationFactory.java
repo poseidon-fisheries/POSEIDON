@@ -2,9 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased.ProfitFunctionRegression;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PlanningHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -37,7 +37,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     /**
      * the regression object (used primarily for species regression)
      */
-    private AlgorithmFactory<? extends GeographicalRegression> regression =
+    private AlgorithmFactory<? extends NumericalGeographicalRegression> regression =
             new NearestNeighborRegressionFactory();
 
 
@@ -151,7 +151,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      *
      * @return Value for property 'regression'.
      */
-    public AlgorithmFactory<? extends GeographicalRegression> getRegression() {
+    public AlgorithmFactory<? extends NumericalGeographicalRegression> getRegression() {
         return regression;
     }
 
@@ -161,7 +161,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
      * @param regression Value to set for property 'regression'.
      */
     public void setRegression(
-            AlgorithmFactory<? extends GeographicalRegression> regression) {
+            AlgorithmFactory<? extends NumericalGeographicalRegression> regression) {
         this.regression = regression;
     }
 

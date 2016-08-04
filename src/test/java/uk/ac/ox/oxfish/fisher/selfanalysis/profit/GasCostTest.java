@@ -42,8 +42,9 @@ public class GasCostTest {
                         assertEquals(cost.cost(fisher,state,record,0d),
                                      record.getTotalCosts(),.001d);
                         TripRecord simulated = simulator.simulateRecord(fisher, record.getMostFishedTileInTrip(),
-                                                                      state, 24 * 5,
-                                                                      new double[]{record.getSoldCatch()[0] / record.getEffort()});
+                                                                        state, 24 * 5,
+                                                                        new double[]{record.getSoldCatch()[0] / record.getEffort()},
+                                                                        false);
                         assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
                         assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
                         assertEquals(simulated.getEffort(),record.getEffort(),.001d);

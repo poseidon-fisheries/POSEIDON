@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -35,7 +35,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     /**
      * the regression object (the one that builds the actual heatmap)
      */
-    private AlgorithmFactory<? extends GeographicalRegression> regression =
+    private AlgorithmFactory<? extends NumericalGeographicalRegression> regression =
             new NearestNeighborRegressionFactory();
 
     /**
@@ -127,7 +127,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      *
      * @return Value for property 'regression'.
      */
-    public AlgorithmFactory<? extends GeographicalRegression> getRegression() {
+    public AlgorithmFactory<? extends NumericalGeographicalRegression> getRegression() {
         return regression;
     }
 
@@ -137,7 +137,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param regression Value to set for property 'regression'.
      */
     public void setRegression(
-            AlgorithmFactory<? extends GeographicalRegression> regression) {
+            AlgorithmFactory<? extends NumericalGeographicalRegression> regression) {
         this.regression = regression;
     }
 

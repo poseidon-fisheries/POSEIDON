@@ -144,7 +144,7 @@ public class TripRecord {
     public Double getProfitPerHour(boolean includingOpportunityCosts)
     {
 
-        double totalEarnings = DoubleStream.of(earningsPerSpecie).sum();
+        double totalEarnings = getEarnings();
         Preconditions.checkArgument(durationInHours > 0 == completed);
         if(!includingOpportunityCosts)
             return (totalEarnings - totalCosts) / durationInHours;
@@ -212,8 +212,12 @@ public class TripRecord {
 
     public double getTotalTripProfit()
     {
-        return DoubleStream.of(earningsPerSpecie).sum() - totalCosts;
+        return getEarnings() - totalCosts;
 
+    }
+
+    public double getEarnings() {
+        return DoubleStream.of(earningsPerSpecie).sum();
     }
 
     /**

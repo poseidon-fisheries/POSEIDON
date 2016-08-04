@@ -2,10 +2,10 @@ package uk.ac.ox.oxfish.experiments;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.KernelTransduction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;

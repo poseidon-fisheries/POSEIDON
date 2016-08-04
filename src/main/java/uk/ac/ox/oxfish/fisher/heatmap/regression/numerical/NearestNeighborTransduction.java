@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
@@ -15,7 +15,7 @@ import java.util.List;
  * That's the idea here
  * Created by carrknight on 7/5/16.
  */
-public class NearestNeighborTransduction implements GeographicalRegression<Double> {
+public class NearestNeighborTransduction implements NumericalGeographicalRegression {
 
 
 

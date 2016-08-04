@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**

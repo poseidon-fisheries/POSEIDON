@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.heatmap.regression.DefaultKernelTransduction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.HabitatRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDifferenceRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RandomRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.DefaultKernelTransduction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;

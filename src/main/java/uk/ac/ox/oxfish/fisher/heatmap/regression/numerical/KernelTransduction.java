@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
@@ -14,7 +14,7 @@ import java.util.List;
  * step a lot faster (even though the new observation step will be worse)
  * Created by carrknight on 7/8/16.
  */
-public class KernelTransduction implements GeographicalRegression<Double> {
+public class KernelTransduction implements NumericalGeographicalRegression {
 
 
     private final HashMap<SeaTile,KernelTilePredictor> kernels;

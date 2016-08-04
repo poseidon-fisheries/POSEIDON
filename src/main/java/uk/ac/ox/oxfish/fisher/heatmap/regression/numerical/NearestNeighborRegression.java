@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import ags.utils.dataStructures.MaxHeap;
 import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/30/16.
  */
-public class NearestNeighborRegression implements GeographicalRegression<Double> {
+public class NearestNeighborRegression implements NumericalGeographicalRegression {
 
 
     /**

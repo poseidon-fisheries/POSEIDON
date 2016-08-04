@@ -24,9 +24,10 @@ import java.util.Iterator;
 public class LameTripSimulator {
 
 
-    public TripRecord simulateRecord(Fisher fisher, SeaTile fishingSpot, FishState state,
-                                     double maxHoursOut,
-                                     double[] expectedHourlyCatches)
+    public TripRecord simulateRecord(
+            Fisher fisher, SeaTile fishingSpot, FishState state,
+            double maxHoursOut,
+            double[] expectedHourlyCatches, boolean verbose)
     {
 
         int numberOfSpecies = state.getSpecies().size();
@@ -46,7 +47,7 @@ public class LameTripSimulator {
         gasConsumed+= fisher.getBoat().expectedFuelConsumption(distanceTravelled);
         //while there is still time, fish
         double maxWeight = fisher.getMaximumHold();
-        double expectedTotalCatchesPerHour = Arrays.stream(expectedHourlyCatches).sum();
+        double expectedTotalCatchesPerHour = Math.max(Arrays.stream(expectedHourlyCatches).sum(),0);
         int hoursNeededToFillBoat = expectedTotalCatchesPerHour>0? (int)
                 Math.ceil((maxWeight- FishStateUtilities.EPSILON)/expectedTotalCatchesPerHour) :
                 (int)maxHoursOut;
@@ -57,7 +58,7 @@ public class LameTripSimulator {
             double[] catches = new double[numberOfSpecies];
             for(int i=0; i<numberOfSpecies; i++)
             {
-                catches[i] = expectedHourlyCatches[i] * fishingHours;
+                catches[i] = Math.max(expectedHourlyCatches[i],0) * fishingHours;
             }
             Hold.throwOverboard(catches,maxWeight);
             assert Arrays.stream(catches).sum() <= maxWeight;
@@ -91,6 +92,18 @@ public class LameTripSimulator {
         record.addToDistanceTravelled(distanceTravelled);
         record.recordGasConsumption(gasConsumed);
         record.completeTrip(timeSpentAtSea + fishingHours, homePort);
+
+        if(verbose)
+        {
+            System.out.println("Going to " + fishingSpot + " I will spend " + timeSpentAtSea + " travelling plus " +
+            fishingHours + " fishing, expecting " +expectedTotalCatchesPerHour + " lbs of catch per hour which implies " +
+                                       hoursNeededToFillBoat +" hours to fill the boat; in total I am going to travel "
+                                       + distanceTravelled + " km and consume " + record.getLitersOfGasConsumed() + " liters of gas");
+
+            System.out.println("I predict earnings of " + record.getEarnings() + " with costs " + record.getTotalCosts()) ;
+            System.out.println("I predict profits of " + record.getTotalTripProfit() + " which means per hour of  " +
+                                       record.getProfitPerHour(true)) ;
+        }
 
         return record;
 

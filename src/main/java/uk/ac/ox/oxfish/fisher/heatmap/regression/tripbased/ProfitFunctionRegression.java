@@ -1,6 +1,8 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression;
+package uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -14,7 +16,7 @@ import java.util.function.Function;
  * of a given species and this function actually simulating profits for each
  * Created by carrknight on 7/14/16.
  */
-public class ProfitFunctionRegression implements GeographicalRegression<TripRecord>, Function<SeaTile, double[]>{
+public class ProfitFunctionRegression implements Function<SeaTile, double[]>, GeographicalRegression<TripRecord> {
 
 
     private final ProfitFunction profit;
@@ -53,10 +55,19 @@ public class ProfitFunctionRegression implements GeographicalRegression<TripReco
     public double predict(
             SeaTile tile, double time, FishState state, Fisher fisher) {
 
+        return this.predict(tile, time, state, fisher,false);
+
+
+    }
+
+
+    public double predict(
+            SeaTile tile, double time, FishState state, Fisher fisher,boolean verbose) {
+
         this.state=state;
         this.currentTime=time;
         this.fisher=fisher;
-        return profit.hourlyProfitFromHypotheticalTripHere(fisher, tile, state,this);
+        return profit.hourlyProfitFromHypotheticalTripHere(fisher, tile, state, this, verbose);
 
 
     }
