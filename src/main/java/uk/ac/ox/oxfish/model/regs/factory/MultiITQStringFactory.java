@@ -82,7 +82,13 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
                                                 allowMultipleTrades, minimumQuotaTraded);
 
 
-        return new MultiQuotaITQRegulation(quotas, state, orderBooks.get(state));
+        MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
+                                                                                      orderBooks.get(state));
+        for(ITQMarketBuilder builder : orderBooksBuilder.get(state))
+            if(builder!=null)
+                builder.addTrader(multiQuotaITQRegulation);
+
+        return multiQuotaITQRegulation;
 
 
 
@@ -131,5 +137,14 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
      */
     public void setMinimumQuotaTraded(int minimumQuotaTraded) {
         this.minimumQuotaTraded = minimumQuotaTraded;
+    }
+
+    /**
+     * Getter for property 'orderBooksBuilder'.
+     *
+     * @return Value for property 'orderBooksBuilder'.
+     */
+    public Map<FishState, ITQMarketBuilder[]> getOrderBooksBuilder() {
+        return orderBooksBuilder;
     }
 }

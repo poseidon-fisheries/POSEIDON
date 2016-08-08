@@ -89,7 +89,13 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
         buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
                                 allowMultipleTrades, minimumQuotaTraded);
 
-        return new MultiQuotaITQRegulation(quotas,state,orderBooks.get(state));
+        MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
+                                                                                      orderBooks.get(state));
+
+        for(ITQMarketBuilder builder : orderBooksBuilder.get(state))
+            if(builder!=null)
+                builder.addTrader(multiQuotaITQRegulation);
+        return multiQuotaITQRegulation;
     }
 
     /**

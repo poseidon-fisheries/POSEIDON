@@ -58,9 +58,9 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         }
         ITQMarketBuilder marketBuilder = marketBuilders.get(state);
         assert marketBuilder != null;
-        return new SpecificQuotaRegulation(individualQuota.apply(state.getRandom()),state,
-                                           state.getSpecies().get(specieIndex))
-        {
+        SpecificQuotaRegulation regulation = new SpecificQuotaRegulation(
+                individualQuota.apply(state.getRandom()), state,
+                state.getSpecies().get(specieIndex)) {
 
             /**
              * in addition tell the fisher to count opportunity costs
@@ -73,6 +73,8 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
                 computeOpportunityCosts(species, seller, biomass, revenue, this, marketBuilder.getMarket());
             }
         };
+        marketBuilder.addTrader(regulation);
+        return regulation;
     }
 
 

@@ -57,8 +57,10 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
             marketBuilders.put(state, initializer);
         }
         ITQMarketBuilder marketBuilder = marketBuilders.get(state);
+
         assert marketBuilder != null;
-        return new MonoQuotaRegulation(individualQuota.apply(state.getRandom()),state){
+        MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom()),
+                                                                          state) {
 
             /**
              * in addition tell the fisher to count opportunity costs
@@ -69,17 +71,17 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
                 super.reactToSale(species, seller, biomass, revenue);
 
                 //account for opportunity costs
-                if(biomass > 0)
-                {
+                if (biomass > 0) {
                     double lastClosingPrice = marketBuilder.getMarket().getLastClosingPrice();
-                    if(Double.isFinite(lastClosingPrice))
-                    {
+                    if (Double.isFinite(lastClosingPrice)) {
                         //you could have sold those quotas!
                         seller.recordOpportunityCosts(lastClosingPrice * biomass);
                     }
                 }
             }
         };
+        marketBuilder.addTrader(toReturn);
+        return toReturn;
     }
 
     public DoubleParameter getIndividualQuota() {

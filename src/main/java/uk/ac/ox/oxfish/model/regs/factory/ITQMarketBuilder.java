@@ -8,8 +8,10 @@ import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PricingPolicy;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.function.Supplier;
 
 /**
@@ -30,6 +32,13 @@ public class ITQMarketBuilder  implements Startable
     final private Supplier<PriceGenerator> priceGeneratorMaker;
 
     private final ITQOrderBook market;
+
+    private final HashSet<Regulation> traders = new HashSet<>();
+
+    public void addTrader(Regulation regulation)
+    {
+        traders.add(regulation);
+    }
 
 
     public ITQMarketBuilder(
@@ -97,19 +106,21 @@ public class ITQMarketBuilder  implements Startable
                                                  Double.NaN);
 
         //and give to each fisher a price-maker
-        for(Fisher fisher : model.getFishers())
-        {
-            PriceGenerator reservationPricer = priceGeneratorMaker.get();
-            reservationPricer.start(model, fisher);
-            market.registerTrader(fisher, reservationPricer);
-            //record it
-            reservationPricers.put(fisher,reservationPricer);
-
+        for(Fisher fisher : model.getFishers()) {
+            if (traders.contains(fisher.getRegulation())) {
+                PriceGenerator reservationPricer = priceGeneratorMaker.get();
+                reservationPricer.start(model, fisher);
+                market.registerTrader(fisher, reservationPricer);
+                //record it
+                reservationPricers.put(fisher, reservationPricer);
+            }
 
         }
 
 
     }
+
+
 
     /**
      * tell the startable to turnoff,

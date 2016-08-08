@@ -190,7 +190,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
         if(instantiate[0]==true) {
-            FishState state = new FishState(0, 1);
+            FishState state = new FishState(System.currentTimeMillis(), 1);
             Log.set(Log.LEVEL_INFO);
             Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
 

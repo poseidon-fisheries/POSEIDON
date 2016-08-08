@@ -49,9 +49,17 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
         else
             subcomponent3 = tacFactory.apply(fishState);
 
-        return new KitchenSinkRegulation(subcomponent1,
-                                         subcomponent2,
-                                         subcomponent3);
+        KitchenSinkRegulation reg = new KitchenSinkRegulation(subcomponent1,
+                                                                                subcomponent2,
+                                                                                subcomponent3);
+
+        if(individualTradeableQuotas) {
+            subcomponent3 = itqFactory.apply(fishState);
+            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().get(fishState))
+                if(builder!=null)
+                    builder.addTrader(reg);
+        }
+        return reg;
 
     }
 
