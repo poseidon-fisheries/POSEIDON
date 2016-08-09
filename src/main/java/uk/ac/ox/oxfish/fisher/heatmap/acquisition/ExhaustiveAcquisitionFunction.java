@@ -6,9 +6,12 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegressio
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.DoublePredicate;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 /**
@@ -44,24 +47,27 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
         List<SeaTile> seaTiles = map.getAllSeaTilesExcludingLandAsList();
         Collections.shuffle(seaTiles);
-        Stream<SeaTile> tileStream = seaTiles.stream();
         MersenneTwisterFast random = state.getRandom();
-        if(proportionSearched<=1d)
-            tileStream = tileStream.filter(tile -> random.nextDouble()<=proportionSearched);
 
-
-        SeaTile possibleBest = tileStream.
-                max(
-                        (o1, o2) -> Double.compare(
-                                regression.predict(o1, state.getHoursSinceStart(), state, fisher),
-                                regression.predict(o2, state.getHoursSinceStart(), state, fisher))
-                ).orElse(seaTiles.get(random.nextInt(seaTiles.size())));
-        if(current==null || current == possibleBest ||
-                regression.predict(possibleBest,state.getHoursSinceStart(),state,fisher) >
-                regression.predict(current,state.getHoursSinceStart(),state,fisher))
-            return possibleBest;
+        Pair<SeaTile,Double> best;
+        if(current!=null)
+            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), state, fisher));
         else
-            return current;
+            best = new Pair<>(null,-Double.MAX_VALUE);
+        assert Double.isFinite(best.getSecond());
+        for(SeaTile tile : seaTiles)
+        {
+            if(random.nextBoolean(proportionSearched))
+            {
+                double predicted = regression.predict(tile,state.getHoursSinceStart(),state,fisher);
+                if(Double.isFinite(predicted) && predicted > best.getSecond())
+                    best=new Pair<>(tile,predicted);
+            }
+        }
+
+
+
+       return best.getFirst();
 
     }
 }

@@ -74,7 +74,9 @@ public class PeriodicUpdateCatchabilityFactory implements AlgorithmFactory<Perio
                             FishState state, MersenneTwisterFast random, Fisher fisher,
                             Gear current1) {
                         Preconditions.checkArgument(current1.getClass().equals(RandomCatchabilityTrawl.class),
-                                                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear");
+                                                    "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear while we got " +
+                                                            current1.getClass()
+                        );
                         assert current1.getClass().equals(RandomCatchabilityTrawl.class);
                         RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 

@@ -29,11 +29,14 @@ public class HomogeneousAbundanceGearTest
                                                                      new FixedProportionFilter(.5),
                                                                      new FixedProportionFilter(.5));
 
-        SeaTile tile = mock(SeaTile.class);
+        SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getBiology().getBiomass(any())).thenReturn(1d);
+
         Species species = new Species("test",Meristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
+
 
         Catch fish = gear.fish(mock(Fisher.class), tile, 1, biology);
         assertEquals(fish.getPoundsCaught(0), FishStateUtilities.weigh(new int[]{0},new int[]{25},species),.001);
@@ -52,9 +55,11 @@ public class HomogeneousAbundanceGearTest
                                                                      new FixedProportionFilter(1),
                                                                      new FixedProportionFilter(.5));
 
-        SeaTile tile = mock(SeaTile.class);
+        SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getBiology().getBiomass(any())).thenReturn(1d);
+
         Species species = new Species("test",Meristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -76,9 +81,11 @@ public class HomogeneousAbundanceGearTest
                                                                      new FixedProportionFilter(1),
                                                                      new FixedProportionFilter(.5));
 
-        SeaTile tile = mock(SeaTile.class);
+        SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getBiology().getBiomass(any())).thenReturn(1d);
+
         Species species = new Species("test",Meristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -98,9 +105,11 @@ public class HomogeneousAbundanceGearTest
                                                                      new FixedProportionFilter(1),
                                                                      new FixedProportionFilter(.5));
 
-        SeaTile tile = mock(SeaTile.class);
+        SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getBiology().getBiomass(any())).thenReturn(1d);
+
         Species species = new Species("test",Meristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 

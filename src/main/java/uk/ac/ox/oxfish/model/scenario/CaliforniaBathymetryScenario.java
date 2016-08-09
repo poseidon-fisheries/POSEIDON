@@ -236,6 +236,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
 
+    //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
     private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587";
 
     public CaliforniaBathymetryScenario() {

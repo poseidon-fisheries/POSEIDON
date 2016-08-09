@@ -60,6 +60,9 @@ public class ProfitFunction {
     public double hourlyProfitFromThisTrip(Fisher fisher, TripRecord trip, FishState state)
     {
 
+        if(trip==null)
+            return Double.NaN;
+
         double[] catches = trip.getSoldCatch();
         double earnings = 0;
         for(Species species : state.getSpecies())

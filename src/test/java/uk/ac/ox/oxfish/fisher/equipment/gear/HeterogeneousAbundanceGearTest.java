@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +41,9 @@ public class HeterogeneousAbundanceGearTest
 
         GlobalBiology biology = new GlobalBiology(species1,species2);
 
-        Catch caught = gear.fish(mock(Fisher.class), mock(SeaTile.class), 2, biology);
+        SeaTile mock = mock(SeaTile.class,RETURNS_DEEP_STUBS);
+        when(mock.getBiology().getBiomass(any())).thenReturn(1d);
+        Catch caught = gear.fish(mock(Fisher.class), mock, 2, biology);
         assertEquals(caught.getPoundsCaught(0),200,.001);
         assertEquals(caught.getPoundsCaught(1),400,.001);
 

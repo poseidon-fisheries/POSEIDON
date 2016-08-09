@@ -60,6 +60,8 @@ public class HomogeneousAbundanceGear implements Gear {
         double[] biomassCaught = new  double[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
+            if(where.getBiology().getBiomass(species)<=0)
+                continue;
             //you are going to fish every hour until you are done
             int hoursSpentFishingThisSpecies = hoursSpentFishing;
 

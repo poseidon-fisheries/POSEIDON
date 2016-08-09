@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -43,6 +44,9 @@ public class FishStateUtilities {
 
     private static final String JAR_NAME = "oxfish_executable.jar";
 
+
+    private FishStateUtilities() {
+    }
 
     /**
      * round to 2nd decimal value
@@ -504,9 +508,9 @@ public class FishStateUtilities {
         Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch
         double specieCatch = Math.min(FishStateUtilities.round(where.getBiomass(species) *
-                                                              q *
-                                                              hoursSpentFishing),
-                where.getBiomass(species));
+                                                                       q *
+                                                                       hoursSpentFishing),
+                                      where.getBiomass(species));
         //tell biomass
         if(!safeMode && specieCatch> 0)
             where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);
@@ -703,5 +707,68 @@ public class FishStateUtilities {
             }
         };
     }
+
+
+
+    public static String printTablePerPort(FishState model,String fisherYearlyColumn)
+    {
+        HashMap<String, DataColumn> portColumns = new HashMap<>();
+        LinkedList<String> columns = new LinkedList<>();
+
+        for(Port port : model.getPorts())
+        {
+            portColumns.put(port.getName(),new DataColumn(port.getName() + " " + fisherYearlyColumn));
+            columns.add(port.getName());
+        }
+        assert columns.size() >0;
+        assert model.getYear() >0;
+
+        for(int year=0; year<model.getYear(); year++)
+        {
+            HashMap<String, DoubleSummaryStatistics> averages = new HashMap<>();
+            for(String portName : portColumns.keySet())
+                averages.put(portName, new DoubleSummaryStatistics());
+            for(Fisher fisher : model.getFishers())
+            {
+                averages.get(fisher.getHomePort().getName()).accept(
+                        fisher.getYearlyData().getColumn(fisherYearlyColumn).get(year));
+            }
+
+            for(Map.Entry<String,DoubleSummaryStatistics> average : averages.entrySet())
+                portColumns.get(average.getKey()).add(average.getValue().getAverage());
+
+
+        }
+
+
+
+        StringBuilder builder = new StringBuilder();
+
+        //write header
+        for(int i=0; i<columns.size(); i++)
+        {
+            if(i!=0)
+                builder.append(",");
+            builder.append(columns.get(i));
+        }
+        builder.append("\n");
+
+        //write columns
+        for(int row=0; row<model.getYear(); row++)
+        {
+            for(int i=0; i<columns.size(); i++)
+            {
+                if(i!=0)
+                    builder.append(",");
+                builder.append(String.valueOf(portColumns.get(columns.get(i)).get(row)));
+            }
+            builder.append("\n");
+
+        }
+
+        return builder.toString();
+
+    }
+
 }
 

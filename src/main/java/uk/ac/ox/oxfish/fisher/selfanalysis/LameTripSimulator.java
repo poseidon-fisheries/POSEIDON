@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.function.DoublePredicate;
 
 /**
  * A "trip simulator" that is really just a collection of equations and not a proper simulation. It assumes you only
@@ -39,6 +40,8 @@ public class LameTripSimulator {
         //get path from port to fishing spot
         Port homePort = fisher.getHomePort();
         Deque<SeaTile> routeToAndFrom = state.getMap().getRoute(homePort.getLocation(), fishingSpot);
+        if(routeToAndFrom == null)
+            return null;
         //you need to go there
         double tripDistance = pathDistance(routeToAndFrom, state.getMap());
         double distanceTravelled = tripDistance;
@@ -47,7 +50,8 @@ public class LameTripSimulator {
         gasConsumed+= fisher.getBoat().expectedFuelConsumption(distanceTravelled);
         //while there is still time, fish
         double maxWeight = fisher.getMaximumHold();
-        double expectedTotalCatchesPerHour = Math.max(Arrays.stream(expectedHourlyCatches).sum(),0);
+        double expectedTotalCatchesPerHour = Math.max(Arrays.stream(expectedHourlyCatches).filter(
+                value -> Double.isFinite(value)).sum(), 0);
         int hoursNeededToFillBoat = expectedTotalCatchesPerHour>0? (int)
                 Math.ceil((maxWeight- FishStateUtilities.EPSILON)/expectedTotalCatchesPerHour) :
                 (int)maxHoursOut;
