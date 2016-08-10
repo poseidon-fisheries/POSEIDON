@@ -110,7 +110,8 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public void start(FishState model) {
-
+        for(GeographicalRegression reg : catches)
+            reg.start(model);
     }
 
     //ignored

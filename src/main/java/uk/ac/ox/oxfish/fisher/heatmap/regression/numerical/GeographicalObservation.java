@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import com.google.common.base.MoreObjects;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Objects;
@@ -91,5 +92,14 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
     @Override
     public int hashCode() {
         return Objects.hash(time, value, tile);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("time", time)
+                .add("value", value)
+                .add("tile", tile)
+                .toString();
     }
 }
