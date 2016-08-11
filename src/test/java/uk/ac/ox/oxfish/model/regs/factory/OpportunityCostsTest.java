@@ -4,6 +4,8 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
@@ -29,27 +31,28 @@ public class OpportunityCostsTest {
         //world split in half
         scenario.setBiologyInitializer(new SplitInitializerFactory());
         scenario.setUsePredictors(true);
-        ITQSpecificFactory regs = new ITQSpecificFactory(){
-            /**
-             * forces huge opportunity costs for fishing the wrong specie
-             */
-            @Override
-            public void computeOpportunityCosts(
-                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
-                    ITQOrderBook market) {
-                //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
-                {
-                    seller.recordOpportunityCosts(1000 * biomass);
-                }
-            }
-        };
+        ITQSpecificFactory regs = new ITQSpecificFactory();
         regs.setSpecieIndex(0);
         regs.setIndividualQuota(new FixedDoubleParameter(5000));
         scenario.setRegulation(regs);
         scenario.setMapMakerDedicatedRandomSeed(100l); //places port around the middle
 
         state.start();
+        for(Fisher fisher : state.getFishers())
+            fisher.getOpportunityCosts().add(new Cost() {
+                @Override
+                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue) {
+                    //account for opportunity costs
+                    SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
+                    double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
+                    if(biomass > 0)
+                    {
+                        return 1000*biomass;
+                    }
+                    return 0d;
+                }
+            });
+
         //run it for two years
         while (state.getYear() < 2) {
             state.schedule.step(state);
@@ -79,27 +82,28 @@ public class OpportunityCostsTest {
         //world split in half
         scenario.setBiologyInitializer(new SplitInitializerFactory());
         scenario.setUsePredictors(true);
-        ITQSpecificFactory regs = new ITQSpecificFactory(){
-            /**
-             * forces huge opportunity costs for fishing the wrong specie
-             */
-            @Override
-            public void computeOpportunityCosts(
-                    Species specie, Fisher seller, double biomass, double revenue, SpecificQuotaRegulation regulation,
-                    ITQOrderBook market) {
-                //account for opportunity costs
-                if(biomass > 0 && regulation.getProtectedSpecies().equals(specie))
-                {
-                    seller.recordOpportunityCosts(1000 * biomass);
-                }
-            }
-        };
+        ITQSpecificFactory regs = new ITQSpecificFactory();
         regs.setSpecieIndex(1);
         regs.setIndividualQuota(new FixedDoubleParameter(5000));
         scenario.setRegulation(regs);
         scenario.setMapMakerDedicatedRandomSeed(100l); //places port around the middle
 
         state.start();
+        for(Fisher fisher : state.getFishers())
+            fisher.getOpportunityCosts().add(new Cost() {
+                @Override
+                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue) {
+                    //account for opportunity costs
+                    SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
+                    double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
+                    if(biomass > 0)
+                    {
+                        return 1000*biomass;
+                    }
+                    return 0d;
+                }
+            });
+
         //run it for two years
         while (state.getYear() < 2) {
             state.schedule.step(state);

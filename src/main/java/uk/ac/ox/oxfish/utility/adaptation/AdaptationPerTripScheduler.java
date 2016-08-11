@@ -34,9 +34,9 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
     }
 
     @Override
-    public void turnOff() {
-        if(fisher!=null)
-            fisher.removeTripListener(this);
+    public void turnOff(Fisher fisher) {
+        if(this.fisher !=null)
+            this.fisher.removeTripListener(this);
     }
 
     /**

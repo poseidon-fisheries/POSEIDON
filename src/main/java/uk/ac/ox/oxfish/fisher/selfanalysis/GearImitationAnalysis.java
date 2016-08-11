@@ -105,7 +105,7 @@ public class GearImitationAnalysis
                 }
 
                 @Override
-                public void turnOff() {
+                public void turnOff(Fisher fisher) {
                     fisher.removeBiMonthlyAdaptation(holdAdaptation);
                 }
             }, fisher);

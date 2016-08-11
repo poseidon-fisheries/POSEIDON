@@ -3,6 +3,8 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
+import uk.ac.ox.oxfish.model.regs.ITQOpportunityCost;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -10,6 +12,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Creates both individual quotas like the IQMonoFactory and a quota market for fishers to trade in
@@ -59,25 +62,27 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
         ITQMarketBuilder marketBuilder = marketBuilders.get(state);
 
         assert marketBuilder != null;
+
+        ITQOpportunityCost cost = new ITQOpportunityCost(new Function<Species, ITQOrderBook>() {
+            @Override
+            public ITQOrderBook apply(Species species) {
+                    return marketBuilder.getMarket();
+            }
+        });
+
         MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom()),
                                                                           state) {
 
-            /**
-             * in addition tell the fisher to count opportunity costs
-             */
             @Override
-            public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-                //do the usual stuff
-                super.reactToSale(species, seller, biomass, revenue);
+            public void start(FishState model, Fisher fisher) {
+                super.start(model, fisher);
+                fisher.getOpportunityCosts().add(cost);
+            }
 
-                //account for opportunity costs
-                if (biomass > 0) {
-                    double lastClosingPrice = marketBuilder.getMarket().getLastClosingPrice();
-                    if (Double.isFinite(lastClosingPrice)) {
-                        //you could have sold those quotas!
-                        seller.recordOpportunityCosts(lastClosingPrice * biomass);
-                    }
-                }
+            @Override
+            public void turnOff(Fisher fisher) {
+                super.turnOff(fisher);
+                fisher.getOpportunityCosts().remove(cost);
             }
         };
         marketBuilder.addTrader(toReturn);

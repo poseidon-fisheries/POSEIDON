@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -169,6 +170,16 @@ public class Fisher implements Steppable, Startable{
      */
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
 
+    /**
+     * list of costs to pay at the end of the trip. Any amount computed is spent. Wages would be a good example.
+     */
+    private final LinkedList<Cost> additionalTripCosts = new LinkedList<>();
+
+    /**
+     * list of additional costs to account for on trip record but not to actually burn money on.
+     */
+    private final LinkedList<Cost> opportunityCosts = new LinkedList<>();
+
 
 
     private Predictor[] dailyCatchesPredictor;
@@ -277,7 +288,8 @@ public class Fisher implements Steppable, Startable{
         //start datas
         memory.start(state, this);
 
-
+        //start the regulations
+        getRegulation().start(state,this);
 
         //start the strategies
         destinationStrategy.start(state,this);
@@ -318,15 +330,16 @@ public class Fisher implements Steppable, Startable{
         memory.getTripMemories().turnOff();
 
         //turn off the strategies
-        destinationStrategy.turnOff();
-        fishingStrategy.turnOff();
-        departingStrategy.turnOff();
-        weatherStrategy.turnOff();
+        destinationStrategy.turnOff(this);
+        fishingStrategy.turnOff(this);
+        departingStrategy.turnOff(this);
+        weatherStrategy.turnOff(this);
+        getRegulation().turnOff(this);
 
         //turn off the adaptations
-        bimonthlyAdaptation.turnOff();
-        yearlyAdaptation.turnOff();
-        tripAdaptation.turnOff();
+        bimonthlyAdaptation.turnOff(this);
+        yearlyAdaptation.turnOff(this);
+        tripAdaptation.turnOff(this);
     }
 
     @Override
@@ -500,6 +513,18 @@ public class Fisher implements Steppable, Startable{
             listener.dockingEvent(this,getHomePort());
         }
 
+        //spend money on all new costs
+        for(Cost realCosts : additionalTripCosts) {
+            double cost = realCosts.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings());
+            spendForTrip(cost);
+        }
+        //account for opportunity costs
+        for(Cost opportunityCost : opportunityCosts) {
+            double cost = opportunityCost.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings());
+            recordOpportunityCosts(cost);
+        }
+
+
         //finish trip!
         memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort() );
 
@@ -579,7 +604,7 @@ public class Fisher implements Steppable, Startable{
 
         if(state != null) //if we have started already
         {
-            old.turnOff(); //turn off old strategy
+            old.turnOff(this); //turn off old strategy
             destinationStrategy.start(state,this);
         }
     }
@@ -589,7 +614,7 @@ public class Fisher implements Steppable, Startable{
         this.departingStrategy = newStrategy;
         if(state != null) //if we have started already
         {
-            old.turnOff(); //turn off old strategy
+            old.turnOff(this); //turn off old strategy
             departingStrategy.start(state,this);
         }
     }
@@ -612,7 +637,7 @@ public class Fisher implements Steppable, Startable{
         this.fishingStrategy = newStrategy;
         if(state != null) //if we have started already
         {
-            old.turnOff(); //turn off old strategy
+            old.turnOff(this); //turn off old strategy
             fishingStrategy.start(state,this);
         }
     }
@@ -733,6 +758,15 @@ public class Fisher implements Steppable, Startable{
     }
 
     public void setRegulation(Regulation regulation) {
+
+
+        if(state != null)
+        {
+            getRegulation().turnOff(this);
+            regulation.start(state,this);
+        }
+
+
         this.status.setRegulation(regulation);
     }
 
@@ -783,7 +817,7 @@ public class Fisher implements Steppable, Startable{
      * for things like opportunity costs
      * @param implicitCost implicit expenditure
      */
-    public void recordOpportunityCosts(double implicitCost)
+    private void recordOpportunityCosts(double implicitCost)
     {
         memory.getTripLogger().recordOpportunityCosts(implicitCost);
     }
@@ -1014,7 +1048,7 @@ public class Fisher implements Steppable, Startable{
 
         if(state != null)
         {
-            this.dailyProfitsPredictor.turnOff();
+            this.dailyProfitsPredictor.turnOff(this);
             dailyProfitsPredictor.start(state,this);
         }
 
@@ -1028,7 +1062,7 @@ public class Fisher implements Steppable, Startable{
         if(state!=null)
         {
             newPredictor.start(state, this);
-            dailyCatchesPredictor[specieIndex].turnOff();
+            dailyCatchesPredictor[specieIndex].turnOff(this);
         }
         dailyCatchesPredictor[specieIndex] = newPredictor;
 
@@ -1045,7 +1079,7 @@ public class Fisher implements Steppable, Startable{
         if(state!=null)
         {
             newPredictor.start(state, this);
-            profitPerUnitPredictor[specieIndex].turnOff();
+            profitPerUnitPredictor[specieIndex].turnOff(this);
         }
         profitPerUnitPredictor[specieIndex] = newPredictor;
 
@@ -1061,7 +1095,7 @@ public class Fisher implements Steppable, Startable{
         this.weatherStrategy = weatherStrategy;
         if(state!=null)
         {
-            old.turnOff();
+            old.turnOff(this);
 
             weatherStrategy.start(state, this);
         }
@@ -1170,7 +1204,7 @@ public class Fisher implements Steppable, Startable{
     public void setGearStrategy(GearStrategy gearStrategy) {
 
         if(state != null && this.gearStrategy != gearStrategy)
-            this.gearStrategy.turnOff();
+            this.gearStrategy.turnOff(this);
 
 
 
@@ -1220,5 +1254,23 @@ public class Fisher implements Steppable, Startable{
      */
     public void setCheater(boolean cheater) {
         this.cheater = cheater;
+    }
+
+    /**
+     * Getter for property 'additionalTripCosts'.
+     *
+     * @return Value for property 'additionalTripCosts'.
+     */
+    public LinkedList<Cost> getAdditionalTripCosts() {
+        return additionalTripCosts;
+    }
+
+    /**
+     * Getter for property 'opportunityCosts'.
+     *
+     * @return Value for property 'opportunityCosts'.
+     */
+    public LinkedList<Cost> getOpportunityCosts() {
+        return opportunityCosts;
     }
 }

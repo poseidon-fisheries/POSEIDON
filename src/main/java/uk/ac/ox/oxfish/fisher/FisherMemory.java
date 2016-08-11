@@ -114,7 +114,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         tripMemories.turnOff();
         catchMemories.turnOff();
         tripLogger.turnOff();

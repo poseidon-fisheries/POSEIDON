@@ -76,7 +76,7 @@ public class MovingTest
                                        }
 
                                        @Override
-                                       public void turnOff() {
+                                       public void turnOff(Fisher fisher) {
 
                                        }
                                    }, new FixedGearStrategy(),

@@ -120,4 +120,22 @@ public class TemporaryProtectedArea implements Regulation
     public Regulation makeCopy() {
         return new TemporaryProtectedArea(firstDay,finalDay);
     }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model, Fisher fisher) {
+        activeDelegate.start(model,fisher);
+        inactiveDelegate.start(model,fisher);
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff(Fisher fisher) {
+        activeDelegate.turnOff(fisher);
+        inactiveDelegate.turnOff(fisher);
+    }
 }

@@ -22,10 +22,6 @@ public class ProfitFunction {
      */
     private Cost oilCosts = new GasCost();
 
-    /**
-     * additional costs (including opportunity ones)
-     */
-    private LinkedList<Cost> additionalCosts = new LinkedList<>();
 
 
     /**
@@ -68,16 +64,25 @@ public class ProfitFunction {
         for(Species species : state.getSpecies())
             earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species,fisher);
         double costs = 0;
-        costs = computeCosts(fisher, trip, state, earnings, costs);
+        computeCosts(fisher, trip, state, earnings);
 
-        return (earnings-costs)/ trip.getDurationInHours();
+
+
+        return  trip.getProfitPerHour(true);
     }
 
-    private double computeCosts(Fisher fisher, TripRecord trip, FishState state, double earnings, double costs) {
-        costs += oilCosts.cost(fisher,state,trip,earnings);
-        for(Cost otherCost : additionalCosts)
+    private void computeCosts(Fisher fisher, TripRecord trip, FishState state, double earnings) {
+
+        double costs = oilCosts.cost(fisher,state,trip,earnings);
+        for(Cost otherCost : fisher.getAdditionalTripCosts())
             costs+= otherCost.cost(fisher,state,trip,earnings);
-        return costs;
+        trip.recordCosts(costs);
+
+        costs = 0;
+        for(Cost opportunity : fisher.getOpportunityCosts())
+            costs+= opportunity.cost(fisher,state,trip,earnings);
+        trip.recordOpportunityCosts(costs);
+
     }
 
     public double hourlyProfitFromHypotheticalTripHere(
@@ -93,9 +98,7 @@ public class ProfitFunction {
     }
 
 
-    public LinkedList<Cost> getAdditionalCosts() {
-        return additionalCosts;
-    }
+
 
 
 

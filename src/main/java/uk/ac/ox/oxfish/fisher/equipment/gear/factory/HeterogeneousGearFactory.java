@@ -7,8 +7,10 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +23,7 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
 
 
     public HeterogeneousGearFactory() {
+        System.out.println("done");
     }
 
     public HeterogeneousGearFactory(Pair<String,HomogeneousGearFactory>...
@@ -32,12 +35,18 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
     }
 
 
+
+
     /**
      * Getter for property 'gears'.
      *
      * @return Value for property 'gears'.
      */
     public HashMap<String, HomogeneousGearFactory> getGears() {
+        if(!(gears.values().iterator().next() instanceof  HomogeneousGearFactory))
+        {
+
+        }
         return gears;
     }
 

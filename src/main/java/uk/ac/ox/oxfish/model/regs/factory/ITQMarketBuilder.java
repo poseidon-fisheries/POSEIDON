@@ -129,7 +129,7 @@ public class ITQMarketBuilder  implements Startable
     public void turnOff() {
         market.turnOff();
         for(PriceGenerator pricer : reservationPricers.values())
-            pricer.turnOff();
+            pricer.turnOff(pricer.getFisher());
     }
 
 

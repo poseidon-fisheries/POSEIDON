@@ -96,10 +96,10 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     }
 
     @Override
-    public void turnOff() {
-        fisher.removeTripListener(this);
+    public void turnOff(Fisher fisher) {
+        this.fisher.removeTripListener(this);
         lastFriendTripRecorded.clear();
-        fisher=null;
+        this.fisher =null;
         model=null;
         profitRegression.turnOff();
         profitRegression = null;

@@ -103,7 +103,7 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 

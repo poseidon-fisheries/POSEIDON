@@ -128,15 +128,10 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
         for(Map.Entry<SeaTile,OneDimensionalKalmanFilter> filter : filters.entrySet())
         {
 
-            if(fisher.getID() == 0 && filter.getKey().getGridX()==37 && filter.getKey().getGridY()==25) {
-                System.out.println("Observation: " + observation);
-            }
+
             filter.getValue().observe(extractNumericalObservation(observation),
                                       extractObservationUncertainty(observation, filter));
-            if(fisher.getID() == 0 && filter.getKey().getGridX()==37 && filter.getKey().getGridY()==25) {
 
-                System.out.println("prediction : " + filter.getValue().getStateEstimate() + " +- " + filter.getValue().getStandardDeviation() );
-            }
         }
     }
 

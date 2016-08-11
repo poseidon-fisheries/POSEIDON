@@ -74,12 +74,14 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         //todo remove gatherer
         if(receipt!=null) {
             receipt.stop();
-            fisher.getDailyData().removeGatherer(dataTitle);
+            this.fisher.getDailyData().removeGatherer(dataTitle);
         }
+        this.fisher = null;
+        this.state = null;
     }
 
     @Override
@@ -105,5 +107,11 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
 
 
 
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Fisher getFisher() {
+        return fisher;
     }
 }

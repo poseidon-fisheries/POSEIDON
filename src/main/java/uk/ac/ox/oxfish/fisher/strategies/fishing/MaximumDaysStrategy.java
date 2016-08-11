@@ -49,9 +49,10 @@ public class MaximumDaysStrategy implements FishingStrategy
 
     /**
      * tell the startable to turnoff,
+     * @param fisher
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 }

@@ -165,13 +165,18 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
 
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(state!=null) {
-            fisher.getDailyData().removeGatherer("Reservation Quota Price of " + state.getSpecies().get(specieIndex));
+            this.fisher.getDailyData().removeGatherer("Reservation Quota Price of " + state.getSpecies().get(specieIndex));
             receipt.stop();
         }
+        this.fisher = null;
+        this.state = null;
     }
 
 
-
+    @Override
+    public Fisher getFisher() {
+        return fisher;
+    }
 }

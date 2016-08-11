@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
+import uk.ac.ox.oxfish.model.regs.ITQOpportunityCost;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -12,6 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Like Mono factory but these quotas are not valid for all species but only for one of them
@@ -58,44 +60,41 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         }
         ITQMarketBuilder marketBuilder = marketBuilders.get(state);
         assert marketBuilder != null;
+        final Species protectedSpecies = state.getSpecies().get(specieIndex);
+        //now I need to add the opportunity cost
+        ITQOpportunityCost cost = new ITQOpportunityCost(new Function<Species, ITQOrderBook>() {
+            @Override
+            public ITQOrderBook apply(Species species) {
+                if(species== protectedSpecies)
+                    return marketBuilder.getMarket();
+                else
+                    return null;
+            }
+        });
         SpecificQuotaRegulation regulation = new SpecificQuotaRegulation(
                 individualQuota.apply(state.getRandom()), state,
-                state.getSpecies().get(specieIndex)) {
-
-            /**
-             * in addition tell the fisher to count opportunity costs
-             */
+                protectedSpecies)
+        {
             @Override
-            public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-                //do the usual stuff
-                super.reactToSale(species, seller, biomass, revenue);
+            public void start(FishState model, Fisher fisher) {
+                super.start(model, fisher);
+                fisher.getOpportunityCosts().add(cost);
+            }
 
-                computeOpportunityCosts(species, seller, biomass, revenue, this, marketBuilder.getMarket());
+            @Override
+            public void turnOff(Fisher fisher) {
+                super.turnOff(fisher);
+                fisher.getOpportunityCosts().remove(cost);
             }
         };
+
+
         marketBuilder.addTrader(regulation);
         return regulation;
     }
 
 
-    /**
-     * this is visible to be overridden by tests. It's just the method used to assign opportunity costs at the end
-     * of the trip
-     */
-    @VisibleForTesting
-    public void computeOpportunityCosts(Species species, Fisher seller, double biomass, double revenue,
-                                        SpecificQuotaRegulation regulation, ITQOrderBook market)
-    {
-        //account for opportunity costs
-        if(biomass > 0 && regulation.getProtectedSpecies().equals(species))
-        {
-            double lastClosingPrice = market.getLastClosingPrice();
-            if(Double.isFinite(lastClosingPrice))
-            {
-                seller.recordOpportunityCosts(lastClosingPrice * biomass); //you could have sold those quotas!
-            }
-        }
-    }
+
 
 
     public DoubleParameter getIndividualQuota() {

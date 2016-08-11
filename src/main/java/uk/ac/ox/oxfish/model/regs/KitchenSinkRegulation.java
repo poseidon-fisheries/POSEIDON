@@ -116,4 +116,18 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
     public void setQuotaRemaining(int specieIndex, double newQuotaValue) {
         quotas.setQuotaRemaining(specieIndex, newQuotaValue);
     }
+
+    @Override
+    public void start(FishState model, Fisher fisher) {
+        mpaRules.start(model,fisher);
+        fishingSeason.start(model,fisher);
+        quotas.start(model,fisher);
+    }
+
+    @Override
+    public void turnOff(Fisher fisher) {
+        mpaRules.turnOff(fisher);
+        fishingSeason.turnOff(fisher);
+        quotas.turnOff(fisher);
+    }
 }

@@ -30,7 +30,7 @@ public class FixedGearStrategy implements GearStrategy {
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 }

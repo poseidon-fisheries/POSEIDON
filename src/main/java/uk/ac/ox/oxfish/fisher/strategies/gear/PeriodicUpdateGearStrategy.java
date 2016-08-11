@@ -164,13 +164,13 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
     }
 
     @Override
-    public void turnOff() {
-        if(fisher!=null) //if started, remov adaptations
+    public void turnOff(Fisher fisher) {
+        if(this.fisher !=null) //if started, remov adaptations
         {
             if (yearly)
-                fisher.removeYearlyAdaptation(gearAdaptation);
+                this.fisher.removeYearlyAdaptation(gearAdaptation);
             else
-                fisher.removeBiMonthlyAdaptation(gearAdaptation);
+                this.fisher.removeBiMonthlyAdaptation(gearAdaptation);
         }
     }
 }

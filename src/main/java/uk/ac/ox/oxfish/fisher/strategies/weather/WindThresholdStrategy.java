@@ -43,7 +43,7 @@ public class WindThresholdStrategy implements WeatherEmergencyStrategy {
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 }

@@ -56,7 +56,7 @@ public class MonthlyDepartingStrategy implements  DepartingStrategy {
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         //doesn't need to turn off
     }
 

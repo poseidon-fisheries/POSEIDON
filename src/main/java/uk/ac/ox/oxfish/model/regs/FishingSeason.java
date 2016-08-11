@@ -109,4 +109,20 @@ public class FishingSeason implements Regulation
     public void setRespectMPAs(boolean respectMPAs) {
         this.respectMPAs = respectMPAs;
     }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff(Fisher fisher) {
+
+    }
 }

@@ -69,9 +69,10 @@ public class DailyDecreasingProbability implements AdaptationProbability, Steppa
 
     /**
      * tell the startable to turnoff,
+     * @param fisher
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 

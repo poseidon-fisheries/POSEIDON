@@ -34,6 +34,7 @@ Abstract:
       standardDeviationCatchabilityFirstSpecies: '0.0'
       standardDeviationCatchabilityOtherSpecies: '0.0'
       gasPerHourFished: '5.0'
+  gearStrategy: Never Change Gear
   habitatInitializer: All Sand
   holdSize: '100.0'
   literPerKilometer: '10.0'

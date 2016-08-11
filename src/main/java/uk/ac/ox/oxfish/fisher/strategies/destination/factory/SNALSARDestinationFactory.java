@@ -99,7 +99,7 @@ public class SNALSARDestinationFactory implements AlgorithmFactory<SNALSARDestin
             }
 
             @Override
-            public void turnOff() {
+            public void turnOff(Fisher fisher) {
 
             }
         };

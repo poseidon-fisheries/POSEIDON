@@ -92,8 +92,8 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     }
 
     @Override
-    public void turnOff() {
-        delegate.turnOff();
+    public void turnOff(Fisher fisher) {
+        delegate.turnOff(fisher);
     }
 
     @Override

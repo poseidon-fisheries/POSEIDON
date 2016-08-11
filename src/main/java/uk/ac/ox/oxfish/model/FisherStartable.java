@@ -11,6 +11,6 @@ public interface FisherStartable {
 
     void start(FishState model, Fisher fisher);
 
-    void turnOff();
+    void turnOff(Fisher fisher);
 
 }

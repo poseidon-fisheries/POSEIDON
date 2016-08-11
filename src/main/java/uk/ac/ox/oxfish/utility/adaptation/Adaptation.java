@@ -255,8 +255,8 @@ public class Adaptation<T> implements FisherStartable {
 
 
     @Override
-    public void turnOff() {
-        probability.turnOff();
+    public void turnOff(Fisher fisher) {
+        probability.turnOff(fisher);
     }
 
     private void act(Fisher toAdapt,T newVariable)

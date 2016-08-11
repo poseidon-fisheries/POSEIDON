@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.market.itq;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FisherStartable;
 
 import java.io.Serializable;
@@ -14,4 +15,6 @@ public interface PriceGenerator extends FisherStartable, Serializable{
 
     double computeLambda();
 
+
+    Fisher getFisher();
 }

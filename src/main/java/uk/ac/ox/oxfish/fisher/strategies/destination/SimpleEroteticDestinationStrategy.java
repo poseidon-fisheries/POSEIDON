@@ -88,10 +88,10 @@ public class SimpleEroteticDestinationStrategy implements DestinationStrategy,
 
 
     @Override
-    public void turnOff() {
-        fisher.removeTripListener(this);
+    public void turnOff(Fisher fisher) {
+        this.fisher.removeTripListener(this);
         for(EroteticAnswer<SeaTile> filter : chooser)
             filter.turnOff();
-        fisher=null;
+        this.fisher =null;
     }
 }

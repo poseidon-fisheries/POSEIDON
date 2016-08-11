@@ -112,7 +112,6 @@ public class TripRecord {
 
     public void recordCosts(double newCosts)
     {
-        Preconditions.checkState(!completed);
         totalCosts += newCosts;
     }
 

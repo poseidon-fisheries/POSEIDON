@@ -5,13 +5,14 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FisherStartable;
 
 /**
  * The regulations object tell agents whether they can fish or not, where they can and whether they can sell their catch
  * or not
  * Created by carrknight on 5/2/15.
  */
-public interface Regulation
+public interface Regulation extends FisherStartable
 {
 
 

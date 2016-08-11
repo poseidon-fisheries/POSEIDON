@@ -108,7 +108,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
             }
 
             @Override
-            public void turnOff() {
+            public void turnOff(Fisher fisher) {
                 if(tripListener[0]!=null)
                     this.fisher.removeTripListener(tripListener[0]);
             }
@@ -136,7 +136,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(stoppable!= null)
             stoppable.stop();
     }

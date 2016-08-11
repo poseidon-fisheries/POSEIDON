@@ -75,7 +75,7 @@ public class FishingTest {
                                        }
 
                                        @Override
-                                       public void turnOff() {
+                                       public void turnOff(Fisher fisher) {
 
                                        }
                                    },

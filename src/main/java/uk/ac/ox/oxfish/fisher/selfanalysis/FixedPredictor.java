@@ -66,7 +66,7 @@ public class FixedPredictor implements Predictor {
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         //ignored
     }
 

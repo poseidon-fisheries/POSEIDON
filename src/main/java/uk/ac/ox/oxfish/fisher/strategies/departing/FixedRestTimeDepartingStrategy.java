@@ -41,9 +41,10 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
     }
 
     /**
+     * @param fisher
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 //nothing
     }
 }

@@ -66,4 +66,20 @@ public class ProtectedAreasOnly implements Regulation {
     public Regulation makeCopy() {
         return new ProtectedAreasOnly();
     }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff(Fisher fisher) {
+
+    }
 }

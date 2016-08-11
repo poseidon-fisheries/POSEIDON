@@ -130,10 +130,11 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
 
     /**
      * tell the startable to turnoff,
+     * @param fisher
      */
     @Override
-    public void turnOff() {
-        delegate.turnOff();
+    public void turnOff(Fisher fisher) {
+        delegate.turnOff(fisher);
     }
 
     /**

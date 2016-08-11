@@ -23,9 +23,9 @@ public class CompositeDepartingStrategy implements DepartingStrategy
 
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         for(DepartingStrategy strategy : strategies)
-            strategy.turnOff();
+            strategy.turnOff(fisher);
     }
 
     @Override

@@ -78,7 +78,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
     }
 
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(stoppable != null)
             stoppable.stop();
         stoppable = null;

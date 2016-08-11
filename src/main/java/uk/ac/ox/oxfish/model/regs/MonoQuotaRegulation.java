@@ -152,4 +152,14 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     public Regulation makeCopy() {
         return new MonoQuotaRegulation(yearlyQuota, null); //todo turn into startable so this makes more sense
     }
+
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    @Override
+    public void turnOff(Fisher fisher) {
+
+    }
 }

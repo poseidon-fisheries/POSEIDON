@@ -37,9 +37,10 @@ public class FishOnceStrategy implements FishingStrategy {
 
     /**
      * ignored
+     * @param fisher
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 }

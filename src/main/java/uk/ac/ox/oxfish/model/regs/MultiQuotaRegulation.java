@@ -50,6 +50,15 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     }
 
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    @Override
+    public void turnOff(Fisher fisher) {
+
+    }
 
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
