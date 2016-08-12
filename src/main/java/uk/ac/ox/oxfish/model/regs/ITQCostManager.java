@@ -13,13 +13,13 @@ import java.util.function.Function;
 /**
  * Created by carrknight on 8/11/16.
  */
-public class ITQOpportunityCost implements Cost{
+public class ITQCostManager implements Cost{
 
 
     private final Function<Species,ITQOrderBook> orderBooks;
 
 
-    public ITQOpportunityCost(
+    public ITQCostManager(
             Function<Species,ITQOrderBook> orderBooks) {
         this.orderBooks = orderBooks;
     }

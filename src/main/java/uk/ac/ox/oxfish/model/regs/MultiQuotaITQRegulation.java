@@ -1,10 +1,7 @@
 package uk.ac.ox.oxfish.model.regs;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 
@@ -29,7 +26,7 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
 
     //compute opportunity costs!
 
-    private ITQOpportunityCost cost;
+    private ITQCostManager cost;
 
     /**
      * add yourself as an opportunity cost!
@@ -39,7 +36,7 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
     @Override
     public void start(FishState model, Fisher fisher) {
         assert cost == null;
-        cost = new ITQOpportunityCost(new Function<Species, ITQOrderBook>() {
+        cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
                 return orderBooks.get(species.getIndex());

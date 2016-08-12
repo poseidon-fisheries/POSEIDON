@@ -4,7 +4,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
-import uk.ac.ox.oxfish.model.regs.ITQOpportunityCost;
+import uk.ac.ox.oxfish.model.regs.ITQCostManager;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -63,7 +63,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 
         assert marketBuilder != null;
 
-        ITQOpportunityCost cost = new ITQOpportunityCost(new Function<Species, ITQOrderBook>() {
+        ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
                     return marketBuilder.getMarket();

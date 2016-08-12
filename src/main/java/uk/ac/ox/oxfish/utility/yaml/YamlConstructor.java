@@ -38,18 +38,18 @@ public class YamlConstructor extends  Constructor {
                     //then a simple scalar must be a fixed double parameter. Build it
                     return doubleParameterSplit((ScalarNode) nnode);
                 else
-                    //if it's a path type we write and read it as string rather than with the ugly !! notation
+                //if it's a path type we write and read it as string rather than with the ugly !! notation
                     if(nnode.getType().equals(Path.class))
                         return Paths.get(((ScalarNode) nnode).getValue());
+                else
+                    //it's also possible that the scalar is an algorithm factory without any settable field
+                    //this is rare which means that factories are represented as maps, but this might be one of the simple
+                    //ones like AnarchyFactory
+                    if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
+                        return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
+                    //otherwise I guess it's really a normal scalar!
                     else
-                        //it's also possible that the scalar is an algorithm factory without any settable field
-                        //this is rare which means that factories are represented as maps, but this might be one of the simple
-                        //ones like AnarchyFactory
-                        if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
-                            return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
-                            //otherwise I guess it's really a normal scalar!
-                        else
-                            return super.construct(nnode);                }
+                        return super.construct(nnode);                }
         });
 
         //intercept maps as well, some of them could be factories
@@ -58,23 +58,26 @@ public class YamlConstructor extends  Constructor {
             @Override
             public Object construct(Node node) {
                 if(AlgorithmFactory.class.isAssignableFrom(node.getType())) {
-
-                    //the original construct failed, hopefully this means it's an algorithm factory
-                    //written as a map, so get its name and look it up
-                    final AlgorithmFactory toReturn = AlgorithmFactories.constructorLookup(
-                            ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
-                    //now take all the elements of the submap, we are going to place them by setter
-                    //todo might have to flatten here!
-                    ((MappingNode) node).setValue(
-                            ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue());
-                    assert toReturn != null;
-                    //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
-                    node.setType(toReturn.getClass());
-                    //use beans to set all the properties correctly
-                    constructJavaBean2ndStep((MappingNode) node, toReturn);
-                    //done!
-                    return toReturn;
-
+                    //try super constructor first, most of the time it works
+                    try {
+                        return super.construct(node);
+                    } catch (YAMLException e) {
+                        //the original construct failed, hopefully this means it's an algorithm factory
+                        //written as a map, so get its name and look it up
+                        final AlgorithmFactory toReturn = AlgorithmFactories.constructorLookup(
+                                ((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+                        //now take all the elements of the submap, we are going to place them by setter
+                        //todo might have to flatten here!
+                        ((MappingNode) node).setValue(
+                                ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        assert toReturn != null;
+                        //need to set the node to the correct return or the reflection magic of snakeYAML wouldn't work
+                        node.setType(toReturn.getClass());
+                        //use beans to set all the properties correctly
+                        constructJavaBean2ndStep((MappingNode) node, toReturn);
+                        //done!
+                        return toReturn;
+                    }
                 }
                 //try a similar approach for scenarios
                 if(Scenario.class.isAssignableFrom(node.getType()))
@@ -110,15 +113,15 @@ public class YamlConstructor extends  Constructor {
                                        "PolicyScript"))
                 {
 
-                    //now we can deal with filling it through beans
-                    //first allocate subnodes correctly
-                    ((MappingNode) node).setValue(
-                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
-                    //set type correctly
-                    node.setType(PolicyScript.class);
-                    PolicyScript script = new PolicyScript();
-                    constructJavaBean2ndStep((MappingNode) node, script);
-                    return script;
+                        //now we can deal with filling it through beans
+                        //first allocate subnodes correctly
+                        ((MappingNode) node).setValue(
+                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                        //set type correctly
+                        node.setType(PolicyScript.class);
+                        PolicyScript script = new PolicyScript();
+                        constructJavaBean2ndStep((MappingNode) node, script);
+                        return script;
 
 
 
@@ -127,20 +130,20 @@ public class YamlConstructor extends  Constructor {
                 if(PolicyScripts.class.isAssignableFrom(node.getType()))
                 {
 
-                    //now we can deal with filling it through beans
-                    //first allocate subnodes correctly
+                        //now we can deal with filling it through beans
+                        //first allocate subnodes correctly
 
-                    //set type correctly
+                        //set type correctly
 
-                    node.setType(PolicyScripts.class);
-                    for(NodeTuple partialScript : ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue())
-                    {
-                        partialScript.getKeyNode().setType(Integer.class);
-                        partialScript.getValueNode().setType(PolicyScript.class);
-                    }
-                    PolicyScripts script = new PolicyScripts();
-                    constructJavaBean2ndStep((MappingNode) node, script);
-                    return script;
+                        node.setType(PolicyScripts.class);
+                        for(NodeTuple partialScript : ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue())
+                        {
+                            partialScript.getKeyNode().setType(Integer.class);
+                            partialScript.getValueNode().setType(PolicyScript.class);
+                        }
+                        PolicyScripts script = new PolicyScripts();
+                        constructJavaBean2ndStep((MappingNode) node, script);
+                        return script;
 
 
 
@@ -170,7 +173,7 @@ public class YamlConstructor extends  Constructor {
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
         if(split.length == 1)
             //fixed
-            return new FixedDoubleParameter(Double.parseDouble(split[0]));
+        return new FixedDoubleParameter(Double.parseDouble(split[0]));
 
         if(split[0].toLowerCase().equals("normal"))
             return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));

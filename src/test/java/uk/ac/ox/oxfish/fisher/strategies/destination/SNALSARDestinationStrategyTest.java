@@ -1,18 +1,31 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import ec.util.MersenneTwisterFast;
+import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.FixedProfitThresholdFactory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.SNALSARDestinationFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -264,5 +277,131 @@ public class SNALSARDestinationStrategyTest {
                 any())).thenReturn(new FixedMap<>(50d,options ));
 
         return extractors;
+    }
+
+    @Test
+    public void cheatingEmergence() throws Exception {
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setCheaters(true);
+        scenario.getStartingMPAs().add(new StartingMPA(0, 0, 3, 15));
+        //few fishers
+        scenario.setFishers(25);
+        //small map makes it faster
+        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        mapInitializer.setWidth(new FixedDoubleParameter(15));
+        mapInitializer.setHeight(new FixedDoubleParameter(15));
+        mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0));
+        scenario.setMapInitializer(mapInitializer);
+        //snalsar!
+        SNALSARDestinationFactory snalsar = new SNALSARDestinationFactory();
+        //you need to make more than 5 to not be considered a failure!
+        FixedProfitThresholdFactory failureThreshold = new FixedProfitThresholdFactory();
+        failureThreshold.setFixedThreshold(new FixedDoubleParameter(5d));
+        snalsar.setFailureThreshold(failureThreshold);
+        scenario.setDestinationStrategy(snalsar);
+
+        FishState state = new FishState();
+        state.setScenario(scenario);
+
+
+        state.start();
+        //skip first 10 random days
+        for (int day = 0; day < 10; day++)
+
+            state.schedule.step(state);
+
+        //fort the next 50 days nobody ought to be cheating
+        double cheaters = 0;
+        for (int day = 0; day < 50; day++) {
+            state.schedule.step(state);
+            for (int x = 0; x < 5; x++)
+                for (int y = 0; y < 12; y++)
+                    cheaters += state.getMap().getDailyTrawlsMap().get(0, y);
+
+        }
+        assertEquals(0, cheaters, .001);
+
+
+        //after 1 year they are all (> 50%) cheating
+        while (state.getYear() < 1)
+            state.schedule.step(state);
+
+        cheaters = 0;
+        double total = 0;
+        for (int day = 0; day < 50; day++) {
+            state.schedule.step(state);
+            for (int x = 0; x < 5; x++)
+                for (int y = 0; y < 12; y++)
+                    cheaters += state.getMap().getDailyTrawlsMap().get(0, y);
+            total += Arrays.stream(state.getMap().getDailyTrawlsMap().toArray()).sum();
+
+        }
+        assertTrue(cheaters / total > .5);
+
+    }
+
+
+    /**
+     * 2 species ITQ, both are valuable but the quotas of the ones only available south are very few so that
+     * it's better to fish north. The results are muffled by the fact that over time north gets consumed and it becomes better
+     * to fish south instead anyway.
+     * @throws Exception
+     */
+    @Test
+    public void itqAffectsGeographySNALSAR() throws Exception {
+
+
+
+        FishYAML yaml = new FishYAML();
+        String scenarioYaml = String.join("\n", Files.readAllLines(
+                Paths.get("inputs", "first_paper", "location_itq.yaml")));
+        PrototypeScenario scenario =  yaml.loadAs(scenarioYaml,PrototypeScenario.class);
+        //few fishers
+        scenario.setFishers(25);
+        //small map makes it faster
+        SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+        mapInitializer.setWidth(new FixedDoubleParameter(15));
+        mapInitializer.setHeight(new FixedDoubleParameter(15));
+        mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0));
+        scenario.setMapInitializer(mapInitializer);
+        scenario.setPortPositionX(5);
+        scenario.setPortPositionY(7);
+        //add snalsar
+        scenario.setDestinationStrategy(new SNALSARDestinationFactory());
+        FishState state = new FishState();
+        state.setScenario(scenario);
+
+
+
+
+
+        long towsNorth = 0;
+        long towsSouth = 0;
+
+        state.start();
+        //first year, just run: there is no ITQ running anyway
+        while (state.getYear() < 1) {
+            state.schedule.step(state);
+        }
+        state.schedule.step(state);
+
+
+        while (state.getYear() < 2) {
+            state.schedule.step(state);
+            for (int x = 0; x < 15; x++) {
+                for (int y = 0; y <= 6; y++) {
+                    towsNorth += state.getMap().getDailyTrawlsMap().get(x, y);
+                }
+                for (int y = 7; y < 15; y++) {
+                    towsSouth += state.getMap().getDailyTrawlsMap().get(x, y);
+                }
+            }
+        }
+
+        System.out.println("North vs South : " + towsNorth / ((double) towsNorth + towsSouth));
+        Assert.assertTrue(towsNorth / ((double) towsNorth + towsSouth) > .6);
+
+
+
     }
 }

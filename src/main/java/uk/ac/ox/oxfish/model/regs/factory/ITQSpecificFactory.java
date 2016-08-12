@@ -1,11 +1,10 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
-import uk.ac.ox.oxfish.model.regs.ITQOpportunityCost;
+import uk.ac.ox.oxfish.model.regs.ITQCostManager;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -62,7 +61,7 @@ public class ITQSpecificFactory implements AlgorithmFactory<SpecificQuotaRegulat
         assert marketBuilder != null;
         final Species protectedSpecies = state.getSpecies().get(specieIndex);
         //now I need to add the opportunity cost
-        ITQOpportunityCost cost = new ITQOpportunityCost(new Function<Species, ITQOrderBook>() {
+        ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
                 if(species== protectedSpecies)
