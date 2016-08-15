@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTilePredictor;
@@ -70,12 +71,12 @@ public class KernelTilePredictorTest {
         KernelTilePredictor forgetting = new KernelTilePredictor(
                 .8d,
                 map.getSeaTile(25,25),
-                new SpaceRegressionDistance(1d)
+                new RBFKernel(new SpaceRegressionDistance(1d),1d)
         );
         KernelTilePredictor notForgetting = new KernelTilePredictor(
                 1d,
                 map.getSeaTile(25,25),
-                new SpaceRegressionDistance(1d)
+                new RBFKernel(new SpaceRegressionDistance(1d),1d)
         );
         forgetting.addObservation(
                  new GeographicalObservation<>(

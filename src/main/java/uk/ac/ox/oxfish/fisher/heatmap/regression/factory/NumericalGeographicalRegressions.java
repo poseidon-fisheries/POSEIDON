@@ -52,11 +52,6 @@ public class NumericalGeographicalRegressions {
         NAMES.put(KernelTransductionFactory.class,
                   "Kernel Transduction");
 
-        CONSTRUCTORS.put("5 Parameters Kernel Transduction",
-                         FiveParametersKernelTransductionFactory::new);
-        NAMES.put(FiveParametersKernelTransductionFactory.class,
-                  "5 Parameters Kernel Transduction");
-
 
         CONSTRUCTORS.put("RBF Kernel Transduction",
                          DefaultRBFKernelTransductionFactory::new);

@@ -74,6 +74,9 @@ dependencies
     //jcommander, useful to parse command line
     compile "com.beust:jcommander:1.48"
 
+    //jama for matrices!
+    compile group: 'gov.nist.math', name: 'jama', version: '1.0.3'
+
 
     //testing:
     testCompile "junit:junit:4.12"

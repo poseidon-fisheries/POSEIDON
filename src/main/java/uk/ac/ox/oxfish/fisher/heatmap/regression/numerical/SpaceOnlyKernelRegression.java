@@ -10,6 +10,7 @@ public class SpaceOnlyKernelRegression extends   AbstractKernelRegression
 
 
 
+
     public SpaceOnlyKernelRegression(int maximumNumberOfObservations,
                                      double distanceBandwidth) {
 
