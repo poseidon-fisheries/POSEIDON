@@ -109,7 +109,7 @@ task fatJar(type: FatCapsule) {
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-task buildHeadless(type: FatCapsule, dependsOn: test) {
+task buildHeadless(type: FatCapsule, dependsOn: jar) {
     archiveName = "yamler.jar"
     applicationClass 'uk.ac.ox.oxfish.YamlMain'
     //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
