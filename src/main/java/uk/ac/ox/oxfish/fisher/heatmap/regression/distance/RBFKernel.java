@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * Takes a regression distance and makes it into RBF distance
  * Created by carrknight on 8/14/16.
  */
-public class RBFRegressionDistance implements RegressionDistance
+public class RBFKernel implements RegressionDistance
 {
 
 
@@ -16,7 +16,7 @@ public class RBFRegressionDistance implements RegressionDistance
 
     private final double bandwidth;
 
-    public RBFRegressionDistance(RegressionDistance delegate, double bandwidth) {
+    public RBFKernel(RegressionDistance delegate, double bandwidth) {
         this.delegate = delegate;
         this.bandwidth = bandwidth;
     }

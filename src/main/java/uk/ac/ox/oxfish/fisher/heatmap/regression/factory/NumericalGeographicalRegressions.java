@@ -58,6 +58,12 @@ public class NumericalGeographicalRegressions {
                   "5 Parameters Kernel Transduction");
 
 
+        CONSTRUCTORS.put("RBF Kernel Transduction",
+                         DefaultRBFKernelTransductionFactory::new);
+        NAMES.put(DefaultRBFKernelTransductionFactory.class,
+                  "RBF Kernel Transduction");
+
+
         CONSTRUCTORS.put("Particle Filter Regression",
                          ParticleFilterRegressionFactory::new);
         NAMES.put(ParticleFilterRegressionFactory.class,
