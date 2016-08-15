@@ -8,6 +8,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.DefaultRBFKernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
@@ -44,7 +45,7 @@ public class HeatmapTester extends GUIState
     private final ColorfulGrid copy;
     private CoordinateTransformer transformer;
 
-    private GeographicalRegression regression = new NearestNeighborRegression(1, 24*7, 5);
+    private GeographicalRegression regression;
     private MouseListener heatmapClicker;
 
     /**
@@ -61,11 +62,12 @@ public class HeatmapTester extends GUIState
      * standard constructor, useful mostly for checkpointing
      * @param state checkpointing state
      */
-    public HeatmapTester(SimState state)
+    public HeatmapTester(FishState state)
     {
         super(state);
         myPortrayal = new ColorfulGrid(guirandom);
         copy = new ColorfulGrid(guirandom);
+
     }
 
 
@@ -90,6 +92,7 @@ public class HeatmapTester extends GUIState
     public void start() {
         super.start();
 
+        regression = (new DefaultRBFKernelTransductionFactory()).apply((FishState) state);
 
         initialize();
 
@@ -174,7 +177,8 @@ public class HeatmapTester extends GUIState
                         getBiomass(state.getSpecies().get(0));
                 regression.addObservation(new GeographicalObservation(state.getMap().getSeaTile(gridPosition.getX(),gridPosition.getY()),
                                                                       state.getHoursSinceStart(),
-                                                                      observation),null );
+                                                                      observation),
+                                          state.getFishers().get(0));
 
                 display2D.repaint();
 
@@ -253,7 +257,7 @@ public class HeatmapTester extends GUIState
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setBiologyInitializer(new FromLeftToRightFactory());
         state.setScenario(scenario);
-        scenario.setFishers(0);
+        scenario.setFishers(1);
 
         HeatmapTester tester = new HeatmapTester(state);
         Console c = new Console(tester);

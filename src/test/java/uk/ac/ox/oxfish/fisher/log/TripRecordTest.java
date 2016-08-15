@@ -39,19 +39,6 @@ public class TripRecordTest {
     }
 
     @Test
-    public void cannotChangeCompletedStuff(){
-        TripRecord record = new TripRecord(0,123d );
-        assertFalse(record.isCompleted());
-        //should not allow earnings after it's complete
-        record.completeTrip(10,mock(Port.class) );
-        assertTrue(record.isCompleted());
-        exception.expect(IllegalStateException.class);
-        record.recordCosts(100);
-
-
-    }
-
-    @Test
     public void profitsAreCorrect() throws Exception {
         TripRecord record = new TripRecord(2,123d );
         record.recordCosts(100);

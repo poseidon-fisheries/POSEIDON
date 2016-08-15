@@ -44,7 +44,7 @@ public class KernelTilePredictor{
         //compute kernel
         double kernel = 1;
         for(RegressionDistance distance : distances)
-            kernel *= gaussianTransform(distance.distance(fisher,
+            kernel *= (distance.distance(fisher,
                                                           whereAmIPredicting,
                                                           observation.getTime(),
                                                           observation));
@@ -60,11 +60,6 @@ public class KernelTilePredictor{
 
 
 
-    private double gaussianTransform(double distance){
-
-        return Math.exp(-(distance)/2d);
-
-    }
 
     public double getCurrentPrediction() {
         return currentPrediction;
