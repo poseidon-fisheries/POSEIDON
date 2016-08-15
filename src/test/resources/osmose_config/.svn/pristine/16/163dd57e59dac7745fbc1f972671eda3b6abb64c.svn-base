@@ -1,0 +1,14 @@
+# Osmose 3 Update 2 - Seeding mechanism for initialisation of the population
+population.seeding.biomass.sp0;786143
+population.seeding.biomass.sp1;3203640
+population.seeding.biomass.sp2;388300
+population.seeding.biomass.sp3;647900
+population.seeding.biomass.sp4;532800
+population.seeding.biomass.sp5;2253240
+population.seeding.biomass.sp6;1369720
+population.seeding.biomass.sp7;460000
+population.seeding.biomass.sp8;10400
+population.seeding.biomass.sp9;74140
+# Seeding year max set to the lifespan of the longest lived species
+population.seeding.year.max;25
+

@@ -1,0 +1,11 @@
+STONE:
+  - stone
+  - stone block
+  - smooth stone
+WOOD:
+  OAK_WOOD:
+    - wood
+    - oak wood
+  SPRUCE_WOOD:
+    - spruce wood
+    - spruce wood block
