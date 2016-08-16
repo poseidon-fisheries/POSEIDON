@@ -6,21 +6,24 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
-import static org.junit.Assert.assertEquals;
+import java.util.function.Function;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by carrknight on 7/13/16.
+ * Created by carrknight on 8/16/16.
  */
-public class GasCostTest {
+public class ProfitFunctionTest {
 
 
     @Test
     public void attached() throws Exception {
 
-        //if I attach it to a fisher in a real simulation it should compute precisely the gas costs
+        //if I attach it to a fisher in a real simulation it should compute precisely the profits
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(1);
         FishState state = new FishState(System.currentTimeMillis());
@@ -30,8 +33,7 @@ public class GasCostTest {
         state.start();
 
 
-        GasCost cost = new GasCost();
-        LameTripSimulator simulator = new LameTripSimulator();
+        ProfitFunction function = new ProfitFunction(new LameTripSimulator(),24*5);
 
         final Fisher fisher = state.getFishers().get(0);
         fisher.addTripListener(
@@ -39,17 +41,31 @@ public class GasCostTest {
                     @Override
                     public void reactToFinishedTrip(TripRecord record) {
                         System.out.println("day : " + state.getDay());
-                        assertEquals(cost.cost(fisher,state,record,0d),
-                                     record.getTotalCosts(),.001d);
-                        TripRecord simulated = simulator.simulateRecord(fisher, record.getMostFishedTileInTrip(),
-                                                                        state, 24 * 5,
-                                                                        new double[]{record.getSoldCatch()[0] / record.getEffort()}
-                        );
+                        TripRecord simulated = function.simulateTrip(fisher,
+                                                                     new double[]{record.getSoldCatch()[0] / record.getEffort()},
+                                                                     record.getMostFishedTileInTrip(),
+                                                                     state
+                                                                     );
+
                         assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
                         assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
                         assertEquals(simulated.getEffort(),record.getEffort(),.001d);
                         assertEquals(simulated.getLitersOfGasConsumed(),record.getLitersOfGasConsumed(),.001d);
                         assertEquals(simulated.getDurationInHours(),record.getDurationInHours(),.1);
+                        double hourlyProfits = function.hourlyProfitFromHypotheticalTripHere(
+                                fisher, record.getMostFishedTileInTrip(),
+                                state,
+                                new Function<SeaTile, double[]>() {
+                                    @Override
+                                    public double[] apply(SeaTile seaTile) {
+                                        return new double[]{record.getSoldCatch()[0] / record.getEffort()};
+                                    }
+                                },
+                                false
+
+
+                        );
+                        assertEquals(hourlyProfits,record.getProfitPerHour(true),.1);
 
                     }
                 }
@@ -60,4 +76,5 @@ public class GasCostTest {
 
 
     }
+
 }

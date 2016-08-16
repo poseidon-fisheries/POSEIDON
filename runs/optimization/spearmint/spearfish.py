@@ -14,9 +14,11 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/gear_itq/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/inputs/first_paper/optimiser/tac-separated/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/kalman_tune/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/kalman_tune/kernel/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/kalman_tune/kernel/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/rbf/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/rbf/itq_plan/"
 
-SPEARMINT_DIRECTORY = "/home/carrknight/code/PESM/Spearmint/spearmint"
+SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
 
 

@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.function.DoublePredicate;
 
 /**
  * A "trip simulator" that is really just a collection of equations and not a proper simulation. It assumes you only
@@ -28,7 +27,7 @@ public class LameTripSimulator {
     public TripRecord simulateRecord(
             Fisher fisher, SeaTile fishingSpot, FishState state,
             double maxHoursOut,
-            double[] expectedHourlyCatches, boolean verbose)
+            double[] expectedHourlyCatches)
     {
 
         int numberOfSpecies = state.getSpecies().size();
@@ -65,7 +64,7 @@ public class LameTripSimulator {
                 catches[i] = Math.max(expectedHourlyCatches[i],0) * fishingHours;
             }
             Hold.throwOverboard(catches,maxWeight);
-            assert Arrays.stream(catches).sum() <= maxWeight;
+            assert Arrays.stream(catches).sum() <= maxWeight + FishStateUtilities.EPSILON ;
             gasConsumed+=
                     fisher.getGear().getFuelConsumptionPerHourOfFishing(
                             fisher,fisher.getBoat(),fishingSpot
@@ -97,17 +96,7 @@ public class LameTripSimulator {
         record.recordGasConsumption(gasConsumed);
         record.completeTrip(timeSpentAtSea + fishingHours, homePort);
 
-        if(verbose)
-        {
-            System.out.println("Going to " + fishingSpot + " I will spend " + timeSpentAtSea + " travelling plus " +
-            fishingHours + " fishing, expecting " +expectedTotalCatchesPerHour + " lbs of catch per hour which implies " +
-                                       hoursNeededToFillBoat +" hours to fill the boat; in total I am going to travel "
-                                       + distanceTravelled + " km and consume " + record.getLitersOfGasConsumed() + " liters of gas");
 
-            System.out.println("I predict earnings of " + record.getEarnings() + " with costs " + record.getTotalCosts()) ;
-            System.out.println("I predict profits of " + record.getTotalTripProfit() + " which means per hour of  " +
-                                       record.getProfitPerHour(true)) ;
-        }
 
         return record;
 
