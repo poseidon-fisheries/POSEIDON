@@ -27,6 +27,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
 
     private DoubleParameter evidenceUncertainty = new FixedDoubleParameter(3);
 
+    private DoubleParameter fishingHerePenalty = new FixedDoubleParameter(0);
 
     /**
      * Applies this function to the given argument.
@@ -44,6 +45,7 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
                 initialUncertainty.apply(state.getRandom()),
                 evidenceUncertainty.apply(state.getRandom()),
                 optimism.apply(state.getRandom()),
+                fishingHerePenalty.apply(state.getRandom()),
                 state.getMap(),
                 state.getRandom()) ;
     }
@@ -124,5 +126,23 @@ public class SimpleKalmanRegressionFactory implements AlgorithmFactory<SimpleKal
      */
     public void setEvidenceUncertainty(DoubleParameter evidenceUncertainty) {
         this.evidenceUncertainty = evidenceUncertainty;
+    }
+
+    /**
+     * Getter for property 'fishingHerePenalty'.
+     *
+     * @return Value for property 'fishingHerePenalty'.
+     */
+    public DoubleParameter getFishingHerePenalty() {
+        return fishingHerePenalty;
+    }
+
+    /**
+     * Setter for property 'fishingHerePenalty'.
+     *
+     * @param fishingHerePenalty Value to set for property 'fishingHerePenalty'.
+     */
+    public void setFishingHerePenalty(DoubleParameter fishingHerePenalty) {
+        this.fishingHerePenalty = fishingHerePenalty;
     }
 }

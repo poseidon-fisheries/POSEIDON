@@ -17,7 +17,7 @@ public class OneDimensionalKalmanFilter {
     /**
      * the C of the model (that is x*c = evidence)
      */
-    private final double emissionMultiplier;
+    private double emissionMultiplier;
 
     /**
      * the P of the kalman filter
@@ -98,5 +98,59 @@ public class OneDimensionalKalmanFilter {
     public double getProbabilityStateIsThis(double guess)
     {
         return FishStateUtilities.normalPDF(stateEstimate,getStandardDeviation()).apply(guess);
+    }
+
+    /**
+     * Getter for property 'transitionMultiplier'.
+     *
+     * @return Value for property 'transitionMultiplier'.
+     */
+    public double getTransitionMultiplier() {
+        return transitionMultiplier;
+    }
+
+    /**
+     * Getter for property 'emissionMultiplier'.
+     *
+     * @return Value for property 'emissionMultiplier'.
+     */
+    public double getEmissionMultiplier() {
+        return emissionMultiplier;
+    }
+
+    /**
+     * Setter for property 'emissionMultiplier'.
+     *
+     * @param emissionMultiplier Value to set for property 'emissionMultiplier'.
+     */
+    public void setEmissionMultiplier(double emissionMultiplier) {
+        this.emissionMultiplier = emissionMultiplier;
+    }
+
+    /**
+     * Setter for property 'uncertainty'.
+     *
+     * @param uncertainty Value to set for property 'uncertainty'.
+     */
+    public void setUncertainty(double uncertainty) {
+        this.uncertainty = uncertainty;
+    }
+
+    /**
+     * Setter for property 'stateEstimate'.
+     *
+     * @param stateEstimate Value to set for property 'stateEstimate'.
+     */
+    public void setStateEstimate(double stateEstimate) {
+        this.stateEstimate = stateEstimate;
+    }
+
+    /**
+     * Getter for property 'drift'.
+     *
+     * @return Value for property 'drift'.
+     */
+    public double getDrift() {
+        return drift;
     }
 }

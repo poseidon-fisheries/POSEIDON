@@ -1,11 +1,14 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.OneDimensionalKalmanFilter;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -22,9 +25,9 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
 
 
     /**
-     * the % increase per unit of distance in evidence variance
+     * 1/exp(-distance/h) will be our distance penalty
      */
-    private final double distancePenalty;
+    private final RBFKernel distancePenalty;
 
     private final double evidenceUncertainty;
 
@@ -46,6 +49,12 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
 
     private final double initialUncertainty;
 
+    /**
+     * if this is different from 0 then our emission model is z = (1+fishingHerePenalty)x
+     * that is we assume our observation is slightly biased upward (since we might think we are ruining the spot for later)
+     */
+    private final double fishingHerePenalty;
+
     private final HashMap<SeaTile,OneDimensionalKalmanFilter> filters = new HashMap<>();
 
     private final NauticalMap map;
@@ -59,13 +68,22 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
             double maxValue,
             double initialVariance,
             double evidenceUncertainty,
-            double optimism, NauticalMap map,
+            double optimism,
+            double fishingHerePenalty,
+            NauticalMap map,
             MersenneTwisterFast random) {
-        this.distancePenalty = distancePenalty;
+        this.distancePenalty =  new RBFKernel(new RegressionDistance() {
+            @Override
+            public double distance(
+                    Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
+                return  distancer.distance(tile,observation.getTile(),map);
+            }
+        }, distancePenalty);
         this.drift = drift;
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.initialUncertainty = initialVariance;
+        this.fishingHerePenalty = fishingHerePenalty;
         this.map = map;
         this.evidenceUncertainty = evidenceUncertainty;
         this.optimism = optimism;
@@ -128,27 +146,61 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
         for(Map.Entry<SeaTile,OneDimensionalKalmanFilter> filter : filters.entrySet())
         {
 
+            double rbfDistance = distancePenalty.distance(
+                    fisher, filter.getKey(), observation.getTime(), observation);
+            double evidencePenalty = evidenceUncertainty + (1/ rbfDistance-1);
 
-            filter.getValue().observe(extractNumericalObservation(observation),
-                                      extractObservationUncertainty(observation, filter));
+             if(!Double.isFinite(evidencePenalty ) || rbfDistance <= 0.0001) //don't bother with extremely small information
+                 continue;
+
+            if(rbfDistance == 1 && fishingHerePenalty != 0 )
+            {
+                filter.getValue().setEmissionMultiplier(1+fishingHerePenalty);
+            }
+
+            filter.getValue().observe(observation.getValue(),
+                                      evidencePenalty);
+
+            filter.getValue().setEmissionMultiplier(1);
 
         }
     }
 
-    private double extractObservationUncertainty(
-            GeographicalObservation<Double> observation, Map.Entry<SeaTile, OneDimensionalKalmanFilter> filter)
-    {
-        double distance = distancer.distance(observation.getTile(),filter.getKey(),map);
-        return evidenceUncertainty + distancePenalty * (distance*distance);
-    }
 
-    private Double extractNumericalObservation(GeographicalObservation<Double> observation) {
-        return observation.getValue();
-    }
-
-
-    public double getDistancePenalty() {
+    /**
+     * Getter for property 'distancePenalty'.
+     *
+     * @return Value for property 'distancePenalty'.
+     */
+    public RBFKernel getDistancePenalty() {
         return distancePenalty;
+    }
+
+    /**
+     * Getter for property 'evidenceUncertainty'.
+     *
+     * @return Value for property 'evidenceUncertainty'.
+     */
+    public double getEvidenceUncertainty() {
+        return evidenceUncertainty;
+    }
+
+    /**
+     * Getter for property 'optimism'.
+     *
+     * @return Value for property 'optimism'.
+     */
+    public double getOptimism() {
+        return optimism;
+    }
+
+    /**
+     * Getter for property 'fishingHerePenalty'.
+     *
+     * @return Value for property 'fishingHerePenalty'.
+     */
+    public double getFishingHerePenalty() {
+        return fishingHerePenalty;
     }
 
     public double getDrift() {
