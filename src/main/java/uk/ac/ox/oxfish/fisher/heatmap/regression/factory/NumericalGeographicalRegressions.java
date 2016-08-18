@@ -42,6 +42,11 @@ public class NumericalGeographicalRegressions {
         NAMES.put(NearestNeighborRegressionFactory.class,"Nearest Neighbor");
 
 
+        CONSTRUCTORS.put("Complete Nearest Neighbor",
+                         CompleteNearestNeighborRegressionFactory::new);
+        NAMES.put(CompleteNearestNeighborRegressionFactory.class,"Complete Nearest Neighbor");
+
+
         CONSTRUCTORS.put("Nearest Neighbor Transduction",
                          NearestNeighborTransductionFactory::new);
         NAMES.put(NearestNeighborTransductionFactory.class,"Nearest Neighbor Transduction");

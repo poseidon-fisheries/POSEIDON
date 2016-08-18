@@ -91,6 +91,21 @@ public class LowessTile {
     }
 
     /**
+     * if sigma^2 is infinite the kalman will be 0 which means that the only thing actually changing is P increasing.
+     * This method just applies that part
+     */
+    public void increaseUncertainty()
+    {
+        for(int row=0; row<dimension; row++)
+            for(int column=0; column<dimension; column++)
+            {
+                uncertainty[row][column]/=exponentialForgetting;
+            }
+
+
+    }
+
+    /**
      * Getter for property 'beta'.
      *
      * @return Value for property 'beta'.

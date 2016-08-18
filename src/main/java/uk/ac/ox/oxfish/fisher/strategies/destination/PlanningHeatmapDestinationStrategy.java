@@ -86,6 +86,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
             return fisher.getGear().expectedHourlyCatch(fisher,tile,1,state.getBiology())[speciesIndex];
         }
 
+
         //ignored
         @Override
         public void addObservation(

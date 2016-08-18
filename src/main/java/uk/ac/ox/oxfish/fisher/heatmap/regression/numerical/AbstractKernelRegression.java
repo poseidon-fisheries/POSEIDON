@@ -102,7 +102,6 @@ public abstract class AbstractKernelRegression implements NumericalGeographicalR
             return predict(tile.getGridX(),tile.getGridY(),time);
     }
 
-
     public double kernel(double u)
     {
         return Math.max(1d/(Math.exp(u)+2+Math.exp(-u)),0);
