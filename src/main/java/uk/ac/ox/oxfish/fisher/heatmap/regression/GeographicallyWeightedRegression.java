@@ -20,7 +20,7 @@ import java.util.Map;
  * Each tile is a separate local linear regression where the weight of the observation is given by RBF distance
  * Created by carrknight on 8/18/16.
  */
-public class GeographicallyWeightedRegression implements NumericalGeographicalRegression {
+public class GeographicallyWeightedRegression implements GeographicalRegression<Double> {
 
 
     /**
@@ -109,7 +109,7 @@ public class GeographicallyWeightedRegression implements NumericalGeographicalRe
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         LowessTile predictor = lowesses.get(tile);
         if(predictor==null)
@@ -153,5 +153,14 @@ public class GeographicallyWeightedRegression implements NumericalGeographicalRe
     @Override
     public void turnOff() {
 
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

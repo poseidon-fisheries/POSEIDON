@@ -18,9 +18,9 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/rbf/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/rbf/itq_plan/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/"
-#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_plan/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_plan/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_simple/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_plan/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_plan/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
@@ -33,6 +33,10 @@ def default_scorer(yamlfile):
     :return: the score of this simulation, the lower the better.
     '''
     return -float(yamlfile["FishState"]["Biomass Species 1"][-1])
+
+
+
+
 
 # one dimensional function
 def run_experiment(input2yaml,

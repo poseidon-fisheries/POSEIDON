@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -19,7 +19,7 @@ public class NumericalGeographicalRegressions {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends NumericalGeographicalRegression>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends GeographicalRegression<Double>>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor

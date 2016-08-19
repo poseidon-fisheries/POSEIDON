@@ -5,6 +5,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ErrorTrackingRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -17,6 +18,7 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * A destination strategy that keeps a heatmap of profits and uses it to guide decisions
@@ -28,7 +30,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     /**
      * geographical regression to learn and predict where you make most money
      */
-    private GeographicalRegression profitRegression;
+    private ErrorTrackingRegression profitRegression;
 
     /**
      * the strategy used to scan the profit regression to look for the "best"
@@ -74,7 +76,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
             NauticalMap map,
             MersenneTwisterFast random,
             int stepSize) {
-        this.profitRegression = profitRegression;
+        this.profitRegression = new ErrorTrackingRegression(profitRegression);
         this.acquisition = acquisition;
         this.ignoreFailedTrips = ignoreFailedTrips;
         this.probability = probability;
@@ -194,7 +196,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
      * @param profitRegression Value to set for property 'profitRegression'.
      */
     public void setProfitRegression(GeographicalRegression profitRegression) {
-        this.profitRegression = profitRegression;
+        this.profitRegression = new ErrorTrackingRegression(profitRegression);
     }
 
     /**
@@ -213,5 +215,21 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
      */
     public void setAcquisition(AcquisitionFunction acquisition) {
         this.acquisition = acquisition;
+    }
+
+    /**
+     *  returns list of errors. No protection here, be careful
+     */
+    public LinkedList<Double> getErrors() {
+        return profitRegression.getErrors();
+    }
+
+    /**
+     * Getter for property 'latestError'.
+     *
+     * @return Value for property 'latestError'.
+     */
+    public double getLatestError() {
+        return profitRegression.getLatestError();
     }
 }

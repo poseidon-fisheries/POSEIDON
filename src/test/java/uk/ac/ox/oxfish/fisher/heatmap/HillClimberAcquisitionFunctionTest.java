@@ -37,7 +37,7 @@ public class HillClimberAcquisitionFunctionTest {
         HillClimberAcquisitionFunction acquisitionFunction2 = new HillClimberAcquisitionFunction(3);
 
         GeographicalRegression regression = mock(GeographicalRegression.class);
-        when(regression.predict(any(SeaTile.class), eq(120d),any(), any())).thenAnswer((Answer<Double>) invocation -> {
+        when(regression.predict(any(SeaTile.class), eq(120d), any())).thenAnswer((Answer<Double>) invocation -> {
             SeaTile seaTile = (SeaTile) invocation.getArguments()[0];
             double toReturn = -Math.abs(seaTile.getGridX()-25) -Math.abs(seaTile.getGridY()-25);
             return toReturn;

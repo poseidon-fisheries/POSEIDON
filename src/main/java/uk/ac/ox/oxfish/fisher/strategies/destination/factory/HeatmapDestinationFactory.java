@@ -1,9 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -12,6 +14,10 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFa
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
+import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 
 public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestinationStrategy>{
@@ -35,13 +41,21 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     /**
      * the regression object (the one that builds the actual heatmap)
      */
-    private AlgorithmFactory<? extends NumericalGeographicalRegression> regression =
+    private AlgorithmFactory<? extends GeographicalRegression<Double>> regression =
             new NearestNeighborRegressionFactory();
 
     /**
      *
      */
     private AlgorithmFactory<? extends AcquisitionFunction> acquisition = new ExhaustiveAcquisitionFunctionFactory();
+
+
+    /**
+     * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
+     */
+    private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
+
+
 
 
     /**
@@ -52,6 +66,16 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      */
     @Override
     public HeatmapDestinationStrategy apply(FishState state) {
+
+
+        //add data gathering if necessary
+        if(!weakStateMap.contains(state))
+        {
+            weakStateMap.add(state);
+            addDataGatherers(state);
+            assert weakStateMap.contains(state);
+        }
+
         return new HeatmapDestinationStrategy(
                 regression.apply(state),
                 acquisition.apply(state),
@@ -63,7 +87,29 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
         );
     }
 
+    private void addDataGatherers(FishState state) {
 
+
+        //first add data gatherers
+        state.getYearlyDataSet().registerGatherer("Average Prediction Error",
+                                                  model -> {
+            double size =model.getFishers().size();
+            if(size == 0)
+                return Double.NaN;
+            else
+            {
+                double total = 0;
+                for(Fisher fisher1 : state.getFishers()) {
+                    DoubleSummaryStatistics errors = new DoubleSummaryStatistics();
+                    for(Double error : ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).getErrors())
+                        errors.accept(error);
+                    total += errors.getAverage();
+                }
+                return total/size;
+            }
+        }, Double.NaN);
+
+    }
 
 
     /**
@@ -127,7 +173,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      *
      * @return Value for property 'regression'.
      */
-    public AlgorithmFactory<? extends NumericalGeographicalRegression> getRegression() {
+    public AlgorithmFactory<? extends GeographicalRegression<Double>> getRegression() {
         return regression;
     }
 
@@ -137,7 +183,7 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
      * @param regression Value to set for property 'regression'.
      */
     public void setRegression(
-            AlgorithmFactory<? extends NumericalGeographicalRegression> regression) {
+            AlgorithmFactory<? extends GeographicalRegression<Double>> regression) {
         this.regression = regression;
     }
 

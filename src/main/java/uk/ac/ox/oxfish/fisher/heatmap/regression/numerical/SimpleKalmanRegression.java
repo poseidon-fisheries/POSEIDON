@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -20,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class SimpleKalmanRegression implements NumericalGeographicalRegression
-{
+public class SimpleKalmanRegression implements GeographicalRegression<Double> {
 
 
     /**
@@ -123,7 +121,7 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
 
     @Override
     public double predict(
-            SeaTile tile, double time, FishState state, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher) {
         OneDimensionalKalmanFilter kalmanFilter = filters.get(tile);
         return kalmanFilter == null ? Double.NaN :
                 kalmanFilter.getStateEstimate() + optimism * kalmanFilter.getStandardDeviation();
@@ -217,5 +215,14 @@ public class SimpleKalmanRegression implements NumericalGeographicalRegression
 
     public double getInitialUncertainty() {
         return initialUncertainty;
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

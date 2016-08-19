@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/28/16.
  */
-public class TimeAndSpaceKernelRegression implements NumericalGeographicalRegression {
+public class TimeAndSpaceKernelRegression implements GeographicalRegression<Double> {
 
 
     private final TimeOnlyKernelRegression timeRegression;
@@ -31,7 +31,7 @@ public class TimeAndSpaceKernelRegression implements NumericalGeographicalRegres
     }
 
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         if(tile.getAltitude()>=0)
             return 0;
@@ -115,5 +115,14 @@ public class TimeAndSpaceKernelRegression implements NumericalGeographicalRegres
     @Override
     public void turnOff() {
 
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

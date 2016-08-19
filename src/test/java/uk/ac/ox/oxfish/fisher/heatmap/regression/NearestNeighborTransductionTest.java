@@ -23,12 +23,12 @@ public class NearestNeighborTransductionTest {
                                                                                  new SpaceTimeRegressionDistance(10000, 1) );
         regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(10, 10), 0, 100d), null );
         regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(0, 0), 0, 1d), null );
-        assertEquals(regression.predict(state.getMap().getSeaTile(0,0),0,state,null ), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(1,0),0,state,null ), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(0,1),0,state,null ), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(3,3),0,state,null ), 1d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(6,6),0,state,null ), 100d, .001);
-        assertEquals(regression.predict(state.getMap().getSeaTile(30,30),0,state,null ), 100d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(0,0), 0, null ), 1d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(1,0), 0, null ), 1d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(0,1), 0, null ), 1d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(3,3), 0, null ), 1d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(6,6), 0, null ), 100d, .001);
+        assertEquals(regression.predict(state.getMap().getSeaTile(30,30), 0, null ), 100d, .001);
 
 
 

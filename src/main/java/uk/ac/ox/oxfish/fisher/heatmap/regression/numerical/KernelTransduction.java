@@ -14,7 +14,7 @@ import java.util.List;
  * step a lot faster (even though the new observation step will be worse)
  * Created by carrknight on 7/8/16.
  */
-public class KernelTransduction implements NumericalGeographicalRegression {
+public class KernelTransduction implements GeographicalRegression<Double> {
 
 
     private final HashMap<SeaTile,KernelTilePredictor> kernels;
@@ -39,7 +39,7 @@ public class KernelTransduction implements NumericalGeographicalRegression {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         KernelTilePredictor kernel = kernels.get(tile);
         if(kernel==null)
@@ -85,5 +85,15 @@ public class KernelTransduction implements NumericalGeographicalRegression {
     @Override
     public void turnOff() {
 
+    }
+
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

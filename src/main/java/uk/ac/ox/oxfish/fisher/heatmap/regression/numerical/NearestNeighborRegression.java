@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * Created by carrknight on 6/30/16.
  */
-public class NearestNeighborRegression implements NumericalGeographicalRegression {
+public class NearestNeighborRegression implements GeographicalRegression<Double> {
 
 
     /**
@@ -118,7 +118,7 @@ public class NearestNeighborRegression implements NumericalGeographicalRegressio
     }
 
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;
@@ -172,6 +172,15 @@ public class NearestNeighborRegression implements NumericalGeographicalRegressio
     @Override
     public void turnOff() {
 
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 
 

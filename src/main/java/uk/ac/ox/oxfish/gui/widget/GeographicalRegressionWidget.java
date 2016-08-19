@@ -143,7 +143,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
             java.util.List<SeaTile> tiles = state.getMap().getAllSeaTilesExcludingLandAsList();
             DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
             for(SeaTile tile : tiles) {
-                double predict = regression.predict(tile, state.getHoursSinceStart(), state, fisher);
+                double predict = regression.predict(tile, state.getHoursSinceStart(), fisher);
                 if(Double.isFinite(predict))
                     statistics.accept(predict);
             }
@@ -158,7 +158,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                                 @Override
                                 public Double apply(SeaTile tile) {
                                     return regression.predict(tile, state.
-                                                                      getHoursSinceStart(), state,
+                                                                      getHoursSinceStart(),
                                                               fisher);
                                 }
                             },
@@ -186,7 +186,6 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                         predict = regression.predict(
                                 map.getSeaTile(gridPosition.getX(),gridPosition.getY()),
                                 state.getHoursSinceStart(),
-                                state,
                                 fisher);
                     }
 

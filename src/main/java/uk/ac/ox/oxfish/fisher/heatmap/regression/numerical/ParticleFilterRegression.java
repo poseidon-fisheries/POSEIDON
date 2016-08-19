@@ -23,7 +23,7 @@ import java.util.function.Function;
  *
  * Created by carrknight on 8/1/16.
  */
-public class ParticleFilterRegression implements NumericalGeographicalRegression {
+public class ParticleFilterRegression implements GeographicalRegression<Double> {
 
 
     private final HashMap<SeaTile,ParticleFilter<Double>> filters = new HashMap<>();
@@ -108,7 +108,7 @@ public class ParticleFilterRegression implements NumericalGeographicalRegression
 
     @Override
     public double predict(
-            SeaTile tile, double time, FishState state, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher) {
         return getMean(tile);
     }
 
@@ -190,5 +190,12 @@ public class ParticleFilterRegression implements NumericalGeographicalRegression
         return maxValue;
     }
 
-
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
+    }
 }
