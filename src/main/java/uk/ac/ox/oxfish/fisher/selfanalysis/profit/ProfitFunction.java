@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -53,25 +53,57 @@ public class ProfitFunction {
      * @param state the model
      * @return $/hr profits of this trip
      */
-    public double hourlyProfitFromThisTrip(Fisher fisher, TripRecord trip, FishState state)
+    public Double simulateHourlyProfits(Fisher fisher, double[] expectedCatches,
+                                        SeaTile where,
+                                        FishState state, boolean verbose)
     {
 
-        if(trip==null)
-            return Double.NaN;
+        TripRecord trip = simulateTrip(fisher, expectedCatches, where, state);
+        if (trip == null)
+            return null;
 
-        double[] catches = trip.getSoldCatch();
-        double earnings = 0;
-        for(Species species : state.getSpecies())
-            earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species,fisher);
-        double costs = 0;
-        computeCosts(fisher, trip, state, earnings);
 
+        if(verbose)
+        {
+            double expectedTotalCatchesPerHour = trip.getEffort() == 0? 0 :
+                    Arrays.stream(trip.getTotalCatch()).sum() / trip.getEffort();
+            double hoursNeeded = expectedTotalCatchesPerHour == 0 ? Double.POSITIVE_INFINITY : fisher.getMaximumHold()/expectedTotalCatchesPerHour;
+            System.out.println("Going to " + trip.getMostFishedTileInTrip() + " I will spend "
+                                       + (trip.getDurationInHours()-trip.getEffort()) + " travelling plus " +
+                                       trip.getEffort() + " fishing, expecting " +expectedTotalCatchesPerHour + " lbs of " +
+                                       "catch per hour which implies " +
+                                       hoursNeeded +" hours to fill the boat; in total I am going to travel "
+                                       + trip.getDistanceTravelled() + " km and consume " + trip.getLitersOfGasConsumed() + " liters of gas");
+
+            System.out.println("I predict earnings of " + trip.getEarnings()
+                                       + " with costs " + trip.getTotalCosts()
+                                       + " of which opportunity costs are : " + trip.getOpportunityCosts());
+            System.out.println("I predict profits of " + trip.getTotalTripProfit() + " which means per hour of  " +
+                                       trip.getProfitPerHour(true)) ;
+        }
 
 
         return  trip.getProfitPerHour(true);
     }
 
-    private void computeCosts(Fisher fisher, TripRecord trip, FishState state, double earnings) {
+    public TripRecord simulateTrip(Fisher fisher, double[] expectedCatches, SeaTile where, FishState state) {
+        TripRecord trip = simulator.simulateRecord(fisher,
+                                                   where,
+                                                   state,
+                                                   maxHours, expectedCatches);
+        if(trip==null)
+            return null;
+
+        recordCostsToTrip(fisher, trip, state);
+        return trip;
+    }
+
+    private void recordCostsToTrip(Fisher fisher, TripRecord trip, FishState state) {
+        double[] catches = trip.getSoldCatch();
+        double earnings = 0;
+        for(Species species : state.getSpecies())
+            earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species,fisher);
+
 
         double costs = oilCosts.cost(fisher,state,trip,earnings);
         for(Cost otherCost : fisher.getAdditionalTripCosts())
@@ -85,16 +117,20 @@ public class ProfitFunction {
 
     }
 
+
     public double hourlyProfitFromHypotheticalTripHere(
             Fisher fisher, SeaTile where, FishState state,
             Function<SeaTile, double[]> catchExpectations, boolean verbose)
     {
-        return hourlyProfitFromThisTrip(fisher,
-                                        simulator.simulateRecord(fisher,
-                                                                 where,
-                                                                 state,
-                                                                 maxHours, catchExpectations.apply(where), verbose),
-                                        state);
+        return simulateHourlyProfits(fisher,
+                                     catchExpectations.apply(where),
+                                     where,
+                                     state,
+                                     verbose);
+
+
+
+
     }
 
 

@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.DefaultRBFKernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.drawing.ColorEncoding;
 import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
@@ -143,7 +142,7 @@ public class HeatmapTester extends GUIState
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
-                        return regression.predict(tile, state.getHoursSinceStart(), null,null );
+                        return regression.predict(tile, state.getHoursSinceStart(), null );
                     }
                 },
                 false
@@ -157,7 +156,7 @@ public class HeatmapTester extends GUIState
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
-                        return regression.predict(tile, state.getHoursSinceStart(), null,null );
+                        return regression.predict(tile, state.getHoursSinceStart(), null );
                     }
                 },
                 false

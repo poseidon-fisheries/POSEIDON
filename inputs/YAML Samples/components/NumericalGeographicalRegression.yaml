@@ -1,0 +1,55 @@
+Space Only Kernel:
+  maximumNumberOfObservations: '100.0'
+  spaceBandwidth: '5.0'
+-------
+Space and Time Kernel:
+  maximumNumberOfObservations: '100.0'
+  spaceBandwidth: '5.0'
+  timeBandwidth: '1000.0'
+-------
+Nearest Neighbor:
+  neighbors: '1.0'
+  spaceBandwidth: '5.0'
+  timeBandwidth: '500.0'
+-------
+Complete Nearest Neighbor:
+  distanceFromPortBandwidth: '0.5'
+  habitatBandwidth: '1.0'
+  neighbors: '1.0'
+  timeBandwidth: '5000.0'
+  xBandwidth: '0.5'
+  yBandwidth: '0.5'
+-------
+Nearest Neighbor Transduction:
+  spaceBandwidth: '5.0'
+  timeBandwidth: '1000.0'
+-------
+Kernel Transduction:
+  forgettingFactor: '1.0'
+  spaceBandwidth: '5.0'
+-------
+RBF Kernel Transduction:
+  distanceFromPortBandwidth: '25.0'
+  forgettingFactor: '0.95'
+  habitatBandwidth: '1.0'
+  xBandwidth: '25.0'
+  yBandwidth: '25.0'
+-------
+Particle Filter Regression:
+  distanceNoise: '0.1'
+  evidenceDeviation: '1.0'
+  filterSize: '100.0'
+  maxValue: '100.0'
+  minValue: '-100.0'
+  temporalDrift: '0.1'
+-------
+Simple Kalman:
+  distancePenalty: '2.0'
+  drift: '1.0'
+  evidenceUncertainty: '3.0'
+  fishingHerePenalty: '0.0'
+  initialUncertainty: '100.0'
+  maxValue: '100.0'
+  minValue: '-100.0'
+  optimism: '0.0'
+-------

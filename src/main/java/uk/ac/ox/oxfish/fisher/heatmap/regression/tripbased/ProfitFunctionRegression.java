@@ -53,7 +53,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public double predict(
-            SeaTile tile, double time, FishState state, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher) {
 
         return this.predict(tile, time, state, fisher,false);
 
@@ -83,7 +83,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
         double[] expectedHourlyCatches = new double[catches.length];
         for(int i=0; i<expectedHourlyCatches.length; i++)
-            expectedHourlyCatches[i] = catches[i].predict(tile,currentTime,state,fisher);
+            expectedHourlyCatches[i] = catches[i].predict(tile, currentTime, fisher);
         return expectedHourlyCatches;
 
     }
@@ -110,6 +110,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public void start(FishState model) {
+        this.state = model;
         for(GeographicalRegression reg : catches)
             reg.start(model);
     }
@@ -119,5 +120,14 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     @Override
     public void turnOff() {
 
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<TripRecord> observation, Fisher fisher) {
+        return observation.getValue().getProfitPerHour(true);
     }
 }

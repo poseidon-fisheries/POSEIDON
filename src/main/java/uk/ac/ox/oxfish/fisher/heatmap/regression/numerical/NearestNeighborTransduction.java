@@ -15,7 +15,7 @@ import java.util.List;
  * That's the idea here
  * Created by carrknight on 7/5/16.
  */
-public class NearestNeighborTransduction implements NumericalGeographicalRegression {
+public class NearestNeighborTransduction implements GeographicalRegression<Double> {
 
 
 
@@ -44,7 +44,7 @@ public class NearestNeighborTransduction implements NumericalGeographicalRegress
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         return closestNeighborForNow.getOrDefault(tile,PLACEHOLDER).getValue();
     }
@@ -77,5 +77,15 @@ public class NearestNeighborTransduction implements NumericalGeographicalRegress
     @Override
     public void turnOff() {
 
+    }
+
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

@@ -10,9 +10,6 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.DoublePredicate;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Stream;
 
 /**
  * Goes through all the possible seatiles and picks the highest one
@@ -51,7 +48,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
         Pair<SeaTile,Double> best;
         if(current!=null)
-            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), state, fisher));
+            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), fisher));
         else
             best = new Pair<>(null,-Double.MAX_VALUE);
         assert Double.isFinite(best.getSecond());
@@ -59,7 +56,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         {
             if(random.nextBoolean(proportionSearched))
             {
-                double predicted = regression.predict(tile,state.getHoursSinceStart(),state,fisher);
+                double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher);
                 if(Double.isFinite(predicted) && predicted > best.getSecond())
                     best=new Pair<>(tile,predicted);
             }

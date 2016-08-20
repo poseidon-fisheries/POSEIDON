@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
@@ -20,6 +21,7 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrategy {
 
 
+    private final ProfitFunctionRegression regression;
 
 
     public PlanningHeatmapDestinationStrategy(
@@ -28,6 +30,8 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
             AdaptationProbability probability,
             NauticalMap map, MersenneTwisterFast random, int stepSize) {
         super(profitRegression, acquisition, ignoreFailedTrips, probability, map, random, stepSize);
+        this.regression = profitRegression;
+
     }
 
 
@@ -36,12 +40,12 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
             double maxHours, int numberOfSpecies,
             AcquisitionFunction acquisition, boolean ignoreFailedTrips,
             AdaptationProbability probability,
-            NauticalMap map, MersenneTwisterFast random, int stepSize
-    ){
+            NauticalMap map, MersenneTwisterFast random, int stepSize,
+            GlobalBiology biology){
 
         GeographicalRegression<Double>[] catches = new GeographicalRegression[numberOfSpecies];
         for(int i=0; i<catches.length; i++)
-            catches[i]= new AlmostPerfectKnowledgeRegression(i);
+            catches[i]= new AlmostPerfectKnowledgeRegression(i,biology);
         return new PlanningHeatmapDestinationStrategy(
                 new ProfitFunctionRegression(
                         new ProfitFunction(maxHours),
@@ -59,7 +63,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
     protected void learnFromTripRecord(
             TripRecord record, SeaTile mostFishedTile, Fisher fisher, FishState model) {
 
-        ((ProfitFunctionRegression) getProfitRegression()).addObservation(
+         getProfitRegression().addObservation(
                 new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
                                               record),
                 fisher
@@ -67,6 +71,14 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
     }
 
+    /**
+     * Getter for property 'regression'.
+     *
+     * @return Value for property 'regression'.
+     */
+    public ProfitFunctionRegression getRegression() {
+        return regression;
+    }
 
     /**
      * for now this class stays here as it really makes sense when used in this context and no other but might
@@ -77,14 +89,19 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
         private final int speciesIndex;
 
-        public AlmostPerfectKnowledgeRegression(int speciesIndex) {
+        private final GlobalBiology biology;
+
+
+        public AlmostPerfectKnowledgeRegression(int speciesIndex, GlobalBiology biology) {
             this.speciesIndex = speciesIndex;
+            this.biology = biology;
         }
 
         @Override
-        public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
-            return fisher.getGear().expectedHourlyCatch(fisher,tile,1,state.getBiology())[speciesIndex];
+        public double predict(SeaTile tile, double time, Fisher fisher) {
+            return fisher.getGear().expectedHourlyCatch(fisher,tile,1,biology)[speciesIndex];
         }
+
 
         //ignored
         @Override
@@ -104,6 +121,15 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         @Override
         public void turnOff() {
 
+        }
+
+        /**
+         * It's already a double so return it!
+         */
+        @Override
+        public double extractNumericalYFromObservation(
+                GeographicalObservation<Double> observation, Fisher fisher) {
+            return observation.getValue();
         }
     }
 }

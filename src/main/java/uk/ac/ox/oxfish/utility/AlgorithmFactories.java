@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.AcquisitionFunctions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NumericalGeographicalRegressions;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NumericalGeographicalRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -96,8 +96,8 @@ public class AlgorithmFactories {
         NAMES_MAP.put(LegalityFeatureExtractor.class, LegalityFeatureExtractors.NAMES);
         CONSTRUCTOR_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.CONSTRUCTORS);
         NAMES_MAP.put(ProfitFeatureExtractor.class, ProfitFeatureExtractors.NAMES);
-        CONSTRUCTOR_MAP.put(NumericalGeographicalRegression.class, NumericalGeographicalRegressions.CONSTRUCTORS);
-        NAMES_MAP.put(NumericalGeographicalRegression.class, NumericalGeographicalRegressions.NAMES);
+        CONSTRUCTOR_MAP.put(GeographicalRegression.class, NumericalGeographicalRegressions.CONSTRUCTORS);
+        NAMES_MAP.put(GeographicalRegression.class, NumericalGeographicalRegressions.NAMES);
         CONSTRUCTOR_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.CONSTRUCTORS);
         NAMES_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.NAMES);
 

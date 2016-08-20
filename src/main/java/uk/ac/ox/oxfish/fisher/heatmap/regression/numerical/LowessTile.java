@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 
 /**
@@ -19,21 +20,48 @@ public class LowessTile {
     private final double exponentialForgetting;
 
 
-    private final RegressionDistance distance;
-
     public LowessTile(
-            int dimension, double[][] uncertainty, double[] beta, double exponentialForgetting,
-            RegressionDistance distance) {
+            int dimension, double[][] uncertainty, double[] beta, double exponentialForgetting) {
+        Preconditions.checkArgument(dimension>0);
         this.dimension = dimension;
         this.uncertainty = uncertainty;
         this.beta = beta;
         this.exponentialForgetting = exponentialForgetting;
-        this.distance = distance;
+    }
+
+    public LowessTile(
+            int dimension, double uncertainty, double[] beta, double exponentialForgetting) {
+        this.dimension = dimension;
+        this.uncertainty = new double[dimension][dimension];
+        for(int i=0; i<dimension; i++)
+            this.uncertainty[i][i] = uncertainty;
+        this.beta = beta;
+        this.exponentialForgetting = exponentialForgetting;
     }
 
     public void addObservation(double[] x, double y, double sigmaSquared){
 
         assert x.length == dimension;
+
+
+        //going through the least squares filter as described here:
+        //http://www.cs.tut.fi/~tabus/course/ASP/LectureNew10.pdf
+        double pi[] = new double[dimension];
+        for(int column=0; column<dimension; column++)
+            for(int row=0; row<dimension; row++)
+            {
+                pi[column] += x[row] * uncertainty[row][column];
+            }
+        //gamma is basically dispersion
+        double gamma = exponentialForgetting * sigmaSquared;
+        for(int row=0; row<dimension; row++)
+            gamma+= x[row] *  pi[row];
+
+
+        //kalman gain
+        double[] kalman = new double[dimension];
+        for(int row=0; row<dimension; row++)
+                kalman[row] = pi[row]/gamma;
 
         //prediction error
         double prediction = 0;
@@ -41,33 +69,48 @@ public class LowessTile {
             prediction += x[i] * beta[i];
         double predictionError = y - prediction;
 
-        //dispersion
-        double[] intermediateSums = new double[dimension];
-        for(int sum=0; sum<dimension; sum++)
-            for(int i=0; i<dimension; i++)
-                intermediateSums[sum] += uncertainty[sum][i] * x[i];
-        double dispersion = 0;
-        for(int sum=0; sum<dimension; sum++)
-            dispersion += intermediateSums[sum] * x[sum];
-        dispersion += exponentialForgetting* sigmaSquared;
-
-        //kalman gain
-        double[] kalman = new double[dimension];
-        for(int i=0; i<dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                kalman[i] += uncertainty[i][j] * x[j];
-            }
-            kalman[i]/=dispersion;
-        }
-
         //update beta
         for(int i=0; i<dimension; i++)
             beta[i] += predictionError * kalman[i];
 
-        //update P
+        //get P'
+        final double[][] prime = new double[dimension][dimension];
+        for(int row=0; row<dimension; row++)
+            for(int column=0; column<dimension; column++)
+                prime[row][column] = kalman[row] * pi[column];
+
+        //update uncertainty
+        for(int row=0; row<dimension; row++)
+            for(int column=0; column<dimension; column++)
+            {
+                uncertainty[row][column]-=prime[row][column];
+                uncertainty[row][column]/=exponentialForgetting;
+            }
 
 
     }
 
+    /**
+     * if sigma^2 is infinite the kalman will be 0 which means that the only thing actually changing is P increasing.
+     * This method just applies that part
+     */
+    public void increaseUncertainty()
+    {
+        for(int row=0; row<dimension; row++)
+            for(int column=0; column<dimension; column++)
+            {
+                uncertainty[row][column]/=exponentialForgetting;
+            }
 
+
+    }
+
+    /**
+     * Getter for property 'beta'.
+     *
+     * @return Value for property 'beta'.
+     */
+    public double[] getBeta() {
+        return beta;
+    }
 }

@@ -9,7 +9,7 @@ import java.util.PriorityQueue;
 /**
  * Created by carrknight on 6/28/16.
  */
-public abstract class AbstractKernelRegression implements NumericalGeographicalRegression {
+public abstract class AbstractKernelRegression implements GeographicalRegression<Double> {
 
 
 
@@ -94,14 +94,13 @@ public abstract class AbstractKernelRegression implements NumericalGeographicalR
 
 
     @Override
-    public double predict(SeaTile tile, double time, FishState state, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;
         else
             return predict(tile.getGridX(),tile.getGridY(),time);
     }
-
 
     public double kernel(double u)
     {
@@ -161,5 +160,14 @@ public abstract class AbstractKernelRegression implements NumericalGeographicalR
     @Override
     public void turnOff() {
 
+    }
+
+    /**
+     * It's already a double so return it!
+     */
+    @Override
+    public double extractNumericalYFromObservation(
+            GeographicalObservation<Double> observation, Fisher fisher) {
+        return observation.getValue();
     }
 }

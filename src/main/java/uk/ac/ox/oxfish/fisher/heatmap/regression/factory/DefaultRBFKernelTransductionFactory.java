@@ -59,10 +59,10 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
                 }, yBandwidth.apply(state.getRandom())),
                 new RBFKernel(
                         new PortDifferenceRegressionDistance(1d),
-                        yBandwidth.apply(state.getRandom())),
+                        distanceFromPortBandwidth.apply(state.getRandom())),
                 new RBFKernel(
                         new HabitatRegressionDistance(1d),
-                        yBandwidth.apply(state.getRandom()))
+                        habitatBandwidth.apply(state.getRandom()))
 
                 );
 
