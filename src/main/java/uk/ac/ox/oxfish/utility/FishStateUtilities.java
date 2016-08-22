@@ -710,6 +710,8 @@ public class FishStateUtilities {
 
 
 
+
+
     public static String printTablePerPort(FishState model,String fisherYearlyColumn)
     {
         HashMap<String, DataColumn> portColumns = new HashMap<>();

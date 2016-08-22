@@ -92,7 +92,9 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         //go through all the tiles
         for(Map.Entry<SeaTile,LowessTile> lowess : lowesses.entrySet())
         {
-            double sigma = 1d/kernel.distance(fisher,lowess.getKey(),observation.getTime(),observation);
+            double sigma = 1d/
+                    kernel.distance(fisher,lowess.getKey(),observation.getTime(),observation);
+
             if(!Double.isFinite(sigma)) {
                 lowess.getValue().increaseUncertainty();
                 continue;

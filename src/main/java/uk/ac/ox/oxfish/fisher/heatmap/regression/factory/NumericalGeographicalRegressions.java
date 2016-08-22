@@ -76,6 +76,12 @@ public class NumericalGeographicalRegressions {
                   "Simple Kalman");
 
 
+        CONSTRUCTORS.put("GWR",
+                         GeographicallyWeightedRegressionFactory::new);
+        NAMES.put(GeographicallyWeightedRegressionFactory.class,
+                  "GWR");
+
+
 
     }
 }
