@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
@@ -129,5 +130,28 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     public double extractNumericalYFromObservation(
             GeographicalObservation<TripRecord> observation, Fisher fisher) {
         return observation.getValue().getProfitPerHour(true);
+    }
+
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return new double[0];
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        Preconditions.checkState(false, "perfect knowledge has no parameters to set!");
     }
 }

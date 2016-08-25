@@ -22,4 +22,5 @@ public class SpaceOnlyKernelRegression extends   AbstractKernelRegression
     protected double distance(double fromX, double fromY, double fromTime, double toX, double toY, double toTime) {
         return Math.sqrt(Math.pow(fromX-toX,2) + Math.pow(fromY-toY,2));
     }
+
 }

@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -23,19 +25,39 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
 
     private final static GeographicalObservation<Double> PLACEHOLDER = new GeographicalObservation<Double>(null,-1d,Double.NaN);
 
-    private final RegressionDistance distance;
+
+    /**
+     * functions used to turn an observation into a double[]
+     */
+    private final ObservationExtractor[] extractors;
+
+    /**
+     * divide each feature distance by this to reweight them
+     */
+    private double[] bandwidths;
+
+    /**
+     * object that weights the distance of observations by their bandwidth
+     */
+    private RegressionDistance transformer;
 
 
     public NearestNeighborTransduction(
             NauticalMap map,
-            RegressionDistance distance) {
+            ObservationExtractor[] extractors, double[] bandwidths,
+            RegressionDistance transformer) {
 
+        Preconditions.checkArgument(bandwidths.length > 0);
+        Preconditions.checkArgument(bandwidths.length  == extractors.length);
+
+        this.extractors = extractors;
+        this.bandwidths = bandwidths;
+        this.transformer = transformer;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         closestNeighborForNow = new HashMap<>(tiles.size());
         for(SeaTile tile : tiles)
             closestNeighborForNow.put(tile,PLACEHOLDER);
 
-        this.distance = distance;
 
     }
 
@@ -51,18 +73,39 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
 
 
     @Override
-    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher) {
+    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher)
+    {
 
         //go through all the tiles
         for(SeaTile tile : closestNeighborForNow.keySet())
         {
             //if the new observation is closer than the old one this is your new closest observation
-            GeographicalObservation oldObservation = closestNeighborForNow.get(tile);
+            GeographicalObservation<Double> oldObservation = closestNeighborForNow.get(tile);
             if(oldObservation == PLACEHOLDER || (
-                    distance.distance(fisher, tile, newObservation.getTime(), newObservation) <
-                            distance.distance(fisher, tile, newObservation.getTime(), oldObservation)))
+                    distance(fisher, tile, newObservation.getTime(), newObservation) <
+                            distance(fisher, tile, newObservation.getTime(), oldObservation)))
                 closestNeighborForNow.put(tile,newObservation);
         }
+    }
+
+
+    private double distance(Fisher fisher, SeaTile tile, double time, GeographicalObservation<Double> observation)
+    {
+        double distance = 0;
+        for(int i=0; i< bandwidths.length; i++)
+        {
+            transformer.setBandwidth(bandwidths[i]);
+            distance += transformer.distance(
+                    extractors[i].extract(tile,time,fisher),
+                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher)
+            );
+
+
+        }
+
+        return distance;
+
+
     }
 
     //ignored
@@ -87,5 +130,27 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
     public double extractNumericalYFromObservation(
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
+    }
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return bandwidths;
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        bandwidths = parameterArray;
     }
 }

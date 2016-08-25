@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 
 /**
  * Classic RLS filter where sigma^2 is 1/distance function as provided
@@ -17,7 +16,7 @@ public class LowessTile {
     private final double[] beta;
 
 
-    private final double exponentialForgetting;
+    private double exponentialForgetting;
 
 
     public LowessTile(
@@ -135,5 +134,23 @@ public class LowessTile {
      */
     public double[] getBeta() {
         return beta;
+    }
+
+    /**
+     * Getter for property 'exponentialForgetting'.
+     *
+     * @return Value for property 'exponentialForgetting'.
+     */
+    public double getExponentialForgetting() {
+        return exponentialForgetting;
+    }
+
+    /**
+     * Setter for property 'exponentialForgetting'.
+     *
+     * @param exponentialForgetting Value to set for property 'exponentialForgetting'.
+     */
+    public void setExponentialForgetting(double exponentialForgetting) {
+        this.exponentialForgetting = exponentialForgetting;
     }
 }

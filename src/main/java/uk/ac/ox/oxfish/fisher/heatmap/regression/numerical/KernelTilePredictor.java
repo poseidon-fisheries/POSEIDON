@@ -2,10 +2,9 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
 import uk.ac.ox.oxfish.geography.SeaTile;
-
-import java.util.LinkedList;
+import uk.ac.ox.oxfish.utility.Pair;
 
 /**
  * A recursive kernel predictor. Because it needs to predict always in the same spot time will be a forgetting factor
@@ -27,27 +26,39 @@ public class KernelTilePredictor{
     /**
      * the bandwidth are within the distance objects
      */
-    private final LinkedList<RegressionDistance> distances = new LinkedList<>();
+    private final ObservationExtractor[] extractors;
 
+
+    private double[] bandwidths;
+
+    private final RBFKernel kerneler = new RBFKernel(0); //this bandwidth gets changed at each step
 
     public KernelTilePredictor(double forgettingFactor,
                                SeaTile whereAmIPredicting,
-                               RegressionDistance... initialDistances) {
+                               Pair<ObservationExtractor,Double>... extractorsAndBandwidths) {
         this.forgettingFactor = forgettingFactor;
         this.whereAmIPredicting = whereAmIPredicting;
-        for(RegressionDistance distance : initialDistances)
-            distances.add(distance);
+        assert extractorsAndBandwidths.length > 0;
+        extractors = new ObservationExtractor[extractorsAndBandwidths.length];
+        bandwidths = new double[extractorsAndBandwidths.length];
+        for(int i=0; i< extractorsAndBandwidths.length; i++) {
+            extractors[i] = extractorsAndBandwidths[i].getFirst();
+            bandwidths[i] = extractorsAndBandwidths[i].getSecond();
+        }
     }
 
     public void addObservation(GeographicalObservation<Double> observation, Fisher fisher)
     {
         //compute kernel
         double kernel = 1;
-        for(RegressionDistance distance : distances)
-            kernel *= (distance.distance(fisher,
-                                                          whereAmIPredicting,
-                                                          observation.getTime(),
-                                                          observation));
+        for(int i=0; i<extractors.length; i++) {
+            kerneler.setBandwidth(bandwidths[i]);
+            kernel *= kerneler.distance(
+                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher),
+                    extractors[i].extract(whereAmIPredicting,observation.getTime(),fisher)
+
+            );
+        }
 
         //update denominator
         currentDenominator = currentDenominator * forgettingFactor + kernel;
@@ -77,10 +88,21 @@ public class KernelTilePredictor{
         return whereAmIPredicting;
     }
 
-    public LinkedList<RegressionDistance> getDistances() {
-        return distances;
+    /**
+     * Getter for property 'bandwidths'.
+     *
+     * @return Value for property 'bandwidths'.
+     */
+    public double[] getBandwidths() {
+        return bandwidths;
     }
 
-
-
+    /**
+     * Setter for property 'bandwidths'.
+     *
+     * @param bandwidths Value to set for property 'bandwidths'.
+     */
+    public void setBandwidths(double[] bandwidths) {
+        this.bandwidths = bandwidths;
+    }
 }

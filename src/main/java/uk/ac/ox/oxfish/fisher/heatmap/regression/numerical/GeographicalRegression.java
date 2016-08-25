@@ -36,4 +36,18 @@ public interface GeographicalRegression<V> extends Startable
      */
     public double extractNumericalYFromObservation(GeographicalObservation<V> observation, Fisher fisher);
 
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     * @return an array containing all the parameters of the model
+     */
+    public double[] getParametersAsArray();
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     * @param parameterArray the new parameters for this regresssion
+     */
+    public void setParameters(double[] parameterArray);
+
 }

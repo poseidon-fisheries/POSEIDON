@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import java.util.Objects;
 
 /**
- * An immutable object useful for regression. It is compared with respect to time
+ * An immutable object useful for regression. It is sorted with respect to time
  * Created by carrknight on 6/27/16.
  */
 public class GeographicalObservation<V> implements Comparable<GeographicalObservation<V>>

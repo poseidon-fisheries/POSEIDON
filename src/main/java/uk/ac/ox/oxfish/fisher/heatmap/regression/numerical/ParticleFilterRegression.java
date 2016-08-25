@@ -32,17 +32,17 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
     /**
      * the % increase per unit of distance in evidence variance
      */
-    private final double distanceNoise;
+    private double distanceNoise;
 
     /**
      * the standard deviation  of p(e|X)~N(observation,.)
      */
-    private final double evidenceDeviation;
+    private double evidenceDeviation;
 
     /**
      * standard deviation of the daily shock to each particle applied
      */
-    private final double temporalDrift;
+    private double temporalDrift;
 
     private final int filterSizes;
 
@@ -50,9 +50,9 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
 
     private final MersenneTwisterFast random;
 
-    private final double minValue;
+    private double minValue;
 
-    private final double maxValue;
+    private double maxValue;
     private Stoppable receipt;
 
 
@@ -197,5 +197,32 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
     public double extractNumericalYFromObservation(
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
+    }
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+
+        return  new double[]{distanceNoise,evidenceDeviation};
+
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        assert  parameterArray.length == 2;
+        distanceNoise = parameterArray[0];
+        evidenceDeviation = parameterArray[1];
+
     }
 }

@@ -60,3 +60,10 @@ GWR:
   initialUncertainty: '10000.0'
   rbfBandwidth: '3.0'
 -------
+Good-Bad:
+  badAverage: '-10.0'
+  distancePenalty: '10.0'
+  drift: '0.005'
+  goodAverage: '10.0'
+  standardDeviation: '7.5'
+-------

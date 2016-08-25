@@ -2,13 +2,11 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.bayes;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import org.xmlpull.v1.builder.xpath.jaxen.expr.Step;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.Distance;
@@ -41,16 +39,15 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
     /**
      * gives us the theta for the bad prior
      */
-    private Function<Fisher, Double> badAverageExtractor;
+    private double badAverage;
 
     /**
      * gives us the theta for the good prior
      */
-    private Function<Fisher, Double> goodAverageExtractor;
+    private double goodAverage;
 
 
-    private Function<Fisher, Double> stdExtractor;
-
+    private double standardDeviation;
     /**
      * its inverse penalizes observations that are far so that the priors are stronger
      * the penalty comes by dividing sigma by the the RBF Kernel
@@ -62,27 +59,27 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      */
     private final double drift;
 
+    private final Distance distance;
+
+    private final NauticalMap map;
+
     public GoodBadRegression(
             NauticalMap map,
             Distance distance,
             MersenneTwisterFast random,
-            Function<Fisher, Double> badAverageExtractor,
-            Function<Fisher, Double> goodAverageExtractor,
-            Function<Fisher, Double> stdExtractor,
+            double badAverage,
+            double goodAverage,
+            double deviation,
             double distanceBandwidth,
             double drift
     ) {
+        this.map = map;
         this.drift = drift;
-        this.badAverageExtractor = badAverageExtractor;
-        this.goodAverageExtractor = goodAverageExtractor;
-        this.stdExtractor = stdExtractor;
-        this.distancePenalty = new RBFKernel(new RegressionDistance() {
-            @Override
-            public double distance(
-                    Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
-                return distance.distance(tile,observation.getTile(),map);
-            }
-        },distanceBandwidth);
+        this.badAverage = badAverage;
+        this.goodAverage = goodAverage;
+        this.standardDeviation = deviation;
+        this.distance = distance;
+        this.distancePenalty = new RBFKernel(distanceBandwidth);
 
         //each tile its own random probability
         spots = new HashMap<>();
@@ -93,37 +90,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
 
     }
 
-    public GoodBadRegression(
-            NauticalMap map,
-            Distance distance,
-            MersenneTwisterFast random,
-            double badAverage,
-            double goodAverage,
-            double deviation,
-            double distanceBandwidth,
-            double drift){
-        this(map, distance, random,
-             new Function<Fisher, Double>() {
-                 @Override
-                 public Double apply(Fisher tile) {
-                     return badAverage;
-                 }
-             },
-             new Function<Fisher, Double>() {
-                 @Override
-                 public Double apply(Fisher tile) {
-                     return goodAverage;
-                 }
-             },
-             new Function<Fisher, Double>() {
-                 @Override
-                 public Double apply(Fisher tile) {
-                     return deviation;
-                 }
-             },
-             distanceBandwidth,drift);
 
-    }
 
 
     private Stoppable receipt;
@@ -165,21 +132,23 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
 
         for(Map.Entry<SeaTile,Double> probability : spots.entrySet())
         {
-            double rbf = distancePenalty.distance(
-                    fisher, probability.getKey(), observation.getTime(), observation);
+            double distance = this.distance.distance(probability.getKey(),
+                                            observation.getTile(),
+                                            map);
+            double rbf = distancePenalty.transform(distance);
             //if the evidence has even a shred of strenght, update
             if(rbf >= FishStateUtilities.EPSILON)
             {
                 double evidenceStrength = 1d/ rbf;
 
-                double goodAverage =  goodAverageExtractor.apply(fisher);
-                double badAverage = badAverageExtractor.apply(fisher);
-                double sigma = stdExtractor.apply(fisher);
+
+                //all that follows is standard bayes
+
 
 
                 double goodPrior = probability.getValue();
                 double goodLikelihood = FishStateUtilities.normalPDF(
-                        goodAverage,sigma*evidenceStrength).apply(observation.getValue());
+                        goodAverage,standardDeviation*evidenceStrength).apply(observation.getValue());
                 double goodPosterior =  goodPrior *goodLikelihood;
                 assert  Double.isFinite(goodPosterior);
                 assert  goodPosterior >=0;
@@ -187,13 +156,22 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
 
                 double badPrior = probability.getValue();
                 double badLikelihood = FishStateUtilities.normalPDF(
-                        badAverage,sigma*evidenceStrength).apply(observation.getValue());
+                        badAverage,standardDeviation*evidenceStrength).apply(observation.getValue());
                 double badPosterior = badPrior*badLikelihood;
                 assert  badPosterior >=0;
                 assert  Double.isFinite(badPosterior);
 
-
-                probability.setValue(goodPosterior/(badPosterior+goodPosterior));
+                if(badPosterior + goodPosterior == 0) {
+                    //if it's many standard deviations away then just default to one or the other
+                    if (observation.getValue() > goodAverage)
+                        probability.setValue(1d);
+                    else if (observation.getValue() < badAverage)
+                        probability.setValue(0d);
+                    else
+                        probability.setValue(.5d); //if you are here that's some very poor averages/std you got
+                }
+                else
+                    probability.setValue(goodPosterior/(badPosterior+goodPosterior));
             }
         }
 
@@ -224,8 +202,6 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
             return Double.NaN;
         else
         {
-            double goodAverage = goodAverageExtractor.apply(fisher);
-            double badAverage = badAverageExtractor.apply(fisher);
             return probabilityGood * goodAverage + (1-probabilityGood) * badAverage;
         }
 
@@ -243,5 +219,37 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
     public double extractNumericalYFromObservation(
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
+    }
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return new double[]{
+            distancePenalty.getBandwidth(),
+            badAverage,
+            goodAverage,
+            standardDeviation
+        };
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+
+        assert parameterArray.length == 4;
+        distancePenalty.setBandwidth(parameterArray[0]);
+        badAverage = parameterArray[1];
+        goodAverage = parameterArray[2];
+        standardDeviation = parameterArray[3];
     }
 }

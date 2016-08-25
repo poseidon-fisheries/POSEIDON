@@ -4,9 +4,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -41,30 +44,22 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
         return new KernelTransduction(
                 state.getMap(),
                 forgettingFactor.apply(state.getRandom()),
-                new RBFKernel(new RegressionDistance() {
-                    @Override
-                    public double distance(
-                            Fisher fisher, SeaTile tile, double currentTimeInHours,
-                            GeographicalObservation observation) {
-                        return tile.getGridX() - observation.getX();
-                    }
-                }, xBandwidth.apply(state.getRandom())),
-                new RBFKernel(new RegressionDistance() {
-                    @Override
-                    public double distance(
-                            Fisher fisher, SeaTile tile, double currentTimeInHours,
-                            GeographicalObservation observation) {
-                        return tile.getGridY() - observation.getY();
-                    }
-                }, yBandwidth.apply(state.getRandom())),
-                new RBFKernel(
-                        new PortDifferenceRegressionDistance(1d),
-                        distanceFromPortBandwidth.apply(state.getRandom())),
-                new RBFKernel(
-                        new HabitatRegressionDistance(1d),
-                        habitatBandwidth.apply(state.getRandom()))
-
-                );
+                new Pair<>(
+                        new GridXExtractor(),
+                        xBandwidth.apply(state.getRandom())
+                ),
+                new Pair<>(
+                        new GridYExtractor(),
+                        yBandwidth.apply(state.getRandom())
+                ),
+                new Pair<>(
+                        new PortDistanceExtractor(new ManhattanDistance(),state.getMap()),
+                        distanceFromPortBandwidth.apply(state.getRandom())
+                ),
+                                new Pair<>(
+                        new HabitatExtractor(),
+                        habitatBandwidth.apply(state.getRandom())
+                ));
 
 
 

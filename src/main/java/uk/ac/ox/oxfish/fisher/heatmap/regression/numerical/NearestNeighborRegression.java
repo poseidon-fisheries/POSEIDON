@@ -5,11 +5,14 @@ import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import ags.utils.dataStructures.trees.thirdGenKD.KdTree;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.AbsoluteRegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 
 /**
+ * KD-tree based regression.
  * Created by carrknight on 6/30/16.
  */
 public class NearestNeighborRegression implements GeographicalRegression<Double> {
@@ -30,12 +33,17 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     /**
      * divide each feature distance by this to reweight them
      */
-    private final double[] bandwidths;
+    private double[] bandwidths;
 
     /**
      * how do we judge the distance between two nodes
      */
-    private final DistanceFunction distanceFunction;
+    private DistanceFunction treeDistance;
+
+    /**
+     * object that weights the distance of observations by their bandwidth
+     */
+    private RegressionDistance transformer;
 
     /**
      * how many neighbors to use
@@ -43,24 +51,40 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     private final int neighbors;
 
 
-    public NearestNeighborRegression(int neighbors, double[] bandwidths, ObservationExtractor... extractors)
+    public NearestNeighborRegression(int neighbors, double[] bandwidths, RegressionDistance distance,
+                                     ObservationExtractor... extractors)
     {
         Preconditions.checkArgument(bandwidths.length > 0);
         Preconditions.checkArgument(bandwidths.length  == extractors.length);
+        this.transformer = distance;
         this.extractors = extractors;
         this.bandwidths = bandwidths;
         this.neighbors = neighbors;
         this.nearestNeighborTree = new KdTree<Double>(bandwidths.length);
         //distance is always absolute difference divided bandwidth
-        this.distanceFunction =  new DistanceFunction() {
+        rebuildDistanceFunction(bandwidths);
+
+
+    }
+
+
+    public NearestNeighborRegression(int neighbors, double[] bandwidths, ObservationExtractor... extractors)
+    {
+       this(neighbors,bandwidths,new AbsoluteRegressionDistance(0),extractors);
+
+
+    }
+
+    public void rebuildDistanceFunction(final double[] bandwidths) {
+        this.treeDistance =  new DistanceFunction() {
             @Override
             public double distance(double[] obs1, double[] obs2) {
 
                 double distance = 0;
                 for(int i = 0; i < obs1.length; i++)
                 {
-                    final double featureDistance = Math.abs(obs1[i] - obs2[i]);
-                    distance += featureDistance / bandwidths[i];
+                    transformer.setBandwidth(bandwidths[i]);
+                    distance += transformer.distance(obs1[i],obs2[i]);
                 }
                 return distance;
 
@@ -73,20 +97,19 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
                 double distance = 0;
                 for(int i = 0; i < observation.length; i++)
                 {
+                    transformer.setBandwidth(bandwidths[i]);
                     double diff = 0;
                     if (observation[i] > max[i]) {
-                        diff = (observation[i] - max[i]);
+                        diff = transformer.distance(observation[i],max[i]);
                     }
                     else if (observation[i] < min[i]) {
-                        diff = (observation[i] - min[i]);
+                        diff = transformer.distance(observation[i],min[i]);
                     }
-                    distance += Math.abs(diff)/bandwidths[i] ;
+                    distance += diff;
                 }
                 return distance;
             }
         };
-
-
     }
 
 
@@ -133,7 +156,7 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
             return 0;
 
         MaxHeap<Double> neighbors = nearestNeighborTree.findNearestNeighbors(observation, this.neighbors,
-                                                                             distanceFunction);
+                                                                             treeDistance);
 
         double prediction = 0;
         double size = neighbors.size();
@@ -184,5 +207,27 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     }
 
 
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return bandwidths;
+    }
 
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        assert parameterArray.length == this.bandwidths.length;
+        this.bandwidths = parameterArray;
+        rebuildDistanceFunction(bandwidths);
+    }
 }

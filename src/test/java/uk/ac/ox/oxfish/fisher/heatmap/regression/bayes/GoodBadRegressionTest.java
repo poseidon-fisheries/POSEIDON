@@ -12,9 +12,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by carrknight on 8/22/16.
- */
+
 public class GoodBadRegressionTest {
 
 

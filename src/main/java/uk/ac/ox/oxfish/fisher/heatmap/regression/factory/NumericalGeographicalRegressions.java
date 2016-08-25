@@ -28,14 +28,6 @@ public class NumericalGeographicalRegressions {
             new LinkedHashMap<>();
     static{
 
-        CONSTRUCTORS.put("Space Only Kernel",
-                         SpaceOnlyKernelRegressionFactory::new);
-        NAMES.put(SpaceOnlyKernelRegressionFactory.class,"Space Only Kernel");
-
-        CONSTRUCTORS.put("Space and Time Kernel",
-                         TimeAndSpaceKernelRegressionFactory::new);
-        NAMES.put(TimeAndSpaceKernelRegressionFactory.class,"Space and Time Kernel");
-
 
         CONSTRUCTORS.put("Nearest Neighbor",
                          NearestNeighborRegressionFactory::new);
@@ -80,6 +72,12 @@ public class NumericalGeographicalRegressions {
                          GeographicallyWeightedRegressionFactory::new);
         NAMES.put(GeographicallyWeightedRegressionFactory.class,
                   "GWR");
+
+
+        CONSTRUCTORS.put("Good-Bad",
+                         GoodBadRegressionFactory::new);
+        NAMES.put(GoodBadRegressionFactory.class,
+                  "Good-Bad");
 
 
 

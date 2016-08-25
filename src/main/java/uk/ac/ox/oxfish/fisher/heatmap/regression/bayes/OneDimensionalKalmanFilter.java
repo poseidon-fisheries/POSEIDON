@@ -32,7 +32,7 @@ public class OneDimensionalKalmanFilter {
     /**
      * the sigma_m of the kalman filter (the gaussian shock each time step to add to uncertainty)
      */
-    private final double drift;
+    private double drift;
 
 
     public OneDimensionalKalmanFilter(
@@ -152,5 +152,9 @@ public class OneDimensionalKalmanFilter {
      */
     public double getDrift() {
         return drift;
+    }
+
+    public void setDrift(double drift) {
+        this.drift = drift;
     }
 }

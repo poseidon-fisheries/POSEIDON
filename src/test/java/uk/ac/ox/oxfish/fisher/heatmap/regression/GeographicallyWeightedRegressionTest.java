@@ -5,7 +5,6 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LowessTile;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -68,6 +67,39 @@ public class GeographicallyWeightedRegressionTest {
         System.out.println(Arrays.toString(regression.getBeta(tile)));
         assertEquals(1.423,regression.getBeta(tile)[0],.1); //some imprecision here, but more or less correct
         assertEquals(9.996,regression.getBeta(tile)[1],.01);
+
+
+    }
+
+    @Test
+    public void setParameters() throws Exception {
+
+        NauticalMap map = mock(NauticalMap.class);
+        SeaTile tile = mock(SeaTile.class);
+        when(map.getAllSeaTilesExcludingLandAsList()).thenReturn(Lists.newArrayList(tile));
+        Distance distance = mock(Distance.class);
+
+        GeographicallyWeightedRegression regression = new GeographicallyWeightedRegression(
+                map,.23d,distance,10,
+                new ObservationExtractor[]{
+                        //this will actually be rerouted to read from the file
+                        new ObservationExtractor() {
+                            @Override
+                            public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                                return timeOfObservation;
+                            }
+                        }
+                },
+                0,10,
+                10000,
+                new MersenneTwisterFast()
+        );
+
+        assertArrayEquals(regression.getParametersAsArray(),new double[]{.23},.001);
+        regression.setParameters(new double[]{.56});
+        assertArrayEquals(regression.getParametersAsArray(),new double[]{.56},.001);
+
+
 
 
     }

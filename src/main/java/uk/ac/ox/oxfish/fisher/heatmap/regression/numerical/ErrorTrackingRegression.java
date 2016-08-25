@@ -114,4 +114,20 @@ public class ErrorTrackingRegression<V> implements GeographicalRegression<V>
             GeographicalObservation<V> observation, Fisher fisher) {
         return delegate.extractNumericalYFromObservation(observation,fisher);
     }
+
+    /**
+     *  ducked, let delegate handle it
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return delegate.getParametersAsArray();
+    }
+
+    /**
+     *  ducked, let delegate handle it
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        delegate.setParameters(parameterArray);
+    }
 }

@@ -170,4 +170,32 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
     }
+
+
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return new double[]{
+            getBandwidth()};
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        assert  parameterArray.length == 1;
+
+        setBandwidth(parameterArray[0]);
+
+    }
 }
