@@ -21,14 +21,14 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_plan/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_simple/"
-#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_plan/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/nn_plan/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/gwr/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/gwr_plan/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/goodbad_simple/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/goodbad_plan/"
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_plan/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_simple/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_simple/"
 
 
 

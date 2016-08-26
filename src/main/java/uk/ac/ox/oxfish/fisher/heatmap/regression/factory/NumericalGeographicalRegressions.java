@@ -79,6 +79,11 @@ public class NumericalGeographicalRegressions {
         NAMES.put(GoodBadRegressionFactory.class,
                   "Good-Bad");
 
+        CONSTRUCTORS.put("Social Tuning",
+                         SocialTuningRegressionFactory::new);
+        NAMES.put(SocialTuningRegressionFactory.class,
+                  "Social Tuning");
+
 
 
     }

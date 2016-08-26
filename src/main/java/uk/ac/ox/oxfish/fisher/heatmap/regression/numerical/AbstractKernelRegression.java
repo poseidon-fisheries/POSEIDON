@@ -150,7 +150,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model,Fisher fisher) {
         
     }
 
@@ -158,7 +158,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 

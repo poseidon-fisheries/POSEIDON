@@ -135,26 +135,21 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         else
             return predictor.getBeta();
     }
-
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
+     * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model,Fisher fisher) {
 
     }
 
     /**
-     * tell the startable to turnoff,
+     * ignored
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
-
     /**
      * It's already a double so return it!
      */

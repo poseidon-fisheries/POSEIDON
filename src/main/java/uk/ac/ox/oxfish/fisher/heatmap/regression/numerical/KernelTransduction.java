@@ -71,17 +71,19 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     }
 
 
-    //ignored
-
+    /**
+     * ignored
+     */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model,Fisher fisher) {
 
     }
 
-    //ignored
-
+    /**
+     * ignored
+     */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 

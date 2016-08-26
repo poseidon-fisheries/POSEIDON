@@ -64,10 +64,9 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
             return null;
 
         try {
-            String[] path = metawidget.getPath().split("/");
             //nested address? no problem
-            String address = path.length == 2? path[1] + "." + attributes.get("name") :
-                    attributes.get("name");
+            String address = StrategyFactoryWidgetProcessor.addressFromPath(
+                    attributes,metawidget);
             GeographicalRegression regression = ((GeographicalRegression)
                     PropertyUtils.getProperty(metawidget.getToInspect(),
                                               address));

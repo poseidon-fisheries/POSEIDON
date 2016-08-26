@@ -103,7 +103,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
         receipt = model.scheduleEveryDay(
                 this, StepOrder.DAWN);
     }
@@ -181,7 +181,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(receipt!= null)
             receipt.stop();
     }

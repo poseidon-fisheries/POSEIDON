@@ -104,7 +104,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
         //every morning drift out a bit
         receipt = model.scheduleEveryDay(new Steppable() {
             @Override
@@ -127,7 +127,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(receipt!= null)
             receipt.stop();
     }

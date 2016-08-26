@@ -42,10 +42,9 @@ public class HashMapWidgetBuilder implements WidgetBuilder<JComponent,SwingMetaw
         final Class<?> actualClass = WidgetBuilderUtils.getActualClassOrType(attributes, String.class);
         if(actualClass == null || !Map.class.isAssignableFrom(actualClass))
             return null;
-        final String[] path = metawidget.getPath().split("/");
         //nested address? no problem
-        final String address = path.length == 2? path[1] + "." + attributes.get("name") :
-                attributes.get("name");
+        final String address = StrategyFactoryWidgetProcessor.addressFromPath(
+                attributes,metawidget);
 
         try {
             final Map inspected  = ((Map) PropertyUtils.getProperty(
