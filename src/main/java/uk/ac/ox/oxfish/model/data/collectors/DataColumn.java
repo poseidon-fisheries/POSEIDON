@@ -125,6 +125,8 @@ public class DataColumn implements Iterable<Double>, Serializable{
     }
 
 
+
+
     public LinkedList<Double> copy(){
         return new LinkedList<>(data);
     }

@@ -29,7 +29,7 @@ public class PortDistanceExtractor implements ObservationExtractor {
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
         SeaTile portLocation = agent.getHomePort().getLocation();
 
-        return geographicalDistance.distance(portLocation,tile,map);
+        return geographicalDistance.distance(portLocation,tile,map)+1d;
 
 
     }

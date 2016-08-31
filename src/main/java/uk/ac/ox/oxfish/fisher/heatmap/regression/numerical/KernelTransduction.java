@@ -105,7 +105,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     public double[] getParametersAsArray() {
 
         double[] bandwidths = kernels.values().iterator().next().getBandwidths();
-        //check that they all have the same forgetting!
+        //check that they all have the same bandwidths!
         assert  kernels.values().stream().allMatch(
                 kernelTile -> Arrays.equals(kernelTile.getBandwidths(),bandwidths));
         return bandwidths;
@@ -118,7 +118,6 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     @Override
     public void setParameters(double[] parameterArray) {
 
-        assert parameterArray.length==1;
         kernels.values().forEach(kernelTile -> kernelTile.setBandwidths(parameterArray));
 
     }

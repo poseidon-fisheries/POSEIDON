@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
@@ -8,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -129,8 +132,17 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
         Actuator<double[]> actuator = new Actuator<double[]>() {
             @Override
             public void apply(Fisher fisher, double[] change, FishState model) {
-                ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().setParameters(
-                        Arrays.copyOf(change,change.length));
+                model.scheduleOnce(
+                        new Steppable() {
+                            @Override
+                            public void step(SimState simState) {
+                                ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().setParameters(
+                                        Arrays.copyOf(change,change.length));
+                            }
+                        },
+                        StepOrder.DAWN
+                );
+
             }
         };
 

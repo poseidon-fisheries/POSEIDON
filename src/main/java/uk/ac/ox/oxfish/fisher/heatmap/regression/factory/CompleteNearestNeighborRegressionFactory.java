@@ -59,7 +59,7 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
             extractors[3] = new ObservationExtractor() {
                 @Override
                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
-                    return distance.distance(tile,agent.getHomePort().getLocation());
+                    return distance.distance(tile,agent.getHomePort().getLocation())+1;
                 }
             } ;
             extractors[4] = new ObservationExtractor() {
