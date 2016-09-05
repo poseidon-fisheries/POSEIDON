@@ -48,7 +48,7 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     /**
      * how many neighbors to use
      */
-    private final int neighbors;
+    private int neighbors;
 
 
     public NearestNeighborRegression(int neighbors, double[] bandwidths, RegressionDistance distance,
@@ -217,7 +217,11 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      */
     @Override
     public double[] getParametersAsArray() {
-        return bandwidths;
+        double[] parameters = new double[bandwidths.length+1];
+        System.arraycopy(bandwidths,0,parameters,0,bandwidths.length);
+        parameters[parameters.length-1] = neighbors;
+        return
+            parameters;
     }
 
     /**
@@ -228,8 +232,10 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
      */
     @Override
     public void setParameters(double[] parameterArray) {
-        assert parameterArray.length == this.bandwidths.length;
-        this.bandwidths = parameterArray;
+        assert parameterArray.length == this.bandwidths.length+1;
+        for(int i=0; i<bandwidths.length; i++)
+            this.bandwidths[i] = parameterArray[i];
+        neighbors = (int) parameterArray[parameterArray.length-1];
         rebuildDistanceFunction(bandwidths);
     }
 }

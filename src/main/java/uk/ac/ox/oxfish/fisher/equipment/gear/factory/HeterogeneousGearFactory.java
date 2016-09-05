@@ -45,7 +45,27 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
     public HashMap<String, HomogeneousGearFactory> getGears() {
         if(!(gears.values().iterator().next() instanceof  HomogeneousGearFactory))
         {
+            //there is an annoying bug with yaml that doesn't really read maps correctly
+            //so we'll have to force it here
+            FishYAML yaml = new FishYAML();
+            HashMap<String, HomogeneousGearFactory> cleaned = new LinkedHashMap<>();
+            for(Map.Entry entry : gears.entrySet())
+            {
+                String key = (String) entry.getKey();
+                HashMap<String,LinkedHashMap<String,String>> container = (HashMap<String, LinkedHashMap<String,String>>) entry.getValue();
+                assert container.size()==1;
+                Map.Entry<String,LinkedHashMap<String,String>> constructor = container.entrySet().iterator().next();
+                StringBuilder cleanedYaml = new StringBuilder();
+                cleanedYaml.append(constructor.getKey()).append(":").append("\n");
+                for(Map.Entry parameter : constructor.getValue().entrySet())
+                {
+                    if(parameter.getValue()!=null)
+                        cleanedYaml.append("  ").append(parameter.getKey().toString()).append(": '").append(parameter.getValue().toString()).append("'").append("\n");
+                }
+                cleaned.put(key,yaml.loadAs(cleanedYaml.toString(),HomogeneousGearFactory.class));
+            }
 
+            gears = cleaned;
         }
         return gears;
     }

@@ -9,7 +9,9 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -142,7 +144,12 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
      */
     @Override
     public double[] getParametersAsArray() {
-        return new double[0];
+
+        double[] toReturn = new double[0];
+        for(int i=0; i<catches.length; i++)
+            toReturn = FishStateUtilities.concatenateArray(toReturn,catches[i].getParametersAsArray());
+
+        return toReturn;
     }
 
     /**
@@ -153,6 +160,17 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
      */
     @Override
     public void setParameters(double[] parameterArray) {
-        Preconditions.checkState(false, "perfect knowledge has no parameters to set!");
+
+
+        int numberOfParameters = catches[0].getParametersAsArray().length;
+        assert parameterArray.length == numberOfParameters * catches.length;
+        if(numberOfParameters>0)
+        {
+            List<double[]> parameters = FishStateUtilities.splitArray(parameterArray, numberOfParameters);
+            assert parameters.size() == catches.length;
+            for(int i=0; i<catches.length; i++)
+                catches[i].setParameters(parameters.get(i));
+        }
+
     }
 }

@@ -169,7 +169,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         //check that they all have the same forgetting!
         assert  lowesses.values().stream().allMatch(
                 lowessTile -> lowessTile.getExponentialForgetting()==currentForgetting);
-        return new double[]{currentForgetting};
+        return new double[]{currentForgetting,kernel.getBandwidth()};
 
     }
 
@@ -179,8 +179,9 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     @Override
     public void setParameters(double[] parameterArray) {
 
-        assert parameterArray.length==1;
+        assert parameterArray.length==2;
         lowesses.values().forEach(lowessTile -> lowessTile.setExponentialForgetting(parameterArray[0]));
+        kernel.setBandwidth(parameterArray[1]);
 
     }
 }

@@ -19,7 +19,8 @@ public class NumericalGeographicalRegressions {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends GeographicalRegression<Double>>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<
+            ? extends GeographicalRegression<Double>>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
@@ -83,6 +84,12 @@ public class NumericalGeographicalRegressions {
                          SocialTuningRegressionFactory::new);
         NAMES.put(SocialTuningRegressionFactory.class,
                   "Social Tuning");
+
+
+        CONSTRUCTORS.put("Epanechnikov Kernel Regression",
+                         DefaultEpanechnikovKernelRegressionFactory::new);
+        NAMES.put(DefaultEpanechnikovKernelRegressionFactory.class,
+                  "Epanechnikov Kernel Regression");
 
 
 

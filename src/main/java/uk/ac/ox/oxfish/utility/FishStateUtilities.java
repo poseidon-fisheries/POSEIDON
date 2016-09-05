@@ -772,5 +772,37 @@ public class FishStateUtilities {
 
     }
 
+
+
+    //from here: http://stackoverflow.com/questions/80476/how-can-i-concatenate-two-arrays-in-java
+    public static double[] concatenateArray(double[] a, double[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+        double[] c= new double[aLen+bLen];
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+        return c;
+    }
+
+
+    //from here: https://gist.github.com/gubatron/c4c816fcec5a74b752ea
+    public static  List<double[]> splitArray(double[] items, int maxSubArraySize) {
+        List<double[]> result = new ArrayList<>();
+        if (items ==null || items.length == 0) {
+            return result;
+        }
+
+        int from = 0;
+        int to = 0;
+        int slicedItems = 0;
+        while (slicedItems < items.length) {
+            to = from + Math.min(maxSubArraySize, items.length - to);
+            double[] slice = Arrays.copyOfRange(items, from, to);
+            result.add(slice);
+            slicedItems += slice.length;
+            from = to;
+        }
+        return result;
+    }
 }
 
