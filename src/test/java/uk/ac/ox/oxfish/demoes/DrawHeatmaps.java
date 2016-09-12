@@ -1,11 +1,14 @@
 package uk.ac.ox.oxfish.demoes;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDistanceExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
@@ -23,6 +26,7 @@ public class DrawHeatmaps
 {
 
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "paper2","heatmap_examples");
+    public static final FishState FISH_STATE = MovingTest.generateSimple10x10Map();
 
 
     public static void main(String[] args) throws Exception {
@@ -38,6 +42,11 @@ public class DrawHeatmaps
         ),"nn_port");
 
 
+        distancePlot(new NearestNeighborRegression(
+                2, new double[]{1, 1},
+                (tile, timeOfObservation, agent) -> tile.getGridX(),
+                (tile, timeOfObservation, agent) -> tile.getGridY()
+        ),"nn_multiple");
 
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1,1,1},
@@ -49,13 +58,15 @@ public class DrawHeatmaps
 
         distancePlot(new KernelRegression(
                 100,
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridX(), 10d),
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridY(), 10d)
+                new EpanechinikovKernel(0),
+                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridX(), 30d),
+                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridY(), 30d)
         ), "epa_simple");
 
 
         distancePlot(new KernelRegression(
                 100,
+                new EpanechinikovKernel(0),
                 new Pair<>((tile, timeOfObservation, agent) -> tile.getGridX(), 30d),
                 new Pair<>((tile, timeOfObservation, agent) -> tile.getGridY(), 30d)
         ), "epa_tilded");
@@ -63,7 +74,46 @@ public class DrawHeatmaps
 
         distancePlot(new KernelRegression(
                 100,
+                new EpanechinikovKernel(0),
                 new Pair<>(new PortDistanceExtractor(new ManhattanDistance(), null), 30d)), "epa_port");
+
+
+
+        distancePlot(new SimpleKalmanRegression(
+                             10, 1, 40, 60, 50*50, .1, 0, 0, FISH_STATE.getMap(),
+                             new MersenneTwisterFast(0)
+                     ),
+                     "kalman_simple");
+
+
+        distancePlot(new KernelTransduction
+                             (
+                                     FISH_STATE.getMap(),
+                                     1,
+                                     new Pair<>(
+                                             new GridXExtractor(),
+                                             20d),
+                                     new Pair<>(
+                                             new GridYExtractor(),
+                                             20d)
+                             ),
+                     "rbf_simple");
+
+        distancePlot(new GeographicallyWeightedRegression(
+                             FISH_STATE.getMap(),
+                             1,
+                             new ManhattanDistance(),
+                             5,
+                             new ObservationExtractor[0],
+                             40,
+                             60,
+                             50*50,
+                             new MersenneTwisterFast()),
+                     "gwr_simple");
+
+
+
+
 
 
 
@@ -74,15 +124,12 @@ public class DrawHeatmaps
     public static  void distancePlot(final GeographicalRegression<Double> regression, final String fileName) throws Exception {
 
 
-
-        FishState state = MovingTest.generateSimple10x10Map();
-
         Fisher mock = mock(Fisher.class);
-        Port port = new Port("porto",state.getMap().getSeaTile(9,9),null,0.01);
+        Port port = new Port("porto", FISH_STATE.getMap().getSeaTile(9, 9), null, 0.01);
         when(mock.getHomePort()).thenReturn(port);
         regression.addObservation(
                 new GeographicalObservation<>(
-                        state.getMap().getSeaTile(1, 1),
+                        FISH_STATE.getMap().getSeaTile(1, 1),
                         0,
                         100d
                 ), mock
@@ -90,7 +137,7 @@ public class DrawHeatmaps
 
         regression.addObservation(
                 new GeographicalObservation<>(
-                        state.getMap().getSeaTile(4, 5),
+                        FISH_STATE.getMap().getSeaTile(4, 5),
                         0,
                         30d
                 ), mock
@@ -99,7 +146,7 @@ public class DrawHeatmaps
 
         regression.addObservation(
                 new GeographicalObservation<>(
-                        state.getMap().getSeaTile(8, 6),
+                        FISH_STATE.getMap().getSeaTile(8, 6),
                         0,
                         5d
                 ), mock
@@ -109,8 +156,8 @@ public class DrawHeatmaps
         for (int x = 0; x < 10; x++)
         {
             for (int y = 0; y < 10; y++) {
-                output.append(x + "," + y + "," + regression.predict(
-                        state.getMap().getSeaTile(x, y), 0, mock
+                output.append((x+1) + "," + (y+1) + "," + regression.predict(
+                        FISH_STATE.getMap().getSeaTile(x, y), 0, mock
                 ));
                 output.append("\n");
             }

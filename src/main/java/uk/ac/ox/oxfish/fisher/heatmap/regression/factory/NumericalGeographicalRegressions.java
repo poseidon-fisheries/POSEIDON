@@ -86,10 +86,10 @@ public class NumericalGeographicalRegressions {
                   "Social Tuning");
 
 
-        CONSTRUCTORS.put("Epanechnikov Kernel Regression",
-                         DefaultEpanechnikovKernelRegressionFactory::new);
-        NAMES.put(DefaultEpanechnikovKernelRegressionFactory.class,
-                  "Epanechnikov Kernel Regression");
+        CONSTRUCTORS.put("Kernel Regression",
+                         DefaultKernelRegressionFactory::new);
+        NAMES.put(DefaultKernelRegressionFactory.class,
+                  "Kernel Regression");
 
 
 

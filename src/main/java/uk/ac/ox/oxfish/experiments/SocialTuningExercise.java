@@ -259,7 +259,22 @@ public class SocialTuningExercise {
     public static void main(String[] args) throws IOException {
 
 
-        /*
+
+
+
+        batchRun("cali_anarchy.yaml", "calianarchy",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 1);
+
+
+        batchRun("cali_itq.yaml", "caliitq",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 1);
+
 
         batchRun("nn.yaml", "fronts",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
@@ -289,15 +304,26 @@ public class SocialTuningExercise {
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0);
 
-        */
 
 
-        batchRun("cali_anarchy.yaml", "calianarchy",
-                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+
+
+
+
+
+        batchRun("cali_anarchy_plan.yaml", "calianarchyplan",
+                 pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
                          ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 1);
 
+
+
+        batchRun("cali_itq_plan.yaml", "caliitqplan",
+                 pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
+                         ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 1);
 
 
 
@@ -322,7 +348,7 @@ public class SocialTuningExercise {
         nn.setxBandwidth(new UniformDoubleParameter(1, 1000));
         nn.setyBandwidth(new UniformDoubleParameter(1, 1000));
         nn.setNeighbors(new UniformDoubleParameter(1, 10));
-        strategies.put("nn", nn);
+  //      strategies.put("nn", nn);
         headers.put("nn", new String[]{"time", "x", "y", "distance", "habitat","neighbors"});
         //kalman
         SimpleKalmanRegressionFactory kalman = new SimpleKalmanRegressionFactory();
@@ -332,13 +358,13 @@ public class SocialTuningExercise {
         kalman.setInitialUncertainty(new FixedDoubleParameter(10000));
         kalman.setOptimism(new UniformDoubleParameter(-2, 2));
         kalman.setDrift(new UniformDoubleParameter(1, 100));
-        strategies.put("kalman", kalman);
+  //      strategies.put("kalman", kalman);
         headers.put("kalman", new String[]{"distance", "evidence", "drift", "optimism", "penalty"});
         //gwr
         GeographicallyWeightedRegressionFactory gwr = new GeographicallyWeightedRegressionFactory();
         gwr.setExponentialForgetting(new UniformDoubleParameter(.8,1));
         gwr.setRbfBandwidth(new UniformDoubleParameter(.1,50));
-        strategies.put("gwr",gwr);
+   //     strategies.put("gwr",gwr);
         headers.put("gwr",new String[]{"forgetting", "bandwidth"});
 
         //good-bad regression
@@ -347,19 +373,32 @@ public class SocialTuningExercise {
         goodBad.setGoodAverage(new UniformDoubleParameter(10,30));
         goodBad.setStandardDeviation(new UniformDoubleParameter(10,30));
         goodBad.setDistancePenalty(new UniformDoubleParameter(.1,50));
-        strategies.put("goodBad", goodBad);
+    //    strategies.put("goodBad", goodBad);
         headers.put("goodBad", new String[]{"bad", "good", "std", "distance"});
 
         //epa
-        DefaultEpanechnikovKernelRegressionFactory epa = new DefaultEpanechnikovKernelRegressionFactory();
+        DefaultKernelRegressionFactory epa = new DefaultKernelRegressionFactory();
         epa.setTimeBandwidth(new UniformDoubleParameter(100,10000));
         epa.setNumberOfObservations(new FixedDoubleParameter(100));
         epa.setxBandwidth(new UniformDoubleParameter(1,1000));
         epa.setyBandwidth(new UniformDoubleParameter(1,1000));
         epa.setDistanceFromPortBandwidth(new UniformDoubleParameter(1,1000));
         epa.setHabitatBandwidth(new UniformDoubleParameter(1,1000));
-        strategies.put("epa", epa);
+        epa.setRbfKernel(false);
+   //     strategies.put("epa", epa);
         headers.put("epa", new String[]{"x", "y", "distance", "habitat","time"});
+
+        //rbf
+        DefaultKernelRegressionFactory rbf = new DefaultKernelRegressionFactory();
+        epa.setTimeBandwidth(new UniformDoubleParameter(100,10000));
+        epa.setNumberOfObservations(new FixedDoubleParameter(100));
+        epa.setxBandwidth(new UniformDoubleParameter(1,1000));
+        epa.setyBandwidth(new UniformDoubleParameter(1,1000));
+        epa.setDistanceFromPortBandwidth(new UniformDoubleParameter(1,1000));
+        epa.setHabitatBandwidth(new UniformDoubleParameter(1,1000));
+        rbf.setRbfKernel(true);
+        strategies.put("rbf", rbf);
+        headers.put("rbf", new String[]{"x", "y", "distance", "habitat","time"});
 
         //kernel
         DefaultRBFKernelTransductionFactory kernel = new DefaultRBFKernelTransductionFactory();
@@ -368,7 +407,7 @@ public class SocialTuningExercise {
         kernel.setxBandwidth(new UniformDoubleParameter(1, 200));
         kernel.setyBandwidth(new UniformDoubleParameter(1, 200));
         kernel.setForgettingFactor(new FixedDoubleParameter(.95));
-        strategies.put("kernel", kernel);
+    //    strategies.put("kernel", kernel);
         headers.put("kernel", new String[]{"x", "y", "distance", "habitat"});
 
 

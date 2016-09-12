@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -31,7 +32,7 @@ public class KernelRegression  implements GeographicalRegression<Double>{
     /**
      * kernel object to use
      */
-    private final EpanechinikovKernel kernel = new EpanechinikovKernel(0);
+    private final RegressionDistance kernel;
 
 
     /**
@@ -49,11 +50,14 @@ public class KernelRegression  implements GeographicalRegression<Double>{
 
     public KernelRegression(
             int maximumNumberOfObservationsToKeep,
+            RegressionDistance kernel,
             Pair<ObservationExtractor,Double>... extractorsAndBandwidths)
     {
 
         this.bandwidths = new double[extractorsAndBandwidths.length];
         this.extractors = new ObservationExtractor[extractorsAndBandwidths.length];
+        this.kernel = kernel;
+
 
         for(int i=0; i< extractorsAndBandwidths.length; i++)
         {

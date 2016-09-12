@@ -4,6 +4,7 @@ import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -56,6 +57,7 @@ public class ITQOrderBook implements Steppable,Startable{
 
 
     private final LinkedList<Fisher> toPenalize = new LinkedList<>();
+    private Stoppable stoppable;
 
 
     /**
@@ -69,7 +71,7 @@ public class ITQOrderBook implements Steppable,Startable{
         counter.addColumn(MATCHES_COLUMN_NAME);
         counter.addColumn(QUOTA_COLUMN_NAME);
         counter.addColumn(MONEY_COLUMN_NAME);
-        model.scheduleEveryDay(this, StepOrder.POLICY_UPDATE);
+        stoppable = model.scheduleEveryDay(this, StepOrder.POLICY_UPDATE);
         counter.start(model);
     }
 
@@ -78,7 +80,8 @@ public class ITQOrderBook implements Steppable,Startable{
      */
     @Override
     public void turnOff() {
-
+        if(stoppable!=null)
+            stoppable.stop();
     }
 
     /**

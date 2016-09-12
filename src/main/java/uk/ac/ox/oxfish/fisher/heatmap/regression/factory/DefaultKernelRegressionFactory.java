@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 9/2/16.
  */
-public class DefaultEpanechnikovKernelRegressionFactory implements AlgorithmFactory<KernelRegression>{
+public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRegression>{
 
 
 
@@ -29,6 +29,7 @@ public class DefaultEpanechnikovKernelRegressionFactory implements AlgorithmFact
 
     private DoubleParameter habitatBandwidth = new FixedDoubleParameter(1);
 
+    private boolean rbfKernel = true;
 
     /**
      * Applies this function to the given argument.
@@ -41,6 +42,7 @@ public class DefaultEpanechnikovKernelRegressionFactory implements AlgorithmFact
 
         return new KernelRegression(
                 numberOfObservations.apply(state.getRandom()).intValue(),
+                rbfKernel ? new RBFKernel(0) : new EpanechinikovKernel(0),
                 new Pair<>(
                         new GridXExtractor(),
                         xBandwidth.apply(state.getRandom())
@@ -174,5 +176,23 @@ public class DefaultEpanechnikovKernelRegressionFactory implements AlgorithmFact
      */
     public void setHabitatBandwidth(DoubleParameter habitatBandwidth) {
         this.habitatBandwidth = habitatBandwidth;
+    }
+
+    /**
+     * Getter for property 'rbfKernel'.
+     *
+     * @return Value for property 'rbfKernel'.
+     */
+    public boolean isRbfKernel() {
+        return rbfKernel;
+    }
+
+    /**
+     * Setter for property 'rbfKernel'.
+     *
+     * @param rbfKernel Value to set for property 'rbfKernel'.
+     */
+    public void setRbfKernel(boolean rbfKernel) {
+        this.rbfKernel = rbfKernel;
     }
 }

@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.geography.pathfinding;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -17,6 +19,9 @@ public class AStarPathfinder implements Pathfinder {
 
 
     private final Distance distanceFunction;
+
+
+    private final Table<SeaTile,SeaTile,LinkedList<SeaTile>> memory = HashBasedTable.create();
 
     /**
      * creates the A* pathfinder it uses distanceFunction both for computing the cost of moving from A to its neighbors
@@ -40,12 +45,16 @@ public class AStarPathfinder implements Pathfinder {
             NauticalMap map, SeaTile start, SeaTile end)
     {
 
+
+
         //preconditions
         Preconditions.checkNotNull(start);
         Preconditions.checkNotNull(end);
         Preconditions.checkNotNull(map);
 
 
+        if(memory.contains(start,end))
+            return new LinkedList<>(memory.get(start,end));
 
 
         //where we will eventually put the path
@@ -110,6 +119,8 @@ public class AStarPathfinder implements Pathfinder {
         }
         //reverse it
         Collections.reverse(path);
+
+        memory.put(start,end,new LinkedList<>(path));
 
         //return it!
         return path;
