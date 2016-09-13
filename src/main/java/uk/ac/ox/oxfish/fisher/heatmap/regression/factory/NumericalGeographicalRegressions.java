@@ -80,17 +80,23 @@ public class NumericalGeographicalRegressions {
         NAMES.put(GoodBadRegressionFactory.class,
                   "Good-Bad");
 
-        CONSTRUCTORS.put("Social Tuning",
-                         SocialTuningRegressionFactory::new);
-        NAMES.put(SocialTuningRegressionFactory.class,
-                  "Social Tuning");
-
 
         CONSTRUCTORS.put("Kernel Regression",
                          DefaultKernelRegressionFactory::new);
         NAMES.put(DefaultKernelRegressionFactory.class,
                   "Kernel Regression");
 
+
+        CONSTRUCTORS.put("Social Tuning",
+                         SocialTuningRegressionFactory::new);
+        NAMES.put(SocialTuningRegressionFactory.class,
+                  "Social Tuning");
+
+
+        CONSTRUCTORS.put("Personal Tuning",
+                         PersonalTuningRegressionFactory::new);
+        NAMES.put(PersonalTuningRegressionFactory.class,
+                  "Personal Tuning");
 
 
     }
