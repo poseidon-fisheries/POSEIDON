@@ -49,7 +49,6 @@ public class ProfitFunction {
      * compute hourly profits for this trip given current information (so if prices of fish changed since this trip is over
      * the profits computed here and the profits recorded in the trip won't be the same)
      * @param fisher agent who made the trip or anyway whose point of view matters
-     * @param trip the actual trip that took place
      * @param state the model
      * @return $/hr profits of this trip
      */
@@ -60,7 +59,7 @@ public class ProfitFunction {
 
         TripRecord trip = simulateTrip(fisher, expectedCatches, where, state);
         if (trip == null)
-            return null;
+            return Double.NaN;
 
 
         if(verbose)

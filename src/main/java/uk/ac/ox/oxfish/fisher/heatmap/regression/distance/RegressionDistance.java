@@ -1,19 +1,18 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
-import uk.ac.ox.oxfish.geography.SeaTile;
-
 /**
- * Needed to tell the difference between a seatile and a  Geographical Observation
- *
- * Created by carrknight on 7/5/16.
+ * The distance (as in opposite of similiarity) between two observations extracted during a regression
+ * Created by carrknight on 8/24/16.
  */
 public interface RegressionDistance {
 
-    public double distance(
-            Fisher fisher, SeaTile tile, double currentTimeInHours,
-            GeographicalObservation observation);
 
+    public double distance(double firstObservation, double secondObservation);
+
+
+    public double getBandwidth();
+
+
+    public void setBandwidth(double bandwidth);
 
 }

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -63,7 +64,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
     protected void learnFromTripRecord(
             TripRecord record, SeaTile mostFishedTile, Fisher fisher, FishState model) {
 
-         getProfitRegression().addObservation(
+         regression.addObservation(
                 new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
                                               record),
                 fisher
@@ -110,16 +111,19 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
         }
 
-        //ignored
-
+        /**
+         * ignored
+         */
         @Override
-        public void start(FishState model) {
+        public void start(FishState model,Fisher fisher) {
 
         }
 
-        //ignored
+        /**
+         * ignored
+         */
         @Override
-        public void turnOff() {
+        public void turnOff(Fisher fisher) {
 
         }
 
@@ -130,6 +134,28 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         public double extractNumericalYFromObservation(
                 GeographicalObservation<Double> observation, Fisher fisher) {
             return observation.getValue();
+        }
+
+        /**
+         * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+         * from the outside without knowing the inner workings of the regression
+         *
+         * @return an array containing all the parameters of the model
+         */
+        @Override
+        public double[] getParametersAsArray() {
+            return new double[0];
+        }
+
+        /**
+         * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+         * to transition to these parameters
+         *
+         * @param parameterArray the new parameters for this regresssion
+         */
+        @Override
+        public void setParameters(double[] parameterArray) {
+            Preconditions.checkState(false, "perfect knowledge has no parameters to set!");
         }
     }
 }

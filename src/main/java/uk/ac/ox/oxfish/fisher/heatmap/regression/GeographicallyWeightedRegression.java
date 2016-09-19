@@ -5,8 +5,8 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -32,12 +32,14 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     private final HashMap<SeaTile,LowessTile> lowesses = new HashMap<>();
 
 
+    private final Distance distance;
 
 
 
 
 
     private final RBFKernel kernel;
+    private final NauticalMap map;
 
 
     public GeographicallyWeightedRegression(
@@ -48,6 +50,8 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
             double initialMax,
             double initialUncertainty,
             MersenneTwisterFast random) {
+        this.distance = distance;
+        this.map = map;
         Preconditions.checkArgument(initialMax>initialMin);
         //get extractors and add intercept
         this.extractors = new ObservationExtractor[nonInterceptExtractors.length+1];
@@ -60,13 +64,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
             }
         };
 
-        this.kernel = new RBFKernel(new RegressionDistance() {
-            @Override
-            public double distance(
-                    Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
-                return distance.distance(tile,observation.getTile(),map);
-            }
-        },rbfBandwidth);
+        this.kernel = new RBFKernel(rbfBandwidth);
 
         //each tile its own lowess with a random intercept
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
@@ -92,7 +90,9 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         //go through all the tiles
         for(Map.Entry<SeaTile,LowessTile> lowess : lowesses.entrySet())
         {
-            double sigma = 1d/kernel.distance(fisher,lowess.getKey(),observation.getTime(),observation);
+            double sigma = 1d/
+                    kernel.transform(distance.distance(lowess.getKey(),observation.getTile(),map));
+
             if(!Double.isFinite(sigma)) {
                 lowess.getValue().increaseUncertainty();
                 continue;
@@ -135,26 +135,21 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         else
             return predictor.getBeta();
     }
-
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
+     * ignored
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model,Fisher fisher) {
 
     }
 
     /**
-     * tell the startable to turnoff,
+     * ignored
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
-
     /**
      * It's already a double so return it!
      */
@@ -162,5 +157,31 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     public double extractNumericalYFromObservation(
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
+    }
+
+    /**
+     *  The only hyper-parameter really is the forgetting value
+     */
+    @Override
+    public double[] getParametersAsArray() {
+
+        double currentForgetting = lowesses.values().iterator().next().getExponentialForgetting();
+        //check that they all have the same forgetting!
+        assert  lowesses.values().stream().allMatch(
+                lowessTile -> lowessTile.getExponentialForgetting()==currentForgetting);
+        return new double[]{currentForgetting,kernel.getBandwidth()};
+
+    }
+
+    /**
+     * receives and modifies the forgetting value
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+
+        assert parameterArray.length==2;
+        lowesses.values().forEach(lowessTile -> lowessTile.setExponentialForgetting(parameterArray[0]));
+        kernel.setBandwidth(parameterArray[1]);
+
     }
 }

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.ErrorTrackingRegression;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -19,7 +20,7 @@ public class ErrorTrackingRegressionTest {
 
 
         GeographicalRegression<Double> fake = mock(GeographicalRegression.class);
-        ErrorTrackingRegression<Double> test = new ErrorTrackingRegression<Double>(fake,3);
+        ErrorTrackingRegression<Double> test = new ErrorTrackingRegression<Double>(fake, 3);
 
         when(fake.predict(any(),anyDouble(),any())).thenReturn(1d,2d,3d,4d);
         when(fake.extractNumericalYFromObservation(any(),any())).thenReturn(0d,0d,0d,0d);

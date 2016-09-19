@@ -3,12 +3,15 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridYExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.SpaceRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTilePredictor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 
 /**
  * Created by carrknight on 7/8/16.
@@ -25,8 +28,16 @@ public class KernelTilePredictorTest {
         KernelTilePredictor predictor = new KernelTilePredictor(
                 1d,
                 map.getSeaTile(25,25),
-                new SpaceRegressionDistance(1d)
-        );
+                new Pair<>(
+                        new GridXExtractor(),
+                        1d
+                ),
+                new Pair<>(
+                        new GridYExtractor(),
+                        1d
+                ));
+
+
         predictor.addObservation(
                 new GeographicalObservation<>(
                         map.getSeaTile(20,20),
@@ -71,13 +82,26 @@ public class KernelTilePredictorTest {
         KernelTilePredictor forgetting = new KernelTilePredictor(
                 .8d,
                 map.getSeaTile(25,25),
-                new RBFKernel(new SpaceRegressionDistance(1d),1d)
-        );
-        KernelTilePredictor notForgetting = new KernelTilePredictor(
+                new Pair<>(
+                        new GridXExtractor(),
+                        1d
+                ),
+                new Pair<>(
+                        new GridYExtractor(),
+                        1d
+                ));
+        KernelTilePredictor notForgetting =new KernelTilePredictor(
                 1d,
                 map.getSeaTile(25,25),
-                new RBFKernel(new SpaceRegressionDistance(1d),1d)
-        );
+                new Pair<>(
+                        new GridXExtractor(),
+                        1d
+                ),
+                new Pair<>(
+                        new GridYExtractor(),
+                        1d
+                ));
+
         forgetting.addObservation(
                  new GeographicalObservation<>(
                         map.getSeaTile(25,25),

@@ -40,10 +40,9 @@ public class ArrayWidgetProcessor implements WidgetProcessor<JComponent,SwingMet
             try {
                 if (clazz.isArray()) {
 
-                    String[] path = metawidget.getPath().split("/");
                     //nested address? no problem
-                    String address = path.length == 2? path[1] + "." + attributes.get("name") :
-                            attributes.get("name");
+                    String address = StrategyFactoryWidgetProcessor.addressFromPath(
+                            attributes,metawidget);
                     //current class
 
                     String toDisplay =

@@ -29,6 +29,11 @@ public class Markets {
         );
         NAMES.put(FixedPriceMarketFactory.class,"Fixed Price Market");
 
+        CONSTRUCTORS.put("Fixed Price Market Array",
+                         ArrayFixedPriceMarket::new
+        );
+        NAMES.put(ArrayFixedPriceMarket.class,"Fixed Price Market Array");
+
         CONSTRUCTORS.put("Congested Market",
                          CongestedMarketFactory::new
         );

@@ -5,7 +5,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ErrorTrackingRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.ErrorTrackingRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
@@ -30,7 +30,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     /**
      * geographical regression to learn and predict where you make most money
      */
-    private ErrorTrackingRegression profitRegression;
+    private ErrorTrackingRegression heatmap;
 
     /**
      * the strategy used to scan the profit regression to look for the "best"
@@ -70,13 +70,13 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
 
     public HeatmapDestinationStrategy(
-            GeographicalRegression profitRegression,
+            GeographicalRegression heatmap,
             AcquisitionFunction acquisition, boolean ignoreFailedTrips,
             AdaptationProbability probability,
             NauticalMap map,
             MersenneTwisterFast random,
             int stepSize) {
-        this.profitRegression = new ErrorTrackingRegression(profitRegression);
+        this.heatmap = new ErrorTrackingRegression(heatmap);
         this.acquisition = acquisition;
         this.ignoreFailedTrips = ignoreFailedTrips;
         this.probability = probability;
@@ -94,7 +94,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         else
             lastFriendTripRecorded = new HashMap<>(0);
         fisher.addTripListener(this);
-        profitRegression.start(model);
+        heatmap.start(model, fisher);
     }
 
     @Override
@@ -103,15 +103,15 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
         lastFriendTripRecorded.clear();
         this.fisher =null;
         model=null;
-        profitRegression.turnOff();
-        profitRegression = null;
+        heatmap.turnOff(fisher);
+        heatmap = null;
     }
 
 
     protected void learnFromTripRecord(
             TripRecord record, SeaTile mostFishedTile, final Fisher fisher, final FishState model)
     {
-        profitRegression.addObservation(new GeographicalObservation<>(
+        heatmap.addObservation(new GeographicalObservation<>(
                 mostFishedTile,
                 model.getHoursSinceStart(),
                 record.getProfitPerHour(true)
@@ -146,7 +146,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
             }
 
         //find the optimal
-        SeaTile optimal = acquisition.pick(model.getMap(), profitRegression, model,fisher, delegate.getFavoriteSpot() );
+        SeaTile optimal = acquisition.pick(model.getMap(), heatmap, model, fisher, delegate.getFavoriteSpot() );
         Preconditions.checkState(optimal.getAltitude()<0);
         if(model.getRandom().nextDouble()<=probability.getExplorationProbability()) {
             optimal = explorationStep.randomStep(model, model.getRandom(), fisher, optimal);
@@ -156,8 +156,8 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     }
 
 
-    public GeographicalRegression getProfitRegression() {
-        return profitRegression;
+    public GeographicalRegression getHeatmap() {
+        return heatmap;
     }
 
     public AdaptationProbability getProbability() {
@@ -191,12 +191,12 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     }
 
     /**
-     * Setter for property 'profitRegression'.
+     * Setter for property 'heatmap'.
      *
-     * @param profitRegression Value to set for property 'profitRegression'.
+     * @param heatmap Value to set for property 'heatmap'.
      */
-    public void setProfitRegression(GeographicalRegression profitRegression) {
-        this.profitRegression = new ErrorTrackingRegression(profitRegression);
+    public void setHeatmap(GeographicalRegression heatmap) {
+        this.heatmap = new ErrorTrackingRegression(heatmap);
     }
 
     /**
@@ -221,7 +221,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
      *  returns list of errors. No protection here, be careful
      */
     public LinkedList<Double> getErrors() {
-        return profitRegression.getErrors();
+        return heatmap.getErrors();
     }
 
     /**
@@ -230,6 +230,6 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
      * @return Value for property 'latestError'.
      */
     public double getLatestError() {
-        return profitRegression.getLatestError();
+        return heatmap.getLatestError();
     }
 }

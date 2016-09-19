@@ -1,11 +1,12 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class KernelTransduction implements GeographicalRegression<Double> {
     public KernelTransduction(
             NauticalMap map,
             double forgettingFactor,
-            RegressionDistance... distance) {
+            Pair<ObservationExtractor,Double>... extractorsAndBandwidths) {
 
         this.forgettingFactor = forgettingFactor;
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
         kernels = new HashMap<>(tiles.size());
         for(SeaTile tile : tiles)
-            kernels.put(tile,new KernelTilePredictor(forgettingFactor,tile,distance));
+            kernels.put(tile,new KernelTilePredictor(forgettingFactor,tile, extractorsAndBandwidths));
 
     }
 
@@ -69,21 +70,20 @@ public class KernelTransduction implements GeographicalRegression<Double> {
         return forgettingFactor;
     }
 
-    public List<RegressionDistance> getDistances(){
-        return         kernels.values().iterator().next().getDistances();
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model,Fisher fisher) {
+
     }
 
-    //ignored
-
+    /**
+     * ignored
+     */
     @Override
-    public void start(FishState model) {
-
-    }
-
-    //ignored
-
-    @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
 
     }
 
@@ -96,4 +96,30 @@ public class KernelTransduction implements GeographicalRegression<Double> {
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
     }
+
+
+    /**
+     *  The only hyper-parameter really is the forgetting value
+     */
+    @Override
+    public double[] getParametersAsArray() {
+
+        double[] bandwidths = kernels.values().iterator().next().getBandwidths();
+        //check that they all have the same bandwidths!
+        assert  kernels.values().stream().allMatch(
+                kernelTile -> Arrays.equals(kernelTile.getBandwidths(),bandwidths));
+        return bandwidths;
+
+    }
+
+    /**
+     * receives and modifies the forgetting value
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+
+        kernels.values().forEach(kernelTile -> kernelTile.setBandwidths(parameterArray));
+
+    }
+
 }

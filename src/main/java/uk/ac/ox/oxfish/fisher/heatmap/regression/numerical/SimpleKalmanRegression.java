@@ -7,7 +7,6 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.OneDimensionalKalmanFilter;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -27,12 +26,12 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      */
     private final RBFKernel distancePenalty;
 
-    private final double evidenceUncertainty;
+    private double evidenceUncertainty;
 
     /**
      * the daily gaussian noise to add to uncertainty for each filter
      */
-    private final double drift;
+    private double drift;
 
 
     private final double minValue;
@@ -40,23 +39,26 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
     /**
      * the prediction is mean + optimism * error
      */
-    private final double optimism;
+    private double optimism;
 
 
     private final double maxValue;
 
-    private final double initialUncertainty;
+    private double initialUncertainty;
 
     /**
      * if this is different from 0 then our emission model is z = (1+fishingHerePenalty)x
      * that is we assume our observation is slightly biased upward (since we might think we are ruining the spot for later)
      */
-    private final double fishingHerePenalty;
+    private double fishingHerePenalty;
 
     private final HashMap<SeaTile,OneDimensionalKalmanFilter> filters = new HashMap<>();
 
     private final NauticalMap map;
 
+    /**
+     * geographical distance
+     */
     private final static ManhattanDistance distancer = new ManhattanDistance() ;
 
     public SimpleKalmanRegression(
@@ -70,13 +72,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
             double fishingHerePenalty,
             NauticalMap map,
             MersenneTwisterFast random) {
-        this.distancePenalty =  new RBFKernel(new RegressionDistance() {
-            @Override
-            public double distance(
-                    Fisher fisher, SeaTile tile, double currentTimeInHours, GeographicalObservation observation) {
-                return  distancer.distance(tile,observation.getTile(),map);
-            }
-        }, distancePenalty);
+        this.distancePenalty =  new RBFKernel(distancePenalty);
         this.drift = drift;
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -108,7 +104,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      * @param model the model
      */
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
         //every morning drift out a bit
         receipt = model.scheduleEveryDay(new Steppable() {
             @Override
@@ -131,7 +127,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      * tell the startable to turnoff,
      */
     @Override
-    public void turnOff() {
+    public void turnOff(Fisher fisher) {
         if(receipt!= null)
             receipt.stop();
     }
@@ -144,8 +140,8 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
         for(Map.Entry<SeaTile,OneDimensionalKalmanFilter> filter : filters.entrySet())
         {
 
-            double rbfDistance = distancePenalty.distance(
-                    fisher, filter.getKey(), observation.getTime(), observation);
+            double rbfDistance = distancePenalty.transform(
+                    distancer.distance(filter.getKey(),observation.getTile()));
             double evidencePenalty = evidenceUncertainty + (1/ rbfDistance-1);
 
              if(!Double.isFinite(evidencePenalty ) || rbfDistance <= 0.0001) //don't bother with extremely small information
@@ -224,5 +220,44 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
     public double extractNumericalYFromObservation(
             GeographicalObservation<Double> observation, Fisher fisher) {
         return observation.getValue();
+    }
+
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+
+
+        return  new double[]{
+            distancePenalty.getBandwidth(),
+                evidenceUncertainty,
+                drift,
+                optimism,
+                fishingHerePenalty
+        };
+
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        assert parameterArray.length == 5;
+        distancePenalty.setBandwidth(parameterArray[0]);
+        evidenceUncertainty = parameterArray[1];
+        drift = parameterArray[2];
+        for(OneDimensionalKalmanFilter kalman : filters.values())
+            kalman.setDrift(drift);
+        optimism = parameterArray[3];
+        fishingHerePenalty = parameterArray[4];
     }
 }

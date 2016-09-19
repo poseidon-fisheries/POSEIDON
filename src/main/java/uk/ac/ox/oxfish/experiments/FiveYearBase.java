@@ -46,8 +46,7 @@ public class FiveYearBase {
 
         FishYAML yaml = new FishYAML();
         PrototypeScenario scenario = yaml.loadAs(
-                new FileReader(Paths.get("runs", "optimization", "kalman_tune",  "rbf",
-                                         "kernel.yaml").toFile()),
+                new FileReader(Paths.get("runs", "optimization", "kalman_tune",  "itq_plan.yaml").toFile()),
                 PrototypeScenario.class);
         PlanningHeatmapDestinationFactory destinationStrategy = new PlanningHeatmapDestinationFactory();
         ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
@@ -8,7 +9,9 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -109,17 +112,18 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     //ignored
 
     @Override
-    public void start(FishState model) {
+    public void start(FishState model, Fisher fisher) {
         this.state = model;
         for(GeographicalRegression reg : catches)
-            reg.start(model);
+            reg.start(model,fisher);
     }
 
     //ignored
 
     @Override
-    public void turnOff() {
-
+    public void turnOff(Fisher fisher) {
+        for(GeographicalRegression reg : catches)
+            reg.turnOff(fisher);
     }
 
     /**
@@ -129,5 +133,44 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     public double extractNumericalYFromObservation(
             GeographicalObservation<TripRecord> observation, Fisher fisher) {
         return observation.getValue().getProfitPerHour(true);
+    }
+
+
+    /**
+     * Transforms the parameters used (and that can be changed) into a double[] array so that it can be inspected
+     * from the outside without knowing the inner workings of the regression
+     *
+     * @return an array containing all the parameters of the model
+     */
+    @Override
+    public double[] getParametersAsArray() {
+
+        double[] toReturn = new double[0];
+        for(int i=0; i<catches.length; i++)
+            toReturn = FishStateUtilities.concatenateArray(toReturn,catches[i].getParametersAsArray());
+
+        return toReturn;
+    }
+
+    /**
+     * given an array of parameters (of size equal to what you'd get if you called the getter) the regression is supposed
+     * to transition to these parameters
+     *
+     * @param parameterArray the new parameters for this regresssion
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+
+
+        int numberOfParameters = catches[0].getParametersAsArray().length;
+        assert parameterArray.length == numberOfParameters * catches.length;
+        if(numberOfParameters>0)
+        {
+            List<double[]> parameters = FishStateUtilities.splitArray(parameterArray, numberOfParameters);
+            assert parameters.size() == catches.length;
+            for(int i=0; i<catches.length; i++)
+                catches[i].setParameters(parameters.get(i));
+        }
+
     }
 }

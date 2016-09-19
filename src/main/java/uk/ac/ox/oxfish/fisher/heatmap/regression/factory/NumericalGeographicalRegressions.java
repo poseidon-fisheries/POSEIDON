@@ -19,7 +19,8 @@ public class NumericalGeographicalRegressions {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends GeographicalRegression<Double>>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<
+            ? extends GeographicalRegression<Double>>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
@@ -27,14 +28,6 @@ public class NumericalGeographicalRegressions {
     public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
             new LinkedHashMap<>();
     static{
-
-        CONSTRUCTORS.put("Space Only Kernel",
-                         SpaceOnlyKernelRegressionFactory::new);
-        NAMES.put(SpaceOnlyKernelRegressionFactory.class,"Space Only Kernel");
-
-        CONSTRUCTORS.put("Space and Time Kernel",
-                         TimeAndSpaceKernelRegressionFactory::new);
-        NAMES.put(TimeAndSpaceKernelRegressionFactory.class,"Space and Time Kernel");
 
 
         CONSTRUCTORS.put("Nearest Neighbor",
@@ -75,6 +68,35 @@ public class NumericalGeographicalRegressions {
         NAMES.put(SimpleKalmanRegressionFactory.class,
                   "Simple Kalman");
 
+
+        CONSTRUCTORS.put("GWR",
+                         GeographicallyWeightedRegressionFactory::new);
+        NAMES.put(GeographicallyWeightedRegressionFactory.class,
+                  "GWR");
+
+
+        CONSTRUCTORS.put("Good-Bad",
+                         GoodBadRegressionFactory::new);
+        NAMES.put(GoodBadRegressionFactory.class,
+                  "Good-Bad");
+
+
+        CONSTRUCTORS.put("Kernel Regression",
+                         DefaultKernelRegressionFactory::new);
+        NAMES.put(DefaultKernelRegressionFactory.class,
+                  "Kernel Regression");
+
+
+        CONSTRUCTORS.put("Social Tuning",
+                         SocialTuningRegressionFactory::new);
+        NAMES.put(SocialTuningRegressionFactory.class,
+                  "Social Tuning");
+
+
+        CONSTRUCTORS.put("Personal Tuning",
+                         PersonalTuningRegressionFactory::new);
+        NAMES.put(PersonalTuningRegressionFactory.class,
+                  "Personal Tuning");
 
 
     }

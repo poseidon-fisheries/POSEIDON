@@ -50,10 +50,9 @@ public class MarketWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawi
         try {
 
 
-            String[] path = metawidget.getPath().split("/");
             //nested address? no problem
-            String address = path.length == 2? path[1] + "." + attributes.get("name") :
-                    attributes.get("name");
+            String address = StrategyFactoryWidgetProcessor.addressFromPath(
+                    attributes,metawidget);
             MarketMap marketMap = ((MarketMap) PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                    address));
 

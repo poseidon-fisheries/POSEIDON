@@ -1,6 +1,8 @@
-package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
+package uk.ac.ox.oxfish.fisher.heatmap.regression;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -73,21 +75,20 @@ public class ErrorTrackingRegression<V> implements GeographicalRegression<V>
 
 
     /**
-     * delegate
+     * delegated
      */
     @Override
-    public void start(FishState model) {
-        delegate.start(model);
+    public void start(FishState model,Fisher fisher) {
+        delegate.start(model,fisher);
     }
 
     /**
-     * delegate
+     * delegated
      */
     @Override
-    public void turnOff() {
-        delegate.turnOff();
+    public void turnOff(Fisher fisher) {
+        delegate.turnOff(fisher);
     }
-
     /**
      * Getter for property 'latestError'.
      *
@@ -113,5 +114,30 @@ public class ErrorTrackingRegression<V> implements GeographicalRegression<V>
     public double extractNumericalYFromObservation(
             GeographicalObservation<V> observation, Fisher fisher) {
         return delegate.extractNumericalYFromObservation(observation,fisher);
+    }
+
+    /**
+     *  ducked, let delegate handle it
+     */
+    @Override
+    public double[] getParametersAsArray() {
+        return delegate.getParametersAsArray();
+    }
+
+    /**
+     *  ducked, let delegate handle it
+     */
+    @Override
+    public void setParameters(double[] parameterArray) {
+        delegate.setParameters(parameterArray);
+    }
+
+    /**
+     * Getter for property 'delegate'.
+     *
+     * @return Value for property 'delegate'.
+     */
+    public GeographicalRegression<V> getDelegate() {
+        return delegate;
     }
 }

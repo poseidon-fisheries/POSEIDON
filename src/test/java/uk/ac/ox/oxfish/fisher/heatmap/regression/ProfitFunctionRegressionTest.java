@@ -31,6 +31,7 @@ public class ProfitFunctionRegressionTest {
 
 
 
+        //build a full model with one fisher
         FishState state = new FishState(System.currentTimeMillis());
 
         PrototypeScenario scenario = new PrototypeScenario();
@@ -45,6 +46,7 @@ public class ProfitFunctionRegressionTest {
         state.setScenario(scenario);
         state.start();
 
+        //profit regression uses nearest neighbor
         ProfitFunctionRegression regression = new ProfitFunctionRegression(
                 new ProfitFunction(24*5),
                 new NearestNeighborTransductionFactory(),
@@ -67,6 +69,7 @@ public class ProfitFunctionRegressionTest {
         fisher.setDestinationStrategy(new FavoriteDestinationStrategy(target));
         for(int day=0; day<10; day++)
             state.schedule.step(state);
+        //if I predict the catches it ought to be exactly the same as what I get at 20,20
         double predictedCatchesPerHour = regression.apply(state.getMap().getSeaTile(20, 20))[0];
         assertEquals(predictedCatchesPerHour,
                      target.getBiomass(state.getSpecies().get(0)) * .01,.001);

@@ -66,10 +66,7 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                 factoryBox.setSelectedIndex(-1);
                 //find out which strategy factory is currently selected and try to show it in the combo-box
                 try {
-                    String[] path = metawidget.getPath().split("/");
-                    //nested address? no problem
-                    String address = path.length == 2? path[1] + "." + attributes.get("name") :
-                            attributes.get("name");
+                    String address = addressFromPath(attributes, metawidget);
                     //current class
                     Class actualClass = PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                   address).getClass();
@@ -99,10 +96,9 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
                     public void actionPerformed(ActionEvent e) {
                         //we need to make changes!
                         try {
-                            String[] path = metawidget.getPath().split("/");
                             //nested address? no problem
-                            String address = path.length == 2? path[1] + "." + fieldName :
-                                    attributes.get("name");
+                            String address = StrategyFactoryWidgetProcessor.addressFromPath(
+                                    attributes,metawidget);
 
                             //use the beansutils to set the new value to the field
                             PropertyUtils.setProperty(
@@ -145,5 +141,25 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
 
 
         return widget;
+    }
+
+    public static String addressFromPath(Map<String, String> attributes, SwingMetawidget metawidget) {
+        String[] path = metawidget.getPath().split("/");
+        if(path.length ==1 )
+            return attributes.get("name");
+        else
+        {
+            StringBuilder builder = new StringBuilder();
+            for(int i=1; i<path.length; i++)
+                builder.append(path[i]).append(".");
+            builder.append(attributes.get("name"));
+            return builder.toString();
+
+        }
+
+
+        //nested address? no problem
+       // return path.length == 2? path[1] + "." + attributes.get("name") :
+        //        attributes.get("name");
     }
 }
