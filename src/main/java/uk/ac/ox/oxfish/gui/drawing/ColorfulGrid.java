@@ -48,7 +48,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      * the specie currently selected, no selection means depth
      */
 
-    private int maxBiomass = 5000;// 500000;
+    private int maxBiomass =  500000;
 
     @UiHidden
     private MersenneTwisterFast random;

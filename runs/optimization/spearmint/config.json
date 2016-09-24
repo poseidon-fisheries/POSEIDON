@@ -1,33 +1,54 @@
 {
   "language"        : "PYTHON",
-  "main_file"       : "front.py",
-  "experiment-name" : "front",
+  "main_file"       : "kalman_tune.py",
+  "experiment-name" : "kalman_tune5",
   "likelihood"      : "GAUSSIAN",
-  "acquisition"     : "PES",
+  "acquisition"     : "ParEGO",
   "resources" : {
     "my-machine" : {
       "scheduler"         : "local",
       "max_concurrent"    : 2,
-      "max_finished-jobs" : 800
+      "max_finished-jobs" : 300
     }
   },
   "variables" : {
-    "selectivityA" : {
+    "distancePenalty" : {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 2,
-      "max"  : 50
+      "min"  : 0.01,
+      "max"  : 20000
     },
-    "selectivityB" : {
+    "initial_uncertainty": {
       "type" : "FLOAT",
       "size" : 1,
-      "min"  : 2,
-      "max"  : 50
+      "min"  : 10,
+      "max"  : 1000000
+    },
+    "evidence_uncertainty":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.01,
+      "max"  : 100000
+    },
+    "drift":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.01,
+      "max"  : 100000
+    },
+    "optimism":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : -2,
+      "max"  : 2
     }
 
   },
   "tasks" : {
-    "cash"  : { "type" : "objective"  }
+    "cash"  : { "type" : "OBJECTIVE"  }
   },
   "database" : {
     "address":"localhost",

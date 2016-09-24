@@ -54,14 +54,15 @@ public class YamlMain {
         YamlMain main = new YamlMain();
         if(args.length>1) //if there are multiple parameters, read them up!
             new JCommander(main, Arrays.copyOfRange(args,1,args.length));
-        main.run(simulationName,inputFile);
+        main.run(simulationName, inputFile, Paths.get("output", simulationName));
 
 
     }
 
-    public void  run(String simulationName,
-                     Path inputFolder) throws IOException {
-        Path outputFolder = Paths.get("output", simulationName);
+    public FishState  run(
+            String simulationName,
+            Path inputFolder,
+            final Path outputFolder) throws IOException {
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
@@ -113,8 +114,115 @@ public class YamlMain {
                     outputFolder.resolve(simulationName+".checkpoint").toFile(),
                     model);
 
-
+        return model;
     }
 
 
+    /**
+     * Getter for property 'seed'.
+     *
+     * @return Value for property 'seed'.
+     */
+    public Long getSeed() {
+        return seed;
+    }
+
+    /**
+     * Setter for property 'seed'.
+     *
+     * @param seed Value to set for property 'seed'.
+     */
+    public void setSeed(Long seed) {
+        this.seed = seed;
+    }
+
+    /**
+     * Getter for property 'logLevel'.
+     *
+     * @return Value for property 'logLevel'.
+     */
+    public int getLogLevel() {
+        return logLevel;
+    }
+
+    /**
+     * Setter for property 'logLevel'.
+     *
+     * @param logLevel Value to set for property 'logLevel'.
+     */
+    public void setLogLevel(int logLevel) {
+        this.logLevel = logLevel;
+    }
+
+    /**
+     * Getter for property 'yearsToRun'.
+     *
+     * @return Value for property 'yearsToRun'.
+     */
+    public int getYearsToRun() {
+        return yearsToRun;
+    }
+
+    /**
+     * Setter for property 'yearsToRun'.
+     *
+     * @param yearsToRun Value to set for property 'yearsToRun'.
+     */
+    public void setYearsToRun(int yearsToRun) {
+        this.yearsToRun = yearsToRun;
+    }
+
+    /**
+     * Getter for property 'saveOnExit'.
+     *
+     * @return Value for property 'saveOnExit'.
+     */
+    public boolean isSaveOnExit() {
+        return saveOnExit;
+    }
+
+    /**
+     * Setter for property 'saveOnExit'.
+     *
+     * @param saveOnExit Value to set for property 'saveOnExit'.
+     */
+    public void setSaveOnExit(boolean saveOnExit) {
+        this.saveOnExit = saveOnExit;
+    }
+
+    /**
+     * Getter for property 'policyScript'.
+     *
+     * @return Value for property 'policyScript'.
+     */
+    public String getPolicyScript() {
+        return policyScript;
+    }
+
+    /**
+     * Setter for property 'policyScript'.
+     *
+     * @param policyScript Value to set for property 'policyScript'.
+     */
+    public void setPolicyScript(String policyScript) {
+        this.policyScript = policyScript;
+    }
+
+    /**
+     * Getter for property 'additionalData'.
+     *
+     * @return Value for property 'additionalData'.
+     */
+    public boolean isAdditionalData() {
+        return additionalData;
+    }
+
+    /**
+     * Setter for property 'additionalData'.
+     *
+     * @param additionalData Value to set for property 'additionalData'.
+     */
+    public void setAdditionalData(boolean additionalData) {
+        this.additionalData = additionalData;
+    }
 }

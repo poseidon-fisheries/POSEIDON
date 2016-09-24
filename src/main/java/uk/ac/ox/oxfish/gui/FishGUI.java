@@ -38,7 +38,7 @@ import java.util.LinkedList;
  * The GUI of FishState
  * Created by carrknight on 3/29/15.
  */
-public class FishGUI extends GUIState{
+public class  FishGUI extends GUIState{
 
     public static final int MIN_DIMENSION = 600;
     public static final Path IMAGES_PATH = Paths.get("inputs", "images");
