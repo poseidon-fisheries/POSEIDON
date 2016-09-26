@@ -8,11 +8,13 @@ import uk.ac.ox.oxfish.gui.DataCharter;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
@@ -197,8 +199,9 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
         for(DataColumn column : dataset.getColumns()){
             JButton columnButton = new JButton(column.getName());
-            //add it to panel
-            buttons.add(columnButton);
+            Box box = new Box(BoxLayout.X_AXIS);
+            box.add(columnButton);
+
             //on click starts the chart
             columnButton.addActionListener(new ActionListener() {
                 @Override
@@ -207,6 +210,25 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                     charter.start(gui);
                 }
             });
+            //create button to output csv as well
+            box.add(Box.createHorizontalGlue());
+            JButton printOut = new JButton();
+            printOut.setText("to csv");
+            printOut.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    if (fileChooser.showSaveDialog(buttons) == JFileChooser.APPROVE_OPTION) {
+                        File file = fileChooser.getSelectedFile();
+                        // save to file
+                        FishStateUtilities.printCSVColumnToFile(file,column);
+                    }
+                }
+            });
+            box.add(printOut);
+
+            //add it all to panel
+            buttons.add(box);
         }
         return buttons;
     }
