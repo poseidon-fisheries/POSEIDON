@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model;
 
-import uk.ac.ox.oxfish.YamlMain;
+import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -70,16 +70,12 @@ public class BatchRunner
 
 
     public void run() throws IOException {
-        YamlMain main = new YamlMain();
-        main.setSeed(initialSeed+runsDone);
-        main.setAdditionalData(true);
-        if(policyFile!=null)
-            main.setPolicyScript(policyFile.toString());
-        main.setYearsToRun(yearsToRun);
+
 
         String simulationName = yamlFile.getFileName().toString().split("\\.")[0]+"_"+runsDone;
-        FishState model = main.run(simulationName, getYamlFile(),
-                                   getOutputFolder().resolve(simulationName));
+        FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
+                                                 getOutputFolder().resolve(simulationName), initialSeed, Log.LEVEL_INFO,
+                                                 true, policyFile == null ? null : policyFile.toString(), yearsToRun, false);
 
 
         ArrayList<DataColumn> columns = new ArrayList<>();

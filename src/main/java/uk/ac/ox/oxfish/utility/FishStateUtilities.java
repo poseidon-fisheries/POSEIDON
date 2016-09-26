@@ -15,7 +15,11 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -27,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Function;
@@ -803,6 +809,65 @@ public class FishStateUtilities {
             from = to;
         }
         return result;
+    }
+
+    public static FishState  run(
+            String simulationName, Path inputFolder, final Path outputFolder,
+            final Long seed, final int logLevel, final boolean additionalData,
+            final String policyScript, final int yearsToRun,
+            final boolean saveOnExit) throws IOException {
+        outputFolder.toFile().mkdirs();
+
+        //create scenario and files
+        String fullScenario = String.join("\n", Files.readAllLines(inputFolder));
+
+        FishYAML yaml = new FishYAML();
+        Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
+        yaml.dump(scenario,new FileWriter(outputFolder.resolve("scenario.yaml").toFile()));
+
+        FishState model = new FishState(seed);
+        Log.setLogger(new FishStateLogger(model,
+                                          outputFolder.resolve(simulationName+ "_log.txt")));
+        Log.set(logLevel);
+        model.setScenario(scenario);
+        model.start();
+
+        if(additionalData) {
+            Log.info("adding additional data");
+            model.attachAdditionalGatherers();
+        }
+
+        //if you have a policy script, then follow it
+        if(policyScript != null && !policyScript.isEmpty())
+        {
+            String policyScriptString = new String(Files.readAllBytes(Paths.get(policyScript)));
+            PolicyScripts scripts = yaml.loadAs(policyScriptString, PolicyScripts.class);
+            model.registerStartable(scripts);
+            Files.write(outputFolder.resolve("policy_script.yaml"),
+                        yaml.dump(scripts.getScripts()).getBytes());
+        }
+
+
+        while(model.getYear()< yearsToRun) {
+            model.schedule.step(model);
+            if(Log.DEBUG && model.getDayOfTheYear()==1)
+                Log.debug("Year " + model.getYear() + " starting");
+        }
+
+        FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
+        ModelResults results =  new ModelResults(model);
+        yaml.dump(results,writer);
+
+        writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
+        writer.write(Long.toString(seed));
+        writer.close();
+
+        if(saveOnExit)
+            writeModelToFile(
+                    outputFolder.resolve(simulationName+".checkpoint").toFile(),
+                    model);
+
+        return model;
     }
 }
 
