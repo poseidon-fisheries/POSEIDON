@@ -147,12 +147,25 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
                     statistics.accept(predict);
             }
 
+            double min=0; double max=0; double average=0;
+            if(statistics.getCount()>0) {
+                min = statistics.getMin();
+                max = statistics.getMax();
+                average = statistics.getAverage();
+            }
+            if(min==max)
+            {
+                min=-1;
+                average = 10;
+                max = 40;
+            }
+
             heatmapPortrayal.addEnconding(
                     "Heatmap",
                     new ColorEncoding(
-                            new TriColorMap(statistics.getMin(),
-                                            statistics.getAverage(),
-                                            statistics.getMax(), Color.RED, Color.WHITE, Color.BLUE),
+                            new TriColorMap(min,
+                                            average,
+                                            max, Color.RED, Color.WHITE, Color.BLUE),
                             new Function<SeaTile, Double>() {
                                 @Override
                                 public Double apply(SeaTile tile) {
@@ -216,7 +229,7 @@ public class GeographicalRegressionWidget  implements WidgetBuilder<JComponent,S
             };
             heatmapDisplay.insideDisplay.addMouseListener(heatmapClicker);
 
-            JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap" + getText(),false);
+            JFrame heatmapFrame = gui.setupDisplay2D(heatmapPortrayal,heatmapDisplay,"Heatmap",false);
             heatmapPortrayal.setSelectedEncoding("Heatmap");
             heatmapFrame.setVisible(true);
         }

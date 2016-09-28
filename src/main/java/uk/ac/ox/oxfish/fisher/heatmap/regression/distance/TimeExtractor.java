@@ -13,6 +13,8 @@ public class TimeExtractor implements ObservationExtractor
 {
 
 
+
+
     @Override
     public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
         return timeOfObservation;

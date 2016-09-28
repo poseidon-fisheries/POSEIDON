@@ -16,7 +16,7 @@ public class RenameJob {
 
     public static void main(String[] args){
 
-        Path mainDirectory = Paths.get("runs", "social_tuning_backup");
+        Path mainDirectory = Paths.get("runs", "social_tuning");
 
         File[] files = mainDirectory.toFile().listFiles(new PatternFilenameFilter(".+plan.csv"));
         System.out.println(Arrays.toString(files));

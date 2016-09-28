@@ -178,8 +178,8 @@ public class SocialTuningExercise {
         defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
         defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
         defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
-
 */
+
         batchRun("nn.yaml", "_fronts",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
                          ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
@@ -193,8 +193,8 @@ public class SocialTuningExercise {
                  ), YEARS_TO_RUN, 0);
 
 
-
 /*
+
         batchRun("front_plan.yaml", "-plan_fronts",
                  pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
                          ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
@@ -207,6 +207,7 @@ public class SocialTuningExercise {
                          ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0);
+
 
 
 
@@ -226,7 +227,6 @@ public class SocialTuningExercise {
 
 
 
-
         batchRun("cali_anarchy_plan.yaml", "-plan_calianarchy",
                  pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
                          ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
@@ -240,9 +240,9 @@ public class SocialTuningExercise {
                          ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 1);
+
+
 */
-
-
 
 
     }
@@ -360,24 +360,24 @@ public class SocialTuningExercise {
 
         //rbf
         DefaultKernelRegressionFactory rbf = new DefaultKernelRegressionFactory();
-        rbf.setTimeBandwidth(new UniformDoubleParameter(10,1000));
+        rbf.setTimeBandwidth(new UniformDoubleParameter(100,100000));
         rbf.setNumberOfObservations(new FixedDoubleParameter(100));
-        rbf.setxBandwidth(new UniformDoubleParameter(1,10));
-        rbf.setyBandwidth(new UniformDoubleParameter(1,10));
-        rbf.setDistanceFromPortBandwidth(new UniformDoubleParameter(1,50));
-        rbf.setHabitatBandwidth(new UniformDoubleParameter(1,10));
+        rbf.setxBandwidth(new UniformDoubleParameter(50,500));
+        rbf.setyBandwidth(new UniformDoubleParameter(50,500));
+        rbf.setDistanceFromPortBandwidth(new UniformDoubleParameter(50,500));
+        rbf.setHabitatBandwidth(new UniformDoubleParameter(50,500));
         rbf.setRbfKernel(true);
         strategies.put("rbf", rbf);
         headers.put("rbf", new String[]{"x", "y", "distance", "habitat","time"});
 
         //epa
         DefaultKernelRegressionFactory epa = new DefaultKernelRegressionFactory();
-        epa.setTimeBandwidth(new UniformDoubleParameter(10,1000));
+        epa.setTimeBandwidth(new UniformDoubleParameter(100,100000));
         epa.setNumberOfObservations(new FixedDoubleParameter(100));
-        epa.setxBandwidth(new UniformDoubleParameter(1,10));
-        epa.setyBandwidth(new UniformDoubleParameter(1,10));
-        epa.setDistanceFromPortBandwidth(new UniformDoubleParameter(1,50));
-        epa.setHabitatBandwidth(new UniformDoubleParameter(1,10));
+        epa.setxBandwidth(new UniformDoubleParameter(50,500));
+        epa.setyBandwidth(new UniformDoubleParameter(50,500));
+        epa.setDistanceFromPortBandwidth(new UniformDoubleParameter(50,500));
+        epa.setHabitatBandwidth(new UniformDoubleParameter(50,500));
         epa.setRbfKernel(false);
         strategies.put("epa", epa);
         headers.put("epa", new String[]{"x", "y", "distance", "habitat","time"});
