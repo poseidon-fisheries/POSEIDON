@@ -85,6 +85,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private double biomassScaling = 1.0;
 
 
+    /**
+     * if this is set to anything but 1 then it scales the <b> number </b> of fish for every tile
+     * whose y is above 60 by this factor
+     */
+    private double californiaScaling = 1.0;
+
     private int gridWidth = 50;
 
 
@@ -395,7 +401,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     seaTile.setBiology(
                             initializer.generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth));
                     //if it's sea (don't bother counting otherwise)
-                    if (seaTile.getAltitude() < 0) {
+                    if (seaTile.getAltitude() < 0)
+                    {
                         int i = 0;
                         //each specie grid value is an ObjectGrid2D whose cells are themselves list of observations
                         //for each species
@@ -407,6 +414,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                                y).stream().mapToDouble(
                                     value -> value).average();
                             averages[i] = average.orElse(0);
+                            //scale californian cells a bit. I need to do it here since otherwise the change would be lost
+                            //at reset time
+                            if(y>=60 && californiaScaling != 1.0)
+                                averages[i]*=californiaScaling;
                             i++;
                         }
                     }
@@ -1049,6 +1060,24 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public void setGearStrategy(
             AlgorithmFactory<? extends GearStrategy> gearStrategy) {
         this.gearStrategy = gearStrategy;
+    }
+
+    /**
+     * Getter for property 'californiaScaling'.
+     *
+     * @return Value for property 'californiaScaling'.
+     */
+    public double getCaliforniaScaling() {
+        return californiaScaling;
+    }
+
+    /**
+     * Setter for property 'californiaScaling'.
+     *
+     * @param californiaScaling Value to set for property 'californiaScaling'.
+     */
+    public void setCaliforniaScaling(double californiaScaling) {
+        this.californiaScaling = californiaScaling;
     }
 }
 

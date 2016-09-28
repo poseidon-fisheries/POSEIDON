@@ -174,7 +174,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     @Override
     public int[] getNumberOfMaleFishPerAge(Species species) {
 
-        Arrays.fill(lastComputedBiomass,Double.NaN);
+        Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
         return  abundance.get(species)[FishStateUtilities.MALE];
     }
 
@@ -186,7 +186,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     @Override
     public int[] getNumberOfFemaleFishPerAge(Species species) {
-        Arrays.fill(lastComputedBiomass,Double.NaN);
+        Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
 
         return  abundance.get(species)[FishStateUtilities.FEMALE];
     }
