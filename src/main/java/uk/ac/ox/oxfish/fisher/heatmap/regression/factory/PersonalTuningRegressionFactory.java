@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.SocialTuningRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
@@ -39,12 +40,12 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
     /**
      * the gradient is guessed numerically by checking prediction error at x +- percentageChangeToGuessGradient * x
      */
-    private DoubleParameter percentageChangeToGuessGradient = new FixedDoubleParameter(.005);
+    private DoubleParameter percentageChangeToGuessGradient = new FixedDoubleParameter(.01);
 
     /**
      * the alpha/gamma that is by how much we change our current parameters given the latest gradient
      */
-    private DoubleParameter stepSize =  new FixedDoubleParameter(.001);
+    private DoubleParameter stepSize =  new FixedDoubleParameter(.01);
 
 
 
@@ -96,25 +97,28 @@ public class PersonalTuningRegressionFactory implements AlgorithmFactory<Persona
 
             //first add data gatherers
             int finalI = i;
+            Gatherer<FishState> gatherer = model -> {
+                double size = model.getFishers().size();
+                if (size == 0)
+                    return Double.NaN;
+                else {
+                    double total = 0;
+                    for (Fisher fisher1 : state.getFishers()) {
+                        total +=
+                                ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
+                                        getHeatmap().getParametersAsArray()[finalI];
+                    }
+                    return total / size;
+                }
+            };
             state.
                     getDailyDataSet().
                     registerGatherer("Average Heatmap Parameter " + i,
-                                     model -> {
-                                         double size =model.getFishers().size();
-                                         if(size == 0)
-                                             return Double.NaN;
-                                         else
-                                         {
-                                             double total = 0;
-                                             for(Fisher fisher1 : state.getFishers())
-                                             {
-                                                 total+=
-                                                         ((HeatmapDestinationStrategy) fisher1.getDestinationStrategy()).
-                                                                 getHeatmap().getParametersAsArray()[finalI];
-                                             }
-                                             return total/size;
-                                         }
-                                     }, Double.NaN);
+                                     gatherer, Double.NaN);
+            state.
+                    getYearlyDataSet().
+                    registerGatherer("Average Heatmap Parameter " + i,
+                                     gatherer, Double.NaN);
         }
 
     }

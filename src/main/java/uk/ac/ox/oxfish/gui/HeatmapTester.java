@@ -225,7 +225,7 @@ public class HeatmapTester extends GUIState
     }
 
     private Display2D setupPortrayal(FishState state, final ColorfulGrid portrayal) {
-        portrayal.initializeGrid(state.getBiology());
+        portrayal.initializeGrid(state.getBiology(), state.getMap().getAllSeaTilesExcludingLandAsList() );
 
         portrayal.setField(state.getRasterBathymetry().getGrid());
         portrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));

@@ -95,9 +95,9 @@ public class GeographicallyWeightedRegressionTest {
                 new MersenneTwisterFast()
         );
 
-        assertArrayEquals(regression.getParametersAsArray(),new double[]{.23},.001);
-        regression.setParameters(new double[]{.56});
-        assertArrayEquals(regression.getParametersAsArray(),new double[]{.56},.001);
+        assertArrayEquals(regression.getParametersAsArray(),new double[]{.23,10},.001);
+        regression.setParameters(new double[]{.56,5});
+        assertArrayEquals(regression.getParametersAsArray(),new double[]{.56,5},.001);
 
 
 

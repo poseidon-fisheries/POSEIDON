@@ -20,7 +20,11 @@ import uk.ac.ox.oxfish.gui.TriColorMap;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
+import java.util.function.DoublePredicate;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Basically a transformer that changes color mapping according to species.
@@ -48,7 +52,13 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      * the specie currently selected, no selection means depth
      */
 
-    private int maxBiomass =  500000;
+
+    /**
+     * when drawing biomass use the transform of the current biomass rather than the biomass itself (to avoid large numbers dominating everything)
+     */
+    private final static Function<Double,Double> BIOMASS_TRANSFORM = aDouble -> Math.log(aDouble+1);
+
+    private final static double MAX_BIOMASS =  5000;
 
     @UiHidden
     private MersenneTwisterFast random;
@@ -80,15 +90,31 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     /**
      * create a colormap for each specie
      * @param biology
+     * @param seaTiles
      */
-    public void initializeGrid(GlobalBiology biology)
+    public void initializeGrid(GlobalBiology biology,
+                               List<SeaTile> seaTiles)
     {
+
+        double max = BIOMASS_TRANSFORM.apply(MAX_BIOMASS);
+        for(Species species : biology.getSpecies())
+        {
+            max = Math.max(max,
+                           BIOMASS_TRANSFORM.apply(
+                                   seaTiles.stream().mapToDouble(value -> value.getBiomass(species)).
+                                           filter(
+                                                   Double::isFinite).max().orElse(MAX_BIOMASS)));
+        }
 
         for(Species species : biology.getSpecies())
         {
+
+
+
             Color color =  defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll();
-            encodings.put(species.getName(), new ColorEncoding(new SimpleColorMap(0, maxBiomass, Color.WHITE, color),
-                                                           seaTile -> seaTile.getBiomass(species), false));
+            encodings.put(species.getName(), new ColorEncoding(new SimpleColorMap(0, max, Color.WHITE, color),
+                                                               seaTile ->
+                                                                       BIOMASS_TRANSFORM.apply(seaTile.getBiomass(species)), false));
         }
 
     }

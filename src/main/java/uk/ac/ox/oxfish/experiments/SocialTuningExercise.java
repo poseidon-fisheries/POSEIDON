@@ -178,7 +178,7 @@ public class SocialTuningExercise {
         defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
         defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
         defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
-*/
+
 
         batchRun("nn.yaml", "_fronts",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
@@ -193,7 +193,7 @@ public class SocialTuningExercise {
                  ), YEARS_TO_RUN, 0);
 
 
-/*
+
 
         batchRun("front_plan.yaml", "-plan_fronts",
                  pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
@@ -245,6 +245,83 @@ public class SocialTuningExercise {
 */
 
 
+
+
+        //personals
+        Consumer<Pair<Scenario, AlgorithmFactory<? extends GeographicalRegression<Double>>>> personal =
+                pair -> {
+                    PersonalTuningRegressionFactory personalTuning = new PersonalTuningRegressionFactory();
+                    ((HeatmapDestinationFactory) ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).
+                            setRegression(personalTuning);
+                    personalTuning.setNested(pair.getSecond());
+
+                };
+
+        Consumer<Pair<Scenario, AlgorithmFactory<? extends GeographicalRegression<Double>>>> personalPlan =
+                pair -> {
+                    PersonalTuningRegressionFactory personalTuning = new PersonalTuningRegressionFactory();
+                    ((PlanningHeatmapDestinationFactory) ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).
+                            setRegression(personalTuning);
+                    personalTuning.setNested(pair.getSecond());
+
+                };
+/*
+        batchRun("nn.yaml", "-personal_fronts",
+                 personal
+                , YEARS_TO_RUN, 0);
+
+        batchRun("fine.yaml", "-personal_fine",
+                 personal, YEARS_TO_RUN, 0);
+
+       batchRun("front_plan.yaml", "-personal-plan_fronts",
+                 personalPlan, YEARS_TO_RUN, 0);
+
+
+        batchRun("fine_plan.yaml", "-personal-plan_fine",
+                 personalPlan, YEARS_TO_RUN, 0);
+
+
+
+
+
+        personal =
+                pair -> {
+                    PersonalTuningRegressionFactory personalTuning = new PersonalTuningRegressionFactory();
+                    ((HeatmapDestinationFactory) ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).
+                            setRegression(personalTuning);
+                    personalTuning.setNested(pair.getSecond());
+
+                };
+
+
+
+
+        batchRun("cali_anarchy.yaml", "-personal_calianarchy",
+                 personal, YEARS_TO_RUN, 1);
+
+
+        batchRun("cali_itq.yaml", "-personal_caliitq",
+                 personal, YEARS_TO_RUN, 1);
+
+*/
+
+        personalPlan =
+                pair -> {
+                    PersonalTuningRegressionFactory personalTuning = new PersonalTuningRegressionFactory();
+                    ((PlanningHeatmapDestinationFactory) ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).
+                            setRegression(personalTuning);
+                    personalTuning.setNested(pair.getSecond());
+
+                };
+
+
+        batchRun("cali_anarchy_plan.yaml", "-personal-plan_calianarchy",
+                 personalPlan, YEARS_TO_RUN, 1);
+
+
+
+        batchRun("cali_itq_plan.yaml", "-personal-plan_caliitq",
+                 personalPlan, YEARS_TO_RUN, 1);
     }
 
 
@@ -330,7 +407,7 @@ public class SocialTuningExercise {
         nn.setxBandwidth(new UniformDoubleParameter(1, 1000));
         nn.setyBandwidth(new UniformDoubleParameter(1, 1000));
         nn.setNeighbors(new UniformDoubleParameter(1, 10));
-        //    strategies.put("nn", nn);
+        strategies.put("nn", nn);
         headers.put("nn", new String[]{"time", "x", "y", "distance", "habitat","neighbors"});
         //kalman
         SimpleKalmanRegressionFactory kalman = new SimpleKalmanRegressionFactory();
@@ -340,13 +417,13 @@ public class SocialTuningExercise {
         kalman.setInitialUncertainty(new FixedDoubleParameter(10000));
         kalman.setOptimism(new UniformDoubleParameter(-2, 2));
         kalman.setDrift(new UniformDoubleParameter(1, 100));
-        //     strategies.put("kalman", kalman);
+        strategies.put("kalman", kalman);
         headers.put("kalman", new String[]{"distance", "evidence", "drift", "optimism", "penalty"});
         //gwr
         GeographicallyWeightedRegressionFactory gwr = new GeographicallyWeightedRegressionFactory();
         gwr.setExponentialForgetting(new UniformDoubleParameter(.8,1));
         gwr.setRbfBandwidth(new UniformDoubleParameter(.1,50));
-        //      strategies.put("gwr",gwr);
+        strategies.put("gwr",gwr);
         headers.put("gwr",new String[]{"forgetting", "bandwidth"});
 
         //good-bad regression
@@ -355,7 +432,7 @@ public class SocialTuningExercise {
         goodBad.setGoodAverage(new UniformDoubleParameter(10,30));
         goodBad.setStandardDeviation(new UniformDoubleParameter(10,30));
         goodBad.setDistancePenalty(new UniformDoubleParameter(.1,50));
-        //      strategies.put("goodBad", goodBad);
+        strategies.put("goodBad", goodBad);
         headers.put("goodBad", new String[]{"bad", "good", "std", "distance"});
 
         //rbf
@@ -391,7 +468,7 @@ public class SocialTuningExercise {
         kernel.setxBandwidth(new UniformDoubleParameter(1, 200));
         kernel.setyBandwidth(new UniformDoubleParameter(1, 200));
         kernel.setForgettingFactor(new FixedDoubleParameter(.95));
-        //strategies.put("kernel", kernel);
+        strategies.put("kernel", kernel);
         headers.put("kernel", new String[]{"x", "y", "distance", "habitat"});
 
 

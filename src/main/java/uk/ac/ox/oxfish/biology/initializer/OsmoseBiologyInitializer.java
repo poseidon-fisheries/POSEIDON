@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Creates an osmose biology (including the the simulation link and the stepper)
@@ -141,6 +142,7 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
         Species[] species = new Species[osmoseSimulation.getNumberOfSpecies()];
         for(int i=0; i<species.length; i++)
             species[i] = new Species(osmoseSimulation.getSpecies(i).getName());
+        System.out.println(Arrays.toString(species));
 
         final OsmoseStepper stepper = new OsmoseStepper(model.getStepsPerDay() * 365, osmoseSimulation, model.random);
         return new OsmoseGlobalBiology(osmoseSimulation,stepper,species);

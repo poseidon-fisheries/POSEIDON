@@ -373,7 +373,7 @@ public class  FishGUI extends GUIState{
 
     public Display2D setupPortrayal(final ColorfulGrid portrayal) {
         FishState model = (FishState) state;
-        portrayal.initializeGrid(model.getBiology());
+        portrayal.initializeGrid(model.getBiology(), model.getMap().getAllSeaTilesExcludingLandAsList());
 
         portrayal.setField(model.getRasterBathymetry().getGrid());
         portrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));

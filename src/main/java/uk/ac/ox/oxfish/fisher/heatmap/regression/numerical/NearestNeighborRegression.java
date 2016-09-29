@@ -235,7 +235,7 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
         assert parameterArray.length == this.bandwidths.length+1;
         for(int i=0; i<bandwidths.length; i++)
             this.bandwidths[i] = parameterArray[i];
-        neighbors = (int) parameterArray[parameterArray.length-1];
+        neighbors = Math.max(1,(int) parameterArray[parameterArray.length-1]);
         rebuildDistanceFunction(bandwidths);
     }
 }

@@ -49,7 +49,8 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
     @Override
     public Double getBiomass(Species species) {
 
-        final double currentBiomass = counter.getBiomass(species.getIndex()) - biomassAlreadyFished[species.getIndex()];
+        final double currentBiomass =
+                counter.getBiomass(species.getIndex()) - biomassAlreadyFished[species.getIndex()];
         assert  currentBiomass >= -FishStateUtilities.EPSILON;
         return currentBiomass;
 
@@ -83,7 +84,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
                                 -biomassAvailable-biomassAlreadyFished[species.getIndex()])
                                 < FishStateUtilities.EPSILON;
 
-        //shuffle the school
+        //shuffle the schools
         Collections.shuffle(schools,new Random(random.nextLong()));
 
         //go through each school
@@ -126,10 +127,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
     }
 
     /**
-     * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-     * or just to percolate a reference to the model
-     *
-     * @param model the model
+     * ignored
      */
     @Override
     public void start(FishState model) {
@@ -137,7 +135,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
     }
 
     /**
-     * tell the startable to turnoff,
+     * ignored
      */
     @Override
     public void turnOff() {

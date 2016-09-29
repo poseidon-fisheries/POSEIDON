@@ -167,6 +167,13 @@ task sample_inputs(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+
+task batch(type:JavaExec){
+    main = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
 task testCSV(dependsOn: test){
     def output = file("build/reports/multitest/" + date + ".csv")
     doLast {
