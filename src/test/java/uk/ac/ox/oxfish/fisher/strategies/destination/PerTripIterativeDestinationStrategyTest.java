@@ -61,7 +61,7 @@ public class PerTripIterativeDestinationStrategyTest {
                                                     random, fishState, new Moving());
             when(record.getProfitPerHour(true)).thenReturn((double) (favoriteSpot.getGridX() + favoriteSpot.getGridY()));
             when(fisher.getLastFinishedTrip()).thenReturn(record);
-            hill.getAlgorithm().adapt(fisher,random);
+            hill.getAlgorithm().adapt(fisher,fishState,random);
 
         }
 

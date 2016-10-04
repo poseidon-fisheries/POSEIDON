@@ -21,7 +21,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateLogger;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
@@ -185,8 +185,8 @@ public class OsmoseComparativeStatics
 
                                         for (Fisher fisher : model.getFishers()) {
 
-                                            Adaptation<Gear> trawlAdaptation =
-                                                    new Adaptation<>(
+                                            ExploreImitateAdaptation<Gear> trawlAdaptation =
+                                                    new ExploreImitateAdaptation<>(
                                                             (Predicate<Fisher>) fisher1 -> true,
                                                             new BeamHillClimbing<Gear>(
                                                                     new RandomStep<Gear>() {

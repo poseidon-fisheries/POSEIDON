@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 
 /**
@@ -39,7 +39,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
 
 
 
-    private final Adaptation<SeaTile> algorithm;
+    private final ExploreImitateAdaptation<SeaTile> algorithm;
 
 
     /**
@@ -57,7 +57,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
     {
         this.delegate = delegate;
         adaptationAlgorithm = new DefaultBeamHillClimbing(stepSize, attempts);
-        this.algorithm = new Adaptation<SeaTile>(
+        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
                 fisher -> fisher.getDailyData().numberOfObservations() > 360,
                 adaptationAlgorithm,
                 (fisher, change, model) -> delegate.setFavoriteSpot(change),
@@ -94,7 +94,7 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
     }
 
 
-    public Adaptation<SeaTile> getAlgorithm() {
+    public ExploreImitateAdaptation<SeaTile> getAlgorithm() {
         return algorithm;
     }
 

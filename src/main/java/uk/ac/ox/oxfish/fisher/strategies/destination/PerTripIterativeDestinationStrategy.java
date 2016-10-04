@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
@@ -31,7 +31,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     private boolean ignoreFailedTrips = false;
 
 
-    private final Adaptation<SeaTile> algorithm;
+    private final ExploreImitateAdaptation<SeaTile> algorithm;
 
     /**
      * this strategy works by modifying the "favorite" destination of its delegate
@@ -51,7 +51,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             final ObjectiveFunction<Fisher> objective)
     {
         this.delegate = delegate;
-        this.algorithm = new Adaptation<SeaTile>(
+        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
                 new Predicate<Fisher>() {
                     @Override
                     public boolean test(Fisher fisher) {
@@ -93,7 +93,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             double randomizationProbability,
             double imitationProbability, final HourlyProfitInTripObjective objective) {
         this.delegate = delegate;
-        this.algorithm = new Adaptation<SeaTile>(
+        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
                 new Predicate<Fisher>() {
 
                     public boolean test(Fisher fisher) {
@@ -166,7 +166,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
 
-    public Adaptation<SeaTile> getAlgorithm() {
+    public ExploreImitateAdaptation<SeaTile> getAlgorithm() {
         return algorithm;
     }
 

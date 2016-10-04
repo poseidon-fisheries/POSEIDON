@@ -20,7 +20,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -109,8 +109,8 @@ public class HardGearSwitch
 
                                         for (Fisher fisher : model.getFishers()) {
 
-                                            Adaptation<Gear> trawlAdaptation =
-                                                    new Adaptation<>(
+                                            ExploreImitateAdaptation<Gear> trawlAdaptation =
+                                                    new ExploreImitateAdaptation<>(
                                                             (Predicate<Fisher>) fisher1 -> true,
                                                             new BeamHillClimbing<Gear>(
                                                                     new RandomStep<Gear>() {

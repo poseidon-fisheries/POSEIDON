@@ -72,6 +72,10 @@ public class Regulations
         NAMES.put(MultiQuotaMapFactory.class, "Multi-Quotas from Map");
 
 
+        CONSTRUCTORS.put("Adaptive Single Species Taxation", AdaptiveSingleSpeciesTaxation::new);
+        NAMES.put(AdaptiveSingleSpeciesTaxation.class, "Adaptive Single Species Taxation");
+
+
 
     }
 

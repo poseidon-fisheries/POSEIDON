@@ -31,7 +31,10 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/kalman_tune/kalman_simple/"
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/personal_tune/nn_simple/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/personal_tune/epa_simple/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/personal_tune/epa_simple/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy/"
+
 
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"

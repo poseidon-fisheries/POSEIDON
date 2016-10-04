@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Iterator;
 import java.util.function.DoublePredicate;
 import java.util.function.ToDoubleFunction;
 
@@ -57,6 +58,7 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
 
             final String earnings =  species + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
             final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
+            final String price = species + " Average Sale Price";
             registerGatherer(landings,
                              FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
                                      landings))
@@ -65,6 +67,33 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
                              FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
                                      earnings))
                     , Double.NaN);
+
+
+            registerGatherer(price,
+                             new Gatherer<FishState>() {
+                                 @Override
+                                 public Double apply(FishState fishState) {
+
+                                     DataColumn numerator = originalGatherer.getColumn(earnings);
+                                     DataColumn denominator = originalGatherer.getColumn(landings);
+                                     final Iterator<Double> numeratorIterator = numerator.descendingIterator();
+                                     final Iterator<Double>  denominatorIterator = denominator.descendingIterator();
+                                     if(!numeratorIterator.hasNext()) //not ready/year 1
+                                         return Double.NaN;
+                                     double sumNumerator = 0;
+                                     double sumDenominator = 0;
+                                     for(int i=0; i<365; i++) {
+                                         //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                                         //and only has a partially filled collection
+                                         if(numeratorIterator.hasNext()) {
+                                             sumNumerator += numeratorIterator.next();
+                                             sumDenominator += denominatorIterator.next();
+                                         }
+                                     }
+                                     return  sumNumerator/sumDenominator;
+
+                                 }
+                             },Double.NaN);
 
 
 

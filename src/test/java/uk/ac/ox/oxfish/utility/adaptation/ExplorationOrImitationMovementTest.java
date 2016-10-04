@@ -53,7 +53,7 @@ public class ExplorationOrImitationMovementTest
                 }
         ));
 
-        Adaptation<SeaTile> test = new Adaptation<SeaTile>(
+        ExploreImitateAdaptation<SeaTile> test = new ExploreImitateAdaptation<SeaTile>(
                 (Predicate<Fisher>) fisher -> true,
                 algorithm,
                 (Actuator<SeaTile>) (fisher, change, model) -> newObjective[0] = change,
@@ -79,7 +79,7 @@ public class ExplorationOrImitationMovementTest
         );
 
 
-        test.adapt(optimizer,new MersenneTwisterFast());
+        test.adapt(optimizer,mock(FishState.class),new MersenneTwisterFast());
 
         //it should have not explored!
         verify(algorithm, never()).randomize(any(),any(),anyDouble(),any());
@@ -123,7 +123,7 @@ public class ExplorationOrImitationMovementTest
 
         ));
 
-        Adaptation<SeaTile> test = new Adaptation<>(
+        ExploreImitateAdaptation<SeaTile> test = new ExploreImitateAdaptation<>(
                 fisher -> true,
                 algorithm,
                 (fisher, change, model) -> newObjective[0] = change,
@@ -144,7 +144,7 @@ public class ExplorationOrImitationMovementTest
         );
 
 
-        test.adapt(optimizer,new MersenneTwisterFast());
+        test.adapt(optimizer,mock(FishState.class),new MersenneTwisterFast());
 
         //it should have neither explored nor imitate
         verify(algorithm, never()).exploit(any(),any(),anyDouble(),any());
@@ -186,7 +186,7 @@ public class ExplorationOrImitationMovementTest
                 )
         );
 
-        Adaptation<SeaTile> test = new Adaptation<>(
+        ExploreImitateAdaptation<SeaTile> test = new ExploreImitateAdaptation<>(
                 fisher -> true,
                 algorithm,
                 (fisher, change, model) -> newObjective[0] = change,
@@ -207,7 +207,7 @@ public class ExplorationOrImitationMovementTest
         );
 
 
-        test.adapt(optimizer, new MersenneTwisterFast());
+        test.adapt(optimizer,mock(FishState.class), new MersenneTwisterFast());
 
         //it should have explored! explored!
         verify(algorithm, times(1)).randomize(any(),any(),anyDouble(),any());

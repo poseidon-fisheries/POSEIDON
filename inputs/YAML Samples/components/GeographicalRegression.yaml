@@ -1,12 +1,3 @@
-Space Only Kernel:
-  maximumNumberOfObservations: '100.0'
-  spaceBandwidth: '5.0'
--------
-Space and Time Kernel:
-  maximumNumberOfObservations: '100.0'
-  spaceBandwidth: '5.0'
-  timeBandwidth: '1000.0'
--------
 Nearest Neighbor:
   neighbors: '1.0'
   spaceBandwidth: '5.0'
@@ -66,4 +57,41 @@ Good-Bad:
   drift: '0.005'
   goodAverage: '10.0'
   standardDeviation: '7.5'
+-------
+Kernel Regression:
+  distanceFromPortBandwidth: '200.0'
+  habitatBandwidth: '1.0'
+  numberOfObservations: '50.0'
+  rbfKernel: true
+  timeBandwidth: '10000.0'
+  xBandwidth: '250.0'
+  yBandwidth: '250.0'
+-------
+Social Tuning:
+  nested:
+    Complete Nearest Neighbor:
+      distanceFromPortBandwidth: uniform 0.1 1000.0
+      habitatBandwidth: uniform 0.1 1000.0
+      neighbors: '1.0'
+      timeBandwidth: uniform 0.1 1000.0
+      xBandwidth: uniform 0.1 1000.0
+      yBandwidth: uniform 0.1 1000.0
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '1.0'
+  yearly: false
+-------
+Personal Tuning:
+  nested:
+    Kernel Regression:
+      distanceFromPortBandwidth: uniform 0.1 1000.0
+      habitatBandwidth: uniform 0.1 1000.0
+      numberOfObservations: '50.0'
+      rbfKernel: true
+      timeBandwidth: uniform 100.0 10000.0
+      xBandwidth: uniform 0.1 1000.0
+      yBandwidth: uniform 0.1 1000.0
+  percentageChangeToGuessGradient: '0.01'
+  stepSize: '0.01'
 -------

@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -118,8 +118,8 @@ public class GearImitationWithITQ
 
                 for(Fisher fisher : model.getFishers())
                 {
-                    Adaptation<RandomCatchabilityTrawl> trawlAdaptation =
-                            new Adaptation<RandomCatchabilityTrawl>(
+                    ExploreImitateAdaptation<RandomCatchabilityTrawl> trawlAdaptation =
+                            new ExploreImitateAdaptation<RandomCatchabilityTrawl>(
                                     (Predicate<Fisher>) fisher1 -> true,
                                     new BeamHillClimbing<RandomCatchabilityTrawl>(
                                             new RandomStep<RandomCatchabilityTrawl>() {

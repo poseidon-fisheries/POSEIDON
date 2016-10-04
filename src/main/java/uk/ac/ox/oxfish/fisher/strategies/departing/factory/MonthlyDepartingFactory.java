@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
@@ -109,7 +109,7 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                     @Override
                     public void start(FishState model) {
                         for(Fisher fisher : model.getFishers()) {
-                            fisher.addYearlyAdaptation(new Adaptation(
+                            fisher.addYearlyAdaptation(new ExploreImitateAdaptation(
                                     (Predicate<Fisher>) fisher1 -> true,
                                     //beam hill-climber with random mutation chance for each month
                                     new BeamHillClimbing<MonthlyDepartingStrategy>(

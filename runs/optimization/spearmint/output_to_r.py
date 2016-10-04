@@ -112,12 +112,11 @@ def get_options(expt_dir, config_file="config.json"):
     return options
 
 
-def plot(experiment_name=None):
+def plot(config_directory = "/home/carrknight/code/oxfish/runs/optimization/spearmint"):
     os.chdir("/home/carrknight/code/oxfish/runs/optimization/spearmint")
-    options = get_options("/home/carrknight/code/oxfish/runs/optimization/spearmint",
-                          config_file=experiment_name + ".json")
-    if experiment_name is None:
-        experiment_name = str(options['experiment-name'])
+    options = get_options(config_directory,
+                          config_file="config.json")
+    experiment_name = str(options['experiment-name'])
     db = MongoDB()
     resources = parse_resources_from_config(options)
     resource = resources.itervalues().next()
@@ -155,49 +154,63 @@ def plot(experiment_name=None):
 
     import numpy as np
 
-    obj_task = task_group.tasks['main']
-    obj_mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in obj_mean]
-    obj_std = [obj_task.unstandardize_variance(np.sqrt(v)) for v in obj_var]
+    for task_name, task in task_group.tasks.iteritems():
+        # make a grid, feed it to the predictor:
 
-    # make a grid, feed it to the predictor:
+        dimensions = ()
+        for key in options['variables'].keys():
+            type = str(options['variables'][key]["type"]).strip().lower()
+            if type == "float":
+                dimension = np.linspace(0, 1, num=300)
+                dimensions = dimensions + (dimension,)
+            elif type == "int":
+                min = int(options['variables'][key]["min"])
+                max = int(options['variables'][key]["max"])
+                dimension = np.array([x + min for x in range(max - min + 1)])
+                dimensions = dimensions + (dimension,)
+            else:
+                assert type == "enum"
+                dimension = tuple([(0, 1) for i in range(len(options['variables'][key]["options"]))])
+                for t in dimension:
+                    dimensions = dimensions + (t,)
+                    # print(dimension)
 
-    dimensions = ()
-    for key in options['variables'].keys():
-        type = str(options['variables'][key]["type"]).strip().lower()
-        if type == "float":
-            dimension = np.linspace(0, 1, num=300)
-            dimensions = dimensions + (dimension,)
-        elif type == "int":
-            min = int(options['variables'][key]["min"])
-            max = int(options['variables'][key]["max"])
-            dimension = np.array([x + min for x in range(max - min + 1)])
-            dimensions = dimensions + (dimension,)
-        else:
-            assert type == "enum"
-            dimension = tuple([(0, 1) for i in range(len(options['variables'][key]["options"]))])
-            for t in dimension:
-                dimensions = dimensions + (t,)
-                # print(dimension)
+        data = cartesian(np.array(dimensions))
 
-    # grid = cartesian(dimensions)
-    # mean, variance = obj_model.function_over_hypers(obj_model.predict, grid)
-    #
-    # mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in mean]
-    # variance = [obj_task.unstandardize_variance(np.sqrt(v)) for v in variance]
-    #
-    # # xymv = [([x for x in xy], m, v) for xy, m, v in izip(new_grid, obj_mean, obj_std)]  # if .2 < xy[0] < .25]
-    # with open(experiment_name + ".csv", 'w') as fileout:
-    #     for i in range(len(mean)):
-    #         fileout.write(str(([x for x in grid[i]], mean[i], variance[i])).replace("(", "").replace(")", "").
-    #                       replace("[", "").replace("]", "") + "\n")
+        mean, variance = chooser.models[task_name].predict(data)
+        mean = [task.unstandardize_mean(task.unstandardize_variance(v)) for v in mean]
+        variance = [task.unstandardize_variance(np.sqrt(v)) for v in variance]
 
-    task = task_group.tasks['main']
-    xy = np.array(task.inputs)
-    # function values:
-    vals = task.values
-    vals = np.array(vals)
-    np.savetxt(experiment_name + "_runs.csv", xy, delimiter=",", fmt='%.3e')
-    np.savetxt(experiment_name + "_runs_values.csv", vals, delimiter=",", fmt='%.3e')
+        os.chdir(config_directory)
+
+        #unzip the data
+        new_data=zip(*data.transpose().tolist())
+        datum = zip(new_data,mean,variance)
+
+        header = ",".join(options['variables'].keys())+",mean,variance";
+        with open(experiment_name + ".csv", 'w') as fileout:
+             fileout.write(header+"\n")
+             for i in range(len(datum)):
+                 fileout.write(str(datum[i]).replace("(", "").replace(")", "") + "\n")
+
+
+        # grid = cartesian(dimensions)
+        # mean, variance = obj_model.function_over_hypers(obj_model.predict, grid)
+        #
+        # mean = [obj_task.unstandardize_mean(obj_task.unstandardize_variance(v)) for v in mean]
+        # variance = [obj_task.unstandardize_variance(np.sqrt(v)) for v in variance]
+        #
+        # # xymv = [([x for x in xy], m, v) for xy, m, v in izip(new_grid, obj_mean, obj_std)]  # if .2 < xy[0] < .25]
+        # with open(experiment_name + ".csv", 'w') as fileout:
+        #     for i in range(len(mean)):
+        #         fileout.write(str(([x for x in grid[i]], mean[i], variance[i])).replace("(", "").replace(")", "").
+        #                       replace("[", "").replace("]", "") + "\n")
+        xy = np.array(task.inputs)
+        # function values:
+        vals = task.values
+        vals = np.array(vals)
+        np.savetxt(experiment_name + "_" + task_name + "_runs.csv", xy, delimiter=",", fmt='%.3e')
+        np.savetxt(experiment_name + "_" + task_name + "_runs_values.csv", vals, delimiter=",", fmt='%.3e')
 
     # plot(experiment_name="tac-separated")
     # plot(experiment_name="itq-separated")
@@ -206,4 +219,5 @@ def plot(experiment_name=None):
     #plot(experiment_name="kitchensink_2")
     #plot(experiment_name="kitchensink_itq")
     #plot(experiment_name="congested_departure")
-plot(experiment_name="selectivity")
+plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy")
+plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/")

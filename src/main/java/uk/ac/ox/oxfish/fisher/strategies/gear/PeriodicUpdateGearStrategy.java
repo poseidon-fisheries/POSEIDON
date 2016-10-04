@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.DiscreteRandomAlgorithm;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
@@ -52,7 +52,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             AdaptationProbability probability
             ) {
         this.yearly = yearly;
-        this.gearAdaptation = new Adaptation<>(
+        this.gearAdaptation = new ExploreImitateAdaptation<>(
                 new Predicate<Fisher>() {
                     @Override
                     public boolean test(Fisher fisher1) {
@@ -91,7 +91,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             AdaptationProbability probability)
     {
         this.yearly = yearly;
-        this.gearAdaptation = new Adaptation<>(
+        this.gearAdaptation = new ExploreImitateAdaptation<>(
                 new Predicate<Fisher>() {
                     @Override
                     public boolean test(Fisher fisher1) {
@@ -149,7 +149,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
      */
     private Fisher fisher;
 
-    final Adaptation<? extends Gear> gearAdaptation;
+    final ExploreImitateAdaptation<? extends Gear> gearAdaptation;
 
     @Override
     public void start(FishState model, Fisher fisher)

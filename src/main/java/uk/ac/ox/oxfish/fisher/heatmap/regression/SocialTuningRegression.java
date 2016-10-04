@@ -12,17 +12,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.ParticleSwarmAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -117,7 +114,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
     }
 
 
-    private Adaptation<double[]> adaptation;
+    private ExploreImitateAdaptation<double[]> adaptation;
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -147,7 +144,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
         };
 
         if(yearly) {
-            adaptation = new Adaptation<>(
+            adaptation = new ExploreImitateAdaptation<>(
                     predictate,
                     optimizer,
                     actuator,
@@ -159,7 +156,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
         //else bimonthly
         else
         {
-            adaptation = new Adaptation<>(
+            adaptation = new ExploreImitateAdaptation<>(
                     predictate,
                     optimizer,
                     actuator,

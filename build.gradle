@@ -107,6 +107,18 @@ task fatJar(type: FatCapsule) {
     }
 }
 
+
+task fatJarBatch(type: FatCapsule) {
+    archiveName = "oxfish_batch.jar"
+    applicationClass 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
+
+    capsuleManifest {
+        minJavaVersion = '1.8.0'
+        minUpdateVersion =  ['1.8.0':'31']
+    }
+}
+
+
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
 task buildHeadless(type: FatCapsule, dependsOn: jar) {

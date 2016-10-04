@@ -2,6 +2,7 @@ California Map Scenario:
   biomassScaling: 1.0
   boatLength: '22.573488'
   boatWidth: '7.0'
+  californiaScaling: 1.0
   cruiseSpeedInKph: '16.0661'
   departingStrategy:
     Fixed Rest:

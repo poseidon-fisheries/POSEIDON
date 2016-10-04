@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
+import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
@@ -79,7 +79,7 @@ public class GearImitationAnalysis
         for(Fisher fisher : fishers)
         {
 
-            Adaptation<Hold> holdAdaptation = new Adaptation<>(
+            ExploreImitateAdaptation<Hold> holdAdaptation = new ExploreImitateAdaptation<>(
                     fisher1 -> true,
                     new BeamHillClimbing<Hold>(
                             new RandomStep<Hold>() {
@@ -137,8 +137,8 @@ public class GearImitationAnalysis
     {
         for(Fisher fisher : fishers)
         {
-            Adaptation<FixedProbabilityDepartingStrategy> departingChance
-                    = new Adaptation<>(
+            ExploreImitateAdaptation<FixedProbabilityDepartingStrategy> departingChance
+                    = new ExploreImitateAdaptation<>(
                     fisher1 -> true,
                     new BeamHillClimbing<FixedProbabilityDepartingStrategy>(
                             new RandomStep<FixedProbabilityDepartingStrategy>() {

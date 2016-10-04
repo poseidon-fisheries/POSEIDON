@@ -32,7 +32,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
 
 
 
-    private final PSOCoordinateTransformer<T> transformers;
+    private final CoordinateTransformer<T> transformers;
     /**
      * optional function to stop coordinates from going out of bounds
      */
@@ -64,7 +64,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
     public ParticleSwarmAlgorithm(
             double inertia, double memoryWeight, double socialWeight, int dimensions,
             Function<Fisher, T> getBestMemory,
-            PSOCoordinateTransformer<T> transformers,
+            CoordinateTransformer<T> transformers,
             double[] velocityShocks,
             MersenneTwisterFast random,
             DoubleParameter[] initialVelocities) {
@@ -109,7 +109,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                                                             );
                                                         }
                                                     },
-                                                    new PSOCoordinateTransformer<SeaTile>() {
+                                                    new CoordinateTransformer<SeaTile>() {
                                                         @Override
                                                         public double[] toCoordinates(
                                                                 SeaTile variable,
@@ -250,24 +250,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         return null;
     }
 
-    /**
-     * object to convert from  PSO made up coordinates to actual variables and viceversa
-     * @param <T>
-     */
-    public  interface PSOCoordinateTransformer<T>
-    {
-        /**
-         * turn a T into PSO coordinates
-         */
-        double[] toCoordinates(T variable, Fisher fisher, FishState model);
-
-        /**
-         * turn coordinates into the variable we want to maximize
-         */
-        T fromCoordinates(double[] variable, Fisher fisher, FishState model);
-    }
-
-    public PSOCoordinateTransformer<T> getTransformers() {
+    public CoordinateTransformer<T> getTransformers() {
         return transformers;
     }
 

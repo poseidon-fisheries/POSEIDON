@@ -59,7 +59,7 @@ public class YearlyIterativeDestinationStrategyTest {
         for(int i=0; i<2000; i++)
         {
             double bankBalance = fisher.getBankBalance();
-            hill.getAlgorithm().adapt(fisher, new MersenneTwisterFast());
+            hill.getAlgorithm().adapt(fisher, fishState,new MersenneTwisterFast());
 
 
         }
