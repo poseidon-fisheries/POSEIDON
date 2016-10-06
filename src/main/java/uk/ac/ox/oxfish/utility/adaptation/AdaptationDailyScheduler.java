@@ -21,7 +21,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
 {
 
 
-    private final List<ExploreImitateAdaptation> adaptations = new LinkedList<>();
+    private final List<Adaptation> adaptations = new LinkedList<>();
 
     private final int period;
 
@@ -44,7 +44,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
         //if there is anything to "adapt"
         if(!adaptations.isEmpty())
         {
-            for(ExploreImitateAdaptation a : adaptations)
+            for(Adaptation a : adaptations)
                 a.start(model, fisher);
 
             stoppable = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE,period);
@@ -58,7 +58,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
      * add an adaptation algorithm to the list. Start it if we have already started
      * @param adaptation
      */
-    public void registerAdaptation(ExploreImitateAdaptation adaptation)
+    public void registerAdaptation(Adaptation adaptation)
     {
 
         adaptations.add(adaptation);
@@ -72,7 +72,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
     }
 
 
-    public void removeAdaptation(ExploreImitateAdaptation adaptation)
+    public void removeAdaptation(Adaptation adaptation)
     {
         adaptations.remove(adaptation);
     }
@@ -89,7 +89,7 @@ public class AdaptationDailyScheduler implements FisherStartable, Steppable
     public void step(SimState simState) {
         if(adaptations.size()>1)
             Collections.shuffle(adaptations,new Random(model.getRandom().nextLong()));
-        for(ExploreImitateAdaptation a : adaptations)
+        for(Adaptation a : adaptations)
             a.adapt(agent, ((FishState) simState),agent.grabRandomizer());
     }
 }

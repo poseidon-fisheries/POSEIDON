@@ -41,6 +41,7 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
@@ -858,33 +859,33 @@ public class Fisher implements Steppable, Startable{
     }
 
 
-    public void addYearlyAdaptation(ExploreImitateAdaptation a)
+    public void addYearlyAdaptation(Adaptation a)
     {
         yearlyAdaptation.registerAdaptation(a);
     }
 
-    public void addBiMonthlyAdaptation(ExploreImitateAdaptation a)
+    public void addBiMonthlyAdaptation(Adaptation a)
     {
         bimonthlyAdaptation.registerAdaptation(a);
     }
 
-    public void addPerTripAdaptation(ExploreImitateAdaptation a)
+    public void addPerTripAdaptation(Adaptation a)
     {
         tripAdaptation.registerAdaptation(a);
     }
 
 
-    public void removeYearlyAdaptation(ExploreImitateAdaptation a)
+    public void removeYearlyAdaptation(Adaptation a)
     {
         yearlyAdaptation.removeAdaptation(a);
     }
 
-    public void removeBiMonthlyAdaptation(ExploreImitateAdaptation a)
+    public void removeBiMonthlyAdaptation(Adaptation a)
     {
         bimonthlyAdaptation.removeAdaptation(a);
     }
 
-    public void removePerTripAdaptation(ExploreImitateAdaptation a)
+    public void removePerTripAdaptation(Adaptation a)
     {
         tripAdaptation.removeAdaptation(a);
     }

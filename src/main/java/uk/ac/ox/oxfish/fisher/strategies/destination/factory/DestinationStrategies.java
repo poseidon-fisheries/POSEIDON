@@ -73,6 +73,11 @@ public class DestinationStrategies
         NAMES.put(PlanningHeatmapDestinationFactory.class,
                   "Heatmap Planning");
 
+        CONSTRUCTORS.put("GSA",
+                         GravitationalSearchDestinationFactory::new);
+        NAMES.put(GravitationalSearchDestinationFactory.class,
+                  "GSA");
+
     }
 
     private DestinationStrategies() {}

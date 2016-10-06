@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
+import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
@@ -31,7 +32,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     private boolean ignoreFailedTrips = false;
 
 
-    private final ExploreImitateAdaptation<SeaTile> algorithm;
+    private final Adaptation<SeaTile> algorithm;
 
     /**
      * this strategy works by modifying the "favorite" destination of its delegate
@@ -84,6 +85,16 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                 objective,
                 probability
         );
+
+    }
+
+
+    public PerTripIterativeDestinationStrategy(
+            FavoriteDestinationStrategy delegate,
+            Adaptation<SeaTile> adaptation)
+    {
+        this.delegate = delegate;
+        this.algorithm = adaptation;
 
     }
 
@@ -166,7 +177,16 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     }
 
 
-    public ExploreImitateAdaptation<SeaTile> getAlgorithm() {
+    /**
+     * Getter for property 'delegate'.
+     *
+     * @return Value for property 'delegate'.
+     */
+    public FavoriteDestinationStrategy getDelegate() {
+        return delegate;
+    }
+
+    public Adaptation<SeaTile> getAlgorithm() {
         return algorithm;
     }
 

@@ -116,7 +116,8 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
                                                                 Fisher fisher,
                                                                 FishState model) {
                                                             return variable == null ? null :
-                                                                    new double[]{variable.getGridX(),
+                                                                    new double[]{
+                                                                            variable.getGridX(),
                                                                     variable.getGridY()};
                                                         }
 

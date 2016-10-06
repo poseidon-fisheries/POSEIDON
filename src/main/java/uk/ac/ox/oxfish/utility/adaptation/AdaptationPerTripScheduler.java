@@ -20,7 +20,7 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
 
     private Fisher fisher;
 
-    private final List<ExploreImitateAdaptation> adaptations = new LinkedList<>();
+    private final List<Adaptation> adaptations = new LinkedList<>();
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -28,7 +28,7 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
         this.fisher=fisher;
         fisher.addTripListener(this);
 
-        for(ExploreImitateAdaptation a : adaptations)
+        for(Adaptation a : adaptations)
             a.start(model, fisher);
 
     }
@@ -43,7 +43,7 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
      * add an adaptation algorithm to the list. Start it if we have already started
      * @param adaptation
      */
-    public void registerAdaptation(ExploreImitateAdaptation adaptation)
+    public void registerAdaptation(Adaptation adaptation)
     {
 
         adaptations.add(adaptation);
@@ -54,7 +54,7 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
     }
 
 
-    public void removeAdaptation(ExploreImitateAdaptation adaptation)
+    public void removeAdaptation(Adaptation adaptation)
     {
         adaptations.remove(adaptation);
     }
@@ -62,7 +62,7 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
     @Override
     public void reactToFinishedTrip(TripRecord record)
     {
-        for(ExploreImitateAdaptation a : adaptations)
+        for(Adaptation a : adaptations)
             a.adapt(fisher,model,fisher.grabRandomizer());
     }
 }

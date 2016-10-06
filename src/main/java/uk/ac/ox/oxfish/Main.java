@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 class Main{
 
 
-
+    public static final long SEED = 0;
 
     //main
     public static void main(String[] args) throws IOException {
@@ -171,7 +171,7 @@ class Main{
             public void actionPerformed(ActionEvent e) {
                 assert SwingUtilities.isEventDispatchThread();
                 System.out.println(SwingUtilities.isEventDispatchThread());
-                FishState state = new FishState(System.currentTimeMillis(),1);
+                FishState state = new FishState(SEED, 1);
                 FishGUI vid = new FishGUI(state);
                 Console c = new Console(vid);
                 scenarioSelection.setEnabled(false);
@@ -190,7 +190,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
         if(instantiate[0]==true) {
-            FishState state = new FishState(System.currentTimeMillis(), 1);
+            FishState state = new FishState(SEED, 1);
             Log.set(Log.LEVEL_INFO);
             Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
 

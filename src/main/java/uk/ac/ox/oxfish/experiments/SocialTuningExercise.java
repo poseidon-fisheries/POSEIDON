@@ -305,6 +305,7 @@ public class SocialTuningExercise {
 
 */
 
+
         personalPlan =
                 pair -> {
                     PersonalTuningRegressionFactory personalTuning = new PersonalTuningRegressionFactory();
@@ -314,10 +315,10 @@ public class SocialTuningExercise {
 
                 };
 
-
+/*
         batchRun("cali_anarchy_plan.yaml", "-personal-plan_calianarchy",
                  personalPlan, YEARS_TO_RUN, 1);
-
+*/
 
 
         batchRun("cali_itq_plan.yaml", "-personal-plan_caliitq",
