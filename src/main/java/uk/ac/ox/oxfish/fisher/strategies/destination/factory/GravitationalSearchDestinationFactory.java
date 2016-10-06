@@ -111,9 +111,20 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                 variable[0] = Math.max(Math.min(variable[0], state.getMap().getWidth() - 1), 0);
                 variable[1] = Math.max(Math.min(variable[1], state.getMap().getHeight() - 1), 0);
 
-                if(map.getSeaTile((int)variable[0],(int)variable[1]).getAltitude()>=0)
+                SeaTile presumedLocation = map.getSeaTile((int) variable[0], (int) variable[1]);
+                if(presumedLocation.getAltitude()>=0)
                 {
-                    SeaTile tile = map.getRandomBelowWaterLineSeaTile(random);
+                    Object[] options = map.getMooreNeighbors(presumedLocation, 3).stream().filter(new Predicate() {
+                        @Override
+                        public boolean test(Object o) {
+                            return ((SeaTile) o).getAltitude() < 0;
+                        }
+                    }).toArray();
+                    SeaTile tile;
+                    if(options.length>0)
+                        tile = (SeaTile) options[random.nextInt(options.length)];
+                    else
+                        tile = map.getRandomBelowWaterLineSeaTile(random);
                     variable[0] = tile.getGridX();
                     variable[1] = tile.getGridY();
                 }

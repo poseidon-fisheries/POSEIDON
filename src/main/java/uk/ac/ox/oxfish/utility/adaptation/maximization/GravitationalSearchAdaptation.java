@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
 {
 
+    private final int maximumSpeed = 2;
     /**
      * we work in a space of numbers but we might be controlling solutions that are
      * in fact not numbers but something else. This transforms back and forth
@@ -211,6 +212,8 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
             assert Double.isFinite(acceleration[i]);
 
             speed[i] = acceleration[i] + speed[i] *  random.nextDouble();
+            speed[i] = Math.min(speed[i], maximumSpeed);
+            speed[i] = Math.max(speed[i],-maximumSpeed);
             currentCoordinates[i] = currentCoordinates[i] + speed[i];
             assert Double.isFinite(currentCoordinates[i]);
         }
