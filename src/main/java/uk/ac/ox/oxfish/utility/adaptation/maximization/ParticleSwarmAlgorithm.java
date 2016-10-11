@@ -190,7 +190,7 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
     @Override
     public Pair<T,Fisher> imitate(
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor)
+            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor)
     {
 
         //get best memory

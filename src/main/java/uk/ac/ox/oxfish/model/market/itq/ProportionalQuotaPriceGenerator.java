@@ -46,7 +46,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
     /**
      * the function that returns how many quotas are left!
      */
-    private final Sensor<Double> numberOfQuotasLeftGetter;
+    private final Sensor<Fisher,Double> numberOfQuotasLeftGetter;
 
 
     /**
@@ -63,7 +63,7 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
 
     public ProportionalQuotaPriceGenerator(
             HashMap<Integer,ITQOrderBook> orderBooks, int specieIndex,
-            Sensor<Double> numberOfQuotasLeftGetter) {
+            Sensor<Fisher,Double> numberOfQuotasLeftGetter) {
         this.orderBooks = orderBooks;
         this.specieIndex = specieIndex;
         this.numberOfQuotasLeftGetter = numberOfQuotasLeftGetter;

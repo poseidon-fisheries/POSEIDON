@@ -166,7 +166,7 @@ public class FishStateUtilities {
 
     public static <T> Pair<T,Fisher> imitateFriendAtRandom(
             MersenneTwisterFast random, double fitness, T current, Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
+            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
         //get random friend
         List<Fisher> friendList = friends.stream().
                 //remove friends we can't imitate
@@ -193,7 +193,7 @@ public class FishStateUtilities {
     public static <T> Pair<T,Fisher> imitateBestFriend(MersenneTwisterFast random, double fitness,
                                                        T current, Collection<Fisher> friends,
                                                        ObjectiveFunction<Fisher> objectiveFunction,
-                                                       Sensor<T> sensor)
+                                                       Sensor<Fisher,T> sensor)
     {
 
         //if you have no friends, keep doing what you currently are doing
@@ -332,7 +332,7 @@ public class FishStateUtilities {
 
 
     public static void pollFishersToFile(Collection<Fisher> fishers,
-                                         File file,Sensor<Double>... pollers)
+                                         File file,Sensor<Fisher,Double>... pollers)
     {
         // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         ArrayList<String> histogram = new ArrayList<>(fishers.size());
@@ -341,7 +341,7 @@ public class FishStateUtilities {
 
             StringBuilder row = new StringBuilder();
             row.append(fisher.getID());
-            for(Sensor<Double> poller : pollers) {
+            for(Sensor<Fisher,Double> poller : pollers) {
                 row.append(",");
                 row.append(poller.scan(fisher));
             }
@@ -366,7 +366,7 @@ public class FishStateUtilities {
 
 
     public static void pollHistogramToFile(
-            Collection<Fisher> fishers, File file, Sensor<Double> poller)
+            Collection<Fisher> fishers, File file, Sensor<Fisher,Double> poller)
     {
         // File histogramFile = Paths.get("runs", "lambda", "hist100.csv").toFile();
         ArrayList<String> histogram = new ArrayList<>(fishers.size());

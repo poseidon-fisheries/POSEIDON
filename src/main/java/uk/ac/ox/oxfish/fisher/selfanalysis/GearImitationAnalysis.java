@@ -27,7 +27,7 @@ import java.util.List;
 public class GearImitationAnalysis
 {
 
-    public static final Actuator<Gear> DEFAULT_GEAR_ACTUATOR = new Actuator<Gear>() {
+    public static final Actuator<Fisher,Gear> DEFAULT_GEAR_ACTUATOR = new Actuator<Fisher,Gear>() {
         @Override
         public void apply(Fisher fisher1, Gear change, FishState model) {
             if (Log.TRACE)

@@ -16,12 +16,12 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      * used by the agent to tell what is its current T object and what is the T of
      * others
      */
-    private Sensor<T> sensor;
+    private Sensor<Fisher,T> sensor;
 
     /**
      * a class that assigns a new T to the fisher
      */
-    private Actuator<T> actuator;
+    private Actuator<Fisher,T> actuator;
 
     /**
      * each "step" the validator makes sure the fisher is ready to adapt; if it returns false the adaptation is aborted
@@ -41,7 +41,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
     protected abstract void onStart(FishState model, Fisher fisher);
 
     public AbstractAdaptation(
-            Sensor<T> sensor, Actuator<T> actuator, Predicate<Fisher> validator) {
+            Sensor<Fisher,T> sensor, Actuator<Fisher,T> actuator, Predicate<Fisher> validator) {
         this.sensor = sensor;
         this.actuator = actuator;
         this.validator = validator;
@@ -76,7 +76,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @return Value for property 'sensor'.
      */
-    public Sensor<T> getSensor() {
+    public Sensor<Fisher,T> getSensor() {
         return sensor;
     }
 
@@ -85,7 +85,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @param sensor Value to set for property 'sensor'.
      */
-    public void setSensor(Sensor<T> sensor) {
+    public void setSensor(Sensor<Fisher,T> sensor) {
         this.sensor = sensor;
     }
 
@@ -94,7 +94,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @return Value for property 'actuator'.
      */
-    public Actuator<T> getActuator() {
+    public Actuator<Fisher,T> getActuator() {
         return actuator;
     }
 
@@ -103,7 +103,7 @@ public abstract class AbstractAdaptation<T> implements  Adaptation<T>{
      *
      * @param actuator Value to set for property 'actuator'.
      */
-    public void setActuator(Actuator<T> actuator) {
+    public void setActuator(Actuator<Fisher,T> actuator) {
         this.actuator = actuator;
     }
 

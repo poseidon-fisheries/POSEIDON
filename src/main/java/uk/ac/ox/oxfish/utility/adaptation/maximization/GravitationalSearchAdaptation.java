@@ -78,7 +78,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
 
 
     public GravitationalSearchAdaptation(
-            Sensor<T> sensor, Actuator<T> actuator,
+            Sensor<Fisher,T> sensor, Actuator<Fisher,T> actuator,
             Predicate<Fisher> validator,
             CoordinateTransformer<T> transformer,
             ObjectiveFunction<Fisher> mass, double gravitationalConstant,

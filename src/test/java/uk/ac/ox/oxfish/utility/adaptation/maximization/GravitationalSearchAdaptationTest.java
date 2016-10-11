@@ -54,7 +54,7 @@ public class GravitationalSearchAdaptationTest {
             searchers.put(
                     fisher,
                     new GravitationalSearchAdaptation<>(
-                            (Sensor<double[]>) fisher1 -> coordinates.get(fisher1),
+                            (Sensor<Fisher,double[]>) fisher1 -> coordinates.get(fisher1),
                             (fisher12, change, state) -> coordinates.put(fisher12, change),
                             fisher13 -> true,
                             new CoordinateTransformer<double[]>() {

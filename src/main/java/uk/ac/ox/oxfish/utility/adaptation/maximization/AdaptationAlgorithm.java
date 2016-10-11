@@ -73,7 +73,7 @@ public interface AdaptationAlgorithm<T> {
             T current,
             Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction,
-            Sensor<T> sensor);
+            Sensor<Fisher,T> sensor);
 
 
     T exploit(

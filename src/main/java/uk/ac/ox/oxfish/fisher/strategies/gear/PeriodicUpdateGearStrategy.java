@@ -62,13 +62,13 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                 new BeamHillClimbing<>(true,
                                            DEFAULT_DYNAMIC_NETWORK,
                                            explorationStep),
-                new Actuator<Gear>() {
+                new Actuator<Fisher,Gear>() {
                     @Override
                     public void apply(Fisher fisher, Gear change, FishState model) {
                         toReturn = change.makeCopy();
                     }
                 },
-                new Sensor<Gear>() {
+                new Sensor<Fisher,Gear>() {
                     @Override
                     public Gear scan(Fisher fisher) {
                         return fisher.getGear();
@@ -99,13 +99,13 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                     }
                 },
                 new DiscreteRandomAlgorithm<>(options),
-                new Actuator<Gear>() {
+                new Actuator<Fisher,Gear>() {
                     @Override
                     public void apply(Fisher fisher, Gear change, FishState model) {
                         toReturn = change.makeCopy();
                     }
                 },
-                new Sensor<Gear>() {
+                new Sensor<Fisher,Gear>() {
                     @Override
                     public Gear scan(Fisher fisher) {
                         return fisher.getGear();

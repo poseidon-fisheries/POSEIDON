@@ -44,7 +44,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
 
     final private AdaptationAlgorithm<double[]> optimizer;
 
-    final static private Sensor<double[]> parameterSensor = new Sensor<double[]>() {
+    final static private Sensor<Fisher,double[]> parameterSensor = new Sensor<Fisher,double[]>() {
         @Override
         public double[] scan(Fisher fisher) {
             return ((HeatmapDestinationStrategy) fisher.getDestinationStrategy()).getHeatmap().getParametersAsArray();
@@ -126,7 +126,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
                 return fisher.getDestinationStrategy() instanceof HeatmapDestinationStrategy;
             }
         };
-        Actuator<double[]> actuator = new Actuator<double[]>() {
+        Actuator<Fisher,double[]> actuator = new Actuator<Fisher,double[]>() {
             @Override
             public void apply(Fisher fisher, double[] change, FishState model) {
                 model.scheduleOnce(

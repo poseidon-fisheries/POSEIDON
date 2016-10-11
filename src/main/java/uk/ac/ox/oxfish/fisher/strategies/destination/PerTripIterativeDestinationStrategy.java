@@ -62,14 +62,14 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
 
 
                 algorithm,
-                new Actuator<SeaTile>() {
+                new Actuator<Fisher,SeaTile>() {
                     @Override
                     public void apply(Fisher fisher, SeaTile change, FishState model) {
                         if (change.getAltitude() < 0) //ignores "go to land" commands
                             delegate.setFavoriteSpot(change);
                     }
                 },
-                new Sensor<SeaTile>() {
+                new Sensor<Fisher,SeaTile>() {
                     @Override
                     public SeaTile scan(Fisher fisher1) {
                         if (fisher1 == fisher) //if we are sensing ourselves
@@ -112,14 +112,14 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                     }
                 },
                 algorithm,
-                new Actuator<SeaTile>() {
+                new Actuator<Fisher,SeaTile>() {
                     @Override
                     public void apply(Fisher fisher, SeaTile change, FishState model) {
                         if (change.getAltitude() < 0) //ignores "go to land" commands
                             delegate.setFavoriteSpot(change);
                     }
                 },
-                new Sensor<SeaTile>() {
+                new Sensor<Fisher,SeaTile>() {
                     @Override
                     public SeaTile scan(Fisher fisher1) {
                         if (fisher1 == fisher) //if we are sensing ourselves

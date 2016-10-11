@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -127,13 +128,13 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                                                 }
                                             }
                                     ),
-                                    (Actuator<MonthlyDepartingStrategy>) (fisher1, change, model1) -> {
+                                    (Actuator<Fisher,MonthlyDepartingStrategy>) (fisher1, change, model1) -> {
                                         fisher1.setDepartingStrategy(change);
                                     },
-                                    new Sensor() {
+                                    new Sensor<Fisher,MonthlyDepartingStrategy>() {
                                         @Override
-                                        public Object scan(Fisher fisher) {
-                                            return fisher.getDepartingStrategy();
+                                        public MonthlyDepartingStrategy scan(Fisher fisher) {
+                                            return (MonthlyDepartingStrategy) fisher.getDepartingStrategy();
                                         }
                                     },
                                     new CashFlowObjective(365),

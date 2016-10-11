@@ -37,7 +37,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     /**
      * this we use to add to the averager
      */
-    protected final Sensor<Double> sensor;
+    protected final Sensor<Fisher,Double> sensor;
 
     protected Fisher fisher;
 
@@ -51,7 +51,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
      * @param averageWindow length of the moving average
      * @return a concrete moving average
      */
-    public static MovingAveragePredictor dailyMAPredictor(String name, Sensor<Double> sensor, int averageWindow)
+    public static MovingAveragePredictor dailyMAPredictor(String name, Sensor<Fisher,Double> sensor, int averageWindow)
     {
 
         return new MovingAveragePredictor(name,sensor,averageWindow) {
@@ -81,7 +81,8 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
      * @param averageWindow length of the moving average
      * @return a concrete moving average
      */
-    public static MovingAveragePredictor perTripMAPredictor(String name, Sensor<Double> sensor, int averageWindow)
+    public static MovingAveragePredictor perTripMAPredictor(String name,
+                                                            Sensor<Fisher,Double> sensor, int averageWindow)
     {
         final TripListener[] tripListener = new TripListener[1]; //trick to remember to stop listening when turned off
         return new MovingAveragePredictor(name,sensor,averageWindow) {
@@ -117,7 +118,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
     }
 
 
-    private MovingAveragePredictor(String name, Sensor<Double> sensor,int averageWindow) {
+    private MovingAveragePredictor(String name, Sensor<Fisher,Double> sensor,int averageWindow) {
         this.name = name;
         this.sensor = sensor;
         averager = new MovingVariance<>(averageWindow);

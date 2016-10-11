@@ -48,7 +48,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
 
         FavoriteDestinationStrategy delegate = new FavoriteDestinationStrategy(map, random);
         GravitationalSearchAdaptation<SeaTile> search = new GravitationalSearchAdaptation<>(
-                new Sensor<SeaTile>() {
+                new Sensor<Fisher,SeaTile>() {
                     @Override
                     public SeaTile scan(Fisher fisher) {
 
@@ -63,7 +63,7 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                         }
                     }
                 },
-                new Actuator<SeaTile>() {
+                new Actuator<Fisher,SeaTile>() {
                     @Override
                     public void apply(Fisher fisher, SeaTile change, FishState model) {
                             delegate.setFavoriteSpot(change);

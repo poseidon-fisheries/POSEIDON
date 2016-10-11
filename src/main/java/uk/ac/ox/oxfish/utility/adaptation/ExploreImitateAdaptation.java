@@ -150,8 +150,8 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     public ExploreImitateAdaptation(
             Predicate<Fisher> validator,
             AdaptationAlgorithm<T> decision,
-            Actuator<T> actuator,
-            Sensor<T> sensor,
+            Actuator<Fisher,T> actuator,
+            Sensor<Fisher,T> sensor,
             ObjectiveFunction<Fisher> objective, double explorationProbability,
             double imitationProbability) {
 
@@ -171,8 +171,8 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     public ExploreImitateAdaptation(
             Predicate<Fisher> validator,
             AdaptationAlgorithm<T> decision,
-            Actuator<T> actuator,
-            Sensor<T> sensor,
+            Actuator<Fisher,T> actuator,
+            Sensor<Fisher,T> sensor,
             ObjectiveFunction<Fisher> objective,
             AdaptationProbability probability) {
         super(sensor, actuator, validator);
@@ -191,7 +191,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     public ExploreImitateAdaptation(
             Predicate<Fisher> validator,
             AdaptationAlgorithm<T> decision,
-            Actuator<T> actuator, Sensor<T> sensor,
+            Actuator<Fisher,T> actuator, Sensor<Fisher,T> sensor,
             ObjectiveFunction<Fisher> objective,
             double explorationProbability,
             double imitationProbability,

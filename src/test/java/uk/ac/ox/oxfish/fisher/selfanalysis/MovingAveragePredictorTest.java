@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -17,7 +18,7 @@ public class MovingAveragePredictorTest {
     public void notReadyGetsNaN() throws Exception {
 
 
-        Sensor<Double> dummy = mock(Sensor.class);
+        Sensor<Fisher,Double> dummy = mock(Sensor.class);
         MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("ignored",dummy,30);
         assertEquals(Double.NaN,predictor.predict(),0);
 
@@ -27,7 +28,7 @@ public class MovingAveragePredictorTest {
     public void noVarianceIsFine() throws Exception {
 
 
-        Sensor<Double> dummy = mock(Sensor.class);
+        Sensor<Fisher,Double> dummy = mock(Sensor.class);
 
 
 
@@ -51,7 +52,7 @@ public class MovingAveragePredictorTest {
 
 
 
-        Sensor<Double> dummy = mock(Sensor.class);
+        Sensor<Fisher,Double> dummy = mock(Sensor.class);
 
 
 
@@ -76,7 +77,7 @@ public class MovingAveragePredictorTest {
     public void predictSumsCorrectly() throws Exception
     {
 
-        Sensor<Double> dummy = mock(Sensor.class);
+        Sensor<Fisher,Double> dummy = mock(Sensor.class);
         MovingAveragePredictor predictor = MovingAveragePredictor.dailyMAPredictor("summer",dummy,10);
         assertEquals(Double.NaN, predictor.predict(), 0);
 

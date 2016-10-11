@@ -56,8 +56,8 @@ public class ExplorationOrImitationMovementTest
         ExploreImitateAdaptation<SeaTile> test = new ExploreImitateAdaptation<SeaTile>(
                 (Predicate<Fisher>) fisher -> true,
                 algorithm,
-                (Actuator<SeaTile>) (fisher, change, model) -> newObjective[0] = change,
-                new Sensor<SeaTile>() {
+                (Actuator<Fisher,SeaTile>) (fisher, change, model) -> newObjective[0] = change,
+                new Sensor<Fisher,SeaTile>() {
                     @Override
                     public SeaTile scan(Fisher fisher) {
                         return locations.get(fisher);

@@ -150,7 +150,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                                                                                                           specieIndex,
                                                                                                           //reads the fisher regulation which we know
                                                                                                           //what it is because we are supplying it now
-                                                                                                          new Sensor<Double>() {
+                                                                                                          new Sensor<Fisher,Double>() {
                                                                                                               @Override
                                                                                                               public Double scan(Fisher fisher) {
                                                                                                                   return ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(

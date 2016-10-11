@@ -43,7 +43,7 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
     @Override
     public Pair<T,Fisher> imitate(
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction, Sensor<T> sensor) {
+            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
         return FishStateUtilities.imitateFriendAtRandom(random, fitness,
                                                         current, friends,
                                                         objectiveFunction, sensor);
