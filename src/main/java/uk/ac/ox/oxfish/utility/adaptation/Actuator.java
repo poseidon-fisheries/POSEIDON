@@ -9,5 +9,5 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public interface Actuator<F,T> {
 
-    void apply(Fisher fisher, T change, FishState model);
+    void apply(F subject, T policy, FishState model);
 }
