@@ -56,7 +56,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
     /**
      * when drawing biomass use the transform of the current biomass rather than the biomass itself (to avoid large numbers dominating everything)
      */
-    private final static Function<Double,Double> BIOMASS_TRANSFORM = aDouble -> Math.log(aDouble+1);
+    private final static Function<Double,Double> BIOMASS_TRANSFORM = aDouble -> Math.sqrt(aDouble);
 
     private final static double MAX_BIOMASS =  5000;
 

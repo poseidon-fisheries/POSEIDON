@@ -10,5 +10,5 @@ import java.io.Serializable;
  */
 public interface Sensor<F,T> extends Serializable{
 
-    T scan(F fisher);
+    T scan(F system);
 }

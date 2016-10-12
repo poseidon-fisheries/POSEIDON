@@ -10,6 +10,8 @@ public enum IntervalPolicy {
 
     EVERY_DAY,
 
+    EVERY_MONTH,
+
     EVERY_YEAR
 
 

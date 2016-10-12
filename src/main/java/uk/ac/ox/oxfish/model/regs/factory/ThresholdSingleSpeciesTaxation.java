@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
 /**
  * Created by carrknight on 9/30/16.
  */
-public class AdaptiveSingleSpeciesTaxation implements AlgorithmFactory<ProtectedAreasOnly> {
+public class ThresholdSingleSpeciesTaxation implements AlgorithmFactory<ProtectedAreasOnly> {
 
 
     private int speciesIndex = 0;

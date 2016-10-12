@@ -53,9 +53,16 @@ Multi-Quotas from Map:
   multipleTradesAllowed: false
   quotaExchangedPerMatch: 100
 -------
-Adaptive Single Species Taxation:
+Single Species Threshold Taxation:
   biomassThreshold: '5000000.0'
   speciesIndex: 0
   tax: '10.0'
   taxWhenBelowThreshold: true
+-------
+Single Species PID Taxation:
+  i: '0.1'
+  landingTarget: '100000.0'
+  p: '0.05'
+  speciesIndex: 0
+  tax: '10.0'
 -------

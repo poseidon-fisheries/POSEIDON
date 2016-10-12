@@ -7,8 +7,6 @@ import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
@@ -37,9 +35,9 @@ public abstract class Controller implements Steppable,Startable {
     private final Actuator<FishState,Double>  actuator;
 
     /**
-     * how often do we act?
+     * how often do we act? (in days)
      */
-    private final IntervalPolicy interval;
+    private final int interval;
 
     /**
      * the last number fed to the actuator
@@ -53,7 +51,7 @@ public abstract class Controller implements Steppable,Startable {
             Sensor<FishState, Double> observed,
             Sensor<FishState, Double> target,
             Actuator<FishState, Double> actuator,
-            IntervalPolicy interval) {
+            int interval) {
         this.observed = observed;
         this.target = target;
         this.actuator = actuator;
@@ -86,8 +84,8 @@ public abstract class Controller implements Steppable,Startable {
      */
     @Override
     public void start(FishState model) {
-        Preconditions.checkArgument(receipt!=null);
-        receipt = model.schedulePerPolicy(this, StepOrder.POLICY_UPDATE,interval);
+        Preconditions.checkArgument(receipt==null);
+        receipt = model.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE, interval);
     }
 
     /**
@@ -97,5 +95,46 @@ public abstract class Controller implements Steppable,Startable {
     public void turnOff() {
         if(receipt!=null)
             receipt.stop();
+    }
+
+    public double getPolicy() {
+        return policy;
+    }
+
+    /**
+     * Getter for property 'observed'.
+     *
+     * @return Value for property 'observed'.
+     */
+    public Sensor<FishState, Double> getObserved() {
+        return observed;
+    }
+
+    /**
+     * Getter for property 'target'.
+     *
+     * @return Value for property 'target'.
+     */
+    public Sensor<FishState, Double> getTarget() {
+        return target;
+    }
+
+    /**
+     * Getter for property 'actuator'.
+     *
+     * @return Value for property 'actuator'.
+     */
+    public Actuator<FishState, Double> getActuator() {
+        return actuator;
+    }
+
+
+    /**
+     * Getter for property 'interval'.
+     *
+     * @return Value for property 'interval'.
+     */
+    public int getInterval() {
+        return interval;
     }
 }

@@ -44,7 +44,7 @@ public class PIDController extends Controller {
             Sensor<FishState, Double> observed,
             Sensor<FishState, Double> target,
             Actuator<FishState, Double> actuator,
-            IntervalPolicy interval,
+            int interval,
             double p, double i, double d,
             double offset) {
         super(observed, target, actuator, interval);

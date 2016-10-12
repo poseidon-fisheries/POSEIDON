@@ -44,7 +44,7 @@ public class Counter implements Startable, Steppable
         /**
          * reset all stuff
          */
-        data.entrySet().stream().forEach(datum -> datum.setValue(0d));
+        data.entrySet().forEach(datum -> datum.setValue(0d));
     }
 
     /**

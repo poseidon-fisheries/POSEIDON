@@ -397,6 +397,8 @@ public class FishState  extends SimState{
                 return scheduleEveryStep(steppable,order);
             case EVERY_DAY:
                 return scheduleEveryDay(steppable,order);
+            case EVERY_MONTH:
+                return scheduleEveryXDay(steppable,order,30);
             case EVERY_YEAR:
                 return scheduleEveryYear(steppable, order);
             default:

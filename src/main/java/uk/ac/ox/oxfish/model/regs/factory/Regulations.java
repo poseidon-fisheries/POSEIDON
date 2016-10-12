@@ -72,8 +72,11 @@ public class Regulations
         NAMES.put(MultiQuotaMapFactory.class, "Multi-Quotas from Map");
 
 
-        CONSTRUCTORS.put("Adaptive Single Species Taxation", AdaptiveSingleSpeciesTaxation::new);
-        NAMES.put(AdaptiveSingleSpeciesTaxation.class, "Adaptive Single Species Taxation");
+        CONSTRUCTORS.put("Single Species Threshold Taxation", ThresholdSingleSpeciesTaxation::new);
+        NAMES.put(ThresholdSingleSpeciesTaxation.class, "Single Species Threshold Taxation");
+
+        CONSTRUCTORS.put("Single Species PID Taxation", SingleSpeciesPIDTaxationOnLandingsFactory::new);
+        NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
 
 
 

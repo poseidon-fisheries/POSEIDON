@@ -54,7 +54,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Safe Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -89,4 +89,9 @@ Heatmap Planning:
       neighbors: '1.0'
       spaceBandwidth: '5.0'
       timeBandwidth: '500.0'
+-------
+GSA:
+  explorationSize: '20.0'
+  gravitationalConstant: '100.0'
+  initialSpeed: '0.0'
 -------
