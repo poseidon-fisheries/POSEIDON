@@ -78,6 +78,11 @@ public class DestinationStrategies
         NAMES.put(GravitationalSearchDestinationFactory.class,
                   "GSA");
 
+        CONSTRUCTORS.put("Unified Amateurish Dynamic Programming",
+                         UnifiedAmateurishDynamicFactory::getInstance);
+        NAMES.put(UnifiedAmateurishDynamicFactory.class,
+                  "Unified Amateurish Dynamic Programming");
+
     }
 
     private DestinationStrategies() {}

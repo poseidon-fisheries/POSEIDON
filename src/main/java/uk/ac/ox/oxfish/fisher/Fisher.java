@@ -42,7 +42,6 @@ import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
-import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
@@ -543,7 +542,7 @@ public class Fisher implements Steppable, Startable{
     public boolean shouldFisherLeavePort(FishState model) {
         assert isAtPort();
         assert !isFuelEmergencyOverride();
-        return !status.isAnyEmergencyFlagOn() && departingStrategy.shouldFisherLeavePort(equipment,status,memory , model);
+        return !status.isAnyEmergencyFlagOn() && departingStrategy.shouldFisherLeavePort(this, model,model.getRandom());
     }
 
     /**
@@ -1273,5 +1272,11 @@ public class Fisher implements Steppable, Startable{
      */
     public LinkedList<Cost> getOpportunityCosts() {
         return opportunityCosts;
+    }
+
+
+
+    public int numberOfDailyObservations() {
+        return memory.numberOfDailyObservations();
     }
 }

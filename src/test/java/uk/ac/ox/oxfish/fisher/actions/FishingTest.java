@@ -44,6 +44,7 @@ public class FishingTest {
     public void integrationTest() throws Exception {
 
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(1);
+        when(fishState.getRandom()).thenReturn(new MersenneTwisterFast());
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 

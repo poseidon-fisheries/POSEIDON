@@ -60,9 +60,9 @@ Single Species Threshold Taxation:
   taxWhenBelowThreshold: true
 -------
 Single Species PID Taxation:
+  actionInterval: '7.0'
   i: '0.1'
-  landingTarget: '100000.0'
+  landingTarget: '5000.0'
   p: '0.05'
   speciesIndex: 0
-  tax: '10.0'
 -------

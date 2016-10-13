@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
@@ -32,19 +33,18 @@ public class WeatherLogisticDepartingStrategyTest {
         //create storm at current location
         SeaTile location = mock(SeaTile.class);
         when(location.getWindSpeedInKph()).thenReturn(30d);
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getLocation()).thenReturn(location);
 
         //create long boat
         Boat boat = mock(Boat.class);
         when(boat.getLength()).thenReturn(5d);
-        FisherEquipment equipo = mock(FisherEquipment.class);
-        when(equipo.getBoat()).thenReturn(boat);
+        Fisher fisher= mock(Fisher.class);
+        when(fisher.getBoat()).thenReturn(boat);
+        when(fisher.getLocation()).thenReturn(location);
 
         int hoursDeparted = 0;
 
         //given the setup the harshness value ought to be 0.8 and the probability ought to be .88
-        assertEquals(.8,strategy.computeX(equipo,status,mock(FisherMemory.class),model),.001);
+        assertEquals(.8,strategy.computeX(fisher,model),.001);
 
         for(int day =0;day <10000; day++ )
         {
@@ -52,7 +52,7 @@ public class WeatherLogisticDepartingStrategyTest {
 
             for(int hour=0; hour<24;hour++)
             {
-                boolean departing = strategy.shouldFisherLeavePort(equipo,status,mock(FisherMemory.class), model);
+                boolean departing = strategy.shouldFisherLeavePort(fisher, model, new MersenneTwisterFast());
                 if(departing) {
                     hoursDeparted++;
                 }

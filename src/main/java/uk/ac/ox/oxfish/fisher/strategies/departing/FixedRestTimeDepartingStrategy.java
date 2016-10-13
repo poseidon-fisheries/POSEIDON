@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -29,8 +27,8 @@ public class FixedRestTimeDepartingStrategy implements DepartingStrategy
      */
     @Override
     public boolean shouldFisherLeavePort(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
-        return status.getHoursAtPort() >= minimumHoursToWait;
+            Fisher fisher, FishState model, MersenneTwisterFast random) {
+        return fisher.getHoursAtPort() >= minimumHoursToWait;
     }
 
     /**

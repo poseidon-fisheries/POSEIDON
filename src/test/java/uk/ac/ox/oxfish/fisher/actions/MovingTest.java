@@ -46,6 +46,8 @@ public class MovingTest
 
         //2 by 2 map:
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(1);
+        when(fishState.getRandom()).thenReturn(new MersenneTwisterFast());
+
         fishState.getMap().setDistance(new CartesianDistance(3)); //3 km per map
         //1 hour step
         when(fishState.getHoursPerStep()).thenReturn(1d);

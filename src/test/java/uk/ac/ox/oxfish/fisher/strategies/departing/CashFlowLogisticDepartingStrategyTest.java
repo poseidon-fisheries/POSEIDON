@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
@@ -29,12 +30,11 @@ public class CashFlowLogisticDepartingStrategyTest
 
 
         //30 days ago you had 10$
-        FisherMemory memory = mock(FisherMemory.class);
-        when(memory.numberOfDailyObservations()).thenReturn(100);
-        when(memory.balanceXDaysAgo(30)).thenReturn(10d);
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.numberOfDailyObservations()).thenReturn(100);
+        when(fisher.balanceXDaysAgo(30)).thenReturn(10d);
         //now you have 105$
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getBankBalance()).thenReturn(105d);
+        when(fisher.getBankBalance()).thenReturn(105d);
         //your cashflow ought to be 95,compared to a 100$ target it means your daily probability of departing ought to be approx 26%
         //see the xlsx example
         int hoursDeparted = 0;
@@ -43,7 +43,7 @@ public class CashFlowLogisticDepartingStrategyTest
             strategy.step(model);
             for(int hour=0; hour<24;hour++)
             {
-                boolean departing = strategy.shouldFisherLeavePort(mock(FisherEquipment.class),status,memory, model);
+                boolean departing = strategy.shouldFisherLeavePort(fisher, model, new MersenneTwisterFast());
                 if(departing) {
                     hoursDeparted++;
                 }

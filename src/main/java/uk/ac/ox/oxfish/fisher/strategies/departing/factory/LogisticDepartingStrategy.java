@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -54,21 +55,21 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
     /**
      * logistic
      *
-     * @param equipment
-     * @param status
-     * @param memory
+     *
+     * @param fisher
      * @param model
+     * @param random
      * @return true if the fisherman wants to leave port.
      */
     @Override
     public boolean shouldFisherLeavePort(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+            Fisher fisher, FishState model, MersenneTwisterFast random) {
 
         //you have no countdown activated
         if (decisionTaken == null) {
 
 
-            double x = computeX(equipment, status, memory, model);
+            double x = computeX(fisher, model);
             x = Math.max(x, 0);
 
             double dailyProbability = FishStateUtilities.logisticProbability(l, k, x0, x);
@@ -91,7 +92,7 @@ public abstract class LogisticDepartingStrategy  implements DepartingStrategy, S
     /**
      * abstract method, returns whatever we need to plug in the logistic function
      */
-    abstract public double computeX(FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model);
+    abstract public double computeX(Fisher fisher, FishState model);
 
 
 

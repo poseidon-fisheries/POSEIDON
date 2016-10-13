@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -33,15 +31,15 @@ public class MonthlyDepartingStrategy implements  DepartingStrategy {
     /**
      * The fisher goes out only on allotted months
      *
-     * @param equipment
-     * @param status
-     * @param memory
-     * @param model
+     *
+     * @param fisher the fisher making the decision
+     * @param model the state
+     * @param random the randomizer
      * @return true if the fisherman wants to leave port.
      */
     @Override
     public boolean shouldFisherLeavePort(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+            Fisher fisher, FishState model, MersenneTwisterFast random) {
         //integer division, gets you the "month" correctly
         int month = (int)(model.getDayOfTheYear() / 30.42);
         assert month>=0;

@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -40,19 +38,16 @@ public class FixedProbabilityDepartingStrategy implements DepartingStrategy {
     /**
      * The fisher asks himself if he wants to leave the warm comfort of his bed.
      *
-     *
-     * @param equipment
-     * @param status
-     *@param memory
+     *  @param fisher
      * @param model the model. Not used  @return true if the fisherman wants to leave port.
-     */
+     * @param random */
     @Override
     public boolean shouldFisherLeavePort(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+            Fisher fisher, FishState model, MersenneTwisterFast random) {
         if(checkOnlyOnceADay && model.getDay()==dayLastCheck) //if you already checked don't bother
             return false;
         dayLastCheck = model.getDay();
-        return status.getRandom().nextBoolean(probabilityToLeavePort);
+        return random.nextBoolean(probabilityToLeavePort);
     }
 
 

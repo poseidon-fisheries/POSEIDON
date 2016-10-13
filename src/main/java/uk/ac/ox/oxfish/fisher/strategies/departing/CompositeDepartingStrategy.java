@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -42,9 +40,9 @@ public class CompositeDepartingStrategy implements DepartingStrategy
      */
     @Override
     public boolean shouldFisherLeavePort(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+            Fisher fisher, FishState model, MersenneTwisterFast random) {
         for(DepartingStrategy strategy : strategies)
-            if(!strategy.shouldFisherLeavePort(equipment, status, memory, model))
+            if(!strategy.shouldFisherLeavePort(fisher, model, model.getRandom()))
                 return false;
         return true;
     }

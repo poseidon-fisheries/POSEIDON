@@ -29,7 +29,7 @@ public class PIDControllerTest {
                 (Sensor<FishState, Double>) fisher -> tank[0],
                 (Sensor<FishState, Double>) fisher -> 10d,
                 (subject, policy, model) -> inflow[0] = policy,
-                IntervalPolicy.EVERY_DAY,
+                1,
                 .05,
                 .1,
                 0,

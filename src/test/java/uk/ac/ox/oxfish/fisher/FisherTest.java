@@ -36,6 +36,8 @@ public class FisherTest {
 
         final int kmPerCell = 1;
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(kmPerCell);
+        when(fishState.getRandom()).thenReturn(new MersenneTwisterFast());
+
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 
@@ -111,6 +113,8 @@ public class FisherTest {
         //exactly like above, except that now the tank is only 30 liters
         final int kmPerCell = 1;
         FishState fishState = RandomThenBackToPortDestinationStrategyTest.generateSimple2x2Map(kmPerCell);
+        when(fishState.getRandom()).thenReturn(new MersenneTwisterFast());
+
         when(fishState.getHoursPerStep()).thenReturn(1d);
 
 

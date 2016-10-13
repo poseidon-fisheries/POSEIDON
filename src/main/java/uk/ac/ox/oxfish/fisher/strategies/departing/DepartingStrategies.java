@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.factory.DoubleLogisticDeparti
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MonthlyDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.UnifiedAmateurishDynamicFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -44,6 +45,11 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("Monthly Departing",
                          MonthlyDepartingFactory::new);
         NAMES.put(MonthlyDepartingFactory.class,"Monthly Departing");
+
+        CONSTRUCTORS.put("Unified Amateurish Dynamic Programming",
+                         UnifiedAmateurishDynamicFactory::getInstance);
+        NAMES.put(UnifiedAmateurishDynamicFactory.class,
+                  "Unified Amateurish Dynamic Programming");
     }
 
     private DepartingStrategies() {}

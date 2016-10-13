@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.strategies;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
@@ -22,14 +22,10 @@ public class FixedProbabilityDepartingStrategyTest {
 
         FixedProbabilityDepartingStrategy always = new FixedProbabilityDepartingStrategy(1.0, false);
 
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
         for(int i=0; i<50;i++) {
-            assertTrue(always.shouldFisherLeavePort(mock(FisherEquipment.class) ,
-                                                    status,
-                                                    mock(FisherMemory.class),mock(FishState.class)));
+            assertTrue(always.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
         }
 
     }
@@ -38,12 +34,8 @@ public class FixedProbabilityDepartingStrategyTest {
     public void neverDeparts() throws Exception {
 
         FixedProbabilityDepartingStrategy never = new FixedProbabilityDepartingStrategy(0, false);
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
         for(int i=0; i<50;i++)
-            assertFalse(never.shouldFisherLeavePort(mock(FisherEquipment.class),
-                                                    status,
-                                                    mock(FisherMemory.class), mock(FishState.class)));
+            assertFalse(never.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
 
     }
 
@@ -52,14 +44,10 @@ public class FixedProbabilityDepartingStrategyTest {
     public void departsSometimes() throws Exception
     {
         FixedProbabilityDepartingStrategy sometimes = new FixedProbabilityDepartingStrategy(.5, false);
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
 
         int departures = 0;
         for(int i=0; i<50;i++)
-            if(sometimes.shouldFisherLeavePort(mock(FisherEquipment.class),
-                                               status,
-                                               mock(FisherMemory.class), mock(FishState.class)))
+            if(sometimes.shouldFisherLeavePort(mock(Fisher.class),mock(FishState.class),new MersenneTwisterFast()));
                 departures++;
         assertTrue(departures < 50);
         assertTrue(departures > 0);
@@ -72,23 +60,16 @@ public class FixedProbabilityDepartingStrategyTest {
 
         //100% probability but you keep asking the same day, you will only get one yes
         FixedProbabilityDepartingStrategy daily = new FixedProbabilityDepartingStrategy(1, true);
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getRandom()).thenReturn(new MersenneTwisterFast());
 
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(1d);
         int departures = 0;
         for(int i=0; i<50;i++) {
-            if(daily.shouldFisherLeavePort(mock(FisherEquipment.class),
-                                               status,
-                                               mock(FisherMemory.class),
-                                               model))
+            if(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()))
                 departures++;
         }
         assertTrue(departures == 1);
         when(model.getDay()).thenReturn(2d);
-        assertTrue(daily.shouldFisherLeavePort(mock(FisherEquipment.class) ,
-                                               status,
-                                               mock(FisherMemory.class),model));
+        assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()));
     }
 }

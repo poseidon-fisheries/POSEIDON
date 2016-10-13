@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
@@ -51,17 +52,15 @@ public class CashFlowLogisticDepartingStrategy extends LogisticDepartingStrategy
     /**
      * abstract method, returns whatever we need to plug in the logistic function
      *
-     * @param equipment the equipment
-     * @param status the status
-     * @param memory the memories of the fisher
+     * @param fisher the fisher making the decision
+     * @param model the state
      * @param model a link to the model
      */
     @Override
-    public double computeX(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
-        double cash = status.getBankBalance();
-        double previousCash = memory.numberOfDailyObservations() > cashflowPeriod ?
-                memory.balanceXDaysAgo(cashflowPeriod) :
+    public double computeX(Fisher fisher, FishState model){
+        double cash = fisher.getBankBalance();
+        double previousCash = fisher.numberOfDailyObservations() > cashflowPeriod ?
+                fisher.balanceXDaysAgo(cashflowPeriod) :
                 0;
 
         double x = (cash-previousCash)/cashflowTarget;

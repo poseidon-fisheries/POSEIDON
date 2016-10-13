@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
@@ -43,18 +44,15 @@ public class WeatherLogisticDepartingStrategy extends LogisticDepartingStrategy 
     /**
      * abstract method, returns whatever we need to plug in the logistic function
      *
-     * @param equipment
-     * @param status
-     * @param memory
-     * @param model
+     * @param fisher the fisher making the decision
+     * @param model the state
      */
-    @Override
-    public double computeX(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, FishState model) {
+    public double computeX(Fisher fisher, FishState model){
 
 
-        return status.getLocation().getWindSpeedInKph() * windspeedSensitivity +
-                equipment.getBoat().getLength() * boatLengthSensitivity +
+
+        return fisher.getLocation().getWindSpeedInKph() * windspeedSensitivity +
+                fisher.getBoat().getLength() * boatLengthSensitivity +
                 harshnessIntercept;
 
     }
