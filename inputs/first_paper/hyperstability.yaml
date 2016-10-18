@@ -17,7 +17,7 @@ Abstract:
             Fixed Probability:
               explorationProbability: '0.2'
               imitationProbability: '1.0'
-          explorationStepSize: uniform 1.0 10.0
+          stepSize: uniform 1.0 10.0
   enginePower: normal 5000.0 100.0
   fishers: 150
   fishingStrategy:

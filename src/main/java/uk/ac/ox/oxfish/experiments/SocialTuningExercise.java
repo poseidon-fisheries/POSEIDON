@@ -232,7 +232,7 @@ public class SocialTuningExercise {
                          ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 1);
-
+*/
 
 
         batchRun("cali_itq_plan.yaml", "-plan_caliitq",
@@ -242,7 +242,7 @@ public class SocialTuningExercise {
                  ), YEARS_TO_RUN, 1);
 
 
-*/
+
 
 
 
@@ -318,11 +318,12 @@ public class SocialTuningExercise {
 /*
         batchRun("cali_anarchy_plan.yaml", "-personal-plan_calianarchy",
                  personalPlan, YEARS_TO_RUN, 1);
-*/
+
 
 
         batchRun("cali_itq_plan.yaml", "-personal-plan_caliitq",
                  personalPlan, YEARS_TO_RUN, 1);
+                 */
     }
 
 
