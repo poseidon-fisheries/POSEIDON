@@ -1,0 +1,87 @@
+{
+  "language"        : "PYTHON",
+  "main_file"       : "gearopt.py",
+  "experiment-name" : "gearopt_ANT",
+  "likelihood"      : "GAUSSIAN",
+  "acquisition"     : "PES",
+  "resources" : {
+    "my-machine" : {
+      "scheduler"         : "local",
+      "max_concurrent"    : 2,
+      "max_finished_jobs" : 150
+    }
+  },
+  "variables" : {
+    "cell_size" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 20
+    },
+    "speed": {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.1,
+      "max"  : 20
+    },
+    "capacity":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1000,
+      "max"  : 20000
+    },
+    "movement":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0,
+      "max"  : 0.2
+    },
+    "epsilon":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.05,
+      "max"  : 0.8
+    },
+    "catchability":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.001,
+      "max"  : 0.2
+    },
+    "hold_size":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 10,
+      "max"  : 1000
+    },
+    "epsilon_gear":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.05,
+      "max"  : 0.8
+    },
+    "delta_gear":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.01,
+      "max"  : 0.5
+    }
+
+  },
+  "tasks" : {
+    "consumption"  : { "type" : "OBJECTIVE"  },
+    "positive_landings" : {"type" : "CONSTRAINT"}
+  },
+  "database" : {
+    "address":"localhost",
+    "name" : "spearmint"
+  }
+}
+

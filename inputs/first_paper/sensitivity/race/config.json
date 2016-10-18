@@ -1,0 +1,60 @@
+{
+  "language"        : "PYTHON",
+  "main_file"       : "find_0_profits.py",
+  "experiment-name" : "find_0_profits",
+  "likelihood"      : "GAUSSIAN",
+  "acquisition"     : "ParEGO",
+  "resources" : {
+    "my-machine" : {
+      "scheduler"         : "local",
+      "max_concurrent"    : 2,
+      "max_finished_jobs" : 300
+    }
+  },
+  "variables" : {
+    "maximumBiomass":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1000,
+      "max"  : 10000
+    },
+    "demand_intercept":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 2000
+    },
+    "demand_slope":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.1,
+      "max"  : 1
+    },
+    "catchability":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.01,
+      "max"  : 0.2
+    },
+    "gas_prices" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.1,
+      "max"  : 10
+    }
+
+
+  },
+  "tasks" : {
+    "distance"  : { "type" : "OBJECTIVE"  }
+  },
+  "database" : {
+    "address":"localhost",
+    "name" : "spearmint"
+  }
+}
+

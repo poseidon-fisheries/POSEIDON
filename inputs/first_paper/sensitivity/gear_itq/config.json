@@ -1,0 +1,75 @@
+{
+  "language"        : "PYTHON",
+  "main_file"       : "gear_itq.py",
+  "experiment-name" : "gear_itq_ANT",
+  "likelihood"      : "GAUSSIAN",
+  "acquisition"     : "PES",
+  "resources" : {
+    "my-machine" : {
+      "scheduler"         : "local",
+      "max_concurrent"    : 2,
+      "max_finished_jobs" : 300
+    }
+  },
+  "variables" : {
+    "cell_size" : {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1,
+      "max"  : 20
+    },
+    "speed": {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.1,
+      "max"  : 20
+    },
+    "capacity":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 1000,
+      "max"  : 20000
+    },
+    "movement":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0,
+      "max"  : 0.2
+    },
+    "epsilon":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0.05,
+      "max"  : 0.8
+    },
+    "hold_size":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 10,
+      "max"  : 1000
+    },
+    "gas_prices":
+    {
+      "type" : "FLOAT",
+      "size" : 1,
+      "min"  : 0,
+      "max"  : 10
+    }
+
+
+
+  },
+  "tasks" : {
+    "red_to_total"  : { "type" : "OBJECTIVE"  },
+    "positive_biomass" : {"type" : "CONSTRAINT"}
+  },
+  "database" : {
+    "address":"localhost",
+    "name" : "spearmint"
+  }
+}
+
