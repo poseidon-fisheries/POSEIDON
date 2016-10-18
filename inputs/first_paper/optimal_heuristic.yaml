@@ -1,4 +1,4 @@
-Prototype:
+Abstract:
   biologyInitializer:
     Diffusing Logistic:
       carryingCapacity: '5000.0'

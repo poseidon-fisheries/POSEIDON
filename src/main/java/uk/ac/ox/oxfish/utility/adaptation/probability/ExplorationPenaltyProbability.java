@@ -80,7 +80,7 @@ public class ExplorationPenaltyProbability implements AdaptationProbability
     @Override
     public void judgeExploration(double previousFitness, double currentFitness) {
         if(currentFitness  > previousFitness + FishStateUtilities.EPSILON)
-            delegate.setExplorationProbability(Math.min(delegate.getExplorationProbability() * (1d+incrementMultiplier),1));
+            delegate.setExplorationProbability(Math.min(delegate.getExplorationProbability() * (1d+incrementMultiplier), 1));
         if( currentFitness < previousFitness - FishStateUtilities.EPSILON )
             delegate.setExplorationProbability(
                     Math.max(delegate.getExplorationProbability() * (1d - incrementMultiplier), explorationMinimum));

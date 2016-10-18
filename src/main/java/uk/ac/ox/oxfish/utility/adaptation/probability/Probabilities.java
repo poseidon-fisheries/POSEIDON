@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.DailyDecreasingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -39,6 +40,12 @@ public class Probabilities {
                          ExplorationPenaltyProbabilityFactory::new
         );
         NAMES.put(ExplorationPenaltyProbabilityFactory.class,"Adaptive Probability");
+
+
+        CONSTRUCTORS.put("Social Annealing Probability",
+                         SocialAnnealingProbabilityFactory::new
+        );
+        NAMES.put(SocialAnnealingProbabilityFactory.class,"Social Annealing Probability");
 
 
     }

@@ -6,6 +6,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.GoodBadRegressionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.HeatmapDestinationFactory;
@@ -32,7 +33,7 @@ import java.nio.file.Paths;
 public class PlanningVsSearching {
 
 
-    public static void file(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         DataColumn[] exploreExploit = runSimulation(new PerTripImitativeDestinationFactory());
 
@@ -41,7 +42,7 @@ public class PlanningVsSearching {
         DataColumn[] perfectPlanner = runSimulation(nextStrategy);
 
         HeatmapDestinationFactory kernel = new HeatmapDestinationFactory();
-        NearestNeighborTransductionFactory regression = new NearestNeighborTransductionFactory();
+        GoodBadRegressionFactory regression = new GoodBadRegressionFactory();
         //regression.setForgettingFactor(new FixedDoubleParameter(.95d));
         kernel.setRegression(regression);
       //  DataColumn[] structuredSearch = runSimulation(kernel);
@@ -93,7 +94,7 @@ public class PlanningVsSearching {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void gui(String[] args) throws IOException {
 
         FishYAML yaml = new FishYAML();
         String scenarioYaml = String.join("\n", Files.readAllLines(

@@ -22,7 +22,7 @@ public class LowessTileTest
         List<String> data = Files.readAllLines(Paths.get("inputs", "tests", "regression.csv"));
         assertEquals(data.size(),100);
 
-        LowessTile tile = new LowessTile(2,1000d, new double[]{0,0},1d);
+        LeastSquareFilter tile = new LeastSquareFilter(2, 1000d, new double[]{0,0}, 1d);
 
         for(String line : data)
         {
