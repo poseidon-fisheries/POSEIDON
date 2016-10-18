@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 class Main{
 
 
-    public static final long SEED = 0;
+    public static final long SEED = 0l;
 
     //main
     public static void main(String[] args) throws IOException {

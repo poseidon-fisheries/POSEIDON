@@ -2,8 +2,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.UnifiedAmateurishDynamicStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.AmateurishDynamicStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
@@ -26,18 +25,20 @@ import java.util.function.ToDoubleFunction;
  *
  * Created by carrknight on 10/13/16.
  */
-public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<UnifiedAmateurishDynamicStrategy>
+public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<AmateurishDynamicStrategy>
 {
 
 
-    private DoubleParameter noiseRate = new FixedDoubleParameter(.01);
+    private DoubleParameter discountRate = new FixedDoubleParameter(0);
+
+    private DoubleParameter noiseRate = new FixedDoubleParameter(.02);
 
     private DoubleParameter learningRate = new FixedDoubleParameter(.025);
 
     private DoubleParameter explorationSize = new FixedDoubleParameter(5);
 
 
-    private WeakHashMap<FishState,UnifiedAmateurishDynamicStrategy> instances = new WeakHashMap<>();
+    private WeakHashMap<FishState,AmateurishDynamicStrategy> instances = new WeakHashMap<>();
 
 
     private UnifiedAmateurishDynamicFactory(){};
@@ -56,24 +57,28 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Unified
      * @return the function result
      */
     @Override
-    public UnifiedAmateurishDynamicStrategy apply(FishState state) {
+    public AmateurishDynamicStrategy apply(FishState state) {
 
-        UnifiedAmateurishDynamicStrategy strategy = instances.get(state);
+        AmateurishDynamicStrategy strategy = instances.get(state);
         if(strategy == null)
         {
-            strategy = new UnifiedAmateurishDynamicStrategy(
+            strategy = new AmateurishDynamicStrategy(
                     learningRate.apply(state.getRandom()),
                     noiseRate.apply(state.getRandom()),
                     state.getMap(), state.getRandom(),
                     explorationSize.apply(state.getRandom()).intValue(),
+                    discountRate.apply(state.getRandom()),
                     //intercept
+                    /*
                     new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher system) {
                             return 1d;
                         }
                     },
+                    */
                     // % distance from average
+                    /*
                     new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher fisher) {
@@ -87,7 +92,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Unified
 
 
                         }
-                    },
+                    }, */
                     // % distance from best friend
                     new Sensor<Fisher, Double>() {
                         @Override
@@ -136,14 +141,21 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Unified
                             }
 
                         }
-                    }
+                    },
+                    // days at home
+                    new Sensor<Fisher, Double>() {
+                        @Override
+                        public Double scan(Fisher fisher) {
+                            return fisher.getHoursAtPort()/24;
 
+                        }
+                    }
 
             );
             instances.put(state,strategy);
 
             Set<String> columns = strategy.getActionsTaken().getData().keySet();
-            UnifiedAmateurishDynamicStrategy finalStrategy = strategy;
+            AmateurishDynamicStrategy finalStrategy = strategy;
 
             for(String string : columns) {
                 DataColumn dailyColumn = state.getDailyDataSet().registerGatherer(string,
@@ -235,5 +247,23 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Unified
      */
     public void setExplorationSize(DoubleParameter explorationSize) {
         this.explorationSize = explorationSize;
+    }
+
+    /**
+     * Getter for property 'discountRate'.
+     *
+     * @return Value for property 'discountRate'.
+     */
+    public DoubleParameter getDiscountRate() {
+        return discountRate;
+    }
+
+    /**
+     * Setter for property 'discountRate'.
+     *
+     * @param discountRate Value to set for property 'discountRate'.
+     */
+    public void setDiscountRate(DoubleParameter discountRate) {
+        this.discountRate = discountRate;
     }
 }

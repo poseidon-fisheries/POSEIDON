@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LeastSquareFilter;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
@@ -23,7 +24,7 @@ public class AmateurishApproximateDynamicProgram {
     /**
      * each array is the "beta"s of the linear approximation
      */
-    private final double[][] linearParameters;
+    private final LeastSquareFilter[] filters;
 
     /**
      * Usually called "alpha"
@@ -32,9 +33,9 @@ public class AmateurishApproximateDynamicProgram {
 
     public AmateurishApproximateDynamicProgram(int possibleActions, int valueFunctionDimension, double learningRate) {
         this.possibleActions = possibleActions;
-        linearParameters = new double[possibleActions][];
+        filters = new LeastSquareFilter[possibleActions];
         for(int i=0; i<possibleActions; i++)
-            linearParameters[i] = new double[valueFunctionDimension];
+            filters[i] = new LeastSquareFilter(valueFunctionDimension,10000,new double[valueFunctionDimension],.999);
         this.learningRate = learningRate;
     }
 
@@ -46,10 +47,10 @@ public class AmateurishApproximateDynamicProgram {
      */
     public double judgeAction(int action, double... stateFeatures){
 
-        Preconditions.checkArgument(stateFeatures.length == linearParameters[action].length, "dimension mismatch");
+        Preconditions.checkArgument(stateFeatures.length == filters[action].getBeta().length, "dimension mismatch");
         double value = 0;
         for(int i=0; i<stateFeatures.length; i++)
-            value+= stateFeatures[i] * linearParameters[action][i];
+            value+= stateFeatures[i] * filters[action].getBeta()[i];
         return value;
     }
 
@@ -79,7 +80,7 @@ public class AmateurishApproximateDynamicProgram {
 
 
     /**
-     * just a bit easier to use version of updateAction() which this method actually call.
+     * just an easier to use version of updateAction() which this method actually call.
      * @param actionTaken the action you took
      * @param instantaneousReward just the instantaneous reward achieved after having taken actionTake
      * @param featuresAtTheTime the state of the world when you took your previous action
@@ -103,37 +104,27 @@ public class AmateurishApproximateDynamicProgram {
                              double... featuresAtTheTime)
     {
 
-        double[] parameters = linearParameters[actionTaken];
-        Preconditions.checkArgument(featuresAtTheTime.length == parameters.length, "dimension mismatch");
 
         //get back your old prediction
         double predictedValue = judgeAction(actionTaken,featuresAtTheTime);
 
 
+        filters[actionTaken].addObservation(featuresAtTheTime,rewardObservation,1/learningRate);
         //w = w + a * (sample - prediction) * feature
-        for(int i=0; i<parameters.length; i++) {
-            parameters[i] = parameters[i] + learningRate * (rewardObservation - predictedValue) * featuresAtTheTime[i];
-            Preconditions.checkState (Double.isFinite(parameters[i]), rewardObservation + " " + predictedValue + " " + featuresAtTheTime[i]);
-        }
-
-    }
-
-
-    /**
-     * smooth all parameters by the same number to avoid them exploding
-     */
-    public void renormalizeParameters(){
-        for(int i=0; i<linearParameters.length; i++)
-            for(int j=0; j< linearParameters[i].length; j++)
-                linearParameters[i][j]*=.99;
-
+        double[] parameters = filters[actionTaken].getBeta();
+        for(int i=0; i<parameters.length; i++)
+            Preconditions.checkState (Double.isFinite(parameters[i]), rewardObservation + " " + predictedValue + " " + featuresAtTheTime[i] + "\n " + this);
+        Preconditions.checkArgument(featuresAtTheTime.length == parameters.length, "dimension mismatch");
 
 
     }
+
+
+
 
     @Override
     public String toString() {
-        return FishStateUtilities.deepToStringArray(linearParameters," ","\n");
+        return FishStateUtilities.deepToStringArray(filters," ","\n");
     }
 
     /**
@@ -142,6 +133,11 @@ public class AmateurishApproximateDynamicProgram {
      * @return Value for property 'linearParameters'.
      */
     public double[][] getLinearParameters() {
-        return linearParameters;
+
+        double[][] toReturn = new double[possibleActions][];
+        for(int i=0; i<possibleActions; i++)
+            toReturn[i] = filters[i].getBeta();
+
+        return toReturn;
     }
 }

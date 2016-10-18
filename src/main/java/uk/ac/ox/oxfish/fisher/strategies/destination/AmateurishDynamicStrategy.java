@@ -26,7 +26,7 @@ import java.util.HashMap;
  *     Decisions are taken on the "should I go out" question. Learning is done next time the trip starts (no reason to be a tripListener)
  * Created by carrknight on 10/13/16.
  */
-public class UnifiedAmateurishDynamicStrategy implements DestinationStrategy, DepartingStrategy {
+public class AmateurishDynamicStrategy implements DestinationStrategy, DepartingStrategy {
 
 
     /**
@@ -69,6 +69,10 @@ public class UnifiedAmateurishDynamicStrategy implements DestinationStrategy, De
 
 
     private final Counter actionsTaken;
+    /**
+     * how much the future matters
+     */
+    private final double discountRate;
 
     /**
      * probability of taking a random decision instead of the best decision
@@ -77,10 +81,11 @@ public class UnifiedAmateurishDynamicStrategy implements DestinationStrategy, De
 
     private final Supplier<FavoriteDestinationStrategy> delegateGenerator;
 
-    public UnifiedAmateurishDynamicStrategy( double learningRate, double noiseRate,
-                                             NauticalMap map, MersenneTwisterFast random,
-                                             int explorationDelta,
-                                             Sensor<Fisher, Double>... featuresExtractor) {
+    public AmateurishDynamicStrategy(
+            double learningRate, double noiseRate,
+            NauticalMap map, MersenneTwisterFast random,
+            int explorationDelta, final double discountRate,
+            Sensor<Fisher, Double>... featuresExtractor) {
         this.program = new AmateurishApproximateDynamicProgram(ActionType.values().length,
                                                                featuresExtractor.length,
                                                                learningRate
@@ -102,6 +107,7 @@ public class UnifiedAmateurishDynamicStrategy implements DestinationStrategy, De
         actionsTaken = new Counter(IntervalPolicy.EVERY_DAY);
         for(ActionType type : actions)
             actionsTaken.addColumn(type.name());
+        this.discountRate = discountRate;
     }
 
 
@@ -160,10 +166,9 @@ public class UnifiedAmateurishDynamicStrategy implements DestinationStrategy, De
             //strictly speaking it should be the max of both the reward and expected value but the way
             //we structure this problem reward is not a function of the action taken (as it is just the end of the trip)
             //so the reward drops out of the maximization.
-            double observation = reward + 0.5*currentDecision.getSecond();
+            double observation = reward + discountRate * currentDecision.getSecond();
 
             program.updateAction(previousDecision.getFirst(),observation,oldFeatures);
-            program.renormalizeParameters();
         }
 
 

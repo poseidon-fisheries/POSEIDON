@@ -5,8 +5,10 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.GoodBadRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
+import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -110,6 +112,15 @@ public class DrawHeatmaps
                              50*50,
                              new MersenneTwisterFast()),
                      "gwr_simple");
+
+
+
+        distancePlot(new GoodBadRegression(
+                             FISH_STATE.getMap(),
+                             new CartesianDistance(1),
+                             new MersenneTwisterFast(),
+                             5,80,20,5,0),
+                     "goodbad_simple");
 
 
 

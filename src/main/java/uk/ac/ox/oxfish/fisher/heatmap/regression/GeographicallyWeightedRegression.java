@@ -29,7 +29,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     private final ObservationExtractor[] extractors;
 
 
-    private final HashMap<SeaTile,LowessTile> lowesses = new HashMap<>();
+    private final HashMap<SeaTile,LeastSquareFilter> lowesses = new HashMap<>();
 
 
     private final Distance distance;
@@ -71,9 +71,9 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         for(SeaTile tile : tiles) {
             double[] beta = new double[nonInterceptExtractors.length+1];
             beta[0] = random.nextDouble() *(initialMax-initialMin) + initialMin;
-            lowesses.put(tile, new LowessTile(nonInterceptExtractors.length + 1,
-                                              initialUncertainty, beta,
-                                              exponentialForgetting));
+            lowesses.put(tile, new LeastSquareFilter(nonInterceptExtractors.length + 1,
+                                                     initialUncertainty, beta,
+                                                     exponentialForgetting));
         }
 
 
@@ -88,7 +88,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
                 observation.getTile(), observation.getTime(),
                 fisher, extractors);
         //go through all the tiles
-        for(Map.Entry<SeaTile,LowessTile> lowess : lowesses.entrySet())
+        for(Map.Entry<SeaTile,LeastSquareFilter> lowess : lowesses.entrySet())
         {
             double sigma = 1d/
                     kernel.transform(distance.distance(lowess.getKey(),observation.getTile(),map));
@@ -111,7 +111,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     @Override
     public double predict(SeaTile tile, double time, Fisher fisher) {
 
-        LowessTile predictor = lowesses.get(tile);
+        LeastSquareFilter predictor = lowesses.get(tile);
         if(predictor==null)
             return Double.NaN;
         else {
@@ -129,7 +129,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
     @VisibleForTesting
     public double[] getBeta(SeaTile tile)
     {
-        LowessTile predictor = lowesses.get(tile);
+        LeastSquareFilter predictor = lowesses.get(tile);
         if(predictor==null)
             return  null;
         else

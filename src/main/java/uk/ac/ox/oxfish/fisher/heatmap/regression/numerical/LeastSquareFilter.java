@@ -1,12 +1,15 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
+import java.util.Arrays;
+
 /**
- * Classic RLS filter where sigma^2 is 1/distance function as provided
+ * Classic RLS filter where we allow weights in terms of sigma^2
  * Created by carrknight on 8/15/16.
  */
-public class LowessTile {
+public class LeastSquareFilter {
 
 
     private final int dimension;
@@ -19,7 +22,7 @@ public class LowessTile {
     private double exponentialForgetting;
 
 
-    public LowessTile(
+    public LeastSquareFilter(
             int dimension, double[][] uncertainty, double[] beta, double exponentialForgetting) {
         Preconditions.checkArgument(dimension>0);
         this.dimension = dimension;
@@ -28,7 +31,7 @@ public class LowessTile {
         this.exponentialForgetting = exponentialForgetting;
     }
 
-    public LowessTile(
+    public LeastSquareFilter(
             int dimension, double uncertainty, double[] beta, double exponentialForgetting) {
         this.dimension = dimension;
         this.uncertainty = new double[dimension][dimension];
@@ -77,6 +80,8 @@ public class LowessTile {
 
             kalman[row] = pi[row] / gamma;
 
+            assert(Double.isFinite( kalman[row]));
+
 
         }
 
@@ -88,15 +93,18 @@ public class LowessTile {
         assert (Double.isFinite(predictionError));
 
         //update beta
-        for(int i=0; i<dimension; i++)
+        for(int i=0; i<dimension; i++) {
             beta[i] += predictionError * kalman[i];
-
+            assert  Double.isFinite(beta[i]);
+        }
         //get P'
         final double[][] prime = new double[dimension][dimension];
         for(int row=0; row<dimension; row++)
-            for(int column=0; column<dimension; column++)
+            for(int column=0; column<dimension; column++) {
                 prime[row][column] = kalman[row] * pi[column];
+                assert(Double.isFinite(prime[row][column])) : "pi " + pi[column] + " , kalman: " + kalman[column] ;
 
+            }
         //update uncertainty
         for(int row=0; row<dimension; row++)
             for(int column=0; column<dimension; column++)
@@ -134,6 +142,12 @@ public class LowessTile {
      */
     public double[] getBeta() {
         return beta;
+    }
+
+
+    @Override
+    public String toString() {
+        return Arrays.toString(beta);
     }
 
     /**

@@ -26,7 +26,7 @@ public class FixedProbability implements AdaptationProbability {
         this.imitationProbability = imitationProbability;
     }
 
-    @Override
+
     public double getExplorationProbability() {
 
         return explorationProbability;
