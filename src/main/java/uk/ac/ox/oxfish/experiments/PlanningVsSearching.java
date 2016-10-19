@@ -6,8 +6,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.GoodBadRegressionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.HeatmapDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
@@ -23,6 +22,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
@@ -42,7 +42,13 @@ public class PlanningVsSearching {
         DataColumn[] perfectPlanner = runSimulation(nextStrategy);
 
         HeatmapDestinationFactory kernel = new HeatmapDestinationFactory();
-        GoodBadRegressionFactory regression = new GoodBadRegressionFactory();
+        CompleteNearestNeighborRegressionFactory regression = new CompleteNearestNeighborRegressionFactory();
+        regression.setDistanceFromPortBandwidth(new UniformDoubleParameter(1, 1000));
+        regression.setHabitatBandwidth(new UniformDoubleParameter(1, 1000));
+        regression.setTimeBandwidth(new UniformDoubleParameter(1, 1000));
+        regression.setxBandwidth(new UniformDoubleParameter(1, 1000));
+        regression.setyBandwidth(new UniformDoubleParameter(1, 1000));
+        regression.setNeighbors(new UniformDoubleParameter(1, 10));
         //regression.setForgettingFactor(new FixedDoubleParameter(.95d));
         kernel.setRegression(regression);
       //  DataColumn[] structuredSearch = runSimulation(kernel);

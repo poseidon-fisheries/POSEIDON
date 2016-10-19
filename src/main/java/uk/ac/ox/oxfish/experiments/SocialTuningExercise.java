@@ -5,9 +5,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionF
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.HeatmapDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PlanningHeatmapDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
@@ -15,6 +13,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -173,12 +172,12 @@ public class SocialTuningExercise {
 
     public static void main(String[] args) throws IOException {
 
-/*
-        defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
-        defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
-        defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
-        defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
 
+   //       defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
+   //     defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
+        defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
+ //       defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
+/*
 
         batchRun("nn.yaml", "_fronts",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
@@ -234,13 +233,14 @@ public class SocialTuningExercise {
                  ), YEARS_TO_RUN, 1);
 */
 
+/*
 
         batchRun("cali_itq_plan.yaml", "-plan_caliitq",
                  pair -> ((SocialTuningRegressionFactory) ((PlanningHeatmapDestinationFactory)
                          ((CaliforniaBathymetryScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 1);
-
+*/
 
 
 
@@ -342,7 +342,15 @@ public class SocialTuningExercise {
         ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
         perfectPlanner.setAcquisition(acquisition);
         acquisition.setProportionSearched(new FixedDoubleParameter(.1));
-        strategies.put("perfect",perfectPlanner);
+//        strategies.put("perfect",perfectPlanner);
+
+
+        strategies.put("gsa",new GravitationalSearchDestinationFactory());
+        strategies.put("pso",new PerTripParticleSwarmFactory());
+        PerTripImitativeDestinationFactory annealing = new PerTripImitativeDestinationFactory();
+        annealing.setProbability(new SocialAnnealingProbabilityFactory());
+        annealing.setBacktracksOnBadExploration(false);
+        strategies.put("annealing",annealing);
 
 
         for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>>

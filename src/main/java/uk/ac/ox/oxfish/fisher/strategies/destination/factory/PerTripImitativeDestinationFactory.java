@@ -48,6 +48,9 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      */
     private boolean alwaysCopyBest = BeamHillClimbing.DEFAULT_ALWAYS_COPY_BEST;
 
+
+    private boolean backtracksOnBadExploration = BeamHillClimbing.DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION;
+
     /**
      * Applies this function to the given argument.
      *
@@ -68,7 +71,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
                                                     BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
                                                     stepSize.apply(
                                                             random).intValue(),
-                                                    10);
+                                                    10, backtracksOnBadExploration);
         }
         else {
             algorithm = DefaultBeamHillClimbing.BeamHillClimbingWithUnfriending(alwaysCopyBest,
@@ -148,5 +151,24 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     public void setObjectiveFunction(
             AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
         this.objectiveFunction = objectiveFunction;
+    }
+
+
+    /**
+     * Getter for property 'backtracksOnBadExploration'.
+     *
+     * @return Value for property 'backtracksOnBadExploration'.
+     */
+    public boolean isBacktracksOnBadExploration() {
+        return backtracksOnBadExploration;
+    }
+
+    /**
+     * Setter for property 'backtracksOnBadExploration'.
+     *
+     * @param backtracksOnBadExploration Value to set for property 'backtracksOnBadExploration'.
+     */
+    public void setBacktracksOnBadExploration(boolean backtracksOnBadExploration) {
+        this.backtracksOnBadExploration = backtracksOnBadExploration;
     }
 }

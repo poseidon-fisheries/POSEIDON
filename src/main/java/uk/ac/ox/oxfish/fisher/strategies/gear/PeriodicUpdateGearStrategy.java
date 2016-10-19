@@ -60,8 +60,8 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                     }
                 },
                 new BeamHillClimbing<>(true,
-                                           DEFAULT_DYNAMIC_NETWORK,
-                                           explorationStep),
+                                       true, DEFAULT_DYNAMIC_NETWORK,
+                                       explorationStep),
                 new Actuator<Fisher,Gear>() {
                     @Override
                     public void apply(Fisher fisher, Gear change, FishState model) {

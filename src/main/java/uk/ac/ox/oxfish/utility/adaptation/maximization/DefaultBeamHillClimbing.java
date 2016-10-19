@@ -41,16 +41,16 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
     }
 
     public DefaultBeamHillClimbing(
-            boolean copyAlwaysBest, Predicate<Pair<Double,Double>> unfriendPredicate,
-            int maxStep, int attempts) {
-        super(copyAlwaysBest, unfriendPredicate,
+            boolean copyAlwaysBest, Predicate<Pair<Double, Double>> unfriendPredicate,
+            int maxStep, int attempts, final boolean backtracksOnBadExploration) {
+        super(copyAlwaysBest, backtracksOnBadExploration, unfriendPredicate,
               DEFAULT_RANDOM_STEP(maxStep,attempts)
               );
     }
 
     public DefaultBeamHillClimbing(int maxStep, int attempts)
     {
-        this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts);
+        this(DEFAULT_ALWAYS_COPY_BEST, DEFAULT_DYNAMIC_NETWORK, maxStep, attempts, true);
     }
 
 
@@ -64,7 +64,7 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
                                                    unfriendingThreshold * oldFitnessAndNew.getFirst() >
                                                            oldFitnessAndNew.getSecond(),
                                            maxSteps,
-                                           attempts);
+                                           attempts, true);
     }
 
 

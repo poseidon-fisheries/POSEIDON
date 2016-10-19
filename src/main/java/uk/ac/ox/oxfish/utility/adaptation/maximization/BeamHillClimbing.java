@@ -34,6 +34,8 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
      */
     public final static boolean DEFAULT_ALWAYS_COPY_BEST = true;
 
+    public final static boolean DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION = true;
+
     /**
      * the default state of the unfriendPredicate field
      */
@@ -63,18 +65,25 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
      */
     private final RandomStep<T> randomStep;
 
-    public BeamHillClimbing(boolean copyAlwaysBest,
-                            Predicate<Pair<Double,Double>> unfriendPredicate,
-                            RandomStep<T> randomStep) {
+    /**
+     * if an exploration goes badly, does it go back to the previous spot ("the best" remembered)
+     */
+    private final boolean backtracksOnBadExploration;
+
+    public BeamHillClimbing(
+            boolean copyAlwaysBest,
+            boolean backtracksOnBadExploration,
+            Predicate<Pair<Double, Double>> unfriendPredicate,
+            RandomStep<T> randomStep) {
         this.copyAlwaysBest = copyAlwaysBest;
         this.unfriendPredicate = unfriendPredicate;
         this.randomStep = randomStep;
-
+        this.backtracksOnBadExploration = backtracksOnBadExploration;
     }
 
     public BeamHillClimbing(RandomStep<T> randomStep) {
         this(DEFAULT_ALWAYS_COPY_BEST,
-             DEFAULT_DYNAMIC_NETWORK,
+             true, DEFAULT_DYNAMIC_NETWORK,
              randomStep);
     }
 
@@ -114,7 +123,7 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
     public T judgeRandomization(
             MersenneTwisterFast random, Fisher agent, double previousFitness, double currentFitness, T previous,
             T current) {
-        if(previousFitness > currentFitness)
+        if(backtracksOnBadExploration && previousFitness > currentFitness)
             return previous;
         else
             return current;
