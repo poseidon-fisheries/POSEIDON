@@ -54,11 +54,11 @@ public class FirstPaper
     public static void main(String[] args) throws IOException {
 
         OUTPUT_FOLDER.toFile().mkdirs();
-/*
+
         Log.info("Moving Front Image Starting");
         fronts();
         frontsSensitivity(Paths.get("fronts.yaml"));
- //       frontsSensitivity(Paths.get("sensitivity","fronts","fronts_worst.yaml"));
+        frontsSensitivity(Paths.get("sensitivity","fronts","fronts_worst.yaml"));
         frontsSensitivity(Paths.get("sensitivity","fronts","fronts_flat.yaml"));
         Log.info("Hyperstability");
         hyperStability();
@@ -80,7 +80,7 @@ public class FirstPaper
 
         Log.info("Directed Technological Change");
         directedTechnologicalChange();
-        */
+
         Log.info("TAC vs ITQ 1 Species");
         catchesPerPolicyCatchability();
         catchesPerPolicyMileage();
