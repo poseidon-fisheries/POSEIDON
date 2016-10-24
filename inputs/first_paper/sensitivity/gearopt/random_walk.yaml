@@ -22,7 +22,7 @@ Abstract:
   fishers: 100
   fishingStrategy:
     Until Full With Day Limit:
-      daysAtSea: '5000.0'
+      daysAtSea: '8000.0'
   fuelTankSize: '100000.0'
   gasPricePerLiter: '1'
   gear:

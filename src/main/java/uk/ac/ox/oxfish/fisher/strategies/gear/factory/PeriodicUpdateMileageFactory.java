@@ -80,7 +80,7 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
                         assert current1.getClass().equals(RandomCatchabilityTrawl.class);
                         RandomCatchabilityTrawl current = ((RandomCatchabilityTrawl) current1);
 
-                        double currentShock = random.nextDouble() * shock * (maxTrawlingSpeed-minTrawlingSpeed);
+                        double currentShock = (random.nextDouble()-0.5) * shock * (maxTrawlingSpeed-minTrawlingSpeed);
                         if (random.nextBoolean())
                             currentShock -= currentShock;
                         double newMileage = current.getGasPerHourFished() + currentShock;

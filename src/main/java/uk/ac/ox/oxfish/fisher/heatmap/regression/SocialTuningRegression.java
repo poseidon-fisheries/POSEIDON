@@ -62,40 +62,7 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
 
 
 
-     /*   optimizer = new ParticleSwarmAlgorithm<double[]>(
-                inertia,
-                memoryWeight,
-                friendWeight,
-                initialParameters.length,
-                //shallow memory, I am afraid
-                new Function<Fisher, double[]>() {
-                    @Override
-                    public double[] apply(Fisher fisher) {
-                        return parameterSensor.scan(fisher);
-                    }
-                },
-                //no projection, force positive?
-                new ParticleSwarmAlgorithm.PSOCoordinateTransformer<double[]>() {
-                    @Override
-                    public double[] toCoordinates(double[] variable, Fisher fisher, FishState model) {
-                        if(forcePositive)
-                            for(int i=0; i<variable.length; i++)
-                                variable[i]= Math.max(variable[i],0);
-                        return variable;
-                    }
 
-                    @Override
-                    public double[] fromCoordinates(double[] variable, Fisher fisher, FishState model) {
-                        if(forcePositive)
-                            for(int i=0; i<variable.length; i++)
-                                variable[i]= Math.max(variable[i],0);
-                        return variable;
-                    }
-                },
-                explorationShocks,
-                random,
-                initialVelocity);
-*/
      optimizer = new BeamHillClimbing<double[]>(
              new RandomStep<double[]>() {
                  @Override

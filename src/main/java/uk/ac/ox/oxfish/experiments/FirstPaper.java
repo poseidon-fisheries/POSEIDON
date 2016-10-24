@@ -79,6 +79,7 @@ public class FirstPaper
                 resolve("large_difference.yaml"), INPUT_FOLDER.resolve("sensitivity").resolve("hardswitch").resolve("large_difference.csv"));
 
         Log.info("Directed Technological Change");
+
         directedTechnologicalChange();
 
         Log.info("TAC vs ITQ 1 Species");
@@ -646,10 +647,11 @@ public class FirstPaper
         String random_gas = String.join("\n", Files.readAllLines(
                 INPUT_FOLDER.resolve("sensitivity").resolve("gearopt").resolve("random_walk.yaml")));
 
+        output.resolve("sensitivity").toFile().mkdir();
         for(int i=0; i<10; i++)
         {
             Dashboard.gearEvolutionDashboard(new FishYAML(), random_gas, i, "ant",
-                                             INPUT_FOLDER.resolve("sensitivity").resolve("gearopt"),
+                                             output.resolve("sensitivity"),
                                              RANDOM_SEED+i);
         }
     }
