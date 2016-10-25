@@ -40,6 +40,9 @@ public class Regulations
         CONSTRUCTORS.put("MPA Only", ProtectedAreasOnlyFactory::new);
         NAMES.put(ProtectedAreasOnlyFactory.class,"MPA Only");
 
+        CONSTRUCTORS.put("MPA Chromosome", ProtectedAreaChromosomeFactory::new);
+        NAMES.put(ProtectedAreaChromosomeFactory.class,"MPA Chromosome");
+
         CONSTRUCTORS.put("Mono-TAC", () -> TAC_MONO_FACTORY);
         NAMES.put(TACMonoFactory.class,"Mono-TAC");
 
