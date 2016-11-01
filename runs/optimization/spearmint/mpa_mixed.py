@@ -18,7 +18,7 @@ def build_mpa_input(filename, height,
     with open("base.yaml", 'r') as infile:
         data = yaml.load(infile)
 
-    data["Prototype"]["startingMPAs"] = [{
+    data["Abstract"]["startingMPAs"] = [{
         "height": int(height),
         "width": int(width),
         "topLeftX": int(x),

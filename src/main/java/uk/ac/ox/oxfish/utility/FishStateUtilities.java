@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -869,5 +870,7 @@ public class FishStateUtilities {
 
         return model;
     }
+
+
 }
 

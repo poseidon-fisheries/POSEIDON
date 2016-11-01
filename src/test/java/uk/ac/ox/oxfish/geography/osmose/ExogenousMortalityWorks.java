@@ -36,6 +36,8 @@ public class ExogenousMortalityWorks
                                                                                     restartFile.getPath());
 
         ExogenousMortality mortality = simulation.getMortality();
+        for(int i=0; i<10; i++)
+            mortality.markThisSpeciesAsExogenous(i);
 
         HashMap<School, Double> fishCaught = new HashMap<>();
         for(School school : simulation.getSchoolSet())
@@ -51,9 +53,55 @@ public class ExogenousMortalityWorks
         //should be stored as "NDead"
         for(Map.Entry<School,Double> catches : fishCaught.entrySet())
         {
+            System.out.println(catches.getValue());
             assertEquals(catches.getValue(),
                          catches.getKey().getNdead(MortalityCause.FISHING),.1);
         }
+
+
+
+    }
+
+    @Test
+    public void osmoseMurderSome() throws Exception {
+
+
+        final URL restartFile = getClass().getClassLoader().getResource(
+                "test.nc");
+        assert restartFile != null;
+
+
+        final URL configuration = getClass().getClassLoader().getResource(
+                "osmose_config/osm_all-parameters.csv");
+        assert configuration != null;
+        OsmoseSimulation simulation = OsmoseSimulation.startupOSMOSEWithRestartFile(0,
+                                                                                    configuration.getPath(),
+                                                                                    restartFile.getPath());
+
+        ExogenousMortality mortality = simulation.getMortality();
+        for(int i=0; i<5; i++)
+            mortality.markThisSpeciesAsExogenous(i);
+
+        HashMap<School, Double> fishCaught = new HashMap<>();
+
+
+        //step the simulation
+        simulation.oneStep();
+        //should be stored as "NDead"
+        int osmoseKilled=0;
+        for(School school : simulation.getSchoolSet())
+        {
+            double deads = school.getNdead(MortalityCause.FISHING);
+
+            System.out.println(deads);
+
+            if(school.getSpeciesIndex()<5)
+            assertEquals(0,
+                         deads, .1);
+            if(school.getSpeciesIndex()>=5 && deads > 0)
+                osmoseKilled ++;
+        }
+        assertTrue(osmoseKilled>0);
 
 
 

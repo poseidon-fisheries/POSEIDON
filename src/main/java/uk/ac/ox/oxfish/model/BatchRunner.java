@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -79,8 +80,11 @@ public class BatchRunner
 
 
         ArrayList<DataColumn> columns = new ArrayList<>();
-        for(String column : columnsToPrint)
-            columns.add(model.getYearlyDataSet().getColumn(column));
+        for(String column : columnsToPrint) {
+            DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
+            Preconditions.checkState(columnToPrint!=null, "Can't find column " + column);
+            columns.add(columnToPrint);
+        }
 
 
         FishStateUtilities.printCSVColumnsToFile(

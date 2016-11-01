@@ -9,6 +9,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 
+import java.util.function.Predicate;
+
 /**
  * A strategy that every year iteratively tries a new sea-patch to fish on. It uses net cash-flow as a fitness value
  * to decide whether the new sea-patch is better than the one before
@@ -63,7 +65,12 @@ public class YearlyIterativeDestinationStrategy implements DestinationStrategy
                 (fisher, change, model) -> delegate.setFavoriteSpot(change),
                 fisher -> delegate.getFavoriteSpot(),
                 new CashFlowObjective(360),
-                1d,0d);
+                1d, 0d, new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile a) {
+                        return true;
+                    }
+                });
     }
 
 

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.factory.HourlyProfitObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
@@ -17,6 +18,8 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenalty
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+
+import java.util.function.Predicate;
 
 /**
  * creates a trip strategy that has imitates friends when not exploring
@@ -51,6 +54,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
 
     private boolean backtracksOnBadExploration = BeamHillClimbing.DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION;
 
+
+    /**
+     * if this is true, the exploration tries hard to avoid protected areas.
+     */
+    private boolean automaticallyIgnoreMPAs = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -64,6 +73,21 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         NauticalMap map = state.getMap();
         double probabilityUnfriending = dropInUtilityNeededForUnfriend.apply(state.getRandom());
         DefaultBeamHillClimbing algorithm;
+
+        Predicate<SeaTile>  explorationValidator = automaticallyIgnoreMPAs ?
+                new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile tile) {
+                        return !tile.isProtected();
+                    }
+                } :
+                new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile tile) {
+                        return true;
+                    }
+                };
+
         if(probabilityUnfriending <= 0)
         { //no unfriending
 
@@ -83,7 +107,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         return new PerTripIterativeDestinationStrategy(
                 new FavoriteDestinationStrategy(map, random), algorithm,
                 probability.apply(state),
-                objectiveFunction.apply(state));
+                objectiveFunction.apply(state), explorationValidator);
 
 
     }
@@ -170,5 +194,23 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      */
     public void setBacktracksOnBadExploration(boolean backtracksOnBadExploration) {
         this.backtracksOnBadExploration = backtracksOnBadExploration;
+    }
+
+    /**
+     * Getter for property 'automaticallyIgnoreMPAs'.
+     *
+     * @return Value for property 'automaticallyIgnoreMPAs'.
+     */
+    public boolean isAutomaticallyIgnoreMPAs() {
+        return automaticallyIgnoreMPAs;
+    }
+
+    /**
+     * Setter for property 'automaticallyIgnoreMPAs'.
+     *
+     * @param automaticallyIgnoreMPAs Value to set for property 'automaticallyIgnoreMPAs'.
+     */
+    public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
+        this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
     }
 }

@@ -128,7 +128,12 @@ public class HardGearSwitch
                                                             GearImitationAnalysis.DEFAULT_GEAR_ACTUATOR,
                                                             fisher1 -> ((RandomCatchabilityTrawl) fisher1.getGear()),
                                                             new CashFlowObjective(365),
-                                                            .1, .8);
+                                                            .1, .8, new Predicate<Gear>() {
+                                                                @Override
+                                                                public boolean test(Gear a) {
+                                                                    return true;
+                                                                }
+                                                            });
 
                                             //tell the fisher to use this once a year
                                             fisher.addYearlyAdaptation(trawlAdaptation);

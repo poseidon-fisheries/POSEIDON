@@ -5,12 +5,15 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.ParticleSwarmAlgorithm;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+
+import java.util.function.Predicate;
 
 /**
  * Creates a trip strategy that uses PSO for imitating and randomly shocks velocity for exploration
@@ -57,7 +60,12 @@ public class PerTripParticleSwarmFactory implements AlgorithmFactory<PerTripIter
                                                                                    -map.getHeight() / 5,
                                                                                    map.getHeight() / 5)},
                                                                    random,map.getWidth(),map.getHeight()),
-                explorationProbability.apply(random), 1, new HourlyProfitInTripObjective());
+                explorationProbability.apply(random), 1, new HourlyProfitInTripObjective(), new Predicate<SeaTile>() {
+            @Override
+            public boolean test(SeaTile a) {
+                return true;
+            }
+        });
 
     }
 

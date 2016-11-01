@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Run every two months, check how are you doing, then check a friend. If he is doing better than you have a small probability
@@ -94,7 +95,12 @@ public class GearImitationAnalysis
                     fisher1 -> {
                         //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
                         return new Hold(fisher1.getMaximumHold(), species);
-                    }, new CashFlowObjective(60), .15, .6);
+                    }, new CashFlowObjective(60), .15, .6, new Predicate<Hold>() {
+                        @Override
+                        public boolean test(Hold a) {
+                            return true;
+                        }
+                    });
 
 
 
@@ -157,7 +163,12 @@ public class GearImitationAnalysis
                     (fisher1, change, model1) -> fisher1.setDepartingStrategy(change),
                     fisher1 -> ((FixedProbabilityDepartingStrategy) fisher1.getDepartingStrategy()),
                     new CashFlowObjective(60),
-                    explorationProbability, imitationProbability
+                    explorationProbability, imitationProbability, new Predicate<FixedProbabilityDepartingStrategy>() {
+                        @Override
+                        public boolean test(FixedProbabilityDepartingStrategy a) {
+                            return true;
+                        }
+                    }
             );
             fisher.addBiMonthlyAdaptation(departingChance);
 

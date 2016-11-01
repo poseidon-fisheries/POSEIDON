@@ -50,7 +50,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             boolean yearly,
             RandomStep<Gear> explorationStep,
             AdaptationProbability probability
-            ) {
+    ) {
         this.yearly = yearly;
         this.gearAdaptation = new ExploreImitateAdaptation<>(
                 new Predicate<Fisher>() {
@@ -75,7 +75,12 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                     }
                 },
                 yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-                probability
+                probability, new Predicate<Gear>() {
+            @Override
+            public boolean test(Gear a) {
+                return true;
+            }
+        }
         );
     }
 
@@ -112,7 +117,12 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                     }
                 },
                 yearly ? new CashFlowObjective(365) : new CashFlowObjective(60),
-                probability
+                probability, new Predicate<Gear>() {
+            @Override
+            public boolean test(Gear a) {
+                return true;
+            }
+        }
         );
     }
 

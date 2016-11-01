@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -110,7 +109,7 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                     @Override
                     public void start(FishState model) {
                         for(Fisher fisher : model.getFishers()) {
-                            fisher.addYearlyAdaptation(new ExploreImitateAdaptation(
+                            fisher.addYearlyAdaptation(new ExploreImitateAdaptation<MonthlyDepartingStrategy>(
                                     (Predicate<Fisher>) fisher1 -> true,
                                     //beam hill-climber with random mutation chance for each month
                                     new BeamHillClimbing<MonthlyDepartingStrategy>(
@@ -139,7 +138,12 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
                                     },
                                     new CashFlowObjective(365),
                                     explorationRate,
-                                    1
+                                    1, new Predicate<MonthlyDepartingStrategy>() {
+                                        @Override
+                                        public boolean test(MonthlyDepartingStrategy a) {
+                                            return true;
+                                        }
+                                    }
                             ));
                         }
                     }

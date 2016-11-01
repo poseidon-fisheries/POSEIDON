@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
+import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
 import java.util.function.Predicate;
 
@@ -49,7 +50,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
             AdaptationProbability probability,
-            final ObjectiveFunction<Fisher> objective)
+            final ObjectiveFunction<Fisher> objective,
+            final Predicate<SeaTile> explorationValidator)
     {
         this.delegate = delegate;
         this.algorithm = new ExploreImitateAdaptation<SeaTile>(
@@ -83,7 +85,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                     }
                 },
                 objective,
-                probability
+                probability, explorationValidator
         );
 
     }
@@ -102,39 +104,10 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             final FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
             double randomizationProbability,
-            double imitationProbability, final HourlyProfitInTripObjective objective) {
-        this.delegate = delegate;
-        this.algorithm = new ExploreImitateAdaptation<SeaTile>(
-                new Predicate<Fisher>() {
-
-                    public boolean test(Fisher fisher) {
-                        return !(ignoreFailedTrips && fisher.getLastFinishedTrip().isCutShort());
-                    }
-                },
-                algorithm,
-                new Actuator<Fisher,SeaTile>() {
-                    @Override
-                    public void apply(Fisher fisher, SeaTile change, FishState model) {
-                        if (change.getAltitude() < 0) //ignores "go to land" commands
-                            delegate.setFavoriteSpot(change);
-                    }
-                },
-                new Sensor<Fisher,SeaTile>() {
-                    @Override
-                    public SeaTile scan(Fisher fisher1) {
-                        if (fisher1 == fisher) //if we are sensing ourselves
-                            //override to delegate
-                            return delegate.getFavoriteSpot();
-                        else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
-                                fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
-                            return null;
-                        else
-                            return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
-                    }
-                },
-                objective, randomizationProbability, imitationProbability);
-
-
+            double imitationProbability, final HourlyProfitInTripObjective objective,
+            final Predicate<SeaTile> explorationValidator) {
+        this(delegate,algorithm,new FixedProbability(randomizationProbability,imitationProbability),
+             objective,explorationValidator);
     }
 
 

@@ -75,7 +75,12 @@ public class ExplorationOrImitationMovementTest
                     }
                 },
                 0d,
-                1d
+                1d, new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile a) {
+                        return true;
+                    }
+                }
         );
 
 
@@ -140,7 +145,12 @@ public class ExplorationOrImitationMovementTest
                     }
                 },
                 0d,
-                1d
+                1d, new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile a) {
+                        return true;
+                    }
+                }
         );
 
 
@@ -203,7 +213,12 @@ public class ExplorationOrImitationMovementTest
                     }
                 },
                 1d,
-                1d
+                1d, new Predicate<SeaTile>() {
+                    @Override
+                    public boolean test(SeaTile a) {
+                        return true;
+                    }
+                }
         );
 
 

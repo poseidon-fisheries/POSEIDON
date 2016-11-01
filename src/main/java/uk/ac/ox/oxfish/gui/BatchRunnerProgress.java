@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by carrknight on 9/25/16.
@@ -103,6 +104,22 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
 
             return null;
 
+        }
+
+        // Executed in EDT
+        protected void done() {
+            try {
+                System.out.println("Done");
+                get();
+            } catch (ExecutionException e) {
+                e.getCause().printStackTrace();
+                String msg = String.format("Unexpected problem: %s",
+                                           e.getCause().toString());
+                JOptionPane.showMessageDialog(null,
+                                              msg, "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (InterruptedException e) {
+                // Process e here
+            }
         }
     }
 

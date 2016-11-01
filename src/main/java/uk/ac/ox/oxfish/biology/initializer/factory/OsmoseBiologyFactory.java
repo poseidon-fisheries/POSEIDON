@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.biology.initializer.OsmoseBiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -31,6 +32,7 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
             );
 
 
+    private String indexOfSpeciesToBeManagedByThisModel = "0,1,2,3,4,5,6,7,8,9";
 
 
 
@@ -42,10 +44,22 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
      */
     @Override
     public OsmoseBiologyInitializer apply(FishState fishState) {
+        String[] split = indexOfSpeciesToBeManagedByThisModel.trim().split(",");
+        Integer[] parsed;
+
+        if(split.length > 0 && split[0].length()>0) {
+            parsed = new Integer[split.length];
+
+            for (int i = 0; i < split.length; i++)
+                parsed[i] = Integer.parseInt(split[i]);
+        }
+        else
+            parsed = new Integer[0];
         return new OsmoseBiologyInitializer(osmoseConfigurationFile,
                                             preInitializedConfiguration,
                                             preInitializedConfigurationDirectory,
-                                            numberOfOsmoseStepsToPulseBeforeSimulationStart);
+                                            numberOfOsmoseStepsToPulseBeforeSimulationStart,
+                                            parsed);
     }
 
 
@@ -79,5 +93,23 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
 
     public void setPreInitializedConfigurationDirectory(String preInitializedConfigurationDirectory) {
         this.preInitializedConfigurationDirectory = preInitializedConfigurationDirectory;
+    }
+
+    /**
+     * Getter for property 'indexOfSpeciesToBeManagedByThisModel'.
+     *
+     * @return Value for property 'indexOfSpeciesToBeManagedByThisModel'.
+     */
+    public String getIndexOfSpeciesToBeManagedByThisModel() {
+        return indexOfSpeciesToBeManagedByThisModel;
+    }
+
+    /**
+     * Setter for property 'indexOfSpeciesToBeManagedByThisModel'.
+     *
+     * @param indexOfSpeciesToBeManagedByThisModel Value to set for property 'indexOfSpeciesToBeManagedByThisModel'.
+     */
+    public void setIndexOfSpeciesToBeManagedByThisModel(String indexOfSpeciesToBeManagedByThisModel) {
+        this.indexOfSpeciesToBeManagedByThisModel = indexOfSpeciesToBeManagedByThisModel;
     }
 }

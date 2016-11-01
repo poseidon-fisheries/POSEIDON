@@ -14,6 +14,8 @@ Abstract 2 Populations:
   destinationStrategyLarge:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:
@@ -29,6 +31,8 @@ Abstract 2 Populations:
   destinationStrategySmall:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:
@@ -62,9 +66,9 @@ Abstract 2 Populations:
       standardDeviationCatchabilityOtherSpecies: '0.0'
   gearStrategy: Never Change Gear
   habitatInitializer: All Sand
-  largeFishers: 10
-  largeFuelTankSize: '100000.0'
-  largeHoldSize: '100.0'
+  largeFishers: 50
+  largeFuelTankSize: '1000000.0'
+  largeHoldSize: '500.0'
   largeLitersPerKilometer: '10.0'
   largeSpeed: '5.0'
   mapInitializer:
@@ -85,11 +89,15 @@ Abstract 2 Populations:
   portPositionY: 25
   regulationLarge:
     MPA Only:
-      startingMPAs: [{'width': 20, 'topLeftX': 25, 'topLeftY': 14, 'height': 21}]
+      startingMPAs:
+      - height: 21
+        topLeftX: 25
+        topLeftY: 14
+        width: 20
   regulationSmall: Anarchy
   separateRegulations: true
-  smallFishers: 100
-  smallFuelTankSize: '500.0'
+  smallFishers: 50
+  smallFuelTankSize: '5000.0'
   smallHoldSize: '10.0'
   smallLitersPerKilometer: '10.0'
   smallSpeed: '5.0'

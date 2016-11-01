@@ -5,11 +5,14 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.function.Predicate;
 
 /**
  * creates a per-trip iterative destination strategy
@@ -40,7 +43,12 @@ public class PerTripIterativeDestinationFactory implements AlgorithmFactory<PerT
                                                                            20);
         return new PerTripIterativeDestinationStrategy(
                 new FavoriteDestinationStrategy(map, random), algorithm, 1d-stayingStillProbability.apply(random), 0d,
-                new HourlyProfitInTripObjective());
+                new HourlyProfitInTripObjective(), new Predicate<SeaTile>() {
+            @Override
+            public boolean test(SeaTile a) {
+                return true;
+            }
+        });
 
     }
 

@@ -36,6 +36,7 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
 
     public final static boolean DEFAULT_BACKTRACKS_ON_BAD_EXPLORATION = true;
 
+
     /**
      * the default state of the unfriendPredicate field
      */

@@ -116,7 +116,12 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
                     optimizer,
                     actuator,
                     parameterSensor,
-                    new CashFlowObjective(365),probability);
+                    new CashFlowObjective(365), probability, new Predicate<double[]>() {
+                        @Override
+                        public boolean test(double[] a) {
+                            return true;
+                        }
+                    });
             fisher.addYearlyAdaptation(
                     adaptation);
         }
@@ -128,7 +133,12 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
                     optimizer,
                     actuator,
                     parameterSensor,
-                    new CashFlowObjective(60), 0, 1);
+                    new CashFlowObjective(60), 0, 1, new Predicate<double[]>() {
+                        @Override
+                        public boolean test(double[] a) {
+                            return true;
+                        }
+                    });
             fisher.addBiMonthlyAdaptation(adaptation);
         }
 

@@ -34,7 +34,9 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/optimization/personal_tune/epa_simple/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161012 pid_tax/daily_target/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161012 pid_tax/daily_target/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161026 shapes/squares/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161026 shapes/careful/"
 
 
 
