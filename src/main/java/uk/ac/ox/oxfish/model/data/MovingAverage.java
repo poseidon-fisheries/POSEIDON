@@ -5,7 +5,7 @@ package uk.ac.ox.oxfish.model.data;
  * <p/> It accepts any number but the computations are all done through double value call
  * * Created by carrknight on 8/14/15.
  */
-public class MovingAverage<T extends Number>{
+public class MovingAverage<T extends Number> implements Averager<T>{
 
     final private MovingSum<T> sum;
 

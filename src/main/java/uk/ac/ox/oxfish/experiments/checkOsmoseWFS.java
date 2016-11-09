@@ -28,8 +28,8 @@ public class checkOsmoseWFS {
     public static void main(String[] args)
     {
        // mortalityHistogram("nogrouper", "2");
-        mortalityHistogram("no_intervention", "");
-
+        //mortalityHistogram("no_intervention", "");
+        mortalityHistogram("grouper_poseidon", "2");
 
     }
 
