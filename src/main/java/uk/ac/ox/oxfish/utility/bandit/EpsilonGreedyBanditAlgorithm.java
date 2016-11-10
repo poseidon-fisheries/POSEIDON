@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.utility.bandit;
 import ec.util.MersenneTwisterFast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * The classic epsilon greedy bandit
@@ -11,16 +10,17 @@ import java.util.Arrays;
  */
 public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
 
-    private final double[] averages;
 
-    private final int[] observations;
+    /**
+     * keeps tracks of averages (and number of arms)
+     */
+    private final BanditAverage averages;
 
     private double explorationProbability;
 
-    public EpsilonGreedyBanditAlgorithm(int numberOfArms, double explorationProbability)
+    public EpsilonGreedyBanditAlgorithm(BanditAverage averages, double explorationProbability)
     {
-        averages = new double[numberOfArms];
-        observations = new int[numberOfArms];
+        this.averages = averages;
         this.explorationProbability = explorationProbability;
     }
 
@@ -28,21 +28,24 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
     public int chooseArm(MersenneTwisterFast random) {
 
         if(random.nextDouble()<explorationProbability)
-            return random.nextInt(averages.length);
+            return random.nextInt(averages.getNumberOfArms());
 
 
-        double max = averages[0];
+        double max = averages.getAverage(0);
+        max = Double.isFinite(max) ? max : 0; //if it's NaN turn it into a 0
         ArrayList<Integer> maxIndices = new ArrayList<>();
         maxIndices.add(0);
-        for(int i=1; i<averages.length; i++)
+        for(int i=1; i<averages.getNumberOfArms(); i++)
         {
-            if(averages[i] > max)
+            double average = averages.getAverage(i);
+            average = Double.isFinite(average) ? average : 0; //if it's NaN turn it into a 0
+            if(average > max)
             {
-                max = averages[i];
+                max = average;
                  maxIndices = new ArrayList<>();
                 maxIndices.add(i);
             }
-            else if(averages[i]==max)
+            else if(average ==max)
                 maxIndices.add(i);
         }
 
@@ -57,8 +60,7 @@ public class EpsilonGreedyBanditAlgorithm implements BanditAlgorithm {
     @Override
     public void observeReward(double reward, int armPlayed) {
 
-        observations[armPlayed]++;
-        averages[armPlayed] =   averages[armPlayed] + (reward-averages[armPlayed])/observations[armPlayed];
+       averages.observeReward(reward, armPlayed);
     }
 
     /**

@@ -83,6 +83,11 @@ public class DestinationStrategies
         NAMES.put(UnifiedAmateurishDynamicFactory.class,
                   "Unified Amateurish Dynamic Programming");
 
+        CONSTRUCTORS.put("Discretized Bandit",
+                         BanditDestinationFactory::new);
+        NAMES.put(BanditDestinationFactory.class,
+                  "Discretized Bandit");
+
     }
 
     private DestinationStrategies() {}

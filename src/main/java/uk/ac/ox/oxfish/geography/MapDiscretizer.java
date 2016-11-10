@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Splits the map in a set of rectangles, each containing a set of cells
@@ -41,6 +42,8 @@ public class MapDiscretizer {
      *  boolean is true if at least one cell within that group
      */
     private final boolean[] validGroup;
+    private final int groupWidth;
+    private final int groupHeight;
 
 
     public MapDiscretizer(NauticalMap map, int verticalSplits, int horizontalSplits) {
@@ -55,14 +58,14 @@ public class MapDiscretizer {
 
 
         //start splitting
-        int groupWidth = map.getWidth() / (horizontalSplits+1);
-        int groupHeight = map.getHeight() / (verticalSplits+1);
+        groupWidth = (int) Math.ceil(map.getWidth() / (horizontalSplits+1d));
+        groupHeight = (int) Math.ceil(map.getHeight() / (verticalSplits+1d));
         for(int x = 0; x<map.getWidth(); x++)
             for(int y = 0; y<map.getHeight(); y++)
             {
                 //integer division is what we want here!
                 int height = y / groupHeight;
-                int width = x /  groupWidth;
+                int width = x / groupWidth;
                 int group = height * (horizontalSplits+1) + width;
                 groups[group].add(map.getSeaTile(x,y));
             }
@@ -77,6 +80,19 @@ public class MapDiscretizer {
 
     }
 
+    /**
+     * find out which group does this sea tile belong to
+     * @param tile
+     * @return
+     */
+    public int getGroup(SeaTile tile)
+    {
+        int height = tile.getGridY() / groupHeight;
+        int width = tile.getGridX() /  groupWidth;
+        int group = height * (horizontalSplits+1) + width;
+        assert groups[group].contains(tile);
+        return group;
+    }
 
     public int getNumberOfGroups()
     {
@@ -91,5 +107,13 @@ public class MapDiscretizer {
     public List<SeaTile> getGroup(int groupIndex)
     {
         return groups[groupIndex];
+    }
+
+    public void filterOutAllLandTiles(){
+        for(int i=0; i<groups.length; i++)
+        {
+            groups[i] = groups[i].stream().filter(tile -> tile.getAltitude()<0).collect(Collectors.toList());
+        }
+
     }
 }

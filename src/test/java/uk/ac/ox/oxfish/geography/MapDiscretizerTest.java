@@ -33,4 +33,20 @@ public class MapDiscretizerTest {
 
 
     }
+
+
+    @Test
+    public void discretizeMaps2() throws Exception
+    {
+
+        SimpleMapInitializer map = new SimpleMapInitializer(50,50,0,0,1);
+        NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
+                                        mock(GlobalBiology.class),
+                                        mock(FishState.class));
+        MapDiscretizer discretizer = new MapDiscretizer(chart,2,2);
+        assertEquals(discretizer.getNumberOfGroups(),9);
+
+
+
+    }
 }
