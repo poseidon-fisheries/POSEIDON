@@ -36,7 +36,10 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161012 pid_tax/daily_target/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161026 shapes/squares/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161026 shapes/careful/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161026 shapes/careful/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/epsilon/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/softmax/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/ucb/"
 
 
 

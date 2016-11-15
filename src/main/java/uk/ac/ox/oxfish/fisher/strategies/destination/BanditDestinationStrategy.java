@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
+import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -48,7 +49,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      */
     public BanditDestinationStrategy(
             Function<Integer, BanditAverage> averagerMaker,
-            Function<BanditAverage,BanditAlgorithm> banditMaker,
+            BanditSupplier banditMaker,
             MapDiscretizer discretizer,
             FavoriteDestinationStrategy delegate) {
         //map arms to valid map groups

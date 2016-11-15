@@ -4,16 +4,21 @@ import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
+import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
+import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
+import uk.ac.ox.oxfish.utility.bandit.factory.UCB1BanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -173,10 +178,12 @@ public class SocialTuningExercise {
     public static void main(String[] args) throws IOException {
 
 
-   //       defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
-   //     defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
-        defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
- //       defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
+     //   defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
+        defaults("no_regrowth.yaml", "_fronts",YEARS_TO_RUN,0);
+
+        //   defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
+        //      defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
+        //       defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
 /*
 
         batchRun("nn.yaml", "_fronts",
@@ -245,7 +252,7 @@ public class SocialTuningExercise {
 
 
 
-
+/*
 
         //personals
         Consumer<Pair<Scenario, AlgorithmFactory<? extends GeographicalRegression<Double>>>> personal =
@@ -265,7 +272,7 @@ public class SocialTuningExercise {
                     personalTuning.setNested(pair.getSecond());
 
                 };
-/*
+
         batchRun("nn.yaml", "-personal_fronts",
                  personal
                 , YEARS_TO_RUN, 0);
@@ -303,7 +310,7 @@ public class SocialTuningExercise {
         batchRun("cali_itq.yaml", "-personal_caliitq",
                  personal, YEARS_TO_RUN, 1);
 
-*/
+
 
 
         personalPlan =
@@ -314,7 +321,7 @@ public class SocialTuningExercise {
                     personalTuning.setNested(pair.getSecond());
 
                 };
-
+*/
 /*
         batchRun("cali_anarchy_plan.yaml", "-personal-plan_calianarchy",
                  personalPlan, YEARS_TO_RUN, 1);
@@ -333,7 +340,43 @@ public class SocialTuningExercise {
             final int firstValidYear) throws IOException
     {
 
+
+
+
         HashMap<String, AlgorithmFactory<? extends DestinationStrategy>> strategies = new LinkedHashMap<>();
+
+
+
+
+        BanditDestinationFactory epsilonGreedy = new BanditDestinationFactory();
+        ExponentialMovingAverageFactory ema = new ExponentialMovingAverageFactory();
+        ema.setAlpha(new FixedDoubleParameter(.97));
+        EpsilonGreedyBanditFactory greedy = new EpsilonGreedyBanditFactory();
+        greedy.setExplorationRate(new FixedDoubleParameter(0.009583));
+        epsilonGreedy.setBandit(greedy);
+        epsilonGreedy.setAverage(ema);
+
+
+        BanditDestinationFactory softmax = new BanditDestinationFactory();
+        ema.setAlpha(new FixedDoubleParameter(0.941162));
+        softmax.setAverage(ema);
+        SoftmaxBanditFactory algorithm = new SoftmaxBanditFactory();
+        softmax.setBandit(algorithm);
+        algorithm.setInitialTemperature(new FixedDoubleParameter(0.000138));
+        algorithm.setTemperatureDecay(new FixedDoubleParameter(0.000138));
+
+        BanditDestinationFactory ucb1 = new BanditDestinationFactory();
+        ema.setAlpha(new FixedDoubleParameter(0.273822));
+        UCB1BanditFactory bandit = new UCB1BanditFactory();
+        bandit.setMinimumReward(new FixedDoubleParameter(0));
+        bandit.setMaximumReward(new FixedDoubleParameter(12));
+        ucb1.setBandit(bandit);
+        ucb1.setAverage(ema);
+        strategies.put("bandit=ucb1", ucb1);
+        strategies.put("bandit=softmax", softmax);
+        strategies.put("bandit=epsilon", epsilonGreedy);
+
+
 
         strategies.put("eei", new PerTripImitativeDestinationFactory());
 

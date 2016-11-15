@@ -21,7 +21,7 @@ public class SoftmaxBanditAlgorithmTest {
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
-                new BanditAverage(10, IterativeAverage::new), 10);
+                new BanditAverage(10, IterativeAverage::new), 10, .98);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
             double reward = random.nextGaussian() / 2 + arm;
@@ -43,7 +43,7 @@ public class SoftmaxBanditAlgorithmTest {
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
-                new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8)),  10);
+                new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8)), 10, .98);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
             double reward = random.nextGaussian() / 2 + arm;
@@ -65,7 +65,7 @@ public class SoftmaxBanditAlgorithmTest {
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
-                new BanditAverage(10, () -> new MovingAverage<>(20)),  10);
+                new BanditAverage(10, () -> new MovingAverage<>(20)), 10, .98);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
             double reward = random.nextGaussian() / 2 + arm;

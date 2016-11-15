@@ -7,11 +7,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
+import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
+import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
+import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -25,7 +31,11 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
     private int verticalTicks = 2;
 
-    private static MapDiscretizer discretizer;
+    private static Locker<FishState,MapDiscretizer> discretizer = new Locker();
+
+    private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
+
+    private AlgorithmFactory<? extends BanditSupplier> bandit = new EpsilonGreedyBanditFactory();
 
 
     /**
@@ -37,15 +47,23 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     @Override
     public BanditDestinationStrategy apply(FishState state)
     {
-        if(discretizer == null)
-            discretizer = new MapDiscretizer(state.getMap(),verticalTicks,horizontalTicks);
+
+        MapDiscretizer map =  discretizer.presentKey(state,
+                                                     () -> new MapDiscretizer(
+                                                             state.getMap(),
+                                                             verticalTicks,
+                                                             horizontalTicks)
+        );
 
 
         return new BanditDestinationStrategy(
-                (Function<Integer, BanditAverage>) integer -> new BanditAverage(integer,
-                                                                                () -> new ExponentialMovingAverage<>(.5)),
-                banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,.1),
-                discretizer,
+                arms -> new BanditAverage(
+                        arms,
+                        average,
+                        state
+                ),
+                bandit.apply(state),
+                map,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()));
     }
 
@@ -84,5 +102,42 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      */
     public void setVerticalTicks(int verticalTicks) {
         this.verticalTicks = verticalTicks;
+    }
+
+    /**
+     * Getter for property 'average'.
+     *
+     * @return Value for property 'average'.
+     */
+    public AlgorithmFactory<? extends Averager> getAverage() {
+        return average;
+    }
+
+    /**
+     * Setter for property 'average'.
+     *
+     * @param average Value to set for property 'average'.
+     */
+    public void setAverage(AlgorithmFactory<? extends Averager> average) {
+        this.average = average;
+    }
+
+    /**
+     * Getter for property 'bandit'.
+     *
+     * @return Value for property 'bandit'.
+     */
+    public AlgorithmFactory<? extends BanditSupplier> getBandit() {
+        return bandit;
+    }
+
+    /**
+     * Setter for property 'bandit'.
+     *
+     * @param bandit Value to set for property 'bandit'.
+     */
+    public void setBandit(
+            AlgorithmFactory<? extends BanditSupplier> bandit) {
+        this.bandit = bandit;
     }
 }

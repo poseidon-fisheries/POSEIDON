@@ -29,6 +29,8 @@ import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializers;
+import uk.ac.ox.oxfish.model.data.Averager;
+import uk.ac.ox.oxfish.model.data.factory.Averages;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
@@ -36,11 +38,16 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
+import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
+import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
+import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
+import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -100,6 +107,10 @@ public class AlgorithmFactories {
         NAMES_MAP.put(GeographicalRegression.class, NumericalGeographicalRegressions.NAMES);
         CONSTRUCTOR_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.CONSTRUCTORS);
         NAMES_MAP.put(AcquisitionFunction.class, AcquisitionFunctions.NAMES);
+        CONSTRUCTOR_MAP.put(BanditSupplier.class, BanditAlgorithms.CONSTRUCTORS);
+        NAMES_MAP.put(BanditSupplier.class, BanditAlgorithms.NAMES);
+        CONSTRUCTOR_MAP.put(Averager.class, Averages.CONSTRUCTORS);
+        NAMES_MAP.put(Averager.class, Averages.NAMES);
 
 
 

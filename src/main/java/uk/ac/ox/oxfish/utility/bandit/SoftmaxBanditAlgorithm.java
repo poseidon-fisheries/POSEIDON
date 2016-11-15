@@ -12,10 +12,15 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
 
 
     private double temperature;
+    private double decay;
 
-    public SoftmaxBanditAlgorithm(BanditAverage averages, final double temp) {
+    public SoftmaxBanditAlgorithm(BanditAverage averages,
+                                  final double temp,
+                                  final double decay) {
         this.averages = averages;
         this.temperature=temp;
+        this.decay = decay;
+
     }
 
     @Override
@@ -54,7 +59,7 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
     @Override
     public void observeReward(double reward, int armPlayed) {
         averages.observeReward(reward, armPlayed);
-        temperature=Math.max(1,.98*temperature);
+        temperature=Math.max(1, decay *temperature);
 
     }
 

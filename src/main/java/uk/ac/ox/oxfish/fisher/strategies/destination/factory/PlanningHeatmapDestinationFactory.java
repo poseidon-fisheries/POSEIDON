@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.PlanningHeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 
 
 public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<PlanningHeatmapDestinationStrategy>{
@@ -61,7 +63,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     /**
      * mantains a (weak) set of fish states so that we initialize our data gatherers only once!
      */
-    private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Locker<FishState,String> locker = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -73,11 +75,11 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     public PlanningHeatmapDestinationStrategy apply(FishState state) {
 
         //add data gathering if necessary
-        if(!weakStateMap.contains(state))
+        if(!locker.getCurrentKey().equals(state))
         {
-            weakStateMap.add(state);
+            locker.presentKey(state, () -> null);
             addDataGatherers(state);
-            assert weakStateMap.contains(state);
+            assert locker.getCurrentKey().equals(state);
         }
 
         if(!almostPerfectKnowledge)

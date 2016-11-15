@@ -13,6 +13,8 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm;
@@ -59,5 +61,42 @@ public class BanditDestinationStrategyTest {
 
         ((EpsilonGreedyBanditAlgorithm) strategy.getAlgorithm()).setExplorationProbability(0);
         assertEquals(2,strategy.getAlgorithm().chooseArm(randomizer));
+    }
+
+
+    @Test
+    public void SampleProperlyWithinABox() throws Exception {
+
+        SimpleMapInitializer map = new SimpleMapInitializer(9,9, 0, 0, 1);
+        MersenneTwisterFast randomizer = new MersenneTwisterFast();
+        NauticalMap chart = map.makeMap(randomizer,
+                                        mock(GlobalBiology.class),
+                                        mock(FishState.class));
+        MapDiscretizer discretizer = new MapDiscretizer(chart, 2, 2);
+        //forced to pick always area 0
+        final BanditAlgorithm banditAlgorithm = mock(BanditAlgorithm.class);
+
+        BanditDestinationStrategy strategy = new BanditDestinationStrategy(
+                integer -> new BanditAverage(integer,
+                                             () -> new ExponentialMovingAverage<>(
+                                                     .5)),
+                banditAverage -> banditAlgorithm,
+                discretizer,
+                new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer))
+        );
+
+        discretizer.filterOutAllLandTiles();
+
+        int[][] chosen = new int[3][3];
+        for (int i = 0; i < 1000; i++) {
+            strategy.choose(strategy.getFavoriteSpot(),0,randomizer);
+            SeaTile tile = strategy.getFavoriteSpot();
+            chosen[tile.getGridX()][tile.getGridY()]++;
+        }
+
+        System.out.println(FishStateUtilities.deepToStringArray(chosen,",","\n"));
+        for(int x=0;x<3;x++)
+            for(int y=0; y<3; y++)
+                assertTrue(chosen[x][y]>50);
     }
 }

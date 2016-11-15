@@ -75,7 +75,9 @@ public class BatchRunner
 
         String simulationName = yamlFile.getFileName().toString().split("\\.")[0]+"_"+runsDone;
         FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
-                                                 getOutputFolder().resolve(simulationName), initialSeed, Log.LEVEL_INFO,
+                                                 getOutputFolder().resolve(simulationName),
+                                                 initialSeed + runsDone,
+                                                 Log.LEVEL_INFO,
                                                  true, policyFile == null ? null : policyFile.toString(), yearsToRun, false);
 
 
