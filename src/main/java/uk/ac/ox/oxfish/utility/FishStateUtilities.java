@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -36,7 +37,6 @@ import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -816,7 +816,7 @@ public class FishStateUtilities {
             String simulationName, Path inputFolder, final Path outputFolder,
             final Long seed, final int logLevel, final boolean additionalData,
             final String policyScript, final int yearsToRun,
-            final boolean saveOnExit) throws IOException {
+            final boolean saveOnExit, Integer heatmapGathererYear) throws IOException {
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
@@ -831,6 +831,18 @@ public class FishStateUtilities {
                                           outputFolder.resolve(simulationName+ "_log.txt")));
         Log.set(logLevel);
         model.setScenario(scenario);
+
+        TowHeatmapGatherer gatherer;
+        if(heatmapGathererYear != null && heatmapGathererYear >=0)
+        {
+            gatherer = new TowHeatmapGatherer(heatmapGathererYear);
+            model.registerStartable(gatherer);
+        }
+        else
+            gatherer=null;
+
+
+
         model.start();
 
         if(additionalData) {
@@ -863,6 +875,14 @@ public class FishStateUtilities {
         writer.write(Long.toString(seed));
         writer.close();
 
+        if(gatherer != null)
+        {
+            writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile());
+            writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
+            writer.close();
+
+        }
+
         if(saveOnExit)
             writeModelToFile(
                     outputFolder.resolve(simulationName+".checkpoint").toFile(),
@@ -872,5 +892,23 @@ public class FishStateUtilities {
     }
 
 
+    public static String gridToCSV(double[][] grid)
+    {
+
+        StringBuilder buffer = new StringBuilder();
+        for(int x=0; x<grid.length; x++)
+        {
+            for(int y=0; y<grid[x].length; y++)
+            {
+                buffer.append(grid[x][y]);
+                if(y<grid[x].length-1)
+                    buffer.append(",");
+            }
+            buffer.append("\n");
+        }
+
+        return buffer.toString();
+
+    }
 }
 

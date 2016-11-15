@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.experiments;
 import com.esotericsoftware.minlog.Log;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
@@ -201,9 +200,9 @@ public class Dashboard
             }
         }
 
-        String grid = PolicyAndLocations.gridToCSV(theGrid);
+        String grid = FishStateUtilities.gridToCSV(theGrid);
         Files.write(outputPath.resolve(outputName),grid.getBytes());
-        grid = PolicyAndLocations.gridToCSV(theBlue);
+        grid = FishStateUtilities.gridToCSV(theBlue);
         Files.write(outputPath.resolve("blue_"+outputName),grid.getBytes());
 
 

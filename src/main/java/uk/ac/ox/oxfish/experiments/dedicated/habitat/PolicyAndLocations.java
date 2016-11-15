@@ -28,27 +28,6 @@ public class PolicyAndLocations
 {
 
 
-
-    public static String gridToCSV(double[][] grid)
-    {
-
-        StringBuilder buffer = new StringBuilder();
-        for(int x=0; x<grid.length; x++)
-        {
-            for(int y=0; y<grid[x].length; y++)
-            {
-                buffer.append(grid[x][y]);
-                if(y<grid[x].length-1)
-                    buffer.append(",");
-            }
-            buffer.append("\n");
-        }
-
-        return buffer.toString();
-
-    }
-
-
     //one dimensional TAC
     public static void main(String[] args) throws IOException {
 
@@ -217,7 +196,7 @@ public class PolicyAndLocations
                     fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
             );
 
-        return new ExperimentResult(state,gridToCSV(theGrid));
+        return new ExperimentResult(state, FishStateUtilities.gridToCSV(theGrid));
 
     }
 

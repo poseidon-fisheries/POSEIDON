@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.experiments;
 
 import sim.field.grid.IntGrid2D;
-import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileWriter;
@@ -47,7 +47,7 @@ public class Geneva {
 
 
 
-        String csvGrid = PolicyAndLocations.gridToCSV(theGrid);
+        String csvGrid = FishStateUtilities.gridToCSV(theGrid);
         FileWriter writer = new FileWriter(
                 MAIN_DIRECTORY.
                         resolve("mpa_grid.csv").toFile());

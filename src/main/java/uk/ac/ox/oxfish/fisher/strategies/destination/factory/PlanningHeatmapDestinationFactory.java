@@ -75,7 +75,7 @@ public class PlanningHeatmapDestinationFactory implements AlgorithmFactory<Plann
     public PlanningHeatmapDestinationStrategy apply(FishState state) {
 
         //add data gathering if necessary
-        if(!locker.getCurrentKey().equals(state))
+        if(!state.equals(locker.getCurrentKey()))
         {
             locker.presentKey(state, () -> null);
             addDataGatherers(state);

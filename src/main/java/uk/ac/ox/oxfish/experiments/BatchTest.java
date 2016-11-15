@@ -24,8 +24,8 @@ public class BatchTest {
                 ),
                 Paths.get("output", "batch"),
                 null,
-                0l
-        );
+                0l,
+                null);
 
         runner.run();
         runner.run();

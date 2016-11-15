@@ -34,6 +34,10 @@ public class YamlMain {
     @Parameter(names={"--data"},description = "gathers additional data for the model")
     private boolean additionalData = false;
 
+
+    @Parameter(names={"--heatmap"},description = "year at which point to start gathering tow heatmap data. Negative values turns it off")
+    private Integer towHeatmapGatherer = null;
+
     public static void main(String[] args) throws IOException {
 
         /**
@@ -47,7 +51,9 @@ public class YamlMain {
         if(args.length>1) //if there are multiple parameters, read them up!
             new JCommander(main, Arrays.copyOfRange(args,1,args.length));
         FishStateUtilities.run(simulationName, inputFile, Paths.get("output", simulationName), main.seed, main.logLevel,
-                               main.additionalData, main.policyScript, main.yearsToRun, main.saveOnExit);
+                               main.additionalData, main.policyScript,
+                               main.yearsToRun, main.saveOnExit,
+                               main.towHeatmapGatherer);
 
 
     }

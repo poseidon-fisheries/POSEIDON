@@ -14,6 +14,7 @@ public class BatchRunnerFactory
     private long randomSeed = System.currentTimeMillis();
     private String columnsToPrint = "Total Effort,Average Cash-Flow ";
     private int numberOfRuns = 100;
+    private Integer heatmapGathererStartYear = -1;
 
     /**
      * Gets a result.
@@ -27,8 +28,8 @@ public class BatchRunnerFactory
                 Arrays.asList(columnsToPrint.split(",")),
                 outputFolder == null ? null : Paths.get(outputFolder),
                 policyFile == null ? null : Paths.get(policyFile),
-                randomSeed
-        );
+                randomSeed,
+                heatmapGathererStartYear);
     }
 
     /**
@@ -155,5 +156,24 @@ public class BatchRunnerFactory
      */
     public void setNumberOfRuns(int numberOfRuns) {
         this.numberOfRuns = numberOfRuns;
+    }
+
+
+    /**
+     * Getter for property 'heatmapGathererStartYear'.
+     *
+     * @return Value for property 'heatmapGathererStartYear'.
+     */
+    public Integer getHeatmapGathererStartYear() {
+        return heatmapGathererStartYear;
+    }
+
+    /**
+     * Setter for property 'heatmapGathererStartYear'.
+     *
+     * @param heatmapGathererStartYear Value to set for property 'heatmapGathererStartYear'.
+     */
+    public void setHeatmapGathererStartYear(Integer heatmapGathererStartYear) {
+        this.heatmapGathererStartYear = heatmapGathererStartYear;
     }
 }

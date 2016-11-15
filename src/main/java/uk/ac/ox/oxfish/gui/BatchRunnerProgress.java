@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -70,7 +72,10 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
         if ("progress" == evt.getPropertyName()) {
             int progress = (Integer) evt.getNewValue();
             progressBar.setValue(progress);
+
         }
+        taskOutput.repaint();
+        this.repaint();
 
     }
 
@@ -99,11 +104,29 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
                 taskOutput.append("Starting run " + runner.getRunsDone()+"\n");
                 runner.run();
                 taskOutput.append("Finished run " + runner.getRunsDone() +"\n");
-                setProgress(runner.getRunsDone());
+                publish();
             }
 
             return null;
 
+        }
+
+        /**
+         * Receives data chunks from the {@code publish} method asynchronously on the
+         * <i>Event Dispatch Thread</i>.
+         * <p>
+         * <p>
+         * Please refer to the {@link #publish} method for more details.
+         *
+         * @param chunks intermediate results to process
+         * @see #publish
+         */
+        @Override
+        protected void process(List<Void> chunks) {
+            super.process(chunks);
+            setProgress(runner.getRunsDone());
+            taskOutput.repaint();
+            progressBar.repaint();
         }
 
         // Executed in EDT

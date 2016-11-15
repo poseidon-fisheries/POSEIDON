@@ -178,8 +178,8 @@ public class SocialTuningExercise {
     public static void main(String[] args) throws IOException {
 
 
-     //   defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
-        defaults("no_regrowth.yaml", "_fronts",YEARS_TO_RUN,0);
+ //       defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
+        defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
 
         //   defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
         //      defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
@@ -355,26 +355,53 @@ public class SocialTuningExercise {
         greedy.setExplorationRate(new FixedDoubleParameter(0.009583));
         epsilonGreedy.setBandit(greedy);
         epsilonGreedy.setAverage(ema);
+        BanditDestinationFactory epsilonBad = new BanditDestinationFactory();
+        epsilonBad.setBandit(greedy);
+        epsilonBad.setAverage(ema);
+        epsilonBad.setHorizontalTicks(49);
+        epsilonBad.setVerticalTicks(49);
+        strategies.put("bandit=epsilon", epsilonGreedy);
+        strategies.put("bandit=epsilon-bad", epsilonBad);
+
 
 
         BanditDestinationFactory softmax = new BanditDestinationFactory();
+        ema = new ExponentialMovingAverageFactory();
         ema.setAlpha(new FixedDoubleParameter(0.941162));
         softmax.setAverage(ema);
         SoftmaxBanditFactory algorithm = new SoftmaxBanditFactory();
         softmax.setBandit(algorithm);
         algorithm.setInitialTemperature(new FixedDoubleParameter(0.000138));
         algorithm.setTemperatureDecay(new FixedDoubleParameter(0.000138));
+        BanditDestinationFactory softmaxBad = new BanditDestinationFactory();
+        softmaxBad.setAverage(ema);
+        softmaxBad.setBandit(algorithm);
+        softmaxBad.setHorizontalTicks(49);
+        softmaxBad.setVerticalTicks(49);
+        strategies.put("bandit=softmax", softmax);
+        strategies.put("bandit=softmax-bad", softmaxBad);
+
+
+
 
         BanditDestinationFactory ucb1 = new BanditDestinationFactory();
+        ema = new ExponentialMovingAverageFactory();
         ema.setAlpha(new FixedDoubleParameter(0.273822));
         UCB1BanditFactory bandit = new UCB1BanditFactory();
         bandit.setMinimumReward(new FixedDoubleParameter(0));
         bandit.setMaximumReward(new FixedDoubleParameter(12));
         ucb1.setBandit(bandit);
         ucb1.setAverage(ema);
+        BanditDestinationFactory ucb1Bad = new BanditDestinationFactory();
+        ucb1Bad.setAverage(ema);
+        ucb1Bad.setBandit(algorithm);
+        ucb1Bad.setHorizontalTicks(49);
+        ucb1Bad.setVerticalTicks(49);
         strategies.put("bandit=ucb1", ucb1);
-        strategies.put("bandit=softmax", softmax);
-        strategies.put("bandit=epsilon", epsilonGreedy);
+        strategies.put("bandit=ucb1-bad", ucb1Bad);
+
+
+
 
 
 
@@ -385,7 +412,7 @@ public class SocialTuningExercise {
         ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
         perfectPlanner.setAcquisition(acquisition);
         acquisition.setProportionSearched(new FixedDoubleParameter(.1));
-//        strategies.put("perfect",perfectPlanner);
+        strategies.put("perfect",perfectPlanner);
 
 
         strategies.put("gsa",new GravitationalSearchDestinationFactory());

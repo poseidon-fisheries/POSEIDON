@@ -53,10 +53,12 @@ public class BatchRunner
      */
     private int runsDone = 0;
 
+    private final Integer heatmapGathererStartYear;
 
     public BatchRunner(
             Path yamlFile, int yearsToRun, List<String> columnsToPrint,
-            Path outputFolder, Path policyFile, long initialSeed) {
+            Path outputFolder, Path policyFile, long initialSeed,
+            Integer heatmapGathererStartYear) {
         this.yamlFile = yamlFile;
         this.initialSeed = initialSeed;
         this.yearsToRun = yearsToRun;
@@ -65,7 +67,7 @@ public class BatchRunner
             this.columnsToPrint.add(column.trim());
         this.outputFolder = outputFolder;
         this.policyFile = policyFile;
-
+        this.heatmapGathererStartYear = heatmapGathererStartYear;
     }
 
 
@@ -78,7 +80,8 @@ public class BatchRunner
                                                  getOutputFolder().resolve(simulationName),
                                                  initialSeed + runsDone,
                                                  Log.LEVEL_INFO,
-                                                 true, policyFile == null ? null : policyFile.toString(), yearsToRun, false);
+                                                 true, policyFile == null ? null : policyFile.toString(), yearsToRun, false,
+                                                 heatmapGathererStartYear);
 
 
         ArrayList<DataColumn> columns = new ArrayList<>();

@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
-import uk.ac.ox.oxfish.experiments.dedicated.habitat.PolicyAndLocations;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
@@ -141,9 +140,9 @@ public class FirstPaper
                             getBiology()).getCarryingCapacity(state.getSpecies().get(1));
             }
 
-        String grid = PolicyAndLocations.gridToCSV(fishing);
+        String grid = FishStateUtilities.gridToCSV(fishing);
         Files.write(outputFolder.resolve(policy + "_tows.csv"), grid.getBytes());
-        grid = PolicyAndLocations.gridToCSV(blue);
+        grid = FishStateUtilities.gridToCSV(blue);
         Files.write(outputFolder.resolve(policy + "_blue.csv"), grid.getBytes());
 
 
@@ -224,9 +223,9 @@ public class FirstPaper
                     biomass[x][state.getMap().getHeight() - y - 1] = state.getMap().getSeaTile(x,y).
                             getBiomass(specie0);
 
-            String grid = PolicyAndLocations.gridToCSV(fishing);
+            String grid = FishStateUtilities.gridToCSV(fishing);
             Files.write(outputFolder.resolve("fishing"+snapshot+".csv"),grid.getBytes());
-            grid = PolicyAndLocations.gridToCSV(biomass);
+            grid = FishStateUtilities.gridToCSV(biomass);
             Files.write(outputFolder.resolve("biomass"+snapshot+".csv"),grid.getBytes());
 
             //reset fishing grid for next year
@@ -379,7 +378,7 @@ public class FirstPaper
 
 
             }
-            String grid = PolicyAndLocations.gridToCSV(fishing);
+            String grid = FishStateUtilities.gridToCSV(fishing);
             Files.write(outputFolder.resolve("oil_"+i+"_"+snapshot+".csv"),grid.getBytes());
 
             //reset fishing grid for next year
@@ -427,7 +426,7 @@ public class FirstPaper
                 }
             }
         }
-        String gridToCSV = PolicyAndLocations.gridToCSV(theGrid);
+        String gridToCSV = FishStateUtilities.gridToCSV(theGrid);
         Files.write(outputFolder.resolve("mpa.csv"),gridToCSV.getBytes());
 
 
@@ -455,7 +454,7 @@ public class FirstPaper
                 }
             }
         }
-        gridToCSV = PolicyAndLocations.gridToCSV(theGrid);
+        gridToCSV = FishStateUtilities.gridToCSV(theGrid);
         Files.write(outputFolder.resolve("rocky.csv"),gridToCSV.getBytes());
 
         theGrid = new double[state.getMap().getWidth()][state.getMap().getHeight()];
@@ -467,7 +466,7 @@ public class FirstPaper
             }
         }
 
-        gridToCSV = PolicyAndLocations.gridToCSV(theGrid);
+        gridToCSV = FishStateUtilities.gridToCSV(theGrid);
         Files.write(outputFolder.resolve("rocky_rock.csv"),gridToCSV.getBytes());
 
     }
