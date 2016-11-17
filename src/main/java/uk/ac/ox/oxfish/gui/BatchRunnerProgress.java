@@ -125,8 +125,8 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
         protected void process(List<Void> chunks) {
             super.process(chunks);
             setProgress(runner.getRunsDone());
-            taskOutput.repaint();
-            progressBar.repaint();
+            taskOutput.revalidate();
+            progressBar.revalidate();
         }
 
         // Executed in EDT

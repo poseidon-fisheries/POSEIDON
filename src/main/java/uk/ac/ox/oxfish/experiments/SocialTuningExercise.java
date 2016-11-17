@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
@@ -15,6 +16,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
@@ -39,9 +41,9 @@ import java.util.function.Consumer;
 public class SocialTuningExercise {
 
 
-    private final static int YEARS_TO_RUN = 5;
+    private final static int YEARS_TO_RUN = 10;
     public static final Path MAIN_DIRECTORY = Paths.get("runs", "social_tuning");
-    public static final int NUMBER_OF_EXPERIMENTS = 100;
+    public static final int NUMBER_OF_EXPERIMENTS = 5;
 
     public static void nn(String[] args) throws IOException {
 
@@ -177,11 +179,13 @@ public class SocialTuningExercise {
 
     public static void main(String[] args) throws IOException {
 
+       //     defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
+      //  defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
+       //   defaults("chaser_free.yaml", "_chaserfree",YEARS_TO_RUN,0);
+       //   defaults("chaser_gas.yaml", "_chasergas",YEARS_TO_RUN,0);
+      //  defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
 
- //       defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
-        defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
-
-        //   defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
+         //  defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
         //      defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
         //       defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
 /*
@@ -348,8 +352,28 @@ public class SocialTuningExercise {
 
 
 
-        BanditDestinationFactory epsilonGreedy = new BanditDestinationFactory();
+
+        BanditDestinationFactory ucb1 = new BanditDestinationFactory();
         ExponentialMovingAverageFactory ema = new ExponentialMovingAverageFactory();
+        ema.setAlpha(new FixedDoubleParameter(0.273822));
+        UCB1BanditFactory bandit = new UCB1BanditFactory();
+        bandit.setMinimumReward(new FixedDoubleParameter(0));
+        bandit.setMaximumReward(new FixedDoubleParameter(12));
+        ucb1.setBandit(bandit);
+        ucb1.setAverage(ema);
+        BanditDestinationFactory ucb1Bad = new BanditDestinationFactory();
+        ucb1Bad.setAverage(ema);
+        ucb1Bad.setBandit(bandit);
+        ucb1Bad.setHorizontalTicks(49);
+        ucb1Bad.setVerticalTicks(49);
+        strategies.put("bandit=ucb1", ucb1);
+        strategies.put("bandit=ucb1-bad", ucb1Bad);
+
+
+
+
+        BanditDestinationFactory epsilonGreedy = new BanditDestinationFactory();
+        ema = new ExponentialMovingAverageFactory();
         ema.setAlpha(new FixedDoubleParameter(.97));
         EpsilonGreedyBanditFactory greedy = new EpsilonGreedyBanditFactory();
         greedy.setExplorationRate(new FixedDoubleParameter(0.009583));
@@ -382,41 +406,33 @@ public class SocialTuningExercise {
         strategies.put("bandit=softmax-bad", softmaxBad);
 
 
+        strategies.put("random", new RandomFavoriteDestinationFactory());
 
 
-        BanditDestinationFactory ucb1 = new BanditDestinationFactory();
-        ema = new ExponentialMovingAverageFactory();
-        ema.setAlpha(new FixedDoubleParameter(0.273822));
-        UCB1BanditFactory bandit = new UCB1BanditFactory();
-        bandit.setMinimumReward(new FixedDoubleParameter(0));
-        bandit.setMaximumReward(new FixedDoubleParameter(12));
-        ucb1.setBandit(bandit);
-        ucb1.setAverage(ema);
-        BanditDestinationFactory ucb1Bad = new BanditDestinationFactory();
-        ucb1Bad.setAverage(ema);
-        ucb1Bad.setBandit(algorithm);
-        ucb1Bad.setHorizontalTicks(49);
-        ucb1Bad.setVerticalTicks(49);
-        strategies.put("bandit=ucb1", ucb1);
-        strategies.put("bandit=ucb1-bad", ucb1Bad);
-
-
-
-
-
-
-        strategies.put("eei", new PerTripImitativeDestinationFactory());
+        PerTripImitativeDestinationFactory eei = new PerTripImitativeDestinationFactory();
+        eei.setProbability(new FixedProbabilityFactory(.48,1));
+        eei.setStepSize(new FixedDoubleParameter(20));
+        strategies.put("eei", eei);
 
         PlanningHeatmapDestinationFactory perfectPlanner = new PlanningHeatmapDestinationFactory();
         perfectPlanner.setAlmostPerfectKnowledge(true);
         ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
         perfectPlanner.setAcquisition(acquisition);
         acquisition.setProportionSearched(new FixedDoubleParameter(.1));
-        strategies.put("perfect",perfectPlanner);
+     //   strategies.put("perfect",perfectPlanner);
 
 
-        strategies.put("gsa",new GravitationalSearchDestinationFactory());
-        strategies.put("pso",new PerTripParticleSwarmFactory());
+        GravitationalSearchDestinationFactory gsa = new GravitationalSearchDestinationFactory();
+        gsa.setExplorationSize(new FixedDoubleParameter(1));
+        gsa.setInitialSpeed(new FixedDoubleParameter(-10));
+        gsa.setGravitationalConstant(new FixedDoubleParameter(10));
+        strategies.put("gsa", gsa);
+        PerTripParticleSwarmFactory pso = new PerTripParticleSwarmFactory();
+        pso.setMemoryWeight(new FixedDoubleParameter(.37));
+        pso.setExplorationProbability(new FixedDoubleParameter(0.001661));
+        pso.setInertia(new FixedDoubleParameter(0.733));
+        pso.setFriendWeight(new FixedDoubleParameter(0.1));
+        strategies.put("pso", pso);
         PerTripImitativeDestinationFactory annealing = new PerTripImitativeDestinationFactory();
         annealing.setProbability(new SocialAnnealingProbabilityFactory());
         annealing.setBacktracksOnBadExploration(false);
@@ -458,6 +474,7 @@ public class SocialTuningExercise {
                 for (int i = firstValidYear; i < cashColumn.size(); i++  )
                     total += cashColumn.get(i);
                 output.append(total);
+                System.out.println("total cash: " + total);
 
 
             }

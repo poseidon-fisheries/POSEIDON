@@ -40,6 +40,9 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/epsilon/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/softmax/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/ucb/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/alternatives/eei"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/alternatives/pso"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/alternatives/gsa"
 
 
 

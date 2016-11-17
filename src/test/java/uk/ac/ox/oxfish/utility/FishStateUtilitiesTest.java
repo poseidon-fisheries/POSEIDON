@@ -36,16 +36,25 @@ public class FishStateUtilitiesTest {
     @Test
     public void utmToLatLong() throws Exception {
 
-        //somewhere on the equator
-        Point2D.Double latlong = FishStateUtilities.utmToLatLong("10 N", 500000, 0);
-        assertEquals(0,latlong.getX(),.01);
-        assertEquals(-123,latlong.getY(),.01);
-        //somewhere near bodega bay
-        latlong = FishStateUtilities.utmToLatLong("10 N", 490000, 4250000);
-        assertEquals(38.398165,latlong.getX(),.01);
-        assertEquals(-123.11452062026362,latlong.getY(),.01);
+        //osmose low-right corner
+        Point2D.Double latlong = FishStateUtilities.utmToLatLong("17 N", 584600.702, 2791787.489);
+        assertEquals(25.24,latlong.getX(),.01);
+        assertEquals(-80.16,latlong.getY(),.01);
+        System.out.println(latlong);
+
+        //osmose up-left corner
+        latlong = FishStateUtilities.utmToLatLong("17 N", -73291.664, 3445097.299);
+        assertEquals(31,latlong.getX(),.01);
+        assertEquals(-87,latlong.getY(),.01);
+
+        System.out.println(latlong);
 
     }
+
+
+
+
+
 
     @Test
     public void  printTablePerPort(){

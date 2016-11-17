@@ -85,6 +85,11 @@ public class BiologyInitializers {
         NAMES.put(SingleSpeciesAbudanceFactory.class,"Single Species Abundance");
 
 
+        CONSTRUCTORS.put("One Species School",
+                         OneSpeciesSchoolFactory::new);
+        NAMES.put(OneSpeciesSchoolFactory.class,"One Species School");
+
+
     }
 
     private BiologyInitializers() {}
