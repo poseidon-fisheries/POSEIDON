@@ -83,10 +83,10 @@ public class FishStateUtilities {
 
     /**
      * looks for a file first in the current directory, otherwise in the directory the jar is stored
-     * otherwise returns back the relative path
+     * otherwise returns back the relative osmoseWFSPath
      *
      * @param relativePath something like dir/file.txt
-     * @return the absolute path
+     * @return the absolute osmoseWFSPath
      */
     public static String getAbsolutePath(String relativePath) {
 
@@ -117,7 +117,7 @@ public class FishStateUtilities {
 
         //finally you can just try to look for the jar file
         //see here : http://stackoverflow.com/questions/775389/accessing-properties-files-outside-the-jar/775565
-        String classpath = System.getProperty("java.class.path");
+        String classpath = System.getProperty("java.class.osmoseWFSPath");
         int jarPos = classpath.indexOf(JAR_NAME);
         int jarPathPos = classpath.lastIndexOf(File.pathSeparatorChar, jarPos) + 1;
         String path = classpath.substring(jarPathPos, jarPos);
@@ -125,7 +125,7 @@ public class FishStateUtilities {
         if (file.exists())
             return file.getAbsolutePath();
 
-        System.err.println("failed to find the absolute path of the default config file");
+        System.err.println("failed to find the absolute osmoseWFSPath of the default config file");
         return relativePath;
 
 

@@ -159,7 +159,7 @@ public class StrategyFactoryWidgetProcessor implements WidgetProcessor<JComponen
 
 
         //nested address? no problem
-       // return path.length == 2? path[1] + "." + attributes.get("name") :
+       // return osmoseWFSPath.length == 2? osmoseWFSPath[1] + "." + attributes.get("name") :
         //        attributes.get("name");
     }
 }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.mapmakers;
 
 import com.google.common.base.Preconditions;
+import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.Cell;
 import fr.ird.osmose.OsmoseSimulation;
@@ -10,10 +11,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.OsmoseGlobalBiology;
-import uk.ac.ox.oxfish.geography.CartesianDistance;
-import uk.ac.ox.oxfish.geography.Distance;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.*;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
@@ -27,14 +25,38 @@ public class OsmoseMapInitializer implements MapInitializer {
 
     private final double gridCellSizeInKm;
 
+    private final double  lowRightEasting;
+
+    private final double lowRightNorthing;
+
+    private final double upLeftEasting;
+
+    private final double upLeftNorthing;
+
     public OsmoseMapInitializer(double gridCellSizeInKm) {
         this.gridCellSizeInKm = gridCellSizeInKm;
+        this.lowRightEasting = Double.NaN;
+        this.lowRightNorthing = Double.NaN;
+        this.upLeftEasting = Double.NaN;
+        this.upLeftNorthing = Double.NaN;
+
+    }
+
+    public OsmoseMapInitializer(
+            double lowRightEasting, double lowRightNorthing,
+            double upLeftEasting, double upLeftNorthing) {
+        this.gridCellSizeInKm = Double.NaN;
+        this.lowRightEasting = lowRightEasting;
+        this.lowRightNorthing = lowRightNorthing;
+        this.upLeftEasting = upLeftEasting;
+        this.upLeftNorthing = upLeftNorthing;
     }
 
     @Override
     public NauticalMap makeMap(
             MersenneTwisterFast random, GlobalBiology biology, FishState model) {
-        Preconditions.checkArgument(biology instanceof OsmoseGlobalBiology, "OSMOSE map requires OSMOSE biology");
+        Preconditions.checkArgument(biology instanceof OsmoseGlobalBiology,
+                                    "OSMOSE map requires OSMOSE biology");
         //cast the global biology
         OsmoseSimulation simulation = ((OsmoseGlobalBiology) biology).getSimulation();
 
@@ -58,11 +80,27 @@ public class OsmoseMapInitializer implements MapInitializer {
             }
 
 
-        GeomGridField bathymetry = new GeomGridField(baseGrid);
-        GeomVectorField mpas = new GeomVectorField(); //empty MPAs
-        Distance distance = new CartesianDistance(gridCellSizeInKm);
+
+        GeomGridField bathymetry;
+        Distance distance;
+        if(Double.isFinite(gridCellSizeInKm)) {
+            bathymetry = new GeomGridField(baseGrid);
+            distance = new CartesianDistance(gridCellSizeInKm);
+        }
+        else
+        {
+            bathymetry = new GeomGridField(baseGrid);
+            bathymetry.setMBR(
+                    new Envelope(
+                    upLeftEasting,lowRightEasting,
+                    lowRightNorthing,upLeftNorthing
+            ));
+            distance = new CartesianUTMDistance();
+
+        }
         Pathfinder astar = new AStarPathfinder(distance);
-        return new NauticalMap(bathymetry,mpas,distance,astar);
+
+        return new NauticalMap(bathymetry,new GeomVectorField(),distance,astar);
 
 
     }

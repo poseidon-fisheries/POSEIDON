@@ -59,7 +59,7 @@ public class NauticalMap implements Startable
 
 
     /**
-     * the object finding a path from A to B
+     * the object finding a osmoseWFSPath from A to B
      */
     private Pathfinder pathfinder;
 
@@ -476,7 +476,7 @@ public class NauticalMap implements Startable
     }
 
     /**
-     * return the full path that brings us from start to end
+     * return the full osmoseWFSPath that brings us from start to end
      * @param start the starting tile
      * @param end the ending tile
      * @return a queue of steps from start to end or null if it isn't possible to go from start to end

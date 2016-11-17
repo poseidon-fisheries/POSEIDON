@@ -39,7 +39,7 @@ public class BatchRunner
     private final Path outputFolder;
 
     /**
-     * nullable path towards policy
+     * nullable osmoseWFSPath towards policy
      */
     private final Path policyFile;
 

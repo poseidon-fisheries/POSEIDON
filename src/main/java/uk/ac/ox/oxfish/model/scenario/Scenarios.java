@@ -36,5 +36,8 @@ public class Scenarios {
         SCENARIOS.put("Abstract 2 Populations",new TwoPopulationsScenario());
         DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
 
+        SCENARIOS.put("OSMOSE WFS",new OsmoseWFSScenario());
+        DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
+
     }
 }

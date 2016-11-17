@@ -88,8 +88,8 @@ public class PathWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
 
         {
-            Log.error("failed to create path widget");
-            throw new RuntimeException("failed to create path widget");
+            Log.error("failed to create osmoseWFSPath widget");
+            throw new RuntimeException("failed to create osmoseWFSPath widget");
         }
 
 

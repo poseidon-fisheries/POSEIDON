@@ -36,7 +36,7 @@ public class LameTripSimulator {
         double timeSpentAtSea = 0;
         double gasConsumed = 0;
 
-        //get path from port to fishing spot
+        //get osmoseWFSPath from port to fishing spot
         Port homePort = fisher.getHomePort();
         Deque<SeaTile> routeToAndFrom = state.getMap().getRoute(homePort.getLocation(), fishingSpot);
         if(routeToAndFrom == null)
@@ -105,7 +105,7 @@ public class LameTripSimulator {
 
 
     /**
-     * turns path into distance
+     * turns osmoseWFSPath into distance
      * @param path
      * @return
      */

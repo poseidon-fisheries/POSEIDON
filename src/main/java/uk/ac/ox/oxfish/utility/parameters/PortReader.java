@@ -54,7 +54,7 @@ public class PortReader {
                     Double.parseDouble(splitLine[3])
             ));
             Preconditions.checkArgument(location!=null, "Port " + portName + " is outside the map! ");
-            Preconditions.checkArgument(!location.isPortHere(), "There is already a port here!");
+            Preconditions.checkArgument(!location.isPortHere(), "There is already a port here! No space for  " + portName);
             //adjust it a bit if needed
             location = correctLocation(location,map,portName);
 

@@ -37,6 +37,11 @@ public class MapInitializers {
         NAMES.put(OsmoseMapInitializerFactory.class,"OSMOSE Map");
 
 
+        CONSTRUCTORS.put("OSMOSE Bounded Map",
+                         OsmoseBoundedMapInitializerFactory::new);
+        NAMES.put(OsmoseBoundedMapInitializerFactory.class,"OSMOSE Bounded Map");
+
+
 
     }
 

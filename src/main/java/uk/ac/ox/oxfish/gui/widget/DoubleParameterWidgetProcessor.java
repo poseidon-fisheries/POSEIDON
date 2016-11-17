@@ -116,7 +116,7 @@ public class DoubleParameterWidgetProcessor implements WidgetProcessor<JComponen
         //remove the first (root) and last (property name)
         toTraverse.removeFirst();
         toTraverse.removeLast();
-        //if there are still some nodes in the path then it is a nested property and we need to traverse it
+        //if there are still some nodes in the osmoseWFSPath then it is a nested property and we need to traverse it
         Object toInspect = metawidget.getToInspect();
         for(String node : toTraverse)
         {

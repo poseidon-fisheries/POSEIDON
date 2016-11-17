@@ -8,14 +8,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import java.util.*;
 
 /**
- * Stepping stone to go to A*. I don't plan on using this besides testing the basics of path-finding.
+ * Stepping stone to go to A*. I don't plan on using this besides testing the basics of osmoseWFSPath-finding.
  * <br>
  * Most of this comes from: http://www.redblobgames.com/pathfinding/a-star/introduction.html
  * Created by carrknight on 11/4/15.
  */
 public class BreadthFirstPathfinder implements Pathfinder {
     /**
-     * Keeps searching the frontier until it hits the goal. Then returns the path that leads to it.
+     * Keeps searching the frontier until it hits the goal. Then returns the osmoseWFSPath that leads to it.
      *
      * @param map   the map
      * @param start the starting tile
@@ -31,7 +31,7 @@ public class BreadthFirstPathfinder implements Pathfinder {
         Preconditions.checkNotNull(end);
         Preconditions.checkNotNull(map);
 
-        //where we will eventually put the path
+        //where we will eventually put the osmoseWFSPath
         LinkedList<SeaTile> path = new LinkedList<>();
 
         //set of tiles to observe
@@ -62,7 +62,7 @@ public class BreadthFirstPathfinder implements Pathfinder {
             }
 
         }
-        //build the path
+        //build the osmoseWFSPath
         SeaTile current = end;
         path.add(current);
         while(current != start)

@@ -20,7 +20,7 @@ public class StraightLinePathfinder implements Pathfinder {
     private Table<SeaTile,SeaTile,LinkedList<SeaTile>> precomputedPaths = HashBasedTable.create();
 
     /**
-     * builds a path from start to end. No weird pathfinding here, simply move diagonally then horizontally-vertically when that's not possible anymore
+     * builds a osmoseWFSPath from start to end. No weird pathfinding here, simply move diagonally then horizontally-vertically when that's not possible anymore
      * @param map the nautical map
      * @param start the start point
      * @param end the end point

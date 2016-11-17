@@ -25,7 +25,7 @@ public class AStarPathfinder implements Pathfinder {
 
     /**
      * creates the A* pathfinder it uses distanceFunction both for computing the cost of moving from A to its neighbors
-     * and as a straight path heuristic
+     * and as a straight osmoseWFSPath heuristic
      * @param distanceFunction
      */
     public AStarPathfinder(Distance distanceFunction) {
@@ -33,7 +33,7 @@ public class AStarPathfinder implements Pathfinder {
     }
 
     /**
-     * return the full path that brings us from start to end
+     * return the full osmoseWFSPath that brings us from start to end
      *
      * @param map   the map
      * @param start the starting tile
@@ -57,7 +57,7 @@ public class AStarPathfinder implements Pathfinder {
             return new LinkedList<>(memory.get(start,end));
 
 
-        //where we will eventually put the path
+        //where we will eventually put the osmoseWFSPath
         LinkedList<SeaTile> path = new LinkedList<>();
 
         //set of tiles to observe
@@ -65,7 +65,7 @@ public class AStarPathfinder implements Pathfinder {
         frontier.add(new FrontierElement(start,0d));
         //edges explored
         HashMap<SeaTile,SeaTile> cameFrom= new HashMap<>();
-        //best path cost to here so far
+        //best osmoseWFSPath cost to here so far
         HashMap<SeaTile,Double> costSoFar = new HashMap<>();
         costSoFar.put(start,0d);
 
@@ -104,11 +104,11 @@ public class AStarPathfinder implements Pathfinder {
 
         }
 
-        //if you haven't found the path, then return null
+        //if you haven't found the osmoseWFSPath, then return null
         if(cameFrom.get(end) == null)
             return null;
 
-        //build the path
+        //build the osmoseWFSPath
         SeaTile current = end;
         path.add(current);
         while(current != start)

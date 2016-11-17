@@ -26,7 +26,7 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 {
 
     /**
-     * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
+     * the osmoseWFSPath to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
     private final LinkedHashMap<String,Path> biologicalDirectories;
 

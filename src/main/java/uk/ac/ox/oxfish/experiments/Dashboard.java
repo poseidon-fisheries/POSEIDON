@@ -44,7 +44,7 @@ public class Dashboard
         Log.set(Log.LEVEL_NONE);
         //get the directory to write in: probably with today's date
         String subDirectory = args[0];
-        //turn it into a path
+        //turn it into a osmoseWFSPath
         Path containerPath = DASHBOARD_OUTPUT_DIRECTORY.resolve(subDirectory);
         containerPath.toFile().mkdirs();
 

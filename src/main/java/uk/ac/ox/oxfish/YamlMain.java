@@ -27,7 +27,7 @@ public class YamlMain {
     @Parameter(names={"--save"},description = "saves model on file at the end of the simulation")
     private boolean saveOnExit = false;
 
-    @Parameter(names = {"--policy","-p"},description = "path to policy script file")
+    @Parameter(names = {"--policy","-p"},description = "osmoseWFSPath to policy script file")
     private String policyScript = null;
 
 

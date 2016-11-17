@@ -38,7 +38,7 @@ public class Moving implements Action
     }
 
     /**
-     * Move on a previous path or ask the map for a new path and follow it from agent location to agent destination
+     * Move on a previous osmoseWFSPath or ask the map for a new osmoseWFSPath and follow it from agent location to agent destination
      *
      * @param model a link to the model, in case you need to grab global objects
      * @param agent a link to the fisher in case you need to get or set agent's variables
@@ -68,13 +68,13 @@ public class Moving implements Action
 
 
         NauticalMap map = model.getMap();
-        //if you don't have a path, you have to find it
+        //if you don't have a osmoseWFSPath, you have to find it
         if(path==null) {
             //get the pathfinder to help
             path = map.getRoute(agent.getLocation(), agent.getDestination());
             if(path == null)
             {
-                //there is no path available
+                //there is no osmoseWFSPath available
                 agent.setDestinationForPort();
                 return new ActionResult(new Arriving(),0);
             }
@@ -103,7 +103,7 @@ public class Moving implements Action
         double timeSpentTravelling=0;
         double totalDistance = 0;
         SeaTile next = agent.getLocation();
-        //go through the path until it's empty
+        //go through the osmoseWFSPath until it's empty
         while(!path.isEmpty())
         {
             //check distance and time to travel one more node during this period
