@@ -4,14 +4,13 @@ import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
-import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -43,7 +42,7 @@ public class SocialTuningExercise {
 
     private final static int YEARS_TO_RUN = 10;
     public static final Path MAIN_DIRECTORY = Paths.get("runs", "social_tuning");
-    public static final int NUMBER_OF_EXPERIMENTS = 5;
+    public static final int NUMBER_OF_EXPERIMENTS = 100;
 
     public static void nn(String[] args) throws IOException {
 
@@ -174,6 +173,14 @@ public class SocialTuningExercise {
 
     }
 
+    public static void reversal() throws IOException {
+        defaults("gear.yaml", "_gear", 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
+        batchRun("gear.yaml", "_gear",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
+    }
 
 
 
@@ -182,12 +189,26 @@ public class SocialTuningExercise {
        //     defaults("nn.yaml", "_fronts",YEARS_TO_RUN,0);
       //  defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
        //   defaults("chaser_free.yaml", "_chaserfree",YEARS_TO_RUN,0);
-       //   defaults("chaser_gas.yaml", "_chasergas",YEARS_TO_RUN,0);
-      //  defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0);
+       //
+      //
 
-         //  defaults("fine.yaml", "_fine",YEARS_TO_RUN,0);
+
+      //  fine();
+
         //      defaults("cali_anarchy.yaml", "_calianarchy",YEARS_TO_RUN,1);
         //       defaults("cali_itq.yaml", "_caliitq",YEARS_TO_RUN,1);
+
+     //   front();
+
+        chaser();
+
+        reversal();
+        /*
+
+
+
+
+*/
 /*
 
         batchRun("nn.yaml", "_fronts",
@@ -337,11 +358,40 @@ public class SocialTuningExercise {
                  */
     }
 
+    public static void chaser() throws IOException {
+        defaults("chaser_gas.yaml", "_chasergas",YEARS_TO_RUN,0,null);
+        batchRun("chaser_gas.yaml", "_chasergas",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 0, null);
+    }
+
+    public static void front() throws IOException {
+        defaults("no_regrowth.yaml", "_noregrowth",YEARS_TO_RUN,0,null);
+
+        batchRun("no_regrowth.yaml", "_noregrowth",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 0, null);
+    }
+
+    public static void fine() throws IOException {
+        defaults("fine.yaml", "_fine", YEARS_TO_RUN, 0, null);
+        batchRun("fine.yaml", "_fine",
+                 pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         pair.getSecond()
+                 ), YEARS_TO_RUN, 0, null);
+    }
+
 
     public static void defaults(
             final String inputFile, final String outputName,
             final int yearsToRun,
-            final int firstValidYear) throws IOException
+            final int firstValidYear,
+            Path policyFile) throws IOException
     {
 
 
@@ -465,6 +515,14 @@ public class SocialTuningExercise {
 
                 FishState state = new FishState(experiment);
                 state.setScenario(scenario);
+
+                //if there is a policy script, read it now:
+                if(policyFile!=null) {
+                    String policyScriptString = new String(Files.readAllBytes(policyFile));
+                    PolicyScripts scripts = yaml.loadAs(policyScriptString, PolicyScripts.class);
+                    state.registerStartable(scripts);
+                }
+
                 state.start();
                 while (state.getYear() < yearsToRun)
                     state.schedule.step(state);
@@ -490,7 +548,8 @@ public class SocialTuningExercise {
     public static void batchRun(
             final String inputFile, final String outputName,
             Consumer<Pair<Scenario, AlgorithmFactory<? extends GeographicalRegression<Double>>>>
-                    strategyAssigner, final int yearsToRun, final int firstValidYear) throws IOException {
+                    strategyAssigner, final int yearsToRun, final int firstValidYear,
+            final Path policyFile) throws IOException {
 
 
         HashMap<String, AlgorithmFactory<? extends GeographicalRegression<Double>>> strategies = new LinkedHashMap<>();
@@ -595,6 +654,14 @@ public class SocialTuningExercise {
 
                 FishState state = new FishState(experiment);
                 state.setScenario(scenario);
+
+                //if there is a policy script, read it now:
+                if(policyFile!=null) {
+
+                    String policyScriptString = new String(Files.readAllBytes(policyFile));
+                    PolicyScripts scripts = yaml.loadAs(policyScriptString, PolicyScripts.class);
+                    state.registerStartable(scripts);
+                }
                 state.start();
                 while (state.getYear() < yearsToRun)
                     state.schedule.step(state);
@@ -615,6 +682,7 @@ public class SocialTuningExercise {
 
             }
 
+            System.out.println(MAIN_DIRECTORY.resolve(strategy.getKey()+ outputName + ".csv").toAbsolutePath());
             Files.write(MAIN_DIRECTORY.resolve(strategy.getKey()+ outputName + ".csv"), output.toString().getBytes());
 
 
