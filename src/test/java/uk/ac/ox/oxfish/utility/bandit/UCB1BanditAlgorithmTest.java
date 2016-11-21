@@ -54,7 +54,7 @@ public class UCB1BanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>5000);
+        assertTrue(bandit.getNumberOfObservations(9)>4000);
 
     }
 
