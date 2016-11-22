@@ -218,4 +218,8 @@ public class SeaTile implements Startable{
     public int[] getNumberOfFemaleFishPerAge(Species species) {
         return biology.getNumberOfFemaleFishPerAge(species);
     }
+
+    public Port grabPortHere() {
+        return portHere;
+    }
 }

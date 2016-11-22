@@ -131,7 +131,7 @@ public class Port {
 
     @Override
     public String toString() {
-        return "Port at " +location;
+        return "Port " + getName() + " at " +location;
     }
 
     public MarketMap getMarketMap(Fisher fisher) {
