@@ -7,8 +7,10 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
+import uk.ac.ox.oxfish.biology.weather.initializer.CSVWeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
+import uk.ac.ox.oxfish.biology.weather.initializer.factory.TimeSeriesWeatherFactory;
 import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.Port;
@@ -36,6 +38,7 @@ import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -43,6 +46,8 @@ import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.CsvColumnToList;
+import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
@@ -50,6 +55,7 @@ import uk.ac.ox.oxfish.utility.parameters.PortReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -86,12 +92,22 @@ public class OsmoseWFSScenario implements Scenario{
     }
 
 
-    private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
+    private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
+            new TimeSeriesWeatherFactory(
+                    Paths.get("temp_wfs","steve","Fleet","PriceWSgas.txt").toString(),
+                    true,
+                    '$',
+                    10
+            );
 
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
 
 
     private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
+
+
+
+    private DoubleParameter longlinerHoldSize = new FixedDoubleParameter(140175.5);
 
 
     /**
@@ -178,6 +194,16 @@ public class OsmoseWFSScenario implements Scenario{
                 map.addPort(port);
 
 
+            //todo put this somewhere else
+            CsvColumnToList gasPrices = new CsvColumnToList(Paths.get("temp_wfs","steve","Fleet","PriceWSgas.txt").toString(),
+                                                            true,
+                                                            '$',
+                                                            13);
+            LinkedList<Double> prices = gasPrices.readColumn();
+            TimeSeriesActuator gasActuator = TimeSeriesActuator.gasPriceDailySchedule(prices, new ArrayList<>(map.getPorts()));
+            gasActuator.step(model);
+            model.scheduleEveryDay(gasActuator, StepOrder.POLICY_UPDATE);
+
             return new ScenarioEssentials(global,map);
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,7 +236,6 @@ public class OsmoseWFSScenario implements Scenario{
             for(int id=0;id<entry.getValue();id++)
             {
                 final double speed = 1;
-                final double capacity = 100;
                 final double engineWeight = 1;
                 final double mileage = 1;
                 final double fuelCapacity = 100000000;
@@ -231,9 +256,13 @@ public class OsmoseWFSScenario implements Scenario{
                                                                   mileage,
                                                                   speed),
                                                        new FuelTank(fuelCapacity)),
-                                              new Hold(capacity, biology.getSize()), fisherGear,
+                                              new Hold(
+                                                      longlinerHoldSize.apply(random),
+                                                      biology.getSize()), fisherGear,
                                               model.getSpecies().size());
                 newFisher.getTags().add("large");
+                newFisher.getTags().add("ship");
+                newFisher.getTags().add("blue");
                 fisherCounter++;
                 //predictors
                 for(Species species : model.getSpecies())

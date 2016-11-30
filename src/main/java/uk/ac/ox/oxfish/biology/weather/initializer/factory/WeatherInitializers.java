@@ -45,6 +45,11 @@ public class WeatherInitializers {
         NAMES.put(OscillatingWeatherFactory.class,"Oscillating Weather");
 
 
+        CONSTRUCTORS.put("CSV Fixed Weather",
+                         TimeSeriesWeatherFactory::new);
+        NAMES.put(TimeSeriesWeatherFactory.class,"CSV Fixed Weather");
+
+
 
     }
 

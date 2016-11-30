@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 public class SocialTuningExercise {
 
 
-    private final static int YEARS_TO_RUN = 10;
+    private final static int YEARS_TO_RUN = 5;
     public static final Path MAIN_DIRECTORY = Paths.get("runs", "social_tuning");
     public static final int NUMBER_OF_EXPERIMENTS = 100;
 
@@ -63,7 +63,7 @@ public class SocialTuningExercise {
 
 
 
-      /*
+/*
         fine();
 
 
@@ -72,8 +72,8 @@ public class SocialTuningExercise {
         chaser();
 
         reversal();
-        */
-      parameterSweep("no_regrowth.yaml",10,0l,5);
+*/
+      parameterSweep("fine.yaml",YEARS_TO_RUN,0l,1);
 
     }
 
@@ -240,7 +240,8 @@ public class SocialTuningExercise {
         strategies.put("bandit=softmax-bad", softmaxBad);
 
 
-        strategies.put("random", new RandomFavoriteDestinationFactory());
+        strategies.put("fixed", new RandomFavoriteDestinationFactory());
+        strategies.put("random", new RandomThenBackToPortFactory());
 
 
         PerTripImitativeDestinationFactory eei = new PerTripImitativeDestinationFactory();
@@ -249,13 +250,6 @@ public class SocialTuningExercise {
         strategies.put("eei", eei);
 
 
-        //not used. Keep planning for another time
-        //PlanningHeatmapDestinationFactory perfectPlanner = new PlanningHeatmapDestinationFactory();
-        //perfectPlanner.setAlmostPerfectKnowledge(true);
-        //ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
-        //perfectPlanner.setAcquisition(acquisition);
-        //acquisition.setProportionSearched(new FixedDoubleParameter(.1));
-        //   strategies.put("perfect",perfectPlanner);
 
 
         GravitationalSearchDestinationFactory gsa = new GravitationalSearchDestinationFactory();
