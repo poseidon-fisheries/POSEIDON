@@ -1,4 +1,4 @@
-wrong,wind_speed,wrong
-0,1,0
-0,2,0
-0,3,0
+wrong,wind_speed,  "alsoWrong"
+0,1,-1
+0,2,-1
+0,3,-1

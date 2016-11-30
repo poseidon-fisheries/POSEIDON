@@ -3,21 +3,17 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BanditDestinationFactory;
-import uk.ac.ox.oxfish.geography.MapDiscretizer;
+import uk.ac.ox.oxfish.geography.MapDiscretization;
+import uk.ac.ox.oxfish.geography.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
-import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
-import uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm;
 
 import java.util.function.Function;
 
@@ -38,23 +34,23 @@ public class BanditDestinationStrategyTest {
         NauticalMap chart = map.makeMap(randomizer,
                                         mock(GlobalBiology.class),
                                         mock(FishState.class));
-        MapDiscretizer discretizer = new MapDiscretizer(chart, 2, 2);
+        SquaresMapDiscretizer discretizer = new SquaresMapDiscretizer(2, 2);
+        MapDiscretization discretization = new MapDiscretization(discretizer);
+        discretization.discretize(chart);
         BanditDestinationStrategy strategy = new BanditDestinationStrategy(
                 (Function<Integer, BanditAverage>) integer -> new BanditAverage(integer,
                                                                                 () -> new ExponentialMovingAverage<>(.5)),
                 banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,.1),
-                discretizer,
+                discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer))
         );
-
-        discretizer.filterOutAllLandTiles();
 
         //option 2 is the best, you should pick it!
 
 
         for (int i = 0; i < 1000; i++) {
             SeaTile tile = strategy.getFavoriteSpot();
-            int armPlayed = discretizer.getGroup(tile);
+            int armPlayed = discretization.getGroup(tile);
             double reward = -Math.pow(armPlayed-2,2)+randomizer.nextGaussian()/2;
             strategy.choose(tile,reward,randomizer);
         }
@@ -72,8 +68,9 @@ public class BanditDestinationStrategyTest {
         NauticalMap chart = map.makeMap(randomizer,
                                         mock(GlobalBiology.class),
                                         mock(FishState.class));
-        MapDiscretizer discretizer = new MapDiscretizer(chart, 2, 2);
-        //forced to pick always area 0
+        SquaresMapDiscretizer discretizer = new SquaresMapDiscretizer(2, 2);
+        MapDiscretization discretization = new MapDiscretization(discretizer);
+        discretization.discretize(chart);        //forced to pick always area 0
         final BanditAlgorithm banditAlgorithm = mock(BanditAlgorithm.class);
 
         BanditDestinationStrategy strategy = new BanditDestinationStrategy(
@@ -81,11 +78,10 @@ public class BanditDestinationStrategyTest {
                                              () -> new ExponentialMovingAverage<>(
                                                      .5)),
                 banditAverage -> banditAlgorithm,
-                discretizer,
+                discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer))
         );
 
-        discretizer.filterOutAllLandTiles();
 
         int[][] chosen = new int[3][3];
         for (int i = 0; i < 1000; i++) {

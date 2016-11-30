@@ -3,9 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.geography.MapDiscretizer;
+import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
@@ -14,7 +12,6 @@ import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -28,7 +25,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
     private final BanditAlgorithm algorithm;
 
-    private final MapDiscretizer discretizer;
+    private final MapDiscretization discretization;
 
     private final FavoriteDestinationStrategy delegate;
 
@@ -42,7 +39,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
     /**
      * the constructor looks a bit weird but it's just due to the fact that we need to first
-     * figure out the right number of arms from the discretizer
+     * figure out the right number of arms from the discretization
      * @param averagerMaker builds the bandit average given the number of arms
      * @param banditMaker builds the bandit algorithm given the bandit average
      * @param delegate the delegate strategy
@@ -50,14 +47,14 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     public BanditDestinationStrategy(
             Function<Integer, BanditAverage> averagerMaker,
             BanditSupplier banditMaker,
-            MapDiscretizer discretizer,
+            MapDiscretization discretization,
             FavoriteDestinationStrategy delegate) {
         //map arms to valid map groups
-        this.discretizer = discretizer;
+        this.discretization = discretization;
         ArrayList<Integer> validGroups = new ArrayList<>();
-        for(int i=0; i<discretizer.getNumberOfGroups(); i++)
+        for(int i = 0; i< discretization.getNumberOfGroups(); i++)
         {
-            if(discretizer.isValid(i))
+            if(discretization.isValid(i))
                 validGroups.add(i);
         }
         filteredGroups = new int[validGroups.size()];
@@ -85,15 +82,15 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     public void choose(SeaTile lastDestination, double reward, MersenneTwisterFast random){
 
 
-        int armPlayed = fromMapGroupToBanditArm(discretizer.getGroup(lastDestination));
+        int armPlayed = fromMapGroupToBanditArm(discretization.getGroup(lastDestination));
         algorithm.observeReward(reward,armPlayed);
 
         //make new decision
         int armToPlay = algorithm.chooseArm(random);
         int groupToFishIn = fromBanditArmToMapGroup(armToPlay);
-        assert discretizer.isValid(groupToFishIn);
-        //assuming here the map discretizer has already removed all the land tiles
-        List<SeaTile> mapGroup = discretizer.getGroup(groupToFishIn);
+        assert discretization.isValid(groupToFishIn);
+        //assuming here the map discretization has already removed all the land tiles
+        List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
         SeaTile tile = mapGroup.get(random.nextInt(
                 mapGroup.size()));
         delegate.setFavoriteSpot(tile);
@@ -117,7 +114,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
             @Override
             public void start(FishState model, Fisher fisher) {
-                discretizer.filterOutAllLandTiles();
+
             }
 
             @Override
@@ -172,5 +169,14 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
     public SeaTile getFavoriteSpot() {
         return delegate.getFavoriteSpot();
+    }
+
+    /**
+     * Getter for property 'discretization'.
+     *
+     * @return Value for property 'discretization'.
+     */
+    public MapDiscretization getDiscretization() {
+        return discretization;
     }
 }

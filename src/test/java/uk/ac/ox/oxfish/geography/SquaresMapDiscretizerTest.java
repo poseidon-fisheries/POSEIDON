@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Created by carrknight on 11/9/16.
  */
-public class MapDiscretizerTest {
+public class SquaresMapDiscretizerTest {
 
 
     @Test
@@ -23,13 +23,14 @@ public class MapDiscretizerTest {
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                               mock(GlobalBiology.class),
                                               mock(FishState.class));
-        MapDiscretizer discretizer = new MapDiscretizer(chart,2,3);
-        assertEquals(discretizer.getNumberOfGroups(),12);
+        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(2, 3));
+        discretization.discretize(chart);
+        assertEquals(discretization.getNumberOfGroups(),12);
 
-        assertTrue(discretizer.isValid(0));
-        assertTrue(!discretizer.isValid(11));
+        assertTrue(discretization.isValid(0));
+        assertTrue(!discretization.isValid(11));
 
-        assertTrue(discretizer.getGroup(5).contains(chart.getSeaTile(2,2)));
+        assertTrue(discretization.getGroup(5).contains(chart.getSeaTile(2,2)));
 
 
     }
@@ -43,8 +44,9 @@ public class MapDiscretizerTest {
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                         mock(GlobalBiology.class),
                                         mock(FishState.class));
-        MapDiscretizer discretizer = new MapDiscretizer(chart,2,2);
-        assertEquals(discretizer.getNumberOfGroups(),9);
+        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(2, 2));
+        discretization.discretize(chart);
+        assertEquals(discretization.getNumberOfGroups(),9);
 
 
 

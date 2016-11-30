@@ -2,24 +2,16 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.geography.MapDiscretizer;
+import uk.ac.ox.oxfish.geography.MapDiscretization;
+import uk.ac.ox.oxfish.geography.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
-import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
-import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
-import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
-import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 11/10/16.
@@ -31,7 +23,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
     private int verticalTicks = 2;
 
-    private static Locker<FishState,MapDiscretizer> discretizer = new Locker();
+    private static Locker<FishState,MapDiscretization> discretizer = new Locker();
 
     private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
 
@@ -48,12 +40,18 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     public BanditDestinationStrategy apply(FishState state)
     {
 
-        MapDiscretizer map =  discretizer.presentKey(state,
-                                                     () -> new MapDiscretizer(
-                                                             state.getMap(),
-                                                             verticalTicks,
-                                                             horizontalTicks)
-        );
+        MapDiscretization map =  discretizer.
+                presentKey(state,
+                           () -> {
+                               MapDiscretization discretization =
+                                       new MapDiscretization(
+                                               new SquaresMapDiscretizer(
+                                                       verticalTicks,
+                                                       horizontalTicks));
+                               discretization.discretize(state.getMap());
+                               return discretization;
+                           }
+                );
 
 
         return new BanditDestinationStrategy(
