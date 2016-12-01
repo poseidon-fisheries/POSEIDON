@@ -59,7 +59,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
             this.extractors[i+1] = nonInterceptExtractors[i];
         this.extractors[0] = new ObservationExtractor() {
             @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                 return 1;
             }
         };
@@ -82,11 +82,11 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
 
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher) {
+            GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
         //add observation with 1/weight as sigma^2
         double[] features = ObservationExtractor.convertToFeatures(
                 observation.getTile(), observation.getTime(),
-                fisher, extractors);
+                fisher, extractors, model);
         //go through all the tiles
         for(Map.Entry<SeaTile,LeastSquareFilter> lowess : lowesses.entrySet())
         {
@@ -109,14 +109,14 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         LeastSquareFilter predictor = lowesses.get(tile);
         if(predictor==null)
             return Double.NaN;
         else {
             double[] features = ObservationExtractor.convertToFeatures(
-                    tile,time,fisher,extractors);
+                    tile,time,fisher,extractors, model);
             double prediction = 0;
             for(int i=0; i<features.length; i++)
                 prediction += features[i] * predictor.getBeta()[i];

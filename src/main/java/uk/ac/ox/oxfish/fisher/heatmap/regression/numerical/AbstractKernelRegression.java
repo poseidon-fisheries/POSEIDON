@@ -32,9 +32,10 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
      * adds an observation and if there are too many removes the oldest one
      * @param observation
      * @param fisher
+     * @param model
      */
     @Override
-    public void addObservation(GeographicalObservation observation, Fisher fisher) {
+    public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
         observations.add(observation);
         if(observations.size()>maximumNumberOfObservations)
         {
@@ -94,7 +95,7 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
 
 
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;

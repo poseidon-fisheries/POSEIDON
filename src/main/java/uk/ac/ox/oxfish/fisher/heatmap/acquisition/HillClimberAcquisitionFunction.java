@@ -55,8 +55,8 @@ public class HillClimberAcquisitionFunction implements  AcquisitionFunction
             SeaTile option = (SeaTile) mooreNeighbors.remove(0);
             //if it is better, restart search at that neighbor!
             if(option.getAltitude()<0 && !checkedAlready.contains(option) &&
-                    regression.predict(location, time, fisher )
-                            < regression.predict(option, time, fisher )) {
+                    regression.predict(location, time, fisher,state )
+                            < regression.predict(option, time, fisher,state )) {
                 location = option;
                 mooreNeighbors = new Bag(map.getMooreNeighbors(location, stepSize));
                 mooreNeighbors.shuffle(state.getRandom());

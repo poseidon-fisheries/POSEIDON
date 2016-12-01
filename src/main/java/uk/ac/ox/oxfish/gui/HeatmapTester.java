@@ -142,7 +142,7 @@ public class HeatmapTester extends GUIState
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
-                        return regression.predict(tile, state.getHoursSinceStart(), null );
+                        return regression.predict(tile, state.getHoursSinceStart(), null, state);
                     }
                 },
                 false
@@ -156,7 +156,7 @@ public class HeatmapTester extends GUIState
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
-                        return regression.predict(tile, state.getHoursSinceStart(), null );
+                        return regression.predict(tile, state.getHoursSinceStart(), null, state);
                     }
                 },
                 false
@@ -177,7 +177,7 @@ public class HeatmapTester extends GUIState
                 regression.addObservation(new GeographicalObservation(state.getMap().getSeaTile(gridPosition.getX(),gridPosition.getY()),
                                                                       state.getHoursSinceStart(),
                                                                       observation),
-                                          state.getFishers().get(0));
+                                          state.getFishers().get(0), state);
 
                 display2D.repaint();
 

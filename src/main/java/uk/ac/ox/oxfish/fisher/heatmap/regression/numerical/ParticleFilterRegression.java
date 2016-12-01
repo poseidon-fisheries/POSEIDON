@@ -108,12 +108,12 @@ public class ParticleFilterRegression implements GeographicalRegression<Double> 
 
     @Override
     public double predict(
-            SeaTile tile, double time, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher, FishState model) {
         return getMean(tile);
     }
 
     @Override
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher) {
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
 
         for(Map.Entry<SeaTile,ParticleFilter<Double>> filter : filters.entrySet())
         {

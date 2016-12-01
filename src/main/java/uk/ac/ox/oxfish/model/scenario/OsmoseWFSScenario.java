@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Splitter;
+import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -23,7 +24,9 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFact
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -31,6 +34,8 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
+import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
+import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
@@ -40,6 +45,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.*;
@@ -47,7 +53,10 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnToList;
+import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
+import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
+import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
@@ -264,6 +273,36 @@ public class OsmoseWFSScenario implements Scenario{
                 newFisher.getTags().add("ship");
                 newFisher.getTags().add("blue");
                 fisherCounter++;
+
+
+                //todo move this
+                CsvColumnsToLists reader = new CsvColumnsToLists(
+                        Paths.get("temp_wfs","areas.txt").toAbsolutePath().toString(),
+                        ',',
+                        new String[]{"eastings","northings"}
+                );
+
+                LinkedList<Double>[] lists = reader.readColumns();
+                ArrayList<Coordinate> coordinates = new ArrayList<>();
+                for(int i=0; i<lists[0].size(); i++)
+                    coordinates.add(new Coordinate(lists[0].get(i),lists[1].get(i),0));
+
+                CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(coordinates);
+                MapDiscretization discretization = new MapDiscretization(discretizer);
+                discretization.discretize(map);
+                newFisher.setDestinationStrategy(
+                        new BanditDestinationStrategy(
+                                arms -> new BanditAverage(
+                                        arms,
+                                        new ExponentialMovingAverageFactory(),
+                                        model
+                                ),
+                                (new EpsilonGreedyBanditFactory()).apply(model),
+                                discretization,
+                                new FavoriteDestinationStrategy(map, random)));
+
+
+
                 //predictors
                 for(Species species : model.getSpecies())
                 {
@@ -322,6 +361,8 @@ public class OsmoseWFSScenario implements Scenario{
                                                             fisher.getHoursAtSea());
                         });
             }
+
+
 
 
         //make friends only within the same port

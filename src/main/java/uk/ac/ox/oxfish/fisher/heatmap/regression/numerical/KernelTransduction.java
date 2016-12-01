@@ -40,7 +40,7 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         KernelTilePredictor kernel = kernels.get(tile);
         if(kernel==null)
@@ -55,14 +55,15 @@ public class KernelTransduction implements GeographicalRegression<Double> {
      * returns the current geographical prediction
      * @param newObservation
      * @param fisher
+     * @param model
      */
     @Override
-    public void addObservation(GeographicalObservation newObservation, Fisher fisher) {
+    public void addObservation(GeographicalObservation newObservation, Fisher fisher, FishState model) {
 
         //go through all the tiles
         for(KernelTilePredictor kernel : kernels.values())
         {
-           kernel.addObservation(newObservation,fisher);
+           kernel.addObservation(newObservation,fisher, model);
         }
     }
 

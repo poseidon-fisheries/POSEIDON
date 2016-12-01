@@ -37,34 +37,34 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
             extractors[0] = new ObservationExtractor() {
                 @Override
                 public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent) {
+                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                     return timeOfObservation;
                 }
             };
             extractors[1] = new ObservationExtractor() {
                 @Override
                 public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent) {
+                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                     return tile.getGridX();
                 }
             };
             extractors[2] = new ObservationExtractor() {
                 @Override
                 public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent) {
+                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                     return tile.getGridY();
                 }
             };
             ManhattanDistance distance = new ManhattanDistance();
             extractors[3] = new ObservationExtractor() {
                 @Override
-                public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                     return distance.distance(tile,agent.getHomePort().getLocation())+1;
                 }
             } ;
             extractors[4] = new ObservationExtractor() {
                 @Override
-                public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                     return  tile.getRockyPercentage();
                 }
             };

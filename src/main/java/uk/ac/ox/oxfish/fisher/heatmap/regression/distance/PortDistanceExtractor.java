@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * Differences in distance from port is what defines this distance
@@ -26,7 +26,7 @@ public class PortDistanceExtractor implements ObservationExtractor {
     }
 
     @Override
-    public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
         SeaTile portLocation = agent.getHomePort().getLocation();
 
         return geographicalDistance.distance(portLocation,tile,map)+1d;

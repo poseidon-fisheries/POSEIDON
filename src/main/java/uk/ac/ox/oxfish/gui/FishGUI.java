@@ -325,14 +325,12 @@ public class  FishGUI extends GUIState{
     //one of the most annoying parts of mason: overriding static methods
     public static Object getInfo()
     {
-        return "On play the model will read the bathymetry of california and paste the known MPAs on it as little black polygons. \n" +
-                "It takes a bit because the bathymetry data is about 30MB. Good news is that most of it is land or deep ocean" +
-                "so there will be plenty to cut out";
+        return "If you are reading this I was lazy and didn't write a proper description. Thank you.";
     }
 
     public static String getName()
     {
-        return  "Proto-Prototype of a Fishery Model";
+        return  "Poseidon";
     }
 
 
@@ -415,6 +413,13 @@ public class  FishGUI extends GUIState{
         displayFrame.setTitle(title);
 
         return displayFrame;
+    }
+
+
+    public void forceRepaint(){
+        controller.refresh();
+        displayFrame.revalidate();
+        displayFrame.repaint();
     }
 
 }

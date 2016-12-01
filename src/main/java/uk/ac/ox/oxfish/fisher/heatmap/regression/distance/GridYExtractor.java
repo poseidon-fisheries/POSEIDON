@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * returns the grid y of the observation's tile
@@ -13,7 +14,7 @@ public class GridYExtractor implements ObservationExtractor{
 
     @Override
     public double extract(
-            SeaTile tile, double timeOfObservation, Fisher agent) {
+            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
         return tile.getGridY();
     }
 }

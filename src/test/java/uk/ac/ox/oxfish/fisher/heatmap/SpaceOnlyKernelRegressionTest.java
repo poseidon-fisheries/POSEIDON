@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.SpaceOnlyKernelRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -25,27 +26,27 @@ public class SpaceOnlyKernelRegressionTest
         SeaTile stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(0);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub, 0, 100d), null);
+        regression.addObservation(new GeographicalObservation<>(stub, 0, 100d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(10);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,150d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,150d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(7);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,110d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,110d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(15);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,200d),null );
+        regression.addObservation(new GeographicalObservation<>(stub,0,200d),null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(-3);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,20d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,20d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(-6);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,0d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,0d), null,mock(FishState.class) );
 
         //ought to be an increasing function
         for(int x=-10; x<10; x++) {
@@ -63,27 +64,27 @@ public class SpaceOnlyKernelRegressionTest
         SeaTile stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(0);
         when(stub.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(stub,0,100d),null );
+        regression.addObservation(new GeographicalObservation<>(stub,0,100d),null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(10);
         when(stub.getGridY()).thenReturn(10);
-        regression.addObservation(new GeographicalObservation<>(stub,0,150d),null );
+        regression.addObservation(new GeographicalObservation<>(stub,0,150d),null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(7);
         when(stub.getGridY()).thenReturn(7);
-        regression.addObservation(new GeographicalObservation<>(stub,0,110d),null );
+        regression.addObservation(new GeographicalObservation<>(stub,0,110d),null, mock(FishState.class));
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(15);
         when(stub.getGridY()).thenReturn(15);
-        regression.addObservation(new GeographicalObservation<>(stub,0,200d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,200d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(-3);
         when(stub.getGridY()).thenReturn(-3);
-        regression.addObservation(new GeographicalObservation<>(stub,0,20d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,20d), null,mock(FishState.class) );
         stub = mock(SeaTile.class);
         when(stub.getGridX()).thenReturn(-6);
         when(stub.getGridY()).thenReturn(-6);
-        regression.addObservation(new GeographicalObservation<>(stub,0,0d), null);
+        regression.addObservation(new GeographicalObservation<>(stub,0,0d), null,mock(FishState.class) );
 
         //ought to be an increasing function
         for(int x=-10; x<10; x++) {

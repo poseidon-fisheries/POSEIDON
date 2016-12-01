@@ -10,7 +10,6 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
@@ -34,8 +33,8 @@ public class DrawHeatmaps
     public static void main(String[] args) throws Exception {
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1, 1},
-                (tile, timeOfObservation, agent) -> tile.getGridX(),
-                (tile, timeOfObservation, agent) -> tile.getGridY()
+                (tile, timeOfObservation, agent, model) -> tile.getGridX(),
+                (tile, timeOfObservation, agent, model) -> tile.getGridY()
         ),"nn_simple");
 
         distancePlot(new NearestNeighborRegression(
@@ -46,14 +45,14 @@ public class DrawHeatmaps
 
         distancePlot(new NearestNeighborRegression(
                 2, new double[]{1, 1},
-                (tile, timeOfObservation, agent) -> tile.getGridX(),
-                (tile, timeOfObservation, agent) -> tile.getGridY()
+                (tile, timeOfObservation, agent, model) -> tile.getGridX(),
+                (tile, timeOfObservation, agent, model) -> tile.getGridY()
         ),"nn_multiple");
 
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1,1,1},
-                (tile, timeOfObservation, agent) -> tile.getGridX(),
-                (tile, timeOfObservation, agent) -> tile.getGridY(),
+                (tile, timeOfObservation, agent,  model) -> tile.getGridX(),
+                (tile, timeOfObservation, agent, model) -> tile.getGridY(),
                 new PortDistanceExtractor(new ManhattanDistance(),null)
         ),"nn_both");
 
@@ -61,16 +60,16 @@ public class DrawHeatmaps
         distancePlot(new KernelRegression(
                 100,
                 new EpanechinikovKernel(0),
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridX(), 30d),
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridY(), 30d)
+                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridX(), 30d),
+                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridY(), 30d)
         ), "epa_simple");
 
 
         distancePlot(new KernelRegression(
                 100,
                 new EpanechinikovKernel(0),
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridX(), 30d),
-                new Pair<>((tile, timeOfObservation, agent) -> tile.getGridY(), 30d)
+                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridX(), 30d),
+                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridY(), 30d)
         ), "epa_tilded");
 
 
@@ -143,7 +142,7 @@ public class DrawHeatmaps
                         FISH_STATE.getMap().getSeaTile(1, 1),
                         0,
                         100d
-                ), mock
+                ), mock,mock(FishState.class)
         );
 
         regression.addObservation(
@@ -151,7 +150,7 @@ public class DrawHeatmaps
                         FISH_STATE.getMap().getSeaTile(4, 5),
                         0,
                         30d
-                ), mock
+                ), mock,mock(FishState.class)
         );
 
 
@@ -160,7 +159,7 @@ public class DrawHeatmaps
                         FISH_STATE.getMap().getSeaTile(8, 6),
                         0,
                         5d
-                ), mock
+                ), mock,mock(FishState.class)
         );
 
         StringBuilder output = new StringBuilder("x,y,value").append("\n");
@@ -168,7 +167,7 @@ public class DrawHeatmaps
         {
             for (int y = 0; y < 10; y++) {
                 output.append((x+1) + "," + (y+1) + "," + regression.predict(
-                        FISH_STATE.getMap().getSeaTile(x, y), 0, mock
+                        FISH_STATE.getMap().getSeaTile(x, y), 0, mock,mock(FishState.class)
                 ));
                 output.append("\n");
             }

@@ -67,28 +67,28 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
      * delegate
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
 
 
-        return delegate.predict(tile,time,fisher);
+        return delegate.predict(tile,time,fisher,model );
     }
 
     /**
      * learn from this observation
-     *
-     * @param observation
+     *  @param observation
      * @param fisher
+     * @param model
      */
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher)
+            GeographicalObservation<Double> observation, Fisher fisher, FishState model)
     {
 
         numberOfObservations++;
         if(numberOfObservations> observationsBeforeTuning)
-            tune(observation,fisher);
-        delegate.addObservation(observation,fisher);
+            tune(observation,fisher,model);
+        delegate.addObservation(observation,fisher, model);
 
 
     }
@@ -97,11 +97,11 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
      * performs a one step gradient descent
      */
     private void tune(GeographicalObservation<Double> observation,
-                      Fisher fisher)
+                      Fisher fisher, FishState model)
     {
 
         //find (squared) prediction error
-        double predictionError =  delegate.predict(observation.getTile(),observation.getTime(),fisher) -
+        double predictionError =  delegate.predict(observation.getTile(),observation.getTime(),fisher,model ) -
                 extractNumericalYFromObservation(observation,fisher);
         predictionError*=predictionError;
         if(!Double.isFinite(predictionError))
@@ -126,7 +126,7 @@ public class PersonalTuningRegression implements GeographicalRegression<Double>
                 }
 
             delegate.setParameters(highParameters);
-            double errorHigh = delegate.predict(observation.getTile(),observation.getTime(),fisher) -
+            double errorHigh = delegate.predict(observation.getTile(),observation.getTime(),fisher,model ) -
                     extractNumericalYFromObservation(observation,fisher);
 
             gradient[i] = (errorHigh*errorHigh-predictionError)/h;

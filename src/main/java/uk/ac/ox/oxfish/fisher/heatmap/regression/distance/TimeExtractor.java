@@ -1,9 +1,9 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.distance;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * returns time from the observation
@@ -16,7 +16,7 @@ public class TimeExtractor implements ObservationExtractor
 
 
     @Override
-    public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+    public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
         return timeOfObservation;
     }
 }

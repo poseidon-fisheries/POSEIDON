@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.model.Startable;
 
 /**
  * Anything that predicts over a geographical map
@@ -18,16 +18,18 @@ public interface GeographicalRegression<V> extends FisherStartable
      * @param tile
      * @param time
      * @param fisher
+     * @param model
      * @return
      */
-    public double predict(SeaTile tile, double time, Fisher fisher);
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model);
 
     /**
      * learn from this observation
      * @param observation
      * @param fisher
+     * @param model
      */
-    public void  addObservation(GeographicalObservation<V> observation, Fisher fisher);
+    public void  addObservation(GeographicalObservation<V> observation, Fisher fisher, FishState model);
 
     /**
      * turn the "V" value of the geographical observation into a number

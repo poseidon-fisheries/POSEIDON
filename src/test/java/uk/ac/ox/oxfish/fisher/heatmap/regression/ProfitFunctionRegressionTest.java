@@ -58,8 +58,8 @@ public class ProfitFunctionRegressionTest {
             public void reactToFinishedTrip(TripRecord record) {
                 regression.addObservation(new GeographicalObservation<>(record.getMostFishedTileInTrip(),
                                                                         state.getHoursSinceStart(),
-                                                                        record),fisher
-                                          );
+                                                                        record),fisher,state
+                );
             }
         });
 

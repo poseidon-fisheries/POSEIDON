@@ -1,12 +1,9 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.PriorityQueue;
@@ -74,9 +71,10 @@ public class KernelRegression  implements GeographicalRegression<Double>{
      * adds an observation and if there are too many removes the oldest one
      * @param observation
      * @param fisher
+     * @param model
      */
 
-    public void addObservation(GeographicalObservation observation, Fisher fisher) {
+    public void addObservation(GeographicalObservation observation, Fisher fisher, FishState model) {
         observations.add(observation);
         if(observations.size()>maximumNumberOfObservationsToKeep)
         {
@@ -106,10 +104,11 @@ public class KernelRegression  implements GeographicalRegression<Double>{
      * @param tile
      * @param time
      * @param fisher
+     * @param model
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
 
         double kernelSum = 0;
@@ -120,10 +119,10 @@ public class KernelRegression  implements GeographicalRegression<Double>{
             for(int i=0; i<bandwidths.length; i++) {
                 kernel.setBandwidth(bandwidths[i]);
                 currentKernel *= kernel.distance(
-                        extractors[i].extract(tile,time,fisher),
+                        extractors[i].extract(tile,time,fisher,model ),
                         extractors[i].extract(observation.getTile(),
                                               observation.getTime(),
-                                              fisher)
+                                              fisher, model)
                 );
                 //don't bother if it's a 0
                 if((currentKernel )<.00001)

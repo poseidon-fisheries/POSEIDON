@@ -67,8 +67,8 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
          regression.addObservation(
                 new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
                                               record),
-                fisher
-        );
+                fisher,model
+         );
 
     }
 
@@ -99,7 +99,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         }
 
         @Override
-        public double predict(SeaTile tile, double time, Fisher fisher) {
+        public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
             return fisher.getGear().expectedHourlyCatch(fisher,tile,1,biology)[speciesIndex];
         }
 
@@ -107,7 +107,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
         //ignored
         @Override
         public void addObservation(
-                GeographicalObservation<Double> observation, Fisher fisher) {
+                GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
 
         }
 

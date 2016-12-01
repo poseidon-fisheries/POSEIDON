@@ -19,7 +19,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Inspired by folk interviews, what if you are only classifying spots as good/bad.
@@ -121,13 +120,13 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
     }
     /**
      * learn from this observation
-     *
-     * @param observation
+     *  @param observation
      * @param fisher
+     * @param model
      */
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher)
+            GeographicalObservation<Double> observation, Fisher fisher, FishState model)
     {
 
         for(Map.Entry<SeaTile,Double> probability : spots.entrySet())
@@ -192,10 +191,11 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * @param tile
      * @param time
      * @param fisher
+     * @param model
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         Double probabilityGood = spots.get(tile);
         if(probabilityGood==null)

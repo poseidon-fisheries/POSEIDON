@@ -29,13 +29,13 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
         ManhattanDistance distance = new ManhattanDistance();
         extractors[0] = new ObservationExtractor() {
             @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                 return distance.distance(tile,agent.getHomePort().getLocation());
             }
         } ;
         extractors[1] = new ObservationExtractor() {
             @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                 return  tile.getRockyPercentage();
             }
         };

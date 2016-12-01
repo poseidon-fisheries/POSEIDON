@@ -165,23 +165,25 @@ public class SocialTuningRegression<V>  implements GeographicalRegression<V>
      * @param tile
      * @param time
      * @param fisher
+     * @param model
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
-        return delegate.predict(tile, time, fisher);
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
+        return delegate.predict(tile, time, fisher, model);
     }
 
     /**
      * learn from this observation
      * @param observation
      * @param fisher
+     * @param model
      */
     @Override
     public void addObservation(
             GeographicalObservation<V> observation,
-            Fisher fisher) {
-        delegate.addObservation(observation, fisher);
+            Fisher fisher, FishState model) {
+        delegate.addObservation(observation, fisher,model );
     }
 
     /**

@@ -5,13 +5,13 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridXExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridYExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTilePredictor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by carrknight on 7/8/16.
@@ -44,7 +44,7 @@ public class KernelTilePredictorTest {
                         0d,
                         80d
                 ),
-                null
+                null,mock(FishState.class)
         );
         predictor.addObservation(
                 new GeographicalObservation<>(
@@ -52,7 +52,7 @@ public class KernelTilePredictorTest {
                         0d,
                         90d
                 ),
-                null
+                null,mock(FishState.class)
         );
         predictor.addObservation(
                 new GeographicalObservation<>(
@@ -60,7 +60,7 @@ public class KernelTilePredictorTest {
                         0d,
                         110d
                 ),
-                null
+                null,mock(FishState.class)
         );
         predictor.addObservation(
                 new GeographicalObservation<>(
@@ -68,7 +68,7 @@ public class KernelTilePredictorTest {
                         0d,
                         130d
                 ),
-                null
+                null,mock(FishState.class)
         );
         Assert.assertEquals(predictor.getCurrentPrediction(),100,5);
     }
@@ -108,7 +108,7 @@ public class KernelTilePredictorTest {
                         0d,
                         80d
                 ),
-                null
+                null,mock(FishState.class)
         );
         notForgetting.addObservation(
                  new GeographicalObservation<>(
@@ -116,7 +116,7 @@ public class KernelTilePredictorTest {
                         0d,
                         80d
                 ),
-                null
+                null,mock(FishState.class)
         );
 
         forgetting.addObservation(
@@ -125,7 +125,7 @@ public class KernelTilePredictorTest {
                         0d,
                         100d
                 ),
-                null
+                null,mock(FishState.class)
         );
         notForgetting.addObservation(
                 new GeographicalObservation<>(
@@ -133,7 +133,7 @@ public class KernelTilePredictorTest {
                         0d,
                         100d
                 ),
-                null
+                null,mock(FishState.class)
         );
 
         System.out.println(forgetting.getCurrentPrediction());

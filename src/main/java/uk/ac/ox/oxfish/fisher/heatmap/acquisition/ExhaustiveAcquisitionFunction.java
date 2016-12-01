@@ -48,7 +48,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
         Pair<SeaTile,Double> best;
         if(current!=null)
-            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), fisher));
+            best = new Pair<>(current, regression.predict(current, state.getHoursSinceStart(), fisher,state ));
         else
             best = new Pair<>(null,-Double.MAX_VALUE);
         assert Double.isFinite(best.getSecond());
@@ -56,7 +56,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         {
             if(random.nextBoolean(proportionSearched))
             {
-                double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher);
+                double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher,state );
                 if(Double.isFinite(predicted) && predicted > best.getSecond())
                     best=new Pair<>(tile,predicted);
             }

@@ -26,13 +26,13 @@ public class PersonalTuningRegressionTest {
             double[] parameters =  new double[2];
 
             @Override
-            public double predict(SeaTile tile, double time, Fisher fisher) {
+            public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
                 return Math.pow(parameters[0]+2,2) + Math.pow(parameters[1]-10,2);
             }
 
             @Override
             public void addObservation(
-                    GeographicalObservation<Double> observation, Fisher fisher) {
+                    GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
                 //ignored
             }
 
@@ -74,7 +74,7 @@ public class PersonalTuningRegressionTest {
 
         for(int i=0; i<1000; i++)
         {
-            regression.addObservation(mock(GeographicalObservation.class),mock(Fisher.class));
+            regression.addObservation(mock(GeographicalObservation.class),mock(Fisher.class),mock(FishState.class) );
             System.out.println(Arrays.toString(regression.getParametersAsArray()));
         }
         //the approach gets really slow so you might not have reached it

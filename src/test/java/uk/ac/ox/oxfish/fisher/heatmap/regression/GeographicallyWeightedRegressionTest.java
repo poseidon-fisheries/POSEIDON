@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -40,7 +41,7 @@ public class GeographicallyWeightedRegressionTest {
                     //this will actually be rerouted to read from the file
                     new ObservationExtractor() {
                         @Override
-                        public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                        public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                             return timeOfObservation;
                         }
                     }
@@ -62,7 +63,8 @@ public class GeographicallyWeightedRegressionTest {
             when(distance.distance(any(),any(),any())).thenReturn(
                     Double.parseDouble(split[2])
             );
-            regression.addObservation(new GeographicalObservation<>(mock(SeaTile.class),x,y),mock(Fisher.class));
+            regression.addObservation(new GeographicalObservation<>(mock(SeaTile.class),x,y),
+                                      mock(Fisher.class), mock(FishState.class));
         }
         System.out.println(Arrays.toString(regression.getBeta(tile)));
         assertEquals(1.423,regression.getBeta(tile)[0],.1); //some imprecision here, but more or less correct
@@ -85,7 +87,7 @@ public class GeographicallyWeightedRegressionTest {
                         //this will actually be rerouted to read from the file
                         new ObservationExtractor() {
                             @Override
-                            public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                                 return timeOfObservation;
                             }
                         }

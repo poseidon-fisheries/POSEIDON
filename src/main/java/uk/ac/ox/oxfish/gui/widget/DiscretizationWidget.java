@@ -111,6 +111,7 @@ public class DiscretizationWidget implements WidgetBuilder<JComponent,SwingMetaw
                                                         },true
                                                 ));
             gui.getMainPortrayal().setSelectedEncoding("Discretization");
+            gui.forceRepaint();
         }
     }
 }

@@ -115,7 +115,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
                 mostFishedTile,
                 model.getHoursSinceStart(),
                 record.getProfitPerHour(true)
-        ), fisher);
+        ), fisher,model );
     }
 
     @Override

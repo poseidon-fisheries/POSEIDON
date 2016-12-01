@@ -117,7 +117,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
 
     @Override
     public double predict(
-            SeaTile tile, double time, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher, FishState model) {
         OneDimensionalKalmanFilter kalmanFilter = filters.get(tile);
         return kalmanFilter == null ? Double.NaN :
                 kalmanFilter.getStateEstimate() + optimism * kalmanFilter.getStandardDeviation();
@@ -134,7 +134,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
 
     @Override
     public void addObservation(
-            GeographicalObservation<Double> observation, Fisher fisher)
+            GeographicalObservation<Double> observation, Fisher fisher, FishState model)
     {
 
         for(Map.Entry<SeaTile,OneDimensionalKalmanFilter> filter : filters.entrySet())

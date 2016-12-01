@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
-import ags.utils.dataStructures.trees.thirdGenKD.DistanceFunction;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
@@ -66,14 +65,14 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
      * @return
      */
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         return closestNeighborForNow.getOrDefault(tile,PLACEHOLDER).getValue();
     }
 
 
     @Override
-    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher)
+    public void addObservation(GeographicalObservation<Double> newObservation, Fisher fisher, FishState model)
     {
 
         //go through all the tiles
@@ -82,22 +81,23 @@ public class NearestNeighborTransduction implements GeographicalRegression<Doubl
             //if the new observation is closer than the old one this is your new closest observation
             GeographicalObservation<Double> oldObservation = closestNeighborForNow.get(tile);
             if(oldObservation == PLACEHOLDER || (
-                    distance(fisher, tile, newObservation.getTime(), newObservation) <
-                            distance(fisher, tile, newObservation.getTime(), oldObservation)))
+                    distance(fisher, tile, newObservation.getTime(),model , newObservation) <
+                            distance(fisher, tile, newObservation.getTime(), model, oldObservation)))
                 closestNeighborForNow.put(tile,newObservation);
         }
     }
 
 
-    private double distance(Fisher fisher, SeaTile tile, double time, GeographicalObservation<Double> observation)
+    private double distance(
+            Fisher fisher, SeaTile tile, double time, FishState model, GeographicalObservation<Double> observation)
     {
         double distance = 0;
         for(int i=0; i< bandwidths.length; i++)
         {
             transformer.setBandwidth(bandwidths[i]);
             distance += transformer.distance(
-                    extractors[i].extract(tile,time,fisher),
-                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher)
+                    extractors[i].extract(tile,time,fisher, model),
+                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher, model)
             );
 
 

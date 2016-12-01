@@ -121,19 +121,19 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
         this(neighbors, new double[]{spaceBandwidth, spaceBandwidth, timeBandwidth},
              new ObservationExtractor() {
                  @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                      return tile.getGridX();
                  }
              },
              new ObservationExtractor() {
                  @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                      return tile.getGridY();
                  }
              },
              new ObservationExtractor() {
                  @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent) {
+                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                      return timeOfObservation;
                  }
              }
@@ -141,12 +141,12 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     }
 
     @Override
-    public double predict(SeaTile tile, double time, Fisher fisher) {
+    public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
         if(tile.getAltitude()>=0)
             return Double.NaN;
         else
-            return predict(ObservationExtractor.convertToFeatures(tile, time, fisher, extractors));
+            return predict(ObservationExtractor.convertToFeatures(tile, time, fisher, extractors, model));
     }
 
 
@@ -173,11 +173,12 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     }
 
     @Override
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher) {
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model) {
 
         nearestNeighborTree.addPoint(ObservationExtractor.convertToFeatures(observation.getTile(),
                                                                             observation.getTime(),
-                                                                            fisher, extractors),
+                                                                            fisher, extractors,
+                                                                            model),
                                      observation.getValue());
 
 

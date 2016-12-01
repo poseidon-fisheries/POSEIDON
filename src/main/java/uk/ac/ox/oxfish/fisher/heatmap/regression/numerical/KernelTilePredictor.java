@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
 /**
@@ -47,15 +48,15 @@ public class KernelTilePredictor{
         }
     }
 
-    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher)
+    public void addObservation(GeographicalObservation<Double> observation, Fisher fisher, FishState model)
     {
         //compute kernel
         double kernel = 1;
         for(int i=0; i<extractors.length; i++) {
             kerneler.setBandwidth(bandwidths[i]);
             kernel *= kerneler.distance(
-                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher),
-                    extractors[i].extract(whereAmIPredicting,observation.getTime(),fisher)
+                    extractors[i].extract(observation.getTile(),observation.getTime(),fisher,model ),
+                    extractors[i].extract(whereAmIPredicting,observation.getTime(),fisher,model )
 
             );
         }

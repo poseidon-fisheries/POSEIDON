@@ -9,11 +9,13 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
+import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A purely bandit-algorithm using destination strategy
@@ -33,7 +35,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      * the index represents the "bandit arm" index, the number in teh array at that index represents
      * the discretemap group. This is done to skip areas that are just land
      */
-    private final int[] filteredGroups;
+    private final BanditSwitch banditSwitch;
+
     private final BanditAverage banditAverage;
 
 
@@ -51,31 +54,26 @@ public class BanditDestinationStrategy implements DestinationStrategy{
             FavoriteDestinationStrategy delegate) {
         //map arms to valid map groups
         this.discretization = discretization;
-        ArrayList<Integer> validGroups = new ArrayList<>();
-        for(int i = 0; i< discretization.getNumberOfGroups(); i++)
-        {
-            if(discretization.isValid(i))
-                validGroups.add(i);
-        }
-        filteredGroups = new int[validGroups.size()];
-        for(int i=0; i<filteredGroups.length; i++)
-            filteredGroups[i]=validGroups.get(i);
+
+        this.banditSwitch = new BanditSwitch(discretization.getNumberOfGroups(),
+                                             discretization::isValid);
+
         //create the bandit algorithm
-        banditAverage = averagerMaker.apply(filteredGroups.length);
+        banditAverage = averagerMaker.apply(banditSwitch.getNumberOfArms());
         algorithm = banditMaker.apply(banditAverage);
 
         this.delegate = delegate;
     }
 
     private int fromBanditArmToMapGroup(int banditArm){
-        return filteredGroups[banditArm];
+
+        return banditSwitch.getGroup(banditArm);
     }
 
     private int fromMapGroupToBanditArm(int mapGroup){
-        for(int i=0; i<filteredGroups.length; i++)
-            if(filteredGroups[i]==mapGroup)
-                return i;
-        throw new RuntimeException("trying to fish in a all-land map rectangle. Not good");
+
+        return banditSwitch.getArm(mapGroup);
+
     }
 
 
@@ -178,5 +176,14 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      */
     public MapDiscretization getDiscretization() {
         return discretization;
+    }
+
+    /**
+     * Getter for property 'banditSwitch'.
+     *
+     * @return Value for property 'banditSwitch'.
+     */
+    public BanditSwitch getBanditSwitch() {
+        return banditSwitch;
     }
 }

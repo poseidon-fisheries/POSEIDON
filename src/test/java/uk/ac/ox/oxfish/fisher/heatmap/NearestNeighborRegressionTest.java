@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -27,8 +28,8 @@ public class NearestNeighborRegressionTest {
         SeaTile zero = mock(SeaTile.class);
         when(zero.getGridX()).thenReturn(0);
         when(zero.getGridY()).thenReturn(0);
-        regression.addObservation(new GeographicalObservation<>(tenten, 0, 100d),null );
-        regression.addObservation(new GeographicalObservation<>(zero,0,1d), null);
+        regression.addObservation(new GeographicalObservation<>(tenten, 0, 100d),null,mock(FishState.class) );
+        regression.addObservation(new GeographicalObservation<>(zero,0,1d), null,mock(FishState.class) );
         assertEquals(regression.predict(0,0,0),1,.001);
         assertEquals(regression.predict(1,0,0),1,.001);
         assertEquals(regression.predict(0,1,0),1,.001);

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.SimpleKalmanRegressio
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by carrknight on 8/3/16.
@@ -22,22 +23,22 @@ public class SimpleKalmanRegressionTest {
         SimpleKalmanRegression regression = new SimpleKalmanRegression(
                 10, 1, 0, 100, 50, .2, 0, 0, state.getMap(), new MersenneTwisterFast());
 
-        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(10, 10), 0, 100d), null );
-        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(5, 5), 0, 50d), null );
-        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(3, 3), 0, 30d), null );
-        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(0, 0), 0, 1d), null );
+        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(10, 10), 0, 100d), null, mock(FishState.class));
+        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(5, 5), 0, 50d), null,mock(FishState.class) );
+        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(3, 3), 0, 30d), null,mock(FishState.class) );
+        regression.addObservation(new GeographicalObservation<>(state.getMap().getSeaTile(0, 0), 0, 1d), null,mock(FishState.class) );
         //should smooth somewhat linearly
-        assertTrue(regression.predict(state.getMap().getSeaTile(0,0), 0, null) <
-                           regression.predict(state.getMap().getSeaTile(10,10), 0, null)
+        assertTrue(regression.predict(state.getMap().getSeaTile(0,0), 0, null, mock(FishState.class)) <
+                           regression.predict(state.getMap().getSeaTile(10,10), 0, null,mock(FishState.class) )
                                       );
-        assertTrue(regression.predict(state.getMap().getSeaTile(0,0), 0, null) <
-                           regression.predict(state.getMap().getSeaTile(2,2), 0, null)
+        assertTrue(regression.predict(state.getMap().getSeaTile(0,0), 0, null,mock(FishState.class) ) <
+                           regression.predict(state.getMap().getSeaTile(2,2), 0, null,mock(FishState.class) )
         );
-        assertTrue(regression.predict(state.getMap().getSeaTile(2,2), 0, null) <
-                           regression.predict(state.getMap().getSeaTile(5,5), 0, null)
+        assertTrue(regression.predict(state.getMap().getSeaTile(2,2), 0, null,mock(FishState.class) ) <
+                           regression.predict(state.getMap().getSeaTile(5,5), 0, null,mock(FishState.class) )
         );
-        assertTrue(regression.predict(state.getMap().getSeaTile(5,5), 0, null) <
-                           regression.predict(state.getMap().getSeaTile(10,10), 0, null)
+        assertTrue(regression.predict(state.getMap().getSeaTile(5,5), 0, null,mock(FishState.class) ) <
+                           regression.predict(state.getMap().getSeaTile(10,10), 0, null, mock(FishState.class))
         );
 
 

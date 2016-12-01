@@ -41,15 +41,15 @@ public class ErrorTrackingRegression<V> implements GeographicalRegression<V>
 
     @Override
     public double predict(
-            SeaTile tile, double time, Fisher fisher) {
-        return delegate.predict(tile, time, fisher);
+            SeaTile tile, double time, Fisher fisher, FishState model) {
+        return delegate.predict(tile, time, fisher, model);
     }
 
     @Override
     public void addObservation(
-            GeographicalObservation<V> observation, Fisher fisher) {
+            GeographicalObservation<V> observation, Fisher fisher, FishState model) {
         //compute error (MSE)
-        double error = predict(observation.getTile(),observation.getTime(),fisher) -
+        double error = predict(observation.getTile(),observation.getTime(),fisher,model ) -
                 extractNumericalYFromObservation(observation,fisher);
         error = error * error;
         //store it
@@ -62,7 +62,7 @@ public class ErrorTrackingRegression<V> implements GeographicalRegression<V>
         }
 
         //now learn.
-        delegate.addObservation(observation,fisher);
+        delegate.addObservation(observation,fisher,model );
 
     }
 

@@ -36,7 +36,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
                 new Pair<>(new ObservationExtractor() {
                     @Override
                     public double extract(
-                            SeaTile tile, double timeOfObservation, Fisher agent) {
+                            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                         return tile.getGridX();
                     }
                 },bandwidth),
@@ -44,7 +44,7 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
                 new Pair<>(new ObservationExtractor() {
                     @Override
                     public double extract(
-                            SeaTile tile, double timeOfObservation, Fisher agent) {
+                            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                         return tile.getGridY();
                     }
                 },bandwidth));

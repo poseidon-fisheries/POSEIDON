@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -66,7 +65,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
                         new ObservationExtractor() {
                             @Override
                             public double extract(
-                                    SeaTile tile, double timeOfObservation, Fisher agent) {
+                                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
                                 return Math.sqrt(timeOfObservation+1);
                             }
                         },

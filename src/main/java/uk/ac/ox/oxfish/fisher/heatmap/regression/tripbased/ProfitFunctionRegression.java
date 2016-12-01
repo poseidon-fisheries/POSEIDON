@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
@@ -56,7 +55,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
     @Override
     public double predict(
-            SeaTile tile, double time, Fisher fisher) {
+            SeaTile tile, double time, Fisher fisher, FishState model) {
 
         return this.predict(tile, time, state, fisher,false);
 
@@ -86,20 +85,20 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
         double[] expectedHourlyCatches = new double[catches.length];
         for(int i=0; i<expectedHourlyCatches.length; i++)
-            expectedHourlyCatches[i] = catches[i].predict(tile, currentTime, fisher);
+            expectedHourlyCatches[i] = catches[i].predict(tile, currentTime, fisher,state );
         return expectedHourlyCatches;
 
     }
 
     @Override
     public void addObservation(
-            GeographicalObservation<TripRecord> observation, Fisher fisher) {
+            GeographicalObservation<TripRecord> observation, Fisher fisher, FishState model) {
         for(int i=0; i<catches.length; i++)
             catches[i].addObservation(
                     new GeographicalObservation<>(observation.getTile(),observation.getTime(),
                                                   observation.getValue().getTotalCatch()[i] /
                                                           observation.getValue().getEffort()),
-                    fisher
+                    fisher,state
             );
 
     }
