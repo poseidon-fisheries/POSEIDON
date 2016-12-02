@@ -1,9 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing;
 
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.DoubleLogisticDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MonthlyDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.UnifiedAmateurishDynamicFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -50,6 +47,12 @@ public class DepartingStrategies {
                          UnifiedAmateurishDynamicFactory::getInstance);
         NAMES.put(UnifiedAmateurishDynamicFactory.class,
                   "Unified Amateurish Dynamic Programming");
+
+
+
+        CONSTRUCTORS.put("WFS Longline",
+                         LonglineFloridaLogisticDepartingFactory::new);
+        NAMES.put(LonglineFloridaLogisticDepartingFactory.class,"WFS Longline");
     }
 
     private DepartingStrategies() {}
