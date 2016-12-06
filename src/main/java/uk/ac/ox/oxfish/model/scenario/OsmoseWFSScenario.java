@@ -1,16 +1,11 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Splitter;
-import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
-import uk.ac.ox.oxfish.biology.weather.initializer.CSVWeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
-import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.TimeSeriesWeatherFactory;
 import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -23,11 +18,9 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -35,8 +28,6 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
-import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
@@ -46,7 +37,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
-import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.*;
@@ -54,10 +44,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnToList;
-import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
-import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
-import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
@@ -123,28 +110,28 @@ public class OsmoseWFSScenario implements Scenario{
     /**
      * factory to produce departing strategy
      */
-    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
+    private AlgorithmFactory<? extends DepartingStrategy> longlinerDepartingStrategy =
             new LonglineFloridaLogisticDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripImitativeDestinationFactory();
+    private AlgorithmFactory<? extends DestinationStrategy> longlinerDestinationStrategy =
+            new FloridaLogitDestinationFactory();
     /**
      * factory to produce fishing strategy
      */
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
+    private AlgorithmFactory<? extends FishingStrategy> longlinerFishingStrategy =
             new MaximumStepsFactory();
 
-    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
+    private AlgorithmFactory<? extends GearStrategy> longlinerGearStrategy =
             new FixedGearStrategyFactory();
 
 
-    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> longlinerWeatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> longlinerRegulations =  new ProtectedAreasOnlyFactory();
 
 
     private NetworkBuilder networkBuilder =
@@ -255,12 +242,12 @@ public class OsmoseWFSScenario implements Scenario{
 
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
                                               model.getRandom(),
-                                              regulation.apply(model),
-                                              departingStrategy.apply(model),
-                                              destinationStrategy.apply(model),
-                                              fishingStrategy.apply(model),
-                                              gearStrategy.apply(model),
-                                              weatherStrategy.apply(model),
+                                              longlinerRegulations.apply(model),
+                                              longlinerDepartingStrategy.apply(model),
+                                              longlinerDestinationStrategy.apply(model),
+                                              longlinerFishingStrategy.apply(model),
+                                              longlinerGearStrategy.apply(model),
+                                              longlinerWeatherStrategy.apply(model),
                                               new Boat(10, 10,
                                                        new Engine(engineWeight,
                                                                   mileage,
@@ -276,31 +263,6 @@ public class OsmoseWFSScenario implements Scenario{
                 fisherCounter++;
 
 
-                //todo move this
-                CsvColumnsToLists reader = new CsvColumnsToLists(
-                        Paths.get("temp_wfs","areas.txt").toAbsolutePath().toString(),
-                        ',',
-                        new String[]{"eastings","northings"}
-                );
-
-                LinkedList<Double>[] lists = reader.readColumns();
-                ArrayList<Coordinate> coordinates = new ArrayList<>();
-                for(int i=0; i<lists[0].size(); i++)
-                    coordinates.add(new Coordinate(lists[0].get(i),lists[1].get(i),0));
-
-                CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(coordinates);
-                MapDiscretization discretization = new MapDiscretization(discretizer);
-                discretization.discretize(map);
-                newFisher.setDestinationStrategy(
-                        new BanditDestinationStrategy(
-                                arms -> new BanditAverage(
-                                        arms,
-                                        new ExponentialMovingAverageFactory(),
-                                        model
-                                ),
-                                (new EpsilonGreedyBanditFactory()).apply(model),
-                                discretization,
-                                new FavoriteDestinationStrategy(map, random)));
 
 
 
@@ -410,5 +372,138 @@ public class OsmoseWFSScenario implements Scenario{
      */
     public OsmoseBoundedMapInitializerFactory getMapInitializer() {
         return mapInitializer;
+    }
+
+
+    /**
+     * Getter for property 'longlinerHoldSize'.
+     *
+     * @return Value for property 'longlinerHoldSize'.
+     */
+    public DoubleParameter getLonglinerHoldSize() {
+        return longlinerHoldSize;
+    }
+
+    /**
+     * Setter for property 'longlinerHoldSize'.
+     *
+     * @param longlinerHoldSize Value to set for property 'longlinerHoldSize'.
+     */
+    public void setLonglinerHoldSize(DoubleParameter longlinerHoldSize) {
+        this.longlinerHoldSize = longlinerHoldSize;
+    }
+
+    /**
+     * Getter for property 'longlinerDepartingStrategy'.
+     *
+     * @return Value for property 'longlinerDepartingStrategy'.
+     */
+    public AlgorithmFactory<? extends DepartingStrategy> getLonglinerDepartingStrategy() {
+        return longlinerDepartingStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerDepartingStrategy'.
+     *
+     * @param longlinerDepartingStrategy Value to set for property 'longlinerDepartingStrategy'.
+     */
+    public void setLonglinerDepartingStrategy(
+            AlgorithmFactory<? extends DepartingStrategy> longlinerDepartingStrategy) {
+        this.longlinerDepartingStrategy = longlinerDepartingStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerDestinationStrategy'.
+     *
+     * @return Value for property 'longlinerDestinationStrategy'.
+     */
+    public AlgorithmFactory<? extends DestinationStrategy> getLonglinerDestinationStrategy() {
+        return longlinerDestinationStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerDestinationStrategy'.
+     *
+     * @param longlinerDestinationStrategy Value to set for property 'longlinerDestinationStrategy'.
+     */
+    public void setLonglinerDestinationStrategy(
+            AlgorithmFactory<? extends DestinationStrategy> longlinerDestinationStrategy) {
+        this.longlinerDestinationStrategy = longlinerDestinationStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerFishingStrategy'.
+     *
+     * @return Value for property 'longlinerFishingStrategy'.
+     */
+    public AlgorithmFactory<? extends FishingStrategy> getLonglinerFishingStrategy() {
+        return longlinerFishingStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerFishingStrategy'.
+     *
+     * @param longlinerFishingStrategy Value to set for property 'longlinerFishingStrategy'.
+     */
+    public void setLonglinerFishingStrategy(
+            AlgorithmFactory<? extends FishingStrategy> longlinerFishingStrategy) {
+        this.longlinerFishingStrategy = longlinerFishingStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerGearStrategy'.
+     *
+     * @return Value for property 'longlinerGearStrategy'.
+     */
+    public AlgorithmFactory<? extends GearStrategy> getLonglinerGearStrategy() {
+        return longlinerGearStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerGearStrategy'.
+     *
+     * @param longlinerGearStrategy Value to set for property 'longlinerGearStrategy'.
+     */
+    public void setLonglinerGearStrategy(
+            AlgorithmFactory<? extends GearStrategy> longlinerGearStrategy) {
+        this.longlinerGearStrategy = longlinerGearStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerWeatherStrategy'.
+     *
+     * @return Value for property 'longlinerWeatherStrategy'.
+     */
+    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getLonglinerWeatherStrategy() {
+        return longlinerWeatherStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerWeatherStrategy'.
+     *
+     * @param longlinerWeatherStrategy Value to set for property 'longlinerWeatherStrategy'.
+     */
+    public void setLonglinerWeatherStrategy(
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> longlinerWeatherStrategy) {
+        this.longlinerWeatherStrategy = longlinerWeatherStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerRegulations'.
+     *
+     * @return Value for property 'longlinerRegulations'.
+     */
+    public AlgorithmFactory<? extends Regulation> getLonglinerRegulations() {
+        return longlinerRegulations;
+    }
+
+    /**
+     * Setter for property 'longlinerRegulations'.
+     *
+     * @param longlinerRegulations Value to set for property 'longlinerRegulations'.
+     */
+    public void setLonglinerRegulations(
+            AlgorithmFactory<? extends Regulation> longlinerRegulations) {
+        this.longlinerRegulations = longlinerRegulations;
     }
 }

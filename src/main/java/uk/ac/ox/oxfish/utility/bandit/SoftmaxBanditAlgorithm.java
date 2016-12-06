@@ -61,6 +61,19 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
                                           int numberOfArms,
                                           Function<Integer,Double> expectedReturnOfArm,
                                           double temperature) {
+        double[] ecdf = getECDF(numberOfArms, expectedReturnOfArm, temperature);
+
+        double seed = random.nextDouble();
+        for(int i=0; i<numberOfArms; i++)
+            if(seed<ecdf[i])
+                return i;
+        assert false;
+        throw new RuntimeException("Can't be here!");
+
+    }
+
+    public static double[] getECDF(
+            int numberOfArms, Function<Integer, Double> expectedReturnOfArm, double temperature) {
         double denominator = 0;
         double[] ecdf = new double[numberOfArms]; //cumulative density
 
@@ -82,16 +95,14 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
                 ecdf[i] += ecdf[i-1];
         }
         assert Math.abs(ecdf[numberOfArms-1]-1d)<.01;
-
-        double seed = random.nextDouble();
-        for(int i=0; i<numberOfArms; i++)
-            if(seed<ecdf[i])
-                return i;
-        assert false;
-        throw new RuntimeException("Can't be here!");
-
+        return ecdf;
     }
 
+    /**
+     * updates rewards and decays temperature
+     * @param reward
+     * @param armPlayed
+     */
     @Override
     public void observeReward(double reward, int armPlayed) {
         averages.observeReward(reward, armPlayed);

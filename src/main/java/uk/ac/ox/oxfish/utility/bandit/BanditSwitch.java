@@ -79,4 +79,13 @@ public class BanditSwitch
         return armToGroup.length;
 
     }
+
+    /**
+     * checks if this group belongs to any arm
+     * @param group
+     * @return
+     */
+    public boolean containsGroup(Integer group){
+        return getArm(group) != null;
+    }
 }
