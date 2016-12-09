@@ -1279,4 +1279,30 @@ public class Fisher implements Steppable, Startable{
     public int numberOfDailyObservations() {
         return memory.numberOfDailyObservations();
     }
+
+
+    /**
+     * keep that memory in the database. The key cannot be currently in use!
+     * @param key the key for the object
+     * @param item the object to store
+     */
+    public void memorize(String key, Object item) {
+        memory.memorize(key, item);
+    }
+
+    /**
+     * removes the memory associated with that key
+     * @param key
+     */
+    public void forget(String key) {
+        memory.forget(key);
+    }
+
+    /**
+     * returns the object associated with this key
+     * @param key
+     */
+    public Object remember(String key) {
+        return memory.remember(key);
+    }
 }

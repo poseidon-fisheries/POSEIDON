@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -14,11 +13,8 @@ import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * makes choices as if a big SOFTMAX where rewards are a linear combination of features
@@ -26,6 +22,8 @@ import java.util.function.Predicate;
  */
 public class LogitDestinationStrategy implements DestinationStrategy{
 
+
+    public static final String MEMORY_KEY = "LogitDestinationStrategy - HABIT ARRAY";
 
     /**
      * this object links the index choices of the logit with the map group of the discretizers
@@ -45,6 +43,11 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
     private final FavoriteDestinationStrategy delegate;
 
+    /**
+     * a very simple "memory" that keeps track of when was each MAP GROUP (not arm) last picked. A copy of it is stored in the fisher memory
+     */
+    private final int[] lastDayThisGroupWasChosen;
+
 
     /**
      * copies the switcher and the classifier object but uses a separate delegate. Makes initialization faster
@@ -58,6 +61,9 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         this.switcher=toClone.getSwitcher();
         this.classifier = toClone.getClassifier();
         this.delegate = newDelegate;
+        this.lastDayThisGroupWasChosen = new int[discretization.getNumberOfGroups()];
+        Arrays.fill(lastDayThisGroupWasChosen,-100000);
+
     }
 
     /**
@@ -106,15 +112,14 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         this.classifier = new LogisticMultiClassifier(
                 effectiveBetas.toArray(new double[effectiveBetas.size()][]),
                 effectiveCovariates.toArray(new ObservationExtractor[effectiveCovariates.size()][]),
-                new Function<Integer, SeaTile>() {
-                    @Override
-                    public SeaTile apply(Integer arm) {
-                        List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
-                        return group.get(random.nextInt(group.size()));
-                    }
+                arm -> {
+                    List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
+                    return group.get(random.nextInt(group.size()));
                 });
 
 
+        this.lastDayThisGroupWasChosen = new int[discretization.getNumberOfGroups()];
+        Arrays.fill(lastDayThisGroupWasChosen,-100000);
 
 
 
@@ -153,6 +158,8 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         started = true;
         delegate.start(model, fisher);
         fisher.addPerTripAdaptation(adaptation);
+        //keep in memory the last time the arm was chosen
+        fisher.memorize(MEMORY_KEY, lastDayThisGroupWasChosen);
     }
 
     /**
@@ -163,6 +170,9 @@ public class LogitDestinationStrategy implements DestinationStrategy{
      */
     public void adapt(FishState state, MersenneTwisterFast random, Fisher fisher) {
         int armChosen = classifier.choose(fisher,state,random);
+
+        //remember it!
+        lastDayThisGroupWasChosen[switcher.getGroup(armChosen)] = (int) state.getDay();
 
         List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
         SeaTile destination = group.get(random.nextInt(group.size()));
@@ -250,4 +260,6 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     public boolean isStarted() {
         return started;
     }
+
+
 }

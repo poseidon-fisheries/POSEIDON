@@ -73,6 +73,57 @@ public class LogisticMultiClassifier {
     }
 
 
+    /**
+     * like choose, but returns a lot more information
+     * @param fisher the fisher making a choice
+     * @param state the model
+     * @param random the randomizer
+     * @return
+     */
+ /*   public Integer chooseFully(Fisher fisher, FishState state, MersenneTwisterFast random)
+    {
+
+        //compute all the x ahead of time
+        final double[][] x = new double[extractors.length][];
+        for(int i=0; i<extractors.length; i++)
+        {
+            x[i] = new double[extractors[0].length];
+            for(int j=0; j<extractors[0].length; j++)
+                x[i][j] = extractors[i][j].extract(armToTileExtractor.apply(i),
+                                                    state.getHoursSinceStart(),fisher,state);
+
+        }
+
+
+        //this is the same algorithm as the SOFTMAX bandit so we just call that one.
+        //the only difference is that the "reward" here is a linear combination
+        return SoftmaxBanditAlgorithm.drawFromSoftmax(
+                random,
+                getNumberOfOptions(),
+                new Function<Integer, Double>() {
+                    @Override
+                    public Double apply(Integer arm) {
+                        double[] beta = betas[arm];
+                        assert beta.length == x[0].length;
+                        //sum them up
+                        double sum = 0;
+                        for(int i=0; i<beta.length ;i++)
+                            sum += beta[i] *  x[arm][i];
+                        return sum;
+                    }
+                }
+
+        );
+
+    } */
+
+    /**
+     *
+     * @param choice
+     * @param fisher
+     * @param state
+     * @return
+     */
     public double getProbability(int choice,
                                  Fisher fisher, FishState state){
 

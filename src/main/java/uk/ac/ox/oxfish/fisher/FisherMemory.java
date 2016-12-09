@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
@@ -11,6 +12,7 @@ import uk.ac.ox.oxfish.model.data.collectors.*;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FisherMemory implements Serializable, FisherStartable {
@@ -69,6 +71,12 @@ public class FisherMemory implements Serializable, FisherStartable {
     public TripLogger getTripLogger() {
         return tripLogger;
     }
+
+
+    /**
+     * any other thing I want the fisher to remember I will have to store in this very general object
+     */
+    private HashMap<String, Object> database = new HashMap<>();
 
 
 
@@ -207,5 +215,33 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
+    /**
+     * keep that memory in the database. The key cannot be currently in use!
+     * @param key the key for the object
+     * @param item the object to store
+     */
+    public void memorize(String key, Object item)
+    {
+        Object previous = database.put(key, item);
+        Preconditions.checkState(previous == null, "The database already contains this key");
+    }
+
+    /**
+     * removes the memory associated with that key
+     * @param key
+     */
+    public void forget(String key)
+    {
+        database.remove(key);
+    }
+
+    /**
+     * returns the object associated with this key
+     * @param key
+     */
+    public Object remember(String key)
+    {
+        return database.get(key);
+    }
 
 }

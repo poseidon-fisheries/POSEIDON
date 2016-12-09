@@ -118,6 +118,8 @@ public class OsmoseWFSScenario implements Scenario{
      */
     private AlgorithmFactory<? extends DestinationStrategy> longlinerDestinationStrategy =
             new FloridaLogitDestinationFactory();
+
+
     /**
      * factory to produce fishing strategy
      */
