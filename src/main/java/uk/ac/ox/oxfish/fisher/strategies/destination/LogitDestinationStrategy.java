@@ -4,8 +4,10 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticMultiClassifier;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -41,6 +43,11 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     private final LogisticMultiClassifier classifier;
 
 
+    /**
+     * the object containing the extractors and building logisti inputs
+     */
+    private final LogisticInputMaker input;
+
     private final FavoriteDestinationStrategy delegate;
 
     /**
@@ -49,22 +56,8 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     private final int[] lastDayThisGroupWasChosen;
 
 
-    /**
-     * copies the switcher and the classifier object but uses a separate delegate. Makes initialization faster
-     * @param toClone
-     * @param newDelegate
-     */
-    public LogitDestinationStrategy(LogitDestinationStrategy toClone,
-                                    FavoriteDestinationStrategy newDelegate){
+    private LogisticLog log;
 
-        this.discretization = toClone.getDiscretization();
-        this.switcher=toClone.getSwitcher();
-        this.classifier = toClone.getClassifier();
-        this.delegate = newDelegate;
-        this.lastDayThisGroupWasChosen = new int[discretization.getNumberOfGroups()];
-        Arrays.fill(lastDayThisGroupWasChosen,-100000);
-
-    }
 
     /**
      *
@@ -109,13 +102,16 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         assert effectiveBetas.size() == effectiveCovariates.size();
         assert effectiveBetas.size() == switcher.getNumberOfArms();
 
-        this.classifier = new LogisticMultiClassifier(
-                effectiveBetas.toArray(new double[effectiveBetas.size()][]),
+
+        this.input = new LogisticInputMaker(
                 effectiveCovariates.toArray(new ObservationExtractor[effectiveCovariates.size()][]),
                 arm -> {
                     List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
                     return group.get(random.nextInt(group.size()));
-                });
+                }
+                );
+        this.classifier = new LogisticMultiClassifier(
+                effectiveBetas.toArray(new double[effectiveBetas.size()][]));
 
 
         this.lastDayThisGroupWasChosen = new int[discretization.getNumberOfGroups()];
@@ -169,7 +165,12 @@ public class LogitDestinationStrategy implements DestinationStrategy{
      * @param fisher the agent making the choie
      */
     public void adapt(FishState state, MersenneTwisterFast random, Fisher fisher) {
-        int armChosen = classifier.choose(fisher,state,random);
+        double[][] input = this.input.getRegressionInput(fisher, state);
+        if(log!=null)
+            log.recordInput(input);
+        int armChosen = classifier.choose(input, random);
+        if(log!=null)
+            log.recordChoice(armChosen);
 
         //remember it!
         lastDayThisGroupWasChosen[switcher.getGroup(armChosen)] = (int) state.getDay();
@@ -262,4 +263,30 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     }
 
 
+    /**
+     * Getter for property 'input'.
+     *
+     * @return Value for property 'input'.
+     */
+    public LogisticInputMaker getInput() {
+        return input;
+    }
+
+    /**
+     * Getter for property 'log'.
+     *
+     * @return Value for property 'log'.
+     */
+    public LogisticLog getLog() {
+        return log;
+    }
+
+    /**
+     * Setter for property 'log'.
+     *
+     * @param log Value to set for property 'log'.
+     */
+    public void setLog(LogisticLog log) {
+        this.log = log;
+    }
 }

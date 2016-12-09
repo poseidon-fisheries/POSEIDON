@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -16,12 +18,13 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -50,12 +53,10 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The scenario to run Osmose WFS.
@@ -227,7 +228,22 @@ public class OsmoseWFSScenario implements Scenario{
         NauticalMap map = model.getMap();
         MersenneTwisterFast random = model.getRandom();
 
-
+        //todo remove
+        List<LogisticLog> logger = new LinkedList<>();
+        model.scheduleOnceInXDays(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(logger.get(0).getColumnNames()).append("\n");
+                for(LogisticLog log : logger)
+                    builder.append(log.getData().toString()).append('\n');
+                try {
+                    Files.write(Paths.get("testlog.csv"),builder.toString().getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, StepOrder.DAWN, 300*8);
 
         //longliners
         for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
@@ -263,6 +279,16 @@ public class OsmoseWFSScenario implements Scenario{
                 newFisher.getTags().add("ship");
                 newFisher.getTags().add("blue");
                 fisherCounter++;
+
+
+                //todo remove!
+                LogisticLog log = new LogisticLog(
+                        new String[]{
+                                "intercept", "distance", "habit", "fuel_price", "wind_speed"},newFisher.getID());
+
+                ((LogitDestinationStrategy) newFisher.getDestinationStrategy()).setLog(
+                        log);
+                logger.add(log);
 
 
 
