@@ -73,10 +73,14 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
+    private DiscretizedLocationMemory discretizedLocationMemory;
+
     /**
      * any other thing I want the fisher to remember I will have to store in this very general object
      */
     private HashMap<String, Object> database = new HashMap<>();
+
+
 
 
 
@@ -135,7 +139,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
     public TripRecord getLastFinishedTrip() {
-            return tripLogger.getLastFinishedTrip();
+        return tripLogger.getLastFinishedTrip();
 
     }
 
@@ -244,4 +248,28 @@ public class FisherMemory implements Serializable, FisherStartable {
         return database.get(key);
     }
 
+
+    /**
+     * registers visit (if the memory exists)
+     */
+    public void registerVisit(int group, int day) {
+        if(discretizedLocationMemory!=null)
+            discretizedLocationMemory.registerVisit(group, day);
+    }
+    /**
+     * registers visit (if the memory exists)
+     */
+    public void registerVisit(SeaTile tile, int day) {
+        if(discretizedLocationMemory!=null)
+            discretizedLocationMemory.registerVisit(tile, day);
+    }
+
+    public DiscretizedLocationMemory getDiscretizedLocationMemory() {
+        return discretizedLocationMemory;
+    }
+
+    public void setDiscretizedLocationMemory(DiscretizedLocationMemory discretizedLocationMemory) {
+        Preconditions.checkArgument(this.discretizedLocationMemory == null, "Rewriting a discretized location memory with another. Probably not what you want!");
+        this.discretizedLocationMemory = discretizedLocationMemory;
+    }
 }

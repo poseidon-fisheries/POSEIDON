@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticMultiClassifier;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -24,8 +25,6 @@ import java.util.List;
  */
 public class LogitDestinationStrategy implements DestinationStrategy{
 
-
-    public static final String MEMORY_KEY = "LogitDestinationStrategy - HABIT ARRAY";
 
     /**
      * this object links the index choices of the logit with the map group of the discretizers
@@ -50,10 +49,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
     private final FavoriteDestinationStrategy delegate;
 
-    /**
-     * a very simple "memory" that keeps track of when was each MAP GROUP (not arm) last picked. A copy of it is stored in the fisher memory
-     */
-    private final int[] lastDayThisGroupWasChosen;
+    private final DiscretizedLocationMemory memory;
 
 
     private LogisticLog log;
@@ -114,8 +110,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                 effectiveBetas.toArray(new double[effectiveBetas.size()][]));
 
 
-        this.lastDayThisGroupWasChosen = new int[discretization.getNumberOfGroups()];
-        Arrays.fill(lastDayThisGroupWasChosen,-100000);
+        this.memory = new DiscretizedLocationMemory(discretization);
 
 
 
@@ -155,7 +150,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         delegate.start(model, fisher);
         fisher.addPerTripAdaptation(adaptation);
         //keep in memory the last time the arm was chosen
-        fisher.memorize(MEMORY_KEY, lastDayThisGroupWasChosen);
+        fisher.setDiscretizedLocationMemory(memory);
     }
 
     /**
@@ -171,9 +166,6 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         int armChosen = classifier.choose(input, random);
         if(log!=null)
             log.recordChoice(armChosen);
-
-        //remember it!
-        lastDayThisGroupWasChosen[switcher.getGroup(armChosen)] = (int) state.getDay();
 
         List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
         SeaTile destination = group.get(random.nextInt(group.size()));

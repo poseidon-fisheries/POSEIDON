@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -74,8 +75,8 @@ public class OsmoseWFSScenario implements Scenario{
         biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2");
         biologyInitializer.setOsmoseConfigurationFile(mainDirectory.resolve("wfs").resolve("osm_all-parameters.csv").toAbsolutePath().toString());
         biologyInitializer.setPreInitializedConfiguration(false);
-        //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
-        biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
+        biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
+        //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
     }
 
     private final OsmoseBoundedMapInitializerFactory mapInitializer = new OsmoseBoundedMapInitializerFactory();
@@ -101,11 +102,11 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
 
 
-    private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
+    private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.01");
 
 
 
-    private DoubleParameter longlinerHoldSize = new FixedDoubleParameter(140175.5);
+    private DoubleParameter longlinerHoldSize = new FixedDoubleParameter(140175.5); // in kg!
 
 
     /**
@@ -255,7 +256,7 @@ public class OsmoseWFSScenario implements Scenario{
                 final double mileage = 1;
                 final double fuelCapacity = 100000000;
 
-                Gear fisherGear = gear.apply(model);
+                Gear fisherGear = longlinerGear.apply(model);
 
 
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
@@ -533,5 +534,23 @@ public class OsmoseWFSScenario implements Scenario{
     public void setLonglinerRegulations(
             AlgorithmFactory<? extends Regulation> longlinerRegulations) {
         this.longlinerRegulations = longlinerRegulations;
+    }
+
+    /**
+     * Getter for property 'longlinerGear'.
+     *
+     * @return Value for property 'longlinerGear'.
+     */
+    public AlgorithmFactory<? extends Gear> getLonglinerGear() {
+        return longlinerGear;
+    }
+
+    /**
+     * Setter for property 'longlinerGear'.
+     *
+     * @param longlinerGear Value to set for property 'longlinerGear'.
+     */
+    public void setLonglinerGear(AlgorithmFactory<? extends Gear> longlinerGear) {
+        this.longlinerGear = longlinerGear;
     }
 }

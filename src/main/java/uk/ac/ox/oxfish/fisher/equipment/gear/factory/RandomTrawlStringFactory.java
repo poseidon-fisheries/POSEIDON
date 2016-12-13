@@ -29,6 +29,10 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
     public RandomTrawlStringFactory() {
     }
 
+    public RandomTrawlStringFactory(String catchabilityMap)
+    {
+        this.catchabilityMap = catchabilityMap;
+    }
 
     /**
      * Applies this function to the given argument.

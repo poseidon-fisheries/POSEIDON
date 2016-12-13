@@ -98,7 +98,7 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
                         (tile, timeOfObservation, agent, model) -> 1d,
                         //distance
                         (tile, timeOfObservation, agent, model) -> {
-                            //it's in miles!
+                            //the coefficient is in miles!\
                             return 0.621371 * model.getMap().distance(
                                     agent.getHomePort().getLocation(), tile);
                         },
@@ -106,13 +106,14 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
                         (tile, timeOfObservation, agent, model) -> {
                             //it it has been less than 90 days since you went there, you get the habit bonus!
                             return  model.getDay() -
-                                    ((int[])agent.remember(LogitDestinationStrategy.MEMORY_KEY))[discretization.getGroup(tile)] < 90 ?
+                                    agent.getDiscretizedLocationMemory()
+                                            .getLastDayVisited()[discretization.getGroup(tile)] < 90 ?
                                     1 : 0;
                         },
                         //fuel_price TODO: adjust from gallon
                         (tile, timeOfObservation, agent, model) ->
                                 agent.getHomePort().getGasPricePerLiter(),
-                        //wind_speed TODO: adjust from gallon
+                        //wind_speed TODO: adjust from mph
                         (tile, timeOfObservation, agent, model) -> tile.getWindSpeedInKph()
                 };
         for (int i = 0; i < extractors.length; i++)

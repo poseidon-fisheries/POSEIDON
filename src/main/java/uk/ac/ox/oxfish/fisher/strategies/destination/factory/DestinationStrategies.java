@@ -88,6 +88,11 @@ public class DestinationStrategies
         NAMES.put(BanditDestinationFactory.class,
                   "Discretized Bandit");
 
+        CONSTRUCTORS.put("Florida Longliner",
+                         FloridaLogitDestinationFactory::new);
+        NAMES.put(FloridaLogitDestinationFactory.class,
+                  "Florida Longliner");
+
     }
 
     private DestinationStrategies() {}

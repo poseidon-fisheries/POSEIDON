@@ -17,10 +17,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
-import uk.ac.ox.oxfish.fisher.log.FishingRecord;
-import uk.ac.ox.oxfish.fisher.log.LocationMemory;
-import uk.ac.ox.oxfish.fisher.log.TripListener;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.log.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
@@ -718,6 +715,7 @@ public class Fisher implements Steppable, Startable{
                                                  state.getStep());
         memory.getTripLogger().recordFishing(record);
         memory.getCatchMemories().memorize(catchOfTheDay, status.getLocation());
+        memory.registerVisit(status.getLocation(), (int) state.getDay());
 
         //now let regulations and the hold deal with it
         status.getRegulation().reactToCatch(catchOfTheDay);
@@ -1304,5 +1302,31 @@ public class Fisher implements Steppable, Startable{
      */
     public Object remember(String key) {
         return memory.remember(key);
+    }
+
+    /**
+     * registers visit (if the memory exists)
+     * @param group
+     * @param day
+     */
+    public void registerVisit(int group, int day) {
+        memory.registerVisit(group, day);
+    }
+
+    /**
+     * registers visit (if the memory exists)
+     * @param tile
+     * @param day
+     */
+    public void registerVisit(SeaTile tile, int day) {
+        memory.registerVisit(tile, day);
+    }
+
+    public DiscretizedLocationMemory getDiscretizedLocationMemory() {
+        return memory.getDiscretizedLocationMemory();
+    }
+
+    public void setDiscretizedLocationMemory(DiscretizedLocationMemory discretizedLocationMemory) {
+        memory.setDiscretizedLocationMemory(discretizedLocationMemory);
     }
 }
