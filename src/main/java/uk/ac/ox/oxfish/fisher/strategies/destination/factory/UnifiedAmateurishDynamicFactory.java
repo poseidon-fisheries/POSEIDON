@@ -33,7 +33,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
 
     private DoubleParameter noiseRate = new FixedDoubleParameter(.02);
 
-    private DoubleParameter learningRate = new FixedDoubleParameter(.025);
+    private DoubleParameter learningRate = new FixedDoubleParameter(.00025);
 
     private DoubleParameter explorationSize = new FixedDoubleParameter(5);
 
@@ -69,16 +69,25 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
                     explorationSize.apply(state.getRandom()).intValue(),
                     discountRate.apply(state.getRandom()),
                     //intercept
-                    /*
+
                     new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher system) {
                             return 1d;
                         }
                     },
-                    */
-                    // % distance from average
-                    /*
+
+                    //previous profits
+
+                    new Sensor<Fisher, Double>() {
+                        @Override
+                        public Double scan(Fisher fisher) {
+                            return fisher.getLastFinishedTrip() == null ? 0d : fisher.getLastFinishedTrip().getProfitPerHour(
+                                    true);
+                        }
+                    },
+                    //  distance from average
+
                     new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher fisher) {
@@ -88,12 +97,13 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
                             //get last profits (to compare)
                             double lastProfits = fisher.getLastFinishedTrip() == null ? Double.NaN : fisher.getLastFinishedTrip().getProfitPerHour(
                                     true);
-                            return percentageDifference(average, lastProfits);
+                            double distance = average - lastProfits;
+                            return Double.isFinite(distance) ? distance : 0d; // average is NaN at the beginning
 
 
                         }
-                    }, */
-                    // % distance from best friend
+                    },
+                    //  distance from best friend
                     new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher fisher) {
@@ -109,16 +119,17 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
                                 public double applyAsDouble(Fisher value) {
                                     return value.getLastFinishedTrip().getProfitPerHour(true);
                                 }
-                            }).max().orElse(Double.NaN);
+                            }).max().orElse(0d);
 
-                            double lastProfits = fisher.getLastFinishedTrip() == null ? Double.NaN : fisher.getLastFinishedTrip().getProfitPerHour(
+                            double lastProfits = fisher.getLastFinishedTrip() == null ? 0d : fisher.getLastFinishedTrip().getProfitPerHour(
                                     true);
-                            return percentageDifference(best, lastProfits);
+                            return best - lastProfits;
 
                         }
-                    },
+                    }
+                    /*
                     // times exploited
-                    new Sensor<Fisher, Double>() {
+                    ,new Sensor<Fisher, Double>() {
                         @Override
                         public Double scan(Fisher fisher) {
                             List<TripRecord> trips = fisher.getFinishedTrips();
@@ -150,7 +161,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
 
                         }
                     }
-
+                    */
             );
             instances.put(state,strategy);
 
