@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.utility.bandit;
 
 import ec.util.MersenneTwisterFast;
+import org.jfree.util.Log;
 
 import java.util.function.Function;
 
@@ -30,7 +31,7 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
 
 
         return drawFromSoftmax(random, averages.getNumberOfArms(),
-                                    averages::getAverage, temperature);
+                               averages::getAverage, temperature);
 
 
     }
@@ -67,9 +68,38 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
         for(int i=0; i<numberOfArms; i++)
             if(seed<ecdf[i])
                 return i;
+
+        //if there was a numerical problem, revert to picking the max
+        if(encounteredNumericalProblems(ecdf, numberOfArms, expectedReturnOfArm)) {
+            Log.warn("SOFTMAX was numerically overwhelmed, picking the highest value instead");
+            for(int i=0; i<numberOfArms; i++)
+                if(Double.isInfinite(Math.exp(expectedReturnOfArm.apply(i))))
+                {
+                    assert Double.isNaN(ecdf[i]);
+                    return i;
+                }
+        }
+
         assert false;
         throw new RuntimeException("Can't be here!");
 
+    }
+
+    private static boolean encounteredNumericalProblems(double[] ecdf, int numberOfArms, Function<Integer,Double> expectedReturnOfArm)
+    {
+        //we might be here if ecdf is 0 0 0 NaN NaN which can happen numerically if one value is way larger than the others
+        //if that's the case, pick the arm that caused it to go bang
+        for(int i=0; i<numberOfArms; i++)
+        {
+            if(!
+                    (ecdf[i] == 0 || Double.isNaN(ecdf[i]))
+
+                    )
+                return false;
+
+
+        }
+        return true;
     }
 
     public static double[] getECDF(
@@ -85,11 +115,19 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
             denominator += Math.exp(numerator/temperature);
             //store temporarilly all numerators in the ecdf array
             ecdf[i] = numerator;
+            assert Double.isFinite(numerator);
+            assert Double.isFinite(denominator);
         }
         //divide all numerators by denominator to get the probability
+
         for(int i=0; i<numberOfArms; i++)
         {
-            ecdf[i] = Math.exp(ecdf[i]/temperature)/denominator;
+            //if the denominator is 0, then everything is equally likely
+            assert denominator>=0;
+            ecdf[i] = denominator > 0 ?
+                    Math.exp(ecdf[i]/temperature)/denominator :
+                    1d/numberOfArms
+            ;
 
             if(i>0)
                 ecdf[i] += ecdf[i-1];

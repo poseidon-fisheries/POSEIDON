@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model;
+package uk.ac.ox.oxfish.utility.dynapro;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;

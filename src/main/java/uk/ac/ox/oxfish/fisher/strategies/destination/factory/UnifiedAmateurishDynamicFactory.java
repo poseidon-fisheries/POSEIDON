@@ -127,7 +127,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
 
                         }
                     }
-                    /*
+
                     // times exploited
                     ,new Sensor<Fisher, Double>() {
                         @Override
@@ -161,7 +161,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
 
                         }
                     }
-                    */
+
             );
             instances.put(state,strategy);
 

@@ -120,6 +120,21 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }, 0d);
 
 
+        registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                            }
+                        }).sum() /
+                        observed.getFishers().size();
+            }
+        }, 0d);
+
+
         final NauticalMap map = state.getMap();
         final List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
 

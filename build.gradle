@@ -15,6 +15,7 @@ mainClassName = 'uk.ac.ox.oxfish.Main'
 repositories {
     mavenLocal()
     mavenCentral()
+
 }
 
 sourceSets
@@ -78,10 +79,14 @@ dependencies
     //jcommander, useful to parse command line
     compile "com.beust:jcommander:1.48"
 
+    //commons math
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
     //testing:
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-all:1.9.5"
+
+
 
 
 }

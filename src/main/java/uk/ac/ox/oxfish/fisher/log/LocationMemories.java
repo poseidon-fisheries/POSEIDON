@@ -69,18 +69,18 @@ public class LocationMemories<T> implements Startable, Steppable
 
         LinkedList<SeaTile> toRemove = new LinkedList<>();
 
-        for(Map.Entry<SeaTile,LocationMemory<T>> memory : memories.entrySet() )
+        if(memories.size() > minimumNumberOfMemoriesBeforeForgetting)
         {
-            int age = memory.getValue().age();
-            if(age >= minimumMemoryAgeInDaysBeforeForgetting &&
-                    memories.size() > minimumNumberOfMemoriesBeforeForgetting &&
-                    ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
-                toRemove.add(memory.getKey());
+            for (Map.Entry<SeaTile, LocationMemory<T>> memory : memories.entrySet()) {
+                int age = memory.getValue().age();
+                if (age >= minimumMemoryAgeInDaysBeforeForgetting &&
+                        ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
+                    toRemove.add(memory.getKey());
 
+            }
+
+            toRemove.forEach(memories::remove);
         }
-
-        toRemove.forEach(memories::remove);
-
     }
 
     /**

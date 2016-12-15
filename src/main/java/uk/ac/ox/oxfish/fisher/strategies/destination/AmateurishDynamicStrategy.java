@@ -10,15 +10,17 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.AmateurishApproximateDynamicProgram;
+import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
+import uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 /**
  * This is my first attempt at a workable approximate dynamic programming agent.
@@ -138,7 +140,13 @@ public class AmateurishDynamicStrategy implements DestinationStrategy, Departing
         double[] currentFeatures = featurize(fisher);
 
         //what is the optimal decision?
-        Pair<Integer,Double> currentDecision = program.chooseBestAction(currentFeatures);
+        Integer softmaxDecision = SoftmaxBanditAlgorithm.drawFromSoftmax(random, 4, new Function<Integer, Double>() {
+            @Override
+            public Double apply(Integer arm) {
+                return program.judgeAction(arm, currentFeatures);
+            }
+        });
+        Pair<Integer,Double> currentDecision = new Pair<>(softmaxDecision,program.judgeAction(softmaxDecision,currentFeatures));
         //with a small chance try something completely bonkers
         if(random.nextBoolean(noiseRate)) {
             int randomAction = random.nextInt(actions.length);

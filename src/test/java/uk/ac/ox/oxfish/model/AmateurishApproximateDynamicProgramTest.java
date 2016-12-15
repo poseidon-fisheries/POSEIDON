@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
 import static org.junit.Assert.*;
 
@@ -19,7 +20,7 @@ public class AmateurishApproximateDynamicProgramTest {
         //and action 1 viceversa. Can it show in the value function?
         MersenneTwisterFast random = new MersenneTwisterFast();
 
-        AmateurishApproximateDynamicProgram program = new AmateurishApproximateDynamicProgram(2,3,.05);
+        AmateurishApproximateDynamicProgram program = new AmateurishApproximateDynamicProgram(2, 3, .05);
 
         double reward = Double.NaN;
         int actionTaken=-100;
