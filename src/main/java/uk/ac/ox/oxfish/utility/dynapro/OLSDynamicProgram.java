@@ -29,7 +29,7 @@ public class OLSDynamicProgram
     /**
      * each array is the "beta"s of the linear approximation
      */
-    private final double[][] linearParameters;
+    private double[][] linearParameters;
 
 
     /**
@@ -41,7 +41,7 @@ public class OLSDynamicProgram
     private final Function<FishState,Double> rewardFunction;
 
     /**
-     * the number of features + intercept + combinations
+     * the number of features + intercept + transformations
      */
     private final int regressionDimension;
 
@@ -50,6 +50,12 @@ public class OLSDynamicProgram
     private final boolean addCubes;
 
     private final boolean addInteractions;
+
+    private final boolean addCumulative;
+
+    private final boolean addAverages;
+
+    private final boolean addLags;
 
 
     private  double[] oldFeatures;
@@ -84,12 +90,20 @@ public class OLSDynamicProgram
 
     public OLSDynamicProgram(
             int possibleActions,
-            Function<FishState, Double> rewardFunction, boolean addSquares,
-            boolean addCubes, boolean addInteractions,
+            Function<FishState, Double> rewardFunction,
+            boolean addSquares,
+            boolean addCubes,
+            boolean addInteractions,
+            boolean addCumulative,
+            boolean addAverages,
+            boolean addLags,
             double errorRate, Predicate<double[]> lastStep,
             Function<Pair<FishState, Double>, Double>... features) {
         this.possibleActions = possibleActions;
         this.rewardFunction = rewardFunction;
+        this.addCumulative = addCumulative;
+        this.addAverages = addAverages;
+        this.addLags = addLags;
         this.errorRate = errorRate;
         this.lastStep = lastStep;
         this.features = features;
@@ -102,6 +116,12 @@ public class OLSDynamicProgram
         if(addSquares)
             dimensions+=features.length;
         if(addCubes)
+            dimensions+=features.length;
+        if(addCumulative)
+            dimensions+=features.length;
+        if(addAverages)
+            dimensions+=features.length;
+        if(addLags)
             dimensions+=features.length;
         if(addInteractions)
             dimensions+= (features.length)*(features.length-1)/2;
@@ -159,17 +179,28 @@ public class OLSDynamicProgram
      * @return
      */
     private Pair<Integer,Double> pickBestAction(double[] currentFeatures) {
-        double[] qValues = new double[getPossibleActions()];
-        for(int i=0; i<qValues.length; i++)
-            qValues[i] = qValue(currentFeatures,i);
+        double[] scores = scoreEachAction(currentFeatures);
         int bestAction = 0;
-        for (int i = 1; i < qValues.length; i++){
-            double candidate = qValues[i];
-            if ((candidate > qValues[bestAction])){
+        for (int i = 1; i < scores.length; i++){
+            double candidate = scores[i];
+            if ((candidate > scores[bestAction])){
                 bestAction = i;
             }
         }
-        return new Pair<>(bestAction,qValues[bestAction]);
+        return new Pair<>(bestAction,scores[bestAction]);
+    }
+
+    /**
+     * by default this just computes the q value of each action but it could be modified
+     * to compute something more akin UCB
+     * @param currentFeatures the features to use to extract the q value (and whatever else)
+     * @return an array producing the scores
+     */
+    protected double[] scoreEachAction(double[] currentFeatures) {
+        double[] qValues = new double[getPossibleActions()];
+        for(int i=0; i<qValues.length; i++)
+            qValues[i] = qValue(currentFeatures,i);
+        return qValues;
     }
 
 
@@ -179,6 +210,7 @@ public class OLSDynamicProgram
     public void regress()
     {
 
+        temporaryParameters = new double[linearParameters.length][linearParameters[0].length];
         for(int i=0; i<linearParameters.length; i++)
         {
             assert preDecisionStates[i].size() == postDecisionStates[i].size();
@@ -189,24 +221,40 @@ public class OLSDynamicProgram
             Iterator<double[]> post = postDecisionStates[i].iterator();
             Iterator<Double> rewardIterator = rewards[i].iterator();
             //create design matrix
+            int j=0;
             while(pre.hasNext())
             {
                 double[] features = pre.next();
-                x[i] = Arrays.copyOf(features, features.length);
+                x[j] = Arrays.copyOf(features, features.length);
                 //y is just reward plus max Q
                 double reward = rewardIterator.next();
-                double[] postFeatures = post.next();
+                double[] postFeatures = Arrays.copyOf(post.next(),features.length);
                 double maxQ = pickBestAction(postFeatures).getSecond();
-                y[i] = reward+ maxQ;
-                i++;
+                y[j] = reward+ maxQ;
+                j++;
             }
             ///feed it
             OLSMultipleLinearRegression regression = new OLSMultipleLinearRegression();
             regression.setNoIntercept(true); //we bring our own
             regression.newSampleData(y,x);
-            linearParameters[i] = regression.estimateRegressionParameters();
+            updateLinearParametersGivenRegression(i, regression,x);
         }
+        linearParameters=temporaryParameters;
+        temporaryParameters=null;
+
     }
+
+    /**
+     * store the linear parameters as they are regressed
+     */
+    protected double[][] temporaryParameters;
+
+    protected void updateLinearParametersGivenRegression(int i,
+                                                         OLSMultipleLinearRegression regression,
+                                                         double[][] x) {
+        temporaryParameters[i] = regression.estimateRegressionParameters();
+    }
+
     /**
      * the approximate value we give to the total sum of rewards of the next steps
      * if we take the next action
@@ -256,6 +304,22 @@ public class OLSDynamicProgram
             for(int j=0; j<originals.length; j++, i++)
                 toReturn[i] = originals[j] * originals[j] * originals[j];
         }
+        if(addCumulative)
+        {
+            for(int j=0; j<originals.length; j++, i++)
+                toReturn[i] = originals[j] + previousFactors[i];
+        }
+        if(addAverages)
+        {
+            for(int j=0; j<originals.length; j++, i++)
+                toReturn[i] = 0.2 * originals[j] + 0.8* previousFactors[i];
+        }
+        if(addLags)
+        {
+            for(int j=0; j<originals.length; j++, i++)
+                toReturn[i] =previousFactors[j+1];  //+1 due to intercept
+        }
+
         if(addInteractions)
         {
             for(int j=0; j<originals.length; j++)
