@@ -82,6 +82,10 @@ dependencies
     //commons math
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
+    //burlap!
+    compile group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
+
+
     //testing:
     testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-all:1.9.5"
