@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -106,19 +105,22 @@ public class ShodanStateOil implements State {
         double totalDistance=0;
         Iterator<Double> distance = state.getDailyDataSet().getColumn(
                 "Average Distance From Port").descendingIterator();
-        for(int i=0; i<30; i++)
-            totalDistance += distance.next();
+        for(int i=0; i<30; i++) {
+            Double dayDistance = distance.next();
+            totalDistance += Double.isFinite(dayDistance) ? dayDistance : 0 ;
+        }
+        totalDistance/=30;
         //cpue
         double totalEffort=0;
         Iterator<Double> effort = state.getDailyDataSet().getColumn(
                 "Total Effort").descendingIterator();
-        for(int i=0; i<30; i++)
+        while (effort.hasNext())
             totalEffort += effort.next();
 
 
         return new ShodanStateOil(state.getPorts().iterator().next().getGasPricePerLiter(),
                                   monthlyLandings,
-                                  (int)(ShodanEnvironment.YEARS_PER_EPISODE*1-state.getDay()/30),
+                                  (int)(ShodanEnvironment.YEARS_PER_EPISODE*12-state.getDay()/30),
                                   totalEffort,
                                   totalDistance,
                                   state.getDayOfTheYear());
