@@ -355,7 +355,7 @@ public class PoshShodan {
 
         Paths.get("runs", "posh_shodan", name).toFile().mkdirs();
 
-        //do one run everything open
+        //do one lspiRun everything open
         FishState initialRun = gasRun(shodan, 0);
         double initialScore = 0;
         for(Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
@@ -369,7 +369,7 @@ public class PoshShodan {
         System.out.println("open," + initialScore);
         writer.close();
 
-        //another run everything random
+        //another lspiRun everything random
         shodan.setErrorRate(1);
         initialRun = gasRun(shodan, 0);
         initialScore = 0;
@@ -401,7 +401,7 @@ public class PoshShodan {
             writer.write(FishStateUtilities.deepToStringArray(shodan.getLinearParameters(),",","\n"));
             writer.close();
             System.out.println(FishStateUtilities.deepToStringArray(shodan.getLinearParameters(),",","\n"));
-            //make one run with error rate 0
+            //make one lspiRun with error rate 0
             double errorRate = shodan.getErrorRate();
             shodan.setErrorRate(0d);
             FishState referenceRun = gasRun(shodan, 0);

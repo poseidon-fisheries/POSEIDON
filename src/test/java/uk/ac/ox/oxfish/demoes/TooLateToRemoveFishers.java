@@ -28,7 +28,7 @@ public class TooLateToRemoveFishers
         simpleMapInitializerFactory.setCoastalRoughness(new FixedDoubleParameter(0));
         scenario.setMapInitializer(simpleMapInitializerFactory);
 
-        //run the model for a full 3 years before progressing
+        //lspiRun the model for a full 3 years before progressing
         state.setScenario(scenario);
         state.start();
         while (state.getYear() < 3)

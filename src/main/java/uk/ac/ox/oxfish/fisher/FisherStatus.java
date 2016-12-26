@@ -144,7 +144,7 @@ public class FisherStatus implements Serializable {
 
 
     /**
-     * when this flag is on, the agent believes that it MUST return home or it will run out of fuel. All other usual
+     * when this flag is on, the agent believes that it MUST return home or it will lspiRun out of fuel. All other usual
      * decisions about destination are ignored.
      */
     private boolean fuelEmergencyOverride = false;

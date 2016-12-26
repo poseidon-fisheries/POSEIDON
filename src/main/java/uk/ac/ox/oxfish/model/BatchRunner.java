@@ -24,7 +24,7 @@ public class BatchRunner
     private final Path yamlFile;
 
     /**
-     * number of years to run each model
+     * number of years to lspiRun each model
      */
     private final int yearsToRun;
 
@@ -93,7 +93,7 @@ public class BatchRunner
 
 
         FishStateUtilities.printCSVColumnsToFile(
-                outputFolder.resolve("run"+runsDone+".csv").toFile(),
+                outputFolder.resolve("lspiRun"+runsDone+".csv").toFile(),
                 columns.toArray(new DataColumn[columns.size()])
         );
 

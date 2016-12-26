@@ -50,7 +50,7 @@ public class FixingSeedWorksOnYamler {
         Path policyPath = Paths.get("inputs", "tests", "policy_script.yaml");
         YamlMain.main(new String[]{inputPath.toString(),"--years","3","--policy",policyPath.toString(),"--save"});
 
-        //run the model, save it and then read it back so that we test checkpointing too.
+        //lspiRun the model, save it and then read it back so that we test checkpointing too.
         FishState state = FishStateUtilities.readModelFromFile(
                 Paths.get("output", "replicate", "replicate.checkpoint").toFile());
 

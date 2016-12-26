@@ -1,14 +1,12 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
-import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.SpecificQuotaRegulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -53,7 +51,7 @@ public class OpportunityCostsTest {
                 }
             });
 
-        //run it for two years
+        //lspiRun it for two years
         while (state.getYear() < 2) {
             state.schedule.step(state);
         }
@@ -104,7 +102,7 @@ public class OpportunityCostsTest {
                 }
             });
 
-        //run it for two years
+        //lspiRun it for two years
         while (state.getYear() < 2) {
             state.schedule.step(state);
         }

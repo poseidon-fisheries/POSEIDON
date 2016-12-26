@@ -37,7 +37,7 @@ public class ShodanFisheries2 {
 
         ShodanFisheries2.Shodan shodan = new ShodanFisheries2.Shodan(0, 0);
 
-        //do one run everything open
+        //do one lspiRun everything open
         FishState initialRun = oneRun(shodan, 0);
         double initialScore = 0;
         for(Double landing : initialRun.getYearlyDataSet().getColumn("Average Cash-Flow"))
@@ -49,7 +49,7 @@ public class ShodanFisheries2 {
         writer.write("open," + initialScore);
         writer.close();
 
-        //another run everything random
+        //another lspiRun everything random
         shodan.setErrorRate(1);
         initialRun = oneRun(shodan, 0);
         initialScore = 0;
@@ -86,7 +86,7 @@ public class ShodanFisheries2 {
                 shodan.setErrorRate(Math.max(shodan.getErrorRate()*.99,.05));
             }
             shodan.regress();
-            //make one run with error rate 0
+            //make one lspiRun with error rate 0
             double errorRate = shodan.getErrorRate();
             shodan.setErrorRate(0d);
             FishState referenceRun = oneRun(shodan, 0);

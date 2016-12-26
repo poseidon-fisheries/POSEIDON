@@ -21,7 +21,7 @@ public class YamlMain {
     @Parameter(names={"--log","-l"},description = "the verbosity level of the logging")
     private int logLevel = Log.LEVEL_INFO;
 
-    @Parameter(names={"--years","-t"}, description = "number of years the simulation has to run")
+    @Parameter(names={"--years","-t"}, description = "number of years the simulation has to lspiRun")
     private int yearsToRun = 20;
 
     @Parameter(names={"--save"},description = "saves model on file at the end of the simulation")

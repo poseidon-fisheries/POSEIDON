@@ -15,14 +15,17 @@ public class PolinomialBasis implements DenseStateFeatures {
 
     private final int order;
 
+    private final double intercept;
 
-    public PolinomialBasis(DenseStateFeatures delegate, int order) {
+
+    public PolinomialBasis(DenseStateFeatures delegate, int order, double intercept) {
         this.delegate = delegate;
         this.order = order;
+        this.intercept = intercept;
     }
 
-    public PolinomialBasis(int order) {
-        this(new NumericVariableFeatures(),order);
+    public PolinomialBasis(int order, int intercept) {
+        this(new NumericVariableFeatures(), order, 1);
     }
 
 
@@ -36,8 +39,10 @@ public class PolinomialBasis implements DenseStateFeatures {
     public double[] features(State s) {
 
         double[] delegateFeatures = delegate.features(s);
-        double[] polinomial = new double[delegateFeatures.length*order];
-        int i=0;
+        double[] polinomial = new double[delegateFeatures.length*order+1];
+        //always have an intercept
+        polinomial[0] = intercept;
+        int i=1;
         for(int original = 0; original<delegateFeatures.length; original++) {
             for (int currentOrder = 1; currentOrder <= order; currentOrder++) {
                 polinomial[i++] = Math.pow(delegateFeatures[original],currentOrder);
@@ -54,6 +59,6 @@ public class PolinomialBasis implements DenseStateFeatures {
      */
     @Override
     public DenseStateFeatures copy() {
-        return new PolinomialBasis(delegate,order);
+        return new PolinomialBasis(delegate, order, 1);
     }
 }

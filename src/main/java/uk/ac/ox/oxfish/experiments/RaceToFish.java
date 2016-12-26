@@ -49,7 +49,7 @@ public class RaceToFish {
         System.out.println("Running Corner Case With No Rules");
         for(int run = 0; run< numberOfRuns; run++)
         {
-            System.out.println("run "+ run);
+            System.out.println("lspiRun "+ run);
             PrototypeScenario scenario = yaml.loadAs(scenarioYaml,PrototypeScenario.class);
             System.out.println(scenario.getDepartingStrategy());
             scenario.setRegulation(new AnarchyFactory());
@@ -82,7 +82,7 @@ public class RaceToFish {
         System.out.println("Running Corner Case With TAC");
         for(int run = 0; run< numberOfRuns; run++)
         {
-            System.out.println("run "+ run);
+            System.out.println("lspiRun "+ run);
             PrototypeScenario scenario = yaml.loadAs(scenarioYaml,PrototypeScenario.class);
             TACMonoFactory tac = new TACMonoFactory();
             tac.setQuota(new FixedDoubleParameter(quotaValue *100));
@@ -112,7 +112,7 @@ public class RaceToFish {
         System.out.println("Running Corner Case With ITQ");
         for(int run = 0; run< numberOfRuns; run++)
         {
-            System.out.println("run "+ run);
+            System.out.println("lspiRun "+ run);
             PrototypeScenario scenario = yaml.loadAs(scenarioYaml,PrototypeScenario.class);
             ITQMonoFactory tac = new ITQMonoFactory();
             tac.setIndividualQuota(new FixedDoubleParameter(quotaValue));

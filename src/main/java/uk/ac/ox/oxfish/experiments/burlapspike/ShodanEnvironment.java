@@ -4,14 +4,11 @@ import burlap.mdp.core.action.Action;
 import burlap.mdp.core.state.State;
 import burlap.mdp.singleagent.environment.Environment;
 import burlap.mdp.singleagent.environment.EnvironmentOutcome;
-import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.ExternalOpenCloseSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.policymakers.Controller;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -36,6 +33,15 @@ public class ShodanEnvironment implements Environment
     public static final String ACTION_OPEN = "open";
 
     public static final String ACTION_CLOSE = "close";
+    private final PrototypeScenario scenario;
+    private Steppable additionalSteppable;
+
+
+
+    public ShodanEnvironment(final PrototypeScenario scenario, final Steppable additionalSteppable) {
+        this.scenario = scenario;
+        this.additionalSteppable = additionalSteppable;
+    }
 
     /**
      * Returns the current observation of the environment as a {@link State}.
@@ -54,7 +60,7 @@ public class ShodanEnvironment implements Environment
      */
     @Override
     public double lastReward() {
-        if(state.getDay() <30)
+        if(state.getDay() <29)
             return 0d;
         else
         {
@@ -86,7 +92,7 @@ public class ShodanEnvironment implements Environment
             assert a.actionName().equals(ACTION_CLOSE);
             shodan.setOpen(false);
         }
-        //run the model for another 30 days
+        //lspiRun the model for another 30 days
         for(int day=0; day<30; day++)
             state.schedule.step(state);
 
@@ -115,9 +121,14 @@ public class ShodanEnvironment implements Environment
      */
     @Override
     public void resetEnvironment() {
+        resetEnvironment(System.currentTimeMillis());
+
+
+    }
+
+
+    public void resetEnvironment(long seed) {
         shodan = new ExternalOpenCloseSeason();
-        PrototypeScenario scenario = new PrototypeScenario();
-        scenario.setFishers(100);
 
         scenario.setRegulation(new AlgorithmFactory<Regulation>() {
             @Override
@@ -126,24 +137,16 @@ public class ShodanEnvironment implements Environment
             }
         });
 
-        state = new FishState(System.currentTimeMillis());
+        state = new FishState(seed);
         state.attachAdditionalGatherers();
         state.setScenario(scenario);
         state.start();
 
-        state.scheduleEveryXDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
 
-                //change oil price
-                for(Port port : state.getPorts())
-                    port.setGasPricePerLiter(state.getDayOfTheYear()/1000d);
-            }
-        }, StepOrder.POLICY_UPDATE, 30);
+        state.scheduleEveryXDay(additionalSteppable, StepOrder.POLICY_UPDATE, 30);
 
 
     }
-
     /**
      * Returns whether the environment is in a terminal state that prevents further action by the agent.
      *

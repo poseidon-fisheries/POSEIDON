@@ -831,7 +831,7 @@ public class FirstPaper
                 state.getFishers(), outputFolder.resolve(policy+"_start_blue.csv").toFile(), fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1]
         );
 
-        //run for 50 years
+        //lspiRun for 50 years
         while (state.getYear() < 50) {
             state.schedule.step(state);
             if(state.getYear()>0 && state.getDayOfTheYear()==1)
@@ -908,7 +908,7 @@ public class FirstPaper
             File runFile = outputPath.resolve("dem2_"+run+".csv").toFile();
             //scenario.setNetworkBuilder(new EmptyNetworkBuilder());
 
-            //create and run
+            //create and lspiRun
             FishYAML yaml = new FishYAML();
             String scenarioYaml = String.join("\n", Files.readAllLines(
                     INPUT_FOLDER.resolve("osmose.yaml")));

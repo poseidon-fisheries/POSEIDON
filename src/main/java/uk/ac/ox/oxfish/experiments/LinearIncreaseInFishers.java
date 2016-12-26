@@ -26,7 +26,7 @@ public class LinearIncreaseInFishers
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(50);
 
-        //run the model for a full 3 years before progressing
+        //lspiRun the model for a full 3 years before progressing
         state.setScenario(scenario);
         state.start();
         while(state.getYear()<3)
@@ -74,7 +74,7 @@ public class LinearIncreaseInFishers
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(50);
 
-        //run the model for a full 3 years before progressing
+        //lspiRun the model for a full 3 years before progressing
         state.setScenario(scenario);
         state.start();
         while(state.getYear()<3)

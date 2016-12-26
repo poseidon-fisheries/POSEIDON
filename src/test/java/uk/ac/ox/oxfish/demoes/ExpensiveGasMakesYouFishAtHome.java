@@ -56,7 +56,7 @@ public class ExpensiveGasMakesYouFishAtHome
 
         //increase the price of gas!
         state.getPorts().iterator().next().setGasPricePerLiter(5);
-        //run for another year
+        //lspiRun for another year
         for(int i=0; i<365;i++)
             state.schedule.step(state);
 

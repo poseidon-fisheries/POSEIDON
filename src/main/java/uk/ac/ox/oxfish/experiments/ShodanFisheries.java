@@ -33,7 +33,7 @@ public class ShodanFisheries {
     public static void main(String[] args) throws IOException {
 
 
-        //do one run everything open
+        //do one lspiRun everything open
         Shodan shodan = new Shodan(0, 0);
         FishState initialRun = oneRun(shodan, 0);
         double initialScore = 0;
@@ -46,7 +46,7 @@ public class ShodanFisheries {
         writer.write("open," + initialScore);
         writer.close();
 
-        //another run everything random
+        //another lspiRun everything random
         shodan.setErrorRate(1);
         initialRun = oneRun(shodan, 0);
         initialScore = 0;
@@ -81,7 +81,7 @@ public class ShodanFisheries {
                 shodan.setErrorRate(Math.max(shodan.getErrorRate()*.99,.02));
             }
             shodan.regress();
-            //make one run with error rate 0
+            //make one lspiRun with error rate 0
             double errorRate = shodan.getErrorRate();
             shodan.setErrorRate(0d);
             FishState referenceRun = oneRun(shodan, 0);

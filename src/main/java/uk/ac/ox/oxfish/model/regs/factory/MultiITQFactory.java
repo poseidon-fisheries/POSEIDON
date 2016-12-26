@@ -30,12 +30,12 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
 
 
     /**
-     * an array of order books for each "model" run
+     * an array of order books for each "model" lspiRun
      */
     private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
 
     /**
-     * an array of order book makers for each model run
+     * an array of order book makers for each model lspiRun
      */
     private final Map<FishState,ITQMarketBuilder[]> orderBooksBuilder = new HashMap<>(1);
 

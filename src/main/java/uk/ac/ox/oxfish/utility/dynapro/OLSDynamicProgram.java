@@ -205,7 +205,7 @@ public class OLSDynamicProgram
 
 
     /**
-     * run separate regressions for each possible state
+     * lspiRun separate regressions for each possible state
      */
     public void regress()
     {

@@ -17,7 +17,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
@@ -43,7 +42,10 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.network.*;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.network.NetworkBuilder;
+import uk.ac.ox.oxfish.model.network.NetworkPredicate;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -60,7 +62,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * The scenario to run Osmose WFS.
+ * The scenario to lspiRun Osmose WFS.
  * Created by carrknight on 11/17/16.
  */
 public class OsmoseWFSScenario implements Scenario{

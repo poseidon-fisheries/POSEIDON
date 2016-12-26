@@ -85,7 +85,7 @@ public class ChangingNetworksTest {
         state.start();
 
 
-        //run for 5 years
+        //lspiRun for 5 years
         while(state.getYear()<5)
             state.schedule.step(state);
         assertTrue(state.getLatestYearlyObservation("Same Gear Friends")>.9);

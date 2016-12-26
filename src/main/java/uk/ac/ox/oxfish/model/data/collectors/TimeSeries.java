@@ -24,7 +24,7 @@ public class TimeSeries<T> implements Steppable
     final private Map<String,DataColumn> dataView;
 
     /**
-     * the functions to run on studied object to gather their data
+     * the functions to lspiRun on studied object to gather their data
      */
     final private LinkedHashMap<String,Gatherer<T>> gatherers;
 

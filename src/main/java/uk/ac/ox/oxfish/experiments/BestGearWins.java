@@ -77,7 +77,7 @@ public class BestGearWins {
                                                      }, Double.NaN);
         }
 
-        //pre-run average efficiency
+        //pre-lspiRun average efficiency
         double average = 0;
         for(Fisher fisher : state.getFishers())
         {

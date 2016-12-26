@@ -32,7 +32,7 @@ public class RespondToFines {
         //make fishing specie 1 very expensive
         ((FixedPriceMarket) state.getAllMarketsForThisSpecie((state.getBiology().getSpecie(1))).get(0)).setPrice(-50);
 
-        //run it for 1000 steps
+        //lspiRun it for 1000 steps
         for(int i=0; i<1000; i++)
             state.schedule.step(state);
 

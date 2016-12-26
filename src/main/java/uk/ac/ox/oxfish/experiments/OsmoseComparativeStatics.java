@@ -55,7 +55,7 @@ public class OsmoseComparativeStatics
             scenario.setFishers(0);
             scenario.setNetworkBuilder(new EmptyNetworkBuilder());
 
-            //create and run
+            //create and lspiRun
             File runFile = outputPath.resolve("virgin_"+run+".csv").toFile();
             FishState fishState = new FishState(System.currentTimeMillis());
             fishState.setScenario(scenario);
@@ -90,7 +90,7 @@ public class OsmoseComparativeStatics
             scenario.setGear(gear);
             //scenario.setNetworkBuilder(new EmptyNetworkBuilder());
 
-            //create and run
+            //create and lspiRun
             FishState fishState = new FishState(System.currentTimeMillis());
             fishState.setScenario(scenario);
 
@@ -124,7 +124,7 @@ public class OsmoseComparativeStatics
             scenario.setGear(gear);
             //scenario.setNetworkBuilder(new EmptyNetworkBuilder());
 
-            //create and run
+            //create and lspiRun
             FishState fishState = new FishState(System.currentTimeMillis());
             fishState.setScenario(scenario);
 

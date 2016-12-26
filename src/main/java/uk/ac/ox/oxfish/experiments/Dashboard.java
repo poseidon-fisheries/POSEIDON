@@ -177,7 +177,7 @@ public class Dashboard
         final FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
         state.start();
-        //run first year "free"
+        //lspiRun first year "free"
         while(state.getYear()<1)
             state.schedule.step(state);
 
@@ -209,7 +209,7 @@ public class Dashboard
     }
 
     /**
-     * run a disfunctional friends simulation: very low p, very high i
+     * lspiRun a disfunctional friends simulation: very low p, very high i
      * @param friends how many friends each person has
      * @param scenario the original scenario, as read from the yaml
      * @param maxYearsToRun maximum years after which to cut the simulation
@@ -253,13 +253,13 @@ public class Dashboard
     )
     {
 
-        System.out.println("    run " + run);
+        System.out.println("    lspiRun " + run);
         //create the model
         FishState state = new FishState(System.currentTimeMillis());
         //read in the scenario
         Scenario scenario = yaml.loadAs(scenarioYAML,Scenario.class);
         state.setScenario(scenario);
-        //run it for 10 years
+        //lspiRun it for 10 years
         state.start();
         while(state.getYear()< yearsToRun)
             state.schedule.step(state);
@@ -276,7 +276,7 @@ public class Dashboard
     public static void hypotheticalOneSpeciesITQRun( FishYAML yaml, String scenarioYAML, int run,
                                                       final String outputName, final Path outputPath, final int yearsToRun)
     {
-        System.out.println("    run " + run);
+        System.out.println("    lspiRun " + run);
         //create the model
         FishState state = new FishState(System.currentTimeMillis());
         //read in the scenario
@@ -314,7 +314,7 @@ public class Dashboard
             }
         });
 
-        //run it for 10 years
+        //lspiRun it for 10 years
         state.start();
         while(state.getYear()< yearsToRun)
             state.schedule.step(state);
@@ -333,7 +333,7 @@ public class Dashboard
     public static void gearEvolutionDashboard(
             FishYAML yamler, String expensiveGas, int i, final String outputName,
             final Path outputPath, final long randomSeed) throws IOException {
-        System.out.println("    run " + i);
+        System.out.println("    lspiRun " + i);
         //create the model
         FishState state = new FishState(randomSeed);
         //read in the scenario
@@ -352,7 +352,7 @@ public class Dashboard
                                                              }
                                                          }, Double.NaN);
 
-        //run it for 10 years
+        //lspiRun it for 10 years
         state.start();
         //make agents optimize their gear
 

@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
 import ec.util.MersenneTwisterFast;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,12 +15,10 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -379,7 +376,7 @@ public class SNALSARDestinationStrategyTest {
         long towsSouth = 0;
 
         state.start();
-        //first year, just run: there is no ITQ running anyway
+        //first year, just lspiRun: there is no ITQ running anyway
         while (state.getYear() < 1) {
             state.schedule.step(state);
         }

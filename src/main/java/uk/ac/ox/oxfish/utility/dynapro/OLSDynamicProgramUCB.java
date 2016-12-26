@@ -63,7 +63,7 @@ public class OLSDynamicProgramUCB extends OLSDynamicProgram {
     }
 
     /**
-     * run separate regressions for each possible state
+     * lspiRun separate regressions for each possible state
      */
     @Override
     public void regress() {

@@ -94,7 +94,7 @@ public class ChangingNetworks {
         Files.write(Paths.get("runs","networks","before.txt"),state.getSocialNetwork().toMatrixFile().getBytes());
         System.out.println();
 
-        //run for 20 years
+        //lspiRun for 20 years
         while(state.getYear()<20)
             state.schedule.step(state);
 

@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
- * A simple main that requires a yaml file from console to run the simulation 1000 steps before quitting. Simple test
+ * A simple main that requires a yaml file from console to lspiRun the simulation 1000 steps before quitting. Simple test
  * for more complicated efforts
  * Created by carrknight on 7/13/15.
  */

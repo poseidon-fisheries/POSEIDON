@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Representing a single run of the model. Runs for x years and returns a "fitness" value. The meat of this class
+ * Representing a single lspiRun of the model. Runs for x years and returns a "fitness" value. The meat of this class
  * is the "scenarioModification" and "afterStartModification" provided. These represent deviations from the baseline
  * scenario/model this experiment is supposedly testing.
  *
@@ -27,7 +27,7 @@ public class Experiment<S extends Scenario> implements Callable<Double>
     private final Function<FishState,Double> fitnessFunction;
 
     /**
-     * the scenario this experiment supposedly run
+     * the scenario this experiment supposedly lspiRun
      */
     private final S initialScenario;
 

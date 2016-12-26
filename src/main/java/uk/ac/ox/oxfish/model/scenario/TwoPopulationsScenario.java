@@ -335,6 +335,7 @@ public class TwoPopulationsScenario implements Scenario{
                                           new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
 
             newFisher.getTags().add("small");
+            newFisher.getTags().add("red");
             //if needed, install better airs
             if(usePredictors)
             {
@@ -423,6 +424,9 @@ public class TwoPopulationsScenario implements Scenario{
                                           new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
 
             newFisher.getTags().add("large");
+            newFisher.getTags().add("ship");
+            newFisher.getTags().add("blue");
+
             //if needed, install better airs
             if(usePredictors)
             {

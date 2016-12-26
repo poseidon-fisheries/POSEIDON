@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -101,9 +100,9 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
             Toolkit.getDefaultToolkit().beep();
             setProgress(0);
             while(runner.getRunsDone()<numberOfRuns) {
-                taskOutput.append("Starting run " + runner.getRunsDone()+"\n");
+                taskOutput.append("Starting lspiRun " + runner.getRunsDone()+"\n");
                 runner.run();
-                taskOutput.append("Finished run " + runner.getRunsDone() +"\n");
+                taskOutput.append("Finished lspiRun " + runner.getRunsDone() +"\n");
                 publish();
             }
 

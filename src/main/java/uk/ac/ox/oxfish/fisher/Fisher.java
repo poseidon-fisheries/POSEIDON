@@ -350,7 +350,7 @@ public class Fisher implements Steppable, Startable{
         //tell equipment!
         equipment.getBoat().newStep();
 
-        //run the state machine
+        //lspiRun the state machine
         double hoursLeft = model.getHoursPerStep();
         while(true)
         {
@@ -456,7 +456,7 @@ public class Fisher implements Steppable, Startable{
         equipment.getBoat().consumeFuel(litersConsumed);
         getCurrentTrip().recordGasConsumption(litersConsumed);
         Preconditions.checkState(equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride(),
-                                 "a boat has run into negative fuel territory");
+                                 "a boat has lspiRun into negative fuel territory");
         memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 

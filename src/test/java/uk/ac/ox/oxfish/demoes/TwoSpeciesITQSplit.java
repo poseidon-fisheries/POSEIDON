@@ -45,7 +45,7 @@ public class TwoSpeciesITQSplit
         long towsSouth = 0;
 
         state.start();
-        //first year, just run: there is no ITQ running anyway
+        //first year, just lspiRun: there is no ITQ running anyway
         while (state.getYear() < 1) {
             state.schedule.step(state);
         }
@@ -115,7 +115,7 @@ public class TwoSpeciesITQSplit
         long towsSouth = 0;
 
         state.start();
-        //first year, just run: there is no ITQ running anyway
+        //first year, just lspiRun: there is no ITQ running anyway
         while (state.getYear() < 1) {
             state.schedule.step(state);
         }

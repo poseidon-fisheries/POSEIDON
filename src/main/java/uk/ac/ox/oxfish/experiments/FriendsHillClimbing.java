@@ -21,7 +21,7 @@ public class FriendsHillClimbing
     public static void testThatFriendsAreGood()
     {
 
-        //run the prototype (2nd July 2015 edition)
+        //lspiRun the prototype (2nd July 2015 edition)
         //make the agents act by hillclimber
         //and compare it with and without friends. Depending on the exploration parameter, with friends is better.
 

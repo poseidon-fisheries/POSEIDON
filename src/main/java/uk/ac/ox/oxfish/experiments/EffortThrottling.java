@@ -149,7 +149,7 @@ public class EffortThrottling {
         System.out.println("start: " + state.getDailyDataSet().getLatestObservation("Probability to leave port"));
 
 
-        //run it for 40 years
+        //lspiRun it for 40 years
         while(state.getYear() < simulationYears)
             state.schedule.step(state);
 
