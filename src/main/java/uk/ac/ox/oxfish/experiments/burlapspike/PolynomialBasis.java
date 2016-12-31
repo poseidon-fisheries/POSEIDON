@@ -7,7 +7,7 @@ import burlap.mdp.core.state.State;
 /**
  * Created by carrknight on 12/19/16.
  */
-public class PolinomialBasis implements DenseStateFeatures {
+public class PolynomialBasis implements DenseStateFeatures {
 
 
 
@@ -18,14 +18,14 @@ public class PolinomialBasis implements DenseStateFeatures {
     private final double intercept;
 
 
-    public PolinomialBasis(DenseStateFeatures delegate, int order, double intercept) {
+    public PolynomialBasis(DenseStateFeatures delegate, int order, double intercept) {
         this.delegate = delegate;
         this.order = order;
         this.intercept = intercept;
     }
 
-    public PolinomialBasis(int order, int intercept) {
-        this(new NumericVariableFeatures(), order, 1);
+    public PolynomialBasis(int order, int intercept) {
+        this(new NumericVariableFeatures(), order, intercept);
     }
 
 
@@ -59,6 +59,6 @@ public class PolinomialBasis implements DenseStateFeatures {
      */
     @Override
     public DenseStateFeatures copy() {
-        return new PolinomialBasis(delegate, order, 1);
+        return new PolynomialBasis(delegate, order, 1);
     }
 }

@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.experiments.burlapspike;
 
 import burlap.behavior.functionapproximation.dense.*;
+import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
+import burlap.behavior.learningrate.ConstantLR;
 import burlap.behavior.policy.EpsilonGreedy;
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.PolicyUtils;
@@ -49,7 +51,7 @@ public class BurlapShodan {
 
 
     public static final int STEPS_PER_LEARNING = 10;
-    public static final int NUMBER_OF_EPISODES = 3000;
+    public static final int NUMBER_OF_EPISODES = 30;
 
     private final static Steppable DEFAULT_STEPPABLE =  new Steppable() {
         @Override
@@ -61,6 +63,8 @@ public class BurlapShodan {
                 port.setGasPricePerLiter(state.getDayOfTheYear() / 1000d);
         }
     };
+
+    //todo fourier basis require fourier
 
     public static void main(String[] args) throws IOException, NoSuchFieldException, IllegalAccessException {
 
@@ -173,7 +177,7 @@ public class BurlapShodan {
         ShodanEnvironment environment = new ShodanEnvironment(scenario, additionalSteppable);
 
         //run sarsa, return last fitness
-        double fitness = runSarsa(new PolinomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
+        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
                                   containerPath, environment);
 
 
@@ -196,6 +200,73 @@ public class BurlapShodan {
         yaml.dump(resultObject,new FileWriter(yamlFile));
     }
 
+    public static void sarsaRunFourier(
+            final double discount, final String name, final int order, final double learningRate, final double lambda,
+            NormalizedVariableFeatures inputFeatures, final PrototypeScenario scenario, final Path containerPath,
+            final Steppable additionalSteppable,
+            String... featureNames) throws IOException, NoSuchFieldException, IllegalAccessException {
+
+
+        ShodanEnvironment environment = new ShodanEnvironment(scenario, additionalSteppable);
+
+        //run sarsa, return last fitness
+        double fitness = runSarsa(new FourierBasis(inputFeatures, order), name, discount, learningRate, lambda,
+                                  containerPath, environment);
+
+
+        //write a YAML for the results
+        HashMap<String,Object> resultObject = new HashMap<>();
+        resultObject.put("method","sarsa");
+        resultObject.put("lambda",lambda);
+        resultObject.put("discount",discount);
+        resultObject.put("learning_rate",learningRate);
+        resultObject.put("factors",featureNames);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+        resultObject.put("name",name);
+        resultObject.put("fitness",fitness);
+        resultObject.put("base","fourier");
+        resultObject.put("order",order);
+        resultObject.put("normalized",true);
+        //to file
+        File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
+        Yaml yaml = new Yaml();
+        yaml.dump(resultObject,new FileWriter(yamlFile));
+    }
+
+    public static void qRunFourier(
+            final double discount, final String name, final int order, final double learningRate, final int replay,
+            final double intercept, final int staleDuration, final PrototypeScenario scenario, final Path containerPath,
+            NormalizedVariableFeatures inputFeatures,
+            final Steppable additionalSteppable,
+            String... keys) throws IOException, NoSuchFieldException, IllegalAccessException {
+
+
+        //lspiRun sarsa, return last fitness
+        double fitness = runQ(new FourierBasis(inputFeatures, order), name, discount, learningRate, replay,
+                              staleDuration, intercept, containerPath,
+                              new ShodanEnvironment(scenario, additionalSteppable));
+
+
+        //write a YAML for the results
+        HashMap<String,Object> resultObject = new HashMap<>();
+        resultObject.put("method","qlearning");
+        resultObject.put("replay",replay);
+        resultObject.put("discount",discount);
+        resultObject.put("learning_rate",learningRate);
+        resultObject.put("factors",keys);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+        resultObject.put("name",name);
+        resultObject.put("fitness",fitness);
+        resultObject.put("base","fourier");
+        resultObject.put("order",order);
+        resultObject.put("normalized",true);
+        resultObject.put("staleDuration",staleDuration);
+        resultObject.put("intercept",intercept);
+        //to file
+        File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
+        Yaml yaml = new Yaml();
+        yaml.dump(resultObject,new FileWriter(yamlFile));
+    }
 
     public static void qRun(
             final double discount, final String name, final int order, final double learningRate, final int replay,
@@ -206,7 +277,7 @@ public class BurlapShodan {
         NumericVariableFeatures inputFeatures = new NumericVariableFeatures(keys);
 
         //lspiRun sarsa, return last fitness
-        double fitness = runQ(new PolinomialBasis(inputFeatures, order, 1), name, discount, learningRate, replay,
+        double fitness = runQ(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, replay,
                               staleDuration, intercept, containerPath,
                               new ShodanEnvironment(scenario, additionalSteppable));
 
@@ -235,6 +306,73 @@ public class BurlapShodan {
         yaml.dump(resultObject,new FileWriter(yamlFile));
     }
 
+    public static void lspiFourierRun(
+            final double discount, final String name, final int order, NormalizedVariableFeatures inputFeatures,
+            final PrototypeScenario scenario,
+            final Path containerPath, final Steppable additionalSteppable,
+            String... featureNames) throws IOException, NoSuchFieldException, IllegalAccessException {
+
+        int initialNumberOfEpisodes = numberOfEpisodesInMemory();
+
+        double fitness = lspiRun(new FourierBasis(inputFeatures, order), name, discount,
+                                 containerPath, new ShodanEnvironment(scenario, additionalSteppable));
+
+
+        //write a YAML for the results
+        HashMap<String,Object> resultObject = new HashMap<>();
+        resultObject.put("method","lspi");
+        resultObject.put("discount",discount);
+
+        String[] names = new String[featureNames.length];
+        for(int i=0; i<names.length; i++)
+            names[i] = featureNames[i];
+
+        resultObject.put("factors",names);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+        resultObject.put("name",name);
+        resultObject.put("fitness",fitness);
+        resultObject.put("base","fourier");
+        resultObject.put("order",order);
+        resultObject.put("normalized",true);
+        resultObject.put("initial_data_set", initialNumberOfEpisodes);
+        //to file
+        File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
+        Yaml yaml = new Yaml();
+        yaml.dump(resultObject,new FileWriter(yamlFile));
+    }
+
+    public static void lspiPolynomialRunNormalized(
+            final double discount, final String name, final int order, final PrototypeScenario scenario,
+            final Path containerPath, final Steppable additionalSteppable, NormalizedVariableFeatures inputFeatures,
+            String... featureNames) throws IOException, NoSuchFieldException, IllegalAccessException {
+
+        int initialNumberOfEpisodes = numberOfEpisodesInMemory();
+
+        double fitness = lspiRun(new PolynomialBasis(inputFeatures, order, 1), name, discount,
+                                 containerPath, new ShodanEnvironment(scenario, additionalSteppable));
+
+
+        //write a YAML for the results
+        HashMap<String,Object> resultObject = new HashMap<>();
+        resultObject.put("method","lspi");
+        resultObject.put("discount",discount);
+
+
+
+        resultObject.put("factors",featureNames);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+        resultObject.put("name",name);
+        resultObject.put("fitness",fitness);
+        resultObject.put("base","polynomial");
+        resultObject.put("order",order);
+        resultObject.put("normalized",true);
+        resultObject.put("initial_data_set", initialNumberOfEpisodes);
+        //to file
+        File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
+        Yaml yaml = new Yaml();
+        yaml.dump(resultObject,new FileWriter(yamlFile));
+    }
+
     public static void polynomialRun(
             final double discount, final String name, final int order, final PrototypeScenario scenario,
             final Path containerPath, final Steppable additionalSteppable,
@@ -243,7 +381,7 @@ public class BurlapShodan {
         NumericVariableFeatures inputFeatures = new NumericVariableFeatures(keys);
         int initialNumberOfEpisodes = numberOfEpisodesInMemory();
 
-        double fitness = lspiRun(new PolinomialBasis(inputFeatures, order, 1), name, discount,
+        double fitness = lspiRun(new PolynomialBasis(inputFeatures, order, 1), name, discount,
                                  containerPath, new ShodanEnvironment(scenario, additionalSteppable));
 
 
@@ -262,7 +400,7 @@ public class BurlapShodan {
         resultObject.put("fitness",fitness);
         resultObject.put("base","polynomial");
         resultObject.put("order",order);
-        resultObject.put("normalized",true);
+        resultObject.put("normalized",false);
         resultObject.put("initial_data_set", initialNumberOfEpisodes);
         //to file
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
@@ -278,7 +416,7 @@ public class BurlapShodan {
         NumericVariableFeatures inputFeatures = new NumericVariableFeatures(keys);
 
         //lspiRun sarsa, return last fitness
-        double fitness = runSarsa(new PolinomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
+        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
                                   containerPath, new ShodanEnvironment(scenario, additionalSteppable));
 
 
@@ -307,7 +445,7 @@ public class BurlapShodan {
 
     public static double runSarsa(
             DenseStateFeatures fb, final String directory, final double discount, final double learningRate,
-            final double lambda, final Path containerPath, final ShodanEnvironment environment) throws IOException {
+            final double lambda, final Path containerPath, final ShodanEnvironment environment) throws IOException, IllegalAccessException, NoSuchFieldException {
 
 
         containerPath.resolve(directory).toFile().mkdirs();
@@ -320,13 +458,21 @@ public class BurlapShodan {
                               new UniversalActionType(ShodanEnvironment.ACTION_CLOSE));
 
 
-        DenseLinearVFA parametricState = new DenseLinearVFA(fb, 1);
+        DenseLinearVFA parametricState;
         GradientDescentSarsaLam sarsaLam = (GradientDescentSarsaLam) readAgent(containerPath, directory);
         if(sarsaLam==null) {
+            parametricState = new DenseLinearVFA(fb, 1);
             sarsaLam = new GradientDescentSarsaLam(domain, discount,
                                                    parametricState,
                                                    learningRate,
                                                    lambda);
+        }
+        else {
+            //read from file, should be safe
+            Field vfa = GradientDescentSarsaLam.class.getDeclaredField("vfa");
+            vfa.setAccessible(true);
+            parametricState = (DenseLinearVFA) vfa.get(sarsaLam);
+            sarsaLam.setLearningRate(new ConstantLR(learningRate));
         }
         EpsilonGreedy greedy = new EpsilonGreedy(sarsaLam,.2);
         sarsaLam.setLearningPolicy(greedy);
@@ -402,7 +548,7 @@ public class BurlapShodan {
 
         DenseLinearVFA parametricState = new DenseLinearVFA(fb, 1);
         parametricState.evaluate(
-                new ShodanStateOil(0,0,0,0,0,0,0,0,0,0,0),
+                new ShodanStateOil(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
                 new SimpleAction(ShodanEnvironment.ACTION_OPEN)); //this initalizes the parametrs
 
         parametricState.setParameter(0,intercept);
@@ -466,7 +612,7 @@ public class BurlapShodan {
                 Episode.writeEpisodes(episodeList, containerPath.resolve("data").toAbsolutePath().toString(),
                                       directory);
 
-                saveAgent(containerPath,directory,qLearning);
+            //    saveAgent(containerPath,directory,qLearning);
 
             }
         }
@@ -525,7 +671,15 @@ public class BurlapShodan {
             {
                 System.out.println("force regression");
                 lspi.runPolicyIteration(30,.001);
-
+                {
+                    Field f = lspi.getClass().getDeclaredField("vfa"); //NoSuchFieldException
+                    f.setAccessible(true);
+                    DenseStateActionLinearVFA parametricState = (DenseStateActionLinearVFA) f.get(lspi); //IllegalAccessException
+                    String parameters[] = new String[parametricState.numParameters()];
+                    for(int p=0; p<parameters.length; p++)
+                        parameters[p] = String.valueOf(parametricState.getParameter(p));
+                    System.out.println(i + ": " + Strings.join(parameters,","));
+                }
 
                 environment.resetEnvironment(0);
                 //final
@@ -535,7 +689,14 @@ public class BurlapShodan {
                 fitness = environment.totalReward();
                 System.out.println("final_"+i + ": " + fitness );
                 Files.write(path.resolve(directory).resolve("lspi_"+i+".test"), String.valueOf(environment.totalReward()).getBytes());
-
+                //try also doing the boltzmann version, for a comparison
+                /*
+                environment.resetEnvironment(0);
+                BoltzmannQPolicy boltzmannQPolicy = new BoltzmannQPolicy(lspi,1d);
+                PolicyUtils.rollout(boltzmannQPolicy, environment).write(
+                        path.resolve(directory).resolve("lspi_boltzmann_"+i).toAbsolutePath().toString());
+                System.out.println("final_boltzmann_"+i + ": " + fitness );
+*/
 
                 Field f = lspi.getClass().getDeclaredField("lastWeights"); //NoSuchFieldException
                 f.setAccessible(true);
@@ -545,7 +706,7 @@ public class BurlapShodan {
 
                 Episode.writeEpisodes(episodeList, path.resolve("data").toAbsolutePath().toString(),
                                       directory);
-                saveAgent(path,directory,lspi);
+              //      saveAgent(path,directory,lspi);
 
             }
         }
@@ -563,6 +724,7 @@ public class BurlapShodan {
         for(Episode e : episodes)
             for(int t=0; t<e.maxTimeStep(); t++)
                 data.add(e.state(t),e.action(t),e.reward(t+1),e.state(t+1));
+        System.out.println("datasize " + data.size());
         return data;
     }
 

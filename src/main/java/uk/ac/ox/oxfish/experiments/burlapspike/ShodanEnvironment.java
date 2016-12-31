@@ -25,9 +25,9 @@ public class ShodanEnvironment implements Environment
     public static int YEARS_PER_EPISODE = 20;
 
 
-    FishState state;
+    private FishState state;
 
-    ExternalOpenCloseSeason shodan;
+    private ExternalOpenCloseSeason shodan;
 
 
     public static final String ACTION_OPEN = "open";
@@ -164,6 +164,26 @@ public class ShodanEnvironment implements Environment
         return initialScore;
     }
 
+
+    /**
+     * Getter for property 'state'.
+     *
+     * @return Value for property 'state'.
+     */
+    public FishState getState() {
+        return state;
+    }
+
+
+
+    /**
+     * Getter for property 'shodan'.
+     *
+     * @return Value for property 'shodan'.
+     */
+    public ExternalOpenCloseSeason getShodan() {
+        return shodan;
+    }
 
 
 }

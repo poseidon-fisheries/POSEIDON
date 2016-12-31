@@ -1,16 +1,26 @@
 package uk.ac.ox.oxfish.experiments.burlapspike;
 
 import burlap.behavior.functionapproximation.dense.NormalizedVariableFeatures;
+import burlap.behavior.policy.Policy;
+import burlap.behavior.policy.PolicyUtils;
+import burlap.mdp.core.action.Action;
+import burlap.mdp.core.action.SimpleAction;
+import burlap.mdp.core.state.State;
 import burlap.mdp.core.state.vardomain.VariableDomain;
 import com.esotericsoftware.minlog.Log;
+import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static uk.ac.ox.oxfish.experiments.burlapspike.BurlapShodan.episodesToCSV;
 
 /**
  * Created by carrknight on 12/25/16.
@@ -59,6 +69,7 @@ public class BurlapQuota {
                                         ShodanStateOil.BIOMASS,
                                         ShodanStateOil.MONTHS_LEFT);
 */
+        /*
         BurlapShodan.sarsaRunNormalized(.99,
                                         "99_sarsa_biomass_highlambda",
                                         1,
@@ -69,6 +80,8 @@ public class BurlapQuota {
                                         containerPath, (Steppable) simState -> {},
                                         ShodanStateOil.BIOMASS,
                                         ShodanStateOil.MONTHS_LEFT);
+                                        */
+
         /*
         //try 90% just to see the difference
         BurlapShodan.sarsaRunNormalized(.90,
@@ -81,8 +94,161 @@ public class BurlapQuota {
                                         containerPath, (Steppable) simState -> {},
                                         ShodanStateOil.BIOMASS,
                                         ShodanStateOil.MONTHS_LEFT);
+*/
+
+
+
+
+/*
+        BurlapShodan.sarsaRunFourier(.99,
+                                        "99_sarsa_biomass_6lambda_fourier",
+                                        4,
+                                        .0001,
+                                        .6,
+                                        features,
+                                         scenario,
+                                        containerPath, (Steppable) simState -> {},
+                                        ShodanStateOil.BIOMASS,
+                                        ShodanStateOil.DAY_OF_THE_YEAR,
+                                        ShodanStateOil.MONTHS_LEFT);
 
 
 */
+/*
+        BurlapShodan.qRunFourier(.99,
+                                 "99_qrun_biomass_fourier4",
+                                 4,
+                                 .0005,
+                                 1000,
+                                 1d,
+                                 5,
+                                 scenario,
+                                 containerPath,features,
+                                 (Steppable) simState -> {},
+                                 ShodanStateOil.BIOMASS,
+                                 ShodanStateOil.DAY_OF_THE_YEAR,
+                                 ShodanStateOil.MONTHS_LEFT);
+
+
+*/
+/*
+        BurlapShodan.polynomialRun(.99,
+                                   "99_lspi_poly3",
+                                   5,
+                                   scenario,
+                                   containerPath,
+                                   (Steppable) simState -> {},
+                                   ShodanStateOil.BIOMASS,
+                                   ShodanStateOil.DAY_OF_THE_YEAR,
+                                   ShodanStateOil.MONTHS_LEFT);
+
+*/
+
+/*
+        BurlapShodan.lspiPolynomialRunNormalized(.99,
+                                                 "99_lspi_poly3_normalized",
+                                                 3,
+                                                 scenario,
+                                                 containerPath,
+                                                 (Steppable) simState -> {},
+                                                 features,
+                                                 ShodanStateOil.BIOMASS,
+                                                 ShodanStateOil.DAY_OF_THE_YEAR,
+                                                 ShodanStateOil.MONTHS_LEFT);
+                                                 */
+
+/*
+                    BurlapShodan.lspiFourierRun(.99,
+                                    "99_lspi_fourier2",
+                                    2,
+                                    features,
+                                    scenario,
+                                    containerPath,
+                                    (Steppable) simState -> {},
+                                    ShodanStateOil.BIOMASS,
+                                    ShodanStateOil.DAY_OF_THE_YEAR,
+                                    ShodanStateOil.MONTHS_LEFT);
+                                    */
+
+
+/*
+        BurlapShodan.lspiPolynomialRunNormalized(100,
+                                   "99_lspi_poly5_normalized",
+                                   5,
+                                   scenario,
+                                   containerPath,
+                                   (Steppable) simState -> {},
+                                                 features,
+                                   ShodanStateOil.BIOMASS,
+                                   ShodanStateOil.DAY_OF_THE_YEAR,
+                                   ShodanStateOil.MONTHS_LEFT);
+*/
+
+
+        //  quotaSweep();
+
+        BurlapShodan.polynomialRun(.99,
+                                   "99_lspi_poly3_distance",
+                                   3,
+                                   scenario,
+                                   containerPath,
+                                   (Steppable) simState -> {},
+                                   ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                   ShodanStateOil.DAY_OF_THE_YEAR,
+                                   ShodanStateOil.MONTHS_LEFT);
+
+        episodesToCSV(containerPath);
+    }
+
+
+    public static  void quotaSweep(){
+
+        for(double quota = 0; quota<2000000; quota+=100000){
+
+
+            PrototypeScenario scenario = new PrototypeScenario();
+            scenario.setFishers(300);
+            SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
+            mapInitializer.setCoastalRoughness(new FixedDoubleParameter(0d));
+            scenario.setPortPositionX(40);
+            scenario.setPortPositionY(25);
+            scenario.setMapInitializer(mapInitializer);
+            ShodanEnvironment environment= new ShodanEnvironment(scenario, new Steppable() {
+                @Override
+                public void step(SimState simState) {
+
+                }
+            });
+
+            Policy policy = new Policy() {
+                @Override
+                public Action action(State s) {
+                    return new SimpleAction("open");
+                }
+
+                @Override
+                public double actionProb(State s, Action a) {
+                    return 1d;
+                }
+
+                @Override
+                public boolean definedFor(State s) {
+                    return true;
+                }
+            };
+
+
+            TACMonoFactory factory = new TACMonoFactory();
+            factory.setQuota(new FixedDoubleParameter(quota));
+            environment.resetEnvironment(0);
+            for (Fisher fisher : environment.getState().getFishers()) {
+                fisher.setRegulation(factory.apply(environment.getState()));
+            }
+            PolicyUtils.rollout(policy,environment);
+            System.out.println(quota + " = " + environment.totalReward());
+        }
+
+
+
     }
 }

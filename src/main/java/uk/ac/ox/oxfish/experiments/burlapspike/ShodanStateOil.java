@@ -33,6 +33,10 @@ public class ShodanStateOil implements State {
 
     private double averageYearlyEfforts;
 
+    private double landingsThisYear;
+
+    private double effortThisYear;
+
     private double cpue;
 
     private double yearlyCpue;
@@ -46,6 +50,8 @@ public class ShodanStateOil implements State {
     public static final String AVERAGE_DISTANCE_TO_PORT = "averageDistanceToPort";
     public static final String DAY_OF_THE_YEAR = "dayOfTheYear";
     public static final String AVERAGE_YEARLY_LANDINGS = "averageYearlyLanding";
+    public static final String LANDINGS_THIS_YEAR = "landingsThisYear";
+    public static final String EFFORT_THIS_YEAR = "effortThisYear";
     public static final String AVERAGE_YEARLY_EFFORTS = "averageYearlyEfforts";
     public static final String CPUE = "cpue";
     public static final String YEARLY_CPUE = "yearlyCPUE";
@@ -53,7 +59,7 @@ public class ShodanStateOil implements State {
     static private ArrayList<Object> names = Lists.newArrayList(GAS_PRICE, LANDINGS, MONTHS_LEFT,
                                                                 CUMULATIVE_EFFORT, AVERAGE_DISTANCE_TO_PORT,
                                                                 DAY_OF_THE_YEAR,AVERAGE_YEARLY_LANDINGS,
-                                                                AVERAGE_YEARLY_EFFORTS,CPUE,YEARLY_CPUE, BIOMASS     ) ;
+                                                                AVERAGE_YEARLY_EFFORTS,CPUE,YEARLY_CPUE, BIOMASS,LANDINGS_THIS_YEAR,EFFORT_THIS_YEAR    ) ;
 
 
     /**
@@ -87,6 +93,10 @@ public class ShodanStateOil implements State {
             return yearlyCpue;
         if(variableKey.equals(BIOMASS))
             return biomass;
+        if(variableKey.equals(LANDINGS_THIS_YEAR))
+            return landingsThisYear;
+        if(variableKey.equals(EFFORT_THIS_YEAR))
+            return effortThisYear;
         throw new UnknownKeyException(variableKey);
     }
 
@@ -99,7 +109,8 @@ public class ShodanStateOil implements State {
 
     public ShodanStateOil(
             double gasPrice, double landings, int monthsLeft, double cumulativeEffort, double averageDistanceToPort,
-            int dayOfTheYear, double averageYearlyLanding, double averageYearlyEfforts, double cpue, double yearlyCpue,
+            int dayOfTheYear, double averageYearlyLanding, double averageYearlyEfforts, double landingsThisYear,
+            double effortThisYear, double cpue, double yearlyCpue,
             double biomass) {
         this.gasPrice = gasPrice;
         this.landings = landings;
@@ -109,6 +120,8 @@ public class ShodanStateOil implements State {
         this.dayOfTheYear = dayOfTheYear;
         this.averageYearlyLanding = averageYearlyLanding;
         this.averageYearlyEfforts = averageYearlyEfforts;
+        this.landingsThisYear = landingsThisYear;
+        this.effortThisYear = effortThisYear;
         this.cpue = cpue;
         this.yearlyCpue = yearlyCpue;
         this.biomass = biomass;
@@ -125,7 +138,7 @@ public class ShodanStateOil implements State {
                                       0d,
                                       0d,
                                       0,
-                                      0d,0d,0d,0d,
+                                      0d, 0d, 0d, 0d    , 0d, 0d,
                                       state.getTotalBiomass(state.getBiology().getSpecie(0)));
 
 
@@ -180,6 +193,20 @@ public class ShodanStateOil implements State {
         double yearlyCPUE = averageLandings/averageEffort;
 
 
+        int dayOfTheYear = state.getDayOfTheYear();
+
+        double landingsSoFarThisYear = 0;
+        landings = state.getDailyDataSet().getColumn(
+                "Species 0 Landings").descendingIterator();
+        for(int i=0; i<dayOfTheYear; i++)
+            landingsSoFarThisYear += landings.next();
+
+        double effortSoFarThisYear = 0;
+        effort = state.getDailyDataSet().getColumn(
+                "Total Effort").descendingIterator();
+        for(int i=0; i<dayOfTheYear; i++)
+            effortSoFarThisYear += effort.next();
+
         return new ShodanStateOil(state.getPorts().iterator().next().getGasPricePerLiter(),
                                   monthlyLandings,
                                   (int)(Math.round((ShodanEnvironment.YEARS_PER_EPISODE*365-state.getDay())/30d))+1,
@@ -187,7 +214,7 @@ public class ShodanStateOil implements State {
                                   totalDistance,
                                   state.getDayOfTheYear(),
                                   averageLandings,
-                                  averageEffort,cpue,yearlyCPUE,
+                                  averageEffort, landingsSoFarThisYear, effortSoFarThisYear, cpue, yearlyCPUE,
                                   state.getTotalBiomass(state.getBiology().getSpecie(0)));
 
 
@@ -203,24 +230,13 @@ public class ShodanStateOil implements State {
         return names;
     }
 
-    /**
-     * Returns a copy of this state suitable for creating state transitions. This copy may be a shallow copy
-     * or deep copy and is domain specific. The State implementation may indicate its copy level with the
-     * {@link DeepCopyState} or {@link ShallowCopyState} annotations. If it is a shallow copy, you should not *directly*
-     * modify any fields of a copied state without copying the fields first, or it could contaminate the state from
-     * which the copy was made. Alternatively, use the {@link MutableState#set(Object, Object)} method to modify
-     * {@link ShallowCopyState} copied states,
-     * which for {@link ShallowCopyState} instances should perform a safe copy-on-write operation.
-     *
-     * @return a copy of this state.
-     */
+
     @Override
     public State copy() {
-        return new ShodanStateOil(gasPrice,landings,monthsLeft,cumulativeEffort,averageDistanceToPort,dayOfTheYear,
-                                  averageYearlyLanding,averageYearlyEfforts,cpue,yearlyCpue,biomass);
+        return new ShodanStateOil(gasPrice, landings, monthsLeft, cumulativeEffort, averageDistanceToPort, dayOfTheYear,
+                                  averageYearlyLanding, averageYearlyEfforts, landingsThisYear, effortThisYear, cpue, yearlyCpue, biomass);
     }
 
-    /**
 
 
 
@@ -429,5 +445,41 @@ public class ShodanStateOil implements State {
     @Override
     public String toString() {
         return StateUtilities.stateToString(this);
+    }
+
+    /**
+     * Getter for property 'landingsThisYear'.
+     *
+     * @return Value for property 'landingsThisYear'.
+     */
+    public double getLandingsThisYear() {
+        return landingsThisYear;
+    }
+
+    /**
+     * Setter for property 'landingsThisYear'.
+     *
+     * @param landingsThisYear Value to set for property 'landingsThisYear'.
+     */
+    public void setLandingsThisYear(double landingsThisYear) {
+        this.landingsThisYear = landingsThisYear;
+    }
+
+    /**
+     * Getter for property 'effortThisYear'.
+     *
+     * @return Value for property 'effortThisYear'.
+     */
+    public double getEffortThisYear() {
+        return effortThisYear;
+    }
+
+    /**
+     * Setter for property 'effortThisYear'.
+     *
+     * @param effortThisYear Value to set for property 'effortThisYear'.
+     */
+    public void setEffortThisYear(double effortThisYear) {
+        this.effortThisYear = effortThisYear;
     }
 }
