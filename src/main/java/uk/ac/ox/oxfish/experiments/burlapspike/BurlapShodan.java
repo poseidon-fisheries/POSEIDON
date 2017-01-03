@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments.burlapspike;
 
 import burlap.behavior.functionapproximation.dense.*;
 import burlap.behavior.functionapproximation.dense.fourier.FourierBasis;
+import burlap.behavior.functionapproximation.dense.fourier.FourierBasisLearningRateWrapper;
 import burlap.behavior.learningrate.ConstantLR;
 import burlap.behavior.policy.EpsilonGreedy;
 import burlap.behavior.policy.GreedyQPolicy;
@@ -36,10 +37,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +49,7 @@ public class BurlapShodan {
 
 
     public static final int STEPS_PER_LEARNING = 10;
-    public static final int NUMBER_OF_EPISODES = 30;
+    public static final int NUMBER_OF_EPISODES = 500;
 
     private final static Steppable DEFAULT_STEPPABLE =  new Steppable() {
         @Override
@@ -176,11 +174,6 @@ public class BurlapShodan {
 
         ShodanEnvironment environment = new ShodanEnvironment(scenario, additionalSteppable);
 
-        //run sarsa, return last fitness
-        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
-                                  containerPath, environment);
-
-
         //write a YAML for the results
         HashMap<String,Object> resultObject = new HashMap<>();
         resultObject.put("method","sarsa");
@@ -188,12 +181,20 @@ public class BurlapShodan {
         resultObject.put("discount",discount);
         resultObject.put("learning_rate",learningRate);
         resultObject.put("factors",featureNames);
-        resultObject.put("episodes",NUMBER_OF_EPISODES);
         resultObject.put("name",name);
-        resultObject.put("fitness",fitness);
         resultObject.put("base","polynomial");
         resultObject.put("order",order);
         resultObject.put("normalized",true);
+        //run sarsa, return last fitness
+        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
+                                  containerPath, environment,resultObject );
+
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+
+        double bestFitness = fitness;
+        if(resultObject.containsKey("fitness"))
+            bestFitness = Math.max(bestFitness, (Double) resultObject.get("fitness"));
+        resultObject.put("fitness",bestFitness);
         //to file
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
         Yaml yaml = new Yaml();
@@ -209,11 +210,6 @@ public class BurlapShodan {
 
         ShodanEnvironment environment = new ShodanEnvironment(scenario, additionalSteppable);
 
-        //run sarsa, return last fitness
-        double fitness = runSarsa(new FourierBasis(inputFeatures, order), name, discount, learningRate, lambda,
-                                  containerPath, environment);
-
-
         //write a YAML for the results
         HashMap<String,Object> resultObject = new HashMap<>();
         resultObject.put("method","sarsa");
@@ -221,12 +217,20 @@ public class BurlapShodan {
         resultObject.put("discount",discount);
         resultObject.put("learning_rate",learningRate);
         resultObject.put("factors",featureNames);
-        resultObject.put("episodes",NUMBER_OF_EPISODES);
         resultObject.put("name",name);
-        resultObject.put("fitness",fitness);
         resultObject.put("base","fourier");
         resultObject.put("order",order);
         resultObject.put("normalized",true);
+        //run sarsa, return last fitness
+        double fitness = runSarsa(new FourierBasis(inputFeatures, order), name, discount, learningRate, lambda,
+                                  containerPath, environment,resultObject );
+
+        double bestFitness = fitness;
+        if(resultObject.containsKey("fitness"))
+            bestFitness = Math.max(bestFitness, (Double) resultObject.get("fitness"));
+        resultObject.put("fitness",bestFitness);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+
         //to file
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
         Yaml yaml = new Yaml();
@@ -234,17 +238,14 @@ public class BurlapShodan {
     }
 
     public static void qRunFourier(
-            final double discount, final String name, final int order, final double learningRate, final int replay,
-            final double intercept, final int staleDuration, final PrototypeScenario scenario, final Path containerPath,
+            final double discount, final String name,
+            final int order, final double learningRate,
+            final int replay,
+            final int staleDuration, final PrototypeScenario scenario, final Path containerPath,
             NormalizedVariableFeatures inputFeatures,
             final Steppable additionalSteppable,
             String... keys) throws IOException, NoSuchFieldException, IllegalAccessException {
 
-
-        //lspiRun sarsa, return last fitness
-        double fitness = runQ(new FourierBasis(inputFeatures, order), name, discount, learningRate, replay,
-                              staleDuration, intercept, containerPath,
-                              new ShodanEnvironment(scenario, additionalSteppable));
 
 
         //write a YAML for the results
@@ -254,14 +255,20 @@ public class BurlapShodan {
         resultObject.put("discount",discount);
         resultObject.put("learning_rate",learningRate);
         resultObject.put("factors",keys);
-        resultObject.put("episodes",NUMBER_OF_EPISODES);
         resultObject.put("name",name);
-        resultObject.put("fitness",fitness);
         resultObject.put("base","fourier");
         resultObject.put("order",order);
         resultObject.put("normalized",true);
         resultObject.put("staleDuration",staleDuration);
-        resultObject.put("intercept",intercept);
+        //lspiRun sarsa, return last fitness
+        double fitness = runQ(new FourierBasis(inputFeatures, order), name, discount, learningRate, replay,
+                              staleDuration, containerPath,
+                              new ShodanEnvironment(scenario, additionalSteppable),
+                              resultObject);
+
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+        resultObject.put("fitness",fitness);
+
         //to file
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
         Yaml yaml = new Yaml();
@@ -276,11 +283,6 @@ public class BurlapShodan {
 
         NumericVariableFeatures inputFeatures = new NumericVariableFeatures(keys);
 
-        //lspiRun sarsa, return last fitness
-        double fitness = runQ(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, replay,
-                              staleDuration, intercept, containerPath,
-                              new ShodanEnvironment(scenario, additionalSteppable));
-
 
         //write a YAML for the results
         HashMap<String,Object> resultObject = new HashMap<>();
@@ -292,14 +294,22 @@ public class BurlapShodan {
         for(int i=0; i<stringedKeys.length; i++)
             stringedKeys[i] = keys[i].toString();
         resultObject.put("factors",stringedKeys);
-        resultObject.put("episodes",NUMBER_OF_EPISODES);
         resultObject.put("name",name);
-        resultObject.put("fitness",fitness);
         resultObject.put("base","polynomial");
         resultObject.put("order",order);
         resultObject.put("normalized",true);
         resultObject.put("staleDuration",staleDuration);
         resultObject.put("intercept",intercept);
+        //lspiRun sarsa, return last fitness
+        double fitness = runQ(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, replay,
+                              staleDuration, containerPath,
+                              new ShodanEnvironment(scenario, additionalSteppable),
+                              resultObject);
+
+
+        resultObject.put("fitness",fitness);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
+
         //to file
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
         Yaml yaml = new Yaml();
@@ -415,11 +425,6 @@ public class BurlapShodan {
 
         NumericVariableFeatures inputFeatures = new NumericVariableFeatures(keys);
 
-        //lspiRun sarsa, return last fitness
-        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
-                                  containerPath, new ShodanEnvironment(scenario, additionalSteppable));
-
-
         //write a YAML for the results
         HashMap<String,Object> resultObject = new HashMap<>();
         resultObject.put("method","sarsa");
@@ -430,13 +435,20 @@ public class BurlapShodan {
         for(int i=0; i<stringedKeys.length; i++)
             stringedKeys[i] = keys[i].toString();
         resultObject.put("factors",stringedKeys);
-        resultObject.put("episodes",NUMBER_OF_EPISODES);
         resultObject.put("name",name);
-        resultObject.put("fitness",fitness);
         resultObject.put("base","polynomial");
         resultObject.put("order",order);
         resultObject.put("normalized",false);
+
+        //lspiRun sarsa, return last fitness
+        double fitness = runSarsa(new PolynomialBasis(inputFeatures, order, 1), name, discount, learningRate, lambda,
+                                  containerPath, new ShodanEnvironment(scenario, additionalSteppable),resultObject );
+
+
+
         //to file
+        resultObject.put("fitness",fitness);
+        resultObject.put("episodes",NUMBER_OF_EPISODES);
         File yamlFile = containerPath.resolve("results").resolve(name + ".yaml").toFile();
         Yaml yaml = new Yaml();
         yaml.dump(resultObject,new FileWriter(yamlFile));
@@ -445,7 +457,8 @@ public class BurlapShodan {
 
     public static double runSarsa(
             DenseStateFeatures fb, final String directory, final double discount, final double learningRate,
-            final double lambda, final Path containerPath, final ShodanEnvironment environment) throws IOException, IllegalAccessException, NoSuchFieldException {
+            final double lambda, final Path containerPath, final ShodanEnvironment environment,
+            HashMap<String, Object> metadata) throws IOException, IllegalAccessException, NoSuchFieldException {
 
 
         containerPath.resolve(directory).toFile().mkdirs();
@@ -457,6 +470,7 @@ public class BurlapShodan {
         domain.setActionTypes(new UniversalActionType(ShodanEnvironment.ACTION_OPEN),
                               new UniversalActionType(ShodanEnvironment.ACTION_CLOSE));
 
+        int i = 0; //episode counter
 
         DenseLinearVFA parametricState;
         GradientDescentSarsaLam sarsaLam = (GradientDescentSarsaLam) readAgent(containerPath, directory);
@@ -466,13 +480,26 @@ public class BurlapShodan {
                                                    parametricState,
                                                    learningRate,
                                                    lambda);
+            if(fb instanceof  FourierBasis) {
+                System.out.println("fourier learning rate!");
+                sarsaLam.setLearningRate(new FourierBasisLearningRateWrapper(new ConstantLR(learningRate),
+                                                                             (FourierBasis) fb));
+            }
         }
         else {
             //read from file, should be safe
             Field vfa = GradientDescentSarsaLam.class.getDeclaredField("vfa");
             vfa.setAccessible(true);
             parametricState = (DenseLinearVFA) vfa.get(sarsaLam);
-            sarsaLam.setLearningRate(new ConstantLR(learningRate));
+
+
+            List<String> previousLines = Files.readAllLines(containerPath.resolve(directory).resolve("progression.csv"));
+            if(previousLines.size() > 0) {
+                i = Integer.parseInt(previousLines.get(previousLines.size() - 1).split(",")[0]);
+                i++;
+                System.out.println("start from episode " + i );
+
+            }
         }
         EpsilonGreedy greedy = new EpsilonGreedy(sarsaLam,.2);
         sarsaLam.setLearningPolicy(greedy);
@@ -482,8 +509,9 @@ public class BurlapShodan {
         List<Episode> episodeList = new LinkedList<>();
 
         double lastEstimation = Double.NaN;
-        //lspiRun learning for 100 episodes
-        for(int i = 0; i <= NUMBER_OF_EPISODES; i++){
+       //lspiRun learning for 100 episodes
+        for(; i <= NUMBER_OF_EPISODES; i++){
+
             greedy.setEpsilon(
                     .2 * (NUMBER_OF_EPISODES-i)/(NUMBER_OF_EPISODES));
 
@@ -512,6 +540,8 @@ public class BurlapShodan {
                 System.out.println("final_"+i + ": " +lastEstimation );
                 Files.write(containerPath.resolve(directory).resolve("sarsa_"+i+".test"), String.valueOf(environment.totalReward()).getBytes());
 
+                Files.write(containerPath.resolve(directory).resolve("progression.csv"), (i + "," + lastEstimation +"\n").getBytes(),
+                            StandardOpenOption.APPEND,StandardOpenOption.CREATE  );
 
 
                 Files.write(containerPath.resolve(directory).resolve("sarsa_"+i+".csv"), Strings.join(parameters, ",").getBytes());
@@ -521,7 +551,17 @@ public class BurlapShodan {
                                       directory);
 
                 saveAgent(containerPath,directory,sarsaLam);
+                //to file
+                double bestFitness = lastEstimation;
+                if(metadata.containsKey("fitness"))
+                    bestFitness = Math.max(bestFitness, (Double) metadata.get("fitness"));
+                metadata.put("fitness",bestFitness);
+                metadata.put("episodes",i);
+                File yamlFile = containerPath.resolve("results").resolve(directory + ".yaml").toFile();
+                Yaml yaml = new Yaml();
+                yaml.dump(metadata,new FileWriter(yamlFile));
 
+                saveAgentHere(containerPath.resolve(directory).resolve("agent_"+i+".xml"),sarsaLam);
             }
         }
 
@@ -533,8 +573,9 @@ public class BurlapShodan {
 
     public static double runQ(
             DenseStateFeatures fb, final String directory, final double discount, final double learningRate,
-            final int memory, final int staleDuration, final double intercept,
-            final Path containerPath, final ShodanEnvironment environment) throws IOException {
+            final int memory, final int staleDuration,
+            final Path containerPath, final ShodanEnvironment environment,
+            HashMap<String,Object> metadata) throws IOException, NoSuchFieldException, IllegalAccessException {
 
         containerPath.resolve(directory).toFile().mkdirs();
 
@@ -546,24 +587,44 @@ public class BurlapShodan {
                               new UniversalActionType(ShodanEnvironment.ACTION_CLOSE));
 
 
-        DenseLinearVFA parametricState = new DenseLinearVFA(fb, 1);
-        parametricState.evaluate(
-                new ShodanStateOil(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-                new SimpleAction(ShodanEnvironment.ACTION_OPEN)); //this initalizes the parametrs
 
-        parametricState.setParameter(0,intercept);
+        DenseLinearVFA parametricState;
+
         GradientDescentQLearning qLearning = (GradientDescentQLearning) readAgent(containerPath, directory);
         if(qLearning== null) {
+            parametricState = new DenseLinearVFA(fb, 1);
+            parametricState.evaluate(
+                    new ShodanStateOil(0, 0, 0, 0, 0,
+                                       0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0),
+                    new SimpleAction(ShodanEnvironment.ACTION_OPEN)); //this initalizes the parametrs
+
             qLearning = new GradientDescentQLearning(domain, discount,
                                                      parametricState,
                                                      learningRate);
+            if(fb instanceof  FourierBasis) {
+                System.out.println("fourier learning rate!");
+                ConstantLR delegate = new ConstantLR(learningRate);
+                qLearning.setLearningRate(new FourierBasisLearningRateWrapper(delegate,
+                                                                             (FourierBasis) fb));
+            }
 
             if (memory > 0) {
                 qLearning.setExperienceReplay(readExperienceMemory(discount, containerPath), memory);
                 qLearning.useStaleTarget(staleDuration);
             }
-        }
 
+            if(fb instanceof  FourierBasis) {
+                System.out.println("fourier learning rate!");
+                qLearning.setLearningRate(new FourierBasisLearningRateWrapper(new ConstantLR(learningRate),
+                                                                             (FourierBasis) fb));
+            }
+        }
+        else{
+            Field vfa = GradientDescentQLearning.class.getDeclaredField("vfa");
+            vfa.setAccessible(true);
+            parametricState = (DenseLinearVFA) vfa.get(qLearning);
+        }
         environment.resetEnvironment();
 
 
@@ -604,6 +665,9 @@ public class BurlapShodan {
                 System.out.println("final_"+i + ": " +lastEstimation );
                 Files.write(containerPath.resolve(directory).resolve("q_"+i+".test"), String.valueOf(environment.totalReward()).getBytes());
 
+                //write progression
+                Files.write(containerPath.resolve(directory).resolve("progression.csv"), (i + "," + lastEstimation +"\n").getBytes(),
+                            StandardOpenOption.APPEND,StandardOpenOption.CREATE  );
 
 
                 Files.write(containerPath.resolve(directory).resolve("q_"+i+".csv"), Strings.join(parameters, ",").getBytes());
@@ -613,6 +677,13 @@ public class BurlapShodan {
                                       directory);
 
             //    saveAgent(containerPath,directory,qLearning);
+                double bestFitness = lastEstimation;
+                if(metadata.containsKey("fitness"))
+                    bestFitness = Math.max(bestFitness, (Double) metadata.get("fitness"));
+                metadata.put("fitness",bestFitness);                metadata.put("episodes",i);
+                File yamlFile = containerPath.resolve("results").resolve(directory + ".yaml").toFile();
+                Yaml yaml = new Yaml();
+                yaml.dump(metadata,new FileWriter(yamlFile));
 
             }
         }
@@ -800,6 +871,20 @@ public class BurlapShodan {
 
         try {
             Files.write(containerPath.resolve("saves").resolve(name+".xml"),xml.getBytes());
+            Log.info("Learner saved ");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.error(e.getMessage());
+        }
+    }
+
+    public static void saveAgentHere(Path filePath, LearningAgent agent){
+        XStream xstream = new XStream(new StaxDriver());
+        Log.info("Writing to file!");
+        String xml = xstream.toXML(agent);
+
+        try {
+            Files.write(filePath,xml.getBytes());
             Log.info("Learner saved ");
         } catch (IOException e) {
             e.printStackTrace();

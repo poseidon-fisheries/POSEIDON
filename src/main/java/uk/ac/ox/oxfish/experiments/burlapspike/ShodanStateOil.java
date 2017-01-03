@@ -43,6 +43,9 @@ public class ShodanStateOil implements State {
 
     private double biomass;
 
+    private double averageCashflow;
+    private double cashflowThisYear;
+
     public static final String GAS_PRICE = "gasPrice";
     public static final String LANDINGS = "landings";
     public static final String MONTHS_LEFT = "monthsLeft";
@@ -56,10 +59,14 @@ public class ShodanStateOil implements State {
     public static final String CPUE = "cpue";
     public static final String YEARLY_CPUE = "yearlyCPUE";
     public static final String BIOMASS = "biomass";
+    public static final String AVERAGE_YEARLY_CASHFLOW = "averageCashflow";
+    public static final String CASHFLOW_THIS_YEAR = "cashflowThisYear";
     static private ArrayList<Object> names = Lists.newArrayList(GAS_PRICE, LANDINGS, MONTHS_LEFT,
                                                                 CUMULATIVE_EFFORT, AVERAGE_DISTANCE_TO_PORT,
                                                                 DAY_OF_THE_YEAR,AVERAGE_YEARLY_LANDINGS,
-                                                                AVERAGE_YEARLY_EFFORTS,CPUE,YEARLY_CPUE, BIOMASS,LANDINGS_THIS_YEAR,EFFORT_THIS_YEAR    ) ;
+                                                                AVERAGE_YEARLY_EFFORTS,CPUE,YEARLY_CPUE, BIOMASS,LANDINGS_THIS_YEAR,EFFORT_THIS_YEAR,
+                                                                AVERAGE_YEARLY_CASHFLOW, CASHFLOW_THIS_YEAR
+                                                                ) ;
 
 
     /**
@@ -97,6 +104,10 @@ public class ShodanStateOil implements State {
             return landingsThisYear;
         if(variableKey.equals(EFFORT_THIS_YEAR))
             return effortThisYear;
+        if(variableKey.equals(AVERAGE_YEARLY_CASHFLOW))
+            return averageCashflow;
+        if(variableKey.equals(CASHFLOW_THIS_YEAR))
+            return cashflowThisYear;
         throw new UnknownKeyException(variableKey);
     }
 
@@ -111,7 +122,7 @@ public class ShodanStateOil implements State {
             double gasPrice, double landings, int monthsLeft, double cumulativeEffort, double averageDistanceToPort,
             int dayOfTheYear, double averageYearlyLanding, double averageYearlyEfforts, double landingsThisYear,
             double effortThisYear, double cpue, double yearlyCpue,
-            double biomass) {
+            double biomass, double averageCashflow, double cashflowThisYear) {
         this.gasPrice = gasPrice;
         this.landings = landings;
         this.monthsLeft = monthsLeft;
@@ -125,6 +136,8 @@ public class ShodanStateOil implements State {
         this.cpue = cpue;
         this.yearlyCpue = yearlyCpue;
         this.biomass = biomass;
+        this.averageCashflow = averageCashflow;
+        this.cashflowThisYear = cashflowThisYear;
     }
 
     static ShodanStateOil fromState(FishState state)
@@ -139,7 +152,8 @@ public class ShodanStateOil implements State {
                                       0d,
                                       0,
                                       0d, 0d, 0d, 0d    , 0d, 0d,
-                                      state.getTotalBiomass(state.getBiology().getSpecie(0)));
+                                      state.getTotalBiomass(state.getBiology().getSpecie(0)), 0d,
+                                      0d);
 
 
         //landings
@@ -207,6 +221,25 @@ public class ShodanStateOil implements State {
         for(int i=0; i<dayOfTheYear; i++)
             effortSoFarThisYear += effort.next();
 
+
+
+        double cashflowSoFarThisYear = 0;
+        Iterator<Double> cashflow = state.getDailyDataSet().getColumn(
+                "Average Cash-Flow").descendingIterator();
+        for(int i=0; i<dayOfTheYear; i++)
+            cashflowSoFarThisYear += cashflow.next();
+
+
+        double last365daysOfCashflow = 0;
+        cashflow = state.getDailyDataSet().getColumn(
+                "Average Cash-Flow").descendingIterator();
+        for(int i=0; i<yearWindow; i++)
+            last365daysOfCashflow += cashflow.next();
+        last365daysOfCashflow/=yearWindow;
+
+
+
+
         return new ShodanStateOil(state.getPorts().iterator().next().getGasPricePerLiter(),
                                   monthlyLandings,
                                   (int)(Math.round((ShodanEnvironment.YEARS_PER_EPISODE*365-state.getDay())/30d))+1,
@@ -215,7 +248,9 @@ public class ShodanStateOil implements State {
                                   state.getDayOfTheYear(),
                                   averageLandings,
                                   averageEffort, landingsSoFarThisYear, effortSoFarThisYear, cpue, yearlyCPUE,
-                                  state.getTotalBiomass(state.getBiology().getSpecie(0)));
+                                  state.getTotalBiomass(state.getBiology().getSpecie(0)),
+                                  last365daysOfCashflow,
+                                  cashflowSoFarThisYear);
 
 
     }
@@ -234,7 +269,8 @@ public class ShodanStateOil implements State {
     @Override
     public State copy() {
         return new ShodanStateOil(gasPrice, landings, monthsLeft, cumulativeEffort, averageDistanceToPort, dayOfTheYear,
-                                  averageYearlyLanding, averageYearlyEfforts, landingsThisYear, effortThisYear, cpue, yearlyCpue, biomass);
+                                  averageYearlyLanding, averageYearlyEfforts, landingsThisYear, effortThisYear, cpue, yearlyCpue, biomass,
+                                  averageCashflow, cashflowThisYear);
     }
 
 
@@ -481,5 +517,41 @@ public class ShodanStateOil implements State {
      */
     public void setEffortThisYear(double effortThisYear) {
         this.effortThisYear = effortThisYear;
+    }
+
+    /**
+     * Getter for property 'averageCashflow'.
+     *
+     * @return Value for property 'averageCashflow'.
+     */
+    public double getAverageCashflow() {
+        return averageCashflow;
+    }
+
+    /**
+     * Setter for property 'averageCashflow'.
+     *
+     * @param averageCashflow Value to set for property 'averageCashflow'.
+     */
+    public void setAverageCashflow(double averageCashflow) {
+        this.averageCashflow = averageCashflow;
+    }
+
+    /**
+     * Getter for property 'cashflowThisYear'.
+     *
+     * @return Value for property 'cashflowThisYear'.
+     */
+    public double getCashflowThisYear() {
+        return cashflowThisYear;
+    }
+
+    /**
+     * Setter for property 'cashflowThisYear'.
+     *
+     * @param cashflowThisYear Value to set for property 'cashflowThisYear'.
+     */
+    public void setCashflowThisYear(double cashflowThisYear) {
+        this.cashflowThisYear = cashflowThisYear;
     }
 }

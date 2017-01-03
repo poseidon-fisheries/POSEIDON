@@ -69,9 +69,10 @@ public class BurlapQuota {
                                         ShodanStateOil.BIOMASS,
                                         ShodanStateOil.MONTHS_LEFT);
 */
+
         /*
         BurlapShodan.sarsaRunNormalized(.99,
-                                        "99_sarsa_biomass_highlambda",
+                                        "99_sarsa_biomass_highlambda3",
                                         1,
                                         .01,
                                         .85,
@@ -79,11 +80,12 @@ public class BurlapQuota {
                                         scenario,
                                         containerPath, (Steppable) simState -> {},
                                         ShodanStateOil.BIOMASS,
+                                        ShodanStateOil.DAY_OF_THE_YEAR,
                                         ShodanStateOil.MONTHS_LEFT);
-                                        */
+*/
 
-        /*
         //try 90% just to see the difference
+        /*
         BurlapShodan.sarsaRunNormalized(.90,
                                         "90_sarsa_biomass2",
                                         1,
@@ -114,13 +116,44 @@ public class BurlapQuota {
 
 
 */
+
+
+
 /*
-        BurlapShodan.qRunFourier(.99,
-                                 "99_qrun_biomass_fourier4",
+        BurlapShodan.sarsaRunFourier(.99,
+                                     "99_sarsa_biomass_6lambda_fourier3",
+                                     4,
+                                     .0001,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.BIOMASS,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+
+ */
+
+/*
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_biomass_6lambda_fourier2",
+                                     4,
+                                     .005,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.BIOMASS,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+*/
+/*
+
+        BurlapShodan.qRunFourier(1,
+                                 "100_qrun_biomass_fourier4",
                                  4,
-                                 .0005,
+                                 .005,
                                  1000,
-                                 1d,
                                  5,
                                  scenario,
                                  containerPath,features,
@@ -128,9 +161,9 @@ public class BurlapQuota {
                                  ShodanStateOil.BIOMASS,
                                  ShodanStateOil.DAY_OF_THE_YEAR,
                                  ShodanStateOil.MONTHS_LEFT);
-
-
 */
+
+
 /*
         BurlapShodan.polynomialRun(.99,
                                    "99_lspi_poly3",
@@ -185,8 +218,32 @@ public class BurlapQuota {
 */
 
 
+/*
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_biomass_6lambda_fourier_decayexp2",
+                                     4,
+                                     .02,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.BIOMASS,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+                                     */
         //  quotaSweep();
 
+
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+
+
+
+
+/*
         BurlapShodan.polynomialRun(.99,
                                    "99_lspi_poly3_distance",
                                    3,
@@ -196,8 +253,97 @@ public class BurlapQuota {
                                    ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
                                    ShodanStateOil.DAY_OF_THE_YEAR,
                                    ShodanStateOil.MONTHS_LEFT);
+*/
+/*
+        BurlapShodan.sarsaRunFourier(.99,
+                                     "99_sarsa_biomass_6lambda_fourier_distance",
+                                     4,
+                                     .001,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+                                     */
 
+
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_EFFORTS, new VariableDomain(0, 6215.0)).
+                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+
+/*
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_effortDistance_6lambda_fourier",
+                                     4,
+                                     .05,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                     ShodanStateOil.AVERAGE_YEARLY_EFFORTS,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+
+*/
+
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_CASHFLOW, new VariableDomain(-5, 300)).
+                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+/*
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_cashDistance_6lambda_fourier2",
+                                     4,
+                                     .0025,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                     ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+
+*/
+
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_cashDistance_6lambda_fourier3",
+                                     4,
+                                     .005,
+                                     .6,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                     ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
+
+/*
+        BurlapShodan.qRunFourier(1,
+                                 "100_qrun_cashDistance_fourier4",
+                                 4,
+                                 .01,
+                                 1000,
+                                 100,
+                                 scenario,
+                                 containerPath,features,
+                                 (Steppable) simState -> {},
+                                 ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                 ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                                 ShodanStateOil.DAY_OF_THE_YEAR,
+                                 ShodanStateOil.MONTHS_LEFT);
+*/
         episodesToCSV(containerPath);
+
     }
 
 
