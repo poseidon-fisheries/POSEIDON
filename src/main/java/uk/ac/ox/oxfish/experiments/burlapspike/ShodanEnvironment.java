@@ -159,8 +159,8 @@ public class ShodanEnvironment implements Environment
 
     public double totalReward(){
         double initialScore = 0;
-        for(Double landing : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            initialScore+=landing;
+        for(Double cashflow : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            initialScore+=cashflow;
         return initialScore;
     }
 

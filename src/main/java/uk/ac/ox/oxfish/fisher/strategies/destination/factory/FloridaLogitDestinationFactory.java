@@ -98,8 +98,7 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
                         (tile, timeOfObservation, agent, model) -> 1d,
                         //distance
                         (tile, timeOfObservation, agent, model) -> {
-                            //the coefficient is in miles!\
-                            return 0.621371 * model.getMap().distance(
+                            return model.getMap().distance(
                                     agent.getHomePort().getLocation(), tile);
                         },
                         //habit

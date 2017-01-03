@@ -81,6 +81,9 @@ public class Regulations
         CONSTRUCTORS.put("Single Species PID Taxation", SingleSpeciesPIDTaxationOnLandingsFactory::new);
         NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
 
+        CONSTRUCTORS.put("Open/Close Shodan from File", ShodanFromFileFactory::new);
+        NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
+
 
 
     }
