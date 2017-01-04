@@ -27,12 +27,12 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
     private final double differentialPercentageToMove;
 
 
-
-
     public DiffusingLogisticInitializer(
-            DoubleParameter carryingCapacity, DoubleParameter steepness, double percentageLimitOnDailyMovement,
+            DoubleParameter carryingCapacity, DoubleParameter steepness,
+            DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
+            double percentageLimitOnDailyMovement,
             double differentialPercentageToMove) {
-        super(carryingCapacity, steepness);
+        super(carryingCapacity, steepness, minInitialCapacity, maxInitialCapacity);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
     }

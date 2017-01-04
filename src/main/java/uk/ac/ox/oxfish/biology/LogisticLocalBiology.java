@@ -53,19 +53,41 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
     }
 
 
+    /**
+     * create a logistic local biology where we specify how much of the biomass is currently available
+     * @param carryingCapacity
+     * @param species
+     * @param steepness
+     * @param random
+     * @param initialMaxCapacity max proportion 0 to 1 of carrying capacity that might be available at this cell
+     * @param initialMinCapacity min proportion 0 to 1 of carrying capacity that might be available at this cell
+     */
     public LogisticLocalBiology(
             double carryingCapacity, int species, double steepness,
-            MersenneTwisterFast random)
+            MersenneTwisterFast random, double initialMaxCapacity, double initialMinCapacity)
     {
+        assert initialMaxCapacity>= initialMinCapacity;
+        assert  initialMaxCapacity >=0;
+        assert  initialMinCapacity <=1;
         this.carryingCapacity = new Double[species];
         Arrays.fill(this.carryingCapacity, carryingCapacity);
         this.currentBiomass = new Double[species];
         this.malthusianParameter = new Double[species];
+
         for(int i=0; i<currentBiomass.length; i++)
         {
-            currentBiomass[i] = random.nextDouble(true, true) * carryingCapacity;
+            currentBiomass[i] = ((initialMaxCapacity - initialMinCapacity)*random.nextDouble(true, true) + initialMinCapacity)
+                    * carryingCapacity;
             malthusianParameter[i] = steepness;
         }
+    }
+
+
+    public LogisticLocalBiology(
+            double carryingCapacity, int species, double steepness,
+            MersenneTwisterFast random)
+    {
+        this(carryingCapacity,species,steepness,random,1,0);
     }
 
     /**

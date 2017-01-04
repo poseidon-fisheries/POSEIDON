@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.experiments.burlapspike.ShodanStateOil;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 
 /**
  * A method that is stepped every month and opens/close a season with given QProvider
@@ -82,6 +83,16 @@ public class ShodanController implements Steppable,Startable{
 
             }
         },StepOrder.POLICY_UPDATE,1);
+
+        //add daily gatherer for policy
+        model.getDailyDataSet().registerGatherer("Shodan Policy",
+                                                  new Gatherer<FishState>() {
+                                                      @Override
+                                                      public Double apply(FishState state) {
+                                                          return regulation.isOpen() ? 0d : 1d;
+                                                      }
+                                                  },
+                                                  regulation.isOpen() ? 0d : 1d);
     }
 
 

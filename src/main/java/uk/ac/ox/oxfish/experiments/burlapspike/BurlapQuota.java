@@ -36,6 +36,8 @@ public class BurlapQuota {
         Path containerPath = Paths.get("runs", "burlap_quota");
         containerPath.toFile().mkdirs();
         containerPath.resolve("data").toFile().mkdirs();
+        containerPath.resolve("results").toFile().mkdirs();
+        containerPath.resolve("saves").toFile().mkdirs();
 
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(300);
@@ -101,11 +103,11 @@ public class BurlapQuota {
 
 
 
-/*
+
         BurlapShodan.sarsaRunFourier(.99,
-                                        "99_sarsa_biomass_6lambda_fourier",
+                                        "99_sarsa_biomass_6lambda_fourier3",
                                         4,
-                                        .0001,
+                                        .005,
                                         .6,
                                         features,
                                          scenario,
@@ -115,7 +117,7 @@ public class BurlapQuota {
                                         ShodanStateOil.MONTHS_LEFT);
 
 
-*/
+
 
 
 
@@ -314,6 +316,7 @@ public class BurlapQuota {
 
 */
 
+/*
         BurlapShodan.sarsaRunFourier(1,
                                      "100_sarsa_cashDistance_6lambda_fourier3",
                                      4,
@@ -326,7 +329,7 @@ public class BurlapQuota {
                                      ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
                                      ShodanStateOil.DAY_OF_THE_YEAR,
                                      ShodanStateOil.MONTHS_LEFT);
-
+*/
 /*
         BurlapShodan.qRunFourier(1,
                                  "100_qrun_cashDistance_fourier4",

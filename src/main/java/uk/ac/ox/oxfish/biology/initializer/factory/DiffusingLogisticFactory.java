@@ -31,6 +31,10 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
 
 
+    private DoubleParameter maxInitialCapacity = new FixedDoubleParameter(1d);
+
+    private DoubleParameter minInitialCapacity = new FixedDoubleParameter(0d);
+
     /**
      * Applies this function to the given argument.
      *
@@ -41,6 +45,8 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     public DiffusingLogisticInitializer apply(FishState state) {
         return new DiffusingLogisticInitializer(carryingCapacity,
                                                 steepness,
+                                                maxInitialCapacity,
+                                                minInitialCapacity,
                                                 percentageLimitOnDailyMovement.apply(state.random),
                                                 differentialPercentageToMove.apply(state.random));
     }
@@ -78,5 +84,41 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     public void setDifferentialPercentageToMove(
             DoubleParameter differentialPercentageToMove) {
         this.differentialPercentageToMove = differentialPercentageToMove;
+    }
+
+    /**
+     * Getter for property 'maxInitialCapacity'.
+     *
+     * @return Value for property 'maxInitialCapacity'.
+     */
+    public DoubleParameter getMaxInitialCapacity() {
+        return maxInitialCapacity;
+    }
+
+    /**
+     * Setter for property 'maxInitialCapacity'.
+     *
+     * @param maxInitialCapacity Value to set for property 'maxInitialCapacity'.
+     */
+    public void setMaxInitialCapacity(DoubleParameter maxInitialCapacity) {
+        this.maxInitialCapacity = maxInitialCapacity;
+    }
+
+    /**
+     * Getter for property 'minInitialCapacity'.
+     *
+     * @return Value for property 'minInitialCapacity'.
+     */
+    public DoubleParameter getMinInitialCapacity() {
+        return minInitialCapacity;
+    }
+
+    /**
+     * Setter for property 'minInitialCapacity'.
+     *
+     * @param minInitialCapacity Value to set for property 'minInitialCapacity'.
+     */
+    public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
+        this.minInitialCapacity = minInitialCapacity;
     }
 }
