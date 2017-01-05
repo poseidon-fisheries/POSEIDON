@@ -147,6 +147,18 @@ public class BurlapQuota {
                                      ShodanStateOil.DAY_OF_THE_YEAR,
                                      ShodanStateOil.MONTHS_LEFT);
 */
+
+        BurlapShodan.sarsaRunFourier(1,
+                                     "100_sarsa_biomass_9lambda_fourier",
+                                     4,
+                                     .005,
+                                     .9,
+                                     features,
+                                     scenario,
+                                     containerPath, (Steppable) simState -> {},
+                                     ShodanStateOil.BIOMASS,
+                                     ShodanStateOil.DAY_OF_THE_YEAR,
+                                     ShodanStateOil.MONTHS_LEFT);
 /*
 
         BurlapShodan.qRunFourier(1,
@@ -313,7 +325,7 @@ public class BurlapQuota {
                                      ShodanStateOil.MONTHS_LEFT);
 
 */
-
+/*
         BurlapShodan.sarsaRunFourier(1,
                                      "100_sarsa_cashDistance_6lambda_fourier3",
                                      4,
@@ -326,7 +338,38 @@ public class BurlapQuota {
                                      ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
                                      ShodanStateOil.DAY_OF_THE_YEAR,
                                      ShodanStateOil.MONTHS_LEFT);
+*/
 
+
+
+/*
+        BurlapShodan.sarsaRunNormalized(1,
+                                        "100_sarsa_distanceeffort_6lambda_polynomial4_normalized",
+                                        4,
+                                        .01,
+                                        .6,
+                                        features,
+                                        scenario,
+                                        containerPath, (Steppable) simState -> {},
+                                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                                        ShodanStateOil.DAY_OF_THE_YEAR,
+                                        ShodanStateOil.MONTHS_LEFT);
+
+*/
+/*
+        BurlapShodan.sarsaRun(1,
+                                        "100_sarsa_distanceeffort_6lambda_polynomial4",
+                                        4,
+                                        .01,
+                                        .6,
+                                        scenario,
+                                        containerPath, (Steppable) simState -> {},
+                                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                                        ShodanStateOil.DAY_OF_THE_YEAR,
+                                        ShodanStateOil.MONTHS_LEFT);
+                                        */
 /*
         BurlapShodan.qRunFourier(1,
                                  "100_qrun_cashDistance_fourier4",
@@ -341,6 +384,25 @@ public class BurlapQuota {
                                  ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
                                  ShodanStateOil.DAY_OF_THE_YEAR,
                                  ShodanStateOil.MONTHS_LEFT);
+*/
+
+
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365)).
+                        variableDomain(ShodanStateOil.MONTHS_LEFT, new VariableDomain(0, 243));
+
+        /*
+        BurlapShodan.sarsaRunNormalized(1,
+                                        "100_sarsa_monthsday_6lambda_polynomial4_normalized",
+                                        4,
+                                        .005,
+                                        .6,
+                                        features,
+                                        scenario,
+                                        containerPath, (Steppable) simState -> {},
+                                        ShodanStateOil.DAY_OF_THE_YEAR,
+                                        ShodanStateOil.MONTHS_LEFT);
 */
         episodesToCSV(containerPath);
 
