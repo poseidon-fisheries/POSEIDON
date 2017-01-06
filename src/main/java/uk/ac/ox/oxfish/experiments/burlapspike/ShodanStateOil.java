@@ -140,7 +140,7 @@ public class ShodanStateOil implements State {
         this.cashflowThisYear = cashflowThisYear;
     }
 
-    static ShodanStateOil fromState(FishState state)
+    public static ShodanStateOil fromState(FishState state)
     {
 
         //initially it's all 0
@@ -207,7 +207,7 @@ public class ShodanStateOil implements State {
         double yearlyCPUE = averageLandings/averageEffort;
 
 
-        int dayOfTheYear = state.getDayOfTheYear();
+        int dayOfTheYear = Math.max(state.getDayOfTheYear()-1,0);
 
         double landingsSoFarThisYear = 0;
         landings = state.getDailyDataSet().getColumn(

@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * Each tile below water is filled with an independent logistic-growth. They all have the same carrying capacity
@@ -22,11 +23,24 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
     private final DoubleParameter steepness;
 
+    private final DoubleParameter minInitialCapacity;
+
+    private final DoubleParameter maxInitialCapacity;
+
+
+    public IndependentLogisticInitializer(
+            DoubleParameter carryingCapacity, DoubleParameter steepness,
+            DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity) {
+        this.carryingCapacity = carryingCapacity;
+        this.steepness = steepness;
+        this.minInitialCapacity = minInitialCapacity;
+        this.maxInitialCapacity = maxInitialCapacity;
+    }
+
 
     public IndependentLogisticInitializer(
             DoubleParameter carryingCapacity, DoubleParameter steepness) {
-        this.carryingCapacity = carryingCapacity;
-        this.steepness = steepness;
+        this(carryingCapacity,steepness,new FixedDoubleParameter(0),new FixedDoubleParameter(1d));
     }
 
     /**
@@ -50,8 +64,11 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
             int species = biology.getSize();
             double carryingCapacityLevel = carryingCapacity.apply(random);
             double steepness = this.steepness.apply(random);
+            double minCapacity = minInitialCapacity.apply(random);
+            double maxCapacity = maxInitialCapacity.apply(random);
 
-            return new LogisticLocalBiology(carryingCapacityLevel,species,steepness,random);
+            return new LogisticLocalBiology(carryingCapacityLevel,species,steepness,random,
+                                            maxCapacity,minCapacity);
         }
     }
 

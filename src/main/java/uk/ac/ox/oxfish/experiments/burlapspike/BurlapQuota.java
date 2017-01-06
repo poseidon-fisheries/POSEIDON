@@ -36,6 +36,8 @@ public class BurlapQuota {
         Path containerPath = Paths.get("runs", "burlap_quota");
         containerPath.toFile().mkdirs();
         containerPath.resolve("data").toFile().mkdirs();
+        containerPath.resolve("results").toFile().mkdirs();
+        containerPath.resolve("saves").toFile().mkdirs();
 
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(300);

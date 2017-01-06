@@ -44,8 +44,9 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/alternatives/pso"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20161114 bandits/alternatives/gsa"
 
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/pretend_calibration/catchability"
 
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/pretend_calibration/catchability"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170103 shodan_test/"
 
 
 

@@ -3,11 +3,13 @@ package uk.ac.ox.oxfish.model.regs.factory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Creates a single mono-quota object and shares it every time it is called. If you modify the quota parameter here, it will
@@ -20,7 +22,7 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     /**
      * for each model there is only one quota object being shared
      */
-    private final Map<FishState,MonoQuotaRegulation> modelQuota = new HashMap<>();
+    private final Locker<FishState,MonoQuotaRegulation> modelQuota = new Locker<>();
 
 
     /**
@@ -41,8 +43,9 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 
 
         final Double yearlyQuota = quota.apply(state.random);
-        modelQuota.putIfAbsent(state,new MonoQuotaRegulation(yearlyQuota,state));
-        final MonoQuotaRegulation quotaRegulation = modelQuota.get(state);
+        final MonoQuotaRegulation quotaRegulation =
+                modelQuota.presentKey(state, () -> new MonoQuotaRegulation(yearlyQuota, state));
+
         //if it has not been consumed (probably because the model still has to start) then:
         if(quotaRegulation.getQuotaRemaining(0) > 0 &&
                 Math.abs(quotaRegulation.getQuotaRemaining(0)-quotaRegulation.getYearlyQuota())<.1)

@@ -68,6 +68,8 @@ public class BurlapShodan {
 
         Paths.get("runs","burlap").toFile().mkdirs();
         Paths.get("runs","burlap","data").toFile().mkdirs();
+        Paths.get("runs","burlap","saves").toFile().mkdirs();
+        Paths.get("runs","burlap","results").toFile().mkdirs();
 
 
 
@@ -295,7 +297,7 @@ public class BurlapShodan {
             stringedKeys[i] = keys[i].toString();
         resultObject.put("factors",stringedKeys);
         resultObject.put("name",name);
-        resultObject.put("base","polynomial");
+        resultObject.put("base","polynomial");http://stats.stackexchange.com/questions/5747/if-a-and-b-are-correlated-with-c-why-are-a-and-b-not-necessarily-correlated/22522#22522
         resultObject.put("order",order);
         resultObject.put("normalized",true);
         resultObject.put("staleDuration",staleDuration);

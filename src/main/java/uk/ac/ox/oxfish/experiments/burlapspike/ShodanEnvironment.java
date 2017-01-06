@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  * Created by carrknight on 12/19/16.
@@ -36,12 +37,30 @@ public class ShodanEnvironment implements Environment
     private final PrototypeScenario scenario;
     private Steppable additionalSteppable;
 
+    /**
+     * year when the episode ends, if this is negative the scenario never ends!
+     */
+    private final int lastYear;
 
 
-    public ShodanEnvironment(final PrototypeScenario scenario, final Steppable additionalSteppable) {
+    /**
+     * create an environment object that stores the prototype scenario
+     * @param scenario
+     * @param additionalSteppable
+     * @param lastYear if negative the episode never ends
+     */
+    public ShodanEnvironment(PrototypeScenario scenario, Steppable additionalSteppable, int lastYear) {
         this.scenario = scenario;
         this.additionalSteppable = additionalSteppable;
+        this.lastYear = lastYear;
     }
+
+    public ShodanEnvironment(final PrototypeScenario scenario, final Steppable additionalSteppable) {
+        this(scenario,additionalSteppable,YEARS_PER_EPISODE);
+    }
+
+
+
 
     /**
      * Returns the current observation of the environment as a {@link State}.
@@ -154,13 +173,13 @@ public class ShodanEnvironment implements Environment
      */
     @Override
     public boolean isInTerminalState() {
-        return state.getYear()>=YEARS_PER_EPISODE;
+        return lastYear >0 && state.getYear()>=lastYear;
     }
 
     public double totalReward(){
         double initialScore = 0;
-        for(Double landing : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
-            initialScore+=landing;
+        for(Double cashflow : state.getYearlyDataSet().getColumn("Average Cash-Flow"))
+            initialScore+=cashflow;
         return initialScore;
     }
 
