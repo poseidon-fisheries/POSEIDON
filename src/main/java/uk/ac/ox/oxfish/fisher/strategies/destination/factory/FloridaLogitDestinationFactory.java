@@ -1,14 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
 import uk.ac.ox.oxfish.geography.MapDiscretization;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
@@ -18,7 +15,6 @@ import uk.ac.ox.oxfish.utility.Locker;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.function.Supplier;
 
 /**
  * Steve saul's stuff, initialized here.

@@ -11,19 +11,22 @@ import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.policy.PolicyUtils;
 import burlap.behavior.singleagent.Episode;
 import burlap.behavior.singleagent.learning.tdmethods.vfa.GradientDescentSarsaLam;
+import burlap.mdp.core.action.Action;
+import burlap.mdp.core.action.SimpleAction;
 import burlap.mdp.core.action.UniversalActionType;
 import burlap.mdp.core.state.vardomain.VariableDomain;
 import burlap.mdp.singleagent.SADomain;
+import burlap.mdp.singleagent.environment.Environment;
+import com.beust.jcommander.internal.Nullable;
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import joptsimple.internal.Strings;
 import org.yaml.snakeyaml.Yaml;
-import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.biology.initializer.DiffusingLogisticInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.File;
@@ -47,6 +50,7 @@ import static uk.ac.ox.oxfish.experiments.burlapspike.BurlapShodan.STEPS_PER_LEA
 public class BurlapQuotaInfinity {
 
 
+    public static final double INITIAL_EPSILON = 1;
 
     public static void main(String[] args) throws IllegalAccessException, NoSuchFieldException, IOException {
 
@@ -76,35 +80,96 @@ public class BurlapQuotaInfinity {
                         variableDomain(ShodanStateOil.BIOMASS, new VariableDomain(0, 10500000)).
                         variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 243));
 
-        /*
-        sarsaRunFourier(.99,
-                                     "99_sarsa_biomass_7lambda_fourier",
-                                     4,
-                                     .005,
-                                     .7,
-                                     features,
-                                     scenario,
-                                     containerPath, (Steppable) simState -> {},
-                                     ShodanStateOil.BIOMASS,
-                                     ShodanStateOil.DAY_OF_THE_YEAR);
+/*
+        sarsaRunFourier(.999,
+                        "999_sarsa_biomass_9lambda_fourier2",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        .2,
+                        null,
+                        ShodanStateOil.BIOMASS,
+                        ShodanStateOil.DAY_OF_THE_YEAR);
 */
+
+        sarsaRunFourier(.999,
+                        "999_sarsa_biomass_9lambda_fourier_baseline",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        .2,
+                        new Pair<>(new ShodanStateOil(
+                                0,0,0,0,0,1,
+                                0,0,0,0,
+                                0,0,5000000,0,0
+                        ), new SimpleAction(ShodanEnvironment.ACTION_OPEN)),
+                        ShodanStateOil.BIOMASS,
+                        ShodanStateOil.DAY_OF_THE_YEAR);
+
         //look at yearly landings only (basically discover quotas)
         features =
                 new NormalizedVariableFeatures().
                         variableDomain(ShodanStateOil.AVERAGE_YEARLY_LANDINGS, new VariableDomain(0, 5500)).
                         variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 243));
 
-        sarsaRunFourier(.99,
+        /*
+        sarsaRunFourier(.999,
                         "99_sarsa_landings_7lambda_fourier",
                         4,
                         .005,
-                        .7,
+                        .9,
                         features,
                         scenario,
                         containerPath, (Steppable) simState -> {},
-                        ShodanStateOil.BIOMASS,
+                        ShodanStateOil.AVERAGE_YEARLY_LANDINGS,
+                        ShodanStateOil.DAY_OF_THE_YEAR);
+                        */
+
+
+
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_CASHFLOW, new VariableDomain(-5, 300)).
+                        variableDomain(ShodanStateOil.DAY_OF_THE_YEAR, new VariableDomain(0, 365));
+
+        /*
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistance_9lambda_fourier",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        .2,
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
                         ShodanStateOil.DAY_OF_THE_YEAR);
 
+*/
+
+        /*
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistance_9lambda_fourier_highepsilon",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        1,null,
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                        ShodanStateOil.DAY_OF_THE_YEAR);
+
+*/
     }
 
 
@@ -112,7 +177,7 @@ public class BurlapQuotaInfinity {
     public static void sarsaRunFourier(
             final double discount, final String name, final int order, final double learningRate, final double lambda,
             NormalizedVariableFeatures inputFeatures, final PrototypeScenario scenario, final Path containerPath,
-            final Steppable additionalSteppable,
+            final Steppable additionalSteppable, final double initialEpsilon, @Nullable Pair<ShodanStateOil,Action> baseline,
             String... featureNames) throws IOException, NoSuchFieldException, IllegalAccessException {
 
 
@@ -128,10 +193,12 @@ public class BurlapQuotaInfinity {
         resultObject.put("name",name);
         resultObject.put("base","fourier");
         resultObject.put("order",order);
+        resultObject.put("initial_epsilon", initialEpsilon);
         resultObject.put("normalized",true);
+        resultObject.put("baseline", baseline != null);
         //run sarsa, return last fitness
         double fitness = runSarsa(new FourierBasis(inputFeatures, order), name, discount, learningRate, lambda,
-                                  containerPath,scenario, resultObject );
+                                  containerPath, scenario,baseline, resultObject, initialEpsilon);
 
         double bestFitness = fitness;
         if(resultObject.containsKey("fitness"))
@@ -149,15 +216,18 @@ public class BurlapQuotaInfinity {
     public static double runSarsa(
             DenseStateFeatures fb, final String directory, final double discount, final double learningRate,
             final double lambda, final Path containerPath, final PrototypeScenario scenario,
-            HashMap<String, Object> metadata) throws IOException, IllegalAccessException, NoSuchFieldException {
+            @Nullable Pair<ShodanStateOil,Action> baseline,
+            HashMap<String, Object> metadata, final double initialEpsilon) throws IOException, IllegalAccessException, NoSuchFieldException {
 
         MersenneTwisterFast random = new MersenneTwisterFast();
 
-        //((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxCapacity(randomnumber)
+        //
 
         //never ending scenario
-        ShodanEnvironment environment = new ShodanEnvironment(scenario, (Steppable) simState -> {
-        },-1);
+        ShodanEnvironment delegate = new ShodanEnvironment(scenario, (Steppable) simState -> {
+        }, -1);
+        Environment environment = delegate;
+
         containerPath.resolve(directory).toFile().mkdirs();
 
         System.out.println("running " + directory   );
@@ -201,20 +271,30 @@ public class BurlapQuotaInfinity {
             }
         }
         //poliy
-        EpsilonGreedy greedy = new EpsilonGreedy(sarsaLam, .2);
+        EpsilonGreedy greedy = new EpsilonGreedy(sarsaLam, initialEpsilon);
         sarsaLam.setLearningPolicy(greedy);
 
+
+        //add baseline if you need to
+        if(baseline != null)
+            environment = new RelativeRewardEnvironmentDecorator(sarsaLam,
+                                                                 environment,
+                                                                 baseline.getFirst(),
+                                                                 baseline.getSecond());
         //start model
+        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxInitialCapacity(new FixedDoubleParameter(
+                random.nextDouble()
+        ));
         environment.resetEnvironment();
 
         List<Episode> episodeList = new LinkedList<>();
 
         double lastEstimation = Double.NaN;
-        //lspiRun learning for 100 episodes
+        //lspiRun learning for NUMBER_OF_EPISODES
         for(; i <= NUMBER_OF_EPISODES; i++){
 
             greedy.setEpsilon(
-                    .2 * (NUMBER_OF_EPISODES-i)/(NUMBER_OF_EPISODES));
+                    initialEpsilon * (NUMBER_OF_EPISODES-i)/(NUMBER_OF_EPISODES));
 
 
             int maxYears = 5 + random.nextInt(40);
@@ -224,33 +304,45 @@ public class BurlapQuotaInfinity {
             //run!
 
             episodeList.add(sarsaLam.runLearningEpisode(environment,maxMonths));
-            System.out.println(i + ": " + environment.totalReward()/maxYears + "epsilon: " + (greedy.getEpsilon()));
+            double runReward;
+
+
+            System.out.println(i + ": " + delegate.totalReward()/maxYears + "epsilon: " + (greedy.getEpsilon()));
             String parameters[] = new String[parametricState.numParameters()];
             for(int p=0; p<parameters.length; p++)
                 parameters[p] = String.valueOf(parametricState.getParameter(p));
             System.out.println(i + ": " + Strings.join(parameters, ","));
 
             //reset environment for next learning episode
+            ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxInitialCapacity(new FixedDoubleParameter(
+                    random.nextDouble()
+            ));
             environment.resetEnvironment();
             if(i% STEPS_PER_LEARNING ==0 )
             {
                 System.out.println("20 year check");
 
-
-                environment.resetEnvironment(0);
+                ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxInitialCapacity(new FixedDoubleParameter(
+                        1d
+                ));
+                delegate.resetEnvironment(0);
                 //final
                 GreedyQPolicy policy = new GreedyQPolicy(sarsaLam);
                 PolicyUtils.rollout(policy, environment,244).write(
                         containerPath.resolve(directory).resolve("lspi_"+i).toAbsolutePath().toString());
-                lastEstimation= environment.totalReward();
+                lastEstimation= delegate.totalReward();
                 System.out.println("final_"+i + ": " +lastEstimation );
-                Files.write(containerPath.resolve(directory).resolve("sarsa_"+i+".test"), String.valueOf(environment.totalReward()).getBytes());
+                Files.write(containerPath.resolve(directory).resolve("sarsa_"+i+".test"), String.valueOf(lastEstimation).getBytes());
 
                 Files.write(containerPath.resolve(directory).resolve("progression.csv"), (i + "," + lastEstimation +"\n").getBytes(),
                             StandardOpenOption.APPEND, StandardOpenOption.CREATE  );
 
 
                 Files.write(containerPath.resolve(directory).resolve("sarsa_"+i+".csv"), Strings.join(parameters, ",").getBytes());
+
+                ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setMaxInitialCapacity(new FixedDoubleParameter(
+                        random.nextDouble()
+                ));
                 environment.resetEnvironment();
 
                 Episode.writeEpisodes(episodeList, containerPath.resolve("data").toAbsolutePath().toString(),

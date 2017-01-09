@@ -7,10 +7,6 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-
 /**
  * Creates a single mono-quota object and shares it every time it is called. If you modify the quota parameter here, it will
  * affect all the quotas that were created before as well

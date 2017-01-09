@@ -158,6 +158,7 @@ public class BurlapQuota {
                                      features,
                                      scenario,
                                      containerPath, (Steppable) simState -> {},
+                                     null,
                                      ShodanStateOil.BIOMASS,
                                      ShodanStateOil.DAY_OF_THE_YEAR,
                                      ShodanStateOil.MONTHS_LEFT);

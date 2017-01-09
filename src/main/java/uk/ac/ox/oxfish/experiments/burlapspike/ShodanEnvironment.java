@@ -13,7 +13,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Iterator;
-import java.util.function.Function;
 
 /**
  * Created by carrknight on 12/19/16.
