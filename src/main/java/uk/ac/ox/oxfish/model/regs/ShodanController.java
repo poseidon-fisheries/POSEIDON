@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.regs;
 
 import burlap.behavior.policy.GreedyQPolicy;
 import burlap.behavior.valuefunction.QProvider;
+import burlap.behavior.valuefunction.QValue;
 import burlap.mdp.core.action.Action;
 import com.google.common.base.Preconditions;
 import sim.engine.SimState;
@@ -32,6 +33,8 @@ public class ShodanController implements Steppable,Startable{
      */
     private final  ExternalOpenCloseSeason regulation;
 
+    private final QProvider qfunction;
+
     /**
      * receipt that we have started!
      */
@@ -40,6 +43,7 @@ public class ShodanController implements Steppable,Startable{
 
     public ShodanController(QProvider qFunction, ExternalOpenCloseSeason regulation) {
         policy = new GreedyQPolicy(qFunction);
+        this.qfunction = qFunction;
         this.regulation = regulation;
     }
 
@@ -52,8 +56,13 @@ public class ShodanController implements Steppable,Startable{
     {
 
         //ask the policy what should be done
-        Action action = policy.action(ShodanStateOil.fromState((FishState) simState));
-        System.out.println("shodan says: " +action);
+        ShodanStateOil state = ShodanStateOil.fromState((FishState) simState);
+        Action action = policy.action(state);
+        StringBuilder qvalues = new StringBuilder();
+        for(QValue qValue : qfunction.qValues(state))
+            qvalues.append(qValue.a.actionName()).append(" -> ").append(qValue.q).append(" | ");
+
+        System.out.println("shodan says: " +action + " , " + qvalues.toString());
         //actuate to the fishstate
         if(action.actionName().equals(ShodanEnvironment.ACTION_OPEN))
             regulation.setOpen(true);
