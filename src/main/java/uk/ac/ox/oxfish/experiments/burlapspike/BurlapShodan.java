@@ -618,7 +618,7 @@ public class BurlapShodan {
             parametricState.evaluate(
                     new ShodanStateOil(0, 0, 0, 0, 0,
                                        0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0),
+                                       0, 0, 0, 0, 0, 0,0),
                     new SimpleAction(ShodanEnvironment.ACTION_OPEN)); //this initalizes the parametrs
 
             qLearning = new GradientDescentQLearning(domain, discount,

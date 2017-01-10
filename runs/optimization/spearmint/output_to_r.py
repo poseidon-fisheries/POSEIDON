@@ -221,4 +221,5 @@ def plot(config_directory = "/home/carrknight/code/oxfish/runs/optimization/spea
     #plot(experiment_name="congested_departure")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/")
-plot(config_directory="/home/carrknight/code/oxfish/docs/20170103 shodan_test")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170103 shodan_test")
+plot(config_directory="/home/carrknight/code/oxfish/docs/20170111 fit_example")

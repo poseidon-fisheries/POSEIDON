@@ -85,9 +85,63 @@ public class ShodanDemo {
                              "burlap_infinity_general",
                              "99_sarsa_biomass_9lambda_fourier"), "agent_500");
                              */
+        /*
         generalRun(Paths.get("runs",
                              "burlap_infinity_general",
                              "99_sarsa_cashdistance_9lambda_fourier"), "agent_500");
+                                     */
+        /*
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_biomass_9lambda_fourier2"), "agent_1000");
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_biomass_9lambda_fourier_baseline"), "agent_1000");
+
+                             */
+
+        /*
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "90_sarsa_biomass_9lambda_fourier_baseline"), "agent_1000");
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "90_sarsa_biomass_9lambda_fourier"), "agent_1000");
+                             */
+
+/*
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier"), "agent_1000");
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline"), "agent_1000");
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_highepsilon"), "agent_1000");
+*/
+
+
+        //maxes!
+        /*
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon"), "agent_780");
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_highepsilon"), "agent_860");
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline"), "agent_430");
+                             */
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier"), "agent_400");
     }
 
     private static void generalRun(final Path containerPath, final String agentName) throws FileNotFoundException {
@@ -97,12 +151,12 @@ public class ShodanDemo {
                 new FileReader(Paths.get("docs", "20170103 shodan_test", "scenario.yaml").toFile()),
                 PrototypeScenario.class);
         ShodanFromFileFactory shodan = new ShodanFromFileFactory();
-        shodan.setPathToXml(containerPath.resolve("agent_500"+".xml").toAbsolutePath().toString());
+        shodan.setPathToXml(containerPath.resolve(agentName+".xml").toAbsolutePath().toString());
         scenario.setRegulation(shodan);
         runSimulation(scenario, agentName, 20,
-                      containerPath.resolve("agent_500"+".csv"));
-        runSimulation(scenario, "80_"+"agent_500", 80,
-                      containerPath.resolve("80_"+"agent_500"+".csv"));
+                      containerPath.resolve(agentName+".csv"));
+        runSimulation(scenario, "80_"+agentName, 80,
+                      containerPath.resolve("80_"+agentName+".csv"));
 
 
     }

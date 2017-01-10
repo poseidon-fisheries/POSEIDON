@@ -95,6 +95,7 @@ public class BurlapQuotaInfinity {
                         ShodanStateOil.DAY_OF_THE_YEAR);
 */
 
+/*
         sarsaRunFourier(.999,
                         "999_sarsa_biomass_9lambda_fourier_baseline",
                         4,
@@ -107,11 +108,11 @@ public class BurlapQuotaInfinity {
                         new Pair<>(new ShodanStateOil(
                                 0,0,0,0,0,1,
                                 0,0,0,0,
-                                0,0,5000000,0,0
+                                0,0,5000000,0,0,0
                         ), new SimpleAction(ShodanEnvironment.ACTION_OPEN)),
                         ShodanStateOil.BIOMASS,
                         ShodanStateOil.DAY_OF_THE_YEAR);
-
+*/
         //look at yearly landings only (basically discover quotas)
         features =
                 new NormalizedVariableFeatures().
@@ -170,6 +171,82 @@ public class BurlapQuotaInfinity {
                         ShodanStateOil.DAY_OF_THE_YEAR);
 
 */
+        features =
+                new NormalizedVariableFeatures().
+                        variableDomain(ShodanStateOil.AVERAGE_DISTANCE_TO_PORT, new VariableDomain(0, 440)).
+                        variableDomain(ShodanStateOil.AVERAGE_YEARLY_CASHFLOW, new VariableDomain(-5, 300)).
+                        variableDomain(ShodanStateOil.MONTHS_CLOSED, new VariableDomain(0, 12*5)); //cutoff at 5 years
+
+
+
+/*
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistanceclosed_9lambda_fourier",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        .2,
+                        null,
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                        ShodanStateOil.MONTHS_CLOSED);
+*/
+/*
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistanceclosed_9lambda_fourier_highepsilon",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        1,
+                        null,
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                        ShodanStateOil.MONTHS_CLOSED);
+*/
+        /*
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        .2,
+                        new Pair<>(new ShodanStateOil(
+                                0,0,0,0,268.5,1,
+                                0,0,0,0,
+                                0,0,0,25.220,0,0
+                        ),new SimpleAction(ShodanEnvironment.ACTION_OPEN)),
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                        ShodanStateOil.MONTHS_CLOSED);
+                        */
+        sarsaRunFourier(.999,
+                        "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon",
+                        4,
+                        .0025,
+                        .9,
+                        features,
+                        scenario,
+                        containerPath, (Steppable) simState -> {},
+                        1,
+                        new Pair<>(new ShodanStateOil(
+                                0,0,0,0,268.5,1,
+                                0,0,0,0,
+                                0,0,0,25.220,0,0
+                        ),new SimpleAction(ShodanEnvironment.ACTION_OPEN)),
+                        ShodanStateOil.AVERAGE_DISTANCE_TO_PORT,
+                        ShodanStateOil.AVERAGE_YEARLY_CASHFLOW,
+                        ShodanStateOil.MONTHS_CLOSED);
+
+
     }
 
 

@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
@@ -879,6 +880,15 @@ public class FishStateUtilities {
         {
             writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile());
             writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
+            writer.close();
+
+        }
+
+        //add additional outputs
+        for(OutputPlugin plugin : model.getOutputPlugins())
+        {
+            writer = new FileWriter(outputFolder.resolve(plugin.getFileName()).toFile());
+            writer.write(plugin.composeFileContents());
             writer.close();
 
         }

@@ -46,6 +46,8 @@ public class ShodanStateOil implements State {
     private double averageCashflow;
     private double cashflowThisYear;
 
+    private double monthsClosed;
+
     public static final String GAS_PRICE = "gasPrice";
     public static final String LANDINGS = "landings";
     public static final String MONTHS_LEFT = "monthsLeft";
@@ -61,11 +63,13 @@ public class ShodanStateOil implements State {
     public static final String BIOMASS = "biomass";
     public static final String AVERAGE_YEARLY_CASHFLOW = "averageCashflow";
     public static final String CASHFLOW_THIS_YEAR = "cashflowThisYear";
+    public static final String MONTHS_CLOSED = "monthsClosed";
     static private ArrayList<Object> names = Lists.newArrayList(GAS_PRICE, LANDINGS, MONTHS_LEFT,
                                                                 CUMULATIVE_EFFORT, AVERAGE_DISTANCE_TO_PORT,
                                                                 DAY_OF_THE_YEAR,AVERAGE_YEARLY_LANDINGS,
                                                                 AVERAGE_YEARLY_EFFORTS,CPUE,YEARLY_CPUE, BIOMASS,LANDINGS_THIS_YEAR,EFFORT_THIS_YEAR,
-                                                                AVERAGE_YEARLY_CASHFLOW, CASHFLOW_THIS_YEAR
+                                                                AVERAGE_YEARLY_CASHFLOW, CASHFLOW_THIS_YEAR,
+                                                                MONTHS_CLOSED
                                                                 ) ;
 
 
@@ -108,6 +112,8 @@ public class ShodanStateOil implements State {
             return averageCashflow;
         if(variableKey.equals(CASHFLOW_THIS_YEAR))
             return cashflowThisYear;
+        if(variableKey.equals(MONTHS_CLOSED))
+            return monthsClosed;
         throw new UnknownKeyException(variableKey);
     }
 
@@ -122,7 +128,7 @@ public class ShodanStateOil implements State {
             double gasPrice, double landings, int monthsLeft, double cumulativeEffort, double averageDistanceToPort,
             int dayOfTheYear, double averageYearlyLanding, double averageYearlyEfforts, double landingsThisYear,
             double effortThisYear, double cpue, double yearlyCpue,
-            double biomass, double averageCashflow, double cashflowThisYear) {
+            double biomass, double averageCashflow, double cashflowThisYear, double monthsClosed) {
         this.gasPrice = gasPrice;
         this.landings = landings;
         this.monthsLeft = monthsLeft;
@@ -138,6 +144,7 @@ public class ShodanStateOil implements State {
         this.biomass = biomass;
         this.averageCashflow = averageCashflow;
         this.cashflowThisYear = cashflowThisYear;
+        this.monthsClosed = monthsClosed;
     }
 
     public static ShodanStateOil fromState(FishState state)
@@ -153,7 +160,9 @@ public class ShodanStateOil implements State {
                                       0,
                                       0d, 0d, 0d, 0d    , 0d, 0d,
                                       state.getTotalBiomass(state.getBiology().getSpecie(0)), 0d,
-                                      0d);
+                                      0d,
+                                      state.getFishers().get(0).getRegulation().allowedAtSea(null,state) ? 0 : 1d
+                                      );
 
 
         //landings
@@ -239,6 +248,15 @@ public class ShodanStateOil implements State {
 
 
 
+        double monthsClosed = 0;
+        Iterator<Double> policy = state.getDailyDataSet().getColumn(
+                "Shodan Policy").descendingIterator();
+        while(policy.hasNext() && policy.next() == 1d) {
+            monthsClosed++;
+        }
+        monthsClosed/=30;
+
+
 
         return new ShodanStateOil(state.getPorts().iterator().next().getGasPricePerLiter(),
                                   monthlyLandings,
@@ -250,7 +268,8 @@ public class ShodanStateOil implements State {
                                   averageEffort, landingsSoFarThisYear, effortSoFarThisYear, cpue, yearlyCPUE,
                                   state.getTotalBiomass(state.getBiology().getSpecie(0)),
                                   last365daysOfCashflow,
-                                  cashflowSoFarThisYear);
+                                  cashflowSoFarThisYear,
+                                  monthsClosed);
 
 
     }
@@ -270,7 +289,7 @@ public class ShodanStateOil implements State {
     public State copy() {
         return new ShodanStateOil(gasPrice, landings, monthsLeft, cumulativeEffort, averageDistanceToPort, dayOfTheYear,
                                   averageYearlyLanding, averageYearlyEfforts, landingsThisYear, effortThisYear, cpue, yearlyCpue, biomass,
-                                  averageCashflow, cashflowThisYear);
+                                  averageCashflow, cashflowThisYear,monthsClosed);
     }
 
 

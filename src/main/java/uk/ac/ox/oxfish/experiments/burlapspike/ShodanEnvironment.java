@@ -7,6 +7,7 @@ import burlap.mdp.singleagent.environment.EnvironmentOutcome;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.ExternalOpenCloseSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -162,6 +163,16 @@ public class ShodanEnvironment implements Environment
 
 
         state.scheduleEveryXDay(additionalSteppable, StepOrder.POLICY_UPDATE, 30);
+
+        state.getDailyDataSet().registerGatherer("Shodan Policy",
+                                                 new Gatherer<FishState>() {
+                                                     @Override
+                                                     public Double apply(FishState state) {
+                                                         if(shodan.isOpen()) return  0d;
+                                                         else
+                                                             return 1d;
+                                                     }
+                                                 },shodan.isOpen() ? 0 : 1);
 
 
     }

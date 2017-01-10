@@ -1,19 +1,17 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
-import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
 import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
@@ -61,7 +59,7 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
     public LogitDestinationStrategy apply(FishState state) {
 
         MapDiscretization discretization = discretizationLocker.
-                presentKey(state, () -> createDiscretization(state, centroidFile)
+                presentKey(state, () -> OsmoseWFSScenario.createDiscretization(state, centroidFile)
                 );
 
         CsvColumnsToLists reader = new CsvColumnsToLists(
@@ -118,28 +116,6 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
                                             new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
                                             state.getRandom());
 
-    }
-
-    private static MapDiscretization createDiscretization(FishState state, String centroidFile) {
-        CsvColumnsToLists reader = new CsvColumnsToLists(
-                centroidFile,
-                ',',
-                new String[]{"eastings", "northings"}
-        );
-
-        LinkedList<Double>[] lists = reader.readColumns();
-        ArrayList<Coordinate> coordinates = new ArrayList<>();
-        for (int i = 0; i < lists[0].size(); i++)
-            coordinates.add(new Coordinate(lists[0].get(i),
-                                           lists[1].get(i),
-                                           0));
-
-        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
-                coordinates);
-        MapDiscretization discretization = new MapDiscretization(
-                discretizer);
-        discretization.discretize(state.getMap());
-        return discretization;
     }
 
     public String getCoefficientsFile() {

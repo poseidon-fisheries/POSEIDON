@@ -118,6 +118,7 @@ public class ExternalOpenCloseSeason implements Regulation{
      * @param open Value to set for property 'open'.
      */
     public void setOpen(boolean open) {
+
         this.open = open;
     }
 }

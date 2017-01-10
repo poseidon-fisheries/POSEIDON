@@ -46,7 +46,8 @@ import os
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/runs/pretend_calibration/catchability"
 
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170103 shodan_test/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170103 shodan_test/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170111 fit_example/"
 
 
 
@@ -54,7 +55,7 @@ SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
 
 
-def default_scorer(yamlfile):
+def default_scorer(yamlfile,output_directory):
     '''
     given the yaml file containing the results, extract a number representing the score for the run!
     :param yamlfile: the results.yaml created by the simulation
@@ -95,7 +96,7 @@ def run_experiment(input2yaml,
     print("reading results")
     import yaml
     results = yaml.load(open(main_directory + "/output/" + experiment_title + "/result.yaml"))
-    result = scorer(results)
+    result = scorer(results,main_directory + "/output/" + experiment_title +"/")
     print("result " + str(result))
     # append them in a list of outputs
     return result

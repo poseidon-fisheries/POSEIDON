@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
@@ -106,6 +107,12 @@ public class FishState  extends SimState{
      * the social network
      */
     private SocialNetwork socialNetwork;
+
+
+    /**
+     * any object that wants to output a file at the end of the simulation can register here
+     */
+    private final List<OutputPlugin> outputPlugins = new LinkedList<>();
 
     /**
      * aggregate steppables for phases where there is no need for randomization
@@ -707,6 +714,12 @@ public class FishState  extends SimState{
     }
 
 
-
-
+    /**
+     * Getter for property 'outputPlugins'.
+     *
+     * @return Value for property 'outputPlugins'.
+     */
+    public List<OutputPlugin> getOutputPlugins() {
+        return outputPlugins;
+    }
 }

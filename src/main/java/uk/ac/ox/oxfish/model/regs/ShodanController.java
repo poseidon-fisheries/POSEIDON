@@ -85,14 +85,9 @@ public class ShodanController implements Steppable,Startable{
     public void start(FishState model) {
         Preconditions.checkState(stoppable==null, "shodan has already started");
         //schedule yourself every month (but skip the first day since you need 30 days of data each step)
-        model.scheduleOnceInXDays(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                stoppable = model.scheduleEveryXDay(ShodanController.this, StepOrder.POLICY_UPDATE, 30);
+        model.scheduleEveryXDay(ShodanController.this, StepOrder.AFTER_DATA, 30);
 
-            }
-        },StepOrder.POLICY_UPDATE,1);
-
+        step(model);
         //add daily gatherer for policy
         model.getDailyDataSet().registerGatherer("Shodan Policy",
                                                   new Gatherer<FishState>() {

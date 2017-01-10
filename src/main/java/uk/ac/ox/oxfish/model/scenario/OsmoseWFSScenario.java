@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -19,6 +20,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
+import uk.ac.ox.oxfish.fisher.log.LogisticLogs;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
@@ -31,6 +33,8 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
+import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
+import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
@@ -39,6 +43,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.DiscretizationHistogrammer;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -48,9 +53,7 @@ import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.CsvColumnToList;
-import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
+import uk.ac.ox.oxfish.utility.*;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
@@ -72,6 +75,8 @@ public class OsmoseWFSScenario implements Scenario{
 
     private final OsmoseBiologyFactory biologyInitializer = new OsmoseBiologyFactory();
     private LinkedHashMap<Port, Integer> numberOfFishersPerPort;
+
+    private boolean collectLogitData = true;
 
     {
         biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2");
@@ -145,6 +150,32 @@ public class OsmoseWFSScenario implements Scenario{
 
 
     private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
+
+
+    private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
+
+
+    public static MapDiscretization createDiscretization(FishState state, String centroidFile) {
+        CsvColumnsToLists reader = new CsvColumnsToLists(
+                centroidFile,
+                ',',
+                new String[]{"eastings", "northings"}
+        );
+
+        LinkedList<Double>[] lists = reader.readColumns();
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
+        for (int i = 0; i < lists[0].size(); i++)
+            coordinates.add(new Coordinate(lists[0].get(i),
+                                           lists[1].get(i),
+                                           0));
+
+        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+                coordinates);
+        MapDiscretization discretization = new MapDiscretization(
+                discretizer);
+        discretization.discretize(state.getMap());
+        return discretization;
+    }
 
 
     /**
@@ -231,29 +262,28 @@ public class OsmoseWFSScenario implements Scenario{
         NauticalMap map = model.getMap();
         MersenneTwisterFast random = model.getRandom();
 
-        //todo remove
-        List<LogisticLog> logger = new LinkedList<>();
-        model.scheduleOnceInXDays(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(logger.get(0).getColumnNames()).append("\n");
-                for(LogisticLog log : logger)
-                    builder.append(log.getData().toString()).append('\n');
-                try {
-                    Files.write(Paths.get("testlog.csv"),builder.toString().getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, StepOrder.DAWN, 300*8);
+        LogisticLogs logger = new LogisticLogs();
 
+        DiscretizationHistogrammer histogrammer = null;
+
+        if(collectLogitData) {
+
+            MapDiscretization originalDiscretization = createDiscretization
+                    (model, FishStateUtilities.getAbsolutePath
+                            (Paths.get("temp_wfs", "areas.txt").toString()));
+
+            histogrammer = new DiscretizationHistogrammer(
+                    originalDiscretization,false);
+            model.getOutputPlugins().add(histogrammer);
+            model.getOutputPlugins().add(logger);
+
+        }
         //longliners
         for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
 
             for(int id=0;id<entry.getValue();id++)
             {
-                final double speed = 1;
+                final double speed = cruiseSpeedInKph.apply(random);
                 final double engineWeight = 1;
                 final double mileage = 1;
                 final double fuelCapacity = 100000000;
@@ -284,15 +314,21 @@ public class OsmoseWFSScenario implements Scenario{
                 fisherCounter++;
 
 
-                //todo remove!
-                LogisticLog log = new LogisticLog(
-                        new String[]{
-                                "intercept", "distance", "habit", "fuel_price", "wind_speed"},newFisher.getID());
 
-                ((LogitDestinationStrategy) newFisher.getDestinationStrategy()).setLog(
-                        log);
-                logger.add(log);
+                if(collectLogitData) {
+                    newFisher.addTripListener(histogrammer);
 
+                    LogisticLog log = new LogisticLog(
+                            new String[]{
+                                    "intercept", "distance", "habit", "fuel_price", "wind_speed"},newFisher.getID());
+
+                    //todo delete this
+                    if(newFisher.getDestinationStrategy() instanceof LogitDestinationStrategy) {
+                        ((LogitDestinationStrategy) newFisher.getDestinationStrategy()).setLog(
+                                log);
+                        logger.add(log);
+                    }
+                }
 
 
 
@@ -330,19 +366,20 @@ public class OsmoseWFSScenario implements Scenario{
 
                 //daily profits predictor
                 newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                fisher ->
-                                                                        //check the daily counter but do not input new values
-                                                                        //if you were not allowed at sea
-                                                                        fisher.isAllowedAtSea() ?
-                                                                                fisher.getDailyCounter().
-                                                                                        getColumn(
-                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                                                :
-                                                                                Double.NaN
-                                ,
+                        MovingAveragePredictor.dailyMAPredictor
+                                ("Predicted Daily Profits",
+                                 fisher ->
+                                         //check the daily counter but do not input new values
+                                         //if you were not allowed at sea
+                                         fisher.isAllowedAtSea() ?
+                                                 fisher.getDailyCounter().
+                                                         getColumn(
+                                                                 YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                 :
+                                                 Double.NaN
+                                        ,
 
-                                                                7));
+                                 7));
 
                 fisherList.add(newFisher);
 
@@ -554,5 +591,43 @@ public class OsmoseWFSScenario implements Scenario{
      */
     public void setLonglinerGear(AlgorithmFactory<? extends Gear> longlinerGear) {
         this.longlinerGear = longlinerGear;
+    }
+
+
+    /**
+     * Getter for property 'collectLogitData'.
+     *
+     * @return Value for property 'collectLogitData'.
+     */
+    public boolean isCollectLogitData() {
+        return collectLogitData;
+    }
+
+    /**
+     * Setter for property 'collectLogitData'.
+     *
+     * @param collectLogitData Value to set for property 'collectLogitData'.
+     */
+    public void setCollectLogitData(boolean collectLogitData) {
+        this.collectLogitData = collectLogitData;
+    }
+
+
+    /**
+     * Getter for property 'cruiseSpeedInKph'.
+     *
+     * @return Value for property 'cruiseSpeedInKph'.
+     */
+    public DoubleParameter getCruiseSpeedInKph() {
+        return cruiseSpeedInKph;
+    }
+
+    /**
+     * Setter for property 'cruiseSpeedInKph'.
+     *
+     * @param cruiseSpeedInKph Value to set for property 'cruiseSpeedInKph'.
+     */
+    public void setCruiseSpeedInKph(DoubleParameter cruiseSpeedInKph) {
+        this.cruiseSpeedInKph = cruiseSpeedInKph;
     }
 }
