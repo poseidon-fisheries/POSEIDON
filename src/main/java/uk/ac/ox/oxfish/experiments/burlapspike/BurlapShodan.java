@@ -53,7 +53,7 @@ public class BurlapShodan {
 
 
     public static final int STEPS_PER_LEARNING = 10;
-    public static final int NUMBER_OF_EPISODES = 1000;
+    public static final int NUMBER_OF_EPISODES = 2000;
 
     private final static Steppable DEFAULT_STEPPABLE =  new Steppable() {
         @Override

@@ -50,7 +50,7 @@ public class FishStateUtilities {
     public final static int MALE = 0;
     public final static int FEMALE = 1;
 
-    private static final String JAR_NAME = "oxfish_executable.jar";
+    private static final String JAR_NAME = "yamler.jar";
 
 
     private FishStateUtilities() {
@@ -118,15 +118,20 @@ public class FishStateUtilities {
 
         //finally you can just try to look for the jar file
         //see here : http://stackoverflow.com/questions/775389/accessing-properties-files-outside-the-jar/775565
-        String classpath = System.getProperty("java.class.osmoseWFSPath");
-        int jarPos = classpath.indexOf(JAR_NAME);
-        int jarPathPos = classpath.lastIndexOf(File.pathSeparatorChar, jarPos) + 1;
-        String path = classpath.substring(jarPathPos, jarPos);
-        file = new File(path + File.separator + relativePath);
-        if (file.exists())
-            return file.getAbsolutePath();
-
-        System.err.println("failed to find the absolute osmoseWFSPath of the default config file");
+        String classpath = System.getProperty("java.class.path");
+        System.out.println("classpath " + classpath);
+        if(classpath.length() > 0) {
+            int jarPos = classpath.indexOf(JAR_NAME);
+            int jarPathPos = classpath.lastIndexOf(File.pathSeparatorChar, jarPos) + 1;
+            System.out.println(jarPos);
+            System.out.println(jarPathPos);
+            String path = classpath.substring(jarPathPos, jarPos);
+            file = new File(path + File.separator + relativePath);
+            System.out.println(file.getAbsolutePath());
+            if (file.exists())
+                return file.getAbsolutePath();
+        }
+        System.err.println("failed to find the absolute path of the default config file");
         return relativePath;
 
 

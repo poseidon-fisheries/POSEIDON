@@ -229,7 +229,7 @@ public class BurlapQuotaInfinity {
                         ShodanStateOil.MONTHS_CLOSED);
                         */
         sarsaRunFourier(.999,
-                        "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon",
+                        "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon2",
                         4,
                         .0025,
                         .9,

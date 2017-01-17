@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.experiments.burlapspike;
 
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.RandomOpenCloseController;
 import uk.ac.ox.oxfish.model.regs.factory.ShodanFromFileFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -24,8 +24,30 @@ public class ShodanDemo {
 
 
         FishYAML yaml = new FishYAML();
-        //policy optimal
+
         PrototypeScenario scenario = yaml.loadAs(
+                new FileReader(Paths.get("docs", "20170103 shodan_test", "scenario.yaml").toFile()),
+                PrototypeScenario.class);
+        RandomOpenCloseController random = new RandomOpenCloseController();
+        scenario.setRegulation(random);
+
+        runSimulation(scenario, "random", 20, Paths.get("docs", "20170103 shodan_test", "random" + ".csv"));
+        runSimulation(scenario, "random80", 80, Paths.get("docs", "20170103 shodan_test", "random80" + ".csv"));
+
+        scenario = yaml.loadAs(
+                new FileReader(Paths.get("docs", "20170103 shodan_test", "scenario.yaml").toFile()),
+                PrototypeScenario.class);
+        AnarchyFactory anarchy = new AnarchyFactory();
+        scenario.setRegulation(anarchy);
+
+        runSimulation(scenario, "anarchy", 20, Paths.get("docs", "20170103 shodan_test", "anarchy" + ".csv"));
+        runSimulation(scenario, "anarchy80", 80, Paths.get("docs", "20170103 shodan_test", "anarchy80" + ".csv"));
+
+
+
+/*
+        //policy optimal
+        scenario = yaml.loadAs(
                 new FileReader(Paths.get("docs", "20170103 shodan_test", "scenario.yaml").toFile()),
                 PrototypeScenario.class);
         TACMonoFactory regulation = new TACMonoFactory();
@@ -34,9 +56,10 @@ public class ShodanDemo {
 
         runSimulation(scenario, "baseline", 20, Paths.get("docs", "20170103 shodan_test", "baseline" + ".csv"));
         runSimulation(scenario, "baseline80", 80, Paths.get("docs", "20170103 shodan_test", "baseline80" + ".csv"));
+*/
 
 
-
+        /*
         //optimal shodan biomass
         scenario = yaml.loadAs(
                 new FileReader(Paths.get("docs", "20170103 shodan_test", "scenario.yaml").toFile()),
@@ -72,7 +95,7 @@ public class ShodanDemo {
                       Paths.get("docs", "20170103 shodan_test", "shodan_general_B" + ".csv"));
         runSimulation(scenario, "shodan_general_B80", 80,
                       Paths.get("docs", "20170103 shodan_test", "shodan_general_B80" + ".csv"));
-
+*/
 
 
 
@@ -104,6 +127,11 @@ public class ShodanDemo {
         /*
         generalRun(Paths.get("runs",
                              "burlap_infinity",
+                             "999_sarsa_biomass_9lambda_fourier_baseline"), "agent_1000");
+*.
+        /*
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
                              "90_sarsa_biomass_9lambda_fourier_baseline"), "agent_1000");
 
         generalRun(Paths.get("runs",
@@ -126,11 +154,13 @@ public class ShodanDemo {
 
 
         //maxes!
+
         /*
         generalRun(Paths.get("runs",
                              "burlap_infinity",
                              "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon"), "agent_780");
-
+                             */
+/*
         generalRun(Paths.get("runs",
                              "burlap_infinity",
                              "999_sarsa_cashdistanceclosed_9lambda_fourier_highepsilon"), "agent_860");
@@ -139,9 +169,15 @@ public class ShodanDemo {
                              "burlap_infinity",
                              "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline"), "agent_430");
                              */
+        /*
         generalRun(Paths.get("runs",
                              "burlap_infinity",
                              "999_sarsa_cashdistanceclosed_9lambda_fourier"), "agent_400");
+                             */
+
+        generalRun(Paths.get("runs",
+                             "burlap_infinity",
+                             "999_sarsa_cashdistanceclosed_9lambda_fourier_baseline_highepsilon2"), "agent_1160");
     }
 
     private static void generalRun(final Path containerPath, final String agentName) throws FileNotFoundException {
