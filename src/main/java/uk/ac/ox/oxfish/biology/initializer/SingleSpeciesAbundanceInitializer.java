@@ -17,6 +17,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Log.error("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
-        initializeNaturalProcesses(model, species, locals, false);
+        initializeNaturalProcesses(model, species, locals.values(), false, 2);
 
 
     }
@@ -152,23 +153,31 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      * @param species the species you need the natural processes set up
      * @param locals a map of all the areas where fish can live
      * @param preserveLastAge
+     * @param yearDelay
      * @return the already scheduled naturalProcesses object
      */
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
-            FishState model, Species species, HashMap<SeaTile, AbundanceBasedLocalBiology> locals,
-            final boolean preserveLastAge) {
+            FishState model, Species species,
+            Collection<AbundanceBasedLocalBiology> locals,
+            final boolean preserveLastAge, final int yearDelay) {
         //schedule recruitment and natural mortality
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
+                yearDelay > 0 ?
                 new RecruitmentBySpawningBiomassDelayed(
                         species.getVirginRecruits(),
                         species.getSteepness(),
                         species.isAddRelativeFecundityToSpawningBiomass(),
-                        2
+                        yearDelay
+                ) :
+                new RecruitmentBySpawningBiomass(
+                        species.getVirginRecruits(),
+                        species.getSteepness(),
+                        species.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
                 preserveLastAge);
-        for(AbundanceBasedLocalBiology local : locals.values())
+        for(AbundanceBasedLocalBiology local : locals)
             processes.add(local);
         model.registerStartable(processes);
         return processes;

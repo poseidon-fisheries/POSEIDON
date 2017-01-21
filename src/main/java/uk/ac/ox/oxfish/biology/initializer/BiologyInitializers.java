@@ -90,6 +90,11 @@ public class BiologyInitializers {
         NAMES.put(OneSpeciesSchoolFactory.class,"One Species School");
 
 
+        CONSTRUCTORS.put("Yellow Bycatch Factory",
+                         YellowBycatchFactory::new);
+        NAMES.put(YellowBycatchFactory.class,"Yellow Bycatch Factory");
+
+
     }
 
     private BiologyInitializers() {}

@@ -45,8 +45,8 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
     public DiffusingLogisticInitializer apply(FishState state) {
         return new DiffusingLogisticInitializer(carryingCapacity,
                                                 steepness,
-                                                maxInitialCapacity,
                                                 minInitialCapacity,
+                                                maxInitialCapacity,
                                                 percentageLimitOnDailyMovement.apply(state.random),
                                                 differentialPercentageToMove.apply(state.random));
     }

@@ -12,8 +12,29 @@ public class Meristics
 
 
     public static final Meristics FAKE_MERISTICS =
-            new Meristics(0,0 , 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0,
-                          0, 1, 1, false);
+            new Meristics(0,
+                          0 ,
+                          0,
+                          1,
+                          1,
+                          1,
+                          1,
+                          0,
+                          1,
+                          0,
+                          1,
+                          1,
+                          1,
+                          1,
+                          0,
+                          1,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          1,
+                          false);
 
     /**
      * the maximum age for a male
@@ -192,6 +213,33 @@ public class Meristics
 
 
     public Meristics(MeristicsInput input) {
+        this(input.getMaxAge(),
+             input.getAgeOld(),
+             input.getYoungAgeMale(),
+             input.getYoungLengthMale(),
+             input.getMaxLengthMale(),
+             input.getKParameterMale(),
+             input.getWeightParameterAMale(),
+             input.getWeightParameterBMale(),
+             input.getMortalityParameterMMale(),
+             input.getYoungAgeFemale(),
+             input.getYoungLengthFemale(),
+             input.getMaxLengthFemale(),
+             input.getKParameterFemale(),
+             input.getWeightParameterAFemale(),
+             input.getWeightParameterBFemale(),
+             input.getMortalityParameterMFemale(),
+             input.getMaturityInflection(),
+             input.getMaturitySlope(),
+             input.getFecundityIntercept(),
+             input.getFecunditySlope(),
+             input.getVirginRecruits(),
+             input.getSteepness(),
+             input.isAddRelativeFecundityToSpawningBiomass());
+    }
+
+    public Meristics(Meristics input) {
+
         this(input.getMaxAge(),
              input.getAgeOld(),
              input.getYoungAgeMale(),
@@ -482,5 +530,14 @@ public class Meristics
      */
     public boolean isAddRelativeFecundityToSpawningBiomass() {
         return addRelativeFecundityToSpawningBiomass;
+    }
+
+    /**
+     * Getter for property 'ageOld'.
+     *
+     * @return Value for property 'ageOld'.
+     */
+    public int getAgeOld() {
+        return ageOld;
     }
 }

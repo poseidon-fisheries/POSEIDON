@@ -169,7 +169,7 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                        model, species, locals, preserveLastAge);
+                        model, species, locals.values(), preserveLastAge, 2);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution)
                     process.setFixedRecruitmentWeight(currentWeightMap);
