@@ -17,7 +17,7 @@ import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
 import uk.ac.ox.oxfish.gui.drawing.*;
 import uk.ac.ox.oxfish.model.FishState;

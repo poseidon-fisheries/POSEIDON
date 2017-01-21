@@ -3,9 +3,9 @@ package uk.ac.ox.oxfish.fisher.log;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.ports.Port;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 

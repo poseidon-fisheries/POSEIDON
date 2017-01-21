@@ -2,14 +2,17 @@ package uk.ac.ox.oxfish.demoes;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.GoodBadRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDistanceExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 

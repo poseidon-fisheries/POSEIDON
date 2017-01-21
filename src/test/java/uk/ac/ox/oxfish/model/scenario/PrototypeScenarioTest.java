@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 

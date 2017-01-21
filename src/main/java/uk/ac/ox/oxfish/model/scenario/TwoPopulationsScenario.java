@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -33,6 +32,9 @@ import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.geography.ports.PortInitializer;
+import uk.ac.ox.oxfish.geography.ports.RandomPortFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -55,12 +57,6 @@ import java.util.function.Supplier;
  * Created by carrknight on 7/25/16.
  */
 public class TwoPopulationsScenario implements Scenario{
-
-
-    /**
-     * number of ports
-     */
-    private final int ports = 1;
 
 
 
@@ -94,21 +90,11 @@ public class TwoPopulationsScenario implements Scenario{
 
 
     /**
-     * the X position of the port on the grid. If null or a negative number the position is randomized
+     * positions the port(s)
      */
-    private Integer portPositionX = -1;
-    /**
-     * the X position of the port on the grid. If null or a negative number the position is randomized
-     */
-    private Integer portPositionY = -1;
+    private AlgorithmFactory<? extends PortInitializer> ports = new RandomPortFactory();
 
-    /**
-     * to use if you really want to port to be somewhere specific
-     */
-    public void forcePortPosition(int[] forcedPortPosition) {
-        portPositionX = forcedPortPosition[0];
-        portPositionY = forcedPortPosition[1];
-    }
+
 
     /**
      * boat speed
@@ -263,15 +249,11 @@ public class TwoPopulationsScenario implements Scenario{
         for(Species species : global.getSpecies())
             marketMap.addMarket(species, market.apply(model));
 
-        //create random ports, all sharing the same market
-        if(portPositionX == null || portPositionX < 0)
-            NauticalMapFactory.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom);
-        else
-        {
-            Port port = new Port("Port 0", map.getSeaTile(portPositionX, portPositionY),
-                                 marketMap, 0);
-            map.addPort(port);
-        }
+        PortInitializer portInitializer = ports.apply(model);
+        portInitializer.buildPorts(map,
+                                   mapMakerRandom,
+                                   seaTile -> marketMap);
+
 
         //create initial mpas
         if(startingMPAs != null)
@@ -538,9 +520,6 @@ public class TwoPopulationsScenario implements Scenario{
 
 
 
-    public int getPorts() {
-        return ports;
-    }
 
 
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
@@ -594,21 +573,6 @@ public class TwoPopulationsScenario implements Scenario{
         this.usePredictors = usePredictors;
     }
 
-    public Integer getPortPositionX() {
-        return portPositionX;
-    }
-
-    public void setPortPositionX(Integer portPositionX) {
-        this.portPositionX = portPositionX;
-    }
-
-    public Integer getPortPositionY() {
-        return portPositionY;
-    }
-
-    public void setPortPositionY(Integer portPositionY) {
-        this.portPositionY = portPositionY;
-    }
 
     public DoubleParameter getSmallSpeed() {
         return smallSpeed;
@@ -871,5 +835,24 @@ public class TwoPopulationsScenario implements Scenario{
      */
     public void setSeparateRegulations(boolean separateRegulations) {
         this.separateRegulations = separateRegulations;
+    }
+
+    /**
+     * Getter for property 'ports'.
+     *
+     * @return Value for property 'ports'.
+     */
+    public AlgorithmFactory<? extends PortInitializer> getPorts() {
+        return ports;
+    }
+
+    /**
+     * Setter for property 'ports'.
+     *
+     * @param ports Value to set for property 'ports'.
+     */
+    public void setPorts(
+            AlgorithmFactory<? extends PortInitializer> ports) {
+        this.ports = ports;
     }
 }

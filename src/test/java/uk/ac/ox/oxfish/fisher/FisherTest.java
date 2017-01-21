@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishUntilFullStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;

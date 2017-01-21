@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.ports.Port;
 
 import java.util.Iterator;
 import java.util.LinkedList;

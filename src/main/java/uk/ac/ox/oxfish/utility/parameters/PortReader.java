@@ -4,9 +4,9 @@ import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.vividsolutions.jts.geom.Coordinate;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.io.IOException;

@@ -32,7 +32,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.yaml.snakeyaml.Yaml;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.Pair;

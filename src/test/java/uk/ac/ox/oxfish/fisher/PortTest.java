@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.assertFalse;

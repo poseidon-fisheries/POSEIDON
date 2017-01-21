@@ -2,16 +2,13 @@ package uk.ac.ox.oxfish.model.market;
 
 import com.google.common.collect.Lists;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Port;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.TimeSeriesActuator;
 
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by carrknight on 11/29/16.

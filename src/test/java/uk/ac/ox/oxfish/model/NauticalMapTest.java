@@ -2,11 +2,11 @@ package uk.ac.ox.oxfish.model;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import static org.junit.Assert.*;

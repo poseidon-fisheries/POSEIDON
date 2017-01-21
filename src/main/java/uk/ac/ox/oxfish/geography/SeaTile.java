@@ -4,8 +4,8 @@ import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 

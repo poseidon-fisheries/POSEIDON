@@ -1,7 +1,8 @@
-package uk.ac.ox.oxfish.fisher;
+package uk.ac.ox.oxfish.geography.ports;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;

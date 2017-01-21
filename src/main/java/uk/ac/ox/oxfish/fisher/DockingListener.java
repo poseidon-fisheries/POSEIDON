@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher;
 
+import uk.ac.ox.oxfish.geography.ports.Port;
+
 import java.io.Serializable;
 
 /**

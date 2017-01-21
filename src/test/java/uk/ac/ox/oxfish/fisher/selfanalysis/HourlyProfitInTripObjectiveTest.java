@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.fisher.selfanalysis;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.fisher.log.TripLogger;
+import uk.ac.ox.oxfish.geography.ports.Port;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

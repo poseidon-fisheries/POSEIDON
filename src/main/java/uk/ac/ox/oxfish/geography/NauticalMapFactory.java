@@ -11,12 +11,10 @@ import sim.util.Bag;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
 import uk.ac.ox.oxfish.geography.pathfinding.StraightLinePathfinder;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.GISReaders;
 
@@ -366,59 +364,6 @@ public class NauticalMapFactory {
 
 
     }
-
-    /**
-     * add random ports to the map
-     * @param map
-     */
-    public static void addRandomPortsToMap(NauticalMap map,int ports,
-                                           Function<SeaTile,MarketMap> marketFactory,
-                                           MersenneTwisterFast random){
-        /***
-         *        _      _    _   ___         _
-         *       /_\  __| |__| | | _ \___ _ _| |_ ___
-         *      / _ \/ _` / _` | |  _/ _ \ '_|  _(_-<
-         *     /_/ \_\__,_\__,_| |_| \___/_|  \__/__/
-         *
-         */
-        ObjectGrid2D baseGrid = (ObjectGrid2D) map.getRasterBathymetry().getGrid();
-        int width = baseGrid.getWidth();
-        int height = baseGrid.getHeight();
-
-        ArrayList<SeaTile> candidateTiles = new ArrayList<>();
-        for(int x=0; x<width; x++)
-            for(int y=0; y<height; y++)
-            {
-
-                SeaTile possible = (SeaTile) baseGrid.get(x, y);
-                if(possible.getAltitude() <= 0) //sea tiles aren't welcome!
-                    continue;
-                int neighboringSeaTiles = 0;
-                Bag neighbors = new Bag();
-                baseGrid.getMooreNeighbors(x,y,1,Grid2D.BOUNDED,false,neighbors,null,null);
-                for(Object neighbor : neighbors)
-                    if(((SeaTile)neighbor).getAltitude() < 0 )
-                        neighboringSeaTiles++;
-
-                if(neighboringSeaTiles >=Math.min(height,3))
-                    candidateTiles.add(possible);
-
-            }
-        //get all candidates (land tiles with at least 4 sea tiles next to them)
-
-        Collections.shuffle(candidateTiles,new Random(random.nextLong()));
-        for(int i=0; i<ports; i++) {
-            Port port = new Port("Port 0", candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)), 0);
-            map.addPort(port);
-        }
-
-    }
-
-
-
-
-
-
 
 
     public static Function<SeaTile,LocalBiology> randomMultipleSpecies(MersenneTwisterFast random,

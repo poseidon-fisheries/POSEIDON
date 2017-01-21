@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.fisher.Port;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
