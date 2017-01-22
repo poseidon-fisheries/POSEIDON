@@ -35,7 +35,10 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -246,7 +249,7 @@ public class FishState  extends SimState{
      * a short-cut from map.getPorts()
      * @return the set of ports in the model
      */
-    public HashSet<Port> getPorts() {
+    public List<Port> getPorts() {
         return map.getPorts();
     }
 
@@ -522,10 +525,17 @@ public class FishState  extends SimState{
         return fisherFactory!=null;
     }
 
+    /**
+     * called usually by GUI. Call this after the scenario has started not before!
+     * @return
+     */
     public Fisher createFisher()
     {
         Preconditions.checkState(canCreateMoreFishers());
-        Fisher newborn = fisherFactory.apply(this);
+        Fisher newborn = fisherFactory.buildFisher(this);
+        getFishers().add(newborn);
+        getSocialNetwork().addFisher(newborn,this);
+        registerStartable(newborn);
         return newborn;
     }
 

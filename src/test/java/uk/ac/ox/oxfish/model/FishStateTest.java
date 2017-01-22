@@ -16,7 +16,7 @@ import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.HashSet;
+import java.util.LinkedList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,7 @@ public class FishStateTest {
         //steps every 365 steps starting from 365
         Steppable steppable = mock(Steppable.class);
 
-        FishState state = new FishState(1l);
+        FishState state = new FishState(1L);
         Scenario scenario = mock(Scenario.class);
         ScenarioEssentials result = mock(ScenarioEssentials.class);
         when(result.getBiology()).thenReturn(mock(GlobalBiology.class));
@@ -40,7 +40,7 @@ public class FishStateTest {
         when(mock.getNetwork()).thenReturn(mock(SocialNetwork.class));
         when(scenario.populateModel(state)).thenReturn(mock);
         NauticalMap map = mock(NauticalMap.class); when(result.getMap()).thenReturn(map);
-        when(map.getPorts()).thenReturn(new HashSet<>());
+        when(map.getPorts()).thenReturn(new LinkedList<>());
 
         state.setScenario(scenario);
         state.start();

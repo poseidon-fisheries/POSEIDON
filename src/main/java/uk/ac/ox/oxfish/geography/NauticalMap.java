@@ -28,7 +28,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -67,7 +70,7 @@ public class NauticalMap implements Startable
     /**
      * The list of ports
      */
-    private HashSet<Port> ports;
+    private LinkedList<Port> ports;
 
     /**
      * the grid containing the location of all the ports
@@ -112,7 +115,7 @@ public class NauticalMap implements Startable
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
         recomputeTilesMPA();
 
-        ports = new HashSet<>();
+        ports = new LinkedList<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
         dailyTrawlsMap = new IntGrid2D(getWidth(),getHeight());
@@ -382,6 +385,7 @@ public class NauticalMap implements Startable
      */
     public void addPort(Port port)
     {
+
         //check location
         SeaTile portSite = port.getLocation();
         Preconditions.checkArgument(portSite.getAltitude() >= 0, "port is not on land");
@@ -399,8 +403,8 @@ public class NauticalMap implements Startable
         Preconditions.checkArgument(isCoastal,"port has no neighboring sea tiles");
 
         //put it in the masterlist
-        boolean wasNotIn = ports.add(port);
-        Preconditions.checkArgument(wasNotIn, "This port was already registered!");
+        Preconditions.checkArgument(!ports.contains(port), "This port was already registered!");
+        ports.add(port);
 
         portMap.setObjectLocation(port,portSite.getGridX(),portSite.getGridY());
 
@@ -414,7 +418,7 @@ public class NauticalMap implements Startable
         return portMap;
     }
 
-    public HashSet<Port> getPorts() {
+    public LinkedList<Port> getPorts() {
         return ports;
     }
 

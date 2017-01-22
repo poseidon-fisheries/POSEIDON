@@ -6,9 +6,11 @@ import com.google.common.collect.ImmutableList;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Fishing;
+import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -17,6 +19,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
+import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -37,6 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -924,6 +928,80 @@ public class FishStateUtilities {
 
         return buffer.toString();
 
+    }
+
+    /**
+     * function that produces a predictor setup. Basically if the "usePredictor" flag is true this function
+     * will return a consumer that, when called, will add catch predictors to the fisher; the predictors are necessary
+     * to build ITQ reservation prices
+     * @param usePredictors if false it returns an empty consumer
+     * @param biology link to the model being initialize
+     * @return consumer we can use to setup agents
+     */
+    public static final Consumer<Fisher> predictorSetup(boolean usePredictors,
+                                                        GlobalBiology biology){
+
+        if(!usePredictors)
+            return new Consumer<Fisher>() {
+                @Override
+                public void accept(Fisher fisher) {
+
+                }
+            };
+        else
+            return new Consumer<Fisher>() {
+                @Override
+                public void accept(Fisher fisher) {
+
+                    for(Species species : biology.getSpecies())
+                    {
+
+                        //create the predictors
+
+                        fisher.setDailyCatchesPredictor(species.getIndex(),
+                                                        MovingAveragePredictor.dailyMAPredictor(
+                                                                "Predicted Daily Catches of " + species,
+                                                                fisher1 ->
+                                                                        //check the daily counter but do not input new values
+                                                                        //if you were not allowed at sea
+                                                                        fisher1.getDailyCounter().getLandingsPerSpecie(
+                                                                                species.getIndex())
+
+                                                                ,
+                                                                365));
+
+
+
+
+                        fisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
+                                "Predicted Unit Profit " + species,
+                                fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
+                                30));
+
+
+
+                    }
+
+
+                    //daily profits predictor
+                    fisher.assignDailyProfitsPredictor(
+                            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                    fisher1 ->
+                                                                            //check the daily counter but do not input new values
+                                                                            //if you were not allowed at sea
+                                                                            fisher1.isAllowedAtSea() ?
+                                                                                    fisher1.getDailyCounter().
+                                                                                            getColumn(
+                                                                                                    YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                                                    :
+                                                                                    Double.NaN
+                                    ,
+
+                                                                    7));
+
+                }
+
+            };
     }
 }
 

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.utility;
 
-import com.google.common.collect.Sets;
+import com.beust.jcommander.internal.Lists;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.junit.Test;
@@ -92,7 +92,7 @@ public class FishStateUtilitiesTest {
 
         FishState model = mock(FishState.class);
         when(model.getFishers()).thenReturn(fishers);
-        when(model.getPorts()).thenReturn(Sets.newHashSet(port1,port2));
+        when(model.getPorts()).thenReturn(Lists.newArrayList(port1, port2));
         when(model.getYear()).thenReturn(2);
 
         String table = FishStateUtilities.printTablePerPort(model, "lame");

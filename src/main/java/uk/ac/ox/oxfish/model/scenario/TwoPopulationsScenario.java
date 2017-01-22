@@ -15,7 +15,6 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -45,12 +44,14 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -186,6 +187,11 @@ public class TwoPopulationsScenario implements Scenario{
     }
 
     /**
+     * If flag set to true, small boats will come from port 1, large boats from port 2.
+     * Careful, if you set this to true and there is only one port you'll get an exception
+     */
+    private boolean separatePorts = false;
+    /**
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
      * in the biology/fishery
      */
@@ -289,190 +295,15 @@ public class TwoPopulationsScenario implements Scenario{
         for(Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.apply(random));
 
-        for(int i=0;i<smallFishers;i++)
-        {
-            Port port = ports[random.nextInt(ports.length)];
-            DepartingStrategy departing = departingStrategySmall.apply(model);
-            final double speed = smallSpeed.apply(random);
-            final double capacity = smallHoldSize.apply(random);
-            final double engineWeight = this.enginePower.apply(random);
-            final double literPerKilometer = this.smallLitersPerKilometer.apply(random);
-            final double  fuelCapacity = this.smallFuelTankSize.apply(random);
 
-            Gear fisherGear = gearSmall.apply(model);
-
-            Fisher newFisher = new Fisher(i, port,
-                                          random,
-                                          regulationSmall.apply(model),
-                                          departing,
-                                          destinationStrategySmall.apply(model),
-                                          fishingStrategy.apply(model),
-                                          gearStrategy.apply(model),
-                                          weatherStrategy.apply(model),
-                                          new Boat(10, 10,
-                                                   new Engine(engineWeight,
-                                                              literPerKilometer,
-                                                              speed),
-                                                   new FuelTank(fuelCapacity)),
-                                          new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
-
-            newFisher.getTags().add("small");
-            newFisher.getTags().add("red");
-            //if needed, install better airs
-            if(usePredictors)
-            {
+        //adds predictors to the fisher if the usepredictors flag is up.
+        //without predictors agents do not participate in ITQs
+        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
 
-                for(Species species : model.getSpecies())
-                {
-
-                    //create the predictors
-
-                    newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                       MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + species,
-                                                               fisher1 ->
-                                                                       //check the daily counter but do not input new values
-                                                                       //if you were not allowed at sea
-                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                               species.getIndex())
-
-                                                               ,
-                                                               365));
-
-
-
-
-                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30));
-
-
-
-                }
-
-
-                //daily profits predictor
-                newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                fisher ->
-                                                                        //check the daily counter but do not input new values
-                                                                        //if you were not allowed at sea
-                                                                        fisher.isAllowedAtSea() ?
-                                                                                fisher.getDailyCounter().
-                                                                                        getColumn(
-                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                                                :
-                                                                                Double.NaN
-                                ,
-
-                                                                7));
-
-            }
-
-
-
-
-            fisherList.add(newFisher);
-        }
-
-        //horrible code repetition:
-        for(int i=smallFishers;i<smallFishers+largeFishers;i++)
-        {
-            Port port = ports[random.nextInt(ports.length)];
-            DepartingStrategy departing = departingStrategyLarge.apply(model);
-            final double speed = largeSpeed.apply(random);
-            final double capacity = largeHoldSize.apply(random);
-            final double engineWeight = this.enginePower.apply(random);
-            final double literPerKilometer = this.largeLitersPerKilometer.apply(random);
-            final double  fuelCapacity = this.largeFuelTankSize.apply(random);
-
-            Gear fisherGear = gearLarge.apply(model);
-
-            Fisher newFisher = new Fisher(i, port,
-                                          random,
-                                          separateRegulations ? regulationLarge.apply(model) : regulationSmall.apply(model),
-                                          departing,
-                                          destinationStrategyLarge.apply(model),
-                                          fishingStrategy.apply(model),
-                                          gearStrategy.apply(model),
-                                          weatherStrategy.apply(model),
-                                          new Boat(10, 10,
-                                                   new Engine(engineWeight,
-                                                              literPerKilometer,
-                                                              speed),
-                                                   new FuelTank(fuelCapacity)),
-                                          new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
-
-            newFisher.getTags().add("large");
-            newFisher.getTags().add("ship");
-            newFisher.getTags().add("blue");
-
-            //if needed, install better airs
-            if(usePredictors)
-            {
-
-
-                for(Species species : model.getSpecies())
-                {
-
-                    //create the predictors
-
-                    newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                       MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + species,
-                                                               fisher1 ->
-                                                                       //check the daily counter but do not input new values
-                                                                       //if you were not allowed at sea
-                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                               species.getIndex())
-
-                                                               ,
-                                                               365));
-
-
-
-
-                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30));
-
-
-
-                }
-
-
-                //daily profits predictor
-                newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                fisher ->
-                                                                        //check the daily counter but do not input new values
-                                                                        //if you were not allowed at sea
-                                                                        fisher.isAllowedAtSea() ?
-                                                                                fisher.getDailyCounter().
-                                                                                        getColumn(
-                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                                                :
-                                                                                Double.NaN
-                                ,
-
-                                                                7));
-
-            }
-
-
-
-
-            fisherList.add(newFisher);
-        }
-
-
-        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
-        //while the model is running
-        FisherFactory fisherFactory = new FisherFactory(
-                (Supplier<Port>) () -> ports[0],
+        //create the fisher factory object, this is for the small fishers
+        FisherFactory smallFisherFactory = new FisherFactory(
+                separatePorts ? () -> ports[0] :() -> ports[random.nextInt(ports.length)],
                 regulationSmall,
                 departingStrategySmall,
                 destinationStrategySmall,
@@ -485,10 +316,70 @@ public class TwoPopulationsScenario implements Scenario{
                                                 new FuelTank(smallFuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(smallHoldSize.apply(random), biology.getSize()),
                 gearSmall,
-                smallFishers+largeFishers
+                0
 
         );
 
+        //create a factory for the large boats too
+        FisherFactory largeFishersFactory = new FisherFactory(
+                separatePorts ? () -> ports[1] :() -> ports[random.nextInt(ports.length)],
+                regulationLarge,
+                departingStrategyLarge,
+                destinationStrategyLarge,
+                fishingStrategy,
+                gearStrategy,
+                weatherStrategy,
+                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
+                                                                   largeLitersPerKilometer.apply(random),
+                                                                   largeSpeed.apply(random)),
+                                                new FuelTank(largeFuelTankSize.apply(random))),
+                (Supplier<Hold>) () -> new Hold(largeHoldSize.apply(random), biology.getSize()),
+                gearLarge,
+                0
+
+        );
+
+
+        //add predictors
+        smallFisherFactory.getAdditionalSetups().add(predictorSetup);
+        largeFishersFactory.getAdditionalSetups().add(predictorSetup);
+        //add tags
+        smallFisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                fisher.getTags().add("small");
+                fisher.getTags().add("black");
+            }
+        });
+        largeFishersFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                fisher.getTags().add("large");
+                fisher.getTags().add("ship");
+                fisher.getTags().add("orange");
+            }
+        });
+
+
+
+
+        //add the small fishers
+        for(int i=0;i<smallFishers;i++)
+        {
+            Fisher newFisher = smallFisherFactory.buildFisher(model);
+            fisherList.add(newFisher);
+        }
+
+        //set the id so that all fishers have a different id
+        largeFishersFactory.setNextID(smallFisherFactory.getNextID());
+        for(int i=0;i<largeFishers;i++)
+        {
+            Fisher newFisher = largeFishersFactory.buildFisher(model);
+            fisherList.add(newFisher);
+        }
+
+
+        //don't let large boats befriend small boats
         networkBuilder.addPredicate(new NetworkPredicate() {
             @Override
             public boolean test(Fisher from, Fisher to) {
@@ -496,24 +387,31 @@ public class TwoPopulationsScenario implements Scenario{
                         (from.getTags().contains("large") && to.getTags().contains("large"));
             }
         });
+        //no friends from separate ports
+        networkBuilder.addPredicate(new NetworkPredicate() {
+            @Override
+            public boolean test(Fisher from, Fisher to) {
+                return from.getHomePort().equals(to.getHomePort());
+            }
+        });
 
 
-        model.getYearlyDataSet().registerGatherer("Poor Fishers Total Income",
+        model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
                                                   fishState -> fishState.getFishers().stream().
                                                           filter(fisher -> fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
                                                                   YearlyFisherTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
 
-        model.getYearlyDataSet().registerGatherer("Rich Fishers Total Income",
+        model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
                                                   fishState -> fishState.getFishers().stream().
                                                           filter(fisher -> !fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
                                                                   YearlyFisherTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
 
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), fisherFactory );
+            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), largeFishersFactory );
         else {
-            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), largeFishersFactory);
         }
     }
 
@@ -854,5 +752,23 @@ public class TwoPopulationsScenario implements Scenario{
     public void setPorts(
             AlgorithmFactory<? extends PortInitializer> ports) {
         this.ports = ports;
+    }
+
+    /**
+     * Getter for property 'separatePorts'.
+     *
+     * @return Value for property 'separatePorts'.
+     */
+    public boolean isSeparatePorts() {
+        return separatePorts;
+    }
+
+    /**
+     * Setter for property 'separatePorts'.
+     *
+     * @param separatePorts Value to set for property 'separatePorts'.
+     */
+    public void setSeparatePorts(boolean separatePorts) {
+        this.separatePorts = separatePorts;
     }
 }

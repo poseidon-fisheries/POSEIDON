@@ -14,13 +14,15 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import java.util.LinkedList;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * An object produced by the scenario that allows the model to produce more fishers
  * Created by carrknight on 12/11/15.
  */
-public class FisherFactory implements AlgorithmFactory<Fisher>
+public class FisherFactory
 {
 
     private int nextID;
@@ -44,6 +46,12 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
     private Supplier<Hold> holdSupplier;
 
     private AlgorithmFactory<? extends Gear> gear;
+
+    /**
+     * this consumers will be called after the fisher is created but before it is returned.
+     * It can be used to add additional characteristics (tags/predictors/etc.) to the boat.
+     */
+    private final LinkedList<Consumer<Fisher>> additionalSetups = new LinkedList<>();
 
 
     private FisherFactory() {
@@ -72,15 +80,17 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
         this.nextID = nextID;
     }
 
+
+
     /**
-     * Creates the fisher, add it to the social network and registers it as a startable
-     *
-     * @param fishState the function argument
-     * @return the function result
+     * creates a fisher and returns it. Doesn't schedule it or add it to the rest of the model so use this
+     * method while the model is still or if the model is running remember to add the fisher to the fisher list
+     * and register it as a startable (also add it to the social network if needed)
+     * @param fishState model
+     * @return
      */
-    @Override
-    public Fisher apply(FishState fishState) {
-        Fisher fisher = new Fisher(nextID++,portSupplier.get(),
+    public Fisher buildFisher(FishState fishState) {
+        Fisher fisher = new Fisher(nextID++, portSupplier.get(),
                                    fishState.getRandom(),
                                    regulations.apply(fishState),
                                    departingStrategy.apply(fishState),
@@ -92,13 +102,11 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
                                    holdSupplier.get(),
                                    gear.apply(fishState),
                                    fishState.getSpecies().size());
-        nextID++;
-        fishState.getFishers().add(fisher);
-        fishState.getSocialNetwork().addFisher(fisher,fishState);
-        fishState.registerStartable(fisher);
+        for(Consumer<Fisher> setup : additionalSetups)
+            setup.accept(fisher);
         return fisher;
-    }
 
+    }
 
     /**
      * Getter for property 'regulations'.
@@ -266,5 +274,51 @@ public class FisherFactory implements AlgorithmFactory<Fisher>
     public void setGearStrategy(
             AlgorithmFactory<? extends GearStrategy> gearStrategy) {
         this.gearStrategy = gearStrategy;
+    }
+
+
+    /**
+     * Getter for property 'portSupplier'.
+     *
+     * @return Value for property 'portSupplier'.
+     */
+    public Supplier<Port> getPortSupplier() {
+        return portSupplier;
+    }
+
+    /**
+     * Setter for property 'portSupplier'.
+     *
+     * @param portSupplier Value to set for property 'portSupplier'.
+     */
+    public void setPortSupplier(Supplier<Port> portSupplier) {
+        this.portSupplier = portSupplier;
+    }
+
+    /**
+     * Getter for property 'additionalSetups'.
+     *
+     * @return Value for property 'additionalSetups'.
+     */
+    public LinkedList<Consumer<Fisher>> getAdditionalSetups() {
+        return additionalSetups;
+    }
+
+    /**
+     * Getter for property 'nextID'.
+     *
+     * @return Value for property 'nextID'.
+     */
+    public int getNextID() {
+        return nextID;
+    }
+
+    /**
+     * Setter for property 'nextID'.
+     *
+     * @param nextID Value to set for property 'nextID'.
+     */
+    public void setNextID(int nextID) {
+        this.nextID = nextID;
     }
 }

@@ -1,6 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.policymakers;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -39,7 +39,7 @@ public class SingleSpeciesBiomassTaxmanTest {
                                                                            true);
 
         FishState model = mock(FishState.class);
-        when(model.getPorts()).thenReturn(Sets.newHashSet(port1,port2));
+        when(model.getPorts()).thenReturn(Lists.newArrayList(port1, port2));
         //there is biomass of 101, no tax should be imposed
         when(model.getTotalBiomass(species)).thenReturn(101d);
         taxman.step(model);

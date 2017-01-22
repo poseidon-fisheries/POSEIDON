@@ -18,7 +18,6 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFact
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -40,7 +39,6 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.RandomPortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -52,6 +50,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -61,6 +60,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -205,7 +205,6 @@ public class PrototypeScenario implements Scenario {
     }
 
 
-
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -303,120 +302,14 @@ public class PrototypeScenario implements Scenario {
         for(Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.apply(random));
 
-        for(int i=0;i<fishers;i++)
-        {
-            Port port = ports[random.nextInt(ports.length)];
-            DepartingStrategy departing = departingStrategy.apply(model);
-            final double speed = speedInKmh.apply(random);
-            final double capacity = holdSize.apply(random);
-            final double engineWeight = this.enginePower.apply(random);
-            final double literPerKilometer = this.literPerKilometer.apply(random);
-            final double  fuelCapacity = this.fuelTankSize.apply(random);
-
-            Gear fisherGear = gear.apply(model);
-
-            Fisher newFisher = new Fisher(i, port,
-                                          random,
-                                          regulation.apply(model),
-                                          departing,
-                                          destinationStrategy.apply(model),
-                                          fishingStrategy.apply(model),
-                                          gearStrategy.apply(model),
-                                          weatherStrategy.apply(model),
-                                          new Boat(10, 10,
-                                                   new Engine(engineWeight,
-                                                               literPerKilometer,
-                                                              speed),
-                                                   new FuelTank(fuelCapacity)),
-                                          new Hold(capacity, biology.getSize()), fisherGear, model.getSpecies().size());
-
-
-            newFisher.setCheater(cheaters);
-            //todo move this somewhere else
-            newFisher.addFeatureExtractor(
-                    SNALSARutilities.PROFIT_FEATURE,
-                    new RememberedProfitsExtractor(true)
-            );
-            newFisher.addFeatureExtractor(
-                    FeatureExtractor.AVERAGE_PROFIT_FEATURE,
-                    new FeatureExtractor<SeaTile>() {
-                        @Override
-                        public HashMap<SeaTile, Double> extractFeature(
-                                Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
-                            double averageProfits = model.getLatestDailyObservation(
-                                    FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
-                            return new FixedMap<>(averageProfits,
-                                                  toRepresent) ;
-                        }
-                    }
-            );
-
-
-            //if needed, install better airs
-            if(usePredictors)
-            {
-
-
-                for(Species species : model.getSpecies())
-                {
-
-                    //create the predictors
-
-                    newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                       MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + species,
-                                                               fisher1 ->
-                                                                       //check the daily counter but do not input new values
-                                                                       //if you were not allowed at sea
-                                                                               fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                                       species.getIndex())
-
-                                                               ,
-                                                               365));
-
-
-
-
-                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30));
-
-
-
-                }
-
-
-                //daily profits predictor
-                newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                fisher ->
-                                                                        //check the daily counter but do not input new values
-                                                                        //if you were not allowed at sea
-                                                                        fisher.isAllowedAtSea() ?
-                                                                                fisher.getDailyCounter().
-                                                                                        getColumn(
-                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                                                :
-                                                                                Double.NaN
-                                ,
-
-                                                                7));
-
-            }
-
-
-
-
-            fisherList.add(newFisher);
-        }
-
-
+        //adds predictors to the fisher if the usepredictors flag is up.
+        //without predictors agents do not participate in ITQs
+        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
         FisherFactory fisherFactory = new FisherFactory(
-                (Supplier<Port>) () -> ports[0],
+                () -> ports[random.nextInt(ports.length)],
                 regulation,
                 departingStrategy,
                 destinationStrategy,
@@ -429,9 +322,50 @@ public class PrototypeScenario implements Scenario {
                                                 new FuelTank(fuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(holdSize.apply(random), biology.getSize()),
                 gear,
-                fishers
+                0
 
         );
+        //add predictor setup to the factory
+        fisherFactory.getAdditionalSetups().add(predictorSetup);
+        //add snalsar info which should be moved elsewhere at some point
+        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                fisher.setCheater(cheaters);
+                //todo move this somewhere else
+                fisher.addFeatureExtractor(
+                        SNALSARutilities.PROFIT_FEATURE,
+                        new RememberedProfitsExtractor(true)
+                );
+                fisher.addFeatureExtractor(
+                        FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                        new FeatureExtractor<SeaTile>() {
+                            @Override
+                            public HashMap<SeaTile, Double> extractFeature(
+                                    Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+                                double averageProfits = model.getLatestDailyObservation(
+                                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
+                                return new FixedMap<>(averageProfits,
+                                                      toRepresent) ;
+                            }
+                        }
+                );
+            }
+        });
+
+
+        //call the factory to keep creating fishers
+        for(int i=0;i<fishers;i++)
+        {
+            Fisher newFisher = fisherFactory.buildFisher(model);
+            fisherList.add(newFisher);
+        }
+
+        assert fisherList.size()==fishers;
+        assert fisherFactory.getNextID()==fishers;
+
+
+
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
         else {
