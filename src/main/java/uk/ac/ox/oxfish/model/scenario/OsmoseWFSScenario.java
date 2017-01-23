@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -18,11 +19,11 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.fisher.log.LogisticLogs;
+import uk.ac.ox.oxfish.fisher.log.PseudoLogisticLogger;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -259,25 +260,11 @@ public class OsmoseWFSScenario implements Scenario{
 
 
         GlobalBiology biology = model.getBiology();
-        NauticalMap map = model.getMap();
         MersenneTwisterFast random = model.getRandom();
 
         LogisticLogs logger = new LogisticLogs();
 
-        DiscretizationHistogrammer histogrammer = null;
 
-        if(collectLogitData) {
-
-            MapDiscretization originalDiscretization = createDiscretization
-                    (model, FishStateUtilities.getAbsolutePath
-                            (Paths.get("temp_wfs", "areas.txt").toString()));
-
-            histogrammer = new DiscretizationHistogrammer(
-                    originalDiscretization,false);
-            model.getOutputPlugins().add(histogrammer);
-            model.getOutputPlugins().add(logger);
-
-        }
         //longliners
         for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
 
@@ -316,18 +303,36 @@ public class OsmoseWFSScenario implements Scenario{
 
 
                 if(collectLogitData) {
+                    MapDiscretization originalDiscretization = createDiscretization
+                            (model, FishStateUtilities.getAbsolutePath
+                                    (Paths.get("temp_wfs", "areas.txt").toString()));
+
+                    DiscretizationHistogrammer histogrammer = new DiscretizationHistogrammer(
+                            originalDiscretization,false);
+
+                    //make sure the non-gui version of the model outputs this to file
+                    model.getOutputPlugins().add(histogrammer);
+                    model.getOutputPlugins().add(logger);
+
                     newFisher.addTripListener(histogrammer);
 
                     LogisticLog log = new LogisticLog(
                             new String[]{
                                     "intercept", "distance", "habit", "fuel_price", "wind_speed"},newFisher.getID());
 
-                    //todo delete this
-                    if(newFisher.getDestinationStrategy() instanceof LogitDestinationStrategy) {
-                        ((LogitDestinationStrategy) newFisher.getDestinationStrategy()).setLog(
-                                log);
-                        logger.add(log);
-                    }
+                    PseudoLogisticLogger pseudoLogger = new PseudoLogisticLogger(
+                            originalDiscretization,
+                            FloridaLogitDestinationFactory.longlineFloridaCommonExtractor(originalDiscretization),
+                            log,
+                            newFisher,
+                            model,
+                            Sets.newHashSet(7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                                            21,22,23,24,25,26,27,28,29,30,31,32,35,
+                                            36,40,45,47),
+                            model.getRandom()
+                    );
+                    newFisher.addTripListener(pseudoLogger);
+                    logger.add(log);
                 }
 
 

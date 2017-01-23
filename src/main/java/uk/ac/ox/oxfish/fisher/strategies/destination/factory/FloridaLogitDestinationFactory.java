@@ -87,28 +87,7 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
         }
         ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
         ObservationExtractor[] commonExtractor =
-                new ObservationExtractor[]{
-                        //intercept
-                        (tile, timeOfObservation, agent, model) -> 1d,
-                        //distance
-                        (tile, timeOfObservation, agent, model) -> {
-                            return model.getMap().distance(
-                                    agent.getHomePort().getLocation(), tile);
-                        },
-                        //habit
-                        (tile, timeOfObservation, agent, model) -> {
-                            //it it has been less than 90 days since you went there, you get the habit bonus!
-                            return  model.getDay() -
-                                    agent.getDiscretizedLocationMemory()
-                                            .getLastDayVisited()[discretization.getGroup(tile)] < 90 ?
-                                    1 : 0;
-                        },
-                        //fuel_price TODO: adjust from gallon
-                        (tile, timeOfObservation, agent, model) ->
-                                agent.getHomePort().getGasPricePerLiter(),
-                        //wind_speed TODO: adjust from mph
-                        (tile, timeOfObservation, agent, model) -> tile.getWindSpeedInKph()
-                };
+                    longlineFloridaCommonExtractor(discretization);
         for (int i = 0; i < extractors.length; i++)
             extractors[i] = commonExtractor;
 
@@ -116,6 +95,32 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
                                             new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
                                             state.getRandom());
 
+    }
+
+    public static ObservationExtractor[] longlineFloridaCommonExtractor(
+            MapDiscretization discretization) {
+        return new ObservationExtractor[]{
+                //intercept
+                (tile, timeOfObservation, agent, model) -> 1d,
+                //distance
+                (tile, timeOfObservation, agent, model) -> {
+                    return model.getMap().distance(
+                            agent.getHomePort().getLocation(), tile);
+                },
+                //habit
+                (tile, timeOfObservation, agent, model) -> {
+                    //it it has been less than 90 days since you went there, you get the habit bonus!
+                    return  model.getDay() -
+                            agent.getDiscretizedLocationMemory()
+                                    .getLastDayVisited()[discretization.getGroup(tile)] < 90 ?
+                            1 : 0;
+                },
+                //fuel_price TODO: adjust from gallon
+                (tile, timeOfObservation, agent, model) ->
+                        agent.getHomePort().getGasPricePerLiter(),
+                //wind_speed TODO: adjust from mph
+                (tile, timeOfObservation, agent, model) -> tile.getWindSpeedInKph()
+        };
     }
 
     public String getCoefficientsFile() {

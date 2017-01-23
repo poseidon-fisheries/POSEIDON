@@ -13,7 +13,7 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
 
     @Override
     public String getFileName() {
-        return "logistic_wide.csv";
+        return "logistic_long.csv";
     }
 
     /**

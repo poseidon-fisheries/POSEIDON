@@ -29,6 +29,15 @@ public class LogisticLog {
         this.columnNames = columns.toString();
     }
 
+    /**
+     * this signal whether or not the log has recorded an input and needs to learn
+     * about what was eventually chosen about it
+     * @return
+     */
+    public boolean waitingForChoice(){
+        return lastInput != null;
+    }
+
     public void recordInput(double[][] x)
     {
         Preconditions.checkArgument(lastInput == null, "haven't closed last trip");
