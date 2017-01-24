@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import uk.ac.ox.oxfish.biology.initializer.TwoSpeciesBoxInitializer;
-import uk.ac.ox.oxfish.biology.initializer.WellMixedBiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -33,7 +32,7 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
                 ratioFirstToSecondSpecies,
                 steepness,
                 percentageLimitOnDailyMovement.apply(fishState.getRandom()),
-                differentialPercentageToMove.apply(fishState.getRandom()).intValue()
+                differentialPercentageToMove.apply(fishState.getRandom())
         );
     }
 
