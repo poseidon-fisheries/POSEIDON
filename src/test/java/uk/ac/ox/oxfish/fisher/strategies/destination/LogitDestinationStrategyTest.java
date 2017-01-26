@@ -7,12 +7,13 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.SquaresMapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**

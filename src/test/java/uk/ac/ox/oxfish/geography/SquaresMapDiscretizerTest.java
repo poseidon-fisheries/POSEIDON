@@ -3,10 +3,14 @@ package uk.ac.ox.oxfish.geography;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -23,7 +27,12 @@ public class SquaresMapDiscretizerTest {
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                               mock(GlobalBiology.class),
                                               mock(FishState.class));
-        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(2, 3));
+
+        SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
+        factory.setHorizontalSplits(new FixedDoubleParameter(3));
+        factory.setVerticalSplits(new FixedDoubleParameter(2));
+
+        MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
         assertEquals(discretization.getNumberOfGroups(),12);
 
@@ -36,6 +45,9 @@ public class SquaresMapDiscretizerTest {
     }
 
 
+
+
+
     @Test
     public void discretizeMaps2() throws Exception
     {
@@ -44,7 +56,10 @@ public class SquaresMapDiscretizerTest {
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                         mock(GlobalBiology.class),
                                         mock(FishState.class));
-        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(2, 2));
+        SquaresMapDiscretizerFactory factory = new SquaresMapDiscretizerFactory();
+        factory.setHorizontalSplits(new FixedDoubleParameter(2));
+        factory.setVerticalSplits(new FixedDoubleParameter(2));
+        MapDiscretization discretization = new MapDiscretization(factory.apply(mock(FishState.class)));
         discretization.discretize(chart);
         assertEquals(discretization.getNumberOfGroups(),9);
 

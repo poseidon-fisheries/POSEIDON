@@ -1,14 +1,13 @@
 package uk.ac.ox.oxfish.fisher.log;
 
-import com.google.common.collect.Sets;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.SquaresMapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
@@ -42,8 +41,6 @@ public class PseudoLogisticLoggerTest {
                                                                log,
                                                                mock(Fisher.class),
                                                                state,
-                                                               //only allow choice over the first 6 tiles
-                                                               Sets.newHashSet(0,1,2,3,4,5,6),
                                                                new MersenneTwisterFast());
 
         TripRecord record = mock(TripRecord.class);
@@ -62,9 +59,9 @@ public class PseudoLogisticLoggerTest {
 
         System.out.print(log.getData().toString());
         String[] csv = log.getData().toString().trim().split("\n");
-        assertEquals(csv.length, 7); //it comes in long format
+        assertEquals(csv.length, 16); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
-        for(int row=0; row<7; row++) {
+        for(int row=0; row<16; row++) {
             if (row == 4)
                 assertTrue(csv[row].contains("yes"));
             else
@@ -86,10 +83,10 @@ public class PseudoLogisticLoggerTest {
         System.out.println("***************************************");
         System.out.print(log.getData().toString());
         csv = log.getData().toString().trim().split("\n");
-        assertEquals(csv.length, 14); //it comes in long format
+        assertEquals(csv.length, 32); //it comes in long format
         //0,1 is actually group 4 (square goes vertical first)
-        for(int row=7; row<14; row++) {
-            if (row == 7)
+        for(int row=16; row<32; row++) {
+            if (row == 16)
                 assertTrue(csv[row].contains("yes"));
             else
                 assertFalse(csv[row].contains("yes"));
@@ -97,6 +94,6 @@ public class PseudoLogisticLoggerTest {
         }
         //check that rows are correct
         //id,trip#,arm,chosen,x,y,time
-        assertTrue("0,1,0,yes,0.0,0.0,100.0".equals(csv[7]));
+        assertTrue("0,1,0,yes,0.0,0.0,100.0".equals(csv[16]));
     }
 }

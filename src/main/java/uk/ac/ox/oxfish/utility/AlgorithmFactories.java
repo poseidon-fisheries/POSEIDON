@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.GearStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.WeatherStrategies;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretizers;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializers;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -114,6 +116,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(PortInitializer.class, PortInitializers.CONSTRUCTORS);
         NAMES_MAP.put(PortInitializer.class, PortInitializers.NAMES);
+
+        CONSTRUCTOR_MAP.put(MapDiscretizer.class, MapDiscretizers.CONSTRUCTORS);
+        NAMES_MAP.put(MapDiscretizer.class, MapDiscretizers.NAMES);
 
 
 

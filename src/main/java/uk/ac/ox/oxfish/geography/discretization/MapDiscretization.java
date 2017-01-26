@@ -1,8 +1,13 @@
-package uk.ac.ox.oxfish.geography;
+package uk.ac.ox.oxfish.geography.discretization;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

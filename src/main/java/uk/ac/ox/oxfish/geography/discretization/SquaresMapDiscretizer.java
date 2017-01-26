@@ -1,4 +1,7 @@
-package uk.ac.ox.oxfish.geography;
+package uk.ac.ox.oxfish.geography.discretization;
+
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.ArrayList;
 import java.util.List;

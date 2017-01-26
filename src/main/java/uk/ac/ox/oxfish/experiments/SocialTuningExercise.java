@@ -1,13 +1,12 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
-import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
@@ -119,8 +118,10 @@ public class SocialTuningExercise {
         EpsilonGreedyBanditFactory greedy = new EpsilonGreedyBanditFactory();
         epsilonGreedy.setBandit(greedy);
         epsilonGreedy.setAverage(ema);
-        epsilonGreedy.setHorizontalTicks(49);
-        epsilonGreedy.setVerticalTicks(49);
+        SquaresMapDiscretizerFactory discretizer = new SquaresMapDiscretizerFactory();
+        epsilonGreedy.setDiscretizer(discretizer);
+        discretizer.setHorizontalSplits(new FixedDoubleParameter(49));
+        discretizer.setVerticalSplits(new FixedDoubleParameter(49));
 
 
         FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve("sweep.csv").toFile());
@@ -196,8 +197,10 @@ public class SocialTuningExercise {
         BanditDestinationFactory ucb1Bad = new BanditDestinationFactory();
         ucb1Bad.setAverage(ema);
         ucb1Bad.setBandit(bandit);
-        ucb1Bad.setHorizontalTicks(49);
-        ucb1Bad.setVerticalTicks(49);
+        SquaresMapDiscretizerFactory discretizer = new SquaresMapDiscretizerFactory();
+        ucb1Bad.setDiscretizer(discretizer);
+        discretizer.setHorizontalSplits(new FixedDoubleParameter(49));
+        discretizer.setVerticalSplits(new FixedDoubleParameter(49));
         strategies.put("bandit=ucb1", ucb1);
         strategies.put("bandit=ucb1-bad", ucb1Bad);
 
@@ -214,8 +217,10 @@ public class SocialTuningExercise {
         BanditDestinationFactory epsilonBad = new BanditDestinationFactory();
         epsilonBad.setBandit(greedy);
         epsilonBad.setAverage(ema);
-        epsilonBad.setHorizontalTicks(49);
-        epsilonBad.setVerticalTicks(49);
+        discretizer = new SquaresMapDiscretizerFactory();
+        epsilonBad.setDiscretizer(discretizer);
+        discretizer.setHorizontalSplits(new FixedDoubleParameter(49));
+        discretizer.setVerticalSplits(new FixedDoubleParameter(49));
         strategies.put("bandit=epsilon", epsilonGreedy);
         strategies.put("bandit=epsilon-bad", epsilonBad);
 
@@ -234,8 +239,10 @@ public class SocialTuningExercise {
         BanditDestinationFactory softmaxBad = new BanditDestinationFactory();
         softmaxBad.setAverage(ema);
         softmaxBad.setBandit(algorithm);
-        softmaxBad.setHorizontalTicks(49);
-        softmaxBad.setVerticalTicks(49);
+        discretizer = new SquaresMapDiscretizerFactory();
+        softmaxBad.setDiscretizer(discretizer);
+        discretizer.setHorizontalSplits(new FixedDoubleParameter(49));
+        discretizer.setVerticalSplits(new FixedDoubleParameter(49));
         strategies.put("bandit=softmax", softmax);
         strategies.put("bandit=softmax-bad", softmaxBad);
 

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.log;
 
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 
 import java.util.Arrays;
 

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -17,6 +16,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
+import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.fisher.log.LogisticLogs;
 import uk.ac.ox.oxfish.fisher.log.PseudoLogisticLogger;
@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -31,10 +32,10 @@ import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
-import uk.ac.ox.oxfish.geography.CentroidMapDiscretizer;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
@@ -272,7 +273,7 @@ public class OsmoseWFSScenario implements Scenario{
             {
                 final double speed = cruiseSpeedInKph.apply(random);
                 final double engineWeight = 1;
-                final double mileage = 1;
+                final double mileage = 0.7518591; //this is gallon per km and it comes from the california estimate of 1.21 gallons a mile
                 final double fuelCapacity = 100000000;
 
                 Gear fisherGear = longlinerGear.apply(model);
@@ -326,12 +327,13 @@ public class OsmoseWFSScenario implements Scenario{
                             log,
                             newFisher,
                             model,
-                            Sets.newHashSet(7,8,9,10,11,12,13,14,15,16,17,18,19,20,
-                                            21,22,23,24,25,26,27,28,29,30,31,32,35,
-                                            36,40,45,47),
                             model.getRandom()
                     );
                     newFisher.addTripListener(pseudoLogger);
+                    //we know the pseudo-logger depends on location memory so add it if your decision strategy doesn't include it
+                    if(!(newFisher.getDestinationStrategy() instanceof LogitDestinationStrategy))
+                        newFisher.setDiscretizedLocationMemory(new DiscretizedLocationMemory(originalDiscretization));
+
                     logger.add(log);
                 }
 

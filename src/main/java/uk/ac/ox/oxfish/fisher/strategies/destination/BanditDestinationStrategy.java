@@ -3,8 +3,8 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
@@ -12,10 +12,8 @@ import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * A purely bandit-algorithm using destination strategy

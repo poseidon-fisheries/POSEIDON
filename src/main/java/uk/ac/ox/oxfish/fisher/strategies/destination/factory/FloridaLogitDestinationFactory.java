@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;

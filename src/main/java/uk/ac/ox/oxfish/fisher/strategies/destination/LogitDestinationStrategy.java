@@ -9,14 +9,13 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticMultiClassifi
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

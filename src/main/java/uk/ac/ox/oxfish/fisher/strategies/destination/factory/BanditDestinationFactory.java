@@ -2,8 +2,9 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.geography.MapDiscretization;
-import uk.ac.ox.oxfish.geography.SquaresMapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
@@ -19,15 +20,16 @@ import uk.ac.ox.oxfish.utility.bandit.factory.EpsilonGreedyBanditFactory;
 public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinationStrategy>{
 
 
-    private int horizontalTicks = 2;
 
-    private int verticalTicks = 2;
-
-    private static Locker<FishState,MapDiscretization> discretizer = new Locker();
+    private static Locker<FishState,MapDiscretization> locker = new Locker();
 
     private AlgorithmFactory<? extends Averager> average = new ExponentialMovingAverageFactory();
 
     private AlgorithmFactory<? extends BanditSupplier> bandit = new EpsilonGreedyBanditFactory();
+
+
+    private AlgorithmFactory<? extends MapDiscretizer> discretizer = new SquaresMapDiscretizerFactory();
+
 
 
     /**
@@ -40,14 +42,12 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     public BanditDestinationStrategy apply(FishState state)
     {
 
-        MapDiscretization map =  discretizer.
+        MapDiscretization map =  locker.
                 presentKey(state,
                            () -> {
                                MapDiscretization discretization =
                                        new MapDiscretization(
-                                               new SquaresMapDiscretizer(
-                                                       verticalTicks,
-                                                       horizontalTicks));
+                                               discretizer.apply(state));
                                discretization.discretize(state.getMap());
                                return discretization;
                            }
@@ -66,41 +66,6 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     }
 
 
-    /**
-     * Getter for property 'horizontalTicks'.
-     *
-     * @return Value for property 'horizontalTicks'.
-     */
-    public int getHorizontalTicks() {
-        return horizontalTicks;
-    }
-
-    /**
-     * Setter for property 'horizontalTicks'.
-     *
-     * @param horizontalTicks Value to set for property 'horizontalTicks'.
-     */
-    public void setHorizontalTicks(int horizontalTicks) {
-        this.horizontalTicks = horizontalTicks;
-    }
-
-    /**
-     * Getter for property 'verticalTicks'.
-     *
-     * @return Value for property 'verticalTicks'.
-     */
-    public int getVerticalTicks() {
-        return verticalTicks;
-    }
-
-    /**
-     * Setter for property 'verticalTicks'.
-     *
-     * @param verticalTicks Value to set for property 'verticalTicks'.
-     */
-    public void setVerticalTicks(int verticalTicks) {
-        this.verticalTicks = verticalTicks;
-    }
 
     /**
      * Getter for property 'average'.
@@ -137,5 +102,24 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     public void setBandit(
             AlgorithmFactory<? extends BanditSupplier> bandit) {
         this.bandit = bandit;
+    }
+
+    /**
+     * Getter for property 'discretizer'.
+     *
+     * @return Value for property 'discretizer'.
+     */
+    public AlgorithmFactory<? extends MapDiscretizer> getDiscretizer() {
+        return discretizer;
+    }
+
+    /**
+     * Setter for property 'discretizer'.
+     *
+     * @param discretizer Value to set for property 'discretizer'.
+     */
+    public void setDiscretizer(
+            AlgorithmFactory<? extends MapDiscretizer> discretizer) {
+        this.discretizer = discretizer;
     }
 }
