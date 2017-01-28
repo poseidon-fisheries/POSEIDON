@@ -25,7 +25,7 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         TripRecord lastFinishedTrip = observed.getLastFinishedTrip();
         return lastFinishedTrip == null ? Double.NaN :
                 FishStateUtilities.round(
-                        extractUtilityFromTrip(lastFinishedTrip)
+                        extractUtilityFromTrip(lastFinishedTrip,observed )
                 );
     }
 
@@ -42,7 +42,7 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         List<TripRecord> finishedTrips = observed.getFinishedTrips();
         if(finishedTrips.size() >= 2)
             return FishStateUtilities.round(
-                    extractUtilityFromTrip(finishedTrips.get(finishedTrips.size() - 2))
+                    extractUtilityFromTrip(finishedTrips.get(finishedTrips.size() - 2),observed )
             );
         else
             return Double.NaN;
@@ -50,5 +50,5 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
     }
 
 
-    abstract protected double extractUtilityFromTrip(TripRecord tripRecord);
+    abstract protected double extractUtilityFromTrip(TripRecord tripRecord, Fisher fisher);
 }

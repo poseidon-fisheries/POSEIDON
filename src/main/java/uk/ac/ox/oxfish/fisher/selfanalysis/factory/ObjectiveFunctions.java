@@ -44,6 +44,22 @@ public class ObjectiveFunctions {
                   "Target Species Hourly Profit");
 
 
+        CONSTRUCTORS.put("Hourly Knife-Edge Objective",
+                         KnifeEdgePerTripFactory::new);
+        NAMES.put(KnifeEdgePerTripFactory.class,
+                  "Hourly Knife-Edge Objective");
+
+        CONSTRUCTORS.put("Hourly Cutoff Objective",
+                         CutoffPerTripObjectiveFactory::new);
+        NAMES.put(CutoffPerTripObjectiveFactory.class,
+                  "Hourly Cutoff Objective");
+
+        CONSTRUCTORS.put("Cash Flow Knife-Edge Objective",
+                         KnifeEdgeCashflowFactory::new);
+        NAMES.put(KnifeEdgeCashflowFactory.class,
+                  "Cash Flow Knife-Edge Objective");
+
+
     }
 
     private ObjectiveFunctions() {}

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 
 /**
@@ -26,7 +27,7 @@ public class HourlyProfitInTripObjective extends TripBasedObjectiveFunction
 
 
     @Override
-    protected double extractUtilityFromTrip(TripRecord tripRecord) {
+    protected double extractUtilityFromTrip(TripRecord tripRecord, Fisher fisher) {
         return tripRecord.getProfitPerHour(includingOpportunityCosts);
     }
 }

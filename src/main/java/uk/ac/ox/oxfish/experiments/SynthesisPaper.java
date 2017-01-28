@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.experiments;
 
 
-import org.jfree.util.Log;
+import com.esotericsoftware.minlog.Log;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.CutoffPerTripObjectiveFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,8 +17,10 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,9 +31,16 @@ public class SynthesisPaper {
 
 
     public static void main(String[] args) throws IOException {
+        Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
+        /*
         avoidTheLine(100,
                      Paths.get("inputs","paper_synthesis"),
                      Paths.get("runs","paper_synthesis"));
+                     */
+        thresholdSweeps(25,
+                        Paths.get("inputs","paper_synthesis"),
+                        Paths.get("runs","paper_synthesis")
+                        );
     }
 
     /**
@@ -163,5 +174,86 @@ public class SynthesisPaper {
 
 
         }
+    }
+
+
+    public static void thresholdSweeps(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
+
+        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("fronts.yaml")));
+
+        FileWriter writer = new FileWriter(outputFolder.resolve("demo2.csv").toFile());
+        writer.write("low_threshold,upper_threshold,run,final_biomass\n");
+        writer.flush();
+
+        //baseline
+        for(int run=0; run<runsPerScenario; run++) {
+            FishYAML reader = new FishYAML();
+            PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+            Log.info("\tStandard Fronts " + run);
+
+            FishState state = new FishState(run);
+            state.setScenario(scenario);
+            state.start();
+            while(state.getYear()<10)
+                state.schedule.step(state);
+            Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+            writer.write("none" + ","  + "none" + ","+ run + "," + lastBiomass +"\n");
+            writer.flush();
+
+        }
+
+        //go by upper thresholds
+        for(double upperThreshold = 1; upperThreshold<20; upperThreshold++)
+        {
+            for(int run=0; run<runsPerScenario; run++)
+            {
+                FishYAML reader = new FishYAML();
+                PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+                Log.info("\tHigh threshold " + upperThreshold + " --- "+ run);
+
+                FishState state = new FishState(run);
+                CutoffPerTripObjectiveFactory objectiveFunction = new CutoffPerTripObjectiveFactory();
+                ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setObjectiveFunction(
+                        objectiveFunction);
+                objectiveFunction.getHighThreshold().setActive(true);
+                objectiveFunction.getHighThreshold().setValue(new FixedDoubleParameter(upperThreshold));
+                state.setScenario(scenario);
+                state.start();
+                while(state.getYear()<10)
+                    state.schedule.step(state);
+                Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+                writer.write("none" + ","  + upperThreshold + ","+ run + "," + lastBiomass+"\n");
+                writer.flush();
+
+            }
+        }
+
+        //go by lower thresholds
+        for(double lowerThreshold = 1; lowerThreshold<20; lowerThreshold++)
+        {
+            for(int run=0; run<runsPerScenario; run++)
+            {
+                FishYAML reader = new FishYAML();
+                PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+                Log.info("\tLow threshold " + lowerThreshold + " --- "+ run);
+
+                FishState state = new FishState(run);
+                CutoffPerTripObjectiveFactory objectiveFunction = new CutoffPerTripObjectiveFactory();
+                ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setObjectiveFunction(
+                        objectiveFunction);
+                objectiveFunction.getLowThreshold().setActive(true);
+                objectiveFunction.getLowThreshold().setValue(new FixedDoubleParameter(lowerThreshold));
+                state.setScenario(scenario);
+                state.start();
+                while(state.getYear()<10)
+                    state.schedule.step(state);
+                Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+                writer.write(lowerThreshold + ","  + "none" + ","+ run + "," + lastBiomass+"\n");
+                writer.flush();
+
+            }
+        }
+        writer.close();
+
     }
 }

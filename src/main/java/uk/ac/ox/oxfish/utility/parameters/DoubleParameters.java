@@ -26,7 +26,10 @@ public class DoubleParameters
         parameters.put("Select", () -> new SelectDoubleParameter("0 1"));
         names.put(SelectDoubleParameter.class,"Select");
         parameters.put("Sin", () -> new SinusoidalDoubleParameter(1,0.01));
-        names.put(SelectDoubleParameter.class,"Select");
+        names.put(SelectDoubleParameter.class,"Sin");
+
+        parameters.put("Conditional", () -> new ConditionalDoubleParameter(false,new FixedDoubleParameter(0)));
+        names.put(ConditionalDoubleParameter.class,"Conditional");
 
 
 

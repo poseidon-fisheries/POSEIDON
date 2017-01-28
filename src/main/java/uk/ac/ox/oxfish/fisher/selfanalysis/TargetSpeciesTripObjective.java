@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 
 /**
@@ -22,10 +23,11 @@ public class TargetSpeciesTripObjective extends TripBasedObjectiveFunction {
     /**
      * the utility is earnings for selected species - total costs
      * @param tripRecord
+     * @param fisher
      * @return
      */
     @Override
-    protected double extractUtilityFromTrip(TripRecord tripRecord) {
+    protected double extractUtilityFromTrip(TripRecord tripRecord, Fisher fisher) {
         double profits = tripRecord.getEarningsOfSpecies(species.getIndex()) - tripRecord.getTotalCosts();
         profits= opportunityCosts ? profits-tripRecord.getOpportunityCosts() :profits;
         profits/=  tripRecord.getDurationInHours();
