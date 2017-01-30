@@ -93,7 +93,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
                         public Double scan(Fisher fisher) {
 
                             double average = state.getLatestDailyObservation(
-                                    FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
+                                    FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
                             //get last profits (to compare)
                             double lastProfits = fisher.getLastFinishedTrip() == null ? Double.NaN : fisher.getLastFinishedTrip().getProfitPerHour(
                                     true);

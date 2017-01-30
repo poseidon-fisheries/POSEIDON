@@ -17,6 +17,8 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ThresholdProbabilityFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -36,11 +38,23 @@ public class SynthesisPaper {
         avoidTheLine(100,
                      Paths.get("inputs","paper_synthesis"),
                      Paths.get("runs","paper_synthesis"));
-                     */
+
         thresholdSweeps(25,
                         Paths.get("inputs","paper_synthesis"),
                         Paths.get("runs","paper_synthesis")
                         );
+                        */
+        thresholdProbabilitySweeps(25,
+                        Paths.get("inputs","paper_synthesis"),
+                        Paths.get("runs","paper_synthesis")
+                        );
+
+        /*
+        socialAnnealing(25,
+                                   Paths.get("inputs","paper_synthesis"),
+                                   Paths.get("runs","paper_synthesis")
+        );
+        */
     }
 
     /**
@@ -177,6 +191,75 @@ public class SynthesisPaper {
     }
 
 
+
+    public static void thresholdProbabilitySweeps(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
+
+        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("fronts.yaml")));
+
+        FileWriter writer = new FileWriter(outputFolder.resolve("demo2_fixed.csv").toFile());
+        writer.write("threshold,run,final_biomass\n");
+        writer.flush();
+
+        //baseline
+        for (double threshold = 0; threshold < 20; threshold++) {
+            for (int run = 0; run < runsPerScenario; run++) {
+                FishYAML reader = new FishYAML();
+                PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+                ThresholdProbabilityFactory probability = new ThresholdProbabilityFactory();
+                probability.setThreshold(new FixedDoubleParameter(threshold));
+                ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setProbability(
+                        probability
+                );
+                Log.info("\tThreshold " + threshold + " exploration "  + run);
+
+                FishState state = new FishState(run);
+                state.setScenario(scenario);
+                state.start();
+                while (state.getYear() < 10)
+                    state.schedule.step(state);
+                Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+                writer.write(threshold + "," + run + "," + lastBiomass + "\n");
+                writer.flush();
+
+            }
+        }
+        writer.close();
+    }
+
+
+    public static void socialAnnealing(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
+
+        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("fronts.yaml")));
+
+        FileWriter writer = new FileWriter(outputFolder.resolve("demo2_annealing.csv").toFile());
+        writer.write("multiplier,run,final_biomass\n");
+        writer.flush();
+
+        //baseline
+        for (double multiplier = 0.1; multiplier < 2; multiplier=FishStateUtilities.round(multiplier+.1)) {
+            for (int run = 0; run < runsPerScenario; run++) {
+                FishYAML reader = new FishYAML();
+                PrototypeScenario scenario = reader.loadAs(readScenario, PrototypeScenario.class);
+                SocialAnnealingProbabilityFactory probability = new SocialAnnealingProbabilityFactory();
+                probability.setMultiplier(new FixedDoubleParameter(multiplier));
+                ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategy()).setProbability(
+                        probability
+                );
+                Log.info("\tAnnealing multiplier " + multiplier + " exploration "  + run);
+
+                FishState state = new FishState(run);
+                state.setScenario(scenario);
+                state.start();
+                while (state.getYear() < 10)
+                    state.schedule.step(state);
+                Double lastBiomass = state.getDailyDataSet().getLatestObservation("Biomass Species 0");
+                writer.write(multiplier + "," + run + "," + lastBiomass + "\n");
+                writer.flush();
+
+            }
+        }
+        writer.close();
+    }
     public static void thresholdSweeps(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
 
         String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("fronts.yaml")));

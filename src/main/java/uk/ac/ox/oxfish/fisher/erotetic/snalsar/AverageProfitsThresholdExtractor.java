@@ -30,7 +30,7 @@ public class AverageProfitsThresholdExtractor implements ProfitThresholdExtracto
     public HashMap<SeaTile, Double> extractFeature(
             Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
         double averageProfits = scale  * model.getLatestDailyObservation(
-                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
+                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
         return new FixedMap<SeaTile, Double>(averageProfits,
                                              toRepresent) ;
     }

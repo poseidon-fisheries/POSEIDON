@@ -1,10 +1,7 @@
 package uk.ac.ox.oxfish.utility.adaptation.probability;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.DailyDecreasingProbabilityFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.ExplorationPenaltyProbabilityFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
-import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.*;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -46,6 +43,13 @@ public class Probabilities {
                          SocialAnnealingProbabilityFactory::new
         );
         NAMES.put(SocialAnnealingProbabilityFactory.class,"Social Annealing Probability");
+
+
+        CONSTRUCTORS.put("Profit Threshold Probability",
+                         ThresholdProbabilityFactory::new
+        );
+        NAMES.put(ThresholdProbabilityFactory.class,"Profit Threshold Probability");
+
 
 
     }

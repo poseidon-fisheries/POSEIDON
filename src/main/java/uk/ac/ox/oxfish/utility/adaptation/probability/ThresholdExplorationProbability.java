@@ -4,18 +4,28 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 
+import java.util.function.Function;
+
 /**
- * Never imitates, but probability of exploring is 1 if last trip profits are below average
+ * Never imitates, but probability of exploring is 1 if last trip profits are below a threshold
  * Created by carrknight on 10/17/16.
  */
-public class SocialAnnealingProbability implements AdaptationProbability, TripListener {
+public class ThresholdExplorationProbability implements AdaptationProbability, TripListener {
 
     private boolean exploring = true;
 
+    private final double multiplier;
+
     private FishState model;
+
+    final private Function<FishState, Double> threshold;
+
+    public ThresholdExplorationProbability(double multiplier, Function<FishState, Double> threshold) {
+        this.multiplier = multiplier;
+        this.threshold = threshold;
+    }
 
     @Override
     public void start(FishState model, Fisher fisher) {
@@ -41,9 +51,9 @@ public class SocialAnnealingProbability implements AdaptationProbability, TripLi
     @Override
     public void reactToFinishedTrip(TripRecord record) {
         Double ourProfits = record.getProfitPerHour(true);
-        Double averageProfits = model.getLatestDailyObservation(
-                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
-        exploring = !Double.isFinite(averageProfits) || ourProfits <= averageProfits;
+        Double toBeat = threshold.apply(model);
+        double correctMultiplier = toBeat >=0 ? multiplier : 1d/multiplier;
+        exploring = !Double.isFinite(toBeat) || ourProfits <= correctMultiplier * toBeat;
 
     }
 
@@ -72,5 +82,14 @@ public class SocialAnnealingProbability implements AdaptationProbability, TripLi
     @Override
     public void judgeExploration(double previousFitness, double currentFitness) {
 
+    }
+
+    /**
+     * Getter for property 'multiplier'.
+     *
+     * @return Value for property 'multiplier'.
+     */
+    public double getMultiplier() {
+        return multiplier;
     }
 }

@@ -344,7 +344,7 @@ public class PrototypeScenario implements Scenario {
                             public HashMap<SeaTile, Double> extractFeature(
                                     Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
                                 double averageProfits = model.getLatestDailyObservation(
-                                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_PROFITS);
+                                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
                                 return new FixedMap<>(averageProfits,
                                                       toRepresent) ;
                             }

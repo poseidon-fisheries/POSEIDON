@@ -23,7 +23,7 @@ import java.util.function.ToDoubleFunction;
 public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
 
-    public static final String AVERAGE_LAST_TRIP_PROFITS = "Average Last Trip Profits";
+    public static final String AVERAGE_LAST_TRIP_HOURLY_PROFITS = "Average Last Trip Hourly Profits";
 
     public FishStateDailyTimeSeries() {
         super(IntervalPolicy.EVERY_DAY,StepOrder.YEARLY_DATA_GATHERING);
@@ -102,7 +102,7 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
             }
         }, 0d);
 
-        registerGatherer(AVERAGE_LAST_TRIP_PROFITS, new Gatherer<FishState>() {
+        registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
                 return observed.getFishers().stream().mapToDouble(
