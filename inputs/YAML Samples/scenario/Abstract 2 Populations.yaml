@@ -3,8 +3,12 @@ Abstract 2 Populations:
     Diffusing Logistic:
       carryingCapacity: '5000.0'
       differentialPercentageToMove: '0.001'
+      grower:
+        Independent Logistic Grower:
+          steepness: uniform 0.6 0.8
+      maxInitialCapacity: '1.0'
+      minInitialCapacity: '0.0'
       percentageLimitOnDailyMovement: '0.01'
-      steepness: uniform 0.6 0.8
   departingStrategyLarge:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
@@ -14,6 +18,8 @@ Abstract 2 Populations:
   destinationStrategyLarge:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:
@@ -29,6 +35,8 @@ Abstract 2 Populations:
   destinationStrategySmall:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:
@@ -81,8 +89,9 @@ Abstract 2 Populations:
   networkBuilder:
     Equal Out Degree:
       degree: 2
-  portPositionX: -1
-  portPositionY: -1
+  ports:
+    Random Ports:
+      numberOfPorts: '1.0'
   regulationLarge:
     MPA Only:
       startingMPAs: [
@@ -91,6 +100,7 @@ Abstract 2 Populations:
     MPA Only:
       startingMPAs: [
         ]
+  separatePorts: false
   separateRegulations: true
   smallFishers: 100
   smallFuelTankSize: '100000.0'

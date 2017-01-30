@@ -29,3 +29,13 @@ Monthly Departing:
   mutationRate: '0.05'
   probabilityEachMonthToGoOutFishing: '0.3'
 -------
+Unified Amateurish Dynamic Programming:
+  discountRate: '0.0'
+  explorationSize: '5.0'
+  learningRate: '2.5E-4'
+  noiseRate: '0.02'
+-------
+WFS Longline:
+  intercept: '-3.626'
+  summer: '0.439'
+-------

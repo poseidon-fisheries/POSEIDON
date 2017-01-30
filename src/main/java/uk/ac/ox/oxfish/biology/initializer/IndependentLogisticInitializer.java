@@ -5,11 +5,15 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Each tile below water is filled with an independent logistic-growth. They all have the same carrying capacity
@@ -21,26 +25,30 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
     private final DoubleParameter carryingCapacity;
 
-    private final DoubleParameter steepness;
 
     private final DoubleParameter minInitialCapacity;
 
     private final DoubleParameter maxInitialCapacity;
 
+    private final Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+
+    private final LogisticGrowerInitializer grower;
+
 
     public IndependentLogisticInitializer(
-            DoubleParameter carryingCapacity, DoubleParameter steepness,
-            DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity) {
+            DoubleParameter carryingCapacity,
+            DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
+            LogisticGrowerInitializer grower) {
         this.carryingCapacity = carryingCapacity;
-        this.steepness = steepness;
         this.minInitialCapacity = minInitialCapacity;
         this.maxInitialCapacity = maxInitialCapacity;
+        this.grower = grower;
     }
 
 
     public IndependentLogisticInitializer(
-            DoubleParameter carryingCapacity, DoubleParameter steepness) {
-        this(carryingCapacity,steepness,new FixedDoubleParameter(0),new FixedDoubleParameter(1d));
+            DoubleParameter carryingCapacity, LogisticGrowerInitializer grower) {
+        this(carryingCapacity, new FixedDoubleParameter(0), new FixedDoubleParameter(1d), grower);
     }
 
     /**
@@ -63,12 +71,13 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
         {
             int species = biology.getSize();
             double carryingCapacityLevel = carryingCapacity.apply(random);
-            double steepness = this.steepness.apply(random);
             double minCapacity = minInitialCapacity.apply(random);
             double maxCapacity = maxInitialCapacity.apply(random);
 
-            return new LogisticLocalBiology(carryingCapacityLevel,species,steepness,random,
-                                            maxCapacity,minCapacity);
+            LogisticLocalBiology local = new LogisticLocalBiology(carryingCapacityLevel, species, random,
+                                                                     maxCapacity, minCapacity);
+            biologies.put(seaTile,local);
+            return local;
         }
     }
 
@@ -84,12 +93,10 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
     {
 
+        grower.initializeGrower(biologies, model, random);
 
     }
 
-    public DoubleParameter getSteepness() {
-        return steepness;
-    }
 
     public DoubleParameter getCarryingCapacity() {
         return carryingCapacity;

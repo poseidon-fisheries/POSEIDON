@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
@@ -23,10 +24,11 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
     public TwoSpeciesRockyLogisticInitializer(
             DoubleParameter rockyCarryingCapacity,
             DoubleParameter sandyCarryingCapacity,
-            DoubleParameter steepness, double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove) {
-        super(rockyCarryingCapacity, sandyCarryingCapacity, steepness, percentageLimitOnDailyMovement,
-              differentialPercentageToMove, 2);
+            double percentageLimitOnDailyMovement,
+            double differentialPercentageToMove,
+            LogisticGrowerInitializer grower) {
+        super(rockyCarryingCapacity, sandyCarryingCapacity, percentageLimitOnDailyMovement,
+              differentialPercentageToMove, 2,grower);
     }
 
 
@@ -58,17 +60,17 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
                             seaTile.getRockyPercentage() * getSandyCarryingCapacity().apply(random);
 
 
-            return new LogisticLocalBiology(
+            LogisticLocalBiology local = new LogisticLocalBiology(
                     new Double[]{
                             carryingCapacityFirst * random.nextDouble(),
                             carryingCapacitySecond * random.nextDouble()
                     },
                     new Double[]{
-                            carryingCapacityFirst,carryingCapacitySecond
-                    },
-                    new Double[]{
-                            getSteepness().apply(random),getSteepness().apply(random)
-                    });
+                            carryingCapacityFirst, carryingCapacitySecond
+                    }
+            );
+            biologies.put(seaTile,local);
+            return local;
         }
     }
 

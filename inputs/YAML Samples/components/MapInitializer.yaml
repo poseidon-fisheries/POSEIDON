@@ -8,3 +8,9 @@ Simple Map:
 OSMOSE Map:
   cellSizeInKilometers: '10.0'
 -------
+OSMOSE Bounded Map:
+  lowRightEasting: 584600.702
+  lowRightNorthing: 2791787.489
+  upLeftEasting: -73291.664
+  upLeftNorthing: 3445097.299
+-------

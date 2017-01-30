@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.demoes;
 
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -93,7 +94,7 @@ public class TwoSpeciesITQSplit
 
         SplitInitializerFactory biologyFactory = new SplitInitializerFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
-        biologyFactory.setSteepness(new FixedDoubleParameter(.9));
+        biologyFactory.setGrower(new SimpleLogisticGrowerFactory(.9));
 
 
         PrototypeScenario scenario = new PrototypeScenario();

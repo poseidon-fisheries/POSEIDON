@@ -8,3 +8,14 @@ Target Species Hourly Profit:
   opportunityCosts: true
   speciesIndex: 0
 -------
+Hourly Knife-Edge Objective:
+  opportunityCosts: true
+  threshold: '10.0'
+-------
+Hourly Cutoff Objective:
+  opportunityCosts: true
+-------
+Cash Flow Knife-Edge Objective:
+  period: '365.0'
+  threshold: '10.0'
+-------

@@ -23,6 +23,7 @@ import ec.util.MersenneTwisterFast;
 import joptsimple.internal.Strings;
 import org.yaml.snakeyaml.Yaml;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -71,7 +72,7 @@ public class BurlapQuotaInfinity {
         scenario.setPortPositionY(25);
         scenario.setMapInitializer(mapInitializer);
         DiffusingLogisticFactory biologyInitializer = new DiffusingLogisticFactory();
-        biologyInitializer.setSteepness(new FixedDoubleParameter(.7));
+        biologyInitializer.setGrower(new SimpleLogisticGrowerFactory(.7));
         scenario.setBiologyInitializer(biologyInitializer);
 
         //just look at biomass

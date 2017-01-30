@@ -2,13 +2,8 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 
@@ -17,7 +12,7 @@ import java.util.Arrays;
  * each year through logistic regression. There is no link/movement to other biologies.
  * Created by carrknight on 5/8/15.
  */
-public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements Steppable, Startable {
+public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements Startable {
 
     /**
      * the current amount of biomass in this spot
@@ -29,26 +24,18 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
      */
     private Double[] carryingCapacity;
 
-    /**
-     * the uninpeded growth rate of each species
-     */
-    private Double[] malthusianParameter;
 
     /**
      * initialize the local biology
      * @param currentBiomass the biomass available
      * @param carryingCapacity the maximum amount of fish
-     * @param malthusianParameter the unconstrained growth rate of each species
      */
     public LogisticLocalBiology(
-            Double[] currentBiomass, Double[] carryingCapacity,
-            Double[] malthusianParameter) {
+            Double[] currentBiomass, Double[] carryingCapacity) {
         Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
-        Preconditions.checkArgument(currentBiomass.length==malthusianParameter.length);
 
         this.currentBiomass = Arrays.copyOf(currentBiomass,currentBiomass.length);
         this.carryingCapacity =Arrays.copyOf(carryingCapacity,carryingCapacity.length);
-        this.malthusianParameter = Arrays.copyOf(malthusianParameter,malthusianParameter.length);
 
     }
 
@@ -57,13 +44,12 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
      * create a logistic local biology where we specify how much of the biomass is currently available
      * @param carryingCapacity
      * @param species
-     * @param steepness
      * @param random
      * @param initialMaxCapacity max proportion 0 to 1 of carrying capacity that might be available at this cell
      * @param initialMinCapacity min proportion 0 to 1 of carrying capacity that might be available at this cell
      */
     public LogisticLocalBiology(
-            double carryingCapacity, int species, double steepness,
+            double carryingCapacity, int species,
             MersenneTwisterFast random, double initialMaxCapacity, double initialMinCapacity)
     {
         assert initialMaxCapacity>= initialMinCapacity;
@@ -72,22 +58,20 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
         this.carryingCapacity = new Double[species];
         Arrays.fill(this.carryingCapacity, carryingCapacity);
         this.currentBiomass = new Double[species];
-        this.malthusianParameter = new Double[species];
 
         for(int i=0; i<currentBiomass.length; i++)
         {
             currentBiomass[i] = ((initialMaxCapacity - initialMinCapacity)*random.nextDouble(true, true) + initialMinCapacity)
                     * carryingCapacity;
-            malthusianParameter[i] = steepness;
         }
     }
 
 
     public LogisticLocalBiology(
-            double carryingCapacity, int species, double steepness,
+            double carryingCapacity, int species,
             MersenneTwisterFast random)
     {
-        this(carryingCapacity,species,steepness,random,1,0);
+        this(carryingCapacity, species, random, 1, 0);
     }
 
     /**
@@ -119,20 +103,21 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
             return this.carryingCapacity[index];
     }
 
-
     /**
-     * Get the unconstrained growth rate of the biomass
-     * @param species the species
-     * @return the unconstrained growth rate.
+     * the carrying capacity of this location for this species
+     * @param index the species
+     * @return the carrying capacity for this species at this location
      */
-    public Double getMalthusianParameter(Species species)
+    public Double getCarryingCapacity(int index)
     {
-        final int index = species.getIndex();
-        if(index>=this.malthusianParameter.length)
+        if(index>=this.carryingCapacity.length)
             return 0d; //don't have it
         else
-            return this.malthusianParameter[index];
+            return this.carryingCapacity[index];
     }
+
+
+
 
 
     /**
@@ -158,29 +143,7 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
     }
 
 
-    /**
-     * grows logistically whenever stepped (supposedly once a year)
-     * @param simState the model
-     */
-    @Override
-    public void step(SimState simState) {
 
-        assert (currentBiomass.length==carryingCapacity.length);
-        assert (currentBiomass.length==malthusianParameter.length);
-
-        //grow fish
-        for(int i=0; i<currentBiomass.length; i++)
-        {
-            assert currentBiomass[i] >=0;
-
-            if(carryingCapacity[i] > FishStateUtilities.EPSILON) {
-                currentBiomass[i] = Math.min(carryingCapacity[i], currentBiomass[i] + malthusianParameter[i] *
-                        (1d - currentBiomass[i] / carryingCapacity[i]) * currentBiomass[i]);
-            }
-            assert currentBiomass[i] >=0;
-        }
-
-    }
 
 
     /**
@@ -221,27 +184,15 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
     }
 
 
-    /**
-     * set the new unconstrained growth rate for a specie
-     * @param s the specie
-     * @param newGrowth the new growth rate, must be not negative
-     */
-    public void setMalthusianParameter(Species s, double newGrowth)
-    {
-        Preconditions.checkArgument(newGrowth >= 0, "growth can't be negative!");
-        final int index = s.getIndex();
-        if(index >=currentBiomass.length)
-            growArrays(index +1);
 
-        malthusianParameter[index] = newGrowth;
-
-    }
 
 
     /**
      * proof that you have started
      */
-    private Stoppable receipt;
+    private boolean started;
+
+    private boolean stopped;
 
 
     /**
@@ -251,8 +202,9 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
     @Override
     public void start(FishState model) {
 
-        Preconditions.checkArgument(receipt==null,"Already started");
-        model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
+        Preconditions.checkArgument(!started,"Already started");
+
+        started=true;
     }
 
     /**
@@ -260,7 +212,20 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
      */
     @Override
     public void turnOff() {
-        receipt.stop();
+
+
+
+        stopped = true;
+
+    }
+
+    /**
+     * Getter for property 'stopped'.
+     *
+     * @return Value for property 'stopped'.
+     */
+    public boolean isStopped() {
+        return stopped;
     }
 
     /**
@@ -272,13 +237,11 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
         final int oldSize = currentBiomass.length;
         assert oldSize < newSize;
         currentBiomass = Arrays.copyOf(currentBiomass,newSize);
-        malthusianParameter = Arrays.copyOf(malthusianParameter,newSize);
         carryingCapacity = Arrays.copyOf(carryingCapacity,newSize);
         //fill them
         for(int i=oldSize; i<newSize; i++)
         {
             currentBiomass[i]=0d;
-            malthusianParameter[i]=0d;
             carryingCapacity[i]=0d;
         }
     }

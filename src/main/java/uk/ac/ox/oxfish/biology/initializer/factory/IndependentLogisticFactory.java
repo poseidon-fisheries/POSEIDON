@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.IndependentLogisticInitializer;
 import uk.ac.ox.oxfish.model.FishState;
@@ -15,7 +17,7 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
 {
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
-    private DoubleParameter steepness = new FixedDoubleParameter(0.4);
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.4);
 
 
 
@@ -28,7 +30,7 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
     @Override
     public BiologyInitializer apply(FishState state) {
         return new IndependentLogisticInitializer(carryingCapacity,
-                                                  steepness);
+                                                  grower.apply(state));
     }
 
     public DoubleParameter getCarryingCapacity() {
@@ -39,12 +41,22 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
         this.carryingCapacity = carryingCapacity;
     }
 
-
-    public DoubleParameter getSteepness() {
-        return steepness;
+    /**
+     * Getter for property 'grower'.
+     *
+     * @return Value for property 'grower'.
+     */
+    public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
+        return grower;
     }
 
-    public void setSteepness(DoubleParameter steepness) {
-        this.steepness = steepness;
+    /**
+     * Setter for property 'grower'.
+     *
+     * @param grower Value to set for property 'grower'.
+     */
+    public void setGrower(
+            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        this.grower = grower;
     }
 }

@@ -1,12 +1,13 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.RockyLogisticInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * Creates the Rocky Logistic Initializer
@@ -22,7 +23,6 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
 
     private DoubleParameter rockyCarryingCapacity = new FixedDoubleParameter(10000);
 
-    private DoubleParameter steepness = new UniformDoubleParameter(0.6,0.8);
 
 
     /**
@@ -38,6 +38,27 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
 
     private int numberOfSpecies = 1;
 
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
+
+    /**
+     * Getter for property 'grower'.
+     *
+     * @return Value for property 'grower'.
+     */
+    public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
+        return grower;
+    }
+
+    /**
+     * Setter for property 'grower'.
+     *
+     * @param grower Value to set for property 'grower'.
+     */
+    public void setGrower(
+            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        this.grower = grower;
+    }
+
     /**
      * Applies this function to the given argument.
      *
@@ -49,10 +70,10 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
         MersenneTwisterFast random = state.getRandom();
         return new RockyLogisticInitializer(rockyCarryingCapacity,
                                             sandyCarryingCapacity,
-                                            steepness,
                                             percentageLimitOnDailyMovement.apply(random),
                                             differentialPercentageToMove.apply(random),
-                                            numberOfSpecies);
+                                            numberOfSpecies,
+                                            grower.apply(state));
     }
 
 
@@ -72,13 +93,6 @@ public class RockyLogisticFactory implements AlgorithmFactory<RockyLogisticIniti
         this.rockyCarryingCapacity = rockyCarryingCapacity;
     }
 
-    public DoubleParameter getSteepness() {
-        return steepness;
-    }
-
-    public void setSteepness(DoubleParameter steepness) {
-        this.steepness = steepness;
-    }
 
     public DoubleParameter getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;

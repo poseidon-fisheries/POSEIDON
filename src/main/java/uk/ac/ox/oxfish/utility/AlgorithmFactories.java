@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.utility;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowers;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
@@ -119,6 +121,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(MapDiscretizer.class, MapDiscretizers.CONSTRUCTORS);
         NAMES_MAP.put(MapDiscretizer.class, MapDiscretizers.NAMES);
+
+        CONSTRUCTOR_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.CONSTRUCTORS);
+        NAMES_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.NAMES);
 
 
 

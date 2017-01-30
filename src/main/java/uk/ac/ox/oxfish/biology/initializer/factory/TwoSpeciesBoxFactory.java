@@ -1,11 +1,12 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.TwoSpeciesBoxInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 /**
  * A more general two-species initializer, the "father" of well-mixed, split in half and half bycatch
@@ -30,11 +31,13 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
                 species0InsideTheBox,
                 firstSpeciesCapacity,
                 ratioFirstToSecondSpecies,
-                steepness,
                 percentageLimitOnDailyMovement.apply(fishState.getRandom()),
-                differentialPercentageToMove.apply(fishState.getRandom())
+                differentialPercentageToMove.apply(fishState.getRandom()),
+                grower.apply(fishState)
         );
     }
+
+
 
     /**
      * the smallest x that is inside the box
@@ -72,7 +75,6 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
     private DoubleParameter ratioFirstToSecondSpecies = new FixedDoubleParameter(1d);
 
 
-    private DoubleParameter steepness = new UniformDoubleParameter(0.6, 0.8);
     /**
      * fixes a limit on how much biomass can leave the sea-tile
      */
@@ -144,12 +146,25 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
         this.ratioFirstToSecondSpecies = ratioFirstToSecondSpecies;
     }
 
-    public DoubleParameter getSteepness() {
-        return steepness;
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6,0.8);
+
+    /**
+     * Getter for property 'grower'.
+     *
+     * @return Value for property 'grower'.
+     */
+    public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
+        return grower;
     }
 
-    public void setSteepness(DoubleParameter steepness) {
-        this.steepness = steepness;
+    /**
+     * Setter for property 'grower'.
+     *
+     * @param grower Value to set for property 'grower'.
+     */
+    public void setGrower(
+            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        this.grower = grower;
     }
 
     public DoubleParameter getPercentageLimitOnDailyMovement() {

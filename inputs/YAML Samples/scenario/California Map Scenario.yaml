@@ -10,6 +10,8 @@ California Map Scenario:
   destinationStrategy:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:

@@ -10,3 +10,10 @@ Oscillating Weather:
   minWindSpeed: '0.0'
   oscillationPeriod: '100.0'
 -------
+CSV Fixed Weather:
+  columnNumber: 1
+  headerInFile: true
+  pathToCSV: /home/carrknight/code/oxfish/inputs/test/weather.csv
+  separator: ','
+  temperature: '30.0'
+-------

@@ -1,19 +1,19 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.SplitInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 public class SplitInitializerFactory implements AlgorithmFactory<SplitInitializer> {
 
 
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(10000);
 
-    private DoubleParameter steepness = new UniformDoubleParameter(0.6,0.8);
 
 
     /**
@@ -37,9 +37,9 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
     @Override
     public SplitInitializer apply(FishState state) {
         return new SplitInitializer(carryingCapacity,
-                                          steepness,
-                                          percentageLimitOnDailyMovement.apply(state.random),
-                                          differentialPercentageToMove.apply(state.random));
+                                    percentageLimitOnDailyMovement.apply(state.random),
+                                    differentialPercentageToMove.apply(state.random),
+                                    grower.apply(state));
     }
 
 
@@ -51,12 +51,25 @@ public class SplitInitializerFactory implements AlgorithmFactory<SplitInitialize
         this.carryingCapacity = carryingCapacity;
     }
 
-    public DoubleParameter getSteepness() {
-        return steepness;
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
+
+    /**
+     * Getter for property 'grower'.
+     *
+     * @return Value for property 'grower'.
+     */
+    public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
+        return grower;
     }
 
-    public void setSteepness(DoubleParameter steepness) {
-        this.steepness = steepness;
+    /**
+     * Setter for property 'grower'.
+     *
+     * @param grower Value to set for property 'grower'.
+     */
+    public void setGrower(
+            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        this.grower = grower;
     }
 
     public DoubleParameter getPercentageLimitOnDailyMovement() {

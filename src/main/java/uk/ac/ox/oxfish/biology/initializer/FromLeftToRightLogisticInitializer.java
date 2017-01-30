@@ -18,7 +18,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
 
 
-    DiffusingLogisticInitializer delegate;
+    private DiffusingLogisticInitializer delegate;
 
     /**
      * the leftmost seatile will have 100% capacity, the rightmost seatile will have minCapacityRatio%
@@ -47,9 +47,7 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
         delegate.processMap(biology, map, random, model);
     }
 
-    public DoubleParameter getSteepness() {
-        return delegate.getSteepness();
-    }
+
 
     /**
      * creates the global biology object for the model

@@ -1,13 +1,10 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -18,16 +15,18 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class SplitInitializer extends TwoSpeciesBoxInitializer {
 
 
-    public SplitInitializer(DoubleParameter carryingCapacity, DoubleParameter steepness,
-                                  double percentageLimitOnDailyMovement,
-                                  double differentialPercentageToMove) {
+    public SplitInitializer(DoubleParameter carryingCapacity,
+                            double percentageLimitOnDailyMovement,
+                            double differentialPercentageToMove,
+                            LogisticGrowerInitializer grower
+    ) {
         //box top Y will have to be reset when generateLocal is called as the map doesn't exist just yet
         super(0,0,Integer.MAX_VALUE,Integer.MAX_VALUE,false,
               carryingCapacity,
               new FixedDoubleParameter(1d),
-              steepness,
               percentageLimitOnDailyMovement,
-              differentialPercentageToMove);
+              differentialPercentageToMove,
+              grower);
 
     }
 

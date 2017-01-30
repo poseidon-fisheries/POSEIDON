@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.experiments;
 
 import sim.display.Console;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
@@ -152,7 +153,7 @@ public class TwoSpeciesITQ
 
         HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
-        biologyFactory.setSteepness(new FixedDoubleParameter(.9));
+        biologyFactory.setGrower(new SimpleLogisticGrowerFactory(.9));
         biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
         biologyFactory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(.2));
 
@@ -258,7 +259,7 @@ public class TwoSpeciesITQ
 
         HalfBycatchFactory biologyFactory = new HalfBycatchFactory();
         biologyFactory.setCarryingCapacity(new FixedDoubleParameter(5000));
-        biologyFactory.setSteepness(new FixedDoubleParameter(.9));
+        biologyFactory.setGrower(new SimpleLogisticGrowerFactory(.9));
         biologyFactory.setDifferentialPercentageToMove(new FixedDoubleParameter(.2));
         biologyFactory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(.2));
 

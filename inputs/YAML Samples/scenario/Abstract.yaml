@@ -3,8 +3,12 @@ Abstract:
     Diffusing Logistic:
       carryingCapacity: '5000.0'
       differentialPercentageToMove: '0.001'
+      grower:
+        Independent Logistic Grower:
+          steepness: uniform 0.6 0.8
+      maxInitialCapacity: '1.0'
+      minInitialCapacity: '0.0'
       percentageLimitOnDailyMovement: '0.01'
-      steepness: uniform 0.6 0.8
   cheaters: false
   departingStrategy:
     Fixed Rest:
@@ -12,6 +16,8 @@ Abstract:
   destinationStrategy:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       objectiveFunction:

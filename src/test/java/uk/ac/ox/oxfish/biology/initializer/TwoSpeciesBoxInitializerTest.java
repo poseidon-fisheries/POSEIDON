@@ -3,14 +3,14 @@ package uk.ac.ox.oxfish.biology.initializer;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
@@ -30,8 +30,8 @@ public class TwoSpeciesBoxInitializerTest
                 false,
                 new FixedDoubleParameter(100),
                 new FixedDoubleParameter(1d),
-                new FixedDoubleParameter(1d),
-                0d,0d
+                0d,0d,
+                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d))
         );
 
 

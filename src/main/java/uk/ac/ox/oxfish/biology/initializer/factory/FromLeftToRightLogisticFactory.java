@@ -50,9 +50,6 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
         delegate.setCarryingCapacity(carryingCapacity);
     }
 
-    public void setSteepness(DoubleParameter steepness) {
-        delegate.setSteepness(steepness);
-    }
 
 
 
@@ -74,9 +71,6 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
         delegate.setPercentageLimitOnDailyMovement(percentageLimitOnDailyMovement);
     }
 
-    public DoubleParameter getSteepness() {
-        return delegate.getSteepness();
-    }
 
     public DoubleParameter getMinCapacityRatio() {
         return minCapacityRatio;

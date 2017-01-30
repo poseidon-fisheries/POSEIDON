@@ -3,11 +3,15 @@ package uk.ac.ox.oxfish.biology.initializer;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class supersedes the older SplitInitializer, HalfBycach and WellMixed. It basically assumes that there
@@ -52,7 +56,6 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
     private final DoubleParameter ratioFirstToSecondSpecies;
 
 
-    private final DoubleParameter steepness;
 
 
     /**
@@ -65,12 +68,20 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
      */
     private final double differentialPercentageToMove;
 
+    /**
+     * get the list of all the logistic local biologies
+     */
+    private Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+
+    private final LogisticGrowerInitializer grower;
+
 
     public TwoSpeciesBoxInitializer(
             int lowestX, int lowestY, int boxHeight, int boxWidth, boolean species0InsideTheBox,
             DoubleParameter firstSpeciesCapacity,
-            DoubleParameter ratioFirstToSecondSpecies, DoubleParameter steepness, double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove) {
+            DoubleParameter ratioFirstToSecondSpecies,  double percentageLimitOnDailyMovement,
+            double differentialPercentageToMove,
+            LogisticGrowerInitializer grower) {
         this.lowestX = lowestX;
         this.lowestY = lowestY;
         this.boxHeight = boxHeight;
@@ -78,9 +89,9 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         this.species0InsideTheBox = species0InsideTheBox;
         this.firstSpeciesCapacity = firstSpeciesCapacity;
         this.ratioFirstToSecondSpecies = ratioFirstToSecondSpecies;
-        this.steepness = steepness;
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
+        this.grower = grower;
     }
 
 
@@ -126,11 +137,11 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         }
 
 
-        return new LogisticLocalBiology(
+        LogisticLocalBiology toReturn =  new LogisticLocalBiology(
                 new Double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
-                new Double[]{firstSpeciesCapacity,secondSpeciesCapacity},
-                new Double[]{steepness.apply(random),steepness.apply(random)}
-        );
+                new Double[]{firstSpeciesCapacity,secondSpeciesCapacity});
+        biologies.put(seaTile,toReturn);
+        return toReturn;
     }
 
     private boolean isInsideTheBox(SeaTile where)
@@ -162,7 +173,12 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
     {
 
+
+
+        grower.initializeGrower(biologies,model,random);
+
         BiomassDiffuser diffuser = new BiomassDiffuser(map, random, biology, differentialPercentageToMove, percentageLimitOnDailyMovement);
+
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
     }
@@ -206,9 +222,6 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         return ratioFirstToSecondSpecies;
     }
 
-    public DoubleParameter getSteepness() {
-        return steepness;
-    }
 
     public double getPercentageLimitOnDailyMovement() {
         return percentageLimitOnDailyMovement;

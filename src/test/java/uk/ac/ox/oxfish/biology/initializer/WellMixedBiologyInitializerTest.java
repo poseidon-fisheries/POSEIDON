@@ -5,6 +5,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -20,9 +21,10 @@ public class WellMixedBiologyInitializerTest {
 
         WellMixedBiologyInitializer initializer =
                 new WellMixedBiologyInitializer(new FixedDoubleParameter(60),
-                                                          new FixedDoubleParameter(.25),
-                                                          new FixedDoubleParameter(.8),
-                                                          .01,.01);
+                                                new FixedDoubleParameter(.25),
+                                                .01,.01,
+                                                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(.8d))
+                );
 
 
 

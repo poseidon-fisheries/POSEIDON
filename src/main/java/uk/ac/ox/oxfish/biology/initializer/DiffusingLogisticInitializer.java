@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassDiffuser;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -28,11 +29,12 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
 
 
     public DiffusingLogisticInitializer(
-            DoubleParameter carryingCapacity, DoubleParameter steepness,
+            DoubleParameter carryingCapacity,
             DoubleParameter minInitialCapacity, DoubleParameter maxInitialCapacity,
             double percentageLimitOnDailyMovement,
-            double differentialPercentageToMove) {
-        super(carryingCapacity, steepness, minInitialCapacity, maxInitialCapacity);
+            double differentialPercentageToMove,
+            LogisticGrowerInitializer grower) {
+        super(carryingCapacity, minInitialCapacity, maxInitialCapacity,grower);
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
     }

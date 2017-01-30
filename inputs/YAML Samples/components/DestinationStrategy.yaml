@@ -15,6 +15,8 @@ Per Trip Iterative:
 -------
 Imitator-Explorator:
   alwaysCopyBest: true
+  automaticallyIgnoreMPAs: false
+  backtracksOnBadExploration: true
   dropInUtilityNeededForUnfriend: '-1.0'
   ignoreEdgeDirection: true
   objectiveFunction:
@@ -54,7 +56,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Safe Everywhere
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -94,4 +96,27 @@ GSA:
   explorationSize: '20.0'
   gravitationalConstant: '100.0'
   initialSpeed: '0.0'
+-------
+Unified Amateurish Dynamic Programming:
+  discountRate: '0.0'
+  explorationSize: '5.0'
+  learningRate: '2.5E-4'
+  noiseRate: '0.02'
+-------
+Discretized Bandit:
+  average:
+    Exponential Moving Average:
+      alpha: '0.2'
+  bandit:
+    Epsilon Greedy Bandit:
+      explorationRate: '0.2'
+  discretizer:
+    Squared Discretization:
+      horizontalSplits: '2.0'
+      verticalSplits: '2.0'
+-------
+Florida Longliner:
+  centroidFile: /home/carrknight/code/oxfish/temp_wfs/areas.txt
+  coefficientsFile: /home/carrknight/code/oxfish/temp_wfs/longline.csv
+  coefficientsStandardDeviationFile: /home/carrknight/code/oxfish/temp_wfs/longline_std.csv
 -------

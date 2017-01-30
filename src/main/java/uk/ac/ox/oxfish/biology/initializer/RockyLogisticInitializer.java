@@ -2,11 +2,15 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A diffusing logistic initializer, but one that has different maximum capacity according to the % of rocky terrain
@@ -23,7 +27,7 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     private final DoubleParameter sandyCarryingCapacity;
 
 
-    private final DoubleParameter steepness;
+    private final LogisticGrowerInitializer grower;
 
 
     /**
@@ -41,16 +45,22 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
      */
     private final int numberOfSpecies;
 
+    /**
+     * get the list of all the logistic local biologies
+     */
+    protected Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+
     public RockyLogisticInitializer(
             DoubleParameter rockyCarryingCapacity, DoubleParameter sandyCarryingCapacity,
-            DoubleParameter steepness, double percentageLimitOnDailyMovement, double differentialPercentageToMove,
-            int numberOfSpecies) {
+            double percentageLimitOnDailyMovement, double differentialPercentageToMove,
+            int numberOfSpecies,
+            LogisticGrowerInitializer grower) {
         this.rockyCarryingCapacity = rockyCarryingCapacity;
         this.sandyCarryingCapacity = sandyCarryingCapacity;
-        this.steepness = steepness;
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.differentialPercentageToMove = differentialPercentageToMove;
         this.numberOfSpecies = numberOfSpecies;
+        this.grower = grower;
     }
 
     /**
@@ -77,9 +87,10 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
                     (1-seaTile.getRockyPercentage()) *  sandyCarryingCapacity.apply(random)  +
                             seaTile.getRockyPercentage() * rockyCarryingCapacity.apply(random);
 
-            double steepness = this.steepness.apply(random);
 
-            return new LogisticLocalBiology(carryingCapacityLevel,species,steepness,random);
+            LogisticLocalBiology local = new LogisticLocalBiology(carryingCapacityLevel, species, random);
+            biologies.put(seaTile,local);
+            return local;
         }
     }
 
@@ -100,6 +111,8 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
                                                        differentialPercentageToMove,
                                                        percentageLimitOnDailyMovement);
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
+
+        grower.initializeGrower(biologies,model,random);
     }
 
 
@@ -138,14 +151,6 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
         return sandyCarryingCapacity;
     }
 
-    /**
-     * Getter for property 'steepness'.
-     *
-     * @return Value for property 'steepness'.
-     */
-    public DoubleParameter getSteepness() {
-        return steepness;
-    }
 
     /**
      * Getter for property 'percentageLimitOnDailyMovement'.

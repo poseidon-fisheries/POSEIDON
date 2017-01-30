@@ -14,3 +14,9 @@ Adaptive Probability:
   imitationProbability: '1.0'
   incrementMultiplier: '0.02'
 -------
+Social Annealing Probability:
+  multiplier: '1.0'
+-------
+Profit Threshold Probability:
+  threshold: '1.0'
+-------
