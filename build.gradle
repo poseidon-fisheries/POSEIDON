@@ -174,14 +174,11 @@ ext{
     website_folder = '/home/carrknight/code/carrknight.github.io';
 
 }
-//creates the CSV the dashboard will use
-task prepareDashBoard(type: JavaExec, dependsOn: test) {
-            classpath = sourceSets.main.runtimeClasspath
-            main = 'uk.ac.ox.oxfish.experiments.Dashboard'
-            args = [ date ]
-        }
 
-task dashboard(type: Exec, dependsOn: prepareDashBoard ) {
+
+task dashboard(type: Exec) {
+    dependsOn 'appendix'
+    dependsOn 'test'
     executable = 'python2'
     workingDir = "${projectDir}"
     args = [ "dashboard.py",  date, website_folder ]
@@ -192,6 +189,11 @@ task sample_inputs(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+
+task appendix(type:JavaExec){
+    main = 'uk.ac.ox.oxfish.experiments.FirstPaper'
+    classpath = sourceSets.main.runtimeClasspath
+}
 
 task batch(type:JavaExec){
     main = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'

@@ -45,16 +45,19 @@ public class FirstPaper
 {
 
     public static final Path INPUT_FOLDER = Paths.get("inputs", "first_paper");
-    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper_temp");
+    public static final Path OUTPUT_FOLDER = Paths.get("runs", "first_paper_test");
 
     public static final long RANDOM_SEED = 0l;
 
 
     public static void main(String[] args) throws IOException {
 
+
+        OUTPUT_FOLDER.toFile().delete();
         OUTPUT_FOLDER.toFile().mkdirs();
 
-        /*
+
+
         Log.info("Moving Front Image Starting");
         fronts();
         frontsSensitivity(Paths.get("fronts.yaml"));
@@ -84,8 +87,7 @@ public class FirstPaper
         directedTechnologicalChange();
 
         Log.info("TAC vs ITQ 1 Species");
-        catchesPerPolicyCatchability();
-        catchesPerPolicyMileage();
+
         Log.info("Race to Fish");
         raceToFish();
         Log.info("Location Choice");
@@ -95,9 +97,12 @@ public class FirstPaper
         policyAndGear("itq");
         policyAndGear("tac");
 
-*/
+        catchesPerPolicyCatchability();
+        catchesPerPolicyMileage();
         policyAndLocation("itq_sensitivity");
-        //policyAndGear("itq_sensitivity");
+
+
+        policyAndGear("itq_sensitivity");
 
     }
 

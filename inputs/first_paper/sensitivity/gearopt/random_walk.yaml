@@ -4,7 +4,9 @@ Abstract:
       carryingCapacity: '7242.0'
       differentialPercentageToMove: '0.03'
       percentageLimitOnDailyMovement: '1'
-      steepness: 0.7
+      grower:
+          Independent Logistic Grower:
+              steepness: 0.7
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'

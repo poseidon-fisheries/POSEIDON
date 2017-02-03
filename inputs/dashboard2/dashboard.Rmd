@@ -1,0 +1,762 @@
+---
+title: "Dashboard"
+author: "Ernesto Carrella"
+date: "February 2, 2016"
+output:
+  bookdown::html_document2:
+      highlight: haddock
+      number_sections: yes
+      self_contained: yes
+      theme: readable
+      toc: yes
+      toc_depth: 3
+toc: yes
+toc_depth: '3'
+  
+---
+# Appendix
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,dpi=100,
+                      fig.width = 16, fig.height = 9)
+library(reshape2)
+library(plyr)
+library(tidyr)  
+library(dplyr)
+library(ggplot2)  
+library(cowplot)
+library(scales)
+library(gridExtra)
+theme_set(theme_bw()) 
+main_directory<-"/home/carrknight/code/oxfish/runs/first_paper"
+optimization_directory<-"/home/carrknight/code/oxfish/inputs/first_paper/optimiser/"
+sensitivity_directory<-"/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/"
+
+test_directory<-"/home/carrknight/code/oxfish/runs/first_paper_tempz"
+
+library(ggthemr)
+ggthemr_reset()
+#ggthemr('flat',layout="clear",type = 'outer')
+
+```
+
+## Fronts
+
+```{r fronts}
+meltProperly<-function(grid,policyName,normalize=TRUE){
+  
+  to_return<-
+    melt(as.matrix(grid)) %>% rename(X = Var1, Y= Var2) %>% 
+    mutate(Y = extract_numeric(Y)) %>%
+    mutate(X = as.numeric(X)-1, Y= as.numeric(Y)-1) %>%
+    mutate(value = ifelse(X>=40,NA,value)) %>%
+    mutate(policy=policyName)
+  if(normalize)
+    to_return<- to_return %>% #remove land
+      mutate(value=(value-min(value,na.rm=TRUE))/(max(value,na.rm=TRUE)-min(value,na.rm=TRUE))) 
+  return(to_return)
+  
+}
+
+front_picture<-function(directory,title){
+  
+  grids<-vector("list", 3) #create list of size 4
+  fishing<-vector("list", 3)
+  for(i in 1:3)
+  {
+    grid <- read.csv(paste(directory,"biomass",i,".csv",sep=""), header=FALSE)
+    grid2<-  meltProperly(grid,as.character(i),normalize=FALSE)
+    grids[[i]]<-grid2
+    
+    fishing[[i]]<-meltProperly(
+      read.csv(paste(directory,"fishing",i,".csv",sep=""), header=FALSE),
+      as.character(i),normalize=TRUE
+    )
+    
+    
+  }
+  grid<-bind_rows(grids)
+  fish_grid<-bind_rows(fishing)
+  
+  bioplot<-ggplot(data=grid) + geom_tile(aes(x=X,y=Y,fill=value)) + 
+    scale_fill_gradient2(low="white",high="red",na.value = "#00FF7F",name="Biomass")  + 
+    # geom_hline(yintercept=25,col="black",lwd=0.5,lty=3) +
+    ggtitle("Biomass Left") + 
+    facet_wrap(~policy,ncol = 1)
+  
+  fishplot<-ggplot(data=fish_grid) + geom_tile(aes(x=X,y=Y,fill=value)) + 
+    scale_fill_gradient2(low="white",high="black",na.value = "#00FF7F",name="Tows")  + 
+    # geom_hline(yintercept=25,col="black",lwd=0.5,lty=3) +
+    ggtitle("Tows Yearly Distribution") + 
+    facet_wrap(~policy,ncol = 1)
+  
+  together<-arrangeGrob(fishplot,bioplot,nrow=1,top = title)
+  return(together)
+}
+
+
+original<-front_picture(paste(main_directory,"/fronts/",sep=""),"original")
+tested<-front_picture(paste(test_directory,"/fronts/",sep=""),"test")
+grid.arrange(original,tested,nrow=2)
+```
+
+### Sensitivity 
+
+```{r fronts_ANT, fig.cap="Square root of the average towing distance from port of agents. While the default parameters produce an upward sloping trend (fishing further from port as tim progresses) there are parameters set for which there is no trend or the trend is negative"}
+library(readr)
+sensitivity<-function(directory){
+  default <- read_csv(paste(directory,"fronts.yaml.csv",sep=""), col_names = FALSE)
+  flat <- read_csv(paste(directory,"fronts_flat.yaml.csv",sep=""), col_names = FALSE)
+  worst<- read_csv(paste(directory,"fronts_worst.yaml.csv",sep=""), col_names = FALSE)
+  fronts_sensitivity<-data.frame(default=default$X1,flat=flat$X1,worst=worst$X1)
+  fronts_sensitivity<-
+    fronts_sensitivity %>%
+    mutate(day=row_number()) %>%
+    gather("run","distance",-day)
+  return(ggplot(data=fronts_sensitivity) +
+           geom_line(aes(x=day,y=distance,col=run)) +
+           scale_y_sqrt() +
+           xlab("Simulation Day") +
+           ylab("Distance From Port") +
+           scale_color_discrete(name="Run Type",labels=c("Default","Flat","Negative")))
+}
+real<-
+  sensitivity(paste(main_directory,"/sensitivity/fronts/",sep="")) + ggtitle("Original")
+test<-
+  sensitivity(paste(test_directory,"/sensitivity/fronts/",sep="")) + ggtitle("Test")
+grid.arrange(real,test,nrow=2)
+
+```
+
+## Hyperstability
+
+```{r hyperstability, fig.cap="The trajectory of catches per unit of effort and biomass over a 40 year run of the simulation. While CPUE falls as biomass is depleted some of the changes are masked by fishers switching their location so that while in the first 10 years two fifths of the biomass is consumed the CPUE remained steady."}
+#directory<-paste(main_directory,"/hyperstability/hyperstability.csv",sep="")
+hyperstability_plot<-function(directory,title){
+  hyperstability <- read_csv(directory)
+  #ma <- function(x,n=5){filter(x,rep(1/n,n), sides=2)}
+  
+  hyperstability$CPUE<-hyperstability$`Species 0 Landings`/hyperstability$`Total Effort`
+  hyperstability<- mutate(hyperstability,year=row_number())
+  #summary(lm(log(hyperstability$CPUE)~log(hyperstability$`Biomass Species 0`)))
+  #par(mfrow=c(2,1))
+  
+  plot1<-ggplot(data=hyperstability)+
+    geom_line(aes(x=year,y=CPUE)) + xlab("Year") + ylab("CPUE")
+  plot2<-
+    ggplot(data=hyperstability)+
+    geom_line(aes(x=year,y=`Biomass Species 0`)) + xlab("Year") + ylab("Biomass Left")
+  
+  return(arrangeGrob(plot1,plot2,nrow=2,top=title))
+}
+plot1<-hyperstability_plot(paste(main_directory,"/hyperstability/hyperstability.csv",sep=""),"Original")
+plot2<-hyperstability_plot(paste(test_directory,"/hyperstability/hyperstability.csv",sep=""),"Test")
+grid.arrange(plot1,plot2,nrow=2)
+#summary(lm(log(hyperstability$CPUE)~log(hyperstability$`Biomass Species 0`)))
+
+```
+
+## Oil Prices
+
+```{r oil prices, fig.cap="How fishers react to oil price changes depends both on the price of the oil and the way fishers consume it; if fishers consume most (or in this case all) gas into moving from and to port then the gas price effects are large in terms of where to fish; if most (or in this case all) gas gets spent on fishing instead then gas prices have no effect on fishing location."}
+
+oilplot <-function(directory){
+  grids<-vector("list", 6) 
+  
+  grids[[1]]<-meltProperly(read.csv(paste(directory,"oil_1_1.csv",sep=""), header=FALSE),"1_1",normalize=TRUE)
+  grids[[2]]<-meltProperly(read.csv(paste(directory,"oil_1_2.csv",sep=""), header=FALSE),"1_2",normalize=TRUE)
+  grids[[3]]<-meltProperly(read.csv(paste(directory,"oil_2_1.csv",sep=""), header=FALSE),"2_1",normalize=TRUE)
+  grids[[4]]<-meltProperly(read.csv(paste(directory,"oil_2_2.csv",sep=""), header=FALSE),"2_2",normalize=TRUE)
+  grids[[5]]<-meltProperly(read.csv(paste(directory,"oil_1_3.csv",sep=""), header=FALSE),"1_3",normalize=TRUE)
+  grids[[6]]<-meltProperly(read.csv(paste(directory,"oil_2_3.csv",sep=""), header=FALSE),"2_3",normalize=TRUE)
+  
+  grids<-bind_rows(grids)
+  grids<-grids %>% separate(policy,c("scenario","year"),sep="_") 
+  grids$scenario<-factor(grids$scenario,labels = c("Only Movement","Only Trawling"))
+  grids$year<-factor(grids$year,labels = c("Free Oil","Cheap Oil","Expensive Oil"))
+  
+  #we need to spread stuff
+  grids<-grids %>%  spread(year,value)
+  
+  
+  
+  grids<-grids %>% mutate(grass=X>=40)
+  return(ggplot(grids,aes(x=X,y=Y))  +
+    geom_tile(aes(alpha=`Free Oil`,fill=factor(1))) +
+    geom_tile(aes(alpha=`Cheap Oil`,fill=factor(2))) +
+    geom_tile(aes(alpha=`Expensive Oil`,fill=factor(3))) +
+    geom_tile(aes(alpha=as.numeric(grass),fill=factor(4))) +
+    scale_fill_manual(values=c("blue","pink","red","#00FF7F"),
+                      na.value="#00FF7F",labels=c("Free Gas","Cheap Gas","Expensive Gas","Land"),name="Tiles Towed")+ 
+    scale_alpha_continuous("Number of Tows",trans="sqrt",guide=FALSE,range=c(0,.85)) +
+    facet_wrap(~scenario) +
+    ggtitle("Fishing Intensity With Gas Price Changes")
+  )
+}
+original <- 
+  oilplot(paste(main_directory,"/oil/",sep="")) + ggtitle("Original")
+test<- 
+  oilplot(paste(test_directory,"/oil/",sep="")) + ggtitle("Test")
+grid.arrange(original,test,nrow=2)
+```
+
+### Oil Prices 2
+
+```{r oil_prices2, fig.cap ="A plot of average distance to port per simulation after fixing oil prices and technology. The stepwise shape of the `movement only` fisher depends on the interaction of fish distribution, oil prices and cell size"}
+
+oilplot2<-function(directory){
+  grid<-read_csv(paste(directory,"/oil_grid.csv",sep=""))
+  return(ggplot(data=grid)+geom_line(aes(x=price,y=distance ,col=type), lwd=2,alpha=.8) +
+    xlab("Gas Price") + 
+    ylab("Average Distance From Port") +
+    ggtitle("Fishing Distance Given Gas Prices") +
+    scale_color_discrete(breaks=c("oil_travel","oil_trawl"),labels=c("Only Movement","Only Trawling"), name="Gas Consumption"))
+}
+original <- 
+  oilplot2(paste(main_directory,"/oil/",sep="")) +
+  ggtitle("Original")
+test <- 
+  oilplot2(paste(test_directory,"/oil/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=2)
+```
+
+## Fish the line
+
+```{r fish_the_line, fig.cap = "The area from (15,10) to (30,40) is protected by a MPA, fishers resort, over 20 years, to mostly fish at its border, so much so that the normalized tows plot show the MPA contour. Notice also how the corners of the MPA are not as heavily fished. This is a consequence of fish movement proceeding over Von Neumann neighborhoods so that fish doesn't move 'diagonally'. The trial and error agents figure out even this detail."}
+#directory<- paste(main_directory,"/line/",sep="")
+mpaPlot<-function(directory){
+  grid <- read.csv(paste(directory,"mpa.csv",sep=""), header=FALSE)
+  grid<-meltProperly(grid,"",normalize=TRUE)
+  
+  return(ggplot(data=grid) + geom_tile(aes(x=X,y=Y,fill=value)) + 
+           scale_fill_gradient2(low="white",high="black",na.value = "#00FF7F",name="# Tows")  + 
+           # geom_hline(yintercept=25,col="black",lwd=0.5,lty=3) +
+           ggtitle("Normalized Tows Over 20 Years of Simulation"))
+}
+original <- 
+  mpaPlot(paste(main_directory,"/line/",sep="")) +
+  ggtitle("Original")
+test <- 
+  mpaPlot(paste(test_directory,"/line/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=2)
+```
+
+## Osmose
+
+```{r osmose, fig.cap="The time series of 50 simulation runs studying the biomass of `Demersal 2` and Mesopelagic fish over 30 years of simulation when fishers are targeting the `Demersal2` species. The bolded line is the average biomass over the 50 runs"}
+directory<-paste(main_directory,"/osmose/",sep="")
+
+osmosePlot<-function(directory,title)
+{
+  paths <- dir(directory, pattern = "dem2_.+\\.csv$", full.names = TRUE)
+  names(paths) <- basename(paths)
+  dem2<-ldply(paths, read.csv, stringsAsFactors = FALSE)
+  
+  dem2<- 
+    dem2 %>% group_by(.id) %>% mutate(year=row_number()) %>%
+    gather("Species","Biomass",-.id,-year)
+  
+  
+  interesting <- "Biomass.mesopelagic"
+  plot1c<-ggplot(data=dem2 %>% filter(Species == interesting)) + geom_line(aes(x=year,y=Biomass,color=.id)) +
+    scale_color_discrete(guide="none") +
+    geom_line(data=
+                dem2 %>% filter(Species == interesting) %>% group_by(year) %>% 
+                summarize(avg=mean(Biomass)),aes(x=year,y=avg),lwd=2,col="black") +
+    scale_y_continuous(labels = comma) +  coord_cartesian(ylim=c(0,2000000)) +
+    
+    ggtitle("Mesopelagic, Dem2 Fishing") + theme_classic() + theme(plot.title = element_text(size = 8))
+  
+  
+  interesting <- "Biomass.demersal1"
+  plot2c<-ggplot(data=dem2 %>% filter(Species == interesting)) + geom_line(aes(x=year,y=Biomass,color=.id)) +
+    scale_color_discrete(guide="none") +
+    geom_line(data=
+                dem2 %>% filter(Species == interesting) %>% group_by(year) %>% 
+                summarize(avg=mean(Biomass)),aes(x=year,y=avg),lwd=2,col="black") +
+    scale_y_continuous(labels = comma) +  coord_cartesian(ylim=c(0,2500000)) +
+    
+    ggtitle("Demersal1, Dem2 Fishing") + theme_classic() + theme(plot.title = element_text(size = 8))
+  
+  interesting <- "Biomass.demersal2"
+  plot3c<- ggplot(data=dem2 %>% filter(Species == interesting)) + geom_line(aes(x=year,y=Biomass,color=.id)) +
+    scale_color_discrete(guide="none") +
+    geom_line(data=
+                dem2 %>% filter(Species == interesting) %>% group_by(year) %>% 
+                summarize(avg=mean(Biomass)),aes(x=year,y=avg),lwd=2,col="black") +
+    scale_y_continuous(labels = comma) +  coord_cartesian(ylim=c(0,2500000)) +
+    
+    ggtitle("Demersal2, Dem2 Fishing") + theme_classic() + theme(plot.title = element_text(size = 8))
+  
+  return(arrangeGrob(plot1c,plot3c,ncol=1,top=title))
+}
+
+grid.arrange(osmosePlot(paste(main_directory,"/osmose/",sep=""),"Original"),
+             osmosePlot(paste(test_directory,"/osmose/",sep=""),"Test"),
+             ncol=2)
+```
+
+
+
+## Optimal Heuristics
+
+```{r optimal_heuristic, fig.cap="A comparison on the overall efficiency (in terms of cumulative catches) for 3 sample heuristics over 3 different biology models"}
+#directory<- paste(main_directory,"/optimal_heuristic/",sep="")
+heuristicPlot<-function(directory){
+  imitation <- read.csv(paste(directory,"heuristic.csv",sep=""), header=TRUE)
+  library(ggplot2)
+  
+  #imitation2 <- imitation %>% group_by(biology) %>% mutate(catches= (catches-min(catches))/(max(catches)-min(catches)))
+  imitation$agent<-relevel(imitation$agent, "Explorer")
+  
+  return(ggplot()+geom_bar(data=imitation,aes(y=catches,x=agent,fill=agent),stat="identity")+facet_grid(~biology) + 
+    ylab("5 Years Cumulative Catches") + xlab("Heuristic Type") + scale_fill_discrete(guide=FALSE))
+  #+ 
+  #  scale_fill_discrete(labels=c("Exploiter","Adaptive","Explorer")) + 
+  #  scale_x_discrete(labels=c("Exploiter","Adaptive","Explorer"))  + ylab("Yearly Catches") 
+}
+original <- 
+  heuristicPlot(paste(main_directory,"/optimal_heuristic/",sep="")) +
+  ggtitle("Original")
+test <- 
+  heuristicPlot(paste(test_directory,"/optimal_heuristic/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+
+```
+
+## Switching Gear
+
+```{r ebbs, fig.cap="A sample run where agents are allowed to switch gear and by consequence target species. Fishers tend to respond to variation in relative biomass distribution even without knowing it by following the example of those that are more profitable"}
+directory<- paste(test_directory,"/hardswitch/",sep="")
+ebbPlot<-function(directory,title)
+{
+  ebbs <- read.csv(paste(directory,"hardswitch.csv",sep=""),stringsAsFactors = FALSE)
+  
+  ebbs<- ebbs %>% mutate(year=row_number())
+  
+  catches<-ebbs %>% select(year,catchers1=Species.0.Catchers,catchers2=Species.1.Catchers)
+  catches<-gather(catches,"target","catches",-year)
+  plot1<-ggplot(data=catches) + geom_line(aes(x=year,col=target,y=catches),lwd=2) + ylab("Catchers") + ggtitle("Catchers per Target") +
+    scale_color_discrete(name="Gear Type",labels=c("Red Gear","Blue Gear"))
+  
+  biomass<- ebbs %>% select(year,Species.0=Biomass.Species.0,Species.1=Biomass.Species.1)
+  biomass<-gather(biomass,"target","biomass",-year)
+  
+  plot2<- ggplot(data=biomass) + geom_line(aes(x=year,col=target,y=biomass),lwd=2) + scale_y_continuous(labels = comma)+ 
+    ylab("Biomass") + ggtitle("Biomasses") + scale_color_discrete(name="Species",labels=c("Reds","Blues"))
+  return(arrangeGrob(plot1,plot2,top=title))
+}
+
+grid.arrange(ebbPlot(paste(main_directory,"/hardswitch/",sep=""),"Original"),
+             ebbPlot(paste(test_directory,"/hardswitch/",sep=""),"Test"),
+             nrow=2)
+```
+
+## Directed Technological Change
+
+```{r directed_tech_change, fig.cap= "Each line represents the average fuel inefficiency for an indpendent simulation. When facing free gas there is no incentive to improve fuel efficiency and therefore technology on average follows a random walk. The more expensive gas gets the more pronounced the march towards better gear becomes"}
+techchange<-function(directory){
+  
+  paths <- dir(directory,pattern = "\\.csv", full.names = TRUE)
+  names(paths) <- basename(paths) #keep the relative path but name them differently which is handy when ldply gets called
+  gas_data<-
+    ldply(paths, read.csv, stringsAsFactors = FALSE,header=FALSE,colClasses="numeric")
+  
+  gas_data<-
+    gas_data %>% separate(.id,into=c("scenario","run"),sep="_") %>% mutate(run = factor(paste(run,scenario))) %>% 
+    mutate(scenario=factor(scenario)) %>% rename(consumption=V1) 
+  
+  #add days as the x of the plot
+  gas_data<-gas_data %>% group_by(run) %>% mutate(days=row_number())
+  gas_data$scenario<-relevel(gas_data$scenario,"free")
+  
+  return(ggplot(data= gas_data) + geom_line(aes(y=consumption,x=days,group=run,col=scenario)) + 
+           scale_color_discrete(guide=FALSE)+
+           ggtitle("Gas Mileage Evolution") + ylab("Average Fuel Inefficiency") + xlab("Simulation Days") +
+           ylim(c(0,20)) +
+           facet_grid(.~scenario,labeller = as_labeller(c("free"= "Free Gas",
+                                                          "cheap"= "Cheap Gas",
+                                                          "expensive"= "Expensive Gas")))
+  )
+}
+
+original <- 
+  techchange(paste(main_directory,"/gearopt/",sep="")) +
+  ggtitle("Original")
+test <- 
+  techchange(paste(test_directory,"/gearopt/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+```
+
+
+## Mileage ITQ vs TAC
+
+```{r mileage_itq, fig.cap= "Each dot in this graph represents a simulated fisher. The generated scatterplot shows how ITQs reward more energy efficient fishers with higher catches while in the TAC scenario there is no correlation between efficiency and catches"}
+
+#directory<-paste(main_directory,"/one_species/",sep="")
+
+mileaplot<-function(directory){
+  mileage<-read.csv(paste(directory,"mileage.csv",sep=""))
+  
+  return(
+    ggplot(data=mileage) +
+      geom_point(aes(x=mileage,y=catches,col=policy)) +
+      scale_color_discrete(guide=FALSE)+
+      ylab("Yearly Catches") +
+      xlab("Oil Consumption Per Hour") +
+      facet_grid(.~policy,labeller = as_labeller(c("itq"= "Individual Tradeable Quota",
+                                                   "tac"= "Fishery-Wide Untradeable Quota"))) 
+  )
+}
+#mileage %>% group_by(policy) %>% summarise(cor(catches,mileage))
+original <- 
+  mileaplot(paste(main_directory,"/one_species/",sep="")) +
+  ggtitle("Original")
+test <- 
+  mileaplot(paste(test_directory,"/one_species/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+```
+
+## Catchability ITQ vs TAC
+
+
+
+```{r catchability, fig.cap= "Each dot in this graph represents a simulated fisher. The generated scatterplot shows a clear positive correlation between catchability and catches in both scenario. For these particular parameters the relationship is stronger in the ITQ example than the TAC one but this difference is not generalizeable "}
+
+catchaplot<-function(directory){
+  catchability<-read.csv(paste(directory,"catchability.csv",sep=""))
+  
+  return(
+    ggplot(data=catchability) +
+      geom_point(aes(x=catchability,y=catches,col=policy)) +
+      scale_color_discrete(guide=FALSE)+
+      ylab("Yearly Catches") +
+      xlab("Fisher Catchability") +
+      facet_grid(.~policy,labeller = as_labeller(c("itq"= "Individual Tradeable Quota",
+                                                   "tac"= "Fishery-Wide Untradeable Quota"))) 
+  )
+}
+
+original <- 
+  catchaplot(paste(main_directory,"/one_species/",sep="")) +
+  ggtitle("Original")
+test <- 
+  catchaplot(paste(test_directory,"/one_species/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+```
+
+
+## Race to fish - 1
+
+```{r racetofish1, fig.cap="The effort distribution in terms of fishers active each month at the last year of simulation averaged over 50 simulations. TAC and open-access regulations generate race to fish while ITQ allocates effort efficiently."}
+
+#directory<-paste(main_directory,"/race/",sep="")
+
+race2plot<-function(directory,title)
+{
+  paths <- dir(directory,pattern="race.*daily.*.csv",full.names = TRUE)
+  names(paths) <- basename(paths)
+  dailies<-ldply(paths, read.csv, stringsAsFactors = FALSE)
+  dailies$id<-dailies$.id
+  dailies<-separate(dailies,.id,c("data","regulation","frequency","run"),sep="_")  %>%  
+    rename(price=Price.of.Species.0.at.Port.0,fishers=Fishers.at.Sea) %>% 
+    group_by(id) %>% mutate(day=row_number()) %>%
+    gather(column,value,price,fishers)
+  
+  
+  #take averages
+  averages <- 
+    dailies  %>% group_by(regulation,day) %>% filter(column=="price") %>% summarise(price=mean(value))
+  
+  #create an histogram for fishers at sea
+  fishers <- 
+    dailies    %>% filter(column=="fishers") %>% mutate(day_of_year=day %% 365) %>%
+    mutate(month=day_of_year %/% 30.42)
+  
+  
+  anarchy<-
+    fishers %>% filter(regulation=="anarchy",day>=365*14) %>% group_by(month) %>% summarise(fishers=mean(value))
+  plot1<-ggplot(data=anarchy) +
+    geom_bar(aes(x=month,y=fishers),stat="identity",fill="black") + 
+    ylim(0,100) + ggtitle("Open Access") + ylab("Active Fishers") 
+  plot2<-ggplot(data= fishers %>% filter(regulation=="tac",day>=365*14) 
+                %>% group_by(month) %>% summarise(fishers=mean(value))) +
+    geom_bar(aes(x=month,y=fishers),stat="identity",fill="blue") + 
+    ylim(0,100) + ggtitle("TAC") + ylab("Active Fishers") 
+  plot3<-ggplot(data= fishers %>% filter(regulation=="itq",day>=365*14) 
+                %>% group_by(month) %>% summarise(fishers=mean(value))) +
+    geom_bar(aes(x=month,y=fishers),stat="identity",fill="red") + 
+    ylim(0,100) + ggtitle("ITQ") + ylab("Active Fishers")
+  return(arrangeGrob(plot1, plot2, plot3,ncol=3,top=title))
+}
+
+grid.arrange(race2plot(paste(main_directory,"/race/",sep=""),"Original"),
+             race2plot(paste(test_directory,"/race/",sep=""),"Test"),
+             nrow=2)
+```
+
+## Race to fish - 2 
+
+```{r racetofish2, fig.cap="The distribution of average profits made on the last year of simulation for each run made, subdivided by regulation. While ITQs generate profits on average, open-acess and TACs do not."}
+
+raceplot<-function(directory){
+
+paths <- dir(directory,pattern="race.*yearly.*.csv",full.names = TRUE)
+names(paths) <- basename(paths)
+yearly<-ldply(paths, read.csv, stringsAsFactors = FALSE)
+#care only about cashflow
+yearly<-yearly %>% select(.id,Average.Cash.Flow)
+yearly$id<-yearly$.id
+yearly<-separate(yearly,.id,c("data","regulation","frequency","run"),sep="_")  %>%  
+  rename(profits=Average.Cash.Flow) %>% 
+  group_by(id) %>% mutate(year=row_number())
+
+#histogram the profits on the last year of profits to 
+final<- 
+  yearly %>% filter(year>=20)
+final$regulation<-factor(final$regulation)
+levels(final$regulation)<-c("Open Access","ITQ","TAC")
+final$regulation<-factor(final$regulation,c("Open Access","TAC","ITQ"))
+
+profit_table<-final %>%
+  group_by(regulation) %>% 
+  summarise(profits=mean(profits))
+
+#library(knitr)
+#kable(profit_table,caption="Average Last Year Profits per Fisher",col.names = c("Regulation","Average Profits"))
+
+return(ggplot(data=final) + geom_histogram(aes(x=profits,fill=regulation),col="grey",binwidth=50000) + facet_grid(.~regulation) +
+  xlab("Average Per Fisher Profits") +
+  scale_x_continuous(breaks=0) + 
+  scale_fill_manual(guide=FALSE,values=c("black","blue","red")) +
+ ggtitle("Average Last Year Profits"))
+}
+
+original <- 
+  raceplot(paste(main_directory,"/race/",sep="")) +
+  ggtitle("Original")
+test <- 
+  raceplot(paste(test_directory,"/race/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=2)
+```
+
+## Location TAC vs ITQ
+
+```{r location_itq,fig.cap="The normalized number of tows for each map cell over 5 simulated years for both the scenario with ITQ and TAC policy in place. The dashed line represents the divide between blue and red species at y=24. Any cell on the dashed line and below contains only blue fish (the bycatch) while the cells strictly above the dashed line contains only red fish"}
+#directory<-paste(main_directory,"/location/",sep="")
+
+locationPlot<-function(directory){
+  blue <- meltProperly(read.csv(paste(directory,"itq_blue.csv",sep=""), header=FALSE),"blue")
+  
+  #to find the line get the topmost blue cell
+  Ymax<-blue %>% filter(value>0) %>% summarise(max(Y))
+  
+  itq<- meltProperly(read.csv(paste(directory,"itq_tows.csv",sep=""), header=FALSE),"itq")
+  tac<- meltProperly(read.csv(paste(directory,"tac_tows.csv",sep=""), header=FALSE),"tac")
+  
+  grid<-bind_rows(itq,tac)
+  
+  grid$policy<-as.factor(grid$policy)
+  grid$policy<-relevel(grid$policy, "tac")
+  
+  return(
+    ggplot(data=grid) + geom_tile(aes(x=X,y=Y,fill=value)) + 
+      scale_fill_gradient2(low="white",high="black",na.value = "#00FF7F",name="Tows")  + 
+      geom_hline(yintercept = 24,col="red",lwd=0.8,lty=3) +
+      ggtitle("Tows Distribution Over 5 Simulated Years ") + 
+      facet_wrap(~policy,ncol = 2,labeller = as_labeller(c("itq"= "Individual Tradeable Quota",
+                                                           "tac"= "Fishery-Wide Untradeable Quota")))
+  )
+}
+
+original <- 
+  locationPlot(paste(main_directory,"/location/",sep="")) +
+  ggtitle("Original")
+test <- 
+  locationPlot(paste(test_directory,"/location/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+
+```
+
+
+## Gear Change TAC - 1
+
+
+```{r tac_histograms, fig.cap= "The distribution of catchability for each fisher for both species on the first and last year of simulation when a TAC policy is in place."}
+
+#directory<-paste(main_directory,"/gear/",sep="")
+histogramPlot<-function(directory,title)
+{
+  
+  earlyBlue<-read.csv(paste(directory,"tac_start_blue.csv",sep=""),
+                      header=FALSE,colClasses = "numeric")
+  lateBlue<-read.csv(paste(directory,"tac_final_blue.csv",sep=""),
+                     header=FALSE,colClasses = "numeric")
+  
+  earlyRed<-read.csv(paste(directory,"tac_start_red.csv",sep=""),
+                     header=FALSE,colClasses = "numeric")
+  lateRed<-read.csv(paste(directory,"tac_final_red.csv",sep=""),
+                    header=FALSE,colClasses = "numeric")
+  
+  
+  plot1<-
+    ggplot()+geom_histogram(aes(x=earlyBlue$V1,fill=factor(1)),col="black",binwidth=0.001) +  
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(values = c("#00BFFF"),guide = FALSE,name="Blue Catchability") +
+    ggtitle("Blue Catchability Year 1") +ylab("Frequency") + xlab("Catchability")  
+  
+  plot2<-
+    ggplot()+geom_histogram(aes(x=lateBlue$V1,fill=factor(1)),col="black",binwidth=0.001) +
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE,values = c("#0000FF"),name="Blue Catchability") +
+    ggtitle("Blue Catchability Year 20") +ylab("Frequency") + xlab("Catchability")
+  
+  
+  plot3<- 
+    ggplot()+geom_histogram(aes(x=earlyRed$V1,fill=factor(1)),col="black",binwidth=0.001) +
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE, values = c("#FF4500"),name="Red Catchability") +
+    ggtitle("Red Catchability Year 1") +ylab("Frequency") + xlab("Catchability") 
+  
+  plot4<-
+    ggplot()+geom_histogram(aes(x=lateRed$V1,fill=factor(1)),col="black",binwidth=0.001) + 
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE, values = c("#FF0000"),name="Red Catchability") +
+    ggtitle("Red Catchability Year 20")  +ylab("Frequency") + xlab("Catchability") 
+  
+  library(gridExtra)
+  return(arrangeGrob(plot1, plot3, plot2,plot4,ncol=2,top=title))
+}
+#library(cowplot)
+#plot_grid(plot1, plot2, align='hv',ncol=1)
+grid.arrange(histogramPlot(paste(main_directory,"/gear/",sep=""),"Original"),
+             histogramPlot(paste(test_directory,"/gear/",sep=""),"Test"),
+             nrow=1)
+```
+
+## Gear Change TAC - 2
+
+```{r tac_efficiency, fig.cap= "The total number of yearly landings per year of simulation when a TAC is in place. The dashed line represents the total number of quotas available each year. Because blue quotas are rare, the blue fish is the choke species of this simulatio and remains so throughout the 20 simulated years."}
+
+efficiencyPlot<-function(directory)
+{
+  reds<-read.csv(paste(directory,"tac_red_landings.csv",sep=""),
+                 header=FALSE,colClasses = "numeric")
+  blues<-read.csv(paste(directory,"tac_blue_landings.csv",sep=""),
+                  header=FALSE,colClasses = "numeric")
+  landings<-data.frame(blues=blues$V1,reds=reds$V1,year=1:50)
+  landings<-melt(landings,id.vars="year")
+  
+  return(
+    ggplot()+geom_line(data=landings,aes(x=year,y=value,col=variable),lwd=1.5) +
+      geom_hline(yintercept = 4500*100,lty=2,col="red") +
+      geom_hline(yintercept = 500*100,lty=2,col="blue")  + scale_color_manual(values=c("blue","red"),labels=c("blues","reds"),name="Landings") + 
+      ylab("Landings") + xlab("Year") + scale_x_discrete() + ggtitle("Yearly Landings Versus Quotas Allocated")
+  )
+}
+original <- 
+  efficiencyPlot(paste(main_directory,"/gear/",sep="")) +
+  ggtitle("Original")
+test <- 
+  efficiencyPlot(paste(test_directory,"/gear/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+
+```
+
+
+## Gear Change ITQ - 1
+
+
+
+```{r itq_histograms, fig.cap= "The distribution of catchability for each fisher for both species on the first and last year of simulation when a ITQ policy is in place."}
+
+#directory<-paste(main_directory,"/gear/",sep="")
+
+histogramPlot<-function(directory,title)
+{
+  earlyBlue<-read.csv(paste(directory,"itq_start_blue.csv",sep=""),
+                      header=FALSE,colClasses = "numeric")
+  lateBlue<-read.csv(paste(directory,"itq_final_blue.csv",sep=""),
+                     header=FALSE,colClasses = "numeric")
+  
+  earlyRed<-read.csv(paste(directory,"itq_start_red.csv",sep=""),
+                     header=FALSE,colClasses = "numeric")
+  lateRed<-read.csv(paste(directory,"itq_final_red.csv",sep=""),
+                    header=FALSE,colClasses = "numeric")
+  
+  
+  plot1<-
+    ggplot()+geom_histogram(aes(x=earlyBlue$V1,fill=factor(1)),col="black",binwidth=0.001) +  
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(values = c("#00BFFF"),guide = FALSE,name="Blue Catchability") +
+    ggtitle("Blue Catchability Year 1") +ylab("Frequency") + xlab("Catchability")  
+  
+  plot2<-
+    ggplot()+geom_histogram(aes(x=lateBlue$V1,fill=factor(1)),col="black",binwidth=0.001) +
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE,values = c("#0000FF"),name="Blue Catchability") +
+    ggtitle("Blue Catchability Year 20") +ylab("Frequency") + xlab("Catchability")
+  
+  
+  plot3<- 
+    ggplot()+geom_histogram(aes(x=earlyRed$V1,fill=factor(1)),col="black",binwidth=0.001) +
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE, values = c("#FF4500"),name="Red Catchability") +
+    ggtitle("Red Catchability Year 1") +ylab("Frequency") + xlab("Catchability") 
+  
+  plot4<-
+    ggplot()+geom_histogram(aes(x=lateRed$V1,fill=factor(1)),col="black",binwidth=0.001) + 
+    coord_cartesian(ylim=c(0,60),xlim=c(0.001,0.02))  + 
+    scale_fill_manual(guide = FALSE, values = c("#FF0000"),name="Red Catchability") +
+    ggtitle("Red Catchability Year 20")  +ylab("Frequency") + xlab("Catchability") 
+  
+  library(gridExtra)
+  return(arrangeGrob(plot1, plot3, plot2,plot4,ncol=2,top=title))
+}
+#library(cowplot)
+#plot_grid(plot1, plot2, align='hv',ncol=1)
+
+grid.arrange(histogramPlot(paste(main_directory,"/gear/",sep=""),"Original"),
+             histogramPlot(paste(test_directory,"/gear/",sep=""),"Test"),
+             nrow=1)
+```
+
+
+
+## Gear Change ITQ - 2
+
+```{r itq_efficiency, fig.cap= "The total number of yearly landings per year of simulation when a ITQ is in place. The dashed line represents the total number of quotas available each year. Because of gear evolution blue fish do not stay as choke species for long and a more efficient use of quotas emerges."}
+efficiencyPlot<-function(directory)
+{
+  reds<-read.csv(paste(directory,"itq_red_landings.csv",sep=""),
+                 header=FALSE,colClasses = "numeric")
+  blues<-read.csv(paste(directory,"itq_blue_landings.csv",sep=""),
+                  header=FALSE,colClasses = "numeric")
+  landings<-data.frame(blues=blues$V1,reds=reds$V1,year=1:50)
+  landings<-melt(landings,id.vars="year")
+  
+  return(
+    ggplot()+geom_line(data=landings,aes(x=year,y=value,col=variable),lwd=1.5) +
+      geom_hline(yintercept = 4500*100,lty=2,col="red") +
+      geom_hline(yintercept = 500*100,lty=2,col="blue")  + scale_color_manual(values=c("blue","red"),labels=c("blues","reds"),name="Landings") + 
+      ylab("Landings") + xlab("Year") + scale_x_discrete() + ggtitle("Yearly Landings Versus Quotas Allocated")
+  )
+}
+
+original <- 
+  efficiencyPlot(paste(main_directory,"/gear/",sep="")) +
+  ggtitle("Original")
+test <- 
+  efficiencyPlot(paste(test_directory,"/gear/",sep="")) +
+  ggtitle("Test")
+grid.arrange(original,test,nrow=1)
+```
