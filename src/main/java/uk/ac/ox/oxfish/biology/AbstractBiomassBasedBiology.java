@@ -4,7 +4,7 @@ import com.esotericsoftware.minlog.Log;
 
 /**
  * An abstract local biology class that marks the children as being based on Biomass rather than abudance.
- * When actual numbers are required (and this is already a suspicious call) just assume every fish is of age 0
+ * When actual abundance is required (and this is already a suspicious call) just assume every fish is of age 0
  * and just return an array with [biomass/weightAtAge0, 0, 0, ... , 0 ]
  * Created by carrknight on 3/3/16.
  */

@@ -525,8 +525,7 @@ public class FishStateUtilities {
         Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch
         double specieCatch = Math.min(FishStateUtilities.round(where.getBiomass(species) *
-                                                                       q *
-                                                                       hoursSpentFishing),
+                                                                       q),
                                       where.getBiomass(species));
         //tell biomass
         if(!safeMode && specieCatch> 0)

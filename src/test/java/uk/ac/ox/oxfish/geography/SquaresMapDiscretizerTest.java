@@ -23,7 +23,7 @@ public class SquaresMapDiscretizerTest {
     public void discretizeMaps() throws Exception
     {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(8,6,0,0,1);
+        SimpleMapInitializer map = new SimpleMapInitializer(8, 6, 0, 0, 1, 10);
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                               mock(GlobalBiology.class),
                                               mock(FishState.class));
@@ -52,7 +52,7 @@ public class SquaresMapDiscretizerTest {
     public void discretizeMaps2() throws Exception
     {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(50,50,0,0,1);
+        SimpleMapInitializer map = new SimpleMapInitializer(50, 50, 0, 0, 1, 10);
         NauticalMap chart = map.makeMap(new MersenneTwisterFast(),
                                         mock(GlobalBiology.class),
                                         mock(FishState.class));

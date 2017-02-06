@@ -95,6 +95,11 @@ public class BiologyInitializers {
         NAMES.put(YellowBycatchFactory.class,"Yellow Bycatch Factory");
 
 
+        CONSTRUCTORS.put("Linear Getter Biology",
+                         LinearGetterBiologyFactory::new);
+        NAMES.put(LinearGetterBiologyFactory.class,"Linear Getter Biology");
+
+
     }
 
     private BiologyInitializers() {}

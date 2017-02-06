@@ -36,6 +36,12 @@ public class MapDiscretizers {
         NAMES.put(CentroidMapFileFactory.class, "Centroid File Discretization");
 
 
+        CONSTRUCTORS.put("Identity Discretization",
+                         IdentityDiscretizerFactory::new
+        );
+        NAMES.put(IdentityDiscretizerFactory.class, "Identity Discretization");
+
+
     }
 
 }

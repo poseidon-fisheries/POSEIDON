@@ -30,7 +30,7 @@ public class BanditDestinationStrategyTest {
     @Test
     public void NineBoxes() throws Exception {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(50,50, 0, 0, 1);
+        SimpleMapInitializer map = new SimpleMapInitializer(50, 50, 0, 0, 1, 10);
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
         NauticalMap chart = map.makeMap(randomizer,
                                         mock(GlobalBiology.class),
@@ -64,7 +64,7 @@ public class BanditDestinationStrategyTest {
     @Test
     public void SampleProperlyWithinABox() throws Exception {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(9,9, 0, 0, 1);
+        SimpleMapInitializer map = new SimpleMapInitializer(9, 9, 0, 0, 1, 10);
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
         NauticalMap chart = map.makeMap(randomizer,
                                         mock(GlobalBiology.class),

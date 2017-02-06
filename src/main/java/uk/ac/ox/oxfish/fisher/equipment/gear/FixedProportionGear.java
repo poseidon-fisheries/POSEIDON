@@ -43,7 +43,7 @@ public class FixedProportionGear implements Gear
         for (Species species : modelBiology.getSpecies()) {
             if (proportionFished > 0)
                 caught[species.getIndex()] = FishStateUtilities.catchSpecieGivenCatchability(
-                    where, hoursSpentFishing, species, proportionFished, safeMode);
+                    where, 1, species, proportionFished, safeMode);
 
         }
         return caught;

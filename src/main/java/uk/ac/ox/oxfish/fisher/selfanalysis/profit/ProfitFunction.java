@@ -89,7 +89,8 @@ public class ProfitFunction {
         TripRecord trip = simulator.simulateRecord(fisher,
                                                    where,
                                                    state,
-                                                   maxHours, expectedCatches);
+                                                   maxHours,
+                                                   expectedCatches);
         if(trip==null)
             return null;
 

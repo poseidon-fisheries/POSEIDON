@@ -36,14 +36,17 @@ public class SimpleMapInitializer implements MapInitializer {
     private final int depthSmoothing;
 
     private final  double cellSizeInKilometers;
+    private final int maxLandWidth;
 
     public SimpleMapInitializer(
-            int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers) {
+            int width, int height, int coastalRoughness, int depthSmoothing, double cellSizeInKilometers,
+            int maxLandWidth) {
         this.width = width;
         this.height = height;
         this.coastalRoughness = coastalRoughness;
         this.depthSmoothing = depthSmoothing;
         this.cellSizeInKilometers = cellSizeInKilometers;
+        this.maxLandWidth = maxLandWidth;
     }
 
     /**
@@ -59,13 +62,13 @@ public class SimpleMapInitializer implements MapInitializer {
         ObjectGrid2D baseGrid =  new ObjectGrid2D(width, height);
 
         //choose how much of the world is land
-        int landX = 10;
+        int actualLandWidth = maxLandWidth;
         if(width <= 10)
-            landX = (int) Math.ceil(width *.2);
+            actualLandWidth = (int) Math.ceil(width *.2);
 
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {
-                baseGrid.field[x][y] = x <width- landX ?
+                baseGrid.field[x][y] = x <width- actualLandWidth ?
                         new SeaTile(x, y, -random.nextInt(5000), new TileHabitat(0d)) :
                         new SeaTile(x,y,2000, new TileHabitat(0d));
             }
@@ -76,7 +79,7 @@ public class SimpleMapInitializer implements MapInitializer {
          *      \___\___/\__,_/__/\__\__,_|_| |_|_\___/\_,_\__, |_||_|_||_\___/__/__/
          *                                                 |___/
          */
-        if(landX >=10)
+        if(actualLandWidth >=10)
             for(int i=0; i<coastalRoughness; i++) {
                 //now go roughen up the coast
                 List<SeaTile> toFlip = new LinkedList<>();

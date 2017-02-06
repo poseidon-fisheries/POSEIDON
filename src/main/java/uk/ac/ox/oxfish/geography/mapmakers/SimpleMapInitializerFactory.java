@@ -21,6 +21,8 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
 
     private DoubleParameter cellSizeInKilometers= new FixedDoubleParameter(10);
 
+    private DoubleParameter maxLandWidth= new FixedDoubleParameter(10);
+
 
     public SimpleMapInitializerFactory() {
     }
@@ -50,7 +52,8 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
                 height.apply(fishState.getRandom()).intValue(),
                 coastalRoughness.apply(fishState.getRandom()).intValue(),
                 depthSmoothing.apply(fishState.getRandom()).intValue(),
-                cellSizeInKilometers.apply(fishState.getRandom()));
+                cellSizeInKilometers.apply(fishState.getRandom()),
+                maxLandWidth.apply(fishState.getRandom()).intValue());
 
     }
 
@@ -93,5 +96,23 @@ public class SimpleMapInitializerFactory implements AlgorithmFactory<SimpleMapIn
 
     public void setCellSizeInKilometers(DoubleParameter cellSizeInKilometers) {
         this.cellSizeInKilometers = cellSizeInKilometers;
+    }
+
+    /**
+     * Getter for property 'maxLandWidth'.
+     *
+     * @return Value for property 'maxLandWidth'.
+     */
+    public DoubleParameter getMaxLandWidth() {
+        return maxLandWidth;
+    }
+
+    /**
+     * Setter for property 'maxLandWidth'.
+     *
+     * @param maxLandWidth Value to set for property 'maxLandWidth'.
+     */
+    public void setMaxLandWidth(DoubleParameter maxLandWidth) {
+        this.maxLandWidth = maxLandWidth;
     }
 }

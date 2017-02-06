@@ -93,6 +93,11 @@ public class DestinationStrategies
         NAMES.put(FloridaLogitDestinationFactory.class,
                   "Florida Longliner");
 
+        CONSTRUCTORS.put("Perfect RPUE Logit",
+                         LogitRPUEDestinationFactory::new);
+        NAMES.put(LogitRPUEDestinationFactory.class,
+                  "Perfect RPUE Logit");
+
     }
 
     private DestinationStrategies() {}
