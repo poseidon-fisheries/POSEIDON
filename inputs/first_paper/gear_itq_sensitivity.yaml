@@ -1,0 +1,79 @@
+Abstract:
+  biologyInitializer:
+    Well-Mixed:
+      capacityRatioSecondToFirst: '1'
+      differentialPercentageToMove: '0.07'
+      firstSpeciesCapacity: '20000.0'
+      percentageLimitOnDailyMovement: '1'
+      grower:
+          Independent Logistic Grower:
+              steepness: 0.7
+  departingStrategy:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  destinationStrategy:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: false
+      probability:
+        Fixed Probability:
+          explorationProbability: '0.05'
+          imitationProbability: '0'
+      stepSize: uniform 1.0 10.0
+  enginePower: normal 5000.0 100.0
+  fishers: 100
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fuelTankSize: '100000.0'
+  gasPricePerLiter: '0.85'
+  gear:
+    Random Catchability:
+      meanCatchabilityFirstSpecies: uniform .001 .02
+      meanCatchabilityOtherSpecies: uniform .001 .02
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+      gasPerHourFished: '5.0'
+  gearStrategy:
+    Periodic Gear Update Catchability:
+      maximumCatchability: '0.02'
+      minimumCatchability: '.001'
+      probability:
+        Fixed Probability:
+          explorationProbability: '0.2'
+          imitationProbability: '1.0'
+      shockSize: '0.2'
+      yearly: true
+  habitatInitializer: All Sand
+  holdSize: '10.0'
+  literPerKilometer: '10.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '20.0'
+      coastalRoughness: '0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      width: '50.0'
+  market:
+    Fixed Price Market:
+      marketPrice: '10.0'
+  networkBuilder:
+    Equal Out Degree:
+      degree: 2
+  portPositionX: 40
+  portPositionY: 25
+  ports: 1
+  regulation:
+    Multi-ITQ by List:
+      yearlyQuotaMaps: 0:4500,1:500
+  speedInKmh: '15.0'
+  startingMPAs: [
+    ]
+  usePredictors: true
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather

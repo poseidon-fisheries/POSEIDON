@@ -16,7 +16,7 @@ def main():
     
 
     
-    subprocess.call([r_command, '-e "rmarkdown::render(\'./inputs/dashboard2/dashboard.Rmd\')"'])
+    os.system(" ".join(['Rscript', '-e', '"rmarkdown::render(\'./inputs/dashboard2/dashboard.Rmd\')"']))
     shutil.move("./inputs/dashboard2/dashboard.html",sys.argv[2] + "/assets/oxfish/dashboards/" + sys.argv[1] +".html")
 
     # copy paste
