@@ -32,7 +32,7 @@ main_directory<-"/home/carrknight/code/oxfish/runs/first_paper"
 optimization_directory<-"/home/carrknight/code/oxfish/inputs/first_paper/optimiser/"
 sensitivity_directory<-"/home/carrknight/code/oxfish/inputs/first_paper/sensitivity/"
 
-test_directory<-"/home/carrknight/code/oxfish/runs/first_paper_tempz"
+test_directory<-"/home/carrknight/code/oxfish/runs/first_paper_test"
 
 library(ggthemr)
 ggthemr_reset()

@@ -2,11 +2,13 @@ package uk.ac.ox.oxfish.model.network;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -118,6 +120,48 @@ public class SocialNetwork
 
     }
 
+    public void removeRandomFriend(Fisher agent,
+                                   boolean ignoreDirection,
+                                   MersenneTwisterFast random)
+    {
+        List<Fisher> friends = ignoreDirection ?
+                ImmutableList.copyOf(getAllNeighbors(agent)) :
+                ImmutableList.copyOf(getDirectedNeighbors(agent));
+        Preconditions.checkArgument(friends.size() > 0, " Fisher has no friend that can be removed");
+
+        Fisher exFriend = friends.get(random.nextInt(friends.size()));
+        Preconditions.checkArgument(network.findEdgeSet(agent,exFriend).size()<=1);
+        Preconditions.checkArgument(network.findEdgeSet(exFriend,agent).size()<=1);
+        FriendshipEdge edge = network.findEdge(agent, exFriend);
+        if(ignoreDirection && edge == null)
+            edge = network.findEdge(exFriend,agent);
+        Preconditions.checkArgument(edge!=null);
+        network.removeEdge(edge);
+
+        friends = ignoreDirection ?
+                ImmutableList.copyOf(getAllNeighbors(agent)) :
+                ImmutableList.copyOf(getDirectedNeighbors(agent));
+        Preconditions.checkArgument(!friends.contains(exFriend));
+
+    }
+
+    public void addRandomFriend(Fisher agent,
+                                   List<Fisher> otherFishers,
+                                   MersenneTwisterFast random)
+    {
+
+        ArrayList<Fisher> candidates = new ArrayList<Fisher>(otherFishers);
+        candidates.remove(agent);
+        candidates.removeAll(getAllNeighbors(agent));
+
+        Preconditions.checkArgument(candidates.size() > 0, " No valid candidate to befriend!");
+
+        Fisher newFriend = candidates.get(random.nextInt(candidates.size()));
+        network.addEdge(new FriendshipEdge(),agent,newFriend);
+
+
+    }
+
 
     public String toMatrixFile()
     {
@@ -152,5 +196,14 @@ public class SocialNetwork
             Fisher newAddition,
             FishState state) {
         networkPopulator.addFisher(newAddition, network, state);
+    }
+
+    /**
+     * Getter forthe JUNG object
+     *
+     * @return Value for property 'network'.
+     */
+    public DirectedGraph<Fisher, FriendshipEdge> getBackingnetwork() {
+        return network;
     }
 }

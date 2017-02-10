@@ -24,6 +24,12 @@ public class EquidegreeBuilder implements NetworkBuilder{
      */
     private final LinkedList<NetworkPredicate> predicates = new LinkedList<>();
 
+
+    /**
+     * when this is false then do not allow both A->B and B->A connections
+     */
+    private boolean allowMutualFriendships = true;
+
     /**
      * Applies this function to the given argument.
      *
@@ -56,9 +62,10 @@ public class EquidegreeBuilder implements NetworkBuilder{
             for(Fisher candidate : fishers)
             {
                 boolean allowed = candidate!=fisher;
+                boolean mutualAllowed = allowMutualFriendships || (toReturn.findEdge(candidate,fisher) == null);
                 for (NetworkPredicate predicate : predicates)
                     allowed = allowed && predicate.test(fisher, candidate);
-                if(allowed)
+                if(allowed  && mutualAllowed)
                     candidates.add(candidate);
             }
 
@@ -89,9 +96,11 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
             //now make them your friends!
 
-            for(Fisher friend : friends)
-                toReturn.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
-
+            if(friends.size() > 0)
+                for(Fisher friend : friends)
+                    toReturn.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
+            else //if you have no friends add yourself as an unconnected person
+                toReturn.addVertex(fisher);
 
         }
 
@@ -163,5 +172,23 @@ public class EquidegreeBuilder implements NetworkBuilder{
      */
     public void addPredicate(NetworkPredicate predicate){
         predicates.add(predicate);
+    }
+
+    /**
+     * Getter for property 'allowMutualFriendships'.
+     *
+     * @return Value for property 'allowMutualFriendships'.
+     */
+    public boolean isAllowMutualFriendships() {
+        return allowMutualFriendships;
+    }
+
+    /**
+     * Setter for property 'allowMutualFriendships'.
+     *
+     * @param allowMutualFriendships Value to set for property 'allowMutualFriendships'.
+     */
+    public void setAllowMutualFriendships(boolean allowMutualFriendships) {
+        this.allowMutualFriendships = allowMutualFriendships;
     }
 }

@@ -71,6 +71,14 @@ public class FirstPaper
         oils(2);
         Log.info("Fishing the Line");
         mpa();
+
+
+
+        Log.info("TAC vs ITQ 1 Species");
+        catchesPerPolicyCatchability();
+        catchesPerPolicyMileage();
+
+
         Log.info("OSMOSE");
         osmoseDemersal2(50);
         Log.info("Best Heuristic");
@@ -86,7 +94,7 @@ public class FirstPaper
 
         directedTechnologicalChange();
 
-        Log.info("TAC vs ITQ 1 Species");
+
 
         Log.info("Race to Fish");
         raceToFish();
@@ -97,8 +105,7 @@ public class FirstPaper
         policyAndGear("itq");
         policyAndGear("tac");
 
-        catchesPerPolicyCatchability();
-        catchesPerPolicyMileage();
+
         policyAndLocation("itq_sensitivity");
 
 
