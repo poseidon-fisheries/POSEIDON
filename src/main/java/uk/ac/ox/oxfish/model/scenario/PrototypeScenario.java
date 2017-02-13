@@ -277,6 +277,8 @@ public class PrototypeScenario implements Scenario {
                 mpa.buildMPA(map);
             }
 
+        //todo make sure the mapmaker randomizer is dead everywhere
+
         //substitute back the original randomizer
         model.random = random;
 

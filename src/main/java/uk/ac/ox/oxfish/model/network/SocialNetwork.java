@@ -122,6 +122,7 @@ public class SocialNetwork
 
     public void removeRandomFriend(Fisher agent,
                                    boolean ignoreDirection,
+                                   boolean bothSides,
                                    MersenneTwisterFast random)
     {
         List<Fisher> friends = ignoreDirection ?
@@ -137,6 +138,14 @@ public class SocialNetwork
             edge = network.findEdge(exFriend,agent);
         Preconditions.checkArgument(edge!=null);
         network.removeEdge(edge);
+
+        if(bothSides == true)
+        {
+            edge = network.findEdge(exFriend,agent);
+            if(edge != null)
+                network.removeEdge(edge);
+
+        }
 
         friends = ignoreDirection ?
                 ImmutableList.copyOf(getAllNeighbors(agent)) :

@@ -68,14 +68,16 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
 
     /**
      * tell the regulation object this much inPenaltyBox been caught
-     *
+     *  @param where
+     * @param who
      * @param fishCaught catch object
+     * @param hoursSpentFishing
      */
     @Override
-    public void reactToCatch(Catch fishCaught) {
-        mpaRules.reactToCatch(fishCaught);
-        fishingSeason.reactToCatch(fishCaught);
-        quotas.reactToCatch(fishCaught);
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
+        mpaRules.reactToFishing(where,who, fishCaught,hoursSpentFishing);
+        fishingSeason.reactToFishing(where,who, fishCaught,hoursSpentFishing);
+        quotas.reactToFishing(where,who, fishCaught,hoursSpentFishing);
     }
 
     /**

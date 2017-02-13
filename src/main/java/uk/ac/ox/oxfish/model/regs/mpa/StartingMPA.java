@@ -32,7 +32,7 @@ public class StartingMPA {
         this.height = height;
     }
 
-    public void buildMPA(NauticalMap map){
+    public MasonGeometry buildMPA(NauticalMap map){
 
         //create the coordinate transformer (null the gui, no need)
         CoordinateTransformer transformer = new CoordinateTransformer(null,map);
@@ -55,8 +55,10 @@ public class StartingMPA {
         //build it
         final Polygon rectangle = geometryFactory.createRectangle();
         //add to map
-        map.getMpaVectorField().addGeometry(new MasonGeometry(rectangle));
+        MasonGeometry mpaGeometry = new MasonGeometry(rectangle);
+        map.getMpaVectorField().addGeometry(mpaGeometry);
         map.recomputeTilesMPA();
+        return mpaGeometry;
     }
 
     public int getTopLeftX() {

@@ -1,8 +1,9 @@
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DailyLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -38,13 +39,7 @@ public class LonglineFloridaLogisticDepartingFactory implements AlgorithmFactory
                 new LogisticClassifier(
                         //intercept:
                         new Pair<>(
-                                new ObservationExtractor() {
-                                    @Override
-                                    public double extract(
-                                            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                                        return 1;
-                                    }
-                                }
+                                new InterceptExtractor()
                         ,intercept.apply(state.getRandom())),
                         //summer?:
                         new Pair<>(

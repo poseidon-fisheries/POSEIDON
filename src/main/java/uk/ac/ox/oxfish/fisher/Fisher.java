@@ -705,27 +705,28 @@ public class Fisher implements Steppable, Startable{
      */
     public Catch fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state)
     {
-        Preconditions.checkState(status.getLocation().getAltitude() < 0, "can't fish on land!");
+        SeaTile here = status.getLocation();
+        Preconditions.checkState(here.getAltitude() < 0, "can't fish on land!");
 
         //catch fish
-        Catch catchOfTheDay = equipment.getGear().fish(this, status.getLocation(), hoursSpentFishing, modelBiology);
+        Catch catchOfTheDay = equipment.getGear().fish(this, here, hoursSpentFishing, modelBiology);
 
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing, equipment.getGear(),
-                                                 status.getLocation(),catchOfTheDay,this,
+                                                 here, catchOfTheDay, this,
                                                  state.getStep());
         memory.getTripLogger().recordFishing(record);
-        memory.getCatchMemories().memorize(catchOfTheDay, status.getLocation());
-        memory.registerVisit(status.getLocation(), (int) state.getDay());
+        memory.getCatchMemories().memorize(catchOfTheDay, here);
+        memory.registerVisit(here, (int) state.getDay());
 
         //now let regulations and the hold deal with it
-        status.getRegulation().reactToCatch(catchOfTheDay);
+        status.getRegulation().reactToFishing(here,this, catchOfTheDay, hoursSpentFishing);
         load(catchOfTheDay);
 
         //consume gas
         final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,
                                                                                            equipment.getBoat(),
-                                                                                           status.getLocation()) * hoursSpentFishing;
+                                                                                           here) * hoursSpentFishing;
         consumeFuel(litersBurned);
 
         memory.getYearlyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);

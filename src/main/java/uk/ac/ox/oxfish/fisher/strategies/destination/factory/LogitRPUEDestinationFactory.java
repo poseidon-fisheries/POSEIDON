@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyCostExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyRevenueExtractor;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
@@ -11,9 +13,10 @@ import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.LinkedList;
 import java.util.function.Supplier;
@@ -34,6 +37,11 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
 
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new IdentityDiscretizerFactory();
+
+
+    private final DoubleParameter revenueBeta = new FixedDoubleParameter(1d);
+
+    private final DoubleParameter costsBeta = new FixedDoubleParameter(-1d);
 
 
     /**
@@ -65,10 +73,13 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
         //betas are just +1 for revenue and -1 for gas costs
         int numberOfGroups = discretization.getNumberOfGroups();
         double[][] betas = new double[numberOfGroups][2];
+        double revenue = revenueBeta.apply(state.getRandom());
+        double costs = costsBeta.apply(state.getRandom());
+
         for(int i=0; i<numberOfGroups; i++)
         {
-            betas[i][0] = 1d;
-            betas[i][1] = -1d;
+            betas[i][0] = revenue;
+            betas[i][1] = costs;
 
         }
 
@@ -98,32 +109,8 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups) {
         LameTripSimulator simulator = new LameTripSimulator();
         ObservationExtractor[] commonExtractor = new ObservationExtractor[2];
-        commonExtractor[0] = new ObservationExtractor() {
-            @Override
-            public double extract(
-                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-
-
-                TripRecord simulation = simulator.simulateRecord(agent,
-                                                                 tile,
-                                                                 model,
-                                                                 5d * 24d,
-                                                                 agent.getGear().expectedHourlyCatch(agent, tile, 1,
-                                                                                                     model.getBiology()));
-                return simulation.getEarnings()/simulation.getDurationInHours();
-            }
-        };
-        commonExtractor[1] = new ObservationExtractor() {
-            @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                TripRecord simulation = simulator.simulateRecord(agent,
-                                                                 tile,
-                                                                 model,
-                                                                 5d * 24d,
-                                                                 agent.getGear().expectedHourlyCatch(agent, tile, 1,
-                                                                                                     model.getBiology()));
-                return simulation.getLitersOfGasConsumed()*agent.getHomePort().getGasPricePerLiter()/simulation.getDurationInHours();            }
-        };
+        commonExtractor[0] = new SimulatedHourlyRevenueExtractor(5*24d);
+        commonExtractor[1] = new SimulatedHourlyCostExtractor(5*24d);
         ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];
         for(int i=0; i<numberOfGroups; i++)
             extractors[i] = commonExtractor;
@@ -148,5 +135,24 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     public void setDiscretizer(
             AlgorithmFactory<? extends MapDiscretizer> discretizer) {
         this.discretizer = discretizer;
+    }
+
+
+    /**
+     * Getter for property 'revenueBeta'.
+     *
+     * @return Value for property 'revenueBeta'.
+     */
+    public DoubleParameter getRevenueBeta() {
+        return revenueBeta;
+    }
+
+    /**
+     * Getter for property 'costsBeta'.
+     *
+     * @return Value for property 'costsBeta'.
+     */
+    public DoubleParameter getCostsBeta() {
+        return costsBeta;
     }
 }

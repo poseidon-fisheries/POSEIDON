@@ -99,7 +99,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      *  reacts only to fish sold
      */
     @Override
-    public void reactToCatch(Catch fishCaught) {
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
     }
 
     /**

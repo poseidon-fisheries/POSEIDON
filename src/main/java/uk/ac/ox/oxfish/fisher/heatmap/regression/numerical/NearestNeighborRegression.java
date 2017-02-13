@@ -7,6 +7,10 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.AbsoluteRegressionDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RegressionDistance;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationTimeExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -119,24 +123,9 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     public NearestNeighborRegression(int neighbors, double timeBandwidth, double spaceBandwidth)
     {
         this(neighbors, new double[]{spaceBandwidth, spaceBandwidth, timeBandwidth},
-             new ObservationExtractor() {
-                 @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                     return tile.getGridX();
-                 }
-             },
-             new ObservationExtractor() {
-                 @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                     return tile.getGridY();
-                 }
-             },
-             new ObservationExtractor() {
-                 @Override
-                 public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                     return timeOfObservation;
-                 }
-             }
+             new GridXExtractor(),
+             new GridYExtractor(),
+             new ObservationTimeExtractor()
              );
     }
 

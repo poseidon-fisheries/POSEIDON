@@ -4,7 +4,9 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
@@ -30,8 +32,8 @@ public class PseudoLogisticLoggerTest {
 
         ObservationExtractor[] extractors = new ObservationExtractor[3];
         //these extractors return the x and y of the tile ad also the time. Not realistic but it's a stub
-        extractors[0] = (tile, timeOfObservation, agent, model) -> tile.getGridX();
-        extractors[1] = (tile, timeOfObservation, agent, model) -> tile.getGridY();
+        extractors[0] = new GridXExtractor();
+        extractors[1] = new GridYExtractor();
         extractors[2] = (tile, timeOfObservation, agent, model) -> model.getDay();
 
         //prepare everything

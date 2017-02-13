@@ -31,7 +31,9 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,6 +50,8 @@ public class SimpleDynamicNetworks
 {
 
 
+    private final static Path INPUT_FILE = Paths.get("runs", "networks", "eighty.yaml");
+    public static final Path OUTPUT_FILE = Paths.get("runs", "networks", "eighty2.csv");
 
 
     public static void main(String[] args) throws IOException {
@@ -56,58 +60,59 @@ public class SimpleDynamicNetworks
 
 
         EquidegreeBuilder builder = new EquidegreeBuilder();
-      /*  for(int degree=0; degree<20; degree++) {
+        for(int degree=0; degree<10; degree++) {
             builder.setDegree(degree);
             run("fixed" + degree,
                 8,
+                INPUT_FILE,
                 new AnarchyFactory(),
                 builder,
-                30,
-                Paths.get("runs","networks","sweep.csv"));
+                100,
+                OUTPUT_FILE);
         }
-        */
+
 
         builder.setAllowMutualFriendships(false);
 
-        adaptiveRun("anarchy",8,new AnarchyFactory(),builder,30,
-                    Paths.get("runs","networks","sweep.csv"));
+        adaptiveRun("anarchy",8,INPUT_FILE,
+                    new AnarchyFactory(),builder,30,
+                    OUTPUT_FILE);
 
 
         ITQMonoFactory regulation = new ITQMonoFactory();
         regulation.setIndividualQuota(new FixedDoubleParameter(4000));
-        adaptiveRun("itq", 8, regulation, builder, 30,
-                    Paths.get("runs","networks","sweep.csv"));
+        adaptiveRun("itq", 8, INPUT_FILE,
+                    regulation, builder, 30,
+                    OUTPUT_FILE);
 
 
         TACMonoFactory factory = new TACMonoFactory();
         factory.setQuota(new FixedDoubleParameter(4000*100));
-        adaptiveRun("tac", 8, factory, builder, 30,
-                    Paths.get("runs","networks","sweep.csv"));
+        adaptiveRun("tac", 8, INPUT_FILE,
+                    factory, builder, 30,
+                    OUTPUT_FILE);
 
         //mpa?
         ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
         mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
-        adaptiveRun("mpa", 8, mpa, builder, 30,
-                    Paths.get("runs","networks","sweep.csv"));
+        adaptiveRun("mpa", 8, INPUT_FILE,
+                    mpa, builder, 30,
+                    OUTPUT_FILE);
 
     }
 
 
     public static void run(String name,
                            int yearsToRun,
+                           Path inputYamlPath,
                            AlgorithmFactory<? extends  Regulation> regulation,
                            NetworkBuilder builder,
                            int numberOfRuns,
                            Path filePath) throws IOException {
         for(int run = 0; run<numberOfRuns; run++)
         {
-            PrototypeScenario scenario = new PrototypeScenario();
-            //no regrowth of biomass!
-            DiffusingLogisticFactory biologyInitializer = new DiffusingLogisticFactory();
-            SimpleLogisticGrowerFactory grower = new SimpleLogisticGrowerFactory();
-            grower.setSteepness(new FixedDoubleParameter(0d));
-            biologyInitializer.setGrower(grower);
-            scenario.setBiologyInitializer(biologyInitializer);
+            FishYAML yaml = new FishYAML();
+            PrototypeScenario scenario = yaml.loadAs(new FileReader(inputYamlPath.toFile()), PrototypeScenario.class);
 
             scenario.setRegulation(regulation);
             scenario.setNetworkBuilder(builder);
@@ -152,19 +157,16 @@ public class SimpleDynamicNetworks
 
     public static void adaptiveRun(String name,
                                    int yearsToRun,
+                                   Path inputYamlPath,
                                    AlgorithmFactory<? extends  Regulation> regulation,
                                    NetworkBuilder builder,
                                    int numberOfRuns,
                                    Path filePath) throws IOException {
         for(int run = 0; run<numberOfRuns; run++)
         {
-            PrototypeScenario scenario = new PrototypeScenario();
-            //no regrowth of biomass!
-            DiffusingLogisticFactory biologyInitializer = new DiffusingLogisticFactory();
-            SimpleLogisticGrowerFactory grower = new SimpleLogisticGrowerFactory();
-            grower.setSteepness(new FixedDoubleParameter(0d));
-            biologyInitializer.setGrower(grower);
-            scenario.setBiologyInitializer(biologyInitializer);
+            FishYAML yaml = new FishYAML();
+            PrototypeScenario scenario = yaml.loadAs(new FileReader(inputYamlPath.toFile()), PrototypeScenario.class);
+
 
             scenario.setRegulation(regulation);
             scenario.setNetworkBuilder(builder);
@@ -199,9 +201,9 @@ public class SimpleDynamicNetworks
                             if (difference < 0) {
                                 for (int i = 0; i < -difference; i++)
                                 {
-                                    int before = model.getSocialNetwork().getAllNeighbors(subject).size();
-                                    model.getSocialNetwork().removeRandomFriend(subject, true, model.getRandom());
-                                    int after = model.getSocialNetwork().getAllNeighbors(subject).size();
+                                    //int before = model.getSocialNetwork().getAllNeighbors(subject).size();
+                                    model.getSocialNetwork().removeRandomFriend(subject, true, true,model.getRandom());
+                                    //int after = model.getSocialNetwork().getAllNeighbors(subject).size();
                                 }
                             }
                             Preconditions.checkArgument(
@@ -209,7 +211,7 @@ public class SimpleDynamicNetworks
                         },
                         (Sensor<Fisher, Integer>) system -> state.getSocialNetwork().getAllNeighbors(system).size(),
                         new CashFlowObjective(60),
-                        new FixedProbability(.2, 1),
+                        new FixedProbability(.2, 0),
                         (Predicate<Integer>) integer -> true
 
 

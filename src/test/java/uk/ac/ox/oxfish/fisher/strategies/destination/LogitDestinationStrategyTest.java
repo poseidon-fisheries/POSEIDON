@@ -6,7 +6,9 @@ import org.jfree.util.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
@@ -53,7 +55,7 @@ public class LogitDestinationStrategyTest
 
         ObservationExtractor[][] extractors = new ObservationExtractor[3][];
         extractors[0]= new ObservationExtractor[]{
-                (tile, timeOfObservation, agent, model) -> 1d
+                new InterceptExtractor(1d)
         };
         extractors[1]=extractors[0];
         extractors[2]= null;
@@ -113,7 +115,7 @@ public class LogitDestinationStrategyTest
 
         ObservationExtractor[][] extractors = new ObservationExtractor[3][];
         extractors[0]= new ObservationExtractor[]{
-                (tile, timeOfObservation, agent, model) -> 1d
+                new InterceptExtractor(1d)
         };
         extractors[1]=extractors[0];
         extractors[2]= null;
@@ -169,7 +171,7 @@ public class LogitDestinationStrategyTest
 
         ObservationExtractor[][] extractors = new ObservationExtractor[3][];
         extractors[0]= new ObservationExtractor[]{
-                (tile, timeOfObservation, agent, model) -> tile.getGridX()
+                new GridXExtractor()
         };
         extractors[1]=extractors[0];
         extractors[2]= null;

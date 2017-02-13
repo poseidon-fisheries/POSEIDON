@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticMultiClassifier;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.geography.SeaTile;

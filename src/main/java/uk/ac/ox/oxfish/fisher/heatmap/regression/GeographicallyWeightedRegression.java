@@ -5,8 +5,9 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -57,12 +58,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
         this.extractors = new ObservationExtractor[nonInterceptExtractors.length+1];
         for(int i=0; i<nonInterceptExtractors.length; i++)
             this.extractors[i+1] = nonInterceptExtractors[i];
-        this.extractors[0] = new ObservationExtractor() {
-            @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                return 1;
-            }
-        };
+        this.extractors[0] = new InterceptExtractor();
 
         this.kernel = new RBFKernel(rbfBandwidth);
 

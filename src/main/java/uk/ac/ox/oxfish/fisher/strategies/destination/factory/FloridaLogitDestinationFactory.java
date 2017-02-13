@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.*;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -101,25 +102,15 @@ public class FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDes
             MapDiscretization discretization) {
         return new ObservationExtractor[]{
                 //intercept
-                (tile, timeOfObservation, agent, model) -> 1d,
+                new InterceptExtractor(),
                 //distance
-                (tile, timeOfObservation, agent, model) -> {
-                    return model.getMap().distance(
-                            agent.getHomePort().getLocation(), tile);
-                },
+                new PortDistanceExtractor(),
                 //habit
-                (tile, timeOfObservation, agent, model) -> {
-                    //it it has been less than 90 days since you went there, you get the habit bonus!
-                    return  model.getDay() -
-                            agent.getDiscretizedLocationMemory()
-                                    .getLastDayVisited()[discretization.getGroup(tile)] < 90 ?
-                            1 : 0;
-                },
+                new PeriodHabitExtractor(discretization,90),
                 //fuel_price TODO: adjust from gallon
-                (tile, timeOfObservation, agent, model) ->
-                        agent.getHomePort().getGasPricePerLiter(),
+                new GasPriceExtractor(),
                 //wind_speed TODO: adjust from mph
-                (tile, timeOfObservation, agent, model) -> tile.getWindSpeedInKph()
+                new WindSpeedExtractor()
         };
     }
 

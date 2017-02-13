@@ -38,7 +38,7 @@ public class Anarchy implements Regulation {
      * no reaction
      */
     @Override
-    public void reactToCatch(Catch fishCaught) {
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
 
     }
 

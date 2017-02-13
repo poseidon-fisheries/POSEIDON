@@ -89,11 +89,13 @@ public class TemporaryProtectedArea implements Regulation
 
     /**
      * tell the regulation object this much has been caught
-     *
+     *  @param where
+     * @param who
      * @param fishCaught catch object
+     * @param hoursSpentFishing
      */
     @Override
-    public void reactToCatch(Catch fishCaught) {
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
         //nothing
     }
 

@@ -3,7 +3,8 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
@@ -25,7 +26,7 @@ public class LogisticMultiClassifierTest {
         beta[1][1] = 0;
         //all intercept
         ObservationExtractor[][] extractor = new ObservationExtractor[2][2];
-        extractor[0][0] = (tile, timeOfObservation, agent, model) -> 1;
+        extractor[0][0] =new InterceptExtractor();
         extractor[1][0] = extractor[0][0];
         extractor[1][1] = extractor[0][0];
         extractor[0][1] = extractor[0][0];

@@ -1,12 +1,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.*;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.HabitatExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -53,7 +52,7 @@ public class DefaultRBFKernelTransductionFactory implements AlgorithmFactory<Ker
                         yBandwidth.apply(state.getRandom())
                 ),
                 new Pair<>(
-                        new PortDistanceExtractor(new ManhattanDistance(),state.getMap()),
+                        new PortDistanceExtractor(new ManhattanDistance(), 1d),
                         distanceFromPortBandwidth.apply(state.getRandom())
                 ),
                                 new Pair<>(

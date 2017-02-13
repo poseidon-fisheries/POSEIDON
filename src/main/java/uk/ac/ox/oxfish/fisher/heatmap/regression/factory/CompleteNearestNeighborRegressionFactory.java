@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -34,40 +32,12 @@ public class CompleteNearestNeighborRegressionFactory implements AlgorithmFactor
 
         private final static ObservationExtractor[] extractors = new ObservationExtractor[5];
         static {
-            extractors[0] = new ObservationExtractor() {
-                @Override
-                public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                    return timeOfObservation;
-                }
-            };
-            extractors[1] = new ObservationExtractor() {
-                @Override
-                public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                    return tile.getGridX();
-                }
-            };
-            extractors[2] = new ObservationExtractor() {
-                @Override
-                public double extract(
-                        SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                    return tile.getGridY();
-                }
-            };
+            extractors[0] = new ObservationTimeExtractor();
+            extractors[1] = new GridXExtractor();
+            extractors[2] = new GridYExtractor();
             ManhattanDistance distance = new ManhattanDistance();
-            extractors[3] = new ObservationExtractor() {
-                @Override
-                public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                    return distance.distance(tile,agent.getHomePort().getLocation())+1;
-                }
-            } ;
-            extractors[4] = new ObservationExtractor() {
-                @Override
-                public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                    return  tile.getRockyPercentage();
-                }
-            };
+            extractors[3] = new PortDistanceExtractor(distance, 1d);
+            extractors[4] = new HabitatExtractor();
 
         }
 

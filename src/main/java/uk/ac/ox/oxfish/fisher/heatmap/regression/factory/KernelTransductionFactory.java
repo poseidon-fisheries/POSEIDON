@@ -2,8 +2,10 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.KernelTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -33,21 +35,9 @@ public class KernelTransductionFactory implements AlgorithmFactory<KernelTransdu
         return new KernelTransduction(
                 state.getMap(),
                 forgettingFactor.apply(state.getRandom()),
-                new Pair<>(new ObservationExtractor() {
-                    @Override
-                    public double extract(
-                            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                        return tile.getGridX();
-                    }
-                },bandwidth),
+                new Pair<>(new GridXExtractor(), bandwidth),
 
-                new Pair<>(new ObservationExtractor() {
-                    @Override
-                    public double extract(
-                            SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                        return tile.getGridY();
-                    }
-                },bandwidth));
+                new Pair<>(new GridYExtractor(), bandwidth));
     }
 
 

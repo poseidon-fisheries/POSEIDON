@@ -2,7 +2,9 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.HabitatExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -27,18 +29,8 @@ public class GeographicallyWeightedRegressionFactory implements AlgorithmFactory
     private final static ObservationExtractor[] extractors = new ObservationExtractor[2];
     static {
         ManhattanDistance distance = new ManhattanDistance();
-        extractors[0] = new ObservationExtractor() {
-            @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                return distance.distance(tile,agent.getHomePort().getLocation());
-            }
-        } ;
-        extractors[1] = new ObservationExtractor() {
-            @Override
-            public double extract(SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                return  tile.getRockyPercentage();
-            }
-        };
+        extractors[0] = new PortDistanceExtractor(distance,0d);
+        extractors[1] = new HabitatExtractor();
 
     }
 

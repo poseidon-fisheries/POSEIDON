@@ -1,11 +1,11 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.factory;
 
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.CartesianRegressionDistance;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridXExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridYExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.TimeExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationTimeExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -37,7 +37,7 @@ public class NearestNeighborTransductionFactory implements AlgorithmFactory<Near
                 new ObservationExtractor[]{
                         new GridYExtractor(),
                         new GridXExtractor(),
-                        new TimeExtractor()
+                        new ObservationTimeExtractor()
                 },
                 new double[]{
                         spaceBandwidth.apply(state.getRandom()),

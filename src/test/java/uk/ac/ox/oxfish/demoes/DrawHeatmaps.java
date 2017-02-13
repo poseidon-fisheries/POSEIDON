@@ -6,9 +6,10 @@ import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.GeographicallyWeightedRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.GoodBadRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.EpanechinikovKernel;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridXExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.GridYExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.PortDistanceExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridXExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.GridYExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
@@ -36,50 +37,50 @@ public class DrawHeatmaps
     public static void main(String[] args) throws Exception {
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1, 1},
-                (tile, timeOfObservation, agent, model) -> tile.getGridX(),
-                (tile, timeOfObservation, agent, model) -> tile.getGridY()
+                new GridXExtractor(),
+                new GridYExtractor()
         ),"nn_simple");
 
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1},
-                new PortDistanceExtractor(new ManhattanDistance(),null)
+                new PortDistanceExtractor(new ManhattanDistance(), 1d)
         ),"nn_port");
 
 
         distancePlot(new NearestNeighborRegression(
                 2, new double[]{1, 1},
-                (tile, timeOfObservation, agent, model) -> tile.getGridX(),
-                (tile, timeOfObservation, agent, model) -> tile.getGridY()
+                new GridXExtractor(),
+                new GridYExtractor()
         ),"nn_multiple");
 
         distancePlot(new NearestNeighborRegression(
                 1, new double[]{1,1,1},
-                (tile, timeOfObservation, agent,  model) -> tile.getGridX(),
-                (tile, timeOfObservation, agent, model) -> tile.getGridY(),
-                new PortDistanceExtractor(new ManhattanDistance(),null)
+                new GridXExtractor(),
+                new GridYExtractor(),
+                new PortDistanceExtractor(new ManhattanDistance(), 1d)
         ),"nn_both");
 
 
         distancePlot(new KernelRegression(
                 100,
                 new EpanechinikovKernel(0),
-                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridX(), 30d),
-                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridY(), 30d)
+                new Pair<>(new GridXExtractor(), 30d),
+                new Pair<>(new GridYExtractor(), 30d)
         ), "epa_simple");
 
 
         distancePlot(new KernelRegression(
                 100,
                 new EpanechinikovKernel(0),
-                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridX(), 30d),
-                new Pair<>((tile, timeOfObservation, agent,  model) -> tile.getGridY(), 30d)
+                new Pair<>(new GridXExtractor(), 30d),
+                new Pair<>(new GridYExtractor(), 30d)
         ), "epa_tilded");
 
 
         distancePlot(new KernelRegression(
                 100,
                 new EpanechinikovKernel(0),
-                new Pair<>(new PortDistanceExtractor(new ManhattanDistance(), null), 30d)), "epa_port");
+                new Pair<>(new PortDistanceExtractor(new ManhattanDistance(), 1d), 30d)), "epa_port");
 
 
 
