@@ -29,15 +29,23 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
 
     private final MersenneTwisterFast random;
 
+    /**
+     * this multiplies the biology weight as stored into OSMOSE before returning it to the model.
+     * This is useful because OSMOSE stores weight in tonnes while we want them in kilos.
+     */
+    private final double scalingFactor;
+
     public LocalOsmoseByBiomassBiology(
             ExogenousMortality mortality, CellBiomass counter,
-            int numberOfSpecies, MersenneTwisterFast random)
+            int numberOfSpecies, MersenneTwisterFast random,
+            double scalingFactor)
     {
         this.counter = counter;
         this.mortality = mortality;
         this.random = random;
         biomassAlreadyFished = new double[numberOfSpecies];
         biomassFishedFromSchool = new HashMap<>();
+        this.scalingFactor = scalingFactor;
     }
 
     /**
@@ -52,7 +60,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
         final double currentBiomass =
                 counter.getBiomass(species.getIndex()) - biomassAlreadyFished[species.getIndex()];
         assert  currentBiomass >= -FishStateUtilities.EPSILON;
-        return currentBiomass;
+        return scalingFactor * currentBiomass;
 
 
 
@@ -68,6 +76,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
     @Override
     public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished)
     {
+        biomassFished /= scalingFactor;
         //this is the biomass available for this species
         double biomassAvailable = counter.getBiomass(species.getIndex())-
                 biomassAlreadyFished[species.getIndex()] ;
@@ -152,7 +161,7 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
 
         double[] toPrint = new double[biomassAlreadyFished.length];
         for(int i =0; i<toPrint.length; i++ )
-            toPrint[i] = counter.getBiomass(i) - biomassAlreadyFished[i];
+            toPrint[i] = (counter.getBiomass(i) - biomassAlreadyFished[i])*scalingFactor;
 
         return Arrays.toString(toPrint);
 

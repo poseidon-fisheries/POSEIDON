@@ -52,15 +52,20 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
     private final Integer[] speciesToManageFromThisSide;
 
 
+    private final double scalingFactor;
+
+
     public OsmoseBiologyInitializer(
             String osmoseConfigurationFile, boolean preInitializedConfiguration,
             String preInitializedConfigurationDirectory, int burnInYears,
-            Integer... speciesToManage) {
+            double scalingFactor, Integer... speciesToManage) {
         this.osmoseConfigurationFile = osmoseConfigurationFile;
         this.preInitializedConfiguration = preInitializedConfiguration;
         this.preInitializedConfigurationDirectory = preInitializedConfigurationDirectory;
         this.burnInYears = burnInYears;
         this.speciesToManageFromThisSide = speciesToManage;
+        this.scalingFactor = scalingFactor;
+
     }
 
     /**
@@ -88,8 +93,8 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
                 new LocalOsmoseByBiomassBiology(simulation.getMortality(),
                                                 simulation.getCounter().getBiomass(x, height-y-1),
                                                 simulation.getNumberOfSpecies(),
-                                                random
-                );
+                                                random,
+                                                scalingFactor);
         ((OsmoseGlobalBiology) biology).getStepper().getToReset().add(local);
 
         return local;

@@ -85,6 +85,7 @@ public class OsmoseWFSScenario implements Scenario{
         biologyInitializer.setOsmoseConfigurationFile(mainDirectory.resolve("wfs").resolve("osm_all-parameters.csv").toAbsolutePath().toString());
         biologyInitializer.setPreInitializedConfiguration(false);
         biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
+        biologyInitializer.setScalingFactor(new FixedDoubleParameter(1000d));
         //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
     }
 

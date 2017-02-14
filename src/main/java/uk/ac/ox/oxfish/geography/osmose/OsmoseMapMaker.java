@@ -48,8 +48,8 @@ public class OsmoseMapMaker{
                 final LocalOsmoseByBiomassBiology biology = new LocalOsmoseByBiomassBiology(simulation.getMortality(),
                                                                                             simulation.getCounter().getBiomass(x, height-y-1),
                                                                                             simulation.getNumberOfSpecies(),
-                                                                                            random
-                                                                          );
+                                                                                            random,
+                                                                                            1);
                 stepper.getToReset().add(biology);
                 seaTile.setBiology(biology);
                 baseGrid.field[x][y] = seaTile;

@@ -1,10 +1,11 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.biology.initializer.OsmoseBiologyInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Paths;
 
@@ -35,6 +36,9 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
     private String indexOfSpeciesToBeManagedByThisModel = "0,1,2,3,4,5,6,7,8,9";
 
 
+    private DoubleParameter scalingFactor = new FixedDoubleParameter(1d);
+
+
 
     /**
      * Applies this function to the given argument.
@@ -59,6 +63,7 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
                                             preInitializedConfiguration,
                                             preInitializedConfigurationDirectory,
                                             numberOfOsmoseStepsToPulseBeforeSimulationStart,
+                                            scalingFactor.apply(fishState.getRandom()),
                                             parsed);
     }
 
@@ -111,5 +116,23 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
      */
     public void setIndexOfSpeciesToBeManagedByThisModel(String indexOfSpeciesToBeManagedByThisModel) {
         this.indexOfSpeciesToBeManagedByThisModel = indexOfSpeciesToBeManagedByThisModel;
+    }
+
+    /**
+     * Getter for property 'scalingFactor'.
+     *
+     * @return Value for property 'scalingFactor'.
+     */
+    public DoubleParameter getScalingFactor() {
+        return scalingFactor;
+    }
+
+    /**
+     * Setter for property 'scalingFactor'.
+     *
+     * @param scalingFactor Value to set for property 'scalingFactor'.
+     */
+    public void setScalingFactor(DoubleParameter scalingFactor) {
+        this.scalingFactor = scalingFactor;
     }
 }

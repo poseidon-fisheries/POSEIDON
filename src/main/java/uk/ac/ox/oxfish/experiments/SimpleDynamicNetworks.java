@@ -50,16 +50,46 @@ public class SimpleDynamicNetworks
 {
 
 
-    private final static Path INPUT_FILE = Paths.get("runs", "networks", "eighty.yaml");
-    public static final Path OUTPUT_FILE = Paths.get("runs", "networks", "eighty2.csv");
+    private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
+    public static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
 
 
     public static void main(String[] args) throws IOException {
 
 
 
-
         EquidegreeBuilder builder = new EquidegreeBuilder();
+
+        builder.setDegree(3);
+
+        builder.setAllowMutualFriendships(false);
+
+        adaptiveRun("anarchy",8,INPUT_FILE,
+                    new AnarchyFactory(),builder,100,
+                    OUTPUT_FILE);
+
+
+        ITQMonoFactory regulation = new ITQMonoFactory();
+        regulation.setIndividualQuota(new FixedDoubleParameter(4000));
+        adaptiveRun("itq", 8, INPUT_FILE,
+                    regulation, builder, 100,
+                    OUTPUT_FILE);
+
+
+        TACMonoFactory factory = new TACMonoFactory();
+        factory.setQuota(new FixedDoubleParameter(4000*100));
+        adaptiveRun("tac", 8, INPUT_FILE,
+                    factory, builder, 100,
+                    OUTPUT_FILE);
+
+        //mpa?
+        ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
+        mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
+        adaptiveRun("mpa", 8, INPUT_FILE,
+                    mpa, builder, 100,
+                    OUTPUT_FILE);
+
+
         for(int degree=0; degree<10; degree++) {
             builder.setDegree(degree);
             run("fixed" + degree,
@@ -70,35 +100,6 @@ public class SimpleDynamicNetworks
                 100,
                 OUTPUT_FILE);
         }
-
-
-        builder.setAllowMutualFriendships(false);
-
-        adaptiveRun("anarchy",8,INPUT_FILE,
-                    new AnarchyFactory(),builder,30,
-                    OUTPUT_FILE);
-
-
-        ITQMonoFactory regulation = new ITQMonoFactory();
-        regulation.setIndividualQuota(new FixedDoubleParameter(4000));
-        adaptiveRun("itq", 8, INPUT_FILE,
-                    regulation, builder, 30,
-                    OUTPUT_FILE);
-
-
-        TACMonoFactory factory = new TACMonoFactory();
-        factory.setQuota(new FixedDoubleParameter(4000*100));
-        adaptiveRun("tac", 8, INPUT_FILE,
-                    factory, builder, 30,
-                    OUTPUT_FILE);
-
-        //mpa?
-        ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
-        mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
-        adaptiveRun("mpa", 8, INPUT_FILE,
-                    mpa, builder, 30,
-                    OUTPUT_FILE);
-
     }
 
 
@@ -183,35 +184,36 @@ public class SimpleDynamicNetworks
                             public Integer randomStep(FishState state, MersenneTwisterFast random, Fisher fisher,
                                                       Integer current) {
                                 return Math.min(
-                                        Math.max(
-                                                current + random.nextInt(6) - 3,0),
+                                        Math.max( random.nextBoolean() ?
+                                                          current + random.nextInt(10) :
+                                                          current - random.nextInt(10),
+                                                  0),
                                         state.getFishers().size() - 1);
                             }
                         })
                         ,
                         (Actuator<Fisher, Integer>) (subject, policy, model) -> {
                             int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
-                            int difference = target - model.getSocialNetwork().getAllNeighbors(subject).size();
+                            int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
                             if (difference > 0) {
                                 for (int i = 0; i < difference; i++)
-                                    model.getSocialNetwork().addRandomFriend(subject, model.getFishers(),
-                                                                             model.getRandom());
+                                    model.getSocialNetwork().addRandomConnection(fisher,model.getFishers(),new MersenneTwisterFast());
                                 ;
                             }
-                            if (difference < 0) {
+                            else if (difference < 0) {
                                 for (int i = 0; i < -difference; i++)
                                 {
                                     //int before = model.getSocialNetwork().getAllNeighbors(subject).size();
-                                    model.getSocialNetwork().removeRandomFriend(subject, true, true,model.getRandom());
+                                    model.getSocialNetwork().removeRandomConnection(subject, model.getRandom());
                                     //int after = model.getSocialNetwork().getAllNeighbors(subject).size();
                                 }
                             }
                             Preconditions.checkArgument(
-                                    model.getSocialNetwork().getAllNeighbors(subject).size() == target);
+                                    model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject) == target);
                         },
-                        (Sensor<Fisher, Integer>) system -> state.getSocialNetwork().getAllNeighbors(system).size(),
+                        (Sensor<Fisher, Integer>) system -> state.getSocialNetwork().getBackingnetwork().getPredecessorCount(system),
                         new CashFlowObjective(60),
-                        new FixedProbability(.2, 0),
+                        new FixedProbability(.5, 0),
                         (Predicate<Integer>) integer -> true
 
 

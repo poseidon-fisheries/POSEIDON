@@ -172,6 +172,46 @@ public class SocialNetwork
     }
 
 
+    /**
+     * create a link from a friend to this agent (basically start sharing information with this other agent if we care about direct neighbors)
+     * @param agent person who is going to share information
+     * @param otherFishers set of all other fishers
+     * @param random randomizer
+     */
+    public void addRandomConnection(Fisher agent,
+                                List<Fisher> otherFishers,
+                                MersenneTwisterFast random)
+    {
+
+        ArrayList<Fisher> candidates = new ArrayList<Fisher>(otherFishers);
+        candidates.remove(agent);
+        candidates.removeAll(network.getPredecessors(agent));
+
+        Preconditions.checkArgument(candidates.size() > 0, " No valid candidate to befriend!");
+
+        Fisher newFriend = candidates.get(random.nextInt(candidates.size()));
+        Preconditions.checkArgument(network.findEdge(newFriend,agent)==null);
+        network.addEdge(new FriendshipEdge(),newFriend,agent);
+
+
+    }
+
+    public void removeRandomConnection(Fisher agent,
+                                       MersenneTwisterFast random)
+    {
+        List<Fisher> friends = ImmutableList.copyOf(network.getPredecessors(agent));
+        Preconditions.checkArgument(friends.size() > 0, " Fisher has no friend that can be removed");
+        Fisher exFriend = friends.get(random.nextInt(friends.size()));
+        Preconditions.checkArgument(getAllNeighbors(agent).contains(exFriend));
+        Preconditions.checkArgument(getDirectedNeighbors(exFriend).contains(agent));
+
+        network.removeEdge(network.findEdge(exFriend, agent));
+
+
+
+    }
+
+
     public String toMatrixFile()
     {
         StringBuffer buffer = new StringBuffer();
