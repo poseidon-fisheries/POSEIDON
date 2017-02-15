@@ -38,7 +38,6 @@ public class KnifeEdgePerTripObjectiveTest {
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
         Assert.assertEquals(tripFunction.computeCurrentFitness(fisher), 10d, .001);
-        Assert.assertEquals(tripFunction.computePreviousFitness(fisher),0d,.001);
 
 
         KnifeEdgePerTripFactory factory = new KnifeEdgePerTripFactory();
@@ -46,7 +45,6 @@ public class KnifeEdgePerTripObjectiveTest {
         factory.setThreshold(new FixedDoubleParameter(5d));
         KnifeEdgePerTripObjective objective = factory.apply(mock(FishState.class));
         Assert.assertEquals(objective.computeCurrentFitness(fisher), 1d, .001);
-        Assert.assertEquals(objective.computePreviousFitness(fisher),-1d,.001);
     }
 
 }

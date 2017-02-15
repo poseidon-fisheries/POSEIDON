@@ -36,7 +36,6 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
      * @param observed the agent whose fitness we want
      * @return a fitness value: the higher the better
      */
-    @Override
     public double computePreviousFitness(Fisher observed) {
         //get the second last completed trip
         List<TripRecord> finishedTrips = observed.getFinishedTrips();

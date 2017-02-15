@@ -32,7 +32,6 @@ public class CashFlowObjectiveTest
         }
         //cash should now be 99, 6 days ago it was 93
         assertEquals(6,objective.computeCurrentFitness(fisher),.0001);
-        assertEquals(6,objective.computePreviousFitness(fisher),.0001);
 
         //let's add some garbage
         for(int i=0; i<6; i++)
@@ -42,7 +41,6 @@ public class CashFlowObjectiveTest
         }
         //now it should be -99
         assertEquals(-99,objective.computeCurrentFitness(fisher),.0001);
-        assertEquals(6,objective.computePreviousFitness(fisher),.0001);
 
     }
 }

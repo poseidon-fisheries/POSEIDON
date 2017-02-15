@@ -30,17 +30,7 @@ public class KnifeEdgeCashflowObjective implements  ObjectiveFunction<Fisher>{
         return delegate.computeCurrentFitness(observed) >= threshold ? +1 : -1;
     }
 
-    /**
-     * compute the fitness of the agent "in the previous step"; How far back that is
-     * depends on the objective function itself
-     *
-     * @param observed the agent whose fitness we want
-     * @return a fitness value: the higher the better
-     */
-    @Override
-    public double computePreviousFitness(Fisher observed) {
-        return delegate.computePreviousFitness(observed) >= threshold ? +1 : -1;
-    }
+
 
 
 }

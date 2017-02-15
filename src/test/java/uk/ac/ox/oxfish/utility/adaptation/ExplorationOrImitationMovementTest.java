@@ -69,10 +69,6 @@ public class ExplorationOrImitationMovementTest
                         return fitness.get(observed);
                     }
 
-                    @Override
-                    public double computePreviousFitness(Fisher observed) {
-                        throw new RuntimeException("Wrong!");
-                    }
                 },
                 0d,
                 1d, new Predicate<SeaTile>() {
@@ -139,10 +135,6 @@ public class ExplorationOrImitationMovementTest
                         return fitness.get(observed);
                     }
 
-                    @Override
-                    public double computePreviousFitness(Fisher observed) {
-                        throw new RuntimeException("Wrong!");
-                    }
                 },
                 0d,
                 1d, new Predicate<SeaTile>() {
@@ -207,10 +199,6 @@ public class ExplorationOrImitationMovementTest
                         return fitness.get(observed);
                     }
 
-                    @Override
-                    public double computePreviousFitness(Fisher observed) {
-                        throw new RuntimeException("Wrong!");
-                    }
                 },
                 1d,
                 1d, new Predicate<SeaTile>() {

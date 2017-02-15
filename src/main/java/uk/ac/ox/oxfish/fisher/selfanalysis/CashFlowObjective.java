@@ -44,22 +44,6 @@ public class CashFlowObjective implements  ObjectiveFunction<Fisher>
                 observed.balanceXDaysAgo(daysAgo) : 0;
     }
 
-    /**
-     * compute the fitness of the agent "in the previous step"; How far back that is
-     * depends on the objective function itself
-     *
-     * @param observed the agent whose fitness we want
-     * @return a fitness value: the higher the better
-     */
-    @Override
-    public double computePreviousFitness(Fisher observed) {
-        //get cash available period days ago
-        double currentCash= getCashInPast(observed,period);
-        //get cash in the past ( 2*period days away)
-        double laggedCash = getCashInPast(observed, 2*period);
 
-        return currentCash-laggedCash;
-
-    }
 }
 

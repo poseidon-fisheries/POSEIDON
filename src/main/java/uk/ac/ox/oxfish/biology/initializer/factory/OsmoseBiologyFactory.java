@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 /**
  * Creates the OsmoseBiologyInitializer
@@ -38,6 +39,7 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
 
     private DoubleParameter scalingFactor = new FixedDoubleParameter(1d);
 
+    private HashMap<Integer, Integer> recruitmentAges = new HashMap<>();
 
 
     /**
@@ -64,7 +66,7 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
                                             preInitializedConfigurationDirectory,
                                             numberOfOsmoseStepsToPulseBeforeSimulationStart,
                                             scalingFactor.apply(fishState.getRandom()),
-                                            parsed);
+                                            recruitmentAges, parsed);
     }
 
 
@@ -135,4 +137,24 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
     public void setScalingFactor(DoubleParameter scalingFactor) {
         this.scalingFactor = scalingFactor;
     }
+
+
+    /**
+     * Getter for property 'recruitmentAges'.
+     *
+     * @return Value for property 'recruitmentAges'.
+     */
+    public HashMap<Integer, Integer> getRecruitmentAges() {
+        return recruitmentAges;
+    }
+
+    /**
+     * Setter for property 'recruitmentAges'.
+     *
+     * @param recruitmentAges Value to set for property 'recruitmentAges'.
+     */
+    public void setRecruitmentAges(HashMap<Integer, Integer> recruitmentAges) {
+        this.recruitmentAges = recruitmentAges;
+    }
 }
+

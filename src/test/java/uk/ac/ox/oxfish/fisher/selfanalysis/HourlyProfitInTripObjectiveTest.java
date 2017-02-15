@@ -35,6 +35,5 @@ public class HourlyProfitInTripObjectiveTest {
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
         Assert.assertEquals(tripFunction.computeCurrentFitness(fisher),10d,.001);
-        Assert.assertEquals(tripFunction.computePreviousFitness(fisher),0d,.001);
     }
 }

@@ -47,9 +47,6 @@ public class KnifeEdgeCashflowObjectiveTest {
         assertEquals(6,objective.computeCurrentFitness(fisher),.0001);
         assertEquals(1,knifeEdge.computeCurrentFitness(fisher),.0001);
         assertEquals(-1,knifeEdge2.computeCurrentFitness(fisher),.0001);
-        assertEquals(6,objective.computePreviousFitness(fisher),.0001);
-        assertEquals(1,knifeEdge.computePreviousFitness(fisher),.0001);
-        assertEquals(-1,knifeEdge2.computePreviousFitness(fisher),.0001);
 
         //let's add some garbage
         for(int i=0; i<6; i++)
@@ -61,9 +58,6 @@ public class KnifeEdgeCashflowObjectiveTest {
         assertEquals(-99,objective.computeCurrentFitness(fisher),.0001);
         assertEquals(-1,knifeEdge.computeCurrentFitness(fisher),.0001);
         assertEquals(-1,knifeEdge2.computeCurrentFitness(fisher),.0001);
-        assertEquals(6,objective.computePreviousFitness(fisher),.0001);
-        assertEquals(1,knifeEdge.computePreviousFitness(fisher),.0001);
-        assertEquals(-1,knifeEdge2.computePreviousFitness(fisher),.0001);
 
     }
 

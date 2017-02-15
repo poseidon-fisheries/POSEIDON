@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.biology.OsmoseGlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseByBiomassBiology;
+import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseWithoutRecruitmentBiology;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -18,6 +18,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Creates an osmose biology (including the the simulation link and the stepper)
@@ -52,17 +54,20 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
     private final Integer[] speciesToManageFromThisSide;
 
 
+    private final HashMap<Integer,Integer> recruitmentAges;
+
     private final double scalingFactor;
 
 
     public OsmoseBiologyInitializer(
             String osmoseConfigurationFile, boolean preInitializedConfiguration,
             String preInitializedConfigurationDirectory, int burnInYears,
-            double scalingFactor, Integer... speciesToManage) {
+            double scalingFactor, HashMap<Integer,Integer> recruitmentAges, Integer... speciesToManage) {
         this.osmoseConfigurationFile = osmoseConfigurationFile;
         this.preInitializedConfiguration = preInitializedConfiguration;
         this.preInitializedConfigurationDirectory = preInitializedConfigurationDirectory;
         this.burnInYears = burnInYears;
+        this.recruitmentAges = recruitmentAges;
         this.speciesToManageFromThisSide = speciesToManage;
         this.scalingFactor = scalingFactor;
 
@@ -89,12 +94,16 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
         final int x = seaTile.getGridX();
         final int y = seaTile.getGridY();
 
-        final LocalOsmoseByBiomassBiology local =
-                new LocalOsmoseByBiomassBiology(simulation.getMortality(),
-                                                simulation.getCounter().getBiomass(x, height-y-1),
-                                                simulation.getNumberOfSpecies(),
-                                                random,
-                                                scalingFactor);
+        int recruitments[] = new int[biology.getSpecies().size()];
+        for(Map.Entry<Integer,Integer> pair : recruitmentAges.entrySet())
+            recruitments[pair.getKey()] = pair.getValue();
+
+        final LocalOsmoseWithoutRecruitmentBiology local =
+                new LocalOsmoseWithoutRecruitmentBiology(simulation.getMortality(),
+                                                         simulation.getCounter().getBiomass(x, height-y-1),
+                                                         random,
+                                                         scalingFactor,
+                                                         recruitments);
         ((OsmoseGlobalBiology) biology).getStepper().getToReset().add(local);
 
         return local;

@@ -161,7 +161,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
 
         //exploit
 
-        return null;
+        return current;
     }
 
     public ExploreImitateAdaptation(

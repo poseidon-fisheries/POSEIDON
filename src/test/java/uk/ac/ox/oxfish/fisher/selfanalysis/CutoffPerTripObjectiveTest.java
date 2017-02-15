@@ -48,12 +48,10 @@ public class CutoffPerTripObjectiveTest {
         factory.getLowThreshold().setActive(true);
         CutoffPerTripObjective objective = factory.apply(mock(FishState.class));
         Assert.assertEquals(objective.computeCurrentFitness(fisher), 10d, .001);
-        Assert.assertEquals(objective.computePreviousFitness(fisher),5d,.001);
         factory.getHighThreshold().setValue(new FixedDoubleParameter(7d));
         factory.getHighThreshold().setActive(true);
         objective = factory.apply(mock(FishState.class));
         Assert.assertEquals(objective.computeCurrentFitness(fisher), 7d, .001);
-        Assert.assertEquals(objective.computePreviousFitness(fisher),5d,.001);
 
     }
 

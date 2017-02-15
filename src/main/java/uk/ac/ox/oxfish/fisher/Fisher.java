@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
@@ -1330,5 +1331,9 @@ public class Fisher implements Steppable, Startable{
 
     public void setDiscretizedLocationMemory(DiscretizedLocationMemory discretizedLocationMemory) {
         memory.setDiscretizedLocationMemory(discretizedLocationMemory);
+    }
+
+    public SocialNetwork getSocialNetwork() {
+        return state.getSocialNetwork();
     }
 }

@@ -7,13 +7,10 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -77,10 +74,6 @@ public class GravitationalSearchAdaptationTest {
                                             -Math.pow(coord[2]-30,2);
                                 }
 
-                                @Override
-                                public double computePreviousFitness(Fisher observed) {
-                                    throw new RuntimeException("not expected!");
-                                }
                             },
                             100,
                             10,

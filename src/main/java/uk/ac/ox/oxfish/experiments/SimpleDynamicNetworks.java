@@ -1,17 +1,14 @@
 package uk.ac.ox.oxfish.experiments;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import ec.util.MersenneTwisterFast;
-import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
 import edu.uci.ics.jung.algorithms.shortestpath.DistanceStatistics;
 import edu.uci.ics.jung.algorithms.shortestpath.UnweightedShortestPath;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import org.apache.commons.collections15.Transformer;
-import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.SocialNetworkAdaptation;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.FriendshipEdge;
@@ -24,24 +21,17 @@ import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
-import uk.ac.ox.oxfish.utility.adaptation.ExploreImitateAdaptation;
-import uk.ac.ox.oxfish.utility.adaptation.Sensor;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
-import uk.ac.ox.oxfish.utility.adaptation.maximization.RandomStep;
-import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.DoubleSummaryStatistics;
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 2/7/17.
@@ -50,54 +40,68 @@ public class SimpleDynamicNetworks
 {
 
 
-    private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
-    public static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
-
+    //private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
+    //private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
+    private final static Path INPUT_FILE = Paths.get("runs", "networks", "chaser_congested.yaml");
+    private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "chaser_congested2.csv");
+    public static final int NUMBER_OF_RUNS = 100;
+    public static final int YEARS_TO_RUN = 20;
 
     public static void main(String[] args) throws IOException {
 
 
 
-        EquidegreeBuilder builder = new EquidegreeBuilder();
+        Supplier<NetworkBuilder> supplier = () -> {
+            EquidegreeBuilder builder = new EquidegreeBuilder();
 
-        builder.setDegree(3);
+            builder.setDegree(3);
+            builder.setAllowMutualFriendships(false);
+            return builder;
+        };
 
-        builder.setAllowMutualFriendships(false);
 
-        adaptiveRun("anarchy",8,INPUT_FILE,
-                    new AnarchyFactory(),builder,100,
+
+        adaptiveRun("anarchy", YEARS_TO_RUN, INPUT_FILE,
+                    new AnarchyFactory(), supplier, NUMBER_OF_RUNS,
                     OUTPUT_FILE);
 
 
         ITQMonoFactory regulation = new ITQMonoFactory();
         regulation.setIndividualQuota(new FixedDoubleParameter(4000));
-        adaptiveRun("itq", 8, INPUT_FILE,
-                    regulation, builder, 100,
+        adaptiveRun("itq", YEARS_TO_RUN, INPUT_FILE,
+                    regulation, supplier, NUMBER_OF_RUNS,
                     OUTPUT_FILE);
 
 
         TACMonoFactory factory = new TACMonoFactory();
-        factory.setQuota(new FixedDoubleParameter(4000*100));
-        adaptiveRun("tac", 8, INPUT_FILE,
-                    factory, builder, 100,
+        factory.setQuota(new FixedDoubleParameter(4000* 100));
+        adaptiveRun("tac", YEARS_TO_RUN, INPUT_FILE,
+                    factory, supplier, NUMBER_OF_RUNS,
                     OUTPUT_FILE);
 
         //mpa?
         ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
         mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
-        adaptiveRun("mpa", 8, INPUT_FILE,
-                    mpa, builder, 100,
+        adaptiveRun("mpa", YEARS_TO_RUN, INPUT_FILE,
+                    mpa, supplier, NUMBER_OF_RUNS,
                     OUTPUT_FILE);
 
 
-        for(int degree=0; degree<10; degree++) {
-            builder.setDegree(degree);
+        for(int degree=0; degree<20; degree++) {
+            int finalDegree = degree;
+            supplier = () -> {
+                EquidegreeBuilder builder = new EquidegreeBuilder();
+
+                builder.setDegree(finalDegree);
+                builder.setAllowMutualFriendships(false);
+                return builder;
+            };
             run("fixed" + degree,
-                8,
+                YEARS_TO_RUN,
                 INPUT_FILE,
                 new AnarchyFactory(),
-                builder,
-                100,
+                supplier,
+                NUMBER_OF_RUNS,
                 OUTPUT_FILE);
         }
     }
@@ -107,7 +111,7 @@ public class SimpleDynamicNetworks
                            int yearsToRun,
                            Path inputYamlPath,
                            AlgorithmFactory<? extends  Regulation> regulation,
-                           NetworkBuilder builder,
+                           Supplier<NetworkBuilder> builder,
                            int numberOfRuns,
                            Path filePath) throws IOException {
         for(int run = 0; run<numberOfRuns; run++)
@@ -116,7 +120,7 @@ public class SimpleDynamicNetworks
             PrototypeScenario scenario = yaml.loadAs(new FileReader(inputYamlPath.toFile()), PrototypeScenario.class);
 
             scenario.setRegulation(regulation);
-            scenario.setNetworkBuilder(builder);
+            scenario.setNetworkBuilder(builder.get());
             FishState state = new FishState(System.currentTimeMillis());
             state.setScenario(scenario);
             state.start();
@@ -149,6 +153,9 @@ public class SimpleDynamicNetworks
                     averageDistance.getAverage() + "," + degree.getAverage() + "," + profits + "\n";
             System.out.print(toWrite);
             Files.write(filePath, toWrite.getBytes(), StandardOpenOption.APPEND);
+            for(Fisher fisher : state.getFishers())
+                fisher.turnOff();
+            state.finish();
 
         }
     }
@@ -160,7 +167,7 @@ public class SimpleDynamicNetworks
                                    int yearsToRun,
                                    Path inputYamlPath,
                                    AlgorithmFactory<? extends  Regulation> regulation,
-                                   NetworkBuilder builder,
+                                   Supplier<NetworkBuilder> builder,
                                    int numberOfRuns,
                                    Path filePath) throws IOException {
         for(int run = 0; run<numberOfRuns; run++)
@@ -170,54 +177,17 @@ public class SimpleDynamicNetworks
 
 
             scenario.setRegulation(regulation);
-            scenario.setNetworkBuilder(builder);
+            scenario.setNetworkBuilder(builder.get());
             FishState state = new FishState(System.currentTimeMillis());
             state.setScenario(scenario);
             state.start();
 
             for(Fisher fisher : state.getFishers())
             {
-                fisher.addBiMonthlyAdaptation(new ExploreImitateAdaptation<Integer>(
-                        (Predicate<Fisher>) fisher1 -> true,
-                        new BeamHillClimbing<Integer>(new RandomStep<Integer>() {
-                            @Override
-                            public Integer randomStep(FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                      Integer current) {
-                                return Math.min(
-                                        Math.max( random.nextBoolean() ?
-                                                          current + random.nextInt(10) :
-                                                          current - random.nextInt(10),
-                                                  0),
-                                        state.getFishers().size() - 1);
-                            }
-                        })
-                        ,
-                        (Actuator<Fisher, Integer>) (subject, policy, model) -> {
-                            int target = Math.min(Math.max(policy, 0), model.getFishers().size() - 1);
-                            int difference = target - model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject);
-                            if (difference > 0) {
-                                for (int i = 0; i < difference; i++)
-                                    model.getSocialNetwork().addRandomConnection(fisher,model.getFishers(),new MersenneTwisterFast());
-                                ;
-                            }
-                            else if (difference < 0) {
-                                for (int i = 0; i < -difference; i++)
-                                {
-                                    //int before = model.getSocialNetwork().getAllNeighbors(subject).size();
-                                    model.getSocialNetwork().removeRandomConnection(subject, model.getRandom());
-                                    //int after = model.getSocialNetwork().getAllNeighbors(subject).size();
-                                }
-                            }
-                            Preconditions.checkArgument(
-                                    model.getSocialNetwork().getBackingnetwork().getPredecessorCount(subject) == target);
-                        },
-                        (Sensor<Fisher, Integer>) system -> state.getSocialNetwork().getBackingnetwork().getPredecessorCount(system),
-                        new CashFlowObjective(60),
-                        new FixedProbability(.5, 0),
-                        (Predicate<Integer>) integer -> true
-
-
-                ));
+                fisher.addBiMonthlyAdaptation(
+                        new SocialNetworkAdaptation(5,
+                                                    new CashFlowObjective(60),
+                                                    .2));
             }
 
             while (state.getYear()<yearsToRun)
@@ -249,6 +219,9 @@ public class SimpleDynamicNetworks
                     averageDistance.getAverage() + "," + degree.getAverage() + "," + profits + "\n";
             System.out.print(toWrite);
             Files.write(filePath, toWrite.getBytes(), StandardOpenOption.APPEND);
+            for(Fisher fisher : state.getFishers())
+                fisher.turnOff();
+            state.finish();
 
         }
     }

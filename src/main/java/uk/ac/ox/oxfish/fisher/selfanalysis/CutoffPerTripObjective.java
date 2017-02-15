@@ -47,15 +47,4 @@ public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
         return profit;
     }
 
-    /**
-     * compute the fitness of the agent "in the previous step"; How far back that is
-     * depends on the objective function itself
-     *
-     * @param observed the agent whose fitness we want
-     * @return a fitness value: the higher the better
-     */
-    @Override
-    public double computePreviousFitness(Fisher observed) {
-        return censor(delegate.computePreviousFitness(observed));
-    }
 }
