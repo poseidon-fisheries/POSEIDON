@@ -266,6 +266,18 @@ public class OsmoseWFSScenario implements Scenario{
 
         LogisticLogs logger = new LogisticLogs();
 
+        MapDiscretization originalDiscretization = createDiscretization
+                (model, FishStateUtilities.getAbsolutePath
+                        (Paths.get("temp_wfs", "areas.txt").toString()));
+
+        DiscretizationHistogrammer histogrammer = new DiscretizationHistogrammer(
+                originalDiscretization,false);
+
+        if(collectLogitData) {
+            model.getOutputPlugins().add(histogrammer);
+            //make sure the non-gui version of the model outputs this to file
+            model.getOutputPlugins().add(logger);
+        }
 
         //longliners
         for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
@@ -305,16 +317,9 @@ public class OsmoseWFSScenario implements Scenario{
 
 
                 if(collectLogitData) {
-                    MapDiscretization originalDiscretization = createDiscretization
-                            (model, FishStateUtilities.getAbsolutePath
-                                    (Paths.get("temp_wfs", "areas.txt").toString()));
 
-                    DiscretizationHistogrammer histogrammer = new DiscretizationHistogrammer(
-                            originalDiscretization,false);
 
-                    //make sure the non-gui version of the model outputs this to file
-                    model.getOutputPlugins().add(histogrammer);
-                    model.getOutputPlugins().add(logger);
+
 
                     newFisher.addTripListener(histogrammer);
 

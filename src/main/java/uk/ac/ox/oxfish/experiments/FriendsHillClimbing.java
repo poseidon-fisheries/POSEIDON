@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.stream.IntStream;
 
@@ -40,7 +41,7 @@ public class FriendsHillClimbing
                 else
                 {
                     final EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
-                    networkBuilder.setDegree(friends);
+                    networkBuilder.setDegree(new FixedDoubleParameter(friends));
                     scenario.setNetworkBuilder(networkBuilder);
                     final PerTripImitativeDestinationFactory destinationStrategy = new PerTripImitativeDestinationFactory();
                     destinationStrategy.setProbability(new FixedProbabilityFactory(.20,1d));

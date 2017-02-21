@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.File;
@@ -221,7 +222,7 @@ public class Dashboard
         System.out.println("    Friends: " + friends);
         if(friends > 0) {
             EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
-            networkBuilder.setDegree(friends);
+            networkBuilder.setDegree(new FixedDoubleParameter(friends));
             scenario.setNetworkBuilder(networkBuilder);
         }
         else

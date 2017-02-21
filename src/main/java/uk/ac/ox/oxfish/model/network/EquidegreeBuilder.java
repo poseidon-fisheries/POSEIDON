@@ -2,12 +2,15 @@ package uk.ac.ox.oxfish.model.network;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import javafx.collections.ObservableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
 
@@ -17,7 +20,7 @@ import java.util.*;
  */
 public class EquidegreeBuilder implements NetworkBuilder{
 
-    private int degree = 2;
+    private DoubleParameter degree = new FixedDoubleParameter(2d);
 
     /**
      * list of additional conditions to pass before allowing friendship
@@ -47,15 +50,17 @@ public class EquidegreeBuilder implements NetworkBuilder{
         if(populationSize <= 1)
             Preconditions.checkArgument(
                     false, "Cannot create social network with no fishers to connect");
-        if( populationSize <= degree) {
 
-            degree = populationSize-1;
-            Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
-
-        }
         Log.trace("random before populating " + state.getRandom().nextDouble());
         for(Fisher fisher : fishers)
         {
+            int degree = computeDegree(state.getRandom());
+            if( populationSize <= degree) {
+
+                degree = populationSize-1;
+                Log.warn("The social network had to reduce the desired degree level to " + degree + " because the population size is too small");
+
+            }
             List<Fisher> friends = new LinkedList<>();
 
             List<Fisher> candidates = new LinkedList<>();
@@ -70,7 +75,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
             }
 
 
-            Collections.sort(candidates, (o1, o2) -> Integer.compare(o1.getID(), o2.getID()));
+            Collections.sort(candidates, Comparator.comparingInt(Fisher::getID));
 
             while(friends.size() < degree && friends.size() < candidates.size())
             {
@@ -108,14 +113,18 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
     }
 
-    public int getDegree() {
+
+    private int computeDegree(MersenneTwisterFast random){
+        return degree.apply(random).intValue();
+    }
+
+    public DoubleParameter getDegree() {
         return degree;
     }
 
-    public void setDegree(int degree) {
+    public void setDegree(DoubleParameter degree) {
         this.degree = degree;
     }
-
 
     /**
      * this is supposed to be called not so much when initializing the network but later on if any agent is created
@@ -134,6 +143,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
         ObservableList<Fisher> fishers = state.getFishers();
         int populationSize = fishers.size();
 
+        int degree = computeDegree(state.getRandom());
         Set<Fisher> friends = new HashSet<>(degree);
         while(friends.size() < Math.min(degree,populationSize))
         {

@@ -7,12 +7,14 @@ import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.ITQCostManager;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Creates both individual quotas like the IQMonoFactory and a quota market for fishers to trade in
@@ -24,7 +26,7 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     /**
      * one market only for each fish-state
      */
-    private final Map<FishState,ITQMarketBuilder> marketBuilders = new HashMap<>(1);
+    private final Locker<FishState,ITQMarketBuilder> marketBuilders = new Locker<>();
 
     /**
      * quota available to each guy
@@ -49,29 +51,31 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
     public MonoQuotaRegulation apply(FishState state) {
         //todo need to make this for multiple species
 
-        //did we create a market already?
-        if(!marketBuilders.containsKey(state))
-        {
-            //if not, create it!
-            ITQMarketBuilder initializer = new ITQMarketBuilder(0);
-            //make sure it will start with the model
-            state.registerStartable(initializer);
-            //put it in the map so we only create it once
-            marketBuilders.put(state, initializer);
-        }
-        ITQMarketBuilder marketBuilder = marketBuilders.get(state);
+
+        ITQMarketBuilder marketBuilder =
+                marketBuilders.presentKey(state,
+                                          new Supplier<ITQMarketBuilder>() {
+                                              @Override
+                                              public ITQMarketBuilder get() {
+                                                  //if not, create it!
+                                                  ITQMarketBuilder initializer = new ITQMarketBuilder(0);
+                                                  //make sure it will start with the model
+                                                  state.registerStartable(initializer);
+                                                  return initializer;
+                                              }
+                                          });
 
         assert marketBuilder != null;
 
         ITQCostManager cost = new ITQCostManager(new Function<Species, ITQOrderBook>() {
             @Override
             public ITQOrderBook apply(Species species) {
-                    return marketBuilder.getMarket();
+                return marketBuilder.getMarket();
             }
         });
 
         MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom()),
-                                                                          state) {
+                                                               state) {
 
             @Override
             public void start(FishState model, Fisher fisher) {

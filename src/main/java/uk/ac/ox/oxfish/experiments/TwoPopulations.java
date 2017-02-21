@@ -64,7 +64,7 @@ public class TwoPopulations {
 
         scenario.setHoldSize(new SelectDoubleParameter(new double[]{10,500}));
         EquidegreeBuilder builder = new EquidegreeBuilder();
-        builder.setDegree(2);
+        builder.setDegree(new FixedDoubleParameter(2));
         //connect people that have the same hold to avoid stupid imitation noise.
         builder.addPredicate((from, to) -> Math.abs(from.getMaximumHold()-to.getMaximumHold()) < 1);
         scenario.setNetworkBuilder(builder);

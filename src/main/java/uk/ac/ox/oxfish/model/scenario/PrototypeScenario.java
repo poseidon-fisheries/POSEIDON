@@ -18,6 +18,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFact
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
+import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -201,6 +203,11 @@ public class PrototypeScenario implements Scenario {
      */
     private Long mapMakerDedicatedRandomSeed =  null;
 
+
+    private AlgorithmFactory<? extends LogbookInitializer> logbook =
+            new NoLogbookFactory();
+
+
     public PrototypeScenario() {
     }
 
@@ -300,9 +307,16 @@ public class PrototypeScenario implements Scenario {
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
 
+
+
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
         for(Port port : ports)
             port.setGasPricePerLiter(gasPricePerLiter.apply(random));
+
+        //create logbook initializer
+        LogbookInitializer log = logbook.apply(model);
+        log.start(model);
+
 
         //adds predictors to the fisher if the usepredictors flag is up.
         //without predictors agents do not participate in ITQs
@@ -329,6 +343,13 @@ public class PrototypeScenario implements Scenario {
         );
         //add predictor setup to the factory
         fisherFactory.getAdditionalSetups().add(predictorSetup);
+        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                log.add(fisher,model);
+            }
+        });
+
         //add snalsar info which should be moved elsewhere at some point
         fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
             @Override
@@ -354,6 +375,7 @@ public class PrototypeScenario implements Scenario {
                 );
             }
         });
+
 
 
         //call the factory to keep creating fishers
@@ -631,5 +653,24 @@ public class PrototypeScenario implements Scenario {
      */
     public void setCheaters(boolean cheaters) {
         this.cheaters = cheaters;
+    }
+
+    /**
+     * Getter for property 'logbook'.
+     *
+     * @return Value for property 'logbook'.
+     */
+    public AlgorithmFactory<? extends LogbookInitializer> getLogbook() {
+        return logbook;
+    }
+
+    /**
+     * Setter for property 'logbook'.
+     *
+     * @param logbook Value to set for property 'logbook'.
+     */
+    public void setLogbook(
+            AlgorithmFactory<? extends LogbookInitializer> logbook) {
+        this.logbook = logbook;
     }
 }

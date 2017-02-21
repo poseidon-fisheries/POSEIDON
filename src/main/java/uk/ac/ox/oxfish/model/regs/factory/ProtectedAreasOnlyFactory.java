@@ -5,9 +5,11 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * creates a Regulation object whose only rule is not to fish in the MPAs
@@ -26,7 +28,7 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
      * for each model I need to create starting mpas from scratch. Here I store
      * the stoppable as a receipt to make sure I create the MPAs only once
      */
-    private final List<FishState> startReceipt = new LinkedList<>();
+    private final Locker<FishState,Startable> startReceipt = new Locker<>();
 
     /**
      * Applies this function to the given argument.
@@ -39,21 +41,26 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
         //if there are mpas to build and I haven't already done it, schedule yourself
         //at the start of the model to create the MPA
         //this makes sure both that the map is properly set up AND that it's only done once
-        if(!startReceipt.contains(state) && !startingMPAs.isEmpty()) {
-            state.registerStartable(new Startable() {
-                @Override
-                public void start(FishState model) {
-                    for (StartingMPA mpa : startingMPAs)
-                        mpa.buildMPA(model.getMap());
-                }
+        startReceipt.presentKey(state, new Supplier<Startable>() {
+            @Override
+            public Startable get() {
+                Startable startable = new Startable() {
+                    @Override
+                    public void start(FishState model) {
+                        for (StartingMPA mpa : startingMPAs)
+                            mpa.buildMPA(model.getMap());
+                    }
 
-                @Override
-                public void turnOff() {
+                    @Override
+                    public void turnOff() {
 
-                }
-            });
-            startReceipt.add(state);
-        }
+                    }
+                };
+                state.registerStartable(startable);
+                return startable;
+            }
+        });
+
 
         return mpa;
     }

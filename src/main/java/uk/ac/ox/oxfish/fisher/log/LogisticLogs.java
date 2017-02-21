@@ -28,7 +28,7 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
         StringBuilder builder = new StringBuilder();
         builder.append(get(0).getColumnNames()).append("\n");
         for (LogisticLog log : this)
-            builder.append(log.getData().toString()).append('\n');
+            builder.append(log.getData().toString());
         return builder.toString();
 
     }

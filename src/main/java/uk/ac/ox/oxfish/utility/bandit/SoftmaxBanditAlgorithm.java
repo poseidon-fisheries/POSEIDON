@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility.bandit;
 
+import burlap.datastructures.BoltzmannDistribution;
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
 
@@ -47,6 +48,8 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
     public static Integer drawFromSoftmax(MersenneTwisterFast random,
                                           int numberOfArms,
                                           Function<Integer,Double> expectedReturnOfArm){
+
+
         return drawFromSoftmax(random,numberOfArms,expectedReturnOfArm,1d);
     }
 
@@ -62,78 +65,27 @@ public class SoftmaxBanditAlgorithm implements BanditAlgorithm{
                                           int numberOfArms,
                                           Function<Integer,Double> expectedReturnOfArm,
                                           double temperature) {
-        double[] ecdf = getECDF(numberOfArms, expectedReturnOfArm, temperature);
 
-        double seed = random.nextDouble();
-        for(int i=0; i<numberOfArms; i++)
-            if(seed<ecdf[i])
-                return i;
-
-        //if there was a numerical problem, revert to picking the max
-        if(encounteredNumericalProblems(ecdf, numberOfArms, expectedReturnOfArm)) {
-            Log.warn("SOFTMAX was numerically overwhelmed, picking the highest value instead");
-            for(int i=0; i<numberOfArms; i++)
-                if(Double.isInfinite(Math.exp(expectedReturnOfArm.apply(i))))
-                {
-                    assert Double.isNaN(ecdf[i]);
-                    return i;
-                }
+        double[] preferences = new double[numberOfArms];
+        for(int i=0; i<preferences.length; i++) {
+            preferences[i] = expectedReturnOfArm.apply(i);
+            if(!Double.isFinite(preferences[i]))
+                preferences[i] = 0; //non-sampled areas default preference is 0
         }
+        BoltzmannDistribution distribution = new BoltzmannDistribution(preferences,temperature);
 
-        assert false;
-        throw new RuntimeException("Can't be here!");
+        return distribution.sample();
 
     }
 
-    private static boolean encounteredNumericalProblems(double[] ecdf, int numberOfArms, Function<Integer,Double> expectedReturnOfArm)
-    {
-        //we might be here if ecdf is 0 0 0 NaN NaN which can happen numerically if one value is way larger than the others
-        //if that's the case, pick the arm that caused it to go bang
-        for(int i=0; i<numberOfArms; i++)
-        {
-            if(!
-                    (ecdf[i] == 0 || Double.isNaN(ecdf[i]))
-
-                    )
-                return false;
-
-
-        }
-        return true;
-    }
-
-    public static double[] getECDF(
+    public static double[] getProbabilities(
             int numberOfArms, Function<Integer, Double> expectedReturnOfArm, double temperature) {
-        double denominator = 0;
-        double[] ecdf = new double[numberOfArms]; //cumulative density
+        double[] preferences = new double[numberOfArms];
+        for(int i=0; i<preferences.length; i++)
+            preferences[i] = expectedReturnOfArm.apply(i);
+        BoltzmannDistribution distribution = new BoltzmannDistribution(preferences,temperature);
 
-        //find denominator by summing up all the numerators
-        for(int i=0; i<numberOfArms; i++)
-        {
-            double numerator =  expectedReturnOfArm.apply(i);
-            numerator = Double.isFinite(numerator) ?  numerator : 0; //clean NaN
-            denominator += Math.exp(numerator/temperature);
-            //store temporarilly all numerators in the ecdf array
-            ecdf[i] = numerator;
-            assert Double.isFinite(numerator);
-            assert Double.isFinite(denominator);
-        }
-        //divide all numerators by denominator to get the probability
-
-        for(int i=0; i<numberOfArms; i++)
-        {
-            //if the denominator is 0, then everything is equally likely
-            assert denominator>=0;
-            ecdf[i] = denominator > 0 ?
-                    Math.exp(ecdf[i]/temperature)/denominator :
-                    1d/numberOfArms
-            ;
-
-            if(i>0)
-                ecdf[i] += ecdf[i-1];
-        }
-        assert Math.abs(ecdf[numberOfArms-1]-1d)<.01;
-        return ecdf;
+        return distribution.getProbabilities();
     }
 
     /**

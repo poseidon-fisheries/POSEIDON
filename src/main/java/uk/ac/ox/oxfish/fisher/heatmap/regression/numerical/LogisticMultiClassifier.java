@@ -67,7 +67,7 @@ public class LogisticMultiClassifier {
     public double getProbability(int arm, final double[][] x){
 
 
-        double[] ecdf = SoftmaxBanditAlgorithm.getECDF(
+        return SoftmaxBanditAlgorithm.getProbabilities(
                 getNumberOfOptions(),
                 new Function<Integer, Double>()
                 {
@@ -82,11 +82,8 @@ public class LogisticMultiClassifier {
                         return sum;
                     }
                 },
-                1d);
-        if(arm == 0)
-            return ecdf[0];
-        else
-            return ecdf[arm]-ecdf[arm-1];
+                1d)[arm];
+
     }
 
     /**

@@ -17,7 +17,7 @@ public class OsmoseStepperTest {
         OsmoseSimulation osmose = mock(OsmoseSimulation.class);
         when(osmose.stepsPerYear()).thenReturn(365);
         OsmoseStepper stepper = new OsmoseStepper(365*2,osmose,new MersenneTwisterFast());
-        final LocalOsmoseByBiomassBiology localBiology = mock(LocalOsmoseByBiomassBiology.class);
+        final LocalOsmoseWithoutRecruitmentBiology localBiology = mock(LocalOsmoseWithoutRecruitmentBiology.class);
         stepper.getToReset().add(localBiology);
         stepper.start(mock(FishState.class));
 

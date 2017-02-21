@@ -15,6 +15,8 @@ import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.AcquisitionFunctions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NumericalGeographicalRegressions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializers;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -124,6 +126,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.CONSTRUCTORS);
         NAMES_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.NAMES);
+
+        CONSTRUCTOR_MAP.put(LogbookInitializer.class, LogbookInitializers.CONSTRUCTORS);
+        NAMES_MAP.put(LogbookInitializer.class, LogbookInitializers.NAMES);
 
 
 
