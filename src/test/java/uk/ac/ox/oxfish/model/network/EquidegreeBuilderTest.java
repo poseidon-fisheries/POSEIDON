@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 
@@ -30,14 +31,14 @@ public class EquidegreeBuilderTest {
 
 
         EquidegreeBuilder builder = new EquidegreeBuilder();
-        builder.setDegree(2);
+        builder.setDegree(new FixedDoubleParameter(2));
         DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);
 
         assertEquals(graph.outDegree(one),2);
         assertEquals(graph.outDegree(two),2);
         assertEquals(graph.outDegree(three),2);
 
-        builder.setDegree(1);
+        builder.setDegree(new FixedDoubleParameter(1));
         graph = builder.apply(state);
         assertEquals(graph.outDegree(one),1);
         assertEquals(graph.outDegree(two),1);
@@ -78,7 +79,7 @@ public class EquidegreeBuilderTest {
 
         EquidegreeBuilder builder = new EquidegreeBuilder();
         builder.addPredicate((from, to) -> !(from==one && to==three));
-        builder.setDegree(1);
+        builder.setDegree(new FixedDoubleParameter(1));
         //build many many graphs
         for(int i=0; i<100; i++) {
             DirectedGraph<Fisher, FriendshipEdge> graph = builder.apply(state);

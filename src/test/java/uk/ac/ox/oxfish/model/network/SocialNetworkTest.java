@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.network;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -8,10 +9,12 @@ import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +22,87 @@ import static org.mockito.Mockito.when;
 public class SocialNetworkTest {
 
 
+
+    @Test
+    public void addFriend() throws  Exception{
+
+
+
+        //the world will be made of 2 fishers
+        ObservableList<Fisher> fishers = FXCollections.observableArrayList();
+        Fisher zero = mock(Fisher.class);
+        Fisher one = mock(Fisher.class);
+
+        fishers.add(zero);
+        fishers.add(one);
+        FishState state = mock(FishState.class);
+        when(state.getRandom()).thenReturn(new MersenneTwisterFast());
+        when(state.getFishers()).thenReturn(fishers);
+
+        EquidegreeBuilder networkPopulator = new EquidegreeBuilder();
+        networkPopulator.setDegree(new FixedDoubleParameter(0));
+        SocialNetwork network = new SocialNetwork(networkPopulator);
+
+        network.populate(state);
+        assertTrue(!network.getAllNeighbors(zero).contains(one));
+        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        assertTrue(!network.getAllNeighbors(one).contains(zero));
+        assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
+        network.addRandomFriend(zero,fishers,state.getRandom());
+
+        //by necessity it must have connected to one
+        assertTrue(network.getAllNeighbors(zero).contains(one));
+        assertTrue(network.getDirectedNeighbors(zero).contains(one));
+        assertTrue(network.getAllNeighbors(one).contains(zero));
+        assertTrue(!network.getDirectedNeighbors(one).contains(zero));
+
+        assertEquals(network.getBackingnetwork().getSuccessorCount(zero),1);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(one),0);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(zero),0);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(one),1);
+    }
+
+
+    @Test
+    public void addConnection() throws  Exception{
+
+
+
+        //the world will be made of 2 fishers
+        ObservableList<Fisher> fishers = FXCollections.observableArrayList();
+        Fisher zero = mock(Fisher.class);
+        Fisher one = mock(Fisher.class);
+
+        fishers.add(zero);
+        fishers.add(one);
+        FishState state = mock(FishState.class);
+        when(state.getRandom()).thenReturn(new MersenneTwisterFast());
+        when(state.getFishers()).thenReturn(fishers);
+
+        EquidegreeBuilder networkPopulator = new EquidegreeBuilder();
+        networkPopulator.setDegree(new FixedDoubleParameter(0));
+        SocialNetwork network = new SocialNetwork(networkPopulator);
+
+        network.populate(state);
+        assertTrue(!network.getAllNeighbors(zero).contains(one));
+        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        assertTrue(!network.getAllNeighbors(one).contains(zero));
+        assertTrue(!network.getDirectedNeighbors(zero).contains(zero));
+        network.addRandomConnection(zero,fishers,state.getRandom());
+
+        //by necessity it must have connected to one
+        assertTrue(network.getAllNeighbors(zero).contains(one));
+        assertTrue(!network.getDirectedNeighbors(zero).contains(one));
+        assertTrue(network.getAllNeighbors(one).contains(zero));
+        assertTrue(network.getDirectedNeighbors(one).contains(zero));
+
+
+        assertEquals(network.getBackingnetwork().getSuccessorCount(zero),0);
+        assertEquals(network.getBackingnetwork().getSuccessorCount(one),1);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(zero),1);
+        assertEquals(network.getBackingnetwork().getPredecessorCount(one),0);
+
+    }
     @Test
     public void replaceFriends() throws Exception {
 

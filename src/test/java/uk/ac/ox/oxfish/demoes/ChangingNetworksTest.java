@@ -32,7 +32,7 @@ public class ChangingNetworksTest {
         imitation.setAlwaysCopyBest(false);
         scenario.setDestinationStrategy(imitation);
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
-        networkBuilder.setDegree(1);
+        networkBuilder.setDegree(new FixedDoubleParameter(1));
         scenario.setNetworkBuilder(networkBuilder);
 
 

@@ -168,6 +168,8 @@ public class SocialNetwork
         Fisher newFriend = candidates.get(random.nextInt(candidates.size()));
         network.addEdge(new FriendshipEdge(),agent,newFriend);
 
+        assert getDirectedNeighbors(agent).contains(newFriend);
+
 
     }
 
@@ -193,6 +195,7 @@ public class SocialNetwork
         Preconditions.checkArgument(network.findEdge(newFriend,agent)==null);
         network.addEdge(new FriendshipEdge(),newFriend,agent);
 
+        assert getDirectedNeighbors(newFriend).contains(agent);
 
     }
 

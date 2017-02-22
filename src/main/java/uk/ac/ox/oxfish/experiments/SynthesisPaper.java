@@ -34,27 +34,29 @@ public class SynthesisPaper {
 
     public static void main(String[] args) throws IOException {
         Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
-        /*
+
         avoidTheLine(100,
                      Paths.get("inputs","paper_synthesis"),
                      Paths.get("runs","paper_synthesis"));
-
+/*
         thresholdSweeps(25,
                         Paths.get("inputs","paper_synthesis"),
                         Paths.get("runs","paper_synthesis")
                         );
-                        */
+
         thresholdProbabilitySweeps(25,
                         Paths.get("inputs","paper_synthesis"),
                         Paths.get("runs","paper_synthesis")
                         );
 
-        /*
+
+
         socialAnnealing(25,
                                    Paths.get("inputs","paper_synthesis"),
                                    Paths.get("runs","paper_synthesis")
         );
         */
+
     }
 
     /**
