@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.ReplicatorDrivenDestinationStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -97,6 +98,11 @@ public class DestinationStrategies
                          LogitRPUEDestinationFactory::new);
         NAMES.put(LogitRPUEDestinationFactory.class,
                   "Perfect RPUE Logit");
+
+        CONSTRUCTORS.put("Replicator",
+                         ReplicatorDestinationFactory::new);
+        NAMES.put(ReplicatorDestinationFactory.class,
+                  "Replicator");
 
     }
 

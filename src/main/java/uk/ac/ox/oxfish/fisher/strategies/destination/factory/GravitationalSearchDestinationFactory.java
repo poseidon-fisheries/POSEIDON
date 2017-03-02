@@ -52,8 +52,9 @@ public class GravitationalSearchDestinationFactory implements AlgorithmFactory<P
                     @Override
                     public SeaTile scan(Fisher fisher) {
 
-                        if
-                                (((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate().equals(
+                        if(
+                                fisher.getDestinationStrategy() instanceof PerTripIterativeDestinationStrategy &&
+                                ((PerTripIterativeDestinationStrategy) fisher.getDestinationStrategy()).getDelegate().equals(
                                 delegate))
                             return delegate.getFavoriteSpot();
                         else {

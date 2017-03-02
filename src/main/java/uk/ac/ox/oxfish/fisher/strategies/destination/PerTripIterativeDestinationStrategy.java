@@ -119,6 +119,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     @Override
     public void turnOff(Fisher fisher) {
         delegate.turnOff(fisher);
+        fisher.removePerTripAdaptation(algorithm);
+
     }
 
     /**

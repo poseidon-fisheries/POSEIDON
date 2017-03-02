@@ -38,10 +38,13 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
     private final double weightAtRecruitmentMinus1;
 
+    private double previousRecruits;
+
 
     public DerisoSchnuteCommonGrower(
             List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
-            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1) {
+            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
+            double initialRecruits) {
         this.empiricalYearlyBiomasses = empiricalYearlyBiomasses;
         this.rho = rho;
         this.naturalSurvivalRate = naturalSurvivalRate;
@@ -50,6 +53,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         this.speciesIndex = speciesIndex;
         this.weightAtRecruitment = weightAtRecruitment;
         this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
+        this.previousRecruits = initialRecruits;
     }
 
     /**
@@ -121,7 +125,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
             virginBiomass+= biology.getCarryingCapacity(speciesIndex);
 
         }
-        double newBiomass = DerisoSchnuteIndependentGrower.computeNewBiomassDerisoSchnute(
+        DerisoSchnuteIndependentGrower.DerisoSchnuteStep bioStep = DerisoSchnuteIndependentGrower.computeNewBiomassDerisoSchnute(
                 currentBiomass,
                 virginBiomass,
                 previousBiomasses,
@@ -131,8 +135,11 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
                 recruitmentSteepness,
                 weightAtRecruitment,
                 rho,
-                weightAtRecruitmentMinus1
+                weightAtRecruitmentMinus1,
+                previousRecruits
         );
+        double newBiomass =  bioStep.getBiomass();
+        previousRecruits = bioStep.getRecruits();
         //reallocate uniformly. Do not allocate above carrying capacity
         Collections.shuffle(biologies);
         double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative

@@ -44,7 +44,7 @@ public class SimpleDynamicNetworks
 
     //private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_limited.yaml");
     //private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "twenty_limited.csv");
-    private final static Path INPUT_FILE = Paths.get("runs", "networks", "twenty_best_big.yaml");
+    private final static Path INPUT_FILE = Paths.get("runs", "networks", "temp3.yaml");
     private static final Path OUTPUT_FILE = Paths.get("runs", "networks", "all_results.csv");
     private static final Path COV_FILE = Paths.get("runs", "networks", "covariances.csv");
 
@@ -76,10 +76,127 @@ public class SimpleDynamicNetworks
         }
 
 
+
+        //Uniformly Distributed Outdegree
+  //      uniforOutdegreeRuns();
+
+
+        //Uniformly distributed indegree
+        indegreeUniformRuns();
+
+
+        //fixed degree policy sweeps
+   //     fixedDegreeSweeps();
+
+
+
+        /*
+        adaptiveRun("anarchy", YEARS_TO_RUN, INPUT_FILE,
+                    new AnarchyFactory(), supplier, NUMBER_OF_RUNS,
+                    OUTPUT_FILE);
+
+
+        ITQMonoFactory itq = new ITQMonoFactory();
+        itq.setIndividualQuota(new FixedDoubleParameter(4000));
+        adaptiveRun("itq", YEARS_TO_RUN, INPUT_FILE,
+                    itq, supplier, NUMBER_OF_RUNS,
+                    OUTPUT_FILE);
+
+
+        TACMonoFactory factory = new TACMonoFactory();
+        factory.setQuota(new FixedDoubleParameter(4000* NUMBER_OF_FISHERS));
+        adaptiveRun("tac", YEARS_TO_RUN, INPUT_FILE,
+                    factory, supplier, NUMBER_OF_RUNS,
+                    OUTPUT_FILE);
+
+        //mpa?
+        ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
+        mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
+        adaptiveRun("mpa", YEARS_TO_RUN, INPUT_FILE,
+                    mpa, supplier, NUMBER_OF_RUNS,
+                    OUTPUT_FILE);
+*/
+
+    }
+
+    private static void fixedDegreeSweeps() throws IOException {
+        Supplier<NetworkBuilder> supplier;
+        ITQMonoFactory itq;
+        TACMonoFactory factory;
+        for(int degree = 0; degree<20 && degree <NUMBER_OF_FISHERS/2 + 1; degree++) {
+            int finalDegree = degree;
+            supplier = () -> {
+                EquidegreeBuilder builder = new EquidegreeBuilder();
+
+                builder.setDegree(new FixedDoubleParameter(finalDegree));
+                builder.setAllowMutualFriendships(false);
+                return builder;
+            };
+
+            run("fixed" + degree,
+                YEARS_TO_RUN,
+                INPUT_FILE,
+                new AnarchyFactory(),
+                supplier,
+                NUMBER_OF_RUNS,
+                OUTPUT_FILE, COV_FILE,null);
+
+
+            itq = new ITQMonoFactory();
+            itq.setIndividualQuota(new FixedDoubleParameter(4000));
+
+            run("itq_fixed" + degree,
+                YEARS_TO_RUN,
+                INPUT_FILE,
+                itq,
+                supplier,
+                NUMBER_OF_RUNS,
+                OUTPUT_FILE, COV_FILE,null);
+
+
+            itq.setIndividualQuota(new FixedDoubleParameter(2000));
+
+            run("lowitq_fixed" + degree,
+                YEARS_TO_RUN,
+                INPUT_FILE,
+                itq,
+                supplier,
+                NUMBER_OF_RUNS,
+                OUTPUT_FILE, COV_FILE,null);
+
+
+            itq.setIndividualQuota(new FixedDoubleParameter(8000));
+
+            run("highitq_fixed" + degree,
+                YEARS_TO_RUN,
+                INPUT_FILE,
+                itq,
+                supplier,
+                NUMBER_OF_RUNS,
+                OUTPUT_FILE, COV_FILE,null);
+
+
+            factory = new TACMonoFactory();
+            factory.setQuota(new FixedDoubleParameter(4000* NUMBER_OF_FISHERS));
+
+            run("tac_fixed" + degree,
+                YEARS_TO_RUN,
+                INPUT_FILE,
+                factory,
+                supplier,
+                NUMBER_OF_RUNS,
+                OUTPUT_FILE, COV_FILE,null);
+
+
+
+        }
+    }
+
+    private static void uniforOutdegreeRuns() throws IOException {
         Supplier<NetworkBuilder> supplier =  () -> {
             EquidegreeBuilder builder = new EquidegreeBuilder();
 
-            builder.setDegree(new UniformDoubleParameter(0,Math.min(40,NUMBER_OF_FISHERS-1)));
+            builder.setDegree(new UniformDoubleParameter(0, Math.min(40, NUMBER_OF_FISHERS-1)));
             builder.setAllowMutualFriendships(true);
             return builder;
         };
@@ -161,7 +278,6 @@ public class SimpleDynamicNetworks
             OUTPUT_FILE, COV_FILE,COV_FILE2);
 
 
-
         factory.setQuota(new FixedDoubleParameter(1000* NUMBER_OF_FISHERS));
 
         run("verylowtac_uniform",
@@ -171,105 +287,6 @@ public class SimpleDynamicNetworks
             supplier,
             NUMBER_OF_RUNS,
             OUTPUT_FILE, COV_FILE,COV_FILE2);
-
-
-
-
-        for(int degree=0; degree<20 && degree <NUMBER_OF_FISHERS/2 + 1; degree++) {
-            int finalDegree = degree;
-            supplier = () -> {
-                EquidegreeBuilder builder = new EquidegreeBuilder();
-
-                builder.setDegree(new FixedDoubleParameter(finalDegree));
-                builder.setAllowMutualFriendships(false);
-                return builder;
-            };
-
-            run("fixed" + degree,
-                YEARS_TO_RUN,
-                INPUT_FILE,
-                new AnarchyFactory(),
-                supplier,
-                NUMBER_OF_RUNS,
-                OUTPUT_FILE, COV_FILE,null);
-
-
-            itq = new ITQMonoFactory();
-            itq.setIndividualQuota(new FixedDoubleParameter(4000));
-
-            run("itq_fixed" + degree,
-                YEARS_TO_RUN,
-                INPUT_FILE,
-                itq,
-                supplier,
-                NUMBER_OF_RUNS,
-                OUTPUT_FILE, COV_FILE,null);
-
-
-            itq.setIndividualQuota(new FixedDoubleParameter(2000));
-
-            run("lowitq_fixed" + degree,
-                YEARS_TO_RUN,
-                INPUT_FILE,
-                itq,
-                supplier,
-                NUMBER_OF_RUNS,
-                OUTPUT_FILE, COV_FILE,null);
-
-
-            itq.setIndividualQuota(new FixedDoubleParameter(8000));
-
-            run("highitq_fixed" + degree,
-                YEARS_TO_RUN,
-                INPUT_FILE,
-                itq,
-                supplier,
-                NUMBER_OF_RUNS,
-                OUTPUT_FILE, COV_FILE,null);
-
-
-            factory = new TACMonoFactory();
-            factory.setQuota(new FixedDoubleParameter(4000* NUMBER_OF_FISHERS));
-
-            run("tac_fixed" + degree,
-                YEARS_TO_RUN,
-                INPUT_FILE,
-                factory,
-                supplier,
-                NUMBER_OF_RUNS,
-                OUTPUT_FILE, COV_FILE,null);
-
-
-
-        }
-
-        /*
-        adaptiveRun("anarchy", YEARS_TO_RUN, INPUT_FILE,
-                    new AnarchyFactory(), supplier, NUMBER_OF_RUNS,
-                    OUTPUT_FILE);
-
-
-        ITQMonoFactory itq = new ITQMonoFactory();
-        itq.setIndividualQuota(new FixedDoubleParameter(4000));
-        adaptiveRun("itq", YEARS_TO_RUN, INPUT_FILE,
-                    itq, supplier, NUMBER_OF_RUNS,
-                    OUTPUT_FILE);
-
-
-        TACMonoFactory factory = new TACMonoFactory();
-        factory.setQuota(new FixedDoubleParameter(4000* NUMBER_OF_FISHERS));
-        adaptiveRun("tac", YEARS_TO_RUN, INPUT_FILE,
-                    factory, supplier, NUMBER_OF_RUNS,
-                    OUTPUT_FILE);
-
-        //mpa?
-        ProtectedAreasOnlyFactory mpa = new ProtectedAreasOnlyFactory();
-        mpa.setStartingMPAs(Lists.newArrayList(new StartingMPA(15,15,15,15)));
-        adaptiveRun("mpa", YEARS_TO_RUN, INPUT_FILE,
-                    mpa, supplier, NUMBER_OF_RUNS,
-                    OUTPUT_FILE);
-*/
-
     }
 
 
@@ -434,6 +451,107 @@ public class SimpleDynamicNetworks
             state.finish();
 
         }
+    }
+
+    public static void indegreeUniformRuns() throws IOException {
+
+        Supplier<NetworkBuilder> supplier =  () -> {
+            EquidegreeBuilder builder = new EquidegreeBuilder();
+
+            builder.setDegree(new UniformDoubleParameter(0,Math.min(40,NUMBER_OF_FISHERS-1)));
+            builder.setAllowMutualFriendships(true);
+            builder.setEqualOutDegree(false);
+            return builder;
+        };
+
+
+        run("uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            new AnarchyFactory(),
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+        ITQMonoFactory itq = new ITQMonoFactory();
+        itq.setIndividualQuota(new FixedDoubleParameter(4000));
+
+        run("itq_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            itq,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+        itq.setIndividualQuota(new FixedDoubleParameter(2000));
+
+        run("lowitq_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            itq,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+        itq.setIndividualQuota(new FixedDoubleParameter(1000));
+
+        run("verylowitq_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            itq,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+        itq.setIndividualQuota(new FixedDoubleParameter(8000));
+
+        run("highitq_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            itq,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+        TACMonoFactory factory = new TACMonoFactory();
+        factory.setQuota(new FixedDoubleParameter(4000* NUMBER_OF_FISHERS));
+
+        run("tac_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            factory,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+        factory.setQuota(new FixedDoubleParameter(2000* NUMBER_OF_FISHERS));
+
+        run("lowtac_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            factory,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
+
+
+        factory.setQuota(new FixedDoubleParameter(1000* NUMBER_OF_FISHERS));
+
+        run("verylowtac_uniform",
+            YEARS_TO_RUN,
+            INPUT_FILE,
+            factory,
+            supplier,
+            NUMBER_OF_RUNS,
+            OUTPUT_FILE, COV_FILE,COV_FILE2);
+
     }
 
 

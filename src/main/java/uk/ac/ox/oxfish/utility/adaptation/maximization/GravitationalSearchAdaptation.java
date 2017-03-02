@@ -106,14 +106,29 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
                                                        fisher,
                                                        model);
 
+        if(currentCoordinates != null) {
+            initializeSpeed(model);
+        }
+    }
+
+    private void initializeSpeed(FishState model) {
         speed = new double[currentCoordinates.length];
-        for(int i=0; i<speed.length; i++)
-            speed[i] =  initialSpeed.apply(model.getRandom());
+        for (int i = 0; i < speed.length; i++)
+            speed[i] = initialSpeed.apply(model.getRandom());
     }
 
     @Override
     public T concreteAdaptation(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
-
+        if(currentCoordinates == null) {
+            currentCoordinates = transformer.toCoordinates(getSensor().scan(toAdapt),
+                                                           toAdapt,
+                                                           state);
+            if (currentCoordinates != null && speed == null) {
+                initializeSpeed(state);
+            }
+            if(currentCoordinates==null)
+                return null;
+        }
         double personalMass = mass.computeCurrentFitness(toAdapt);
         //don't bother if you don't have mass or coordinates
         Preconditions.checkNotNull(currentCoordinates);

@@ -36,6 +36,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     private final BanditSwitch banditSwitch;
 
     private final BanditAverage banditAverage;
+    private Adaptation concreteAdaptation;
 
 
     /**
@@ -96,7 +97,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     public void start(FishState model, Fisher fisher) {
 
         delegate.start(model,fisher);
-        fisher.addPerTripAdaptation(new Adaptation() {
+        concreteAdaptation = new Adaptation() {
             @Override
             public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
                 // observe previous trip
@@ -104,7 +105,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
                 assert toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ||
                         toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
                 double reward = toAdapt.getLastFinishedTrip().getProfitPerHour(true);
-                choose(lastDestination,reward,random);
+                choose(lastDestination, reward, random);
 
             }
 
@@ -117,7 +118,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
             public void turnOff(Fisher fisher) {
 
             }
-        });
+        };
+        fisher.addPerTripAdaptation(concreteAdaptation);
 
     }
 
@@ -140,6 +142,9 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     @Override
     public void turnOff(Fisher fisher) {
         delegate.turnOff(fisher);
+        if(concreteAdaptation != null)
+            fisher.removePerTripAdaptation(concreteAdaptation);
+
     }
 
     public int getNumberOfObservations(int arm) {

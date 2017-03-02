@@ -33,6 +33,13 @@ public class EquidegreeBuilder implements NetworkBuilder{
      */
     private boolean allowMutualFriendships = true;
 
+
+    /**
+     * when this is set to true, you are trying to target outdegree equal to the "degree" variable;
+     * Otherwise you are trying to target indegree equal to "degree"
+     */
+    private boolean equalOutDegree = true;
+
     /**
      * Applies this function to the given argument.
      *
@@ -67,7 +74,8 @@ public class EquidegreeBuilder implements NetworkBuilder{
             for(Fisher candidate : fishers)
             {
                 boolean allowed = candidate!=fisher;
-                boolean mutualAllowed = allowMutualFriendships || (toReturn.findEdge(candidate,fisher) == null);
+                boolean notConnected = equalOutDegree ? toReturn.findEdge(candidate,fisher) == null :  toReturn.findEdge(fisher,candidate) == null;
+                boolean mutualAllowed = allowMutualFriendships || notConnected;
                 for (NetworkPredicate predicate : predicates)
                     allowed = allowed && predicate.test(fisher, candidate);
                 if(allowed  && mutualAllowed)
@@ -102,8 +110,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
             //now make them your friends!
 
             if(friends.size() > 0)
-                for(Fisher friend : friends)
-                    toReturn.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
+                addSetOfFriends(toReturn, fisher, friends);
             else //if you have no friends add yourself as an unconnected person
                 toReturn.addVertex(fisher);
 
@@ -111,6 +118,16 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
         return toReturn;
 
+    }
+
+    private void addSetOfFriends(
+            DirectedGraph<Fisher, FriendshipEdge> network, Fisher fisher, Collection<Fisher> newConnections) {
+        for(Fisher friend : newConnections) {
+        if(equalOutDegree)
+            network.addEdge(new FriendshipEdge(), fisher, friend, EdgeType.DIRECTED);
+        else
+            network.addEdge(new FriendshipEdge(), friend, fisher, EdgeType.DIRECTED);
+        }
     }
 
 
@@ -158,9 +175,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
             }
         }
         //now make them your friends!
-        for(Fisher friend : friends)
-            currentNetwork.addEdge(new FriendshipEdge(),fisher,friend, EdgeType.DIRECTED);
-
+        addSetOfFriends(currentNetwork, fisher, friends);
     }
 
     /**
@@ -200,5 +215,23 @@ public class EquidegreeBuilder implements NetworkBuilder{
      */
     public void setAllowMutualFriendships(boolean allowMutualFriendships) {
         this.allowMutualFriendships = allowMutualFriendships;
+    }
+
+    /**
+     * Getter for property 'equalOutDegree'.
+     *
+     * @return Value for property 'equalOutDegree'.
+     */
+    public boolean isEqualOutDegree() {
+        return equalOutDegree;
+    }
+
+    /**
+     * Setter for property 'equalOutDegree'.
+     *
+     * @param equalOutDegree Value to set for property 'equalOutDegree'.
+     */
+    public void setEqualOutDegree(boolean equalOutDegree) {
+        this.equalOutDegree = equalOutDegree;
     }
 }
