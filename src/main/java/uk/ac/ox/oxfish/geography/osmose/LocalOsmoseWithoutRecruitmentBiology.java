@@ -30,6 +30,7 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
     private final ExogenousMortality mortality;
 
 
+
     private final Map<School,Double> biomassFishedFromSchool;
 
     private final MersenneTwisterFast random;
@@ -72,11 +73,42 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 
     public double getBiomassIncludingJuveniles(Species species)
     {
-        final double currentBiomass =
-            counter.getBiomass(species.getIndex()) - biomassFishedFromSchool.getOrDefault(species.getIndex(),
-                                                                                          0d);
+
+        /*
+        //get all the schools of fish that belong to this species
+        List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
+
+        //count them all
+        double currentBiomass = 0d;
+        for(School school : schools) {
+            final Double depletion = biomassFishedFromSchool.getOrDefault(school,0d);
+            double biomass = school.getInstantaneousBiomass();
+            assert biomass >= depletion;
+            currentBiomass += biomass - depletion;
+
+        }
         assert  currentBiomass >= -FishStateUtilities.EPSILON;
-        return currentBiomass;
+        assert  currentBiomass * scalingFactor >= getBiomass(species); //this includes juveniles so it should be more
+
+        assert  counter.getBiomassOfSpecie(species.getIndex()) -
+                biomassFishedFromSchool.values().stream()
+                        .mapToDouble(Double::doubleValue).sum() == currentBiomass;
+        return currentBiomass * scalingFactor;
+
+*/
+
+        double currentBiomass =   counter.getBiomassOfSpecie(species.getIndex()) -
+                biomassFishedFromSchool.values().stream()
+                        .mapToDouble(Double::doubleValue).sum();
+
+
+        assert  currentBiomass >= -FishStateUtilities.EPSILON;
+        assert  currentBiomass * scalingFactor >= getBiomass(species); //this includes juveniles so it should be more
+        //if recruitment mortality is 0, these two ought to be equal
+        // A => B is equivalent to  (!A or B)
+        assert  !(recruitmentAge[species.getIndex()]  == 0) || (currentBiomass * scalingFactor == getBiomass(species));
+        return currentBiomass * scalingFactor;
+
 
     }
 
@@ -122,13 +154,13 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
             return;
 
         // do not need to scale since they are both "wrong" and all we care about is their proportion
-        double biomassAvailable = getBiomass(species);
+        double biomassAvailable = getBiomass(species); //already scaled
 
         if(biomassAvailable<FishStateUtilities.EPSILON) //if there is no fish, do not bother
             return;
 
         double proportionFishedPerEachSchool =
-                        biomassFished/biomassAvailable;
+                biomassFished/biomassAvailable;
 
         assert proportionFishedPerEachSchool >=0;
         assert proportionFishedPerEachSchool <=1;
@@ -218,73 +250,73 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 }
 
 
-    /**
-     *
-     * old schooling algorithm. Might come useful later
+/**
+ *
+ * old schooling algorithm. Might come useful later
 
-    @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-        //scale
-        biomassFished /= scalingFactor;
-        double biomassAvailable = getBiomass(species) / scalingFactor;
-
-
+ @Override
+ public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+ //scale
+ biomassFished /= scalingFactor;
+ double biomassAvailable = getBiomass(species) / scalingFactor;
 
 
-        //you can't fish MORE than what is available right now
-        Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
-                                    "can't fish this much!");
 
-        //get all the schools of fish that belong to this species
-        List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
 
-        //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
-        //variable I have
-        Integer recruitmentAge = this.recruitmentAge[species.getIndex()];
+ //you can't fish MORE than what is available right now
+ Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
+ "can't fish this much!");
 
-        assert Math.abs(schools.stream().filter(school -> school.getAge() >=recruitmentAge )
-                                .mapToDouble(School::getInstantaneousBiomass).sum()
-                                -biomassAvailable)
-                < FishStateUtilities.EPSILON;
+ //get all the schools of fish that belong to this species
+ List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
 
-        //shuffle the schools
-        Collections.shuffle(schools, new Random(random.nextLong()));
+ //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
+ //variable I have
+ Integer recruitmentAge = this.recruitmentAge[species.getIndex()];
 
-        //go through each school
-        final ListIterator<School> listIterator = schools.listIterator();
-        //as long as there is something to fish
-        double biomassToConsume = biomassFished;
-        while(biomassToConsume > 0)
-        {
-            //pick next valid school
-            School school;
-            do {
-                school = listIterator.next();
-            }
-            while(school.getAge()<recruitmentAge);
+ assert Math.abs(schools.stream().filter(school -> school.getAge() >=recruitmentAge )
+ .mapToDouble(School::getInstantaneousBiomass).sum()
+ -biomassAvailable)
+ < FishStateUtilities.EPSILON;
 
-            biomassFishedFromSchool.putIfAbsent(school, 0d);
-            //count what has already been depleted
-            final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
-            //fish as much as you can
-            double fishedHere = Math.max(0,
-                                         Math.min(school.getInstantaneousBiomass()- schoolEarlierDepletion,
-                                                  biomassToConsume));
+ //shuffle the schools
+ Collections.shuffle(schools, new Random(random.nextLong()));
 
-            //should be no more than what we want to fish
-            assert fishedHere <=biomassToConsume;
-            assert fishedHere <=biomassFished;
-            //should be positive or 0
-            assert fishedHere >=0;
+ //go through each school
+ final ListIterator<School> listIterator = schools.listIterator();
+ //as long as there is something to fish
+ double biomassToConsume = biomassFished;
+ while(biomassToConsume > 0)
+ {
+ //pick next valid school
+ School school;
+ do {
+ school = listIterator.next();
+ }
+ while(school.getAge()<recruitmentAge);
 
-            //register the catch
-            //with yourself
-            biomassToConsume-=biomassFished;
-            //with the school
-            biomassFishedFromSchool.put(school,schoolEarlierDepletion+fishedHere);
-            //with the OSMOSE module
-            mortality.incrementCatches(school,fishedHere);
+ biomassFishedFromSchool.putIfAbsent(school, 0d);
+ //count what has already been depleted
+ final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
+ //fish as much as you can
+ double fishedHere = Math.max(0,
+ Math.min(school.getInstantaneousBiomass()- schoolEarlierDepletion,
+ biomassToConsume));
 
-        }
-    }
-     */
+ //should be no more than what we want to fish
+ assert fishedHere <=biomassToConsume;
+ assert fishedHere <=biomassFished;
+ //should be positive or 0
+ assert fishedHere >=0;
+
+ //register the catch
+ //with yourself
+ biomassToConsume-=biomassFished;
+ //with the school
+ biomassFishedFromSchool.put(school,schoolEarlierDepletion+fishedHere);
+ //with the OSMOSE module
+ mortality.incrementCatches(school,fishedHere);
+
+ }
+ }
+ */

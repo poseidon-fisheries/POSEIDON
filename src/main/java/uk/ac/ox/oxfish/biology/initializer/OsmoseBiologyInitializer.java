@@ -2,15 +2,16 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.OsmoseSimulation;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.OsmoseGlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseWithoutRecruitmentBiology;
 import uk.ac.ox.oxfish.geography.osmose.OsmoseStepper;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Creates an osmose biology (including the the simulation link and the stepper)
@@ -88,6 +90,8 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
             int mapWidthInCells) {
         OsmoseSimulation simulation = ((OsmoseGlobalBiology) biology).getSimulation();
 
+        if(seaTile.getAltitude()>0)
+            return new EmptyLocalBiology();
 
 
 
@@ -143,6 +147,7 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
 
         OsmoseSimulation osmoseSimulation;
 
+        //either read in a pre-made OSMOSE start or spinup
         try {
             if(!preInitializedConfiguration)
                 osmoseSimulation = OsmoseSimulation.startUpOSMOSESimulationWithBurnIn(burnInYears,
@@ -162,16 +167,75 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
             e.printStackTrace();
             throw  new IllegalArgumentException("Can't instantiate OSMOSE! \n" );
         }
+
+        //activate exogenous (with respect to OSMOSE) mortality for the right species
         for(Integer speciesIndex : speciesToManageFromThisSide  )
             osmoseSimulation.getMortality().markThisSpeciesAsExogenous(speciesIndex);
 
         //grab all the species
-        Species[] species = new Species[osmoseSimulation.getNumberOfSpecies()];
+        final Species[] species = new Species[osmoseSimulation.getNumberOfSpecies()];
         for(int i=0; i<species.length; i++)
             species[i] = new Species(osmoseSimulation.getSpecies(i).getName());
         System.out.println(Arrays.toString(species));
 
+        //set up the stepper
         final OsmoseStepper stepper = new OsmoseStepper(model.getStepsPerDay() * 365, osmoseSimulation, model.random);
+
+
+
+        //for species where there is a recruitment age, add data tracker on real biomass (since the default one ignores juveniles)
+        if(!recruitmentAges.isEmpty())
+        {
+            model.registerStartable(new Startable() {
+                @Override
+                public void start(FishState model) {
+                    for (Integer index : recruitmentAges.keySet()) {
+                    //for (int index = 0; index<species.length; index++) {
+                        //add daily gatherer
+                        //notice that it grabs the list of local biology from the stepper (since that's one less cast)
+                        int finalIndex = index;
+                        //the datagatherer checks instantaneous biomass
+                        Gatherer<FishState> dataGatherer = new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
+                                ToDoubleFunction<LocalOsmoseWithoutRecruitmentBiology> getter =
+                                        new ToDoubleFunction<LocalOsmoseWithoutRecruitmentBiology>() {
+                                            @Override
+                                            public double applyAsDouble(
+                                                    LocalOsmoseWithoutRecruitmentBiology value) {
+                                                return value.getBiomassIncludingJuveniles(species[finalIndex]);
+                                            }
+                                        };
+                                return stepper.getToReset().stream().mapToDouble(
+                                        getter).sum();
+                            }
+                        };
+                        //add it daily
+                        DataColumn dailyGatherer = model.getDailyDataSet().registerGatherer(
+                                "Total Biomass " + species[index].getName(),
+                                dataGatherer,
+                                Double.NaN
+                        );
+                        //add it yearly
+                        model.getYearlyDataSet().registerGatherer(
+                                "Total Biomass " + species[index].getName(),
+                                new Gatherer<FishState>() {
+                                    @Override
+                                    public Double apply(FishState state) {
+                                        return dailyGatherer.getLatest();
+                                    }
+                                },
+                                Double.NaN);
+                    }
+                }
+
+                @Override
+                public void turnOff() {
+
+                }
+            });
+        }
+
         return new OsmoseGlobalBiology(osmoseSimulation,stepper,species);
 
     }

@@ -81,12 +81,16 @@ public class OsmoseWFSScenario implements Scenario{
     private boolean collectLogitData = true;
 
     {
-        biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2");
+        biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2,3,4");
         biologyInitializer.setOsmoseConfigurationFile(mainDirectory.resolve("wfs").resolve("osm_all-parameters.csv").toAbsolutePath().toString());
         biologyInitializer.setPreInitializedConfiguration(false);
         biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
         biologyInitializer.setScalingFactor(new FixedDoubleParameter(1000d));
         //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
+        //this should take care of selectivityi
+        biologyInitializer.getRecruitmentAges().put(2,2);
+        biologyInitializer.getRecruitmentAges().put(3,2);
+        biologyInitializer.getRecruitmentAges().put(4,1);
     }
 
     private final OsmoseBoundedMapInitializerFactory mapInitializer = new OsmoseBoundedMapInitializerFactory();
