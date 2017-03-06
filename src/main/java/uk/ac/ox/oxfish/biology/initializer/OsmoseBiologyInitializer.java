@@ -90,6 +90,7 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
 
 
 
+
         final int height = simulation.getMap().get_ny(); //needs height because OSMOSE map is reversed
         final int x = seaTile.getGridX();
         final int y = seaTile.getGridY();

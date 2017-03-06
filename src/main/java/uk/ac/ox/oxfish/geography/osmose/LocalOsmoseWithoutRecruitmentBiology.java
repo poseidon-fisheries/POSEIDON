@@ -69,6 +69,17 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 
     }
 
+
+    public double getBiomassIncludingJuveniles(Species species)
+    {
+        final double currentBiomass =
+            counter.getBiomass(species.getIndex()) - biomassFishedFromSchool.getOrDefault(species.getIndex(),
+                                                                                          0d);
+        assert  currentBiomass >= -FishStateUtilities.EPSILON;
+        return currentBiomass;
+
+    }
+
     /**
      * the biomass at this location for a single species.
      *
@@ -105,9 +116,120 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
      */
     @Override
     public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+
+        //if nothing was fished, then ignore
+        if(biomassFished<FishStateUtilities.EPSILON)
+            return;
+
+        // do not need to scale since they are both "wrong" and all we care about is their proportion
+        double biomassAvailable = getBiomass(species);
+
+        if(biomassAvailable<FishStateUtilities.EPSILON) //if there is no fish, do not bother
+            return;
+
+        double proportionFishedPerEachSchool =
+                        biomassFished/biomassAvailable;
+
+        assert proportionFishedPerEachSchool >=0;
+        assert proportionFishedPerEachSchool <=1;
+
+        //you can't fish MORE than what is available right now
+        Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
+                                    "can't fish this much!");
+
+        assert biomassAvailable >=0;
+
+
+        //get all the schools of fish that belong to this species
+        List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
+
+        //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
+        //variable I have
+        Integer recruitmentAge = this.recruitmentAge[species.getIndex()];
+        assert Math.abs(schools.stream().filter(school -> school.getAge() >=recruitmentAge )
+                                .mapToDouble(School::getInstantaneousBiomass).sum()
+                                -biomassAvailable)
+                < FishStateUtilities.EPSILON;
+
+
+
+        //go through each school
+        //fish each with the same proportion
+        double totalFished = 0;
+        for(School school : schools)
+        {
+
+            //ignore small fish
+            if(school.getAge()<recruitmentAge)
+                continue;
+
+            biomassFishedFromSchool.putIfAbsent(school, 0d);
+            //count what has already been depleted
+            final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
+            //fish the right proportion
+            double fishedHere = (school.getInstantaneousBiomass()- schoolEarlierDepletion) * proportionFishedPerEachSchool;
+            totalFished += fishedHere;
+            //should be no more than what we want to fish
+            assert fishedHere <=biomassFished;
+            //should be positive or 0
+            assert fishedHere >=0;
+
+            //register the catch
+            //with the school
+            biomassFishedFromSchool.put(school,schoolEarlierDepletion+fishedHere);
+            //with the OSMOSE module
+            mortality.incrementCatches(school,fishedHere);
+
+        }
+        assert  totalFished == biomassFished/scalingFactor;
+    }
+
+
+    /**
+     * ignored
+     */
+    @Override
+    public void start(FishState model) {
+
+    }
+
+    /**
+     * ignored
+     */
+    @Override
+    public void turnOff() {
+
+    }
+
+    public void osmoseStep(){
+        biomassFishedFromSchool.clear();
+    }
+
+    @Override
+    public String toString() {
+
+        double[] toPrint = new double[recruitmentAge.length];
+        for(int i =0; i<toPrint.length; i++ )
+            toPrint[i] = getBiomass(i);
+
+        return Arrays.toString(toPrint);
+
+    }
+}
+
+
+    /**
+     *
+     * old schooling algorithm. Might come useful later
+
+    @Override
+    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+        //scale
         biomassFished /= scalingFactor;
-        //this is the biomass available for this species
         double biomassAvailable = getBiomass(species) / scalingFactor;
+
+
+
 
         //you can't fish MORE than what is available right now
         Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
@@ -165,36 +287,4 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 
         }
     }
-
-
-    /**
-     * ignored
      */
-    @Override
-    public void start(FishState model) {
-
-    }
-
-    /**
-     * ignored
-     */
-    @Override
-    public void turnOff() {
-
-    }
-
-    public void osmoseStep(){
-        biomassFishedFromSchool.clear();
-    }
-
-    @Override
-    public String toString() {
-
-        double[] toPrint = new double[recruitmentAge.length];
-        for(int i =0; i<toPrint.length; i++ )
-            toPrint[i] = getBiomass(i);
-
-        return Arrays.toString(toPrint);
-
-    }
-}
