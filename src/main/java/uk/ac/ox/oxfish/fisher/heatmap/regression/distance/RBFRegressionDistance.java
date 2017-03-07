@@ -8,11 +8,11 @@ public class RBFRegressionDistance implements RegressionDistance
 {
 
 
-    private final RBFKernel delegate;
+    private final RBFDistance delegate;
 
 
     public RBFRegressionDistance(double bandwidth) {
-        this.delegate = new RBFKernel(bandwidth);
+        this.delegate = new RBFDistance(bandwidth);
     }
 
 

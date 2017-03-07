@@ -75,8 +75,8 @@ public abstract class AbstractKernelRegression implements GeographicalRegression
         double numerator = 0;
         for(GeographicalObservation<Double> observation : getObservations())
         {
-            double distance = distance(observation.getX(),
-                                       observation.getY(),
+            double distance = distance(observation.getXCoordinate(),
+                                       observation.getYCoordinate(),
                                        observation.getTime(),
                                        x,
                                        y,

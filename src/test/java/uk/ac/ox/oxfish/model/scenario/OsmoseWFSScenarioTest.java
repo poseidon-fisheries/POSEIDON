@@ -34,7 +34,7 @@ public class OsmoseWFSScenarioTest {
         Coordinate coordinates = map.getCoordinates(map.getWidth()-1,map.getHeight()-1 );
         Point2D.Double latLong = FishStateUtilities.utmToLatLong("17 N", coordinates.x, coordinates.y);
         System.out.println("lat-long of low right :" + latLong);
-//        assertEquals(latLong.getX(),25.24,.2);
+//        assertEquals(latLong.getXCoordinate(),25.24,.2);
         assertEquals(latLong.getY(),-80.16,.2);
         coordinates = map.getCoordinates(0, 0);
         latLong = FishStateUtilities.utmToLatLong("17 N", coordinates.x, coordinates.y);

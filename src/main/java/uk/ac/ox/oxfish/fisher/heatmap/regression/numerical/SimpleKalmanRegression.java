@@ -6,7 +6,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.bayes.OneDimensionalKalmanFilter;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.geography.ManhattanDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -24,7 +24,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
     /**
      * 1/exp(-distance/h) will be our distance penalty
      */
-    private final RBFKernel distancePenalty;
+    private final RBFDistance distancePenalty;
 
     private double evidenceUncertainty;
 
@@ -72,7 +72,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
             double fishingHerePenalty,
             NauticalMap map,
             MersenneTwisterFast random) {
-        this.distancePenalty =  new RBFKernel(distancePenalty);
+        this.distancePenalty =  new RBFDistance(distancePenalty);
         this.drift = drift;
         this.minValue = minValue;
         this.maxValue = maxValue;
@@ -166,7 +166,7 @@ public class SimpleKalmanRegression implements GeographicalRegression<Double> {
      *
      * @return Value for property 'distancePenalty'.
      */
-    public RBFKernel getDistancePenalty() {
+    public RBFDistance getDistancePenalty() {
         return distancePenalty;
     }
 

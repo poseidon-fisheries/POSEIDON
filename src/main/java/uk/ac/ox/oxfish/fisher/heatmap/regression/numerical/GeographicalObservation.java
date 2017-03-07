@@ -26,20 +26,16 @@ public class GeographicalObservation<V> implements Comparable<GeographicalObserv
 
 
     /**
-     * Getter for property 'x'.
-     *
-     * @return Value for property 'x'.
+     *  the tile x coordinate
      */
-    public double getX() {
+    public double getXCoordinate() {
         return tile.getGridX();
     }
 
     /**
-     * Getter for property 'y'.
-     *
-     * @return Value for property 'y'.
+     *  the tile y coordinate
      */
-    public double getY() {
+    public double getYCoordinate() {
         return tile.getGridY();
     }
 

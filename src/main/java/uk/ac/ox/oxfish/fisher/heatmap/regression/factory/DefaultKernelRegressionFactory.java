@@ -44,7 +44,7 @@ public class DefaultKernelRegressionFactory implements AlgorithmFactory<KernelRe
 
         return new KernelRegression(
                 numberOfObservations.apply(state.getRandom()).intValue(),
-                rbfKernel ? new RBFKernel(0) : new EpanechinikovKernel(0),
+                rbfKernel ? new RBFDistance(0) : new EpanechinikovKernel(0),
                 new Pair<>(
                         new GridXExtractor(),
                         xBandwidth.apply(state.getRandom())

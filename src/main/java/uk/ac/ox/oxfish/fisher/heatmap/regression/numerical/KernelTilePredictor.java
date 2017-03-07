@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -33,7 +33,7 @@ public class KernelTilePredictor{
 
     private double[] bandwidths;
 
-    private final RBFKernel kerneler = new RBFKernel(0); //this bandwidth gets changed at each step
+    private final RBFDistance kerneler = new RBFDistance(0); //this bandwidth gets changed at each step
 
     public KernelTilePredictor(double forgettingFactor,
                                SeaTile whereAmIPredicting,

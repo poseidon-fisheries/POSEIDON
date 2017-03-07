@@ -9,14 +9,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * since Kernels are a measure of similarity
  * Created by carrknight on 8/14/16.
  */
-public class RBFKernel implements RegressionDistance
+public class RBFDistance implements RegressionDistance
 {
 
 
 
     private double bandwidth;
 
-    public RBFKernel(double bandwidth) {
+    public RBFDistance(double bandwidth) {
         this.bandwidth = bandwidth;
     }
 

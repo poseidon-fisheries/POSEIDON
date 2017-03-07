@@ -87,6 +87,12 @@ public class NumericalGeographicalRegressions {
                   "Kernel Regression");
 
 
+        CONSTRUCTORS.put("RBF Network",
+                         RBFNetworkFactory::new);
+        NAMES.put(RBFNetworkFactory.class,
+                  "RBF Network");
+
+
         CONSTRUCTORS.put("Social Tuning",
                          SocialTuningRegressionFactory::new);
         NAMES.put(SocialTuningRegressionFactory.class,

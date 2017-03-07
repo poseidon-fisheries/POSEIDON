@@ -6,7 +6,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.geography.Distance;
@@ -51,7 +51,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
      * its inverse penalizes observations that are far so that the priors are stronger
      * the penalty comes by dividing sigma by the the RBF Kernel
      */
-    private RBFKernel distancePenalty;
+    private RBFDistance distancePenalty;
 
     /**
      * daily drift of probabilities towards the middle
@@ -78,7 +78,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
         this.goodAverage = goodAverage;
         this.standardDeviation = deviation;
         this.distance = distance;
-        this.distancePenalty = new RBFKernel(distanceBandwidth);
+        this.distancePenalty = new RBFDistance(distanceBandwidth);
 
         //each tile its own random probability
         spots = new HashMap<>();

@@ -4,7 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFKernel;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.distance.RBFDistance;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.*;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
@@ -39,7 +39,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
 
 
 
-    private final RBFKernel kernel;
+    private final RBFDistance kernel;
     private final NauticalMap map;
 
 
@@ -60,7 +60,7 @@ public class GeographicallyWeightedRegression implements GeographicalRegression<
             this.extractors[i+1] = nonInterceptExtractors[i];
         this.extractors[0] = new InterceptExtractor();
 
-        this.kernel = new RBFKernel(rbfBandwidth);
+        this.kernel = new RBFDistance(rbfBandwidth);
 
         //each tile its own lowess with a random intercept
         List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList();
