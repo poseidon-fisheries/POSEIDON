@@ -76,7 +76,11 @@ public class OsmoseWFSScenario implements Scenario{
     public final static Path mainDirectory = Paths.get("temp_wfs");
 
     private final OsmoseBiologyFactory biologyInitializer = new OsmoseBiologyFactory();
-    private LinkedHashMap<Port, Integer> numberOfFishersPerPort;
+
+    private LinkedHashMap<Port, Integer> longlinersPerPort;
+
+    private LinkedHashMap<Port, Integer> handlinersPerPort;
+
 
     private boolean collectLogitData = true;
 
@@ -218,7 +222,9 @@ public class OsmoseWFSScenario implements Scenario{
                                              global, model);
 
 
-            numberOfFishersPerPort = PortReader.readFile(
+            PortReader reader = new PortReader();
+
+            longlinersPerPort = reader.readFile(
                     mainDirectory.resolve("longline_ports.csv"),
                     map,
                     () -> {
@@ -231,7 +237,18 @@ public class OsmoseWFSScenario implements Scenario{
                     0.1234);
 
 
-            for(Port port : numberOfFishersPerPort.keySet())
+            handlinersPerPort = reader.readFile(mainDirectory.resolve("handline_ports.csv"),
+                                                map,
+                                                () -> {
+                                                    MarketMap markets = new MarketMap(global);
+                                                    for(Species species : global.getSpecies())
+                                                        markets.addMarket(species, new FixedPriceMarket(1));
+
+                                                    return markets;
+                                                },
+                                                0.1234);
+
+            for(Port port : reader.getPorts())
                 map.addPort(port);
 
 
@@ -284,7 +301,7 @@ public class OsmoseWFSScenario implements Scenario{
         }
 
         //longliners
-        for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
+        for(Map.Entry<Port,Integer> entry : longlinersPerPort.entrySet())
 
             for(int id=0;id<entry.getValue();id++)
             {

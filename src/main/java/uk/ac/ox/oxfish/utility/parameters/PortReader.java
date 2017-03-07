@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Reads a list of ports and returns an hashmap of it
@@ -21,24 +22,26 @@ import java.util.*;
 public class PortReader {
 
 
-    public static final int MAXIMUM_NEIGHBORHOOD = 5;
+    /**
+     * map connecting names to ports
+     */
+    private final HashMap<String, Port> ports = new HashMap<>();
 
     /**
-     * reads a csv file that looks like "portname","number of fishers",eastings,northings
-     * @param pathToFile
-     * @param marketmap
-     *@param gasPrice  @return
-     * @throws IOException
+     * function returning the number of ports given a file read
+     * <br> here's how I expect the headings to be: <br>
+     * <i>Port,Fishers,Eastings,Northings,probability</i>
+     * <br>
      */
-    public static LinkedHashMap<Port,Integer> readFile(
+    public LinkedHashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
-            Supplier<MarketMap> marketmap, double gasPrice) throws IOException {
+            Supplier<MarketMap> marketmap, double gasPrice)
+            throws IOException {
 
         List<String> fileLines = Files.readAllLines(pathToFile);
         Preconditions.checkArgument(fileLines.size()>=2);
 
         LinkedHashMap<Port,Integer> toReturn = new LinkedHashMap<>();
-
         //the first line is heading
         Iterator<String> rowIterator = fileLines.iterator();
         rowIterator.next();
@@ -47,21 +50,37 @@ public class PortReader {
         {
             //read name and location
             String line = rowIterator.next();
+            if(line.startsWith("#")) //ignore commented out
+                continue;
             String[] splitLine = line.split(",");
-            String portName = splitLine[0];
-            SeaTile location = map.getSeaTile(new Coordinate(
-                    Double.parseDouble(splitLine[2]),
-                    Double.parseDouble(splitLine[3])
-            ));
-            Preconditions.checkArgument(location!=null, "Port " + portName + " is outside the map! ");
-            if(location.isPortHere())
-                throw new IllegalArgumentException("There is already a port here! No space for  " + portName + ", it is occupied by " + location.grabPortHere().getName());
-            //adjust it a bit if needed
-            location = correctLocation(location,map,portName);
+            String portName = splitLine[0].trim();
+            Port port = ports.
+                    computeIfAbsent(
+                            portName,
+                            new Function<String, Port>() {
+                                @Override
+                                public Port apply(String s) {
+                                    SeaTile location = map.getSeaTile(new Coordinate(
+                                            Double.parseDouble(splitLine[2]),
+                                            Double.parseDouble(splitLine[3])
+                                    ));
+                                    Preconditions.checkArgument(
+                                            location!=null,
+                                            "Port " + portName + " is outside the map! ");
+                                    if(location.isPortHere())
+                                        throw new IllegalArgumentException(
+                                                "There is already a port here! No space for  " +
+                                                        portName + ", it is occupied by " +
+                                                        location.grabPortHere().getName());
+                                    //adjust it a bit if needed
+                                    location = correctLocation(location,map,portName);
 
-            //build the port
-            Port port = new Port(portName,location,marketmap.get(),gasPrice);
+                                    //build the port
+                                    return new Port(portName,location,marketmap.get(),gasPrice);
+                                }
+                            });
             toReturn.put(port,Integer.parseInt(splitLine[1]));
+            ports.put(portName,port);
 
         }
 
@@ -71,6 +90,11 @@ public class PortReader {
 
     }
 
+
+    public static final int MAXIMUM_NEIGHBORHOOD = 5;
+
+
+
     /**
      * a tile is good for port iff:
      * 1- is on land
@@ -79,7 +103,7 @@ public class PortReader {
      * @param map the nautical map
      * @return
      */
-    private static boolean isCorrect(SeaTile tile, NauticalMap map)
+    private boolean isCorrect(SeaTile tile, NauticalMap map)
     {
         if(tile.getAltitude()>=0)
         {
@@ -96,7 +120,7 @@ public class PortReader {
      * @param map
      * @return
      */
-    private static SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
+    private SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
     {
         //if it's fine, don't move it
         if(isCorrect(originalSeatile,map))
@@ -114,12 +138,12 @@ public class PortReader {
             neighbors.removeAll(alreadyExplored);
             Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrect(seaTile, map)).
                     sorted(
-                    (o1, o2) -> {
-                        int comparison = Integer.compare(o1.getGridX(),o2.getGridX());
-                        if(comparison==0)
-                            return Integer.compare(o1.getGridY(),o2.getGridY());
-                        return comparison;
-                    })
+                            (o1, o2) -> {
+                                int comparison = Integer.compare(o1.getGridX(),o2.getGridX());
+                                if(comparison==0)
+                                    return Integer.compare(o1.getGridY(),o2.getGridY());
+                                return comparison;
+                            })
                     .findFirst();
             //found something acceptable?
             if(acceptableNeighbor.isPresent())
@@ -143,5 +167,12 @@ public class PortReader {
 
     }
 
-
+    /**
+     * Getter for property 'ports'.
+     *
+     * @return Value for property 'ports'.
+     */
+    public Collection<Port> getPorts() {
+        return ports.values();
+    }
 }

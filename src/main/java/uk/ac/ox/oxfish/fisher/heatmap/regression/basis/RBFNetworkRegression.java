@@ -74,7 +74,7 @@ public class RBFNetworkRegression implements GeographicalRegression<Double> {
             step[i] = (max[i]-min[i])/ (double)(order-1);
         }
 
-        double initialBandwidth = 2d/(order-1) * Math.pow(Arrays.stream(step).max().getAsDouble(),2);
+        double initialBandwidth = 2*(Arrays.stream(step).max().getAsDouble()) ;
 
         this.network = new LinkedList<>();
 

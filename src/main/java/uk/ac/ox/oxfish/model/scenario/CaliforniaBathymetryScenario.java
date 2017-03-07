@@ -461,8 +461,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
 
 
-
-            numberOfFishersPerPort = PortReader.readFile(
+            PortReader reader = new PortReader();
+            numberOfFishersPerPort = reader.readFile(
                     mainDirectory.resolve("port.csv"),
                     map,
                     () -> {
