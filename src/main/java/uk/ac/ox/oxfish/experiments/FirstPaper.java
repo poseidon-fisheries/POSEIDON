@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import sim.field.grid.IntGrid2D;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -153,7 +153,7 @@ public class FirstPaper
             for (int y = 0; y < state.getMap().getHeight(); y++) {
                 SeaTile seaTile = state.getMap().getSeaTile(x, y);
                 if(seaTile.getAltitude()<0)
-                    blue[x][state.getMap().getHeight() - y - 1] = ((LogisticLocalBiology) seaTile.
+                    blue[x][state.getMap().getHeight() - y - 1] = ((BiomassLocalBiology) seaTile.
                             getBiology()).getCarryingCapacity(state.getSpecies().get(1));
             }
 

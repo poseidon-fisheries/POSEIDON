@@ -11,30 +11,51 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchInitializer>
 {
-    private boolean separateYelloweyeStock = false;
+    private boolean separateBycatchStock = false;
 
     private String targetSpeciesName = "Sablefish";
 
     private String bycatchSpeciesName  = "Yelloweye Rockfish";
 
-    private DoubleParameter initialTargetAbundance
-            = new FixedDoubleParameter(100000000);
+    private DoubleParameter bycatchRho = new FixedDoubleParameter(1.03);
 
-    private DoubleParameter initialBycatchAbundance
-            = new FixedDoubleParameter(10000000);
+    private DoubleParameter bycatchNaturalSurvivalRate = new FixedDoubleParameter(0.95504);
 
-    private DoubleParameter proportionJuvenileTarget
-            = new FixedDoubleParameter(.2);
-
-    private DoubleParameter proportionJuvenileBycatch
-            = new FixedDoubleParameter(.2);
+    private DoubleParameter bycatchRecruitmentSteepness = new FixedDoubleParameter(0.44056);
 
 
-    /**
-     * any cell with x >= verticalSeparator will include the bycatch species
-     */
-    private DoubleParameter verticalSeparator
-            = new FixedDoubleParameter(25);
+    private DoubleParameter bycatchRecruitmentLag = new FixedDoubleParameter(14);
+
+    private DoubleParameter bycatchWeightAtRecruitment = new FixedDoubleParameter(1.11909797520236);
+
+    private DoubleParameter bycatchWeightAtRecruitmentMinus1 = new FixedDoubleParameter(1.01603952895487);
+
+
+    private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
+
+    private DoubleParameter bycatchVirginRecruits = new FixedDoubleParameter(85.13962 * 1000d);
+
+
+
+
+
+    private DoubleParameter  targetRho = new FixedDoubleParameter(0.92267402483245);
+
+    private DoubleParameter targetNaturalSurvivalRate = new FixedDoubleParameter(0.923116346386636);
+
+    private DoubleParameter targetRecruitmentSteepness = new FixedDoubleParameter(0.6);
+
+
+    private DoubleParameter targetRecruitmentLag = new FixedDoubleParameter(3);
+
+    private DoubleParameter targetWeightAtRecruitment = new FixedDoubleParameter(1.03312585773941);
+
+    private DoubleParameter targetWeightAtRecruitmentMinus1 = new FixedDoubleParameter(0.634560212266768);
+
+
+    private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
+
+    private DoubleParameter targetVirginRecruits = new FixedDoubleParameter(29728.8 * 1000d);
 
 
     /**
@@ -46,157 +67,193 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     @Override
     public YellowBycatchInitializer apply(FishState state) {
         return new YellowBycatchInitializer(
-                separateYelloweyeStock,
+                separateBycatchStock,
                 targetSpeciesName,
                 bycatchSpeciesName,
-                initialTargetAbundance.apply(state.getRandom()).intValue(),
-                initialBycatchAbundance.apply(state.getRandom()).intValue(),
-                proportionJuvenileTarget.apply(state.getRandom()),
-                proportionJuvenileBycatch.apply(state.getRandom())
-
+                bycatchRho.apply(state.getRandom()),
+                bycatchNaturalSurvivalRate.apply(state.getRandom()),
+                bycatchRecruitmentSteepness.apply(state.getRandom()),
+                bycatchRecruitmentLag.apply(state.getRandom()).intValue(),
+                bycatchWeightAtRecruitment.apply(state.getRandom()),
+                bycatchWeightAtRecruitmentMinus1.apply(state.getRandom()),
+                bycatchVirginBiomass.apply(state.getRandom()),
+                bycatchVirginRecruits.apply(state.getRandom()),
+                targetRho.apply(state.getRandom()),
+                targetNaturalSurvivalRate.apply(state.getRandom()),
+                targetRecruitmentSteepness.apply(state.getRandom()),
+                targetRecruitmentLag.apply(state.getRandom()).intValue(),
+                targetWeightAtRecruitment.apply(state.getRandom()),
+                targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
+                targetVirginBiomass.apply(state.getRandom()),
+                targetVirginRecruits.apply(state.getRandom())
         );
     }
 
     /**
-     * Getter for property 'separateYelloweyeStock'.
-     *
-     * @return Value for property 'separateYelloweyeStock'.
+     * any cell with x >= verticalSeparator will include the bycatch species
      */
-    public boolean isSeparateYelloweyeStock() {
-        return separateYelloweyeStock;
+    private DoubleParameter verticalSeparator
+            = new FixedDoubleParameter(25);
+
+
+    public boolean isSeparateBycatchStock() {
+        return separateBycatchStock;
     }
 
-    /**
-     * Setter for property 'separateYelloweyeStock'.
-     *
-     * @param separateYelloweyeStock Value to set for property 'separateYelloweyeStock'.
-     */
-    public void setSeparateYelloweyeStock(boolean separateYelloweyeStock) {
-        this.separateYelloweyeStock = separateYelloweyeStock;
+    public void setSeparateBycatchStock(boolean separateBycatchStock) {
+        this.separateBycatchStock = separateBycatchStock;
     }
 
-    /**
-     * Getter for property 'targetSpeciesName'.
-     *
-     * @return Value for property 'targetSpeciesName'.
-     */
     public String getTargetSpeciesName() {
         return targetSpeciesName;
     }
 
-    /**
-     * Setter for property 'targetSpeciesName'.
-     *
-     * @param targetSpeciesName Value to set for property 'targetSpeciesName'.
-     */
     public void setTargetSpeciesName(String targetSpeciesName) {
         this.targetSpeciesName = targetSpeciesName;
     }
 
-    /**
-     * Getter for property 'bycatchSpeciesName'.
-     *
-     * @return Value for property 'bycatchSpeciesName'.
-     */
     public String getBycatchSpeciesName() {
         return bycatchSpeciesName;
     }
 
-    /**
-     * Setter for property 'bycatchSpeciesName'.
-     *
-     * @param bycatchSpeciesName Value to set for property 'bycatchSpeciesName'.
-     */
     public void setBycatchSpeciesName(String bycatchSpeciesName) {
         this.bycatchSpeciesName = bycatchSpeciesName;
     }
 
-    /**
-     * Getter for property 'initialTargetAbundance'.
-     *
-     * @return Value for property 'initialTargetAbundance'.
-     */
-    public DoubleParameter getInitialTargetAbundance() {
-        return initialTargetAbundance;
+    public DoubleParameter getBycatchRho() {
+        return bycatchRho;
     }
 
-    /**
-     * Setter for property 'initialTargetAbundance'.
-     *
-     * @param initialTargetAbundance Value to set for property 'initialTargetAbundance'.
-     */
-    public void setInitialTargetAbundance(DoubleParameter initialTargetAbundance) {
-        this.initialTargetAbundance = initialTargetAbundance;
+    public void setBycatchRho(DoubleParameter bycatchRho) {
+        this.bycatchRho = bycatchRho;
     }
 
-    /**
-     * Getter for property 'initialBycatchAbundance'.
-     *
-     * @return Value for property 'initialBycatchAbundance'.
-     */
-    public DoubleParameter getInitialBycatchAbundance() {
-        return initialBycatchAbundance;
+    public DoubleParameter getBycatchNaturalSurvivalRate() {
+        return bycatchNaturalSurvivalRate;
     }
 
-    /**
-     * Setter for property 'initialBycatchAbundance'.
-     *
-     * @param initialBycatchAbundance Value to set for property 'initialBycatchAbundance'.
-     */
-    public void setInitialBycatchAbundance(DoubleParameter initialBycatchAbundance) {
-        this.initialBycatchAbundance = initialBycatchAbundance;
+    public void setBycatchNaturalSurvivalRate(DoubleParameter bycatchNaturalSurvivalRate) {
+        this.bycatchNaturalSurvivalRate = bycatchNaturalSurvivalRate;
     }
 
-    /**
-     * Getter for property 'proportionJuvenileTarget'.
-     *
-     * @return Value for property 'proportionJuvenileTarget'.
-     */
-    public DoubleParameter getProportionJuvenileTarget() {
-        return proportionJuvenileTarget;
+    public DoubleParameter getBycatchRecruitmentSteepness() {
+        return bycatchRecruitmentSteepness;
     }
 
-    /**
-     * Setter for property 'proportionJuvenileTarget'.
-     *
-     * @param proportionJuvenileTarget Value to set for property 'proportionJuvenileTarget'.
-     */
-    public void setProportionJuvenileTarget(DoubleParameter proportionJuvenileTarget) {
-        this.proportionJuvenileTarget = proportionJuvenileTarget;
+    public void setBycatchRecruitmentSteepness(DoubleParameter bycatchRecruitmentSteepness) {
+        this.bycatchRecruitmentSteepness = bycatchRecruitmentSteepness;
     }
 
-    /**
-     * Getter for property 'proportionJuvenileBycatch'.
-     *
-     * @return Value for property 'proportionJuvenileBycatch'.
-     */
-    public DoubleParameter getProportionJuvenileBycatch() {
-        return proportionJuvenileBycatch;
+    public DoubleParameter getBycatchRecruitmentLag() {
+        return bycatchRecruitmentLag;
     }
 
-    /**
-     * Setter for property 'proportionJuvenileBycatch'.
-     *
-     * @param proportionJuvenileBycatch Value to set for property 'proportionJuvenileBycatch'.
-     */
-    public void setProportionJuvenileBycatch(DoubleParameter proportionJuvenileBycatch) {
-        this.proportionJuvenileBycatch = proportionJuvenileBycatch;
+    public void setBycatchRecruitmentLag(DoubleParameter bycatchRecruitmentLag) {
+        this.bycatchRecruitmentLag = bycatchRecruitmentLag;
     }
 
-    /**
-     * Getter for property 'verticalSeparator'.
-     *
-     * @return Value for property 'verticalSeparator'.
-     */
+    public DoubleParameter getBycatchWeightAtRecruitment() {
+        return bycatchWeightAtRecruitment;
+    }
+
+    public void setBycatchWeightAtRecruitment(DoubleParameter bycatchWeightAtRecruitment) {
+        this.bycatchWeightAtRecruitment = bycatchWeightAtRecruitment;
+    }
+
+    public DoubleParameter getBycatchWeightAtRecruitmentMinus1() {
+        return bycatchWeightAtRecruitmentMinus1;
+    }
+
+    public void setBycatchWeightAtRecruitmentMinus1(
+            DoubleParameter bycatchWeightAtRecruitmentMinus1) {
+        this.bycatchWeightAtRecruitmentMinus1 = bycatchWeightAtRecruitmentMinus1;
+    }
+
+    public DoubleParameter getBycatchVirginBiomass() {
+        return bycatchVirginBiomass;
+    }
+
+    public void setBycatchVirginBiomass(DoubleParameter bycatchVirginBiomass) {
+        this.bycatchVirginBiomass = bycatchVirginBiomass;
+    }
+
+    public DoubleParameter getBycatchVirginRecruits() {
+        return bycatchVirginRecruits;
+    }
+
+    public void setBycatchVirginRecruits(DoubleParameter bycatchVirginRecruits) {
+        this.bycatchVirginRecruits = bycatchVirginRecruits;
+    }
+
+    public DoubleParameter getTargetRho() {
+        return targetRho;
+    }
+
+    public void setTargetRho(DoubleParameter targetRho) {
+        this.targetRho = targetRho;
+    }
+
+    public DoubleParameter getTargetNaturalSurvivalRate() {
+        return targetNaturalSurvivalRate;
+    }
+
+    public void setTargetNaturalSurvivalRate(DoubleParameter targetNaturalSurvivalRate) {
+        this.targetNaturalSurvivalRate = targetNaturalSurvivalRate;
+    }
+
+    public DoubleParameter getTargetRecruitmentSteepness() {
+        return targetRecruitmentSteepness;
+    }
+
+    public void setTargetRecruitmentSteepness(DoubleParameter targetRecruitmentSteepness) {
+        this.targetRecruitmentSteepness = targetRecruitmentSteepness;
+    }
+
+    public DoubleParameter getTargetRecruitmentLag() {
+        return targetRecruitmentLag;
+    }
+
+    public void setTargetRecruitmentLag(DoubleParameter targetRecruitmentLag) {
+        this.targetRecruitmentLag = targetRecruitmentLag;
+    }
+
+    public DoubleParameter getTargetWeightAtRecruitment() {
+        return targetWeightAtRecruitment;
+    }
+
+    public void setTargetWeightAtRecruitment(DoubleParameter targetWeightAtRecruitment) {
+        this.targetWeightAtRecruitment = targetWeightAtRecruitment;
+    }
+
+    public DoubleParameter getTargetWeightAtRecruitmentMinus1() {
+        return targetWeightAtRecruitmentMinus1;
+    }
+
+    public void setTargetWeightAtRecruitmentMinus1(
+            DoubleParameter targetWeightAtRecruitmentMinus1) {
+        this.targetWeightAtRecruitmentMinus1 = targetWeightAtRecruitmentMinus1;
+    }
+
+    public DoubleParameter getTargetVirginBiomass() {
+        return targetVirginBiomass;
+    }
+
+    public void setTargetVirginBiomass(DoubleParameter targetVirginBiomass) {
+        this.targetVirginBiomass = targetVirginBiomass;
+    }
+
+    public DoubleParameter getTargetVirginRecruits() {
+        return targetVirginRecruits;
+    }
+
+    public void setTargetVirginRecruits(DoubleParameter targetVirginRecruits) {
+        this.targetVirginRecruits = targetVirginRecruits;
+    }
+
     public DoubleParameter getVerticalSeparator() {
         return verticalSeparator;
     }
 
-    /**
-     * Setter for property 'verticalSeparator'.
-     *
-     * @param verticalSeparator Value to set for property 'verticalSeparator'.
-     */
     public void setVerticalSeparator(DoubleParameter verticalSeparator) {
         this.verticalSeparator = verticalSeparator;
     }

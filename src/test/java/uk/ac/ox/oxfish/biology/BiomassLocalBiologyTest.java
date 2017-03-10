@@ -8,12 +8,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 
-public class LogisticLocalBiologyTest
+public class BiomassLocalBiologyTest
 {
     @Test
     public void logisticGrowthWorks() throws Exception {
 
-        LogisticLocalBiology bio = new LogisticLocalBiology(
+        BiomassLocalBiology bio = new BiomassLocalBiology(
                 new Double[]{100d,200d}, new Double[]{100d,400d}
         );
         IndependentLogisticBiomassGrower grower = new IndependentLogisticBiomassGrower(new Double[]{.5,.5});

@@ -48,7 +48,7 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     /**
      * get the list of all the logistic local biologies
      */
-    protected Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+    protected Map<SeaTile,BiomassLocalBiology> biologies = new HashMap<>();
 
     public RockyLogisticInitializer(
             DoubleParameter rockyCarryingCapacity, DoubleParameter sandyCarryingCapacity,
@@ -88,7 +88,7 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
                             seaTile.getRockyPercentage() * rockyCarryingCapacity.apply(random);
 
 
-            LogisticLocalBiology local = new LogisticLocalBiology(carryingCapacityLevel, species, random);
+            BiomassLocalBiology local = new BiomassLocalBiology(carryingCapacityLevel, species, random);
             biologies.put(seaTile,local);
             return local;
         }

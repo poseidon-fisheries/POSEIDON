@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -25,7 +25,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
      * list of biologies to grow. You can use a single grower for all the cells or a separate grower
      * for each cell. It shouldn't be too much of a big deal.
      */
-    private List<LogisticLocalBiology> biologies = new LinkedList<>();
+    private List<BiomassLocalBiology> biologies = new LinkedList<>();
 
 
 
@@ -49,7 +49,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
                 logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for(LogisticLocalBiology biology : biologies)
+        for(BiomassLocalBiology biology : biologies)
         {
             //grow fish
 
@@ -103,7 +103,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
      *
      * @return Value for property 'biologies'.
      */
-    public List<LogisticLocalBiology> getBiologies() {
+    public List<BiomassLocalBiology> getBiologies() {
         return biologies;
     }
 

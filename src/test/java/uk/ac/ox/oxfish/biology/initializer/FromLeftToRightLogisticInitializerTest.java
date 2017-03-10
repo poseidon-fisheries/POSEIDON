@@ -2,8 +2,8 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
@@ -30,7 +30,7 @@ public class FromLeftToRightLogisticInitializerTest {
         //the leftmost cell shouldn't be bothered
         SeaTile tile = mock(SeaTile.class);
         when(tile.getGridX()).thenReturn(0);
-        LogisticLocalBiology local = mock(LogisticLocalBiology.class);
+        BiomassLocalBiology local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
         when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
         initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);
@@ -39,7 +39,7 @@ public class FromLeftToRightLogisticInitializerTest {
         //in the middle you lose 50%
         tile = mock(SeaTile.class);
         when(tile.getGridX()).thenReturn(50);
-        local = mock(LogisticLocalBiology.class);
+        local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
         when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
         initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);
@@ -49,7 +49,7 @@ public class FromLeftToRightLogisticInitializerTest {
         //rightmost you lose 10% (bound)
         tile = mock(SeaTile.class);
         when(tile.getGridX()).thenReturn(99);
-        local = mock(LogisticLocalBiology.class);
+        local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
         when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
         initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);

@@ -482,7 +482,7 @@ public class ShodanFisheries {
                     tile -> tile.getGridY() >= 25,
                     tile -> {
                         //kill off 90% of the biomass
-                        LogisticLocalBiology biology = (LogisticLocalBiology) tile.getBiology();
+                        BiomassLocalBiology biology = (BiomassLocalBiology) tile.getBiology();
                         biology.setCurrentBiomass(
                                 fishSpecies,Math.max(250,biology.getBiomass(fishSpecies)));
                     }
@@ -496,7 +496,7 @@ public class ShodanFisheries {
                     tile -> tile.getGridY() >= 25,
                     tile -> {
                         //go back to carrying capacity
-                        LogisticLocalBiology biology = (LogisticLocalBiology) tile.getBiology();
+                        BiomassLocalBiology biology = (BiomassLocalBiology) tile.getBiology();
                         biology.setCurrentBiomass(
                                 fishSpecies,biology.getCarryingCapacity(fishSpecies));
                     }

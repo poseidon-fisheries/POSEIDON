@@ -120,7 +120,7 @@ Yellow Bycatch Factory:
   initialTargetAbundance: '1.0E8'
   proportionJuvenileBycatch: '0.2'
   proportionJuvenileTarget: '0.2'
-  separateYelloweyeStock: false
+  separateBycatchStock: false
   targetSpeciesName: Sablefish
   verticalSeparator: '25.0'
 -------

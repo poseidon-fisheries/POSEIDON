@@ -9,10 +9,9 @@ import java.util.Arrays;
 
 /**
  * A simple local biology that has carrying capacity and actual biomass. It then grows each species,
- * each year through logistic regression. There is no link/movement to other biologies.
  * Created by carrknight on 5/8/15.
  */
-public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements Startable {
+public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements Startable {
 
     /**
      * the current amount of biomass in this spot
@@ -30,7 +29,7 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
      * @param currentBiomass the biomass available
      * @param carryingCapacity the maximum amount of fish
      */
-    public LogisticLocalBiology(
+    public BiomassLocalBiology(
             Double[] currentBiomass, Double[] carryingCapacity) {
         Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
 
@@ -48,7 +47,7 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
      * @param initialMaxCapacity max proportion 0 to 1 of carrying capacity that might be available at this cell
      * @param initialMinCapacity min proportion 0 to 1 of carrying capacity that might be available at this cell
      */
-    public LogisticLocalBiology(
+    public BiomassLocalBiology(
             double carryingCapacity, int species,
             MersenneTwisterFast random, double initialMaxCapacity, double initialMinCapacity)
     {
@@ -67,7 +66,7 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
     }
 
 
-    public LogisticLocalBiology(
+    public BiomassLocalBiology(
             double carryingCapacity, int species,
             MersenneTwisterFast random)
     {
@@ -253,7 +252,7 @@ public class LogisticLocalBiology extends AbstractBiomassBasedBiology implements
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("LogisticLocalBiology{");
+        final StringBuilder sb = new StringBuilder("BiomassLocalBiology{");
         sb.append("currentBiomass=").append(Arrays.toString(currentBiomass));
         sb.append('}');
         return sb.toString();

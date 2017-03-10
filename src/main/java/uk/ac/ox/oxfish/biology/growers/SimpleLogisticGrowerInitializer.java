@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -25,8 +25,8 @@ public class SimpleLogisticGrowerInitializer implements LogisticGrowerInitialize
 
     @Override
     public void initializeGrower(
-            Map<SeaTile, LogisticLocalBiology> tiles, FishState state, MersenneTwisterFast random) {
-        Collection<LogisticLocalBiology> biologies = tiles.values();
+            Map<SeaTile, BiomassLocalBiology> tiles, FishState state, MersenneTwisterFast random) {
+        Collection<BiomassLocalBiology> biologies = tiles.values();
         if(biologies.isEmpty())
             return;
         //initialize the malthusian parameter
@@ -38,7 +38,7 @@ public class SimpleLogisticGrowerInitializer implements LogisticGrowerInitialize
         IndependentLogisticBiomassGrower grower = new IndependentLogisticBiomassGrower(malthusian);
 
         //add all the biologies
-        for(LogisticLocalBiology biology : biologies)
+        for(BiomassLocalBiology biology : biologies)
             grower.getBiologies().add(biology);
         state.registerStartable(grower);
 

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -14,7 +14,7 @@ import java.util.Map;
 public interface LogisticGrowerInitializer {
 
 
-    public void initializeGrower(Map<SeaTile,LogisticLocalBiology> tiles,
+    public void initializeGrower(Map<SeaTile,BiomassLocalBiology> tiles,
                                  FishState state,
                                  MersenneTwisterFast random);
 }

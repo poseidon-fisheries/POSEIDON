@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -60,7 +60,7 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
                             seaTile.getRockyPercentage() * getSandyCarryingCapacity().apply(random);
 
 
-            LogisticLocalBiology local = new LogisticLocalBiology(
+            BiomassLocalBiology local = new BiomassLocalBiology(
                     new Double[]{
                             carryingCapacityFirst * random.nextDouble(),
                             carryingCapacitySecond * random.nextDouble()

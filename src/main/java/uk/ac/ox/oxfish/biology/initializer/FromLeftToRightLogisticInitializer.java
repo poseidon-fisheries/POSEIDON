@@ -2,9 +2,9 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -82,7 +82,7 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
         LocalBiology generated = delegate.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells);
         if(seaTile.getAltitude()>0)
             return generated;
-        LogisticLocalBiology local = (LogisticLocalBiology) generated;
+        BiomassLocalBiology local = (BiomassLocalBiology) generated;
         double correctRatio = Math.max((mapWidthInCells-seaTile.getGridX())
                                                /
                                                (float)mapWidthInCells,minCapacityRatio);

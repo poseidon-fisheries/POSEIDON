@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -22,7 +22,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
 
 
 
-    private List<LogisticLocalBiology> biologies = new LinkedList<>();
+    private List<BiomassLocalBiology> biologies = new LinkedList<>();
 
 
     /**
@@ -48,17 +48,17 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
     /**
      * map containing previous end of the year biomasses, last is the latest/newest
      */
-    private Map<LogisticLocalBiology,LinkedList<Double>> previousBiomasses =
+    private Map<BiomassLocalBiology,LinkedList<Double>> previousBiomasses =
             new HashMap<>();
 
     /**
      * map containing survival rates after fishing has occurred, last is the latest/newest
      */
-    private Map<LogisticLocalBiology,LinkedList<Double>> actualSurvivalRates =
+    private Map<BiomassLocalBiology,LinkedList<Double>> actualSurvivalRates =
             new HashMap<>();
 
 
-    private Map<LogisticLocalBiology,Double> previousRecruits = new HashMap<>();
+    private Map<BiomassLocalBiology,Double> previousRecruits = new HashMap<>();
 
     /**
      * set up when starting
@@ -81,7 +81,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
 
         double numberOfCells = biologies.size();
 
-        for(LogisticLocalBiology biology : biologies)
+        for(BiomassLocalBiology biology : biologies)
         {
             //populates biomasses from data
             LinkedList<Double> biomasses = new LinkedList<>();
@@ -147,7 +147,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
      * the operation is in progress.  (Note that this will occur if the
      * specified collection is this list, and it's nonempty.)
      */
-    public boolean addAll(Collection<? extends LogisticLocalBiology> c) {
+    public boolean addAll(Collection<? extends BiomassLocalBiology> c) {
         return biologies.addAll(c);
     }
 
@@ -157,7 +157,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
      *
      * @return Value for property 'biologies'.
      */
-    public List<LogisticLocalBiology> getBiologies() {
+    public List<BiomassLocalBiology> getBiologies() {
         return biologies;
     }
 
@@ -170,7 +170,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
                 logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for(LogisticLocalBiology biology : biologies)
+        for(BiomassLocalBiology biology : biologies)
         {
 
             //basic current info

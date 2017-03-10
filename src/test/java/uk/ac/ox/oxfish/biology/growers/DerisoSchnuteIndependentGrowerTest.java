@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology.growers;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.ArrayList;
@@ -16,15 +16,14 @@ import static org.mockito.Mockito.mock;
 public class DerisoSchnuteIndependentGrowerTest {
 
 
-
     @Test
     public void stayVirgin() throws Exception {
 
         //numbers are from sablefish
 
-        LogisticLocalBiology biology =
-                new LogisticLocalBiology(new Double[]{527154d},
-                                         new Double[]{527154d});
+        BiomassLocalBiology biology =
+                new BiomassLocalBiology(new Double[]{527154d},
+                                        new Double[]{527154d});
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
@@ -55,9 +54,9 @@ public class DerisoSchnuteIndependentGrowerTest {
 
         //numbers are from sablefish
 
-        LogisticLocalBiology biology =
-                new LogisticLocalBiology(new Double[]{527154d},
-                                         new Double[]{527154d});
+        BiomassLocalBiology biology =
+                new BiomassLocalBiology(new Double[]{527154d},
+                                        new Double[]{527154d});
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
@@ -89,23 +88,30 @@ public class DerisoSchnuteIndependentGrowerTest {
 
         //numbers are from sablefish
 
-        LogisticLocalBiology biology =
-                new LogisticLocalBiology(new Double[]{8883d},
-                                         new Double[]{8883d});
+        double virginB = 8883d;
+        double virginV = 85.13962;
+        BiomassLocalBiology biology =
+                new BiomassLocalBiology(new Double[]{virginB},
+                                        new Double[]{virginB});
 
-        ArrayList<Double> biomasses = Lists.newArrayList(8883d, 8883d, 8883d, 8883d, 8883d,
-                                                         8883d,8883d,8883d,8883d,8883d,
-                                                         8883d,8883d,8883d,8883d,8883d,
-                                                         8883d,8883d,8883d,8883d,8883d,
-                                                         8883d,8883d);
+        ArrayList<Double> biomasses = Lists.newArrayList(virginB, virginB, virginB, virginB, virginB,
+                                                         virginB, virginB, virginB, virginB, virginB,
+                                                         virginB, virginB, virginB, virginB, virginB,
+                                                         virginB, virginB, virginB, virginB, virginB,
+                                                         virginB, virginB);
+
+        //notice that these aren't the correct yelloweye numbers (rho is from sablefish)
+        //but these were the numbers in the R script and the factual accuracy of the
+        //biology is not important here, the numbers have to be the same though
+
         DerisoSchnuteIndependentGrower grower =
                 new DerisoSchnuteIndependentGrower(
                         biomasses, 0.922, 0.95504,
                         0.44056, 14, 0,
                         1.11910,
                         .63456,
-                        8883d,
-                        85.13962
+                        virginB,
+                        virginV
 
                 );
 
@@ -128,8 +134,8 @@ public class DerisoSchnuteIndependentGrowerTest {
 
         //numbers are from sablefish
 
-        LogisticLocalBiology biology =
-                new LogisticLocalBiology(new Double[]{205662d},
+        BiomassLocalBiology biology =
+                new BiomassLocalBiology(new Double[]{205662d},
                                          new Double[]{527154d});
 
         ArrayList<Double> data = Lists.newArrayList(263494d, 248481d, 233025d, 222936d, 211793d, 205662d);

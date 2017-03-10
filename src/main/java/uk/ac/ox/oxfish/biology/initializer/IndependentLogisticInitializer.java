@@ -4,7 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -30,7 +30,7 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
     private final DoubleParameter maxInitialCapacity;
 
-    private final Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+    private final Map<SeaTile,BiomassLocalBiology> biologies = new HashMap<>();
 
     private final LogisticGrowerInitializer grower;
 
@@ -74,8 +74,8 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
             double minCapacity = minInitialCapacity.apply(random);
             double maxCapacity = maxInitialCapacity.apply(random);
 
-            LogisticLocalBiology local = new LogisticLocalBiology(carryingCapacityLevel, species, random,
-                                                                     maxCapacity, minCapacity);
+            BiomassLocalBiology local = new BiomassLocalBiology(carryingCapacityLevel, species, random,
+                                                                maxCapacity, minCapacity);
             biologies.put(seaTile,local);
             return local;
         }

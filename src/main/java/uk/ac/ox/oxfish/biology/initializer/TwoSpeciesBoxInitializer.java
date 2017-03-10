@@ -71,7 +71,7 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
     /**
      * get the list of all the logistic local biologies
      */
-    private Map<SeaTile,LogisticLocalBiology> biologies = new HashMap<>();
+    private Map<SeaTile,BiomassLocalBiology> biologies = new HashMap<>();
 
     private final LogisticGrowerInitializer grower;
 
@@ -137,7 +137,7 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         }
 
 
-        LogisticLocalBiology toReturn =  new LogisticLocalBiology(
+        BiomassLocalBiology toReturn =  new BiomassLocalBiology(
                 new Double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
                 new Double[]{firstSpeciesCapacity,secondSpeciesCapacity});
         biologies.put(seaTile,toReturn);

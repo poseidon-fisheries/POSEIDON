@@ -3,16 +3,13 @@ package uk.ac.ox.oxfish.biology.growers;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.LogisticLocalBiology;
+import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  *  Grower using Deriso Schnute formula. It aggregates all given biologies into one, reproduce biomass that way and
@@ -70,7 +67,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     /**
      * list of local biologies we manage. We will at all times
      */
-    private List<LogisticLocalBiology> biologies = new LinkedList<>();
+    private Set<BiomassLocalBiology> biologies = new HashSet<>();
     /**
      * receipt to stop the grower when needed
      */
@@ -119,7 +116,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         //basic current info
         double currentBiomass = 0;
         double virginBiomass = 0;
-        for(LogisticLocalBiology biology : biologies)
+        for(BiomassLocalBiology biology : biologies)
         {
             currentBiomass+= biology.getCurrentBiomass()[speciesIndex];
             virginBiomass+= biology.getCarryingCapacity(speciesIndex);
@@ -141,13 +138,14 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         double newBiomass =  bioStep.getBiomass();
         previousRecruits = bioStep.getRecruits();
         //reallocate uniformly. Do not allocate above carrying capacity
+        List<BiomassLocalBiology> biologies = new ArrayList<>(this.biologies);
         Collections.shuffle(biologies);
         double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative
 
         for(int i=0; i<biologies.size(); i++)
         {
 
-            LogisticLocalBiology local = biologies.get(i);
+            BiomassLocalBiology local = biologies.get(i);
             local.getCurrentBiomass()[speciesIndex] += toReallocate/ (double)biologies.size();
             double excess =  local.getCarryingCapacity(speciesIndex) - local.getCurrentBiomass()[speciesIndex];
             //if there is too much
@@ -164,7 +162,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
     }
 
-    public boolean addAll(Collection<? extends LogisticLocalBiology> c) {
+    public boolean addAll(Collection<? extends BiomassLocalBiology> c) {
         return biologies.addAll(c);
     }
 
@@ -264,7 +262,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
      *
      * @return Value for property 'biologies'.
      */
-    public List<LogisticLocalBiology> getBiologies() {
+    public Set<BiomassLocalBiology> getBiologies() {
         return biologies;
     }
 }

@@ -78,10 +78,10 @@ public class BiomassDiffuser  implements Steppable {
                     final Species species = biology.getSpecie(i);
 
                     //if your carrying capacity is 0 do not diffuse
-                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON)
+                    if(((BiomassLocalBiology) neighbor.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON)
                         continue;
                     //if they are full, do not diffuse
-                    if(((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(species) - neighbor.getBiomass(
+                    if(((BiomassLocalBiology) neighbor.getBiology()).getCarryingCapacity(species) - neighbor.getBiomass(
                             species)<= FishStateUtilities.EPSILON)
                         continue;
 
@@ -90,7 +90,7 @@ public class BiomassDiffuser  implements Steppable {
                     assert tile.getBiomass(species) >= 0;
                     double differential = tile.getBiomass(species) - neighbor.getBiomass(species);
                     //don't transport more than the other is able to accomodate anyway
-                    differential = Math.min(differential, ((LogisticLocalBiology) neighbor.getBiology()).getCarryingCapacity(
+                    differential = Math.min(differential, ((BiomassLocalBiology) neighbor.getBiology()).getCarryingCapacity(
                             species)-neighbor.getBiomass(species));
                     differential = FishStateUtilities.round(differential);
                     if (differential > 0) {
@@ -100,8 +100,8 @@ public class BiomassDiffuser  implements Steppable {
                         assert movement >= 0 : movement + " --- " + differential + " ------ " + tile.getBiomass(
                                 species) + " ------ " + FishStateUtilities.round(movement);
                         assert tile.getBiomass(species) >= movement;
-                        LogisticLocalBiology here = (LogisticLocalBiology) tile.getBiology();
-                        LogisticLocalBiology there = (LogisticLocalBiology) neighbor.getBiology();
+                        BiomassLocalBiology here = (BiomassLocalBiology) tile.getBiology();
+                        BiomassLocalBiology there = (BiomassLocalBiology) neighbor.getBiology();
                         here.getCurrentBiomass()[i] -= movement;
                         assert here.getCurrentBiomass()[i] >= 0;
                         there.getCurrentBiomass()[i] += movement;
@@ -129,7 +129,7 @@ public class BiomassDiffuser  implements Steppable {
         for(Object inBag : mooreNeighbors)
         {
             SeaTile newTile = (SeaTile) inBag;
-            if (newTile.getAltitude() < 0 && newTile.getBiology() instanceof LogisticLocalBiology)
+            if (newTile.getAltitude() < 0 && newTile.getBiology() instanceof BiomassLocalBiology)
             {
                 toKeep.add(newTile);
             }
