@@ -50,7 +50,7 @@ public class PortReader {
         {
             //read name and location
             String line = rowIterator.next();
-            if(line.startsWith("#")) //ignore commented out
+            if(line.startsWith("#") || line.trim().isEmpty()) //ignore commented out
                 continue;
             String[] splitLine = line.split(",");
             String portName = splitLine[0].trim();

@@ -40,6 +40,13 @@ public class LogisticLogbookFactory
 
     private boolean windSpeed = false;
 
+    private int periodHabit = -1;
+
+    /**
+     * useful (in fact, needed) if you have multiple logbooks running at once!
+     */
+    private String identifier = "";
+
 
     private AlgorithmFactory<? extends MapDiscretizer> discretization
             = new IdentityDiscretizerFactory();
@@ -58,6 +65,18 @@ public class LogisticLogbookFactory
 
         ArrayList<ObservationExtractor> extractors = new ArrayList<>();
         ArrayList<String> names = new ArrayList<>();
+
+        MapDiscretization discretized =
+                locker.presentKey(state,
+                                  new Supplier<MapDiscretization>() {
+                                      @Override
+                                      public MapDiscretization get() {
+                                          MapDiscretization toReturn =
+                                                  new MapDiscretization(discretization.apply(state));
+                                          toReturn.discretize(state.getMap());
+                                          return toReturn;
+                                      }
+                                  });
 
         if(dayOfTheYear)
         {
@@ -127,28 +146,28 @@ public class LogisticLogbookFactory
             names.add("wind_speed");
         }
 
+        if(periodHabit>0)
+        {
+            extractors.add(new PeriodHabitExtractor(discretized,periodHabit));
+            names.add("habit");
+            //the logit discretized memory this extractor depends on is produced by
+            // LogistiLogbookInitializer
+
+        }
+
 
         String[] nameArray =
                 names.toArray(new String[names.size()]);
         ObservationExtractor[] observations =
                 extractors.toArray(new ObservationExtractor[extractors.size()]);
 
-        MapDiscretization discretized =
-                locker.presentKey(state,
-                                  new Supplier<MapDiscretization>() {
-                                      @Override
-                                      public MapDiscretization get() {
-                                          MapDiscretization toReturn =
-                                                  new MapDiscretization(discretization.apply(state));
-                                          toReturn.discretize(state.getMap());
-                                          return toReturn;
-                                      }
-                                  });
+
 
         return new LogisticLogbookInitializer(
                 discretized,
                 observations,
-                nameArray
+                nameArray,
+                identifier
         );
 
 
@@ -373,4 +392,32 @@ public class LogisticLogbookFactory
             AlgorithmFactory<? extends MapDiscretizer> discretization) {
         this.discretization = discretization;
     }
+
+    /**
+     * Getter for property 'periodHabit'.
+     *
+     * @return Value for property 'periodHabit'.
+     */
+    public int getPeriodHabit() {
+        return periodHabit;
+    }
+
+    /**
+     * Setter for property 'periodHabit'.
+     *
+     * @param periodHabit Value to set for property 'periodHabit'.
+     */
+    public void setPeriodHabit(int periodHabit) {
+        this.periodHabit = periodHabit;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+
 }

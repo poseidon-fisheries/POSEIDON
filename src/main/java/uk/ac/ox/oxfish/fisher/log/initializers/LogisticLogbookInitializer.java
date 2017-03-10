@@ -35,16 +35,31 @@ public class LogisticLogbookInitializer implements LogbookInitializer {
      */
     private DiscretizationHistogrammer histogrammer;
 
+    /**
+     * useful to discriminate between multiple outputs
+     */
+    private final String identifier;
+
 
     public LogisticLogbookInitializer(
             MapDiscretization discretization,
             ObservationExtractor[] commonExtractor,
             String[] extractorNames) {
+       this(discretization,commonExtractor,extractorNames,"");
+    }
+
+
+
+    public LogisticLogbookInitializer(
+            MapDiscretization discretization,
+            ObservationExtractor[] commonExtractor,
+            String[] extractorNames,
+            String identifier) {
         this.discretization = discretization;
         this.commonExtractor = commonExtractor;
         this.extractorNames = extractorNames;
+        this.identifier = identifier;
     }
-
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
      * or just to percolate a reference to the model
@@ -56,9 +71,10 @@ public class LogisticLogbookInitializer implements LogbookInitializer {
 
 
         logger = new LogisticLogs();
+        logger.setFileName( identifier + logger.getFileName());
         histogrammer = new DiscretizationHistogrammer(
                 discretization,false);
-
+        histogrammer.setFileName( identifier + histogrammer.getFileName());
 
         model.getOutputPlugins().add(logger);
         model.getOutputPlugins().add(histogrammer);

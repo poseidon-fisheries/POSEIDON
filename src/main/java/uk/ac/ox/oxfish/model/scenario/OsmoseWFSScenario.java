@@ -16,15 +16,12 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
-import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
-import uk.ac.ox.oxfish.fisher.log.LogisticLog;
-import uk.ac.ox.oxfish.fisher.log.LogisticLogs;
-import uk.ac.ox.oxfish.fisher.log.PseudoLogisticLogger;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogisticLogbookFactory;
+import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -35,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
+import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
@@ -43,8 +41,6 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.DiscretizationHistogrammer;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
@@ -65,6 +61,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * The scenario to lspiRun Osmose WFS.
@@ -82,7 +79,26 @@ public class OsmoseWFSScenario implements Scenario{
     private LinkedHashMap<Port, Integer> handlinersPerPort;
 
 
-    private boolean collectLogitData = true;
+    private AlgorithmFactory<? extends LogbookInitializer> longlineLogbook =
+            new LogisticLogbookFactory();
+    {
+        //intercept", "distance", "habit", "fuel_price", "wind_speed"
+        CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
+        discretizer.setFilePath(Paths.get("temp_wfs", "areas.txt").toString());
+        ((LogisticLogbookFactory) longlineLogbook).setDiscretization(discretizer);
+        ((LogisticLogbookFactory) longlineLogbook).setIntercept(true);
+        ((LogisticLogbookFactory) longlineLogbook).setPortDistance(true);
+        ((LogisticLogbookFactory) longlineLogbook).setPeriodHabit(90);
+        ((LogisticLogbookFactory) longlineLogbook).setGasPrice(true);
+        ((LogisticLogbookFactory) longlineLogbook).setWindSpeed(true);
+        ((LogisticLogbookFactory) longlineLogbook).setIdentifier("longline_");
+
+
+    }
+
+    private AlgorithmFactory<? extends LogbookInitializer> handlineLogbook =
+            new NoLogbookFactory();
+
 
     {
         biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2,3,4");
@@ -122,9 +138,43 @@ public class OsmoseWFSScenario implements Scenario{
 
     private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.01");
 
+    private AlgorithmFactory<? extends Gear> handlinerGear = new RandomTrawlStringFactory("2:0.01");
 
 
-    private DoubleParameter longlinerHoldSize = new FixedDoubleParameter(140175.5); // in kg!
+    //comes as 95th percentile from Steve's data on hold-sizes
+    private DoubleParameter longlinerHoldSize = new FixedDoubleParameter(6500); // in kg!
+
+    //comes as 95th percentile from Steve's data on hold-sizes
+    private DoubleParameter handlinerHoldSize = new FixedDoubleParameter(2200); // in kg!
+
+
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DepartingStrategy> handlinerDepartingStrategy =
+            new LonglineFloridaLogisticDepartingFactory();
+
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DestinationStrategy> handlinerDestinationStrategy =
+            new FloridaLogitDestinationFactory();
+
+
+    /**
+     * factory to produce fishing strategy
+     */
+    private AlgorithmFactory<? extends FishingStrategy> handlinerFishingStrategy =
+            new MaximumStepsFactory();
+
+    private AlgorithmFactory<? extends GearStrategy> handlinerGearStrategy =
+            new FixedGearStrategyFactory();
+
+
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> handlinerWeatherStrategy =
+            new IgnoreWeatherFactory();
+
+    private AlgorithmFactory<? extends Regulation> handlinerRegulations =  new ProtectedAreasOnlyFactory();
 
 
     /**
@@ -160,10 +210,14 @@ public class OsmoseWFSScenario implements Scenario{
             new EquidegreeBuilder();
 
 
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
+    private DoubleParameter longlinerTravellingCosts = new FixedDoubleParameter(0);
+
+    private DoubleParameter handlinerTravellingCosts = new FixedDoubleParameter(0);
 
 
-    private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
+    private DoubleParameter longlinerSpeedKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
+
+    private DoubleParameter  handlinerSpeedKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
 
 
     public static MapDiscretization createDiscretization(FishState state, String centroidFile) {
@@ -220,6 +274,8 @@ public class OsmoseWFSScenario implements Scenario{
             NauticalMapFactory.initializeMap(map, model.getRandom(), biology,
                                              weather,
                                              global, model);
+
+
 
 
             PortReader reader = new PortReader();
@@ -285,27 +341,23 @@ public class OsmoseWFSScenario implements Scenario{
         GlobalBiology biology = model.getBiology();
         MersenneTwisterFast random = model.getRandom();
 
-        LogisticLogs logger = new LogisticLogs();
 
-        MapDiscretization originalDiscretization = createDiscretization
-                (model, FishStateUtilities.getAbsolutePath
-                        (Paths.get("temp_wfs", "areas.txt").toString()));
 
-        DiscretizationHistogrammer histogrammer = new DiscretizationHistogrammer(
-                originalDiscretization,false);
+        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(true,
+                                                                            biology);
 
-        if(collectLogitData) {
-            model.getOutputPlugins().add(histogrammer);
-            //make sure the non-gui version of the model outputs this to file
-            model.getOutputPlugins().add(logger);
-        }
+        //start the logbooks!
+        LogbookInitializer longlineLog = longlineLogbook.apply(model);
+        longlineLog.start(model);
+        LogbookInitializer handlineLog = handlineLogbook.apply(model);
+        handlineLog.start(model);
 
         //longliners
         for(Map.Entry<Port,Integer> entry : longlinersPerPort.entrySet())
 
-            for(int id=0;id<entry.getValue();id++)
+            for(int i=0;i<entry.getValue();i++)
             {
-                final double speed = cruiseSpeedInKph.apply(random);
+                final double speed = longlinerSpeedKph.apply(random);
                 final double engineWeight = 1;
                 final double mileage = 0.7518591; //this is gallon per km and it comes from the california estimate of 1.21 gallons a mile
                 final double fuelCapacity = 100000000;
@@ -331,89 +383,16 @@ public class OsmoseWFSScenario implements Scenario{
                                                       biology.getSize()), fisherGear,
                                               model.getSpecies().size());
                 newFisher.getTags().add("large");
+                newFisher.getTags().add("longline");
                 newFisher.getTags().add("ship");
                 newFisher.getTags().add("blue");
                 fisherCounter++;
 
 
 
-                if(collectLogitData) {
+                longlineLog.add(newFisher,model);
+                predictorSetup.accept(newFisher);
 
-
-
-
-                    newFisher.addTripListener(histogrammer);
-
-                    LogisticLog log = new LogisticLog(
-                            new String[]{
-                                    "intercept", "distance", "habit", "fuel_price", "wind_speed"},newFisher.getID());
-
-                    PseudoLogisticLogger pseudoLogger = new PseudoLogisticLogger(
-                            originalDiscretization,
-                            FloridaLogitDestinationFactory.longlineFloridaCommonExtractor(originalDiscretization),
-                            log,
-                            newFisher,
-                            model,
-                            model.getRandom()
-                    );
-                    newFisher.addTripListener(pseudoLogger);
-                    //we know the pseudo-logger depends on location memory so add it if your decision strategy doesn't include it
-                    if(!(newFisher.getDestinationStrategy() instanceof LogitDestinationStrategy))
-                        newFisher.setDiscretizedLocationMemory(new DiscretizedLocationMemory(originalDiscretization));
-
-                    logger.add(log);
-                }
-
-
-
-
-                //predictors
-                for(Species species : model.getSpecies())
-                {
-
-                    //create the predictors
-
-                    newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                       MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + species,
-                                                               fisher1 ->
-                                                                       //check the daily counter but do not input new values
-                                                                       //if you were not allowed at sea
-                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                               species.getIndex())
-
-                                                               ,
-                                                               365));
-
-
-
-
-                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30));
-
-
-
-                }
-
-
-                //daily profits predictor
-                newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor
-                                ("Predicted Daily Profits",
-                                 fisher ->
-                                         //check the daily counter but do not input new values
-                                         //if you were not allowed at sea
-                                         fisher.isAllowedAtSea() ?
-                                                 fisher.getDailyCounter().
-                                                         getColumn(
-                                                                 YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
-                                                 :
-                                                 Double.NaN
-                                        ,
-
-                                 7));
 
                 fisherList.add(newFisher);
 
@@ -421,12 +400,66 @@ public class OsmoseWFSScenario implements Scenario{
                 newFisher.addDockingListener(
                         (DockingListener) (fisher, port1) -> {
                             if (fisher.getHoursAtSea() > 0)
-                                fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
+                                fisher.spendForTrip(longlinerTravellingCosts.apply(model.getRandom())
                                                             /
                                                             fisher.getHoursAtSea());
                         });
             }
 
+        //handliners
+        for(Map.Entry<Port,Integer> entry : handlinersPerPort.entrySet())
+
+            for(int i=0;i<entry.getValue();i++)
+            {
+                final double speed = handlinerSpeedKph.apply(random);
+                final double engineWeight = 1;
+                final double mileage = 0.7518591; //this is gallon per km and it comes
+                // from the california estimate of 1.21 gallons a mile
+                final double fuelCapacity = 100000000;
+
+                Gear fisherGear = handlinerGear.apply(model);
+
+
+                Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
+                                              model.getRandom(),
+                                              handlinerRegulations.apply(model),
+                                              handlinerDepartingStrategy.apply(model),
+                                              handlinerDestinationStrategy.apply(model),
+                                              handlinerFishingStrategy.apply(model),
+                                              handlinerGearStrategy.apply(model),
+                                              handlinerWeatherStrategy.apply(model),
+                                              new Boat(10, 10,
+                                                       new Engine(engineWeight,
+                                                                  mileage,
+                                                                  speed),
+                                                       new FuelTank(fuelCapacity)),
+                                              new Hold(
+                                                      handlinerHoldSize.apply(random),
+                                                      biology.getSize()), fisherGear,
+                                              model.getSpecies().size());
+                newFisher.getTags().add("small");
+                newFisher.getTags().add("handline");
+                newFisher.getTags().add("boat");
+                newFisher.getTags().add("red");
+                fisherCounter++;
+
+
+
+                handlineLog.add(newFisher,model);
+                predictorSetup.accept(newFisher);
+
+
+                fisherList.add(newFisher);
+
+                //add other trip costs
+                newFisher.addDockingListener(
+                        (DockingListener) (fisher, port1) -> {
+                            if (fisher.getHoursAtSea() > 0)
+                                fisher.spendForTrip(handlinerTravellingCosts.apply(model.getRandom())
+                                                            /
+                                                            fisher.getHoursAtSea());
+                        });
+            }
 
 
 
@@ -628,23 +661,7 @@ public class OsmoseWFSScenario implements Scenario{
     }
 
 
-    /**
-     * Getter for property 'collectLogitData'.
-     *
-     * @return Value for property 'collectLogitData'.
-     */
-    public boolean isCollectLogitData() {
-        return collectLogitData;
-    }
 
-    /**
-     * Setter for property 'collectLogitData'.
-     *
-     * @param collectLogitData Value to set for property 'collectLogitData'.
-     */
-    public void setCollectLogitData(boolean collectLogitData) {
-        this.collectLogitData = collectLogitData;
-    }
 
 
     /**
@@ -652,8 +669,8 @@ public class OsmoseWFSScenario implements Scenario{
      *
      * @return Value for property 'cruiseSpeedInKph'.
      */
-    public DoubleParameter getCruiseSpeedInKph() {
-        return cruiseSpeedInKph;
+    public DoubleParameter getLonglinerSpeedKph() {
+        return longlinerSpeedKph;
     }
 
     /**
@@ -661,7 +678,120 @@ public class OsmoseWFSScenario implements Scenario{
      *
      * @param cruiseSpeedInKph Value to set for property 'cruiseSpeedInKph'.
      */
-    public void setCruiseSpeedInKph(DoubleParameter cruiseSpeedInKph) {
-        this.cruiseSpeedInKph = cruiseSpeedInKph;
+    public void setLonglinerSpeedKph(DoubleParameter longlinerSpeedKph) {
+        this.longlinerSpeedKph = longlinerSpeedKph;
+    }
+
+    public AlgorithmFactory<? extends LogbookInitializer> getLonglineLogbook() {
+        return longlineLogbook;
+    }
+
+    public void setLonglineLogbook(
+            AlgorithmFactory<? extends LogbookInitializer> longlineLogbook) {
+        this.longlineLogbook = longlineLogbook;
+    }
+
+    public AlgorithmFactory<? extends LogbookInitializer> getHandlineLogbook() {
+        return handlineLogbook;
+    }
+
+    public void setHandlineLogbook(
+            AlgorithmFactory<? extends LogbookInitializer> handlineLogbook) {
+        this.handlineLogbook = handlineLogbook;
+    }
+
+    public AlgorithmFactory<? extends Gear> getHandlinerGear() {
+        return handlinerGear;
+    }
+
+    public void setHandlinerGear(
+            AlgorithmFactory<? extends Gear> handlinerGear) {
+        this.handlinerGear = handlinerGear;
+    }
+
+    public DoubleParameter getHandlinerHoldSize() {
+        return handlinerHoldSize;
+    }
+
+    public void setHandlinerHoldSize(DoubleParameter handlinerHoldSize) {
+        this.handlinerHoldSize = handlinerHoldSize;
+    }
+
+    public AlgorithmFactory<? extends DepartingStrategy> getHandlinerDepartingStrategy() {
+        return handlinerDepartingStrategy;
+    }
+
+    public void setHandlinerDepartingStrategy(
+            AlgorithmFactory<? extends DepartingStrategy> handlinerDepartingStrategy) {
+        this.handlinerDepartingStrategy = handlinerDepartingStrategy;
+    }
+
+    public AlgorithmFactory<? extends DestinationStrategy> getHandlinerDestinationStrategy() {
+        return handlinerDestinationStrategy;
+    }
+
+    public void setHandlinerDestinationStrategy(
+            AlgorithmFactory<? extends DestinationStrategy> handlinerDestinationStrategy) {
+        this.handlinerDestinationStrategy = handlinerDestinationStrategy;
+    }
+
+    public AlgorithmFactory<? extends FishingStrategy> getHandlinerFishingStrategy() {
+        return handlinerFishingStrategy;
+    }
+
+    public void setHandlinerFishingStrategy(
+            AlgorithmFactory<? extends FishingStrategy> handlinerFishingStrategy) {
+        this.handlinerFishingStrategy = handlinerFishingStrategy;
+    }
+
+    public AlgorithmFactory<? extends GearStrategy> getHandlinerGearStrategy() {
+        return handlinerGearStrategy;
+    }
+
+    public void setHandlinerGearStrategy(
+            AlgorithmFactory<? extends GearStrategy> handlinerGearStrategy) {
+        this.handlinerGearStrategy = handlinerGearStrategy;
+    }
+
+    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getHandlinerWeatherStrategy() {
+        return handlinerWeatherStrategy;
+    }
+
+    public void setHandlinerWeatherStrategy(
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> handlinerWeatherStrategy) {
+        this.handlinerWeatherStrategy = handlinerWeatherStrategy;
+    }
+
+    public AlgorithmFactory<? extends Regulation> getHandlinerRegulations() {
+        return handlinerRegulations;
+    }
+
+    public void setHandlinerRegulations(
+            AlgorithmFactory<? extends Regulation> handlinerRegulations) {
+        this.handlinerRegulations = handlinerRegulations;
+    }
+
+    public DoubleParameter getLonglinerTravellingCosts() {
+        return longlinerTravellingCosts;
+    }
+
+    public void setLonglinerTravellingCosts(DoubleParameter longlinerTravellingCosts) {
+        this.longlinerTravellingCosts = longlinerTravellingCosts;
+    }
+
+    public DoubleParameter getHandlinerTravellingCosts() {
+        return handlinerTravellingCosts;
+    }
+
+    public void setHandlinerTravellingCosts(DoubleParameter handlinerTravellingCosts) {
+        this.handlinerTravellingCosts = handlinerTravellingCosts;
+    }
+
+    public DoubleParameter getHandlinerSpeedKph() {
+        return handlinerSpeedKph;
+    }
+
+    public void setHandlinerSpeedKph(DoubleParameter handlinerSpeedKph) {
+        this.handlinerSpeedKph = handlinerSpeedKph;
     }
 }

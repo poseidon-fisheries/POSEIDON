@@ -11,9 +11,11 @@ import java.util.LinkedList;
 public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugin {
 
 
+    private String filename = "logistic_long.csv";
+
     @Override
     public String getFileName() {
-        return "logistic_long.csv";
+        return filename;
     }
 
     /**
@@ -31,5 +33,17 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
             builder.append(log.getData().toString());
         return builder.toString();
 
+    }
+
+
+
+
+    /**
+     * Setter for property 'filename'.
+     *
+     * @param filename Value to set for property 'filename'.
+     */
+    public void setFileName(String filename) {
+        this.filename = filename;
     }
 }
