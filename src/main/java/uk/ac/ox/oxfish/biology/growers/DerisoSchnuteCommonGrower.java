@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.growers;
 
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -10,9 +11,12 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
- *  Grower using Deriso Schnute formula. It aggregates all given biologies into one, reproduce biomass that way and
+ *  Grower using Deriso Schnute formula.
+ *  It aggregates all given biologies into one, reproduce biomass that way and
  *  redistribute it uniformly.
  * Created by carrknight on 2/2/17.
  */
@@ -139,25 +143,67 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         previousRecruits = bioStep.getRecruits();
         //reallocate uniformly. Do not allocate above carrying capacity
         List<BiomassLocalBiology> biologies = new ArrayList<>(this.biologies);
-        Collections.shuffle(biologies);
+        // Collections.shuffle(biologies);
         double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative
 
-        for(int i=0; i<biologies.size(); i++)
-        {
+        if( Math.abs(toReallocate) < FishStateUtilities.EPSILON ) //if there is nothing to allocate, ignore
+            return;
 
-            BiomassLocalBiology local = biologies.get(i);
-            local.getCurrentBiomass()[speciesIndex] += toReallocate/ (double)biologies.size();
-            double excess =  local.getCarryingCapacity(speciesIndex) - local.getCurrentBiomass()[speciesIndex];
-            //if there is too much
-            if(excess< -FishStateUtilities.EPSILON) {
-                assert local.getCarryingCapacity(speciesIndex) < local.getCurrentBiomass()[speciesIndex];
-                local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
-                //put this fish somewhere else!
-                assert  - excess > 0;
-                toReallocate += -excess;
+        if(toReallocate > 0) //if we are adding biomass, keep only not-full biologies
+            biologies = biologies.stream().filter(new Predicate<BiomassLocalBiology>() {
+                @Override
+                public boolean test(BiomassLocalBiology loco) {
+                    return loco.getCurrentBiomass()[speciesIndex]< loco.getCarryingCapacity(speciesIndex);
+                }
+            }).collect(Collectors.toList());
+        if(toReallocate < 0) //if we are removing biomass, keep only not-empty biologies
+            biologies = biologies.stream().filter(new Predicate<BiomassLocalBiology>() {
+                @Override
+                public boolean test(BiomassLocalBiology loco) {
+                    return loco.getCurrentBiomass()[speciesIndex] > 0;
+                }
+            }).collect(Collectors.toList());
+
+
+
+        //while there is still reallocation to be done
+        MersenneTwisterFast random = ((FishState) simState).getRandom();
+        while(Math.abs(toReallocate) > FishStateUtilities.EPSILON && !biologies.isEmpty())
+        {
+            //pick a biology at random
+            BiomassLocalBiology local = biologies.get(random.nextInt(biologies.size()));
+            //give or take some biomass out
+            double delta = toReallocate / (double) biologies.size();
+            local.getCurrentBiomass()[speciesIndex] += delta;
+            //if you gave some biomass
+            if(delta > 0)
+            {
+                //account for it
+                toReallocate -= delta;
+                //but if it's above carrying capacity, take it back
+                double excess =  local.getCurrentBiomass()[speciesIndex] - local.getCarryingCapacity(speciesIndex);
+                if(excess > FishStateUtilities.EPSILON) {
+                    toReallocate += excess;
+                    local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
+                    biologies.remove(local); //this biology is not going to accept any more
+                }
+            }
+            //if you took biomass back
+            else
+            {
+                //account for it
+                toReallocate += delta;
+                //but if there is negative fish, put it back!
+                if(local.getCurrentBiomass()[speciesIndex] < 0 ) {
+                    toReallocate -= local.getCurrentBiomass()[speciesIndex];
+                    local.getCurrentBiomass()[speciesIndex] = 0d;
+                    biologies.remove(local); //this biology is not going to accept any more
+                }
             }
 
+
         }
+
 
 
     }

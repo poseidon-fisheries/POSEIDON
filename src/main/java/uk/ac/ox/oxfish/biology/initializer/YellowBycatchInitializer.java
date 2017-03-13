@@ -2,9 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
-import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -54,7 +52,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     /**
      * any cell with x >= verticalSeparator will include the bycatch species
      */
-    final private int verticalSeparator = 25;
+    final private int verticalSeparator;
 
     /**
      * bycatch tiles
@@ -77,7 +75,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             double bycatchWeightAtRecruitment, double bycatchWeightAtRecruitmentMinus1, double bycatchVirginBiomass,
             double bycatchVirginRecruits, double targetRho, double targetNaturalSurvivalRate,
             double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
-            double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double targetVirginRecruits) {
+            double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double targetVirginRecruits,
+            int verticalSeparator) {
         this.separateBycatchStock = separateBycatchStock;
         this.targetSpeciesName = targetSpeciesName;
         this.bycatchSpeciesName = bycatchSpeciesName;
@@ -97,6 +96,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         this.targetWeightAtRecruitmentMinus1 = targetWeightAtRecruitmentMinus1;
         this.targetVirginBiomass = targetVirginBiomass;
         this.targetVirginRecruits = targetVirginRecruits;
+        this.verticalSeparator = verticalSeparator;
     }
 
     /**
@@ -156,7 +156,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         int targetContainers = northBiologies.size() + southBiologies.size();
         int bycatchContainers = bycatchBios.size();
         double targetBiomass = targetVirginBiomass/targetContainers;
-        double bycatchBiomass = bycatchVirginBiomass/targetContainers;
+        double bycatchBiomass = bycatchVirginBiomass/bycatchContainers;
 
 
         for(BiomassLocalBiology bio : allBiologies)
@@ -175,8 +175,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
 
         //target grower
         //make sure we allocated the right amount of biomass
-        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCurrentBiomass()[0]).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
-        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCarryingCapacity(0)).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCurrentBiomass()[0]).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCarryingCapacity(0)).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
         DerisoSchnuteCommonGrower targetGrower = new DerisoSchnuteCommonGrower(
                 Collections.nCopies(targetRecruitmentLag,targetVirginBiomass),
                 targetRho,

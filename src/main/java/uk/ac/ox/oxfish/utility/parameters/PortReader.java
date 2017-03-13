@@ -84,7 +84,6 @@ public class PortReader {
 
         }
 
-        assert toReturn.size() == fileLines.size()-1;
         return toReturn;
 
 

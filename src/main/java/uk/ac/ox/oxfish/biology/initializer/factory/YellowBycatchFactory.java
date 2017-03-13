@@ -33,7 +33,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
 
-    private DoubleParameter bycatchVirginRecruits = new FixedDoubleParameter(85.13962 * 1000d);
+    private DoubleParameter bycatchVirginRecruits = new FixedDoubleParameter(54.44606 * 1000d);
 
 
 
@@ -55,7 +55,14 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
 
-    private DoubleParameter targetVirginRecruits = new FixedDoubleParameter(29728.8 * 1000d);
+    private DoubleParameter targetVirginRecruits = new FixedDoubleParameter(1.2197524018851934E7);
+
+
+    /**
+     * any cell with x >= verticalSeparator will include the bycatch species
+     */
+    private DoubleParameter verticalSeparator
+            = new FixedDoubleParameter(25);
 
 
     /**
@@ -85,15 +92,10 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
                 targetWeightAtRecruitment.apply(state.getRandom()),
                 targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
                 targetVirginBiomass.apply(state.getRandom()),
-                targetVirginRecruits.apply(state.getRandom())
-        );
+                targetVirginRecruits.apply(state.getRandom()),
+                verticalSeparator.apply(state.getRandom()).intValue());
     }
 
-    /**
-     * any cell with x >= verticalSeparator will include the bycatch species
-     */
-    private DoubleParameter verticalSeparator
-            = new FixedDoubleParameter(25);
 
 
     public boolean isSeparateBycatchStock() {
