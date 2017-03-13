@@ -2,6 +2,9 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
+
+import java.util.regex.Pattern;
 
 /**
  * A customized YAML reader to use with the model
@@ -23,6 +26,9 @@ public class FishYAML extends Yaml{
 
         super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
         this.customConstructor = ((YamlConstructor) super.constructor);
+        this.addImplicitResolver(new Tag("!coord"),
+                                 Pattern.compile("['\"]?[0-9]+\\.?[0-9]*,[0-9]+\\.?[0-9]*['\"]?"),
+                                 "01234567890'\"");
 
     }
 

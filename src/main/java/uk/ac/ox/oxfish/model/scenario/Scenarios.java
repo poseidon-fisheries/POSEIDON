@@ -40,5 +40,10 @@ public class Scenarios {
         SCENARIOS.put("OSMOSE WFS",new OsmoseWFSScenario());
         DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
 
+
+        SCENARIOS.put("Simple California",new SimpleCaliforniaScenario());
+        DESCRIPTIONS.put("Simple California","California Scenario for the masses!");
+
+
     }
 }

@@ -136,9 +136,9 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
 
 
-    private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.01");
+    private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.01,3:0.01,4:0.01");
 
-    private AlgorithmFactory<? extends Gear> handlinerGear = new RandomTrawlStringFactory("2:0.01");
+    private AlgorithmFactory<? extends Gear> handlinerGear = new RandomTrawlStringFactory("2:0.01,3:0.01,4:0.01");
 
 
     //comes as 95th percentile from Steve's data on hold-sizes

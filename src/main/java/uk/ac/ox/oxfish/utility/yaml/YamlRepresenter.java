@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -85,6 +86,13 @@ public class YamlRepresenter extends Representer
         this.multiRepresenters.put(Path.class,
                                    pathRepresenter);
 
+        //do the same for the coordinate class
+        this.representers.put(Coordinate.class,
+                              data -> {
+                                      Coordinate data1 = (Coordinate) data;
+                                      return representScalar(Tag.STR,data1.x +"," + data1.y);
+                                  }
+                              );
 
 
         //get a reference to this we can use from the outside

@@ -303,7 +303,7 @@ public class TwoPopulationsScenario implements Scenario{
 
         //create the fisher factory object, this is for the small fishers
         FisherFactory smallFisherFactory = new FisherFactory(
-                separatePorts ? () -> ports[0] :() -> ports[random.nextInt(ports.length)],
+                getSmallPortSupplier(random, ports),
                 regulationSmall,
                 departingStrategySmall,
                 destinationStrategySmall,
@@ -322,7 +322,7 @@ public class TwoPopulationsScenario implements Scenario{
 
         //create a factory for the large boats too
         FisherFactory largeFishersFactory = new FisherFactory(
-                separatePorts ? () -> ports[1] :() -> ports[random.nextInt(ports.length)],
+                getLargePortSupplier(random, ports),
                 regulationLarge,
                 departingStrategyLarge,
                 destinationStrategyLarge,
@@ -415,9 +415,13 @@ public class TwoPopulationsScenario implements Scenario{
         }
     }
 
+    protected Supplier<Port> getLargePortSupplier(MersenneTwisterFast random, Port[] ports) {
+        return separatePorts ? () -> ports[1] :() -> ports[random.nextInt(ports.length)];
+    }
 
-
-
+    protected Supplier<Port> getSmallPortSupplier(MersenneTwisterFast random, Port[] ports) {
+        return separatePorts ? () -> ports[0] :() -> ports[random.nextInt(ports.length)];
+    }
 
 
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
@@ -771,4 +775,6 @@ public class TwoPopulationsScenario implements Scenario{
     public void setSeparatePorts(boolean separatePorts) {
         this.separatePorts = separatePorts;
     }
+
+
 }

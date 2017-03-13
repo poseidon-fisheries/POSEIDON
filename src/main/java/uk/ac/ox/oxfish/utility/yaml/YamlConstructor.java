@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
@@ -29,28 +31,48 @@ public class YamlConstructor extends  Constructor {
     public YamlConstructor()
     {
 
-        //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
-        this.yamlClassConstructors.put(NodeId.scalar, new Constructor.ConstructScalar(){
+        //add the ability to read/write coordinates
+
+        this.yamlConstructors.put(new Tag("!coord"), new Construct() {
             @Override
-            public Object construct(Node nnode) {
-                //if the field you are trying to fill is a double parameter
-                if(nnode.getType().equals(DoubleParameter.class))
-                    //then a simple scalar must be a fixed double parameter. Build it
-                    return doubleParameterSplit((ScalarNode) nnode);
-                else
-                //if it's a path type we write and read it as string rather than with the ugly !! notation
-                    if(nnode.getType().equals(Path.class))
-                        return Paths.get(((ScalarNode) nnode).getValue());
-                else
-                    //it's also possible that the scalar is an algorithm factory without any settable field
-                    //this is rare which means that factories are represented as maps, but this might be one of the simple
-                    //ones like AnarchyFactory
-                    if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
-                        return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
-                    //otherwise I guess it's really a normal scalar!
-                    else
-                        return super.construct(nnode);                }
+            public Object construct(Node node) {
+                String val = (String) constructScalar((ScalarNode) node);
+                String[] split = val.split(",");
+                return new Coordinate(
+                        Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
+                        Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
+
+            }
+
+            @Override
+            public void construct2ndStep(Node node, Object object) {
+
+            }
         });
+
+
+
+        //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
+        this.yamlClassConstructors.put(
+                NodeId.scalar, new Constructor.ConstructScalar(){
+                    @Override
+                    public Object construct(Node nnode) {
+                        //if the field you are trying to fill is a double parameter
+                        if(nnode.getType().equals(DoubleParameter.class))
+                            //then a simple scalar must be a fixed double parameter. Build it
+                            return doubleParameterSplit((ScalarNode) nnode);
+                        //if it's a path type we write and read it as string rather than with the ugly !! notation
+                        if(nnode.getType().equals(Path.class))
+                            return Paths.get(((ScalarNode) nnode).getValue());
+                        //it's also possible that the scalar is an algorithm factory without any settable field
+                        //this is rare since factories are represented as maps, but this might be one of the simple
+                        //ones like AnarchyFactory
+                        if(AlgorithmFactory.class.isAssignableFrom(nnode.getType()))
+                            return AlgorithmFactories.constructorLookup((String) constructScalar((ScalarNode) nnode));
+                            //otherwise I guess it's really a normal scalar!
+                        else
+                            return super.construct(nnode);                }
+                });
 
         //intercept maps as well, some of them could be factories
         this.yamlClassConstructors.put(NodeId.mapping, new Constructor.ConstructMapping(){
@@ -113,15 +135,15 @@ public class YamlConstructor extends  Constructor {
                                        "PolicyScript"))
                 {
 
-                        //now we can deal with filling it through beans
-                        //first allocate subnodes correctly
-                        ((MappingNode) node).setValue(
-                                ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
-                        //set type correctly
-                        node.setType(PolicyScript.class);
-                        PolicyScript script = new PolicyScript();
-                        constructJavaBean2ndStep((MappingNode) node, script);
-                        return script;
+                    //now we can deal with filling it through beans
+                    //first allocate subnodes correctly
+                    ((MappingNode) node).setValue(
+                            ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
+                    //set type correctly
+                    node.setType(PolicyScript.class);
+                    PolicyScript script = new PolicyScript();
+                    constructJavaBean2ndStep((MappingNode) node, script);
+                    return script;
 
 
 
@@ -130,20 +152,20 @@ public class YamlConstructor extends  Constructor {
                 if(PolicyScripts.class.isAssignableFrom(node.getType()))
                 {
 
-                        //now we can deal with filling it through beans
-                        //first allocate subnodes correctly
+                    //now we can deal with filling it through beans
+                    //first allocate subnodes correctly
 
-                        //set type correctly
+                    //set type correctly
 
-                        node.setType(PolicyScripts.class);
-                        for(NodeTuple partialScript : ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue())
-                        {
-                            partialScript.getKeyNode().setType(Integer.class);
-                            partialScript.getValueNode().setType(PolicyScript.class);
-                        }
-                        PolicyScripts script = new PolicyScripts();
-                        constructJavaBean2ndStep((MappingNode) node, script);
-                        return script;
+                    node.setType(PolicyScripts.class);
+                    for(NodeTuple partialScript : ((MappingNode)((MappingNode) node).getValue().get(0).getValueNode()).getValue())
+                    {
+                        partialScript.getKeyNode().setType(Integer.class);
+                        partialScript.getValueNode().setType(PolicyScript.class);
+                    }
+                    PolicyScripts script = new PolicyScripts();
+                    constructJavaBean2ndStep((MappingNode) node, script);
+                    return script;
 
 
 
@@ -173,7 +195,7 @@ public class YamlConstructor extends  Constructor {
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
         if(split.length == 1)
             //fixed
-        return new FixedDoubleParameter(Double.parseDouble(split[0]));
+            return new FixedDoubleParameter(Double.parseDouble(split[0]));
 
         if(split[0].toLowerCase().equals("normal"))
             return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
