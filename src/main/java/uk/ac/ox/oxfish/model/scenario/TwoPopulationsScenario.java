@@ -258,7 +258,7 @@ public class TwoPopulationsScenario implements Scenario{
         PortInitializer portInitializer = ports.apply(model);
         portInitializer.buildPorts(map,
                                    mapMakerRandom,
-                                   seaTile -> marketMap);
+                                   seaTile -> marketMap,model );
 
 
         //create initial mpas

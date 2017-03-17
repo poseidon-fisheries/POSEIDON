@@ -34,7 +34,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     private final double bycatchWeightAtRecruitment;
     private final double bycatchWeightAtRecruitmentMinus1;
     private final double bycatchVirginBiomass;
-    private final double bycatchVirginRecruits;
+    private final double bycatchInitialRecruits;
 
 
 
@@ -45,7 +45,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     private final double targetWeightAtRecruitment;
     private final double targetWeightAtRecruitmentMinus1;
     private final double targetVirginBiomass;
-    private final double targetVirginRecruits;
+    private final double initialVirginRecruits;
 
 
 
@@ -69,13 +69,37 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     private List<BiomassLocalBiology> southBiologies = new LinkedList<>();
 
 
+    /**
+     * (optional) the biomass for target species in the previous years
+     */
+    private List<Double> historicalTargetBiomass = null;
+
+    /**
+     * (optional) the biomass for bycatch species in the previous years
+     */
+    private List<Double> historicalBycatchBiomass = null;
+
+
+
+
+    /**
+     * (optional) the biomass for target species in the previous years
+     */
+    private List<Double> historicalTargetSurvivalRate = null;
+
+    /**
+     * (optional) the biomass for bycatch species in the previous years
+     */
+    private List<Double> historicalBycatchSurvivalRate = null;
+
+
     public YellowBycatchInitializer(
             boolean separateBycatchStock, String targetSpeciesName, String bycatchSpeciesName, double bycatchRho,
             double bycatchNaturalSurvivalRate, double bycatchRecruitmentSteepness, int bycatchRecruitmentLag,
             double bycatchWeightAtRecruitment, double bycatchWeightAtRecruitmentMinus1, double bycatchVirginBiomass,
-            double bycatchVirginRecruits, double targetRho, double targetNaturalSurvivalRate,
+            double bycatchInitialRecruits, double targetRho, double targetNaturalSurvivalRate,
             double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
-            double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double targetVirginRecruits,
+            double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double initialVirginRecruits,
             int verticalSeparator) {
         this.separateBycatchStock = separateBycatchStock;
         this.targetSpeciesName = targetSpeciesName;
@@ -87,7 +111,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         this.bycatchWeightAtRecruitment = bycatchWeightAtRecruitment;
         this.bycatchWeightAtRecruitmentMinus1 = bycatchWeightAtRecruitmentMinus1;
         this.bycatchVirginBiomass = bycatchVirginBiomass;
-        this.bycatchVirginRecruits = bycatchVirginRecruits;
+        this.bycatchInitialRecruits = bycatchInitialRecruits;
         this.targetRho = targetRho;
         this.targetNaturalSurvivalRate = targetNaturalSurvivalRate;
         this.targetRecruitmentSteepness = targetRecruitmentSteepness;
@@ -95,7 +119,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         this.targetWeightAtRecruitment = targetWeightAtRecruitment;
         this.targetWeightAtRecruitmentMinus1 = targetWeightAtRecruitmentMinus1;
         this.targetVirginBiomass = targetVirginBiomass;
-        this.targetVirginRecruits = targetVirginRecruits;
+        this.initialVirginRecruits = initialVirginRecruits;
         this.verticalSeparator = verticalSeparator;
     }
 
@@ -153,32 +177,46 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         List<BiomassLocalBiology> allBiologies = new LinkedList<>();
         allBiologies.addAll(northBiologies);
         allBiologies.addAll(southBiologies);
+
+        //split carrying capacity and biomass equally among all tiles
         int targetContainers = northBiologies.size() + southBiologies.size();
         int bycatchContainers = bycatchBios.size();
-        double targetBiomass = targetVirginBiomass/targetContainers;
-        double bycatchBiomass = bycatchVirginBiomass/bycatchContainers;
+        double targetBiomass = historicalTargetBiomass == null ? targetVirginBiomass :
+                historicalTargetBiomass.get(historicalTargetBiomass.size()-1);
+        targetBiomass /= targetContainers;
+        double carryingCapacityTarget = targetVirginBiomass / targetContainers;
+        double bycatchBiomass = historicalBycatchBiomass  == null ?
+                bycatchVirginBiomass : historicalBycatchBiomass.get(historicalBycatchBiomass.size()-1);
+        double carryingCapacityBycatch = bycatchVirginBiomass / bycatchContainers;
+        bycatchBiomass /= bycatchContainers;
 
 
         for(BiomassLocalBiology bio : allBiologies)
         {
-            bio.setCarryingCapacity(biology.getSpecie(0),targetBiomass);
+            bio.setCarryingCapacity(biology.getSpecie(0),carryingCapacityTarget);
             bio.setCurrentBiomass(biology.getSpecie(0),targetBiomass);
             if(bycatchBios.contains(bio))
             {
-                bio.setCarryingCapacity(biology.getSpecie(1),bycatchBiomass);
+                bio.setCarryingCapacity(biology.getSpecie(1),carryingCapacityBycatch);
                 bio.setCurrentBiomass(biology.getSpecie(1),bycatchBiomass);
             }
         }
 
-
+        //if no historical biomass is provided, assume the world has always been at virgin levels
+        if(historicalTargetBiomass==null)
+            historicalTargetBiomass= Collections.nCopies(targetRecruitmentLag, targetVirginBiomass);
+        if(historicalBycatchBiomass == null)
+            historicalBycatchBiomass = Collections.nCopies(bycatchRecruitmentLag,bycatchVirginBiomass);
 
 
         //target grower
         //make sure we allocated the right amount of biomass
-        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCurrentBiomass()[0]).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCurrentBiomass()[0]).sum() -
+                                historicalTargetBiomass.get(historicalTargetBiomass.size()-1)) < FishStateUtilities.EPSILON;
         assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCarryingCapacity(0)).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
         DerisoSchnuteCommonGrower targetGrower = new DerisoSchnuteCommonGrower(
-                Collections.nCopies(targetRecruitmentLag,targetVirginBiomass),
+                historicalTargetBiomass,
+                historicalTargetSurvivalRate,
                 targetRho,
                 targetNaturalSurvivalRate,
                 targetRecruitmentSteepness,
@@ -186,13 +224,14 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                 0,
                 targetWeightAtRecruitment,
                 targetWeightAtRecruitmentMinus1,
-                targetVirginRecruits
+                initialVirginRecruits
         );
         targetGrower.getBiologies().addAll(northBiologies);
         targetGrower.getBiologies().addAll(southBiologies);
         model.registerStartable(targetGrower);
 
-        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() - bycatchVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -
+                                historicalBycatchBiomass.get(historicalBycatchBiomass.size()-1)) < FishStateUtilities.EPSILON;
         assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCarryingCapacity(1)).sum() - bycatchVirginBiomass) < FishStateUtilities.EPSILON;
         //bycatch growers
         if(!separateBycatchStock)
@@ -200,8 +239,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             //unified grower, very similar to the one for target fish
 
             DerisoSchnuteCommonGrower unifiedBycatchGrower = new DerisoSchnuteCommonGrower(
-                    Collections.nCopies(
-                            bycatchRecruitmentLag,bycatchVirginBiomass),
+                    historicalBycatchBiomass,
+                    historicalBycatchSurvivalRate,
                     bycatchRho,
                     bycatchNaturalSurvivalRate,
                     bycatchRecruitmentSteepness,
@@ -209,7 +248,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                     1,
                     bycatchWeightAtRecruitment,
                     bycatchWeightAtRecruitmentMinus1,
-                    bycatchVirginRecruits
+                    bycatchInitialRecruits
             );
             unifiedBycatchGrower.getBiologies().addAll(bycatchBios);
             model.registerStartable(unifiedBycatchGrower);
@@ -226,9 +265,17 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             double virginNorth = northBiologies.stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum();
             double proportionNorth = virginNorth / bycatchVirginBiomass;
 
+
+            //historical bycatch, if not provided then it's just the virgin value
+            assert historicalBycatchBiomass!=null;
+
+            List<Double> historyNorth = new ArrayList<>(historicalBycatchBiomass);
+            historyNorth.replaceAll(biomass -> biomass * proportionNorth);
+
+
             DerisoSchnuteCommonGrower northGrower = new DerisoSchnuteCommonGrower(
-                    Collections.nCopies(
-                            bycatchRecruitmentLag,virginNorth),
+                    historyNorth,
+                    historicalBycatchSurvivalRate,
                     bycatchRho,
                     bycatchNaturalSurvivalRate,
                     bycatchRecruitmentSteepness,
@@ -236,14 +283,20 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                     1,
                     bycatchWeightAtRecruitment,
                     bycatchWeightAtRecruitmentMinus1,
-                    bycatchVirginRecruits * proportionNorth
+                    bycatchInitialRecruits * proportionNorth
             );
             northGrower.getBiologies().addAll(northBiologies);
             model.registerStartable(northGrower);
 
+
+            List<Double> historySouth = new ArrayList<>(historicalBycatchBiomass);
+            historySouth.replaceAll(biomass -> biomass * (1d-proportionNorth));
+
+
+
             DerisoSchnuteCommonGrower southGrower = new DerisoSchnuteCommonGrower(
-                    Collections.nCopies(
-                            bycatchRecruitmentLag,bycatchVirginBiomass-virginNorth),
+                    historySouth,
+                    historicalBycatchSurvivalRate,
                     bycatchRho,
                     bycatchNaturalSurvivalRate,
                     bycatchRecruitmentSteepness,
@@ -251,7 +304,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                     1,
                     bycatchWeightAtRecruitment,
                     bycatchWeightAtRecruitmentMinus1,
-                    bycatchVirginRecruits * (1d-proportionNorth)
+                    bycatchInitialRecruits * (1d-proportionNorth)
             );
             northGrower.getBiologies().addAll(southBiologies);
             model.registerStartable(southGrower);
@@ -350,8 +403,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         return bycatchVirginBiomass;
     }
 
-    public double getBycatchVirginRecruits() {
-        return bycatchVirginRecruits;
+    public double getBycatchInitialRecruits() {
+        return bycatchInitialRecruits;
     }
 
     public double getTargetRho() {
@@ -382,8 +435,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         return targetVirginBiomass;
     }
 
-    public double getTargetVirginRecruits() {
-        return targetVirginRecruits;
+    public double getInitialVirginRecruits() {
+        return initialVirginRecruits;
     }
 
     public int getVerticalSeparator() {
@@ -400,5 +453,79 @@ public class YellowBycatchInitializer implements BiologyInitializer {
 
     public List<BiomassLocalBiology> getSouthBiologies() {
         return southBiologies;
+    }
+
+
+    /**
+     * Getter for property 'historicalTargetBiomass'.
+     *
+     * @return Value for property 'historicalTargetBiomass'.
+     */
+    public List<Double> getHistoricalTargetBiomass() {
+        return historicalTargetBiomass;
+    }
+
+    /**
+     * Setter for property 'historicalTargetBiomass'.
+     *
+     * @param historicalTargetBiomass Value to set for property 'historicalTargetBiomass'.
+     */
+    public void setHistoricalTargetBiomass(List<Double> historicalTargetBiomass) {
+        this.historicalTargetBiomass = historicalTargetBiomass;
+    }
+
+    /**
+     * Getter for property 'historicalBycatchBiomass'.
+     *
+     * @return Value for property 'historicalBycatchBiomass'.
+     */
+    public List<Double> getHistoricalBycatchBiomass() {
+        return historicalBycatchBiomass;
+    }
+
+    /**
+     * Setter for property 'historicalBycatchBiomass'.
+     *
+     * @param historicalBycatchBiomass Value to set for property 'historicalBycatchBiomass'.
+     */
+    public void setHistoricalBycatchBiomass(List<Double> historicalBycatchBiomass) {
+        this.historicalBycatchBiomass = historicalBycatchBiomass;
+    }
+
+
+    /**
+     * Getter for property 'historicalTargetSurvivalRate'.
+     *
+     * @return Value for property 'historicalTargetSurvivalRate'.
+     */
+    public List<Double> getHistoricalTargetSurvivalRate() {
+        return historicalTargetSurvivalRate;
+    }
+
+    /**
+     * Setter for property 'historicalTargetSurvivalRate'.
+     *
+     * @param historicalTargetSurvivalRate Value to set for property 'historicalTargetSurvivalRate'.
+     */
+    public void setHistoricalTargetSurvivalRate(List<Double> historicalTargetSurvivalRate) {
+        this.historicalTargetSurvivalRate = historicalTargetSurvivalRate;
+    }
+
+    /**
+     * Getter for property 'historicalBycatchSurvivalRate'.
+     *
+     * @return Value for property 'historicalBycatchSurvivalRate'.
+     */
+    public List<Double> getHistoricalBycatchSurvivalRate() {
+        return historicalBycatchSurvivalRate;
+    }
+
+    /**
+     * Setter for property 'historicalBycatchSurvivalRate'.
+     *
+     * @param historicalBycatchSurvivalRate Value to set for property 'historicalBycatchSurvivalRate'.
+     */
+    public void setHistoricalBycatchSurvivalRate(List<Double> historicalBycatchSurvivalRate) {
+        this.historicalBycatchSurvivalRate = historicalBycatchSurvivalRate;
     }
 }

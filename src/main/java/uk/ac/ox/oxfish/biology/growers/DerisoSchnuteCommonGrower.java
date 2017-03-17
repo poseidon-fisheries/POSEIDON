@@ -42,20 +42,6 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     private double previousRecruits;
 
 
-    public DerisoSchnuteCommonGrower(
-            List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
-            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
-            double initialRecruits) {
-        this.empiricalYearlyBiomasses = empiricalYearlyBiomasses;
-        this.rho = rho;
-        this.naturalSurvivalRate = naturalSurvivalRate;
-        this.recruitmentSteepness = recruitmentSteepness;
-        this.recruitmentLag = recruitmentLag;
-        this.speciesIndex = speciesIndex;
-        this.weightAtRecruitment = weightAtRecruitment;
-        this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
-        this.previousRecruits = initialRecruits;
-    }
 
     /**
      * queue containing previous end of the year biomasses, last is the latest/newest
@@ -77,6 +63,43 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
      */
     private Stoppable stoppable;
 
+
+    /**
+     * this is the OPTIONAL time series of survival rates used to initialize the model
+     * Assume the "last" element of the list is the newest.
+     * if not given, it will be filled with natural survival rates (assuming virgin state)
+     */
+    private final List<Double> empiricalSurvivalRates;
+
+
+
+    public DerisoSchnuteCommonGrower(
+            List<Double> empiricalYearlyBiomasses, double rho, double naturalSurvivalRate, double recruitmentSteepness,
+            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
+            double initialRecruits) {
+        this(empiricalYearlyBiomasses,null,rho,naturalSurvivalRate,recruitmentSteepness,
+             recruitmentLag,speciesIndex,weightAtRecruitment,weightAtRecruitmentMinus1,initialRecruits);
+    }
+
+
+    public DerisoSchnuteCommonGrower(
+            List<Double> empiricalYearlyBiomasses,
+            List<Double> empiricalSurvivalRates,
+            double rho, double naturalSurvivalRate, double recruitmentSteepness,
+            int recruitmentLag, int speciesIndex, double weightAtRecruitment, double weightAtRecruitmentMinus1,
+            double initialRecruits) {
+        this.empiricalSurvivalRates = empiricalSurvivalRates;
+        this.empiricalYearlyBiomasses = empiricalYearlyBiomasses;
+        this.rho = rho;
+        this.naturalSurvivalRate = naturalSurvivalRate;
+        this.recruitmentSteepness = recruitmentSteepness;
+        this.recruitmentLag = recruitmentLag;
+        this.speciesIndex = speciesIndex;
+        this.weightAtRecruitment = weightAtRecruitment;
+        this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
+        this.previousRecruits = initialRecruits;
+    }
+
     /**
      * very much like the independent grower, except we do not divide the biomasses by number of cells
      *
@@ -94,9 +117,20 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
                     get(empiricalYearlyBiomasses.size()-i-1));
         assert previousBiomasses.size() == recruitmentLag;
 
-        //todo add fishing rate here
-        actualSurvivalRates.add(naturalSurvivalRate);
-        actualSurvivalRates.add(naturalSurvivalRate);
+
+        //read from data or bootstrap it as just natural survival rate
+        if(empiricalSurvivalRates != null)
+        {
+            for(int i=0; i<2; i++)
+                actualSurvivalRates.addFirst(empiricalSurvivalRates.
+                        get(empiricalSurvivalRates.size()-i-1));
+        }
+        else
+        {
+            actualSurvivalRates.add(naturalSurvivalRate);
+            actualSurvivalRates.add(naturalSurvivalRate);
+        }
+
 
 
         stoppable = model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
@@ -192,7 +226,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
             else
             {
                 //account for it
-                toReallocate += delta;
+                toReallocate -= delta;
                 //but if there is negative fish, put it back!
                 if(local.getCurrentBiomass()[speciesIndex] < 0 ) {
                     toReallocate -= local.getCurrentBiomass()[speciesIndex];

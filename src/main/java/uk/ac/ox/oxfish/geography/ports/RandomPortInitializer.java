@@ -6,6 +6,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.util.Bag;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.*;
@@ -84,11 +85,13 @@ public class RandomPortInitializer implements PortInitializer {
      * @param map            the map to place ports in
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
+     * @param model
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
-            NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory) {
+            NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
+            FishState model) {
         return addRandomPortsToMap(map,getPorts(),marketFactory,mapmakerRandom);
     }
 

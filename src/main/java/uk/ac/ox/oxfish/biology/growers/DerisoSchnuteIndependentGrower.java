@@ -31,6 +31,8 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
      */
     private final List<Double> empiricalYearlyBiomasses;
 
+
+
     private final double rho;
 
     private final double naturalSurvivalRate;
@@ -91,7 +93,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
             assert biomasses.size() == recruitmentLag;
             LinkedList<Double>  survivalRates = new LinkedList<>();
 
-            //todo add fishing rate here
+            //todo add fishing rate here like in the common grower
             survivalRates.add(naturalSurvivalRate);
             survivalRates.add(naturalSurvivalRate);
 
@@ -130,13 +132,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
         this.initialRecruits = initialRecruits;
 
 
-        double virginRecruits =
-                virginBiomass * (1d-(1+rho)*naturalSurvivalRate + rho * naturalSurvivalRate * naturalSurvivalRate)
-                        /
-                        (weightAtRecruitment - rho * naturalSurvivalRate * weightAtRecruitmentMinus1);
 
-        double alpha = (1d-recruitmentSteepness)/(4d*recruitmentSteepness*virginRecruits);
-        double beta = (5*recruitmentSteepness-1d)/(4d*recruitmentSteepness*virginRecruits);
     }
 
     /**

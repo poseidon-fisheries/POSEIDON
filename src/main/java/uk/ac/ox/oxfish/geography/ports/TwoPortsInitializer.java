@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.List;
@@ -65,13 +66,14 @@ public class TwoPortsInitializer implements PortInitializer {
      * @param map            the map to place ports in
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
+     * @param model
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map,
             MersenneTwisterFast mapmakerRandom,
-            Function<SeaTile, MarketMap> marketFactory) {
+            Function<SeaTile, MarketMap> marketFactory, FishState model) {
 
         //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 

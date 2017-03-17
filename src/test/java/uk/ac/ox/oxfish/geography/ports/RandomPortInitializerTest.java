@@ -31,7 +31,7 @@ public class RandomPortInitializerTest {
                                               mock(FishState.class));
 
         RandomPortInitializer ports = new RandomPortInitializer(4);
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class));
+        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class), mock(FishState.class));
         assertEquals(map.getPorts().size(),4);
         assertTrue(map.getSeaTile(3,0).isPortHere());
         assertTrue(map.getSeaTile(3,1).isPortHere());

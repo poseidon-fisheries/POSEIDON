@@ -34,7 +34,7 @@ public class TwoPortsInitializerTest {
                                                             2,
                                                             "North",
                                                             "South");
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class));
+        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class),mock(FishState.class) );
         assertEquals(map.getPorts().size(),2);
         for(Port port : map.getPorts())
         {

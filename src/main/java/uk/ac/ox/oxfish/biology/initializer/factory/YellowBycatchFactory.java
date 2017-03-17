@@ -33,7 +33,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
 
-    private DoubleParameter bycatchVirginRecruits = new FixedDoubleParameter(54.44606 * 1000d);
+    private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(54.44606 * 1000d);
 
 
 
@@ -55,7 +55,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
 
-    private DoubleParameter targetVirginRecruits = new FixedDoubleParameter(1.2197524018851934E7);
+    private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(1.2197524018851934E7);
 
 
     /**
@@ -84,7 +84,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
                 bycatchWeightAtRecruitment.apply(state.getRandom()),
                 bycatchWeightAtRecruitmentMinus1.apply(state.getRandom()),
                 bycatchVirginBiomass.apply(state.getRandom()),
-                bycatchVirginRecruits.apply(state.getRandom()),
+                bycatchInitialRecruits.apply(state.getRandom()),
                 targetRho.apply(state.getRandom()),
                 targetNaturalSurvivalRate.apply(state.getRandom()),
                 targetRecruitmentSteepness.apply(state.getRandom()),
@@ -92,7 +92,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
                 targetWeightAtRecruitment.apply(state.getRandom()),
                 targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
                 targetVirginBiomass.apply(state.getRandom()),
-                targetVirginRecruits.apply(state.getRandom()),
+                targetInitialRecruits.apply(state.getRandom()),
                 verticalSeparator.apply(state.getRandom()).intValue());
     }
 
@@ -179,12 +179,12 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         this.bycatchVirginBiomass = bycatchVirginBiomass;
     }
 
-    public DoubleParameter getBycatchVirginRecruits() {
-        return bycatchVirginRecruits;
+    public DoubleParameter getBycatchInitialRecruits() {
+        return bycatchInitialRecruits;
     }
 
-    public void setBycatchVirginRecruits(DoubleParameter bycatchVirginRecruits) {
-        this.bycatchVirginRecruits = bycatchVirginRecruits;
+    public void setBycatchInitialRecruits(DoubleParameter bycatchInitialRecruits) {
+        this.bycatchInitialRecruits = bycatchInitialRecruits;
     }
 
     public DoubleParameter getTargetRho() {
@@ -244,12 +244,12 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
         this.targetVirginBiomass = targetVirginBiomass;
     }
 
-    public DoubleParameter getTargetVirginRecruits() {
-        return targetVirginRecruits;
+    public DoubleParameter getTargetInitialRecruits() {
+        return targetInitialRecruits;
     }
 
-    public void setTargetVirginRecruits(DoubleParameter targetVirginRecruits) {
-        this.targetVirginRecruits = targetVirginRecruits;
+    public void setTargetInitialRecruits(DoubleParameter targetInitialRecruits) {
+        this.targetInitialRecruits = targetInitialRecruits;
     }
 
     public DoubleParameter getVerticalSeparator() {

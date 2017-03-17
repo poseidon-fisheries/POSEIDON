@@ -21,7 +21,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
     {
         YellowBycatchFactory biologyInitializer = new YellowBycatchFactory();
-        biologyInitializer.setVerticalSeparator(new FixedDoubleParameter(10));
+        biologyInitializer.setVerticalSeparator(new FixedDoubleParameter(5));
         this.setBiologyInitializer(biologyInitializer);
 
         //assuming all agents are just long-liners a la WFS
@@ -41,10 +41,10 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
         //ratio width/height comes from the original california bathymetry
         //size of the cell is assuming max 120km distance to fish
         SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
-        mapInitializer.setHeight(new FixedDoubleParameter(60));
-        mapInitializer.setWidth(new FixedDoubleParameter(26));
+        mapInitializer.setHeight(new FixedDoubleParameter(100));
+        mapInitializer.setWidth(new FixedDoubleParameter(11));
         mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
-        mapInitializer.setCellSizeInKilometers(new FixedDoubleParameter(120d/25d));
+        mapInitializer.setCellSizeInKilometers(new FixedDoubleParameter(1547d/100d)); //1547 km from los angeles to seattle
         this.setMapInitializer(mapInitializer);
 
 
@@ -56,9 +56,12 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
         PortListFactory ports = new PortListFactory();
         ports.getPorts().clear();
-        ports.getPorts().put("Washington",new Coordinate(25,0));
-        ports.getPorts().put("California",new Coordinate(25,59));
+        ports.getPorts().put("Washington",new Coordinate(10,0));
+        ports.getPorts().put("California",new Coordinate(10,99));
         this.setPorts(ports);
+
+        this.setSmallFishers(50);
+        this.setLargeFishers(50);
 
 
     }
