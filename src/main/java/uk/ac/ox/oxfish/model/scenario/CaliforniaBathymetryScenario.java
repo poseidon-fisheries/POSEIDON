@@ -80,6 +80,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private final boolean mortalityAt100PercentForOldestFish = false;
     /**
+     * filename containing all the ports
+     */
+    private String portFileName = "dts_ports_2010.csv";
+    /**
      * how much should the model biomass/abundance be given the data we read in?
      */
     private double biomassScaling = 1.0;
@@ -111,7 +115,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * hold size of the boat in kg
      */
-    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(40*1000); // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
+        private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20*1000); // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
 
     private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
 
@@ -189,7 +193,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                new DoubleNormalGearFactory(38.953,-1.483,3.967,
                                                            -0.764,Double.NaN,-2.259,
                                                            0d,50d,1d,26.962,1.065,0.869,
-                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,0d)),
+                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)),
                     new Pair<>("Longspine Thornyhead",
                                new LogisticSelectivityGearFactory(23.5035,
                                                                   9.03702,
@@ -197,7 +201,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                   1.7773,
                                                                   0.992661,
                                                                   LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                  0d)),
+                                                                  0.00156832676d)),
                     //todo change this
                     new Pair<>("Sablefish",
                                new LogisticSelectivityGearFactory(23.5035,
@@ -206,16 +210,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                   1.7773,
                                                                   0.992661,
                                                                   LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                  0d)),
+                                                                  0.00156832676d)),
                     new Pair<>("Shortspine Thornyhead",
                                new DoubleNormalGearFactory(28.05,-0.3,4.25,
                                                            4.85,Double.NaN,Double.NaN,
                                                            0d,75d,1d,23.74,2.42,1d,
                                                            LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                           0d)),
+                                                           0.00156832676d)),
                     new Pair<>("Yelloweye Rockfish",
                                new LogisticSelectivityGearFactory(36.364,14.009,
-                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,0d)
+                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)
                     )
 
             );
@@ -463,7 +467,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
             PortReader reader = new PortReader();
             numberOfFishersPerPort = reader.readFile(
-                    mainDirectory.resolve("port.csv"),
+                    mainDirectory.resolve(portFileName),
                     map,
                     () -> {
                         MarketMap markets = new MarketMap(biology);
@@ -514,14 +518,23 @@ public class CaliforniaBathymetryScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
+        LinkedList<Fisher> fisherList = new LinkedList<>();
 
         //compute catchability
-        LinkedList<Fisher> fisherList = new LinkedList<>();
+    /*
         double inputedCatchability = 0.00000074932 / (1d / initializer.getNumberOfFishableTiles());
 
         for(HomogeneousGearFactory factory : gear.getGears().values())
             factory.setAverageCatchability(new FixedDoubleParameter(
                     inputedCatchability));
+
+                    if(Log.DEBUG) {
+            Log.debug("the inputed catchability is : " + inputedCatchability
+                              + ", due to these many number of tiles being available"
+                              + initializer.getNumberOfFishableTiles());
+        }
+*/
+
 
 
         GlobalBiology biology = model.getBiology();
@@ -647,9 +660,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
         if(Log.DEBUG)
         {
-            Log.debug("the inputed catchability is : " + inputedCatchability
-                              +", due to these many number of tiles being available"
-                              + initializer.getNumberOfFishableTiles());
+
             List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
             for(Species species : biology.getSpecies() )
                 Log.debug(species.getName() + ", index " + species.getIndex() + " biomass is : " +
@@ -1083,6 +1094,25 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     public void setCaliforniaScaling(double californiaScaling) {
         this.californiaScaling = californiaScaling;
+    }
+
+
+    /**
+     * Getter for property 'portFileName'.
+     *
+     * @return Value for property 'portFileName'.
+     */
+    public String getPortFileName() {
+        return portFileName;
+    }
+
+    /**
+     * Setter for property 'portFileName'.
+     *
+     * @param portFileName Value to set for property 'portFileName'.
+     */
+    public void setPortFileName(String portFileName) {
+        this.portFileName = portFileName;
     }
 }
 

@@ -83,7 +83,7 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         HashMap<Species, HomogeneousAbundanceGear> gearsPerSpecies = new HashMap<>();
 
         for(Map.Entry<String,HomogeneousGearFactory>
-                entry : gears.entrySet())
+                entry : getGears().entrySet())
         {
             gearsPerSpecies.put(
                     state.getBiology().getSpecie(entry.getKey()),
