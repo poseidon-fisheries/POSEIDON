@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -95,11 +96,7 @@ public class HomogeneousAbundanceGear implements Gear {
         fish[FishStateUtilities.MALE] = where.getNumberOfMaleFishPerAge(species);
         fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
         //filter until you get the catch
-        for (AbundanceFilter filter : filters)
-            fish = filter.filter(fish[FishStateUtilities.MALE],
-                                 fish[FishStateUtilities.FEMALE],
-                                 species);
-
+        fish = filter(species, fish);
 
 
         //now turn the catch into total biomass caught
@@ -114,6 +111,22 @@ public class HomogeneousAbundanceGear implements Gear {
 
         //you've spent one hour (or less fishing)
         return weightCaught;
+    }
+
+    /**
+     * this is just the loop that calls all filters in order used by the gear when fishing.
+     * It's visible so one can test that the numbers are right
+     * @param species the species being fished
+     * @param abundance a matrix of 2 columns and MAX_AGE rows
+     * @return a matrix of 2 columns and MAX_AGE rows corresponding to what was caught
+     */
+    @VisibleForTesting
+    public int[][] filter(Species species, int[][] abundance) {
+        for (AbundanceFilter filter : filters)
+            abundance = filter.filter(abundance[FishStateUtilities.MALE],
+                                 abundance[FishStateUtilities.FEMALE],
+                                 species);
+        return abundance;
     }
 
     /**
@@ -136,4 +149,7 @@ public class HomogeneousAbundanceGear implements Gear {
 
 
     }
+
+
+
 }

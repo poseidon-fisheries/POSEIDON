@@ -64,6 +64,10 @@ public class Gears {
                          DoubleNormalGearFactory::new);
         NAMES.put(DoubleNormalGearFactory.class,"Double Normal Selectivity Gear");
 
+        CONSTRUCTORS.put("Sablefish Trawl Selectivity Gear",
+                         SablefishGearFactory::new);
+        NAMES.put(SablefishGearFactory.class,"Sablefish Trawl Selectivity Gear");
+
         CONSTRUCTORS.put("Heterogeneous Selectivity Gear",
                          HeterogeneousGearFactory::new);
         NAMES.put(HeterogeneousGearFactory.class,"Heterogeneous Selectivity Gear");

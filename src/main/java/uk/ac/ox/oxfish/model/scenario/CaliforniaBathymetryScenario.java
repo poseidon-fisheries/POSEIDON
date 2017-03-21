@@ -23,10 +23,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.DoubleNormalGearFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HeterogeneousGearFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HomogeneousGearFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.LogisticSelectivityGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -204,13 +201,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                   0.00156832676d)),
                     //todo change this
                     new Pair<>("Sablefish",
-                               new LogisticSelectivityGearFactory(23.5035,
-                                                                  9.03702,
-                                                                  21.8035,
-                                                                  1.7773,
-                                                                  0.992661,
-                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                  0.00156832676d)),
+
+                               new SablefishGearFactory(0.00156832676d,
+                                                        45.5128, 3.12457,0.910947,
+                                                        LITERS_OF_GAS_CONSUMED_PER_HOUR)
+                    )
+                              ,
                     new Pair<>("Shortspine Thornyhead",
                                new DoubleNormalGearFactory(28.05,-0.3,4.25,
                                                            4.85,Double.NaN,Double.NaN,
