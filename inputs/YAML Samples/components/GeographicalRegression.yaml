@@ -67,6 +67,8 @@ Kernel Regression:
   xBandwidth: '250.0'
   yBandwidth: '250.0'
 -------
+RBF Network
+-------
 Social Tuning:
   nested:
     Complete Nearest Neighbor:

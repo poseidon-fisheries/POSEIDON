@@ -35,7 +35,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     }
 
 
-    final Counter yearlyCounter;
+    final private Counter yearlyCounter;
 
     public Counter getYearlyCounter() {
         return yearlyCounter;
@@ -106,6 +106,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_EXPENDITURE);
         yearlyCounter.addColumn(YearlyFisherTimeSeries.TRIPS);
         yearlyCounter.addColumn(YearlyFisherTimeSeries.EFFORT);
+        yearlyCounter.addColumn(YearlyFisherTimeSeries.HOURS_OUT);
         dailyCounter = new FisherDailyCounter(model.getSpecies().size());
 
         dailyTimeSeries.start(model, fisher);

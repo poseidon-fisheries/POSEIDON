@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.MockNaturalProcess;
 import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -25,6 +27,7 @@ import java.util.function.Function;
 public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 {
 
+    public static final String FAKE_SPECIES_NAME = "Others";
     /**
      * the osmoseWFSPath to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
@@ -43,13 +46,20 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
     private final boolean fixedRecruitmentDistribution;
     private final boolean preserveLastAge;
 
+    /**
+     * boolean representing whether or not we should add "others" as a mock species to account in the model
+     * for everything else that is not directly modeled?
+     */
+    private final boolean addOtherSpecies;
+
     public MultipleSpeciesAbundanceInitializer(
             LinkedHashMap<String, Path> biologicalDirectories, double scaling,
-            boolean fixedRecruitmentDistribution, final boolean preserveLastAge) {
+            boolean fixedRecruitmentDistribution, final boolean preserveLastAge, boolean addOtherSpecies) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
         this.preserveLastAge = preserveLastAge;
+        this.addOtherSpecies = addOtherSpecies;
     }
 
     /**
@@ -123,6 +133,11 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
 
             }
+            //need to add an additional species to catch "all"
+            if(addOtherSpecies)
+                speciesList.add(new Species(FAKE_SPECIES_NAME, Meristics.FAKE_MERISTICS,true));
+
+
             return new GlobalBiology(speciesList.toArray(new Species[speciesList.size()]));
         }catch (IOException e) {
             e.printStackTrace();
@@ -150,6 +165,15 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
 
         try {
             for (Species species : biology.getSpecies()) {
+
+                if(addOtherSpecies && biologicalDirectories.get(species.getName()) == null)
+                {
+                    Preconditions.checkState(species.getName().equals(FAKE_SPECIES_NAME),
+                                             "Do not have biological directory for species " + species.getName());
+                    naturalProcesses.put(species,new MockNaturalProcess(species));
+                    continue;
+                }
+
                 int[][] totalCount = SingleSpeciesAbundanceInitializer.
                         turnCountsFileIntoAbundanceArray(species, biologicalDirectories.get(species.getName()));
                 initialAbundance.put(species,totalCount);
@@ -207,6 +231,10 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
             Species speciesToReset, int[][] newTotalFishCount,
             HashMap<AbundanceBasedLocalBiology, Double> biologyToProportionOfFishThere)
     {
+        if(speciesToReset.getName().equals(FAKE_SPECIES_NAME))
+            return;
+
+
         Preconditions.checkArgument(locals.values().containsAll(biologyToProportionOfFishThere.keySet()),
                                     "Some local biologies in the proportion map are not present in the initializer list");
         Preconditions.checkArgument(biologyToProportionOfFishThere.keySet().containsAll(locals.values()),

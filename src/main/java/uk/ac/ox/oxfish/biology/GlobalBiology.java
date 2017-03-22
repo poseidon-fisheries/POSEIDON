@@ -66,7 +66,7 @@ public class GlobalBiology
     {
         return unmodifiableView.stream().
                 filter(s -> s.getName().trim().equalsIgnoreCase(name.trim())).
-                findFirst().get();
+                findFirst().orElseGet(()->null);
     }
 
     public int getSize()

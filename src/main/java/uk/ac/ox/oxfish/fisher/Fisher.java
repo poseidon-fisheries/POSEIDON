@@ -498,6 +498,7 @@ public class Fisher implements Steppable, Startable{
         //when you dock you also refill
         final double litersBought = equipment.getBoat().refill();
         status.setFuelEmergencyOverride(false);
+        memory.getYearlyCounter().count(YearlyFisherTimeSeries.HOURS_OUT,status.getHoursAtSea());
         //now pay for it
         double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
         spendForTrip(gasExpenditure);

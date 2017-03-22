@@ -111,7 +111,7 @@ public class SerializeTest {
                      state2.random.nextDouble(),
                      .001);
 
-        for(int id=0; id<134; id++)
+        for(int id=0; id<state.getFishers().size(); id++)
         {
             assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                          state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -129,7 +129,7 @@ public class SerializeTest {
             //the randomizers are linked!
 
             Log.info("step " + i);
-            for(int id=0; id<134; id++)
+            for(int id=0; id<state.getFishers().size(); id++)
             {
                 assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                              state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -141,8 +141,7 @@ public class SerializeTest {
                          .001);
 
         }
-        assertEquals(134,state.getFishers().size());
-        assertEquals(134,state2.getFishers().size());
+        assertEquals(state.getFishers().size(),state2.getFishers().size());
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
@@ -186,7 +185,7 @@ public class SerializeTest {
                      state2.random.nextDouble(),
                      .001);
 
-        for(int id=0; id<134; id++)
+        for(int id=0; id<state.getFishers().size(); id++)
         {
             assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                          state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -204,7 +203,7 @@ public class SerializeTest {
             //the randomizers are linked!
 
             Log.info("step " + i);
-            for(int id=0; id<134; id++)
+            for(int id=0; id<state.getFishers().size(); id++)
             {
                 assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                              state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -216,8 +215,7 @@ public class SerializeTest {
                          .001);
 
         }
-        assertEquals(134,state.getFishers().size());
-        assertEquals(134,state2.getFishers().size());
+        assertEquals(state.getFishers().size(),state2.getFishers().size());
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
@@ -263,7 +261,7 @@ public class SerializeTest {
                      state2.random.nextDouble(),
                      .001);
 
-        for(int id=0; id<134; id++)
+        for(int id=0; id<state.getFishers().size(); id++)
         {
             assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                          state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -280,7 +278,7 @@ public class SerializeTest {
             state2.schedule.step(state2);
             //the randomizers are linked!
 
-            for(int id=0; id<134; id++)
+            for(int id=0; id<state.getFishers().size(); id++)
             {
                 assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
                              state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
@@ -293,8 +291,7 @@ public class SerializeTest {
 
         }
 //aaa
-        assertEquals(134,state.getFishers().size());
-        assertEquals(134,state2.getFishers().size());
+        assertEquals(state.getFishers().size(),state2.getFishers().size());
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 

@@ -33,6 +33,7 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
     public static final String EFFORT = "HOURS_OF_EFFORT";
     public static final String FISHING_DISTANCE = "DISTANCE_TOW_TO_PORT";
     public static final String TRIP_DURATION = "MEAN_TRIP_DURATION";
+    public static final String HOURS_OUT = "HOURS_AT_SEA";
 
     public YearlyFisherTimeSeries() {
         super(IntervalPolicy.EVERY_YEAR);
@@ -74,6 +75,8 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
         registerGatherer(EFFORT,
                          fisher -> observed.getYearlyCounterColumn(EFFORT),Double.NaN);
 
+        registerGatherer(HOURS_OUT,
+                         fisher -> observed.getYearlyCounterColumn(HOURS_OUT),Double.NaN);
 
         //this is a set because it gets accessed by two different gatherers and can be filled by either
         registerGatherer(FISHING_DISTANCE,

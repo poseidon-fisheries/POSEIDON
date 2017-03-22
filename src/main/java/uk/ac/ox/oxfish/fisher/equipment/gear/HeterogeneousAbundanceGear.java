@@ -56,6 +56,8 @@ public class HeterogeneousAbundanceGear implements Gear
         double[] biomassCaught = new  double[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
+            if(species.isImaginary() && !gears.containsKey(species))
+                continue; //do not directly catch imaginary species
             if(where.getBiology().getBiomass(species)<=0)
                 continue;
             //you are going to fish every hour until you are done

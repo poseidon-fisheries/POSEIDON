@@ -85,6 +85,9 @@ Osmose Biology:
   osmoseConfigurationFile: /home/carrknight/code/oxfish/inputs/osmose/prototype/osm_all-parameters.csv
   preInitializedConfiguration: true
   preInitializedConfigurationDirectory: /home/carrknight/code/oxfish/inputs/osmose/prototype/restart
+  recruitmentAges: {
+    }
+  scalingFactor: '1.0'
 -------
 Two Species Box:
   boxHeight: '10.0'
@@ -115,12 +118,67 @@ One Species School:
   waypoints: '0,0 : 40,0 :  40,40: 0,40'
 -------
 Yellow Bycatch Factory:
+  bycatchInitialRecruits: '54446.060000000005'
+  bycatchNaturalSurvivalRate: '0.95504'
+  bycatchRecruitmentLag: '14.0'
+  bycatchRecruitmentSteepness: '0.44056'
+  bycatchRho: '1.03'
   bycatchSpeciesName: Yelloweye Rockfish
-  initialBycatchAbundance: '1.0E7'
-  initialTargetAbundance: '1.0E8'
-  proportionJuvenileBycatch: '0.2'
-  proportionJuvenileTarget: '0.2'
+  bycatchVirginBiomass: '8883000.0'
+  bycatchWeightAtRecruitment: '1.11909797520236'
+  bycatchWeightAtRecruitmentMinus1: '1.01603952895487'
   separateBycatchStock: false
+  targetInitialRecruits: '1.2197524018851934E7'
+  targetNaturalSurvivalRate: '0.923116346386636'
+  targetRecruitmentLag: '3.0'
+  targetRecruitmentSteepness: '0.6'
+  targetRho: '0.92267402483245'
   targetSpeciesName: Sablefish
+  targetVirginBiomass: '5.27154E8'
+  targetWeightAtRecruitment: '1.03312585773941'
+  targetWeightAtRecruitmentMinus1: '0.634560212266768'
   verticalSeparator: '25.0'
+-------
+Yellow Bycatch Factory with History:
+  bycatchInitialRecruits: '54446.060000000005'
+  bycatchNaturalSurvivalRate: '0.95504'
+  bycatchRecruitmentLag: '14.0'
+  bycatchRecruitmentSteepness: '0.44056'
+  bycatchRho: '1.03'
+  bycatchSpeciesName: Yelloweye Rockfish
+  bycatchVirginBiomass: '8883000.0'
+  bycatchWeightAtRecruitment: '1.11909797520236'
+  bycatchWeightAtRecruitmentMinus1: '1.01603952895487'
+  historicalBycatchBiomass:
+  - 1.0
+  - 2.0
+  - 3.0
+  historicalBycatchSurvival: null
+  historicalTargetBiomass:
+  - 1.0
+  - 2.0
+  - 3.0
+  historicalTargetSurvival: null
+  separateBycatchStock: false
+  targetInitialRecruits: '1.2197524018851934E7'
+  targetNaturalSurvivalRate: '0.923116346386636'
+  targetRecruitmentLag: '3.0'
+  targetRecruitmentSteepness: '0.6'
+  targetRho: '0.92267402483245'
+  targetSpeciesName: Sablefish
+  targetVirginBiomass: '5.27154E8'
+  targetWeightAtRecruitment: '1.03312585773941'
+  targetWeightAtRecruitmentMinus1: '0.634560212266768'
+  verticalSeparator: '25.0'
+-------
+Linear Getter Biology:
+  dayRocky: '0.0'
+  intercept: '1000.0'
+  rocky: '0.0'
+  x: '0.0'
+  xDay: '0.0'
+  xRocky: '0.0'
+  y: '0.0'
+  yDay: '0.0'
+  yRocky: '0.0'
 -------

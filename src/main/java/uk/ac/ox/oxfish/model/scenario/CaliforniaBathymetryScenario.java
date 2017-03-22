@@ -182,43 +182,56 @@ public class CaliforniaBathymetryScenario implements Scenario {
        */
     private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 11.652789144d;
     /**
-     * gear maker, for now fixed
+     * gear maker
      */
-    private HeterogeneousGearFactory gear =
-            new HeterogeneousGearFactory(
-                    new Pair<>("Dover Sole",
-                               new DoubleNormalGearFactory(38.953,-1.483,3.967,
-                                                           -0.764,Double.NaN,-2.259,
-                                                           0d,50d,1d,26.962,1.065,0.869,
-                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)),
-                    new Pair<>("Longspine Thornyhead",
-                               new LogisticSelectivityGearFactory(23.5035,
-                                                                  9.03702,
-                                                                  21.8035,
-                                                                  1.7773,
-                                                                  0.992661,
-                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                  0.00156832676d)),
-                    //todo change this
-                    new Pair<>("Sablefish",
+    private AlgorithmFactory<? extends Gear> gear =
+            new GarbageGearFactory();
+    {
+        //numbers all come from stock assessment
+        ((GarbageGearFactory) gear).setDelegate(
+                new HeterogeneousGearFactory(
+                        new Pair<>("Dover Sole",
+                                   new DoubleNormalGearFactory(38.953,-1.483,3.967,
+                                                               -0.764,Double.NaN,-2.259,
+                                                               0d,50d,1d,26.962,1.065,0.869,
+                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)),
+                        new Pair<>("Longspine Thornyhead",
+                                   new LogisticSelectivityGearFactory(23.5035,
+                                                                      9.03702,
+                                                                      21.8035,
+                                                                      1.7773,
+                                                                      0.992661,
+                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                      0.00156832676d)),
+                        //todo change this
+                        new Pair<>("Sablefish",
 
-                               new SablefishGearFactory(0.00156832676d,
-                                                        45.5128, 3.12457,0.910947,
-                                                        LITERS_OF_GAS_CONSUMED_PER_HOUR)
-                    )
-                              ,
-                    new Pair<>("Shortspine Thornyhead",
-                               new DoubleNormalGearFactory(28.05,-0.3,4.25,
-                                                           4.85,Double.NaN,Double.NaN,
-                                                           0d,75d,1d,23.74,2.42,1d,
-                                                           LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                           0.00156832676d)),
-                    new Pair<>("Yelloweye Rockfish",
-                               new LogisticSelectivityGearFactory(36.364,14.009,
-                                                                  LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)
-                    )
+                                   new SablefishGearFactory(0.00156832676d,
+                                                            45.5128, 3.12457,0.910947,
+                                                            LITERS_OF_GAS_CONSUMED_PER_HOUR)
+                        )
+                        ,
+                        new Pair<>("Shortspine Thornyhead",
+                                   new DoubleNormalGearFactory(28.05,-0.3,4.25,
+                                                               4.85,Double.NaN,Double.NaN,
+                                                               0d,75d,1d,23.74,2.42,1d,
+                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                               0.00156832676d)),
+                        new Pair<>("Yelloweye Rockfish",
+                                   new LogisticSelectivityGearFactory(36.364,14.009,
+                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)
+                        )
 
-            );
+                )
+        );
+        //the proportion of garbage comes from DTS data from the catcher vesesl report
+        ((GarbageGearFactory) gear).setGarbageSpeciesName(
+                MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME
+        );
+        ((GarbageGearFactory) gear).setProportionSimulatedToGarbage(
+                new FixedDoubleParameter(0.3221743)
+        );
+    }
 
     private MultipleSpeciesAbundanceInitializer initializer;
 
@@ -243,7 +256,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
 
     //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
-    private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587";
+    private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
+            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0"
+
+            ;
 
     public CaliforniaBathymetryScenario() {
 
@@ -348,7 +364,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
             initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
                                                                   biomassScaling,
                                                                   fixedRecruitmentDistribution,
-                                                                  mortalityAt100PercentForOldestFish);
+                                                                  mortalityAt100PercentForOldestFish,
+                                                                  true);
 
             biology = initializer.generateGlobal(model.getRandom(),
                                                  model);
@@ -855,7 +872,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     }
 
 
-    public HeterogeneousGearFactory getGear() {
+    public AlgorithmFactory<? extends Gear> getGear() {
         return gear;
     }
 
@@ -864,7 +881,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
      *
      * @param gear Value to set for property 'gear'.
      */
-    public void setGear(HeterogeneousGearFactory gear) {
+    public void setGear(AlgorithmFactory<? extends Gear> gear) {
         this.gear = gear;
     }
 
@@ -1110,6 +1127,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public void setPortFileName(String portFileName) {
         this.portFileName = portFileName;
     }
+
+
 }
 
 

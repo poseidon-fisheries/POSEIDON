@@ -33,7 +33,7 @@ public class MultipleSpeciesAbundanceInitializerTest
         LinkedHashMap<String,Path> directories= new LinkedHashMap<>();
         directories.put("fake",testInput);
         MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
-                directories, 2.0, true, false);
+                directories, 2.0, true, false,false );
         //create biology object
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
@@ -88,7 +88,7 @@ public class MultipleSpeciesAbundanceInitializerTest
         LinkedHashMap<String,Path> directories= new LinkedHashMap<>();
         directories.put("fake",testInput);
         MultipleSpeciesAbundanceInitializer initializer = new MultipleSpeciesAbundanceInitializer(
-                directories, 2.0, true, false);
+                directories, 2.0, true, false,false );
         //create biology object
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct

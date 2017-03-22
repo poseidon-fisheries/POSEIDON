@@ -28,6 +28,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      */
     private final HashMap<Species,int[][]>  abundance = new HashMap<>();
 
+
+
     /**
      * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
      */
@@ -62,12 +64,14 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     @Override
     public Double getBiomass(Species species) {
 
-        if(Double.isNaN(lastComputedBiomass[species.getIndex()] ))
-            lastComputedBiomass[species.getIndex()]  = FishStateUtilities.weigh(
+        if(Double.isNaN(lastComputedBiomass[species.getIndex()] )) {
+            lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
                     abundance.get(species)[FishStateUtilities.MALE],
                     abundance.get(species)[FishStateUtilities.FEMALE],
                     species
             );
+            assert !Double.isNaN(lastComputedBiomass[species.getIndex()] );
+        }
         return lastComputedBiomass[species.getIndex()];
 
     }
@@ -83,6 +87,9 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     @Override
     public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches)
     {
+        if(species.isImaginary()) //ignore imaginary catches
+            return;
+
         final int[][] fish = abundance.get(species);
         Preconditions.checkArgument(maleCatches.length == femaleCatches.length);
         Preconditions.checkArgument(maleCatches.length == fish[FishStateUtilities.MALE].length);
@@ -93,7 +100,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             fish[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
             Preconditions.checkArgument(fish[FishStateUtilities.FEMALE][age] >=0, "There is now a negative amount of female fish left at age " + age);
         }
-        Arrays.fill(lastComputedBiomass,Double.NaN);
+        lastComputedBiomass[species.getIndex()]=Double.NaN;
     }
 
     /**
@@ -132,6 +139,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             Log.warn("Using fishing by biomass on a biology designed for fishing by abundance. Might be an error!");
             warned =true;
         }
+        if(species.isImaginary()) //ignore imaginary catches
+            return;
         assert biomassToFish<=getBiomass(species);
 
         final int[][] fish = abundance.get(species);

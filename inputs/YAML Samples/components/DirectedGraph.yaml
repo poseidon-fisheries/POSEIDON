@@ -5,5 +5,7 @@ Barabasi-Albert:
   parallelFriendshipsAllowed: true
 -------
 Equal Out Degree:
-  degree: 2
+  allowMutualFriendships: true
+  degree: '2.0'
+  equalOutDegree: true
 -------

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
@@ -90,7 +91,13 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
                     entry.getValue().apply(state)
             );
         }
-        Preconditions.checkState(gears.size()==state.getSpecies().size(), "Not all species have a gear assigned");
+
+        Preconditions.checkState(
+                gears.size()==state.getSpecies().size() ||
+                                         (gears.size()+1==state.getSpecies().size() && state.getBiology().getSpecie(
+                                                 MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME)!=null)
+        ,
+                                 "Not all species have a gear assigned");
         return new HeterogeneousAbundanceGear(gearsPerSpecies);
 
     }

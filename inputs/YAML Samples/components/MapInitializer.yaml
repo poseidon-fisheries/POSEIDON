@@ -3,6 +3,7 @@ Simple Map:
   coastalRoughness: '4.0'
   depthSmoothing: '1000000.0'
   height: '50.0'
+  maxLandWidth: '10.0'
   width: '50.0'
 -------
 OSMOSE Map:

@@ -205,6 +205,22 @@ public class YearlyFishStateTimeSeries extends TimeSeries<FishState>
             }
         }, 0d);
 
+
+        registerGatherer("Average Hours Out", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(YearlyFisherTimeSeries.HOURS_OUT);
+                            }
+                        }).sum() /
+                        observed.getFishers().size();
+            }
+        }, 0d);
+
+
     }
 
 

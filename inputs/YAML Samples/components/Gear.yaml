@@ -54,7 +54,21 @@ Double Normal Selectivity Gear:
   retentionSlope: '3.43'
   top: '-7.0'
 -------
+Sablefish Trawl Selectivity Gear:
+  averageCatchability: '0.0'
+  litersOfGasConsumedPerHour: '0.0'
+  retentionAsymptote: '0.910947'
+  retentionInflection: '45.5128'
+  retentionSlope: '3.12457'
+-------
 Heterogeneous Selectivity Gear:
   gears: {
     }
+-------
+Garbage Gear:
+  delegate:
+    Fixed Proportion:
+      catchabilityPerHour: '0.01'
+  garbageSpeciesName: Others
+  proportionSimulatedToGarbage: '0.3'
 -------

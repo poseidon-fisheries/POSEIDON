@@ -58,6 +58,8 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
     @Override
     public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
         warnIfNeeded();
+        if(species.isImaginary())
+            return;
 
         //turn it into biomass and call the other method
         assert maleCatches.length == femaleCatches.length;

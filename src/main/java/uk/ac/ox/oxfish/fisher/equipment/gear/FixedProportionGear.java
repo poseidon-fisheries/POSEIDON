@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -37,6 +38,7 @@ public class FixedProportionGear implements Gear
     private double[] catchesToArray(
             SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished, boolean safeMode)
     {
+        Preconditions.checkArgument(hoursSpentFishing==1);
         //catch fish
         double[] caught = new double[modelBiology.getSize()];
         //for each species, same operation

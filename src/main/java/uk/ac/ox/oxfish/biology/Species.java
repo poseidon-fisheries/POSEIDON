@@ -22,17 +22,29 @@ public class Species {
     private int index;
 
     /**
+     * a flag used to signify that this species is not really part of the model but some accounting column used
+     * to simulate fish that isn't simulated but occurs in reality
+     */
+    private final boolean imaginary;
+
+    /**
      * creates a species with fake default meristics
      * @param name the name of the specie
      */
     public Species(String name) {
-        this(name,Meristics.FAKE_MERISTICS);
+        this(name,Meristics.FAKE_MERISTICS,false);
 
     }
 
     public Species(String name, Meristics meristics) {
+        this(name,meristics,false);
+
+    }
+
+    public Species(String name, Meristics meristics, boolean imaginary) {
         this.name = name;
         this.meristics = meristics;
+        this.imaginary = imaginary;
     }
 
     public String getName()
@@ -217,5 +229,14 @@ public class Species {
      */
     public boolean isAddRelativeFecundityToSpawningBiomass() {
         return meristics.isAddRelativeFecundityToSpawningBiomass();
+    }
+
+    /**
+     * Getter for property 'imaginary'.
+     *
+     * @return Value for property 'imaginary'.
+     */
+    public boolean isImaginary() {
+        return imaginary;
     }
 }
