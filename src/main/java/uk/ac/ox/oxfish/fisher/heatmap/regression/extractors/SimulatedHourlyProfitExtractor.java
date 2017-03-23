@@ -7,16 +7,14 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * Use a simulator (and perfect knowledge) to check how much $/hr one would make (ignoring costs)
- * Created by carrknight on 2/13/17.
+ * Created by carrknight on 3/23/17.
  */
-public class SimulatedHourlyRevenueExtractor implements ObservationExtractor {
-
+public class SimulatedHourlyProfitExtractor implements ObservationExtractor {
 
     private final static LameTripSimulator simulator = new LameTripSimulator();
     private final double maxHoursOut;
 
-    public SimulatedHourlyRevenueExtractor(final double maxHoursOut) {
+    public SimulatedHourlyProfitExtractor(final double maxHoursOut) {
         this.maxHoursOut = maxHoursOut;
     }
 
@@ -35,6 +33,6 @@ public class SimulatedHourlyRevenueExtractor implements ObservationExtractor {
                                                                                              model.getBiology()));
         if(simulation== null)
             return -10000;
-        return simulation.getEarnings()/simulation.getDurationInHours();
+        return simulation.getProfitPerHour(true);
     }
 }

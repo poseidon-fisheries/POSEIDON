@@ -30,7 +30,8 @@ public class SimulatedHourlyCostExtractor implements ObservationExtractor {
 
 
 
-
+        if(simulation== null)
+            return 10000;
         return (simulation.getTotalCosts()  + simulation.getOpportunityCosts())/simulation.getDurationInHours();
     }
 }

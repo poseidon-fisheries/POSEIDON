@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyCostExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyProfitExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyRevenueExtractor;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
@@ -39,9 +40,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new IdentityDiscretizerFactory();
 
 
-    private final DoubleParameter revenueBeta = new FixedDoubleParameter(1d);
-
-    private final DoubleParameter costsBeta = new FixedDoubleParameter(-1d);
+    private DoubleParameter profitBeta = new FixedDoubleParameter(1d);
 
 
     /**
@@ -72,14 +71,11 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
         //betas are just +1 for revenue and -1 for gas costs
         int numberOfGroups = discretization.getNumberOfGroups();
-        double[][] betas = new double[numberOfGroups][2];
-        double revenue = revenueBeta.apply(state.getRandom());
-        double costs = costsBeta.apply(state.getRandom());
+        double[][] betas = new double[numberOfGroups][1];
 
         for(int i=0; i<numberOfGroups; i++)
         {
-            betas[i][0] = revenue;
-            betas[i][1] = costs;
+            betas[i][0] = profitBeta.apply(state.getRandom());;
 
         }
 
@@ -108,9 +104,8 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
     private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups) {
         LameTripSimulator simulator = new LameTripSimulator();
-        ObservationExtractor[] commonExtractor = new ObservationExtractor[2];
-        commonExtractor[0] = new SimulatedHourlyRevenueExtractor(5*24d);
-        commonExtractor[1] = new SimulatedHourlyCostExtractor(5*24d);
+        ObservationExtractor[] commonExtractor = new ObservationExtractor[1];
+        commonExtractor[0] = new SimulatedHourlyProfitExtractor(5*24d);
         ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];
         for(int i=0; i<numberOfGroups; i++)
             extractors[i] = commonExtractor;
@@ -139,20 +134,20 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
 
     /**
-     * Getter for property 'revenueBeta'.
+     * Getter for property 'profitBeta'.
      *
-     * @return Value for property 'revenueBeta'.
+     * @return Value for property 'profitBeta'.
      */
-    public DoubleParameter getRevenueBeta() {
-        return revenueBeta;
+    public DoubleParameter getProfitBeta() {
+        return profitBeta;
     }
 
     /**
-     * Getter for property 'costsBeta'.
+     * Setter for property 'profitBeta'.
      *
-     * @return Value for property 'costsBeta'.
+     * @param profitBeta Value to set for property 'profitBeta'.
      */
-    public DoubleParameter getCostsBeta() {
-        return costsBeta;
+    public void setProfitBeta(DoubleParameter profitBeta) {
+        this.profitBeta = profitBeta;
     }
 }

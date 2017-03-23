@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;

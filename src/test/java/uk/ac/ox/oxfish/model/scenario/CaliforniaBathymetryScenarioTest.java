@@ -71,6 +71,11 @@ public class CaliforniaBathymetryScenarioTest {
 
 
         CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+
+
+        scenario.getExogenousCatches().clear();
+        scenario.getExogenousCatches().put("Dover Sole", String.valueOf(12345678d));
+
         scenario.setResetBiologyAtYear(1);
         FishState state = new FishState(System.currentTimeMillis());
 
@@ -114,6 +119,9 @@ public class CaliforniaBathymetryScenarioTest {
         for (int i = 0; i < 366; i++)
             state.schedule.step(state);
 
+        //innaccurate +-10kg
+        assertEquals(state.getYearlyDataSet().getLatestObservation("Exogenous catches of Dover Sole"),
+                     12345678d,10d);
 
     }
 }

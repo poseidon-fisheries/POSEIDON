@@ -46,6 +46,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -112,7 +113,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * hold size of the boat in kg
      */
-        private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20*1000); // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
+    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20*1000); // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
 
     private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
 
@@ -176,10 +177,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                      new Pair<>("Shortspine thornyhead",1196999.874)
             );
 
-        /*
-       * the speed when fishing is 4.9541 kilometers per hour (2.675 knots) so that we can
-       * guess that an hour consumes 11.652789144 liters of fuel
-       */
+    /*
+   * the speed when fishing is 4.9541 kilometers per hour (2.675 knots) so that we can
+   * guess that an hour consumes 11.652789144 liters of fuel
+   */
     private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 11.652789144d;
     /**
      * gear maker
@@ -250,7 +251,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(0);
+    //136 thousands dollars a year in Variable Costs
+    //0.269835329 proportion of fuel costs over total variable cost         (table 9.1 old catcher vessel report)
+    //1212 hours out on average per DTS boat (table 3.1 of old catcher vessel report)
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(136000d *(1d-0.269835329)/1212d); //81.932669353$ per hour out
 
 
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
@@ -260,6 +264,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
             +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0"
 
             ;
+
+
+    private Map<String, String> exogenousCatches = new HashMap<>();
+    {
+        //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
+        //all for the year 2010
+        exogenousCatches.put("Dover Sole",Double.toString(676.9*1000));
+        exogenousCatches.put("Sablefish",Double.toString(4438.2*1000));
+
+    }
 
     public CaliforniaBathymetryScenario() {
 
@@ -507,6 +521,15 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
 
 
+            //add exogenous catches
+            //first turn map of strings into map of species
+            HashMap<Species,Double>  recast = new HashMap<>();
+            for (Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
+                recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
+            }
+            //start it!
+            AbundanceDrivenFixedExogenousCatches catches = new AbundanceDrivenFixedExogenousCatches(recast);
+            model.registerStartable(catches);
 
 
             return new ScenarioEssentials(biology, map);
@@ -639,7 +662,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                         (DockingListener) (fisher, port1) -> {
                             if (fisher.getHoursAtSea() > 0)
                                 fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
-                                                            /
+                                                            *
                                                             fisher.getHoursAtSea());
                         });
             }
@@ -1129,6 +1152,23 @@ public class CaliforniaBathymetryScenario implements Scenario {
     }
 
 
+    /**
+     * Getter for property 'exogenousCatches'.
+     *
+     * @return Value for property 'exogenousCatches'.
+     */
+    public Map<String, String> getExogenousCatches() {
+        return exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'exogenousCatches'.
+     *
+     * @param exogenousCatches Value to set for property 'exogenousCatches'.
+     */
+    public void setExogenousCatches(Map<String, String> exogenousCatches) {
+        this.exogenousCatches = exogenousCatches;
+    }
 }
 
 
