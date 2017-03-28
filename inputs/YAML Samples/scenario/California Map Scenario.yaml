@@ -24,6 +24,9 @@ California Map Scenario:
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
+  exogenousCatches:
+    Sablefish: '4438200.0'
+    Dover Sole: '676900.0'
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
@@ -95,7 +98,7 @@ California Map Scenario:
   gearStrategy: Never Change Gear
   gridWidth: 50
   holdSizePerBoat: '20000.0'
-  hourlyTravellingCosts: '0.0'
+  hourlyTravellingCosts: '81.93266935313531'
   literPerKilometer: '2.352150571'
   mainDirectory: inputs/california
   networkBuilder:

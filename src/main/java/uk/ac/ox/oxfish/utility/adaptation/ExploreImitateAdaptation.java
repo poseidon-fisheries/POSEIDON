@@ -152,10 +152,13 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             Pair<T, Fisher> imitation = algorithm.imitate(random,
                                                           toAdapt, fitness, current,
                                                           friends, objective, getSensor());
-            if(imitation.getSecond() != null)
+            //if there is somebody to imitate and the imitation does not involve just doing what I am doing anyway
+            if(imitation.getSecond() != null && !imitation.getFirst().equals(current))
+            {
                 imitationStart = new ImitationStart<>(imitation.getSecond(),fitness,imitation.getFirst());
 
-            return imitation.getFirst();
+                return imitation.getFirst();
+            }
 
         }
 

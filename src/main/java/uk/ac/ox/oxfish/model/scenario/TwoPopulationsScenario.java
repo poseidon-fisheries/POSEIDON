@@ -356,7 +356,7 @@ public class TwoPopulationsScenario implements Scenario{
             public void accept(Fisher fisher) {
                 fisher.getTags().add("large");
                 fisher.getTags().add("ship");
-                fisher.getTags().add("orange");
+                fisher.getTags().add("blue");
             }
         });
 

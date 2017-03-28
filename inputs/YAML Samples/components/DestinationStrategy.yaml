@@ -122,6 +122,7 @@ Florida Longliner:
 -------
 Perfect RPUE Logit:
   discretizer: Identity Discretization
+  profitBeta: '1.0'
 -------
 Replicator:
   inertia: '0.8'

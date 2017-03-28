@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightLogisticInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -78,5 +79,61 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
 
     public void setMinCapacityRatio(DoubleParameter minCapacityRatio) {
         this.minCapacityRatio = minCapacityRatio;
+    }
+
+
+    /**
+     * Getter for property 'grower'.
+     *
+     * @return Value for property 'grower'.
+     */
+    public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
+        return delegate.getGrower();
+    }
+
+    /**
+     * Setter for property 'grower'.
+     *
+     * @param grower Value to set for property 'grower'.
+     */
+    public void setGrower(
+            AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
+        delegate.setGrower(grower);
+    }
+
+    /**
+     * Getter for property 'maxInitialCapacity'.
+     *
+     * @return Value for property 'maxInitialCapacity'.
+     */
+    public DoubleParameter getMaxInitialCapacity() {
+        return delegate.getMaxInitialCapacity();
+    }
+
+    /**
+     * Setter for property 'maxInitialCapacity'.
+     *
+     * @param maxInitialCapacity Value to set for property 'maxInitialCapacity'.
+     */
+    public void setMaxInitialCapacity(DoubleParameter maxInitialCapacity) {
+        delegate.setMaxInitialCapacity(maxInitialCapacity);
+    }
+
+    /**
+     * Getter for property 'minInitialCapacity'.
+     *
+     * @return Value for property 'minInitialCapacity'.
+     */
+    public DoubleParameter getMinInitialCapacity() {
+        return delegate.getMinInitialCapacity();
+    }
+
+    /**
+     * Setter for property 'minInitialCapacity'.
+     *
+     * @param minInitialCapacity Value to set for property 'minInitialCapacity'.
+     */
+    public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
+        delegate.setMinInitialCapacity(minInitialCapacity);
     }
 }
