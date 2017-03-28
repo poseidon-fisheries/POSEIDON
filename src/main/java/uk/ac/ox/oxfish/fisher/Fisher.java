@@ -33,10 +33,10 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -202,7 +202,7 @@ public class Fisher implements Steppable, Startable{
                                                                                       fisher ->
                                                                                               fisher.getDailyData().
                                                                                                       getColumn(
-                                                                                                              YearlyFisherTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN).getLatest(),
                                                                                       365);
 */
 
@@ -459,7 +459,7 @@ public class Fisher implements Steppable, Startable{
         getCurrentTrip().recordGasConsumption(litersConsumed);
         Preconditions.checkState(equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride(),
                                  "a boat has lspiRun into negative fuel territory");
-        memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_CONSUMPTION, litersConsumed);
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 
     /**
@@ -498,13 +498,13 @@ public class Fisher implements Steppable, Startable{
         //when you dock you also refill
         final double litersBought = equipment.getBoat().refill();
         status.setFuelEmergencyOverride(false);
-        memory.getYearlyCounter().count(YearlyFisherTimeSeries.HOURS_OUT,status.getHoursAtSea());
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.HOURS_OUT, status.getHoursAtSea());
         //now pay for it
         double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
         spendForTrip(gasExpenditure);
-        memory.getYearlyCounter().count(YearlyFisherTimeSeries.FUEL_EXPENDITURE, gasExpenditure);
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_EXPENDITURE, gasExpenditure);
         if(status.getHoursAtSea()>0) //if you have been somewhere at all
-            memory.getYearlyCounter().count(YearlyFisherTimeSeries.TRIPS,1);
+            memory.getYearlyCounter().count(FisherYearlyTimeSeries.TRIPS, 1);
 
 
         //notify listeners
@@ -515,19 +515,20 @@ public class Fisher implements Steppable, Startable{
 
         //spend money on all new costs
         for(Cost realCosts : additionalTripCosts) {
-            double cost = realCosts.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings());
+            double cost = realCosts.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
             spendForTrip(cost);
         }
         //account for opportunity costs
         for(Cost opportunityCost : opportunityCosts) {
-            double cost = opportunityCost.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings());
+            double cost = opportunityCost.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
             recordOpportunityCosts(cost);
         }
 
 
         //finish trip!
-        memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort() );
-
+        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort());
+        //account for the costs
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
 
         status.setHoursAtSea(0);
         assert  isAtPort();
@@ -731,8 +732,8 @@ public class Fisher implements Steppable, Startable{
                                                                                            here) * hoursSpentFishing;
         consumeFuel(litersBurned);
 
-        memory.getYearlyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);
-        memory.getDailyCounter().count(YearlyFisherTimeSeries.EFFORT,hoursSpentFishing);
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
+        memory.getDailyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
 
 
         return catchOfTheDay;
@@ -778,7 +779,7 @@ public class Fisher implements Steppable, Startable{
 
     }
 
-    public DailyFisherTimeSeries getDailyData() {
+    public FisherDailyTimeSeries getDailyData() {
         return memory.getDailyTimeSeries();
     }
 
@@ -796,7 +797,7 @@ public class Fisher implements Steppable, Startable{
     public void earn(double moneyEarned)
     {
         status.setBankBalance(status.getBankBalance() + moneyEarned);
-        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,moneyEarned);
+        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, moneyEarned);
 
     }
 
@@ -809,7 +810,7 @@ public class Fisher implements Steppable, Startable{
     {
         spendExogenously(moneySpent);
         memory.getTripLogger().recordCosts(moneySpent);
-        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,-moneySpent);
+        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
 
     }
 
@@ -833,7 +834,7 @@ public class Fisher implements Steppable, Startable{
      */
     public void spendExogenously(double moneySpent){
         status.setBankBalance(status.getBankBalance() - moneySpent);
-        getDailyCounter().count(YearlyFisherTimeSeries.CASH_FLOW_COLUMN,-moneySpent);
+        getDailyCounter().count(FisherYearlyTimeSeries.CASH_FLOW_COLUMN, -moneySpent);
 
     }
 
@@ -856,7 +857,7 @@ public class Fisher implements Steppable, Startable{
     public double balanceXDaysAgo(int daysAgo)
     {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
-        return getDailyData().getColumn(YearlyFisherTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+        return getDailyData().getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
     }
 
 

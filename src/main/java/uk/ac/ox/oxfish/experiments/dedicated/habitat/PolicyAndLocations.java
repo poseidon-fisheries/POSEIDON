@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.HalfBycatchFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
@@ -142,7 +142,7 @@ public class PolicyAndLocations
                                                                                                                (a, b) -> a+b)   +
                                 ", " +
                                 simulation.getModel().getYearlyDataSet().
-                                        getColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION).stream().reduce(0d,
+                                        getColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION).stream().reduce(0d,
                                                                                                            (a, b) -> a +b)
                                 + "\n") ;
     }
@@ -193,7 +193,7 @@ public class PolicyAndLocations
         if(histogramFile != null)
             FishStateUtilities.pollHistogramToFile(
                     state.getFishers(), histogramFile,
-                    fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                    fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
             );
 
         return new ExperimentResult(state, FishStateUtilities.gridToCSV(theGrid));

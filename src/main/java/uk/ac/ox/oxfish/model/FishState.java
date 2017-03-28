@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.*;
@@ -79,7 +79,7 @@ public class FishState  extends SimState{
     /**
      * Dataset of all the columns that are updated yearly.
      */
-    private final YearlyFishStateTimeSeries yearlyDataSet = new YearlyFishStateTimeSeries(dailyDataSet);
+    private final FishStateYearlyTimeSeries yearlyDataSet = new FishStateYearlyTimeSeries(dailyDataSet);
 
     /**
      * created by the scenario (optionally, could be null) this object is used to add fishers on the fly.
@@ -485,7 +485,7 @@ public class FishState  extends SimState{
         return dailyDataSet;
     }
 
-    public YearlyFishStateTimeSeries getYearlyDataSet() {
+    public FishStateYearlyTimeSeries getYearlyDataSet() {
         return yearlyDataSet;
     }
 

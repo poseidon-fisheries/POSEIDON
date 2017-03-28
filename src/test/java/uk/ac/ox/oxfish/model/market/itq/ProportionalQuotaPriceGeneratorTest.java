@@ -5,7 +5,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ public class ProportionalQuotaPriceGeneratorTest {
 
 
         Fisher fisher = mock(Fisher.class);
-        when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
+        when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         when(fisher.predictDailyCatches(0)).thenReturn(100d);
         when(fisher.predictDailyCatches(1)).thenReturn(100d);
 

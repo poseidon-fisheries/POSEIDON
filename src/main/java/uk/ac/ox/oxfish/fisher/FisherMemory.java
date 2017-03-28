@@ -19,18 +19,18 @@ public class FisherMemory implements Serializable, FisherStartable {
     /**
      * the data gatherer that fires once a year
      */
-    final YearlyFisherTimeSeries yearlyTimeSeries;
+    final FisherYearlyTimeSeries yearlyTimeSeries;
 
-    public YearlyFisherTimeSeries getYearlyTimeSeries() {
+    public FisherYearlyTimeSeries getYearlyTimeSeries() {
         return yearlyTimeSeries;
     }
 
     /**
      * the data gatherer that fires every day
      */
-    private DailyFisherTimeSeries dailyTimeSeries;
+    private FisherDailyTimeSeries dailyTimeSeries;
 
-    public DailyFisherTimeSeries getDailyTimeSeries() {
+    public FisherDailyTimeSeries getDailyTimeSeries() {
         return dailyTimeSeries;
     }
 
@@ -93,20 +93,21 @@ public class FisherMemory implements Serializable, FisherStartable {
     public FisherMemory(
             LocationMemories<Catch> catchMemories,
             LocationMemories<TripRecord> tripMemories) {
-        yearlyTimeSeries = new YearlyFisherTimeSeries();
+        yearlyTimeSeries = new FisherYearlyTimeSeries();
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
-        this.dailyTimeSeries = new DailyFisherTimeSeries();
+        this.dailyTimeSeries = new FisherDailyTimeSeries();
         this.catchMemories = catchMemories;
         this.tripMemories = tripMemories;
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
-        yearlyCounter.addColumn(YearlyFisherTimeSeries.FUEL_EXPENDITURE);
-        yearlyCounter.addColumn(YearlyFisherTimeSeries.TRIPS);
-        yearlyCounter.addColumn(YearlyFisherTimeSeries.EFFORT);
-        yearlyCounter.addColumn(YearlyFisherTimeSeries.HOURS_OUT);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_EXPENDITURE);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.TRIPS);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.EFFORT);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.HOURS_OUT);
         dailyCounter = new FisherDailyCounter(model.getSpecies().size());
 
         dailyTimeSeries.start(model, fisher);
@@ -148,7 +149,7 @@ public class FisherMemory implements Serializable, FisherStartable {
     public double balanceXDaysAgo(int daysAgo)
     {
         //    Preconditions.checkArgument(dailyTimeSeries.numberOfObservations() >daysAgo);
-        return dailyTimeSeries.getColumn(YearlyFisherTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
+        return dailyTimeSeries.getColumn(FisherYearlyTimeSeries.CASH_COLUMN).getDatumXDaysAgo(daysAgo);
     }
 
 

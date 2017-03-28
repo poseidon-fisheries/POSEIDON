@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
@@ -186,7 +186,7 @@ public class MarketFirstDemo {
                          + "," +
                          String.valueOf(
                                  fisher.getLatestYearlyObservation(
-                                         YearlyFisherTimeSeries.FUEL_CONSUMPTION))
+                                         FisherYearlyTimeSeries.FUEL_CONSUMPTION))
 
                 );
 

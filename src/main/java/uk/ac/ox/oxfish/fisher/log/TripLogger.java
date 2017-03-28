@@ -77,7 +77,7 @@ public class TripLogger implements Startable
     /**
      * log the trip is over
      */
-    public void finishTrip(double hoursAtSea, Port terminal)
+    public TripRecord finishTrip(double hoursAtSea, Port terminal)
     {
 
         //it must have taken more than 0 hours to do a trip
@@ -91,6 +91,8 @@ public class TripLogger implements Startable
         //tell the listeners
         for(TripListener listener : listeners)
             listener.reactToFinishedTrip(currentTrip);
+
+        return currentTrip;
 
     }
 

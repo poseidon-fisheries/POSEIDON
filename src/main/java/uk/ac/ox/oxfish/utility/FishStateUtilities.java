@@ -19,7 +19,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -991,7 +991,7 @@ public class FishStateUtilities {
                                                                             fisher1.isAllowedAtSea() ?
                                                                                     fisher1.getDailyCounter().
                                                                                             getColumn(
-                                                                                                    YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                                                                    FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
                                                                                     :
                                                                                     Double.NaN
                                     ,

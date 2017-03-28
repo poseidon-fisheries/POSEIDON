@@ -4,20 +4,20 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class YearlyFisherTimeSeriesTest {
+public class FisherYearlyTimeSeriesTest {
 
 
     @Test
     public void testCash() throws Exception {
 
-        YearlyFisherTimeSeries yearlyGatherer = new YearlyFisherTimeSeries();
+        FisherYearlyTimeSeries yearlyGatherer = new FisherYearlyTimeSeries();
         Fisher fisher = mock(Fisher.class);
         when(fisher.getHomePort()).thenReturn(mock(Port.class));
         when(fisher.getBankBalance()).thenReturn(0d);

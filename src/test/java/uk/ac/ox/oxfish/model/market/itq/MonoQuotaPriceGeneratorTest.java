@@ -4,7 +4,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ public class MonoQuotaPriceGeneratorTest {
 
 
         Fisher fisher = mock(Fisher.class);
-        when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
+        when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getDayOfTheYear()).thenReturn(364);
         when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
@@ -60,7 +60,7 @@ public class MonoQuotaPriceGeneratorTest {
     public void countingDailyProfits() throws Exception {
 
         Fisher fisher = mock(Fisher.class);
-        when(fisher.getDailyData()).thenReturn(mock(DailyFisherTimeSeries.class));
+        when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Collections.singletonList(new Species("a")));
 

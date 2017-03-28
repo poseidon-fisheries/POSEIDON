@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -65,7 +65,7 @@ public class OsmoseComparativeStatics
                 fishState.schedule.step(fishState);
 
             //print out all biomasses
-            YearlyFishStateTimeSeries yearlyData = fishState.getYearlyDataSet();
+            FishStateYearlyTimeSeries yearlyData = fishState.getYearlyDataSet();
             DataColumn[] data = new DataColumn[fishState.getSpecies().size()];
             for(int i=0; i<data.length; i++)
             {
@@ -99,7 +99,7 @@ public class OsmoseComparativeStatics
                 fishState.schedule.step(fishState);
 
             //print out all biomasses
-            YearlyFishStateTimeSeries yearlyData = fishState.getYearlyDataSet();
+            FishStateYearlyTimeSeries yearlyData = fishState.getYearlyDataSet();
             DataColumn[] data = new DataColumn[fishState.getSpecies().size()];
             for(int i=0; i<data.length; i++)
             {
@@ -133,7 +133,7 @@ public class OsmoseComparativeStatics
                 fishState.schedule.step(fishState);
 
             //print out all biomasses
-            YearlyFishStateTimeSeries yearlyData = fishState.getYearlyDataSet();
+            FishStateYearlyTimeSeries yearlyData = fishState.getYearlyDataSet();
             DataColumn[] data = new DataColumn[fishState.getSpecies().size()];
             for(int i=0; i<data.length; i++)
             {

@@ -39,7 +39,7 @@ public class OpportunityCostsTest {
         for(Fisher fisher : state.getFishers())
             fisher.getOpportunityCosts().add(new Cost() {
                 @Override
-                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue) {
+                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
                     //account for opportunity costs
                     SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
                     double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];
@@ -90,7 +90,7 @@ public class OpportunityCostsTest {
         for(Fisher fisher : state.getFishers())
             fisher.getOpportunityCosts().add(new Cost() {
                 @Override
-                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue) {
+                public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
                     //account for opportunity costs
                     SpecificQuotaRegulation regs = ((SpecificQuotaRegulation) fisher.getRegulation());
                     double biomass = record.getSoldCatch()[regs.getProtectedSpecies().getIndex()];

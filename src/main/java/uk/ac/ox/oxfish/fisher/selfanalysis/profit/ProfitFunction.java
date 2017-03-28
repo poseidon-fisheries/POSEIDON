@@ -105,14 +105,14 @@ public class ProfitFunction {
             earnings += catches[species.getIndex()] * fisher.getHomePort().getMarginalPrice(species,fisher);
 
 
-        double costs = oilCosts.cost(fisher,state,trip,earnings);
+        double costs = oilCosts.cost(fisher,state,trip,earnings,trip.getDurationInHours() );
         for(Cost otherCost : fisher.getAdditionalTripCosts())
-            costs+= otherCost.cost(fisher,state,trip,earnings);
+            costs+= otherCost.cost(fisher,state,trip,earnings,trip.getDurationInHours() );
         trip.recordCosts(costs);
 
         costs = 0;
         for(Cost opportunity : fisher.getOpportunityCosts())
-            costs+= opportunity.cost(fisher,state,trip,earnings);
+            costs+= opportunity.cost(fisher,state,trip,earnings, trip.getDurationInHours());
         trip.recordOpportunityCosts(costs);
 
     }

@@ -6,9 +6,9 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 
@@ -96,7 +96,7 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                         new ToDoubleFunction<Fisher>() {
                             @Override
                             public double applyAsDouble(Fisher value) {
-                                return value.getDailyCounter().getColumn(YearlyFisherTimeSeries.EFFORT);
+                                return value.getDailyCounter().getColumn(FisherYearlyTimeSeries.EFFORT);
                             }
                         }).sum();
             }
@@ -127,7 +127,7 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                         new ToDoubleFunction<Fisher>() {
                             @Override
                             public double applyAsDouble(Fisher value) {
-                                return value.getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                return value.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                             }
                         }).sum() /
                         observed.getFishers().size();

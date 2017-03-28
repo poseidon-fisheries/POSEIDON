@@ -16,8 +16,8 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFishStateTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -354,7 +354,7 @@ public class FirstPaper
         state.schedule.step(state);
         //count the landings
         results[1] = state.getYearlyDataSet().getLatestObservation("Species 0 Landings");
-        results[2] = state.getYearlyDataSet().getLatestObservation(YearlyFisherTimeSeries.FUEL_CONSUMPTION);
+        results[2] = state.getYearlyDataSet().getLatestObservation(FisherYearlyTimeSeries.FUEL_CONSUMPTION);
         //and the average distance to port on the last 30 days!
         DataColumn distances = state.getDailyDataSet().getColumn("Average Distance From Port");
         results[0]=distances.stream().skip(distances.size()-30).
@@ -856,7 +856,7 @@ public class FirstPaper
                                                      outputFolder.resolve(policy+"_"+state.getYear()+"_obs.csv").toFile(),
                                                      fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
                                                      fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                                                     fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                     fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
                 );
         }
         state.schedule.step(state);
@@ -864,7 +864,7 @@ public class FirstPaper
                                              outputFolder.resolve(policy+"_"+state.getYear()+"_obs.csv").toFile(),
                                              fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[0],
                                              fisher -> ((RandomCatchabilityTrawl) fisher.getGear()).getCatchabilityMeanPerSpecie()[1],
-                                             fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                             fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
         );
         //final distributions
         FishStateUtilities.pollHistogramToFile(
@@ -940,7 +940,7 @@ public class FirstPaper
                 fishState.schedule.step(fishState);
 
             //print out all biomasses
-            YearlyFishStateTimeSeries yearlyData = fishState.getYearlyDataSet();
+            FishStateYearlyTimeSeries yearlyData = fishState.getYearlyDataSet();
             DataColumn[] data = new DataColumn[fishState.getSpecies().size()];
             for(int i=0; i<data.length; i++)
             {

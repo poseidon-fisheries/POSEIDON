@@ -1,9 +1,8 @@
 package uk.ac.ox.oxfish.experiments;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
@@ -13,13 +12,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
-
-import static uk.ac.ox.oxfish.experiments.FirstPaper.oil;
 
 /**
  * Created by carrknight on 8/9/16.
@@ -38,7 +32,7 @@ public class CaliforniaGasPrices {
         {
             gasPrice = FishStateUtilities.round5(gasPrice);
             FishState state = run(10,0,gasPrice,new AnarchyFactory());
-            String printOut = FishStateUtilities.printTablePerPort(state, YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+            String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
 
             FileWriter writer = new FileWriter(Paths.get("runs","caligas","simple_"+gasPrice + ".csv").toFile());
             writer.write(printOut);
@@ -60,7 +54,7 @@ public class CaliforniaGasPrices {
             for(long seed =0; seed<30; seed++) {
                 price = FishStateUtilities.round5(price);
                 FishState state = runSableFish(10, seed, price,null);
-                String printOut = FishStateUtilities.printTablePerPort(state, YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
 
                 FileWriter writer = new FileWriter(
                         Paths.get("runs", "caligas","fishitq", "simple_" + price + "_" + seed +".csv").toFile());
@@ -82,7 +76,7 @@ public class CaliforniaGasPrices {
             for(long seed =30; seed<60; seed++) {
                 gasPrice = FishStateUtilities.round5(gasPrice);
                 FishState state = run(10, seed, gasPrice,new AnarchyFactory());
-                String printOut = FishStateUtilities.printTablePerPort(state, YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
 
                 FileWriter writer = new FileWriter(
                         Paths.get("runs", "caligas","anarchy", "simple_" + gasPrice + "_" + seed +".csv").toFile());

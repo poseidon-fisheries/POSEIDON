@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.gui.ScenarioSelector;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
@@ -225,7 +225,7 @@ public class TwoPopulations {
                                                                       @Override
                                                                       public double applyAsDouble(Fisher value) {
                                                                           return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_COLUMN);
+                                                                                  FisherYearlyTimeSeries.CASH_COLUMN);
                                                                       }
                                                                   }).sum(), Double.NaN);
             }

@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFact
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -98,7 +98,7 @@ public class FixedGearsVsTrawlers {
                                                                       @Override
                                                                       public double applyAsDouble(Fisher value) {
                                                                           return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                                                                       }
                                                                   }).sum(), Double.NaN);
 
@@ -128,7 +128,7 @@ public class FixedGearsVsTrawlers {
                                                                       @Override
                                                                       public double applyAsDouble(Fisher value) {
                                                                           return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                                                                       }
                                                                   }).sum(), Double.NaN);
 
@@ -233,7 +233,7 @@ public class FixedGearsVsTrawlers {
                                                                       @Override
                                                                       public double applyAsDouble(Fisher value) {
                                                                           return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                                                                       }
                                                                   }).sum(), Double.NaN);
 
@@ -263,7 +263,7 @@ public class FixedGearsVsTrawlers {
                                                                       @Override
                                                                       public double applyAsDouble(Fisher value) {
                                                                           return value.getLatestYearlyObservation(
-                                                                                  YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                                                                       }
                                                                   }).sum(), Double.NaN);
 

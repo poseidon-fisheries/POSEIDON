@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DailyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 
 import static org.mockito.Mockito.*;
 
@@ -38,7 +38,7 @@ public class YearlyIterativeDestinationStrategyTest {
 
 
 
-        DailyFisherTimeSeries data = mock(DailyFisherTimeSeries.class);
+        FisherDailyTimeSeries data = mock(FisherDailyTimeSeries.class);
         when(data.numberOfObservations()).thenReturn(8000);
         when(fisher.getDailyData()).thenReturn(data);
 

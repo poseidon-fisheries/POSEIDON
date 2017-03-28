@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
-import uk.ac.ox.oxfish.fisher.DockingListener;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
@@ -25,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -45,7 +45,7 @@ import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -120,22 +120,27 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
 
 
+    //old thinking:
     //1104.39389 liters of gasoline consumed each day
     //385.5864 kilometers a day if you cruise the whole time
     // = about 2.86 liter per kilometer
-
     //291.75 gallons consumed each day
     //10 miles per hour, 240 miles a day
     // 1.21 gallon per mile
-
     //These numbers however are higher than they should be because I am assuming fishers cruise
     //the whole time so I am just going to assume 1 gallon a day
     // 3.78541 liters / 1.60934 km
     // 2.352150571 liters per km
-    private DoubleParameter literPerKilometer = new FixedDoubleParameter(2.352150571);
 
 
-    private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.811008583); //grabbed online on Friday March 18
+    //new thinking:
+    //liters per hour 57 (toft)
+    //kph 16.0661
+    //liter per km : 57/16.0661
+    private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
+
+
+    private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.667606393); //january 2010
 
 
     /**
@@ -178,10 +183,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
             );
 
     /*
-   * the speed when fishing is 4.9541 kilometers per hour (2.675 knots) so that we can
-   * guess that an hour consumes 11.652789144 liters of fuel
+   * fuel efficiency per hour is 57l according to Toft et al
    */
-    private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 11.652789144d;
+    private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
     /**
      * gear maker
      */
@@ -259,9 +263,16 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
 
+    /*
     //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
     private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
-            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0"
+            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0";
+    */
+
+    //these prices are averages from the catcher vessel report
+    //2010
+    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502"
+            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181"
 
             ;
 
@@ -648,7 +659,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                         fisher.isAllowedAtSea() ?
                                                                                 fisher.getDailyCounter().
                                                                                         getColumn(
-                                                                                                YearlyFisherTimeSeries.CASH_FLOW_COLUMN)
+                                                                                                FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
                                                                                 :
                                                                                 Double.NaN
                                 ,
@@ -658,13 +669,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 fisherList.add(newFisher);
 
                 //add other trip costs
-                newFisher.addDockingListener(
-                        (DockingListener) (fisher, port1) -> {
-                            if (fisher.getHoursAtSea() > 0)
-                                fisher.spendForTrip(hourlyTravellingCosts.apply(model.getRandom())
-                                                            *
-                                                            fisher.getHoursAtSea());
-                        });
+                newFisher.getAdditionalTripCosts().add(
+                        new HourlyCost(hourlyTravellingCosts.apply(random))
+                );
             }
 
 

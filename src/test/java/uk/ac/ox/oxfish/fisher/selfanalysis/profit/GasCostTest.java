@@ -39,7 +39,7 @@ public class GasCostTest {
                     @Override
                     public void reactToFinishedTrip(TripRecord record) {
                         System.out.println("day : " + state.getDay());
-                        assertEquals(cost.cost(fisher,state,record,0d),
+                        assertEquals(cost.cost(fisher,state,record,0d,fisher.getHoursAtSea() ),
                                      record.getTotalCosts(),.001d);
                         TripRecord simulated = simulator.simulateRecord(fisher, record.getMostFishedTileInTrip(),
                                                                         state, 24 * 5,

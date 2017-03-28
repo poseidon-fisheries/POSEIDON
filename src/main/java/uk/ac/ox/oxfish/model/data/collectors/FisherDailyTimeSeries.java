@@ -11,14 +11,14 @@ import uk.ac.ox.oxfish.model.market.AbstractMarket;
  * Dataset for each fisher being updated once a day
  * Created by carrknight on 8/4/15.
  */
-public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
+public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
 
-    public static final String CASH_COLUMN = YearlyFisherTimeSeries.CASH_COLUMN;
+    public static final String CASH_COLUMN = FisherYearlyTimeSeries.CASH_COLUMN;
 
 
 
-    public DailyFisherTimeSeries() {
+    public FisherDailyTimeSeries() {
         super(IntervalPolicy.EVERY_DAY);
 
     }
@@ -40,8 +40,8 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
         }, Double.NaN);
 
 
-        registerGatherer( YearlyFisherTimeSeries.CASH_FLOW_COLUMN,
-                          new Gatherer<Fisher>() {
+        registerGatherer(FisherYearlyTimeSeries.CASH_FLOW_COLUMN,
+                         new Gatherer<Fisher>() {
 
                               double oldCash = observed.getBankBalance();
 
@@ -50,7 +50,7 @@ public class DailyFisherTimeSeries extends TimeSeries<Fisher> {
             double flow = fisher.getBankBalance() - oldCash;
             oldCash = fisher.getBankBalance();
             return flow;
-        }},Double.NaN);
+        }}, Double.NaN);
 
 
         for(Species species : state.getSpecies())

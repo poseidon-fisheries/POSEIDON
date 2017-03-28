@@ -20,15 +20,15 @@ public class HourlyCost implements Cost{
 
     /**
      * computes and return the cost
-     *
-     * @param fisher  agent that did the trip
+     *  @param fisher  agent that did the trip
      * @param model
      * @param record  the trip record
      * @param revenue revenue from catches   @return $ spent
+     * @param durationInHours
      */
     @Override
     public double cost(
-            Fisher fisher, FishState model, TripRecord record, double revenue) {
-        return hourlyCost * record.getDurationInHours();
+            Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
+        return hourlyCost * durationInHours;
     }
 }

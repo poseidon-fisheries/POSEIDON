@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
 import java.util.*;
@@ -81,7 +81,7 @@ public class PortListInitializer implements PortInitializer {
                                                                           @Override
                                                                           public double applyAsDouble(Fisher value) {
                                                                               return value.getLatestYearlyObservation(
-                                                                                      YearlyFisherTimeSeries.CASH_FLOW_COLUMN);
+                                                                                      FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
                                                                           }
                                                                       }).sum() /
                                                                       fishers.size();

@@ -35,7 +35,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.geography.ports.RandomPortFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -400,13 +400,13 @@ public class TwoPopulationsScenario implements Scenario{
                                                   fishState -> fishState.getFishers().stream().
                                                           filter(fisher -> fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  YearlyFisherTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
+                                                                  FisherYearlyTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
 
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
                                                   fishState -> fishState.getFishers().stream().
                                                           filter(fisher -> !fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  YearlyFisherTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
+                                                                  FisherYearlyTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
 
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), largeFishersFactory );

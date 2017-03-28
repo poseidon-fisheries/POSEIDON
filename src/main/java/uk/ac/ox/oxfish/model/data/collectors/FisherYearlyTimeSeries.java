@@ -21,7 +21,7 @@ import java.util.LinkedList;
  *     <li> NET_CASH_FLOW</li>
  * </ul>
  */
-public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
+public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
 {
 
 
@@ -29,13 +29,14 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
     public static final String CASH_FLOW_COLUMN = "NET_CASH_FLOW";
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
     public static final String FUEL_EXPENDITURE = "FUEL_EXPENDITURE";
+    public static final String VARIABLE_COSTS = "VARIABLE_COSTS";
     public static final String TRIPS = "NUMBER_OF_TRIPS";
     public static final String EFFORT = "HOURS_OF_EFFORT";
     public static final String FISHING_DISTANCE = "DISTANCE_TOW_TO_PORT";
     public static final String TRIP_DURATION = "MEAN_TRIP_DURATION";
     public static final String HOURS_OUT = "HOURS_AT_SEA";
 
-    public YearlyFisherTimeSeries() {
+    public FisherYearlyTimeSeries() {
         super(IntervalPolicy.EVERY_YEAR);
     }
 
@@ -68,6 +69,9 @@ public class YearlyFisherTimeSeries extends TimeSeries<Fisher>
 
         registerGatherer(FUEL_EXPENDITURE,
                          fisher -> observed.getYearlyCounterColumn(FUEL_EXPENDITURE),Double.NaN);
+
+        registerGatherer(VARIABLE_COSTS,
+                         fisher -> observed.getYearlyCounterColumn(VARIABLE_COSTS),Double.NaN);
 
         registerGatherer(TRIPS,
                          fisher -> observed.getYearlyCounterColumn(TRIPS),Double.NaN);

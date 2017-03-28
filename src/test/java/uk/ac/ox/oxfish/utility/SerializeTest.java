@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.junit.After;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -64,12 +64,12 @@ public class SerializeTest {
         assertEquals(800,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(800,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
-        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                      state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                      state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
-        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
 
@@ -113,8 +113,8 @@ public class SerializeTest {
 
         for(int id=0; id<state.getFishers().size(); id++)
         {
-            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                         state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                         state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                          .001);
         }
 
@@ -131,8 +131,8 @@ public class SerializeTest {
             Log.info("step " + i);
             for(int id=0; id<state.getFishers().size(); id++)
             {
-                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                             state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                              .001);
             }
 
@@ -145,12 +145,12 @@ public class SerializeTest {
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
-        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
-        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
     }
 
@@ -187,8 +187,8 @@ public class SerializeTest {
 
         for(int id=0; id<state.getFishers().size(); id++)
         {
-            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                         state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                         state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                          .001);
         }
 
@@ -205,8 +205,8 @@ public class SerializeTest {
             Log.info("step " + i);
             for(int id=0; id<state.getFishers().size(); id++)
             {
-                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                             state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                              .001);
             }
 
@@ -219,12 +219,12 @@ public class SerializeTest {
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
-        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
-        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
     }
 
@@ -263,8 +263,8 @@ public class SerializeTest {
 
         for(int id=0; id<state.getFishers().size(); id++)
         {
-            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                         state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+            assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                         state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                          .001);
         }
 
@@ -280,8 +280,8 @@ public class SerializeTest {
 
             for(int id=0; id<state.getFishers().size(); id++)
             {
-                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                             state2.getFishers().get(id).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                              .001);
             }
 
@@ -295,12 +295,12 @@ public class SerializeTest {
         assertEquals(40,state.getFishers().get(5).getDailyData().numberOfObservations());
         assertEquals(40,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
-        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getLatestYearlyObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
-        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
-                     state2.getFishers().get(5).getDailyData().getLatestObservation(YearlyFisherTimeSeries.CASH_COLUMN),
+        assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
     }
 

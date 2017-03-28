@@ -12,15 +12,15 @@ public class GasCost implements Cost{
 
     /**
      * computes and return the cost
-     *
-     * @param fisher  agent that did the trip
+     *  @param fisher  agent that did the trip
      * @param model
-     *@param record  the trip record
+     * @param record  the trip record
      * @param revenue revenue from catches
-     *                @return $ spent
+     * @param durationInHours
+     * @return $ spent
      */
     @Override
-    public double cost(Fisher fisher, FishState model, TripRecord record, double revenue) {
+    public double cost(Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
         return record.getLitersOfGasConsumed() * fisher.getHomePort().getGasPricePerLiter();
     }
 

@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -40,27 +40,27 @@ public class CaliforniaFuelExpenditures {
 
         FishStateUtilities.pollHistogramToFile(
                 state.getFishers(), MAIN_DIRECTORY.resolve("fuel.csv").toFile(),
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FUEL_EXPENDITURE)
+                fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.FUEL_EXPENDITURE)
 
         );
         FishStateUtilities.pollHistogramToFile(
                 state.getFishers(), MAIN_DIRECTORY.resolve("trips.csv").toFile(),
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIPS)
+                fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)
 
         );
         FishStateUtilities.pollHistogramToFile(
                 state.getFishers(), MAIN_DIRECTORY.resolve("effort.csv").toFile(),
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.EFFORT)
+                fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.EFFORT)
 
         );
         FishStateUtilities.pollHistogramToFile(
                 state.getFishers(), MAIN_DIRECTORY.resolve("distance.csv").toFile(),
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.FISHING_DISTANCE)
+                fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.FISHING_DISTANCE)
 
         );
         FishStateUtilities.pollHistogramToFile(
                 state.getFishers(), MAIN_DIRECTORY.resolve("duration.csv").toFile(),
-                fisher -> fisher.getLatestYearlyObservation(YearlyFisherTimeSeries.TRIP_DURATION)
+                fisher -> fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIP_DURATION)
 
         );
 

@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.biology.initializer.factory.OsmoseBiologyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.OsmoseMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.YearlyFisherTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -89,7 +89,7 @@ public class EfficiencyInLocation
                         stream().reduce(0.0,Double::sum);
 
                 double fuel = state.getYearlyDataSet().
-                        getColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION).
+                        getColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION).
                         stream().reduce(0.0,Double::sum);
 
                 writer.write(probability.getClass().getSimpleName() +
@@ -146,7 +146,7 @@ public class EfficiencyInLocation
                         stream().reduce(0.0, Double::sum);
 
                 fuels[i] = state.getYearlyDataSet().
-                        getColumn(YearlyFisherTimeSeries.FUEL_CONSUMPTION).
+                        getColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION).
                         stream().reduce(0.0, Double::sum);
 
             }

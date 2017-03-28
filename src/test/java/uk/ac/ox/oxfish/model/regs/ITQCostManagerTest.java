@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import org.jfree.util.Log;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -99,7 +98,7 @@ public class ITQCostManagerTest {
 
         TripRecord record = mock(TripRecord.class);
         when(record.getSoldCatch()).thenReturn(new double[]{5,3});
-        assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1), .001);
+        assertEquals(35, costManager.cost(mock(Fisher.class), model, record, -1,1 ), .001);
 
     }
 }
