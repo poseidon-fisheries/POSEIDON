@@ -48,6 +48,7 @@ Double Normal Selectivity Gear:
   dscWidth: '6.78'
   finalScaling: .NaN
   initialScaling: .NaN
+  litersOfGasConsumedPerHour: '0.0'
   peak: '23.53'
   retentionAsymptote: '1.0'
   retentionInflection: '28.11'

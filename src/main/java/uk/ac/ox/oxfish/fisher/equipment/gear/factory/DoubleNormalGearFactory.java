@@ -345,4 +345,22 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
     public void setAverageCatchability(DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
     }
+
+    /**
+     * Getter for property 'litersOfGasConsumedPerHour'.
+     *
+     * @return Value for property 'litersOfGasConsumedPerHour'.
+     */
+    public DoubleParameter getLitersOfGasConsumedPerHour() {
+        return litersOfGasConsumedPerHour;
+    }
+
+    /**
+     * Setter for property 'litersOfGasConsumedPerHour'.
+     *
+     * @param litersOfGasConsumedPerHour Value to set for property 'litersOfGasConsumedPerHour'.
+     */
+    public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
+        this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
+    }
 }

@@ -113,7 +113,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * hold size of the boat in kg
      */
-    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20*1000); // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
+    // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
+    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20000);
 
     private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
 
@@ -191,15 +192,20 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     private AlgorithmFactory<? extends Gear> gear =
             new GarbageGearFactory();
+
+    //this catchability (with no rounding) comes from the calicatch_2010 maximization, trying to equate catches and effort
+    public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
+            // implied by stock assessment: 0.00156832676d;
+
     {
         //numbers all come from stock assessment
         ((GarbageGearFactory) gear).setDelegate(
                 new HeterogeneousGearFactory(
                         new Pair<>("Dover Sole",
-                                   new DoubleNormalGearFactory(38.953,-1.483,3.967,
-                                                               -0.764,Double.NaN,-2.259,
-                                                               0d,50d,1d,26.962,1.065,0.869,
-                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)),
+                                   new DoubleNormalGearFactory(38.953, -1.483, 3.967,
+                                                               -0.764, Double.NaN, -2.259,
+                                                               0d, 50d, 1d, 26.962, 1.065, 0.869,
+                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR, DEFAULT_CATCHABILITY)),
                         new Pair<>("Longspine Thornyhead",
                                    new LogisticSelectivityGearFactory(23.5035,
                                                                       9.03702,
@@ -207,12 +213,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                       1.7773,
                                                                       0.992661,
                                                                       LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                      0.00156832676d)),
+                                                                      DEFAULT_CATCHABILITY)),
                         //todo change this
                         new Pair<>("Sablefish",
 
-                                   new SablefishGearFactory(0.00156832676d,
-                                                            45.5128, 3.12457,0.910947,
+                                   new SablefishGearFactory(DEFAULT_CATCHABILITY,
+                                                            45.5128, 3.12457, 0.910947,
                                                             LITERS_OF_GAS_CONSUMED_PER_HOUR)
                         )
                         ,
@@ -221,10 +227,11 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                                                4.85,Double.NaN,Double.NaN,
                                                                0d,75d,1d,23.74,2.42,1d,
                                                                LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                               0.00156832676d)),
+                                                               DEFAULT_CATCHABILITY)),
                         new Pair<>("Yelloweye Rockfish",
-                                   new LogisticSelectivityGearFactory(36.364,14.009,
-                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,0.00156832676d)
+                                   new LogisticSelectivityGearFactory(36.364, 14.009,
+                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                      DEFAULT_CATCHABILITY)
                         )
 
                 )

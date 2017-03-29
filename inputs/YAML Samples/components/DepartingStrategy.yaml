@@ -35,6 +35,9 @@ Unified Amateurish Dynamic Programming:
   learningRate: '2.5E-4'
   noiseRate: '0.02'
 -------
+Max Hours Per Year:
+  maxHoursOut: '1200.0'
+-------
 WFS Longline:
   intercept: '-3.626'
   summer: '0.439'

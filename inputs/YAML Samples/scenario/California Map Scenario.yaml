@@ -32,7 +32,7 @@ California Map Scenario:
       daysAtSea: '5.0'
   fixedRecruitmentDistribution: false
   fuelTankInLiters: '45519.577'
-  gasPricePerLiter: '0.811008583'
+  gasPricePerLiter: '0.667606393'
   gear:
     Garbage Gear:
       delegate:
@@ -41,13 +41,14 @@ California Map Scenario:
             Shortspine Thornyhead:
               Double Normal Selectivity Gear:
                 ascWidth: '4.25'
-                averageCatchability: '0.00156832676'
+                averageCatchability: '1.0E-4'
                 binMax: '75.0'
                 binMin: '0.0'
                 binWidth: '1.0'
                 dscWidth: '4.85'
                 finalScaling: .NaN
                 initialScaling: .NaN
+                litersOfGasConsumedPerHour: '57.0'
                 peak: '28.05'
                 retentionAsymptote: '1.0'
                 retentionInflection: '23.74'
@@ -55,8 +56,8 @@ California Map Scenario:
                 top: '-0.3'
             Yelloweye Rockfish:
               Logistic Selectivity Gear:
-                averageCatchability: '0.00156832676'
-                litersOfGasConsumedPerHour: '11.652789144'
+                averageCatchability: '1.0E-4'
+                litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: null
                 retentionInflection: null
                 retentionSlope: null
@@ -64,21 +65,22 @@ California Map Scenario:
                 selectivityBParameter: '14.009'
             Sablefish:
               Sablefish Trawl Selectivity Gear:
-                averageCatchability: '0.00156832676'
-                litersOfGasConsumedPerHour: '11.652789144'
+                averageCatchability: '1.0E-4'
+                litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.910947'
                 retentionInflection: '45.5128'
                 retentionSlope: '3.12457'
             Dover Sole:
               Double Normal Selectivity Gear:
                 ascWidth: '3.967'
-                averageCatchability: '0.00156832676'
+                averageCatchability: '1.0E-4'
                 binMax: '50.0'
                 binMin: '0.0'
                 binWidth: '1.0'
                 dscWidth: '-0.764'
                 finalScaling: -2.259
                 initialScaling: .NaN
+                litersOfGasConsumedPerHour: '57.0'
                 peak: '38.953'
                 retentionAsymptote: '0.869'
                 retentionInflection: '26.962'
@@ -86,8 +88,8 @@ California Map Scenario:
                 top: '-1.483'
             Longspine Thornyhead:
               Logistic Selectivity Gear:
-                averageCatchability: '0.00156832676'
-                litersOfGasConsumedPerHour: '11.652789144'
+                averageCatchability: '1.0E-4'
+                litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
                 retentionSlope: '1.7773'
@@ -97,9 +99,9 @@ California Map Scenario:
       proportionSimulatedToGarbage: '0.3221743'
   gearStrategy: Never Change Gear
   gridWidth: 50
-  holdSizePerBoat: '20000.0'
+  holdSizePerBoat: '9022.520144'
   hourlyTravellingCosts: '81.93266935313531'
-  literPerKilometer: '2.352150571'
+  literPerKilometer: '3.547842974'
   mainDirectory: inputs/california
   networkBuilder:
     Equal Out Degree:
@@ -107,7 +109,7 @@ California Map Scenario:
       degree: '2.0'
       equalOutDegree: true
   portFileName: dts_ports_2010.csv
-  priceMap: Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587,Others:1.0
+  priceMap: Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502,Others:1.7646181
   recruitmentNoise: '0.0'
   regulation:
     Multi-Quotas from Map:

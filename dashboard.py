@@ -21,14 +21,14 @@ def main():
 
     # copy paste
     assert os.path.isdir("./build/reports/tests/")
-    reportDirectory = sys.argv[2] + "/assets/oxfish/reports/" + sys.argv[1] + "/"
+    reportDirectory = sys.argv[2] + "/poseidon/reports/" + sys.argv[1] + "/"
     shutil.copytree("./build/reports/tests/", reportDirectory)
 
-    with open(sys.argv[2] + "/assets/oxfish/dashboards/dashboards.txt", "a") as masterlist:
+    with open(sys.argv[2] + "/poseidon/dashboards/dashboards.txt", "a") as masterlist:
         masterlist.write(sys.argv[1] + ".html\n")
 
     os.chdir(sys.argv[2])
-    subprocess.call([git_command,"add","assets/oxfish/*"])
+    subprocess.call([git_command,"add","poseidon/*"])
     subprocess.call([git_command,"commit","-m",' "added dashboard ' + sys.argv[1] + ' "'])
     subprocess.call([git_command,"push"])
 

@@ -49,6 +49,12 @@ public class DepartingStrategies {
                   "Unified Amateurish Dynamic Programming");
 
 
+        CONSTRUCTORS.put("Max Hours Per Year",
+                         MaxHoursPerYearDepartingFactory::new);
+        NAMES.put(MaxHoursPerYearDepartingFactory.class,
+                  "Max Hours Per Year");
+
+
 
         CONSTRUCTORS.put("WFS Longline",
                          LonglineFloridaLogisticDepartingFactory::new);
