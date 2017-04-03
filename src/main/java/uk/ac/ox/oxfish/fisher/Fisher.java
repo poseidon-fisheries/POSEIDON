@@ -498,6 +498,7 @@ public class Fisher implements Steppable, Startable{
         //when you dock you also refill
         final double litersBought = equipment.getBoat().refill();
         status.setFuelEmergencyOverride(false);
+        status.setExogenousEmergencyOverride(false);
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.HOURS_OUT, status.getHoursAtSea());
         //now pay for it
         double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
@@ -903,14 +904,6 @@ public class Fisher implements Steppable, Startable{
 
     public void removeTripListener(TripListener listener) {
         memory.getTripLogger().removeTripListener(listener);
-    }
-
-    public void recordTripCutShort() {
-        memory.getTripLogger().recordTripCutShort();
-    }
-
-    public void recordEarnings(int specieIndex,double biomass ,double newEarnings) {
-        memory.getTripLogger().recordEarnings(specieIndex, biomass, newEarnings);
     }
 
 
@@ -1337,5 +1330,24 @@ public class Fisher implements Steppable, Startable{
 
     public SocialNetwork getSocialNetwork() {
         return state.getSocialNetwork();
+    }
+
+
+    /**
+     * Getter for property 'exogenousEmergencyOverride'.
+     *
+     * @return Value for property 'exogenousEmergencyOverride'.
+     */
+    public boolean isExogenousEmergencyOverride() {
+        return status.isExogenousEmergencyOverride();
+    }
+
+    /**
+     * Setter for property 'exogenousEmergencyOverride'.
+     *
+     * @param exogenousEmergencyOverride Value to set for property 'exogenousEmergencyOverride'.
+     */
+    public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
+        status.setExogenousEmergencyOverride(exogenousEmergencyOverride);
     }
 }

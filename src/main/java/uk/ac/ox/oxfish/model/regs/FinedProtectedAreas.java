@@ -44,14 +44,19 @@ public class FinedProtectedAreas extends ProtectedAreasOnly{
 
         super.reactToFishing(where, who, fishCaught, hoursSpentFishing);
         assert who.isCheater(); //you must be willing to cheat to even be here!
-
+        assert !who.isExogenousEmergencyOverride(); // you wouldn't have been caught already during this trip!
 
         Enforcement enforcement = enforcements.get(where.grabMPA());
         Preconditions.checkState(enforcement!= null, "not a registered MPA!");
 
         for (int i = 0; i < hoursSpentFishing; i++)
-            if(random.nextBoolean(enforcement.getHourlyProbabilityOfBeingCaught()))
+            if(random.nextBoolean(enforcement.getHourlyProbabilityOfBeingCaught())) {
+            //you pay a fine
                 who.spendForTrip(enforcement.getFine());
+                //you are sent back home
+                who.setExogenousEmergencyOverride(true);
+
+            }
     }
 
 

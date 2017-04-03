@@ -27,6 +27,12 @@ public class FisherStatus implements Serializable {
      */
     private SeaTile location;
 
+    /**
+     * set by events (right now by enforcement).
+     * It forces agents back to port!
+     */
+    private boolean exogenousEmergencyOverride = false;
+
     public SeaTile getLocation() {
         return location;
     }
@@ -174,9 +180,13 @@ public class FisherStatus implements Serializable {
         this.weatherEmergencyOverride = weatherEmergencyOverride;
     }
 
+    /**
+     * whenever any of these flag is set to true, the agent just goes back home
+     * @return
+     */
     public boolean isAnyEmergencyFlagOn()
     {
-        return fuelEmergencyOverride || weatherEmergencyOverride;
+        return fuelEmergencyOverride || weatherEmergencyOverride || exogenousEmergencyOverride;
     }
 
     public FisherStatus(
@@ -219,6 +229,7 @@ public class FisherStatus implements Serializable {
         this.network = network;
         this.bankBalance = 0;
         this.fuelEmergencyOverride = false;
+        this.exogenousEmergencyOverride=false;
         network = null;
     }
 
@@ -277,5 +288,24 @@ public class FisherStatus implements Serializable {
      */
     public boolean isAllowedToFishHere(Fisher agent, SeaTile tile, FishState model) {
         return regulation.canFishHere(agent, tile, model);
+    }
+
+
+    /**
+     * Getter for property 'exogenousEmergencyOverride'.
+     *
+     * @return Value for property 'exogenousEmergencyOverride'.
+     */
+    public boolean isExogenousEmergencyOverride() {
+        return exogenousEmergencyOverride;
+    }
+
+    /**
+     * Setter for property 'exogenousEmergencyOverride'.
+     *
+     * @param exogenousEmergencyOverride Value to set for property 'exogenousEmergencyOverride'.
+     */
+    public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
+        this.exogenousEmergencyOverride = exogenousEmergencyOverride;
     }
 }

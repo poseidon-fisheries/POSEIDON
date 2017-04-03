@@ -17,7 +17,7 @@ def main():
 
     
     os.system(" ".join(['Rscript', '-e', '"rmarkdown::render(\'./inputs/dashboard2/dashboard.Rmd\')"']))
-    shutil.move("./inputs/dashboard2/dashboard.html",sys.argv[2] + "/assets/oxfish/dashboards/" + sys.argv[1] +".html")
+    shutil.move("./inputs/dashboard2/dashboard.html",sys.argv[2] + "/poseidon/dashboards/" + sys.argv[1] +".html")
 
     # copy paste
     assert os.path.isdir("./build/reports/tests/")
