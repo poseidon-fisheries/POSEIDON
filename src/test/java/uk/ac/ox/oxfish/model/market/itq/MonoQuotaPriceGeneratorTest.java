@@ -28,7 +28,7 @@ public class MonoQuotaPriceGeneratorTest {
         when(model.getDayOfTheYear()).thenReturn(364);
         when(model.getSpecies()).thenReturn(Arrays.asList(new Species("a"), new Species("b"),
                                                           new Species("c"), new Species("d")));
-        MonoQuotaRegulation regulation = new MonoQuotaRegulation(100, model);
+        MonoQuotaRegulation regulation = new MonoQuotaRegulation(100);
         when(fisher.getRegulation()).thenReturn(regulation);
 
         when(fisher.predictUnitProfit(3)).thenReturn(10d);
@@ -64,7 +64,7 @@ public class MonoQuotaPriceGeneratorTest {
         FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Collections.singletonList(new Species("a")));
 
-        MonoQuotaRegulation regulation = new MonoQuotaRegulation(200, model);
+        MonoQuotaRegulation regulation = new MonoQuotaRegulation(200);
         when(fisher.getRegulation()).thenReturn(regulation);
 
         when(fisher.probabilitySumDailyCatchesBelow(0, 200, 2)).thenReturn(.5); //50%

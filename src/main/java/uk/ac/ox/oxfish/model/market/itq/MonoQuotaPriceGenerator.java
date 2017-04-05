@@ -7,6 +7,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.MonoQuotaRegulation;
+import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
+import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A simple method to compute quota values for agents. Works in isolation, that is considers the value of a quota
@@ -59,7 +65,19 @@ public class MonoQuotaPriceGenerator implements PriceGenerator, Steppable
         this.fisher = fisher;
         this.state = model;
         //only works with the right kind of regulation!
-        quotas = ((MonoQuotaRegulation) fisher.getRegulation());
+        if(fisher.getRegulation() instanceof MonoQuotaRegulation)
+            quotas = (MonoQuotaRegulation) fisher.getRegulation();
+        else
+            //todo make this better
+        //ugly hack to deal with multiple regulations: just grab the first one that shows up!
+            quotas = (MonoQuotaRegulation)
+                    ((MultipleRegulations) fisher.getRegulation()).getRegulations().stream().filter(
+                    new Predicate<Regulation>() {
+                        @Override
+                        public boolean test(Regulation regulation) {
+                            return regulation instanceof QuotaPerSpecieRegulation;
+                        }
+                    }).collect(Collectors.toList()).get(0);
 
 
         receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);

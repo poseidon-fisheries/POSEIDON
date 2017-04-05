@@ -40,7 +40,7 @@ public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 
         final Double yearlyQuota = quota.apply(state.random);
         final MonoQuotaRegulation quotaRegulation =
-                modelQuota.presentKey(state, () -> new MonoQuotaRegulation(yearlyQuota, state));
+                modelQuota.presentKey(state, () -> new MonoQuotaRegulation(yearlyQuota));
 
         //if it has not been consumed (probably because the model still has to start) then:
         if(quotaRegulation.getQuotaRemaining(0) > 0 &&

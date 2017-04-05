@@ -41,7 +41,7 @@ California Map Scenario:
             Shortspine Thornyhead:
               Double Normal Selectivity Gear:
                 ascWidth: '4.25'
-                averageCatchability: '1.0E-4'
+                averageCatchability: '0.00156832676'
                 binMax: '75.0'
                 binMin: '0.0'
                 binWidth: '1.0'
@@ -56,7 +56,7 @@ California Map Scenario:
                 top: '-0.3'
             Yelloweye Rockfish:
               Logistic Selectivity Gear:
-                averageCatchability: '1.0E-4'
+                averageCatchability: '0.00156832676'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: null
                 retentionInflection: null
@@ -65,7 +65,7 @@ California Map Scenario:
                 selectivityBParameter: '14.009'
             Sablefish:
               Sablefish Trawl Selectivity Gear:
-                averageCatchability: '1.0E-4'
+                averageCatchability: '0.00156832676'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.910947'
                 retentionInflection: '45.5128'
@@ -73,7 +73,7 @@ California Map Scenario:
             Dover Sole:
               Double Normal Selectivity Gear:
                 ascWidth: '3.967'
-                averageCatchability: '1.0E-4'
+                averageCatchability: '0.00156832676'
                 binMax: '50.0'
                 binMin: '0.0'
                 binWidth: '1.0'
@@ -88,7 +88,7 @@ California Map Scenario:
                 top: '-1.483'
             Longspine Thornyhead:
               Logistic Selectivity Gear:
-                averageCatchability: '1.0E-4'
+                averageCatchability: '0.00156832676'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
@@ -99,7 +99,7 @@ California Map Scenario:
       proportionSimulatedToGarbage: '0.3221743'
   gearStrategy: Never Change Gear
   gridWidth: 50
-  holdSizePerBoat: '9022.520144'
+  holdSizePerBoat: '20000.0'
   hourlyTravellingCosts: '81.93266935313531'
   literPerKilometer: '3.547842974'
   mainDirectory: inputs/california

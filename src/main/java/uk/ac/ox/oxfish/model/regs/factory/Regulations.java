@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -86,6 +87,10 @@ public class Regulations
 
         CONSTRUCTORS.put("Open/Close Shodan from File", ShodanFromFileFactory::new);
         NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
+
+
+        CONSTRUCTORS.put("Multiple Regulations", MultipleRegulationsFactory::new);
+        NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");
 
 
 

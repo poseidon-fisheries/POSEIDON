@@ -28,7 +28,7 @@ public class ITQOrderBookTest {
         orderBook.setUnitsTradedPerMatch(100);
 
         //first guy values quota 100: he will buy for 90 and sell for 110
-        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100, state);
+        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100);
         Fisher buyer = mock(Fisher.class);
         when(buyer.getRegulation()).thenReturn(buyerReg);
         MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -36,7 +36,7 @@ public class ITQOrderBookTest {
         orderBook.registerTrader(buyer,buyerGenerator);
 
         //the second guy values quota 10: he will buy for 9 and sell for 11
-        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(100, state);
+        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(100);
         Fisher seller = mock(Fisher.class);
         when(seller.getRegulation()).thenReturn(sellerReg);
         MonoQuotaPriceGenerator sellerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -87,7 +87,7 @@ public class ITQOrderBookTest {
         orderBook.setUnitsTradedPerMatch(100);
 
         //first guy values quota 10: he will buy for 9 and sell for 11
-        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100, state);
+        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100);
         Fisher buyer = mock(Fisher.class);
         when(buyer.getRegulation()).thenReturn(buyerReg);
         MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -95,7 +95,7 @@ public class ITQOrderBookTest {
         orderBook.registerTrader(buyer,buyerGenerator);
 
         //the second guy is the same. No trading will occurr
-        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(100, state);
+        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(100);
         Fisher seller = mock(Fisher.class);
         when(seller.getRegulation()).thenReturn(sellerReg);
         MonoQuotaPriceGenerator sellerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -134,7 +134,7 @@ public class ITQOrderBookTest {
         orderBook.setUnitsTradedPerMatch(100);
 
         //first guy values quota 100: he will buy for 90 and sell for 110
-        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100, state);
+        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(100);
         Fisher buyer = mock(Fisher.class);
         when(buyer.getRegulation()).thenReturn(buyerReg);
         MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -142,7 +142,7 @@ public class ITQOrderBookTest {
         orderBook.registerTrader(buyer,buyerGenerator);
 
         //the second guy values quota 10: but inPenaltyBox not enough to sell
-        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(50, state);
+        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(50);
         Fisher seller = mock(Fisher.class);
         when(seller.getRegulation()).thenReturn(sellerReg);
         MonoQuotaPriceGenerator sellerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -188,7 +188,7 @@ public class ITQOrderBookTest {
         MonoQuotaRegulation regs[] = new MonoQuotaRegulation[5];
         for(int i=0; i<5;i++)
         {
-            regs[i] = new MonoQuotaRegulation(100, state);
+            regs[i] = new MonoQuotaRegulation(100);
             Fisher fisher = mock(Fisher.class);
             when(fisher.getRegulation()).thenReturn(regs[i]);
             MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -229,7 +229,7 @@ public class ITQOrderBookTest {
         orderBook.setAllowMultipleTradesPerFisher(true);
 
         //first guy values quota 100 at first, but only 1 the second time!
-        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(500, state);
+        MonoQuotaRegulation buyerReg = new MonoQuotaRegulation(500);
         Fisher buyer = mock(Fisher.class);
         when(buyer.getRegulation()).thenReturn(buyerReg);
         MonoQuotaPriceGenerator buyerGenerator = mock(MonoQuotaPriceGenerator.class);
@@ -237,7 +237,7 @@ public class ITQOrderBookTest {
         orderBook.registerTrader(buyer,buyerGenerator);
 
         //the second guy values quota 10: he will buy for 9 and sell for 11
-        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(500, state);
+        MonoQuotaRegulation sellerReg = new MonoQuotaRegulation(500);
         Fisher seller = mock(Fisher.class);
         when(seller.getRegulation()).thenReturn(sellerReg);
         MonoQuotaPriceGenerator sellerGenerator = mock(MonoQuotaPriceGenerator.class);

@@ -66,4 +66,7 @@ public interface Regulation extends FisherStartable
      * @return
      */
     Regulation makeCopy();
+
+
+
 }

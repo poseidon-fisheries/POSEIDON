@@ -26,6 +26,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
 
     private String hourlyFines = "100,2000";
 
+    private boolean canContemplateCheating = false;
 
     /**
      * makes sure you only schedule yourself to build the MPAs once
@@ -56,7 +57,7 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
                     @Override
                     public FinedProtectedAreas get() {
 
-                        FinedProtectedAreas regs = new FinedProtectedAreas(state.getRandom());
+                        FinedProtectedAreas regs = new FinedProtectedAreas(state.getRandom(),canContemplateCheating);
 
 
                         List<Double> probabilities =
@@ -78,9 +79,9 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
                             public void start(FishState model) {
                                 for (int i=0; i<mpas.size(); i++) {
                                     MasonGeometry geometry = mpas.get(i).buildMPA(model.getMap());
-                                    regs.registerMPA(geometry,
-                                                     probabilities.get(i),
-                                                     fines.get(i));
+                                    regs.registerEnforcement(geometry,
+                                                             probabilities.get(i),
+                                                             fines.get(i));
 
                                 }
                             }
@@ -153,5 +154,23 @@ public class FinedProtectedAreasFactory implements AlgorithmFactory<FinedProtect
      */
     public void setMpas(List<StartingMPA> mpas) {
         this.mpas = mpas;
+    }
+
+    /**
+     * Getter for property 'canContemplateCheating'.
+     *
+     * @return Value for property 'canContemplateCheating'.
+     */
+    public boolean isCanContemplateCheating() {
+        return canContemplateCheating;
+    }
+
+    /**
+     * Setter for property 'canContemplateCheating'.
+     *
+     * @param canContemplateCheating Value to set for property 'canContemplateCheating'.
+     */
+    public void setCanContemplateCheating(boolean canContemplateCheating) {
+        this.canContemplateCheating = canContemplateCheating;
     }
 }

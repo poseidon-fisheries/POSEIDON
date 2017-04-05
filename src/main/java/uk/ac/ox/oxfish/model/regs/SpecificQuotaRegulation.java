@@ -24,7 +24,7 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * @param state       the model link to schedule on
      */
     public SpecificQuotaRegulation(double yearlyQuota, FishState state, Species species) {
-        super(yearlyQuota, state);
+        super(yearlyQuota);
         this.protectedSpecies = species;
     }
 

@@ -13,6 +13,7 @@ MPA Chromosome:
 -------
 MPA with fine:
   beingCaughtProbability: 1,.2
+  canContemplateCheating: false
   hourlyFines: '100,2000'
   mpas:
   - height: 5
@@ -84,4 +85,15 @@ Single Species PID Taxation:
 -------
 Open/Close Shodan from File:
   pathToXml: /home/carrknight/code/oxfish/inputs/biomassQ.xml
+-------
+Multiple Regulations:
+  factories:
+  - Mono-ITQ:
+      individualQuota: '2500.0'
+  - MPA Only:
+      startingMPAs: [
+        ]
+  tags:
+  - all
+  - all
 -------

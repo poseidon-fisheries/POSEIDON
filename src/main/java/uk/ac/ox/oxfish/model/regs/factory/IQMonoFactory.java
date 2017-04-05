@@ -25,7 +25,7 @@ public class IQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
      */
     @Override
     public MonoQuotaRegulation apply(FishState state) {
-        return new MonoQuotaRegulation(individualQuota.apply(state.random),state);
+        return new MonoQuotaRegulation(individualQuota.apply(state.random));
     }
 
     public DoubleParameter getIndividualQuota() {

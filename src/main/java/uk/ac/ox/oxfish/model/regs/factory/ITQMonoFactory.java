@@ -11,8 +11,6 @@ import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -74,8 +72,8 @@ public class ITQMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
             }
         });
 
-        MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom()),
-                                                               state) {
+        MonoQuotaRegulation toReturn = new MonoQuotaRegulation(individualQuota.apply(state.getRandom())
+        ) {
 
             @Override
             public void start(FishState model, Fisher fisher) {

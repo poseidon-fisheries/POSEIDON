@@ -32,13 +32,12 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     /**
      * when created it sets itself to step every year to reset the quota
      * @param yearlyQuota the yearly quota
-     * @param state the model link to schedule on
+     *
      */
     //todo turn regulations into startable so they don't need a fish-state reference
-    public MonoQuotaRegulation(double yearlyQuota, FishState state) {
+    public MonoQuotaRegulation(double yearlyQuota) {
         this.yearlyQuota = yearlyQuota;
         this.quotaRemaining = yearlyQuota;
-        state.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
     }
 
     private boolean isFishingStillAllowed(){
@@ -150,11 +149,12 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public Regulation makeCopy() {
-        return new MonoQuotaRegulation(yearlyQuota, null); //todo turn into startable so this makes more sense
+        return new MonoQuotaRegulation(yearlyQuota);
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
+        model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
 
     }
 

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PricingPolicy;
+import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.util.HashMap;
@@ -107,7 +108,8 @@ public class ITQMarketBuilder  implements Startable
 
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers()) {
-            if (traders.contains(fisher.getRegulation())) {
+            //todo remove this ugly hack~!
+           if (traders.contains(fisher.getRegulation()) || fisher.getRegulation() instanceof MultipleRegulations) {
                 PriceGenerator reservationPricer = priceGeneratorMaker.get();
                 reservationPricer.start(model, fisher);
                 market.registerTrader(fisher, reservationPricer);

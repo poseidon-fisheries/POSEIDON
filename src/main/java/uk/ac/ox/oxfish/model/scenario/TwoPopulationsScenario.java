@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.geography.ports.RandomPortFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -296,10 +297,6 @@ public class TwoPopulationsScenario implements Scenario{
             port.setGasPricePerLiter(gasPricePerLiter.apply(random));
 
 
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
-        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
-
 
         //create the fisher factory object, this is for the small fishers
         FisherFactory smallFisherFactory = new FisherFactory(
@@ -323,7 +320,7 @@ public class TwoPopulationsScenario implements Scenario{
         //create a factory for the large boats too
         FisherFactory largeFishersFactory = new FisherFactory(
                 getLargePortSupplier(random, ports),
-                regulationLarge,
+                separateRegulations ? regulationLarge : regulationSmall,
                 departingStrategyLarge,
                 destinationStrategyLarge,
                 fishingStrategy,
@@ -340,7 +337,10 @@ public class TwoPopulationsScenario implements Scenario{
         );
 
 
-        //add predictors
+        //adds predictors to the fisher if the usepredictors flag is up.
+        //without predictors agents do not participate in ITQs
+        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
+
         smallFisherFactory.getAdditionalSetups().add(predictorSetup);
         largeFishersFactory.getAdditionalSetups().add(predictorSetup);
         //add tags
@@ -359,7 +359,6 @@ public class TwoPopulationsScenario implements Scenario{
                 fisher.getTags().add("blue");
             }
         });
-
 
 
 
@@ -397,16 +396,34 @@ public class TwoPopulationsScenario implements Scenario{
 
 
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
-                                                  fishState -> fishState.getFishers().stream().
+                                                  fishState ->
+                                                          fishState.getFishers().stream().
                                                           filter(fisher -> fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  FisherYearlyTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
+                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
 
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
                                                   fishState -> fishState.getFishers().stream().
                                                           filter(fisher -> !fisher.getTags().contains("small")).
                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  FisherYearlyTimeSeries.CASH_COLUMN)).sum(), Double.NaN);
+                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
+
+        for(Species species : biology.getSpecies())
+        {
+            model.getYearlyDataSet().registerGatherer("Small Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                                                      fishState -> fishState.getFishers().stream().
+                                                              filter(fisher -> fisher.getTags().contains("small")).
+                                                              mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                      species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+
+            model.getYearlyDataSet().registerGatherer("Large Fishers " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                                                      fishState -> fishState.getFishers().stream().
+                                                              filter(fisher -> !fisher.getTags().contains("small")).
+                                                              mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                      species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+
+        }
 
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), largeFishersFactory );
@@ -775,6 +792,7 @@ public class TwoPopulationsScenario implements Scenario{
     public void setSeparatePorts(boolean separatePorts) {
         this.separatePorts = separatePorts;
     }
+
 
 
 }
