@@ -27,6 +27,8 @@ public class BoatPortrayalFactory
 
     private final BufferedImage shipIcon;
 
+    private final BufferedImage canoeIcon;
+
     private final FishGUI gui;
 
     private final static HashMap<String,Color> colors = new HashMap<>();
@@ -48,6 +50,7 @@ public class BoatPortrayalFactory
     public BoatPortrayalFactory(FishGUI gui) throws IOException {
         boatIcon = ImageIO.read(FishGUI.IMAGES_PATH.resolve("boat.png").toFile());
         shipIcon= ImageIO.read(FishGUI.IMAGES_PATH.resolve("ship.png").toFile());
+        canoeIcon= ImageIO.read(FishGUI.IMAGES_PATH.resolve("canoe.png").toFile());
         this.gui=gui;
     }
 
@@ -57,24 +60,23 @@ public class BoatPortrayalFactory
     public BoatPortrayal build(Fisher fisher)
     {
 
-        //need a color?
-        if(!fisher.getTags().stream().filter(s -> s.equalsIgnoreCase("ship")).findFirst().isPresent()) {
-            for (Map.Entry<String, Color> color : colors.entrySet()) {
-                if (fisher.getTags().stream().filter(s -> s.equalsIgnoreCase(color.getKey())).findFirst().isPresent())
-                    return new BoatPortrayal(colorImage(boatIcon, color.getValue()),gui);
-            }
-            return new BoatPortrayal(boatIcon,gui);
-        }
+        BufferedImage correctImage;
+        if(fisher.getTags().contains("ship"))
+            correctImage = shipIcon;
+        else if(fisher.getTags().contains("canoe"))
+            correctImage = canoeIcon;
         else
-        {
-            for (Map.Entry<String, Color> color : colors.entrySet())
-            {
-                if (fisher.getTags().stream().filter(s -> s.equalsIgnoreCase(color.getKey())).findFirst().isPresent())
-                    return new BoatPortrayal(colorImage(shipIcon, color.getValue()),gui);
-            }
-            return new BoatPortrayal(shipIcon,gui);
+            correctImage = shipIcon;
 
+        for (Map.Entry<String, Color> color : colors.entrySet()) {
+            if (fisher.getTags().contains(color.getKey()))
+                return new BoatPortrayal(colorImage(correctImage, color.getValue()), gui);
         }
+        //there is no color
+        return new BoatPortrayal(correctImage,gui);
+
+
+
 
     }
 

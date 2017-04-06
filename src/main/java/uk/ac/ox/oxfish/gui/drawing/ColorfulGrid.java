@@ -80,8 +80,9 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
         setSelectedEncoding("Depth");
 
-        defaultFishColors.add(Color.RED);
+
         defaultFishColors.add(Color.BLUE);
+        defaultFishColors.add(Color.RED);
         defaultFishColors.add(Color.ORANGE);
         defaultFishColors.add(Color.YELLOW);
     }

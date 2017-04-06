@@ -48,6 +48,21 @@ From Left To Right Logistic:
   minInitialCapacity: '0.0'
   percentageLimitOnDailyMovement: '0.01'
 -------
+From Left To Right Logistic with Climate Change:
+  carryingCapacity: '5000.0'
+  climateChangePercentageMovement: '0.001'
+  differentialPercentageToMove: '0.001'
+  grower:
+    Independent Logistic Grower:
+      steepness: uniform 0.6 0.8
+  maxInitialCapacity: '1.0'
+  minCapacityRatio: '0.2'
+  minInitialCapacity: '0.0'
+  northMigration: 1
+  percentageLimitOnDailyMovement: '0.01'
+  speciesAffectedByClimateChange: 0
+  westMigration: 1
+-------
 From Left To Right Well-Mixed:
   firstSpeciesName: Species 0
   maximumBiomass: '5000.0'

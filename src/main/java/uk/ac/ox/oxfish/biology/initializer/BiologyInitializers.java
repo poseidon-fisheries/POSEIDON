@@ -51,6 +51,10 @@ public class BiologyInitializers {
                          FromLeftToRightLogisticFactory::new);
         NAMES.put(FromLeftToRightLogisticFactory.class,"From Left To Right Logistic");
 
+        CONSTRUCTORS.put("From Left To Right Logistic with Climate Change",
+                         FromLeftToRightLogisticPlusClimateChangeFactory::new);
+        NAMES.put(FromLeftToRightLogisticPlusClimateChangeFactory.class,"From Left To Right Logistic with Climate Change");
+
         CONSTRUCTORS.put("From Left To Right Well-Mixed",
                          FromLeftToRightMixedFactory::new);
         NAMES.put(FromLeftToRightMixedFactory.class,"From Left To Right Well-Mixed");

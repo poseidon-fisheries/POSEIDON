@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.CarryingCapacityDiffuser;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -289,6 +290,9 @@ public class PrototypeScenario implements Scenario {
         //substitute back the original randomizer
         model.random = random;
 
+
+
+
         return new ScenarioEssentials(global,map);
     }
 
@@ -387,8 +391,6 @@ public class PrototypeScenario implements Scenario {
 
         assert fisherList.size()==fishers;
         assert fisherFactory.getNextID()==fishers;
-
-
 
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );

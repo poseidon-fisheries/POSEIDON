@@ -348,7 +348,8 @@ public class TwoPopulationsScenario implements Scenario{
             @Override
             public void accept(Fisher fisher) {
                 fisher.getTags().add("small");
-                fisher.getTags().add("black");
+                fisher.getTags().add("yellow");
+                fisher.getTags().add("canoe");
             }
         });
         largeFishersFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
@@ -356,7 +357,7 @@ public class TwoPopulationsScenario implements Scenario{
             public void accept(Fisher fisher) {
                 fisher.getTags().add("large");
                 fisher.getTags().add("ship");
-                fisher.getTags().add("blue");
+                fisher.getTags().add("red");
             }
         });
 

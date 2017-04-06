@@ -122,7 +122,7 @@ public class BiomassDiffuser  implements Steppable {
      * @param map the map object
      * @return a bag with all the neighbors
      */
-    private List<SeaTile> getUsefulNeighbors(SeaTile tile, NauticalMap map)
+    public static List<SeaTile> getUsefulNeighbors(SeaTile tile, NauticalMap map)
     {
         final Bag mooreNeighbors = map.getMooreNeighbors(tile, 1);
         List<SeaTile> toKeep = new LinkedList<>();

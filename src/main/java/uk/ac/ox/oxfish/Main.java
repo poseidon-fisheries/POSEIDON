@@ -27,6 +27,7 @@ class Main{
 
 
     public static final long SEED = System.currentTimeMillis();
+    public static final int STEPS_PER_DAY = 1;
 
     //main
     public static void main(String[] args) throws IOException {
@@ -171,7 +172,7 @@ class Main{
             public void actionPerformed(ActionEvent e) {
                 assert SwingUtilities.isEventDispatchThread();
                 System.out.println(SwingUtilities.isEventDispatchThread());
-                FishState state = new FishState(SEED, 1);
+                FishState state = new FishState(SEED, STEPS_PER_DAY);
                 FishGUI vid = new FishGUI(state);
                 Console c = new Console(vid);
                 scenarioSelection.setEnabled(false);
@@ -190,7 +191,7 @@ class Main{
         scenarioSelection.setVisible(true);
 
         if(instantiate[0]==true) {
-            FishState state = new FishState(SEED, 1);
+            FishState state = new FishState(SEED, STEPS_PER_DAY);
             Log.set(Log.LEVEL_INFO);
             Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
 
