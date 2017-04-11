@@ -140,9 +140,16 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
     {
 
         double differential = from.getCarryingCapacity(species) * dailyMigration;
+        double biomassMovement = Math.min(from.getBiomass(species),differential);
 
+        //move the fish out
+        from.setCurrentBiomass(species,from.getBiomass(species)-biomassMovement);
+        //destroy habitat
         from.setCarryingCapacity(species,from.getCarryingCapacity(species)-differential);
         to.setCarryingCapacity(species,to.getCarryingCapacity(species)+ differential);
+        //move the fish in
+        to.setCurrentBiomass(species,to.getBiomass(species)+biomassMovement);
+
     }
 
     private static enum Direction

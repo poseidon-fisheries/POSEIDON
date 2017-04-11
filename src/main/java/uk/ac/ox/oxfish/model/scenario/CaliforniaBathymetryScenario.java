@@ -141,7 +141,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
 
 
-    private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.667606393); //january 2010
+    private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.694094345);
+    //average diesel retail 2010
+    // from https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_SCA_DPG&f=M
 
 
     /**
@@ -193,7 +195,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private AlgorithmFactory<? extends Gear> gear =
             new GarbageGearFactory();
 
-    //this catchability (with no rounding) comes from the calicatch_2010 maximization, trying to equate catches and effort
     public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
             // implied by stock assessment: 0.00156832676d;
 

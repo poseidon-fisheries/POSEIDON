@@ -86,6 +86,8 @@ public class NarrativeBest
                     state.getYearlyDataSet().getColumn("Average Cash-Flow"),
                     state.getYearlyDataSet().getColumn("Small Fishers Total Income"),
                     state.getYearlyDataSet().getColumn("Large Fishers Total Income"),
+                    state.getYearlyDataSet().getColumn("Small Fishers Total Effort"),
+                    state.getYearlyDataSet().getColumn("Large Fishers Total Effort"),
                     state.getYearlyDataSet().getColumn("Large Fishers Species 0 Landings"),
                     state.getYearlyDataSet().getColumn("Small Fishers Species 0 Landings")
             );

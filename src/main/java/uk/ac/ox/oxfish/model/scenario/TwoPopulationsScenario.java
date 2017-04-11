@@ -35,6 +35,8 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.geography.ports.RandomPortFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -54,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Created by carrknight on 7/25/16.
@@ -399,9 +402,9 @@ public class TwoPopulationsScenario implements Scenario{
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
                                                   fishState ->
                                                           fishState.getFishers().stream().
-                                                          filter(fisher -> fisher.getTags().contains("small")).
-                                                          mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+                                                                  filter(fisher -> fisher.getTags().contains("small")).
+                                                                  mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                          FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
 
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Income",
                                                   fishState -> fishState.getFishers().stream().
@@ -424,7 +427,55 @@ public class TwoPopulationsScenario implements Scenario{
                                                               mapToDouble(value -> value.getLatestYearlyObservation(
                                                                       species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
 
+
+
         }
+
+        //count effort too!
+        DataColumn smallEffort
+                = model.getDailyDataSet().registerGatherer("Small Fishers Total Effort",
+                                                           new Gatherer<FishState>() {
+                                                               @Override
+                                                               public Double apply(FishState ignored) {
+                                                                   return model.getFishers().stream().
+                                                                           filter(fisher -> fisher.getTags().contains(
+                                                                                   "small")).
+                                                                           mapToDouble(
+                                                                                   new ToDoubleFunction<Fisher>() {
+                                                                                       @Override
+                                                                                       public double applyAsDouble(
+                                                                                               Fisher value) {
+                                                                                           return value.getDailyCounter().getColumn(
+                                                                                                   FisherYearlyTimeSeries.EFFORT);
+                                                                                       }
+                                                                                   }).sum();
+                                                               }
+                                                           }, 0d);
+        model.getYearlyDataSet().registerGatherer("Small Fishers Total Effort",
+                                                  FishStateUtilities.generateYearlySum(smallEffort),Double.NaN);
+        DataColumn largeEffort
+                = model.getDailyDataSet().registerGatherer("Large Fishers Total Effort",
+                                                           new Gatherer<FishState>() {
+                                                               @Override
+                                                               public Double apply(FishState ignored) {
+                                                                   return model.getFishers().stream().
+                                                                           filter(fisher -> fisher.getTags().contains(
+                                                                                   "large")).
+                                                                           mapToDouble(
+                                                                                   new ToDoubleFunction<Fisher>() {
+                                                                                       @Override
+                                                                                       public double applyAsDouble(
+                                                                                               Fisher value) {
+                                                                                           return value.getDailyCounter().getColumn(
+                                                                                                   FisherYearlyTimeSeries.EFFORT);
+                                                                                       }
+                                                                                   }).sum();
+                                                               }
+                                                           }, 0d);
+        model.getYearlyDataSet().registerGatherer("Large Fishers Total Effort",
+                                                  FishStateUtilities.generateYearlySum(largeEffort),Double.NaN);
+
+
 
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), largeFishersFactory );
