@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesFloridaDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FloridaLogitReturnFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
@@ -182,7 +183,16 @@ public class OsmoseWFSScenario implements Scenario{
      * factory to produce fishing strategy
      */
     private AlgorithmFactory<? extends FishingStrategy> handlinerFishingStrategy =
-            new MaximumStepsFactory();
+            new FloridaLogitReturnFactory();
+    {
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setIntercept(new FixedDoubleParameter(-3.47701));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(0.92395));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.65122));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setRatioCatchToFishHold(new FixedDoubleParameter(-4.37828));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setWeekendDummy(new FixedDoubleParameter(-0.24437));
+
+
+    }
 
     private AlgorithmFactory<? extends GearStrategy> handlinerGearStrategy =
             new FixedGearStrategyFactory();
@@ -211,7 +221,16 @@ public class OsmoseWFSScenario implements Scenario{
      * factory to produce fishing strategy
      */
     private AlgorithmFactory<? extends FishingStrategy> longlinerFishingStrategy =
-            new MaximumStepsFactory();
+            new FloridaLogitReturnFactory();
+
+    {
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setIntercept(new FixedDoubleParameter(-2.74969d));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(-0.12476));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.28232));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setRatioCatchToFishHold(new FixedDoubleParameter(4.53092));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setWeekendDummy(new FixedDoubleParameter(-0.15556));
+
+    }
 
     private AlgorithmFactory<? extends GearStrategy> longlinerGearStrategy =
             new FixedGearStrategyFactory();

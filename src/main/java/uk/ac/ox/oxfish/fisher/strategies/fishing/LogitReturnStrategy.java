@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * Use a logit classifier to judge whether or not to return to port.
@@ -54,6 +55,9 @@ public class LogitReturnStrategy  implements FishingStrategy{
         //do not return if you haven't done any fishing yet
         if(currentTrip.getEffort() ==0)
             return true;
+        //always return if full
+        if(fisher.getTotalWeightOfCatchInHold()/fisher.getMaximumHold()>=1d- FishStateUtilities.EPSILON)
+            return false;
         //otherwise check if you want to continue by calling the logit
         //should I fish is the inverse of should I return
         return ! shouldIReturnClassifier.test(fisher, model, fisher.getLocation(), random);

@@ -27,6 +27,8 @@ public class FishingStrategies {
         NAMES.put(FishUntilFullFactory.class,"Fish Until Full");
         CONSTRUCTORS.put("Until Full With Day Limit", MaximumStepsFactory::new);
         NAMES.put(MaximumStepsFactory.class,"Until Full With Day Limit");
+        CONSTRUCTORS.put("WFS Logit Return", FloridaLogitReturnFactory::new);
+        NAMES.put(FloridaLogitReturnFactory.class,"WFS Logit Return");
 
     }
 

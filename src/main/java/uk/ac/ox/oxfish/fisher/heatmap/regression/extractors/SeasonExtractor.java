@@ -23,7 +23,7 @@ public class SeasonExtractor implements ObservationExtractor
     public double extract(
             SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
         return Season.season(
-                getSimulationDayFromHoursSinceStart(timeOfObservation,model)
+                getDayOfTheYearFromHoursSinceStart(timeOfObservation, model)
         ).equals(correctSeason) ? 1d : 0d;
     }
 
@@ -42,11 +42,11 @@ public class SeasonExtractor implements ObservationExtractor
         //get the steps
         double steps = hoursSinceStart / model.getHoursPerStep();
         //get days passed
-        int days = (int) (steps * model.getStepsPerDay());
+        int days = (int) (steps / model.getStepsPerDay());
 */
 
 //simplifies to this
-        return  (int) (hoursSinceStart * model.getStepsPerDay() * model.getStepsPerDay() / 24d);
+        return  (int) (hoursSinceStart / 24d);
 
     }
 
@@ -56,8 +56,8 @@ public class SeasonExtractor implements ObservationExtractor
      * @param model
      * @return
      */
-    public static int getSimulationDayFromHoursSinceStart(double hoursSinceStart,
-                                                          FishState model)
+    public static int getDayOfTheYearFromHoursSinceStart(double hoursSinceStart,
+                                                         FishState model)
     {
 
 

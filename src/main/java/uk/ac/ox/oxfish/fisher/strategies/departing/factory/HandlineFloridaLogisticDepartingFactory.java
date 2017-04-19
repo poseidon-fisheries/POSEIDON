@@ -63,14 +63,7 @@ public class HandlineFloridaLogisticDepartingFactory implements AlgorithmFactory
                         ),
                         //weekend
                         new Pair<>(
-                                new ObservationExtractor() {
-                                    @Override
-                                    public double extract(SeaTile tile, double timeOfObservation, Fisher agent,
-                                                          FishState model) {
-                                        return SeasonExtractor.getDaySinceStartFromHoursSinceStart(timeOfObservation,model) % 7
-                                                >=5 ? 1 : 0;
-                                    }
-                                },
+                                new WeekendExtractor(),
                                 weekend.apply(state.getRandom())
 
                         ),
