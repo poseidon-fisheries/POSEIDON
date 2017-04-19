@@ -89,11 +89,11 @@ public class Hold {
         }
     }
 
-    public double getTotalPoundsCarried() {
+    public double getTotalWeightOfCatchInHold() {
         return tonnesCarried;
     }
 
-    public double getPoundsCarried(Species species) {
+    public double getWeightOfCatchInHold(Species species) {
         return fishHold[species.getIndex()];
     }
 

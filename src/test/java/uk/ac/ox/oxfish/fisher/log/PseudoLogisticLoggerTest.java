@@ -25,7 +25,7 @@ public class PseudoLogisticLoggerTest {
     public void logs() throws Exception {
 
         FishState state = MovingTest.generateSimple4x4Map();
-        when(state.getDay()).thenReturn(0d);
+        when(state.getDay()).thenReturn(0);
         MapDiscretization discretization = new MapDiscretization(
                 new SquaresMapDiscretizer(3,3));
         discretization.discretize(state.getMap());
@@ -56,7 +56,7 @@ public class PseudoLogisticLoggerTest {
         destination = state.
                 getMap().getSeaTile(0, 1);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
-        when(state.getDay()).thenReturn(100d);
+        when(state.getDay()).thenReturn(100);
         logger.reactToFinishedTrip(record);
 
         System.out.print(log.getData().toString());

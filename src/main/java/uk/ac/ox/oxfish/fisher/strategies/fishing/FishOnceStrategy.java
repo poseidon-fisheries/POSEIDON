@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -17,17 +18,14 @@ public class FishOnceStrategy implements FishingStrategy {
      * not to continue fishing
      *
      *
-     * @param equipment
-     * @param status
-     *@param memory
      * @param random the randomizer
-     * @param model  the model itself   @return true if the fisher should fish here, false otherwise
+     * @param model  the model itself
+     * @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, MersenneTwisterFast random,
-            FishState model) {
-        return equipment.getTotalPoundsCarried() == 0;
+            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        return currentTrip.getEffort()<=0;
     }
 
     @Override

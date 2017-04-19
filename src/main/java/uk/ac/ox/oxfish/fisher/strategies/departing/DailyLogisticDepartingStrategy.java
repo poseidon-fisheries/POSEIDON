@@ -64,7 +64,7 @@ public class DailyLogisticDepartingStrategy implements DepartingStrategy {
         if(fisher.getHoursAtPort() < daysToWait * 24)
             return false;
         //time for a check!
-        boolean check = classifier.test(fisher,model,null,random);
+        boolean check = classifier.test(fisher,model,fisher.getHomePort().getLocation(),random);
         if(check)
             daysToWait=0;
         else

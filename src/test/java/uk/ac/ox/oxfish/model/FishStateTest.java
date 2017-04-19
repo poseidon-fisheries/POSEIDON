@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
+import org.mockito.MockSettings;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -96,6 +97,24 @@ public class FishStateTest {
 
 
 
+    }
+
+    @Test
+    public void hoursSinceStartWorks() throws Exception {
+
+
+        Scenario scenario = mock(Scenario.class, RETURNS_DEEP_STUBS);
+        FishState state = new FishState(System.currentTimeMillis(),2);
+        state.setScenario(scenario);
+
+        state.start();
+        while(state.getDay()<366)
+            state.schedule.step(state);
+        assertEquals(2,state.getDayOfTheYear());
+        assertEquals(1,state.getYear());
+        assertEquals(366,state.getDay(),.001d);
+        //midnight is the previous day, so that the first valid step for day 366 will be at 12pm
+        assertEquals(8784+12,state.getHoursSinceStart(),0.0001d);
     }
 
     @Test

@@ -61,12 +61,12 @@ public class FisherEquipment implements Serializable {
         this.gear = gear;
     }
 
-    public double getTotalPoundsCarried() {
-        return hold.getTotalPoundsCarried();
+    public double getTotalWeightOfCatchInHold() {
+        return hold.getTotalWeightOfCatchInHold();
     }
 
-    public double getPoundsCarried(Species species) {
-        return hold.getPoundsCarried(species);
+    public double getWeightOfCatchInHold(Species species) {
+        return hold.getWeightOfCatchInHold(species);
     }
 
     public double getMaximumLoad() {

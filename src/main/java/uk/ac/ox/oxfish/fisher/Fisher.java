@@ -646,11 +646,10 @@ public class Fisher implements Steppable, Startable{
 
     public boolean shouldIFish(FishState state)
     {
-        return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(equipment,
-                                                                            status,
-                                                                            memory,
-                                                                            grabRandomizer(),
-                                                                            state);
+        return !status.isAnyEmergencyFlagOn() && fishingStrategy.shouldFish(this,
+                                                                            state.getRandom(),
+                                                                            state,
+                                                                            getCurrentTrip());
 
     }
 
@@ -670,7 +669,7 @@ public class Fisher implements Steppable, Startable{
      * @return lbs of species carried
      */
     public double getPoundsCarried(Species species) {
-        return equipment.getHold().getPoundsCarried(species);
+        return equipment.getHold().getWeightOfCatchInHold(species);
     }
 
     /**
@@ -678,7 +677,7 @@ public class Fisher implements Steppable, Startable{
      * @return pounds carried
      */
     public double getPoundsCarried() {
-        return equipment.getHold().getTotalPoundsCarried();
+        return equipment.getHold().getTotalWeightOfCatchInHold();
     }
 
     /**
@@ -1349,5 +1348,13 @@ public class Fisher implements Steppable, Startable{
      */
     public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
         status.setExogenousEmergencyOverride(exogenousEmergencyOverride);
+    }
+
+    public double getTotalWeightOfCatchInHold() {
+        return equipment.getTotalWeightOfCatchInHold();
+    }
+
+    public double getWeightOfCatchInHold(Species species) {
+        return equipment.getWeightOfCatchInHold(species);
     }
 }

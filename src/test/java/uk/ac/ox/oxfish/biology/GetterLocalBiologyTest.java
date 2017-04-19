@@ -17,14 +17,14 @@ public class GetterLocalBiologyTest {
         Species species = mock(Species.class);
         GetterLocalBiology localBiology =
                 new GetterLocalBiology(species,
-                                       state -> 10 + state.getDay());
+                                       state -> 10d + state.getDay());
 
         FishState state = mock(FishState.class);
         localBiology.start(state);
 
-        when(state.getDay()).thenReturn(0d);
+        when(state.getDay()).thenReturn(0);
         assertEquals(localBiology.getBiomass(species),10d,.001);
-        when(state.getDay()).thenReturn(10d);
+        when(state.getDay()).thenReturn(10);
         assertEquals(localBiology.getBiomass(species),20d,.001);
 
 

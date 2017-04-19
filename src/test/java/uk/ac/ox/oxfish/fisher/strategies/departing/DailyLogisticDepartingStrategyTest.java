@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +32,7 @@ public class DailyLogisticDepartingStrategyTest {
 
         //true gets propagated
         when(classifier.test(any(),any(),any(),any())).thenReturn(true);
-        Fisher fisher = mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
         when(fisher.getHoursAtPort()).thenReturn(0d);
 
         //always true

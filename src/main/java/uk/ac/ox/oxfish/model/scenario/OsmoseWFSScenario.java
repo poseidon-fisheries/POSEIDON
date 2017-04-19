@@ -20,8 +20,10 @@ import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogisticLogbookFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.HandlineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesFloridaDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
@@ -152,13 +154,28 @@ public class OsmoseWFSScenario implements Scenario{
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> handlinerDepartingStrategy =
-            new LonglineFloridaLogisticDepartingFactory();
+            new HandlineFloridaLogisticDepartingFactory();
 
     /**
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> handlinerDestinationStrategy =
-            new FloridaLogitDestinationFactory();
+            new BarebonesFloridaDestinationFactory();
+    {
+        ((BarebonesFloridaDestinationFactory) handlinerDestinationStrategy).setHabitIntercept(
+                new FixedDoubleParameter(2.53163185)
+        );
+        ((BarebonesFloridaDestinationFactory) handlinerDestinationStrategy).setDistanceInKm(
+                new FixedDoubleParameter(-0.00759009)
+        );
+
+        CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
+        discretizer.setFilePath(Paths.get("temp_wfs", "areas.txt").toString());
+        discretizer.setxColumnName("eastings");
+        discretizer.setyColumnName("northings");
+        ((BarebonesFloridaDestinationFactory) handlinerDestinationStrategy).setDiscretizer(discretizer);
+
+    }
 
 
     /**
@@ -676,7 +693,7 @@ public class OsmoseWFSScenario implements Scenario{
     /**
      * Setter for property 'cruiseSpeedInKph'.
      *
-     * @param cruiseSpeedInKph Value to set for property 'cruiseSpeedInKph'.
+     * @param longlinerSpeedKph Value to set for property 'cruiseSpeedInKph'.
      */
     public void setLonglinerSpeedKph(DoubleParameter longlinerSpeedKph) {
         this.longlinerSpeedKph = longlinerSpeedKph;

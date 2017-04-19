@@ -1,0 +1,119 @@
+Abstract 2 Populations:
+  biologyInitializer:
+    From Left To Right Logistic:
+      carryingCapacity: '10000.0'
+      differentialPercentageToMove: '0.001'
+      grower:
+        Independent Logistic Grower:
+          steepness: '0.7'
+      maxInitialCapacity: '1.0'
+      minCapacityRatio: '0.2'
+      minInitialCapacity: '0.0'
+      percentageLimitOnDailyMovement: '0.01'
+  departingStrategyLarge:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  departingStrategySmall:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  destinationStrategyLarge:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.2'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  destinationStrategySmall:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      automaticallyIgnoreMPAs: false
+      backtracksOnBadExploration: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
+      probability:
+        Adaptive Probability:
+          explorationProbability: '0.2'
+          explorationProbabilityMinimum: '0.01'
+          imitationProbability: '1.0'
+          incrementMultiplier: '0.02'
+      stepSize: uniform 1.0 10.0
+  enginePower: normal 5000.0 100.0
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  gasPricePerLiter: '0.05'
+  gearLarge:
+    Random Catchability:
+      gasPerHourFished: '0.0'
+      meanCatchabilityFirstSpecies: '0.1'
+      meanCatchabilityOtherSpecies: '0.1'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+  gearSmall:
+    Random Catchability:
+      gasPerHourFished: '5.0'
+      meanCatchabilityFirstSpecies: '0.001'
+      meanCatchabilityOtherSpecies: '0.001'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+  gearStrategy: Never Change Gear
+  habitatInitializer: All Sand
+  largeFishers: 50
+  largeFuelTankSize: '1000000.0'
+  largeHoldSize: '500.0'
+  largeLitersPerKilometer: '10.0'
+  largeSpeed: '5.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '2.0'
+      coastalRoughness: '0.0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      maxLandWidth: '10.0'
+      width: '50.0'
+  mapMakerDedicatedRandomSeed: 0
+  market:
+    Fixed Price Market:
+      marketPrice: '10.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  ports:
+    One Port:
+      portPositionX: '40.0'
+      portPositionY: '25.0'
+  regulationLarge: Anarchy
+  regulationSmall:
+    Mono-TAC:
+      quota: '1151062.6099'
+  separatePorts: false
+  separateRegulations: false
+  smallFishers: 50
+  smallFuelTankSize: '500.0'
+  smallHoldSize: '10.0'
+  smallLitersPerKilometer: '10.0'
+  smallSpeed: '5.0'
+  startingMPAs: [
+    ]
+  usePredictors: true
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather

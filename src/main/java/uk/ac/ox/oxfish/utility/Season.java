@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.utility;
 
+import uk.ac.ox.oxfish.model.FishState;
+
 /**
  * Just a marker for season
  * Created by carrknight on 12/2/16.
@@ -37,6 +39,13 @@ public enum Season {
         } else {
             return WINTER;
         }
+
+    }
+
+    public static Season season(FishState model)
+    {
+
+        return season(model.getDayOfTheYear());
 
     }
 

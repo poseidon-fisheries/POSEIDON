@@ -62,14 +62,14 @@ public class FixedProbabilityDepartingStrategyTest {
         FixedProbabilityDepartingStrategy daily = new FixedProbabilityDepartingStrategy(1, true);
 
         FishState model = mock(FishState.class);
-        when(model.getDay()).thenReturn(1d);
+        when(model.getDay()).thenReturn(1);
         int departures = 0;
         for(int i=0; i<50;i++) {
             if(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()))
                 departures++;
         }
         assertTrue(departures == 1);
-        when(model.getDay()).thenReturn(2d);
+        when(model.getDay()).thenReturn(2);
         assertTrue(daily.shouldFisherLeavePort(mock(Fisher.class),model,new MersenneTwisterFast()));
     }
 }

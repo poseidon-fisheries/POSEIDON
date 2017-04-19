@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishUntilFullFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -24,60 +25,55 @@ public class FishUntilFullStrategyTest {
         factory.setMinimumPercentageFull(new FixedDoubleParameter(.5)); //needs to be 50% full
         final FishUntilFullStrategy strategy = factory.apply(mock(FishState.class));
 
-        FisherEquipment equipment = mock(FisherEquipment.class);
-        when(equipment.getTotalPoundsCarried()).thenReturn(0d);
-        when(equipment.getMaximumLoad()).thenReturn(100d);
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(0d);
+        when(fisher.getMaximumHold()).thenReturn(100d);
 
 
         //it's empty, you should fish
         assertTrue(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class) ,
+                strategy.shouldFish(fisher,
                                     new MersenneTwisterFast(),
-                                    mock(FishState.class))
+                                    mock(FishState.class),
+                                    mock(TripRecord.class))
         );
 
         //it's 25% full, you should fish
-        when(equipment.getTotalPoundsCarried()).thenReturn(25d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(25d);
         assertTrue(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class) ,
+                strategy.shouldFish(fisher,
                                     new MersenneTwisterFast(),
-                                    mock(FishState.class))        );
+                                    mock(FishState.class),
+                                    mock(TripRecord.class))        );
 
         //it's 50% full, you shouldn't fish
-        when(equipment.getTotalPoundsCarried()).thenReturn(50d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
         assertFalse(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class) ,
+                strategy.shouldFish(fisher,
                                     new MersenneTwisterFast(),
-                                    mock(FishState.class))        );
+                                    mock(FishState.class),
+                                    mock(TripRecord.class))        );
 
         //it's 75& full, you shouldn't fish
-        when(equipment.getTotalPoundsCarried()).thenReturn(75d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(75d);
         assertFalse(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class) ,
+                strategy.shouldFish(fisher,
                                     new MersenneTwisterFast(),
-                                    mock(FishState.class))        );
+                                    mock(FishState.class),
+                                    mock(TripRecord.class))        );
 
         //if I change the minimum percentage, you should fish again
         strategy.setMinimumPercentageFull(85);
         assertTrue(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class) ,
+                strategy.shouldFish(fisher,
                                     new MersenneTwisterFast(),
-                                    mock(FishState.class))        );
+                                    mock(FishState.class),
+                                    mock(TripRecord.class))        );
 
         //the threshold is satisfied even if the pounds carried are very slightly less(.001%) than the correct
         //minimum
         strategy.setMinimumPercentageFull(100d);
-        when(equipment.getTotalPoundsCarried()).thenReturn(99.999d);
-        when(equipment.getMaximumLoad()).thenReturn(100d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(99.999d);
+        when(fisher.getMaximumHold()).thenReturn(100d);
     }
 }

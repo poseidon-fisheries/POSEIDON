@@ -6,7 +6,12 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishOnceFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;
@@ -22,27 +27,33 @@ public class FishOnceStrategyTest
     @Test
     public void fishOnce() throws Exception {
 
-        FisherEquipment equipment = mock(FisherEquipment.class);
+        TripRecord record = new TripRecord(1,100d);
+
         FishOnceStrategy strategy = new FishOnceFactory().apply(mock(FishState.class));
 
 
-        when(equipment.getTotalPoundsCarried()).thenReturn(0d);
-        //should be true: carrying nothing
+        //should be true: you haven't fished before
         assertTrue(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class),
-                                    new MersenneTwisterFast(), mock(FishState.class))
+                strategy.shouldFish(mock(Fisher.class),
+                                    new MersenneTwisterFast(),
+                                    mock(FishState.class),
+                                    record)
         );
 
-        when(equipment.getTotalPoundsCarried()).thenReturn(1d);
-        //should be false: nothing is being carried
+        //record a single fish
+        record.recordFishing(new FishingRecord(1,
+                                               mock(Gear.class),
+                                               mock(SeaTile.class),
+                                               mock(Catch.class),
+                                               mock(Fisher.class),
+                                               11));
+
+        //should be false: you have fished at least once~!
         assertFalse(
-                strategy.shouldFish(equipment,
-                                    mock(FisherStatus.class),
-                                    mock(FisherMemory.class),
-                                    new MersenneTwisterFast(), mock(FishState.class))
+                strategy.shouldFish(mock(Fisher.class),
+                                    new MersenneTwisterFast(),
+                                    mock(FishState.class),
+                                    record)
         );
-
     }
 }

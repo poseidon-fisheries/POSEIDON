@@ -19,7 +19,8 @@ import java.util.LinkedList;
  * Steve saul's stuff, initialized here.
  * Created by carrknight on 12/6/16.
  */
-public class    FloridaLogitDestinationFactory implements AlgorithmFactory<LogitDestinationStrategy> {
+public class FloridaLogitDestinationFactory implements
+        AlgorithmFactory<LogitDestinationStrategy> {
 
 
     /**

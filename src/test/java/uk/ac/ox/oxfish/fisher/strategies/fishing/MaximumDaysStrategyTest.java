@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
@@ -22,28 +23,30 @@ public class MaximumDaysStrategyTest {
         MaximumDaysStrategy steps =  new MaximumDaysStrategy(100);
 
         //fish as long as it is BOTH not full and not being out for too long
-        FisherEquipment equipment = mock(FisherEquipment.class);
-        when(equipment.getMaximumLoad()).thenReturn(100d);
-        when(equipment.getTotalPoundsCarried()).thenReturn(50d);
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.getMaximumHold()).thenReturn(100d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
 
-        FisherStatus status = mock(FisherStatus.class);
-        when(status.getHoursAtSea()).thenReturn(50*24d);
+        when(fisher.getHoursAtSea()).thenReturn(50*24d);
 
         //both are true
-        assertTrue(steps.shouldFish(equipment,status,mock(FisherMemory.class) ,
-                                    new MersenneTwisterFast(), mock(FishState.class)));
+        assertTrue(steps.shouldFish(fisher,
+                                    new MersenneTwisterFast(), mock(FishState.class),
+                                    mock(TripRecord.class)));
 
-        when(status.getHoursAtSea()).thenReturn(50*24d);
-        when(equipment.getTotalPoundsCarried()).thenReturn(100d);
+        when(fisher.getHoursAtSea()).thenReturn(50*24d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(100d);
         //full, will be false
-        assertFalse(steps.shouldFish(equipment,status,mock(FisherMemory.class) ,
-                                     new MersenneTwisterFast(), mock(FishState.class)));
+        assertFalse(steps.shouldFish(fisher,
+                                     new MersenneTwisterFast(), mock(FishState.class),
+                                     mock(TripRecord.class)));
 
-        when(status.getHoursAtSea()).thenReturn(101*24d);
-        when(equipment.getTotalPoundsCarried()).thenReturn(50d);
+        when(fisher.getHoursAtSea()).thenReturn(101*24d);
+        when(fisher.getTotalWeightOfCatchInHold()).thenReturn(50d);
         //too late, will be false
-        assertFalse(steps.shouldFish(equipment,status,mock(FisherMemory.class) ,
-                                     new MersenneTwisterFast(), mock(FishState.class)));
+        assertFalse(steps.shouldFish(fisher,
+                                     new MersenneTwisterFast(), mock(FishState.class),
+                                     mock(TripRecord.class)));
 
 
     }

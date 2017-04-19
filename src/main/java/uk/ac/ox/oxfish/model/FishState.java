@@ -141,6 +141,8 @@ public class FishState  extends SimState{
         return getStep() * getHoursPerStep();
     }
 
+
+
     public FishState(){
         this(System.currentTimeMillis(),1);
     }
@@ -311,9 +313,9 @@ public class FishState  extends SimState{
         return (int) ((schedule.getTime() / stepsPerDay) % 365) + 1;
     }
 
-    public double getDay()
+    public int getDay()
     {
-        return (schedule.getTime() / stepsPerDay);
+        return (int) (schedule.getTime() / stepsPerDay);
     }
 
     public int getYear()

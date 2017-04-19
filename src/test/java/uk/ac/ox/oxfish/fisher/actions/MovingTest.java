@@ -14,6 +14,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
@@ -70,9 +71,7 @@ public class MovingTest
                                    new FishingStrategy() {
                                        @Override
                                        public boolean shouldFish(
-                                               FisherEquipment equipment, FisherStatus status,
-                                               FisherMemory memory, MersenneTwisterFast random,
-                                               FishState model) {
+                                               Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
                                            return true;
                                        }
 

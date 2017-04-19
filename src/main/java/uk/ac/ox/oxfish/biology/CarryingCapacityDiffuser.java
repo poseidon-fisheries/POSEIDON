@@ -93,7 +93,7 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
                 for(Direction direction : Direction.getDirection(here,neighbour))
                 {
                     //if your carrying capacity is 0 do not diffuse
-                    if(((BiomassLocalBiology) here.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON)
+                    if(((BiomassLocalBiology) here.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON )
                         continue tileloop;
 
                     if(direction.getBiasNorth() == biasNorth)
@@ -139,7 +139,9 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
                          Species species)
     {
 
-        double differential = from.getCarryingCapacity(species) * dailyMigration;
+        //differential is just a proportion of the carrying apacity or epsilon if there is very little carrying capacity left
+        double differential = from.getCarryingCapacity(species) <= FishStateUtilities.EPSILON ? from.getCarryingCapacity(species) :
+                from.getCarryingCapacity(species) * dailyMigration;
         double biomassMovement = Math.min(from.getBiomass(species),differential);
 
         //move the fish out
@@ -149,6 +151,8 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
         to.setCarryingCapacity(species,to.getCarryingCapacity(species)+ differential);
         //move the fish in
         to.setCurrentBiomass(species,to.getBiomass(species)+biomassMovement);
+
+
 
     }
 

@@ -5,10 +5,11 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.fisher.FisherMemory;
 import uk.ac.ox.oxfish.fisher.FisherStatus;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
- * The Fisher keep fishing until full or until a limit number of days have passed
+ * The Fisher keep fishing until full or until a limit number of days have passed.
  * Created by carrknight on 6/23/15.
  */
 public class MaximumDaysStrategy implements FishingStrategy
@@ -28,17 +29,14 @@ public class MaximumDaysStrategy implements FishingStrategy
      * not to continue fishing
      *
      *
-     * @param equipment
-     * @param status
-     *@param memory
      * @param random the randomizer
      * @param model  the model itself   @return true if the fisher should fish here, false otherwise
      */
     @Override
     public boolean shouldFish(
-            FisherEquipment equipment, FisherStatus status, FisherMemory memory, MersenneTwisterFast random,
-            FishState model) {
-        return delegate.shouldFish(equipment,status,memory,random,model) && status.getHoursAtSea() /24d  <= daysBeforeGoingHome;
+            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
+        return delegate.shouldFish(fisher,random,model,currentTrip)
+                && fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome;
     }
 
 
@@ -53,6 +51,6 @@ public class MaximumDaysStrategy implements FishingStrategy
      */
     @Override
     public void turnOff(Fisher fisher) {
-
+        delegate.turnOff(fisher);
     }
 }
