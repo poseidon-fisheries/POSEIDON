@@ -16,11 +16,18 @@ public class MaximumDaysStrategy implements FishingStrategy
 {
 
 
-    private final FishUntilFullStrategy delegate = new FishUntilFullStrategy(1d);
+    private final FishingStrategy delegate;
 
     private final int daysBeforeGoingHome;
 
     public MaximumDaysStrategy(int daysBeforeGoingHome) {
+        this(new FishUntilFullStrategy(1d),daysBeforeGoingHome);
+
+
+    }
+
+    public MaximumDaysStrategy(FishingStrategy delegate, int daysBeforeGoingHome) {
+        this.delegate = delegate;
         this.daysBeforeGoingHome = daysBeforeGoingHome;
     }
 
@@ -35,8 +42,8 @@ public class MaximumDaysStrategy implements FishingStrategy
     @Override
     public boolean shouldFish(
             Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip) {
-        return delegate.shouldFish(fisher,random,model,currentTrip)
-                && fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome;
+        return
+                 fisher.getHoursAtSea() /24d  <= daysBeforeGoingHome && delegate.shouldFish(fisher,random,model,currentTrip) ;
     }
 
 

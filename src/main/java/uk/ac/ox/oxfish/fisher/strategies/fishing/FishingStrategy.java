@@ -27,7 +27,10 @@ public interface FishingStrategy extends FisherStartable{
      * @return true if the fisher should fish here, false otherwise
      */
     boolean shouldFish(
-            Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip);
+            Fisher fisher,
+            MersenneTwisterFast random,
+            FishState model,
+            TripRecord currentTrip);
 
 
 
