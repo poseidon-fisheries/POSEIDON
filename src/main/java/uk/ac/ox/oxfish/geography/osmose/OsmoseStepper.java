@@ -54,7 +54,8 @@ public class OsmoseStepper implements Startable,Steppable{
      */
     private final MersenneTwisterFast random;
 
-    public OsmoseStepper(int stepsPerYearInFishState, OsmoseSimulation osmoseSimulation,
+    public OsmoseStepper(int stepsPerYearInFishState,
+                         OsmoseSimulation osmoseSimulation,
                          MersenneTwisterFast random) {
         Preconditions.checkArgument(stepsPerYearInFishState > 0);
         Preconditions.checkArgument(osmoseSimulation.stepsPerYear() > 0);
