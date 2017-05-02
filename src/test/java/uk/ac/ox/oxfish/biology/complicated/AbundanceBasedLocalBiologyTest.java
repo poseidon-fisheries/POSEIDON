@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
@@ -66,7 +67,8 @@ public class AbundanceBasedLocalBiologyTest
         int[] maleCatches = new int[longspine.getMaxAge()+1];
         int[] femaleCatches = new int[longspine.getMaxAge()+1];
         maleCatches[6] = 50;
-        local.reactToThisAmountOfFishBeingCaught(longspine,maleCatches,femaleCatches);
+        local.reactToThisAmountOfBiomassBeingFished(new Catch(maleCatches,femaleCatches,longspine,biology),
+                                                    null,biology);
 
         assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[5],100);
         assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[6],0);
@@ -75,34 +77,4 @@ public class AbundanceBasedLocalBiologyTest
 
     }
 
-    @Test
-    public void fishOutByBiomass() throws Exception {
-
-        //create fake species, lives for 10 years
-        Species fake = mock(Species.class);
-        GlobalBiology biology = new GlobalBiology(fake);
-        when(fake.getMaxAge()).thenReturn(10);
-        ImmutableList<Double> weight = mock(ImmutableList.class);
-        //every age and sex weights 10 kg
-        when(weight.get(anyInt())).thenReturn(10d);
-        when(fake.getWeightFemaleInKg()).thenReturn(weight);
-        when(fake.getWeightMaleInKg()).thenReturn(weight);
-
-        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
-        //can modify directly
-        local.getNumberOfFemaleFishPerAge(fake)[5]=100;
-        local.getNumberOfMaleFishPerAge(fake)[5]=200;
-        local.getNumberOfMaleFishPerAge(fake)[6]=100;
-        assertEquals(local.getBiomass(fake),400*10,.001);
-
-
-        local.reactToThisAmountOfBiomassBeingFished(fake,1100d);
-        //should kill all male of age 6 and 10 male of age 5
-        assertEquals(local.getNumberOfFemaleFishPerAge(fake)[5],100);
-        assertEquals(local.getNumberOfFemaleFishPerAge(fake)[6],0);
-        assertEquals(local.getNumberOfMaleFishPerAge(fake)[5],190);
-        assertEquals(local.getNumberOfMaleFishPerAge(fake)[6],0);
-
-
-    }
 }

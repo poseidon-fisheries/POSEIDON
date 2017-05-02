@@ -72,10 +72,10 @@ public class HoldTest {
         Catch caught = hold.unload();
         //should have emptied the hold
         assertEquals(0, hold.getTotalWeightOfCatchInHold(), .001);
-        assertEquals(25.0,caught.getPoundsCaught(first),.001);
+        assertEquals(25.0, caught.getWeightCaught(first), .001);
         //should not fuck up if I fill the hold again
         hold.load(new Catch(first, 15.0, bio));
-        assertEquals(25.0, caught.getPoundsCaught(first), .001);
+        assertEquals(25.0, caught.getWeightCaught(first), .001);
         assertEquals(15, hold.getTotalWeightOfCatchInHold(), .001);
 
 

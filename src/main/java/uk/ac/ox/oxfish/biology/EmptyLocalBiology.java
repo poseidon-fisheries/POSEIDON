@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.biology;
 
+import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -22,13 +24,14 @@ public class EmptyLocalBiology implements LocalBiology
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *
-     * @param species        the species fished
-     * @param biomassFished the biomass fished
+     *  @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-        throw new IllegalStateException("It's impossible to take biomass from the empty biology");
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        Preconditions.checkArgument(caught.getTotalWeight() == 0,"It's impossible to take biomass from the empty biology");
     }
 
     /**
@@ -55,18 +58,6 @@ public class EmptyLocalBiology implements LocalBiology
         return new int[0];
     }
 
-
-    /**
-     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
-     * location
-     *  @param species the species fished
-     * @param maleCatches the biomass fished
-     * @param femaleCatches
-     */
-    @Override
-    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
-        throw new IllegalStateException("It's impossible to catch fish in the empty biology");
-    }
 
     /**
      * ignored

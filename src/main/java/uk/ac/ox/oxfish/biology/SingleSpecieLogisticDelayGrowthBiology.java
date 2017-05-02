@@ -5,6 +5,7 @@ import com.google.common.collect.EvictingQueue;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -92,17 +93,19 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *
-     * @param species        the species fished
-     * @param biomassFished the biomass fished
+     *  @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-        if(species.equals(this.species))
-        {
-            Preconditions.checkArgument(biomassFished <= currentBiomass);
-            currentBiomass-= biomassFished;
-        }
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        //focus on only the one you care about!
+        double biomassFished = caught.getWeightCaught(this.species);
+
+        Preconditions.checkArgument(biomassFished <= currentBiomass);
+        currentBiomass-= biomassFished;
+
     }
 
     @Override

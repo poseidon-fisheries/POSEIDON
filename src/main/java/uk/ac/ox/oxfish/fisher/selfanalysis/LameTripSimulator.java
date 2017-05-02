@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -71,10 +70,8 @@ public class LameTripSimulator {
                             fisher,fisher.getBoat(),fishingSpot
                     ) * fishingHours;
 
-            record.recordFishing(new FishingRecord(fishingHours, fisher.getGear(),
-                                                   fishingSpot, new Catch(catches),
-                                                   fisher,
-                                                   state.getStep()));
+            record.recordFishing(new FishingRecord(fishingHours,
+                                                   fishingSpot, new Catch(catches)));
             //now check what can actually be sold
             for(int i=0; i<numberOfSpecies; i++)
             {

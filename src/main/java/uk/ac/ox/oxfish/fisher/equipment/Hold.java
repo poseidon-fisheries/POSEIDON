@@ -45,7 +45,7 @@ public class Hold {
         //start loading up
         for(int i=0; i< fishHold.length; i++)
         {
-            double poundsCaught = caught.getPoundsCaught(i);
+            double poundsCaught = caught.getWeightCaught(i);
             fishHold[i] += poundsCaught;
             tonnesCarried += poundsCaught;
             assert  poundsCaught >=0;

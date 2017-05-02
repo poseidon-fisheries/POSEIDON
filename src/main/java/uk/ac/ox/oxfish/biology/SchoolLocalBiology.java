@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -46,9 +47,13 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
 
     /**
      * ignored
+     * @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
     }
 

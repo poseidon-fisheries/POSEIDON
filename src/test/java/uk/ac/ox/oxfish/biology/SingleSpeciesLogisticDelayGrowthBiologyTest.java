@@ -2,9 +2,12 @@ package uk.ac.ox.oxfish.biology;
 
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class SingleSpeciesLogisticDelayGrowthBiologyTest {
@@ -54,7 +57,10 @@ public class SingleSpeciesLogisticDelayGrowthBiologyTest {
 
         );
         Assert.assertEquals(1000,biology.getBiomass(aaa),.0001);
-        biology.reactToThisAmountOfBiomassBeingFished(aaa,200d);
+        GlobalBiology global = mock(GlobalBiology.class);
+        when(global.getSize()).thenReturn(1);
+        biology.reactToThisAmountOfBiomassBeingFished(new Catch(aaa, 200, global),
+                                                      null, global);
         Assert.assertEquals(800,biology.getBiomass(aaa),.0001);
 
 

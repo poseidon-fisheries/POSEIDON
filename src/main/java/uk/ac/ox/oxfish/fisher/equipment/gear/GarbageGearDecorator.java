@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
-import com.google.common.primitives.Doubles;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -48,19 +48,44 @@ public class GarbageGearDecorator implements Gear {
         //delegate
         Catch nonGarbage = delegate.fish(fisher, where, hoursSpentFishing, modelBiology);
         //shouldn't be any garbage collected so far
-        assert nonGarbage.getPoundsCaught(garbageSpecies) == 0;
+        assert nonGarbage.getWeightCaught(garbageSpecies) == 0;
         double totalNonGarbageWeight = nonGarbage.totalCatchWeight();
-        if(totalNonGarbageWeight <= FishStateUtilities.EPSILON)
+        if (totalNonGarbageWeight <= FishStateUtilities.EPSILON)
             return nonGarbage; //nothing to add!
 
-        //copy to new array
-        double[] newCatches = new double[modelBiology.getSize()];
-        for(int i=0; i< modelBiology.getSize(); i++)
-            newCatches[i] = nonGarbage.getPoundsCaught(i);
-        //add garbage in the right proportion
-        newCatches[garbageSpecies.getIndex()] = totalNonGarbageWeight * ratioToRestOfCatch;
+        //preserve abundance information if possible
+        if (nonGarbage.hasAbundanceInformation()) {
+            //replicate all abundances
+            StructuredAbundance[] newAbundances = new StructuredAbundance[modelBiology.getSize()];
+            for (int i = 0; i < modelBiology.getSize(); i++) {
+                if (i != garbageSpecies.getIndex())
+                    newAbundances[i] = nonGarbage.getAbundance(i);
+                else {
+                    //todo make this sex structured too if needed
+                    int[] garbageStructured = new int[garbageSpecies.getMaxAge() + 1];
+                    garbageStructured[0]= (int) (totalNonGarbageWeight/garbageSpecies.getWeightMaleInKg().get(0));
+                    newAbundances[i] = new StructuredAbundance(garbageStructured);
+                }
+                //
 
-        return new Catch(newCatches);
+            }
+
+            return  new Catch(newAbundances,modelBiology);
+        }
+        //replicate all weights!
+        else {
+            //copy to new array
+            double[] newCatches = new double[modelBiology.getSize()];
+            for (int i = 0; i < modelBiology.getSize(); i++)
+
+                newCatches[i] = nonGarbage.getWeightCaught(i);
+            //add garbage in the right proportion
+            newCatches[garbageSpecies.getIndex()] = totalNonGarbageWeight * ratioToRestOfCatch;
+            return new Catch(newCatches);
+
+        }
+
+
 
 
     }

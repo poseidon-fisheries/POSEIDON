@@ -40,6 +40,7 @@ import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
@@ -713,11 +714,13 @@ public class Fisher implements Steppable, Startable{
 
         //catch fish
         Catch catchOfTheDay = equipment.getGear().fish(this, here, hoursSpentFishing, modelBiology);
+        //if you actually caught something
+        if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON)
+            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay,null,modelBiology);
 
         //record it
-        FishingRecord record = new FishingRecord(hoursSpentFishing, equipment.getGear(),
-                                                 here, catchOfTheDay, this,
-                                                 state.getStep());
+        FishingRecord record = new FishingRecord(hoursSpentFishing,
+                                                 here, catchOfTheDay);
         memory.getTripLogger().recordFishing(record);
         memory.getCatchMemories().memorize(catchOfTheDay, here);
         memory.registerVisit(here, (int) state.getDay());

@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -11,6 +12,9 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 /**
  * A map species ---> homogeneousAbudanceGear so that each species has a different selectivity and such.
@@ -48,34 +52,40 @@ public class HeterogeneousAbundanceGear implements Gear
     {
         Preconditions.checkArgument(hoursSpentFishing>0);
         //create array containing biomass
-        return new Catch(catchesAsArray(where, hoursSpentFishing, modelBiology, false));
+        return new Catch(catchesAsArray(where, hoursSpentFishing, modelBiology),modelBiology);
     }
 
-    private double[] catchesAsArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, final boolean safeMode) {
-        double[] biomassCaught = new  double[modelBiology.getSize()];
+    private StructuredAbundance[] catchesAsArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+        StructuredAbundance[] caught = new  StructuredAbundance[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
-            if(species.isImaginary() || !gears.containsKey(species))
-                continue; //do not directly catch imaginary species or species not specified
-            if(where.getBiology().getBiomass(species)<=0)
-                continue;
-            //you are going to fish every hour until you are done
-            int hoursSpentFishingThisSpecies = hoursSpentFishing;
-            while (hoursSpentFishingThisSpecies>0)
+            if(species.isImaginary() || !gears.containsKey(species) || where.getBiology().getBiomass(species)<=0)
             {
-                biomassCaught[species.getIndex()] +=
-                        gears.get(species).fishThisSpecies(where, species, safeMode);
-                hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
+                //if it's imaginary or not set or there is no fish, just return empty
+                int[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
+                caught[species.getIndex()] = new StructuredAbundance(abundance[MALE],abundance[FEMALE]);
+
             }
+            else {
+                caught[species.getIndex()] = gears.get(species).catchesAsAbundanceForThisSpecies(where,hoursSpentFishing,species);
+            }
+
         }
-        return biomassCaught;
+        return caught;
     }
 
     @Override
     public double[] expectedHourlyCatch(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        return catchesAsArray(where,hoursSpentFishing,modelBiology,true);
+        StructuredAbundance[] abundances = catchesAsArray(where, hoursSpentFishing, modelBiology);
+        assert modelBiology.getSpecies().size() == abundances.length;
+
+        double[] weights = new double[abundances.length];
+        for(Species species : modelBiology.getSpecies())
+            weights[species.getIndex()] = abundances[species.getIndex()].computeWeight(species);
+
+        return weights;
     }
 
     /**

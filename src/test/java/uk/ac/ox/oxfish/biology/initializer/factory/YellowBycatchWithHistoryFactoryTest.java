@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteIndependentGrower;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -139,7 +140,9 @@ public class YellowBycatchWithHistoryFactoryTest {
             if(state.getDayOfTheYear()==100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
                 for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-                    tile.reactToThisAmountOfBiomassBeingFished(target, tile.getBiomass(target) * .01);
+                    tile.reactToThisAmountOfBiomassBeingFished(
+                            new Catch(target,tile.getBiomass(target)*.01,state.getBiology()),
+                            null,state.getBiology());
             }
         }
         assertEquals(state.getTotalBiomass(target), 509166.4d, .1);
@@ -187,7 +190,9 @@ public class YellowBycatchWithHistoryFactoryTest {
             if(state.getDayOfTheYear()==100) { // at day 100 kill off one % of all the target
                 System.out.println(state.getTotalBiomass(target));
                 for (SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
-                    tile.reactToThisAmountOfBiomassBeingFished(target, tile.getBiomass(target) * .01);
+                    tile.reactToThisAmountOfBiomassBeingFished(
+                            new Catch(target,tile.getBiomass(target)*.01,state.getBiology()),
+                            null,state.getBiology());
             }
         }
         assertEquals(state.getTotalBiomass(target), 478923.5d, .1);

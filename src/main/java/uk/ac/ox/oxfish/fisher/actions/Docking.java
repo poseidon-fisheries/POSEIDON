@@ -49,7 +49,7 @@ public class Docking implements Action{
         MarketMap marketMap =port.getMarketMap(agent);
         for(Species species : biology.getSpecies())
         {
-            double biomass = toSell.getPoundsCaught(species);
+            double biomass = toSell.getWeightCaught(species);
 
 
             assert  biomass>=0;

@@ -18,11 +18,6 @@ public class FishingRecord
      */
     final private int hoursSpentFishing;
 
-    /**
-     * the gear used
-     */
-    final private Gear gearUsed;
-
 
     /**
      * where did fishing occur
@@ -34,35 +29,20 @@ public class FishingRecord
      */
     final private Catch fishCaught;
 
-    /**
-     * the agent that did the fishing
-     */
-    final private Fisher fisher;
 
-    /**
-     * the time-step when the fishing occurred
-     */
-    final private int step;
 
 
     public FishingRecord(
-            int hoursSpentFishing, Gear gearUsed, SeaTile tileFished, Catch fishCaught,
-            Fisher fisher, int step) {
+            int hoursSpentFishing, SeaTile tileFished, Catch fishCaught) {
         this.hoursSpentFishing = hoursSpentFishing;
-        this.gearUsed = gearUsed;
         this.tileFished = tileFished;
         this.fishCaught = fishCaught;
-        this.fisher = fisher;
-        this.step = step;
     }
 
     public int getHoursSpentFishing() {
         return hoursSpentFishing;
     }
 
-    public Gear getGearUsed() {
-        return gearUsed;
-    }
 
     public SeaTile getTileFished() {
         return tileFished;
@@ -72,11 +52,5 @@ public class FishingRecord
         return fishCaught;
     }
 
-    public int getStep() {
-        return step;
-    }
 
-    public Fisher getFisher() {
-        return fisher;
-    }
 }

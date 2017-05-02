@@ -29,8 +29,8 @@ public class FixedProportionGearTest {
         FixedProportionGear gear = new FixedProportionGear(.5);
         Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
-        assertEquals(fishCaught.getPoundsCaught(first), 0, .001);
-        assertEquals(fishCaught.getPoundsCaught(second), 0, .001);
+        assertEquals(fishCaught.getWeightCaught(first), 0, .001);
+        assertEquals(fishCaught.getWeightCaught(second), 0, .001);
 
     }
 
@@ -50,10 +50,10 @@ public class FixedProportionGearTest {
         FixedProportionGear gear = new FixedProportionGear(.5);
         Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
-        assertEquals(fishCaught.getPoundsCaught(first), 50, .001);
-        assertEquals(fishCaught.getPoundsCaught(second), 0, .001);
-        verify(local).reactToThisAmountOfBiomassBeingFished(first, 50.0);
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(second,0.0);
+        assertEquals(fishCaught.getWeightCaught(first), 50, .001);
+        assertEquals(fishCaught.getWeightCaught(second), 0, .001);
+        //gear itself never calls biology reacts
+        verify(local,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
 
     }
 
@@ -75,8 +75,8 @@ public class FixedProportionGearTest {
 
         assertEquals(fishCaught[0], 50, .001);
         assertEquals(fishCaught[1], 0, .001);
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(first, 50.0);
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(second,0.0);
+        //gear itself never calls biology reacts
+        verify(local,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
 
     }
 
@@ -96,10 +96,10 @@ public class FixedProportionGearTest {
         FixedProportionGear gear = new FixedProportionGear(.5);
         Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
-        assertEquals(fishCaught.getPoundsCaught(first), 0, .001);
-        assertEquals(fishCaught.getPoundsCaught(second), 50, .001);
-        verify(local,never()).reactToThisAmountOfBiomassBeingFished(first, 0.0);
-        verify(local).reactToThisAmountOfBiomassBeingFished(second, 50.0);
+        assertEquals(fishCaught.getWeightCaught(first), 0, .001);
+        assertEquals(fishCaught.getWeightCaught(second), 50, .001);
+        //gear itself never calls biology reacts
+        verify(local,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
 
     }
 }

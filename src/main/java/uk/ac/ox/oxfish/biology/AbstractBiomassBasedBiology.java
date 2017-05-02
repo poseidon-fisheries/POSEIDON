@@ -48,34 +48,6 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
     }
 
 
-    /**
-     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
-     * location
-     *  @param species the species fished
-     * @param maleCatches the biomass fished
-     * @param femaleCatches
-     */
-    @Override
-    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
-        warnIfNeeded();
-        if(species.isImaginary())
-            return;
-
-        //turn it into biomass and call the other method
-        assert maleCatches.length == femaleCatches.length;
-        double biomassCaught = 0;
-        for(int i=0; i< maleCatches.length; i++)
-        {
-            biomassCaught += maleCatches[i] * species.getWeightMaleInKg().get(i);
-            biomassCaught += femaleCatches[i] * species.getWeightFemaleInKg().get(i);
-        }
-        assert biomassCaught>=0;    
-
-        this.reactToThisAmountOfBiomassBeingFished(species,biomassCaught);
-
-
-    }
-
     public void warnIfNeeded() {
         if(Log.WARN && !warned)
             Log.warn("Calling a number based biology method on a biomass based local biology. This is usually not desired");

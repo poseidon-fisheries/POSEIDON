@@ -6,7 +6,9 @@ import fr.ird.osmose.School;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
 import uk.ac.ox.oxfish.biology.AbstractBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -142,78 +144,83 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *
-     * @param species       the species fished
-     * @param biomassFished the biomass fished
+     *  @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-
-        //if nothing was fished, then ignore
-        if(biomassFished<FishStateUtilities.EPSILON)
-            return;
-
-        // do not need to scale since they are both "wrong" and all we care about is their proportion
-        double biomassAvailable = getBiomass(species); //already scaled
-
-        if(biomassAvailable<FishStateUtilities.EPSILON) //if there is no fish, do not bother
-            return;
-
-        double proportionFishedPerEachSchool =
-                biomassFished/biomassAvailable;
-
-        assert proportionFishedPerEachSchool >=0;
-        assert proportionFishedPerEachSchool <=1;
-
-        //you can't fish MORE than what is available right now
-        Preconditions.checkArgument(biomassFished<=biomassAvailable+FishStateUtilities.EPSILON,
-                                    "can't fish this much!");
-
-        assert biomassAvailable >=0;
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
 
-        //get all the schools of fish that belong to this species
-        List<School> schools = counter.getSchoolsPerSpecie(species.getIndex());
+        Preconditions.checkArgument(caught.hasAbundanceInformation(),"Osmose biology isn't adapted through abudance gear. What's going on?");
 
-        //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
-        //variable I have
-        Integer recruitmentAge = this.recruitmentAge[species.getIndex()];
-        assert Math.abs(schools.stream().filter(school -> school.getAge() >=recruitmentAge )
-                                .mapToDouble(School::getInstantaneousBiomass).sum()
-                                -biomassAvailable)
-                < FishStateUtilities.EPSILON;
-
-
-
-        //go through each school
-        //fish each with the same proportion
-        double totalFished = 0;
-        for(School school : schools)
-        {
-
-            //ignore small fish
-            if(school.getAge()<recruitmentAge)
+        for(int species = 0; species<caught.numberOfSpecies(); species++) {
+            double biomassFished = caught.getWeightCaught(species);
+            //if nothing was fished, then ignore
+            if (biomassFished < FishStateUtilities.EPSILON)
                 continue;
 
-            biomassFishedFromSchool.putIfAbsent(school, 0d);
-            //count what has already been depleted
-            final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
-            //fish the right proportion
-            double fishedHere = (school.getInstantaneousBiomass()- schoolEarlierDepletion) * proportionFishedPerEachSchool;
-            totalFished += fishedHere;
-            //should be no more than what we want to fish
-            assert fishedHere <=biomassFished;
-            //should be positive or 0
-            assert fishedHere >=0;
+            // do not need to scale since they are both "wrong" and all we care about is their proportion
+            double biomassAvailable = getBiomass(species); //already scaled
 
-            //register the catch
-            //with the school
-            biomassFishedFromSchool.put(school,schoolEarlierDepletion+fishedHere);
-            //with the OSMOSE module
-            mortality.incrementCatches(school,fishedHere);
+            if (biomassAvailable < FishStateUtilities.EPSILON) //if there is no fish, do not bother
+                continue;
 
+            double proportionFishedPerEachSchool =
+                    biomassFished / biomassAvailable;
+
+            assert proportionFishedPerEachSchool >= 0;
+            assert proportionFishedPerEachSchool <= 1;
+
+            //you can't fish MORE than what is available right now
+            Preconditions.checkArgument(biomassFished <= biomassAvailable + FishStateUtilities.EPSILON,
+                                        "can't fish this much!");
+
+            assert biomassAvailable >= 0;
+
+
+            //get all the schools of fish that belong to this species
+            List<School> schools = counter.getSchoolsPerSpecie(species);
+
+            //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
+            //variable I have
+            Integer recruitmentAge = this.recruitmentAge[species];
+            assert Math.abs(schools.stream().filter(school -> school.getAge() >= recruitmentAge)
+                                    .mapToDouble(School::getInstantaneousBiomass).sum()
+                                    - biomassAvailable)
+                    < FishStateUtilities.EPSILON;
+
+
+            //go through each school
+            //fish each with the same proportion
+            double totalFished = 0;
+            for (School school : schools) {
+
+                //ignore small fish
+                if (school.getAge() < recruitmentAge)
+                    continue;
+
+                biomassFishedFromSchool.putIfAbsent(school, 0d);
+                //count what has already been depleted
+                final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
+                //fish the right proportion
+                double fishedHere = (school.getInstantaneousBiomass() - schoolEarlierDepletion) * proportionFishedPerEachSchool;
+                totalFished += fishedHere;
+                //should be no more than what we want to fish
+                assert fishedHere <= biomassFished;
+                //should be positive or 0
+                assert fishedHere >= 0;
+
+                //register the catch
+                //with the school
+                biomassFishedFromSchool.put(school, schoolEarlierDepletion + fishedHere);
+                //with the OSMOSE module
+                mortality.incrementCatches(school, fishedHere);
+
+            }
+            assert totalFished == biomassFished / scalingFactor;
         }
-        assert  totalFished == biomassFished/scalingFactor;
     }
 
 

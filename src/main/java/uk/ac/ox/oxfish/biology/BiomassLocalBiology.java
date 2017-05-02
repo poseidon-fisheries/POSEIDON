@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -121,23 +122,29 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *
-     * @param species        the species fished
-     * @param biomassFished the biomass fished
+     *  @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
-        final int specieIntex = species.getIndex();
-        Preconditions.checkArgument(specieIntex < currentBiomass.length || biomassFished == 0,
-                                    "you can't fish species that aren't here");
+        Preconditions.checkArgument(!caught.hasAbundanceInformation(), "using abundance driven catches with biomass driven biology!");
 
-
-        if(specieIntex < currentBiomass.length)
+        for(int speciesIndex =0; speciesIndex< caught.numberOfSpecies(); speciesIndex++)
         {
-            currentBiomass[specieIntex]-= biomassFished;
-            Preconditions.checkState(currentBiomass[specieIntex] >=0, "fished more biomass than available");
+            //if you caught anything
+            double biomassFishedOut = caught.getWeightCaught(speciesIndex);
+            if(biomassFishedOut > 0)
+            {
+                currentBiomass[speciesIndex]-= biomassFishedOut;
+                Preconditions.checkState(currentBiomass[speciesIndex] >=0, "fished more biomass than available");
+            }
         }
+
+
+
 
     }
 

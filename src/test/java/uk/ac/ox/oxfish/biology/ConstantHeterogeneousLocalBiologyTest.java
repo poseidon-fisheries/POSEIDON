@@ -1,8 +1,10 @@
 package uk.ac.ox.oxfish.biology;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +21,11 @@ public class ConstantHeterogeneousLocalBiologyTest {
 
         when(species.getIndex()).thenReturn(1);
         assertEquals(200, bio.getBiomass(species), .001);
-        bio.reactToThisAmountOfBiomassBeingFished(species, 4000000d);
+        GlobalBiology biology = new GlobalBiology(mock(Species.class),
+                                                  species);
+        bio.reactToThisAmountOfBiomassBeingFished(new Catch(species, 4000000d,
+                                                            biology), null,
+                                                  biology);//can't kill it off
         assertEquals(200, bio.getBiomass(species), .001);
 
     }

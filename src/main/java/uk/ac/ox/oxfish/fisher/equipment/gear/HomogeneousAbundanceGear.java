@@ -5,12 +5,16 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 /**
  * A gear that works on abundance and applies the same series of filters to all species equally
@@ -46,71 +50,91 @@ public class HomogeneousAbundanceGear implements Gear {
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
     {
-        double[] biomassCaught = catchesToArray(where, hoursSpentFishing, modelBiology, false);
+        StructuredAbundance[] catches = catchesToArray(where, hoursSpentFishing, modelBiology);
 
 
-        return new Catch(biomassCaught);
+        return new Catch(catches,modelBiology);
 
 
     }
 
-    private double[] catchesToArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology,
-            final boolean safeMode) {
+    private StructuredAbundance[] catchesToArray(
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         //create array containing biomass
-        double[] biomassCaught = new  double[modelBiology.getSize()];
+        StructuredAbundance[] abundances = new StructuredAbundance[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
-            if(where.getBiology().getBiomass(species)<=0)
-                continue;
+            abundances[species.getIndex()] = catchesAsAbundanceForThisSpecies(where, hoursSpentFishing, species);
+        }
+        return abundances;
+    }
+
+    /**
+     * this is a way to apply the gear to a species only. Useful for heterogeneous abundance gear
+     * @param where
+     * @param hoursSpentFishing
+     * @param species
+     * @return
+     */
+    public StructuredAbundance catchesAsAbundanceForThisSpecies(SeaTile where, int hoursSpentFishing, Species species) {
+        //prepare empty array
+        int[][] catches = emptyAbundance(species);
+
+        //if there is no fish, don't bother
+        if(where.getBiology().getBiomass(species)>FishStateUtilities.EPSILON) {
+
             //you are going to fish every hour until you are done
             int hoursSpentFishingThisSpecies = hoursSpentFishing;
 
-            while (hoursSpentFishingThisSpecies>0)
-            {
-                biomassCaught[species.getIndex()] +=
-                        fishThisSpecies(where, species, safeMode);
-                hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies-1;
+            while (hoursSpentFishingThisSpecies > 0) {
+                int[][] hourlyCatches = fishThisSpecies(where, species);
+                for (int sex = 0; sex < 2; sex++)
+                    for (int bin = 0; bin < catches[0].length; bin++)
+                        catches[sex][bin] += hourlyCatches[sex][bin];
+
+                hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies - 1;
             }
         }
-        return biomassCaught;
+        return new StructuredAbundance(catches[MALE],catches[FEMALE]);
+    }
+
+    protected static int[][] emptyAbundance(Species species) {
+        int[][] catches = new int[2][];
+        catches[MALE] = new int[species.getMaxAge()+1];
+        catches[FishStateUtilities.FEMALE] = new int[species.getMaxAge()+1];
+        return catches;
     }
 
 
     @Override
     public double[] expectedHourlyCatch(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        return catchesToArray(where,hoursSpentFishing,modelBiology,true);
+        StructuredAbundance[] abundances = catchesToArray(where, hoursSpentFishing, modelBiology);
+        assert modelBiology.getSpecies().size() == abundances.length;
+
+        double[] weights = new double[abundances.length];
+        for(Species species : modelBiology.getSpecies())
+            weights[species.getIndex()] = abundances[species.getIndex()].computeWeight(species);
+
+        return weights;
     }
 
     /**
-     * fish for one hour targeting one species and returns the biomass
+     * fish for one hour targeting one species and returns the abundance caught
      * @param where where the fishing occurs
      * @param species the species considered
      * @return
      */
-    protected double fishThisSpecies(
-            SeaTile where, Species species,
-            boolean safeMode) {
+    protected int[][] fishThisSpecies(
+            SeaTile where, Species species) {
         int[][] fish = new int[2][];
-        fish[FishStateUtilities.MALE] = where.getNumberOfMaleFishPerAge(species);
+        fish[MALE] = where.getNumberOfMaleFishPerAge(species);
         fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
         //filter until you get the catch
         fish = filter(species, fish);
 
 
-        //now turn the catch into total biomass caught
-        double weightCaught = FishStateUtilities.weigh(fish[FishStateUtilities.MALE],
-                                                fish[FishStateUtilities.FEMALE],
-                                                species);
-        //tell the biology to react to it
-        if (weightCaught > 0 && !safeMode)
-            where.reactToThisAmountOfFishBeingCaught(species,
-                                                     fish[FishStateUtilities.MALE],
-                                                     fish[FishStateUtilities.FEMALE]);
-
-        //you've spent one hour (or less fishing)
-        return weightCaught;
+        return fish;
     }
 
     /**
@@ -123,7 +147,7 @@ public class HomogeneousAbundanceGear implements Gear {
     @VisibleForTesting
     public int[][] filter(Species species, int[][] abundance) {
         for (AbundanceFilter filter : filters)
-            abundance = filter.filter(abundance[FishStateUtilities.MALE],
+            abundance = filter.filter(abundance[MALE],
                                  abundance[FishStateUtilities.FEMALE],
                                  species);
         return abundance;

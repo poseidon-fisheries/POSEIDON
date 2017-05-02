@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.Startable;
 
 /**
@@ -24,19 +25,12 @@ public interface LocalBiology extends Startable
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     * @param species the species fished
-     * @param biomassFished the biomass fished
+     * @param caught the amount fished out of the sea
+     * @param notDiscarded the amount retained in the boat (not thrown out)
+     * @param biology
      */
-    void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished);
-
-    /**
-     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
-     * location
-     * @param species the species fished
-     * @param maleCatches the biomass fished
-     * @param femaleCatches
-     */
-    void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches);
+    void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology);
 
     /**
      * returns the number of male fish in this seatile belonging to this species, split into age cohorts

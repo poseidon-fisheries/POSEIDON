@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
@@ -26,9 +27,13 @@ public class ConstantLocalBiology extends AbstractBiomassBasedBiology {
 
     /**
      * nothing happens
+     * @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished)
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology)
     {
 
     }

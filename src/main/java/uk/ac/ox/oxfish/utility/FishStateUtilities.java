@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
@@ -516,20 +517,17 @@ public class FishStateUtilities {
      * @param hoursSpentFishing hours spent fishing
      * @param species species targeted
      * @param q catchability
-     * @param safeMode when true no fish actually dies
      * @return
      */
     public static double catchSpecieGivenCatchability(
-            SeaTile where, int hoursSpentFishing, Species species, double q, boolean safeMode) {
+            SeaTile where, int hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
         Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch
         double specieCatch = Math.min(FishStateUtilities.round(where.getBiomass(species) *
                                                                        q),
                                       where.getBiomass(species));
-        //tell biomass
-        if(!safeMode && specieCatch> 0)
-            where.reactToThisAmountOfBiomassBeingFished(species, specieCatch);
+
 
         return specieCatch;
 
@@ -599,6 +597,51 @@ public class FishStateUtilities {
         {
             totalWeight += maleWeights.get(age) * male[age];
             totalWeight += femaleWeights.get(age) * female[age];
+        }
+
+        return totalWeight;
+
+
+
+    }
+
+    /**
+     * weights this number of fish  assuming they are all male
+     * @param abundance number of fish per size
+     * @param species species object containig the details
+     * @return the weight of hte fish
+     */
+    public static double weigh(StructuredAbundance abundance, Species species)
+    {
+        if(abundance.getSubdivisions() == 1)
+            return weigh(abundance.getAbundance()[0],species);
+        if(abundance.getSubdivisions() == 2)
+            return weigh(abundance.getAbundance()[MALE],
+                         abundance.getAbundance()[FEMALE],
+                         species);
+
+        throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
+
+
+
+
+    }
+
+
+    /**
+     * weights this number of fish  assuming they are all male
+     * @param ageStructure number of fish per size
+     * @param species species object containig the details
+     * @return the weight of hte fish
+     */
+    private static double weigh(int[] ageStructure, Species species)
+    {
+        final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
+        double totalWeight = 0;
+        //go through all the fish and sum up their weight at given age
+        for(int age=0; age<species.getMaxAge()+1; age++)
+        {
+            totalWeight += maleWeights.get(age) * ageStructure[age];
         }
 
         return totalWeight;

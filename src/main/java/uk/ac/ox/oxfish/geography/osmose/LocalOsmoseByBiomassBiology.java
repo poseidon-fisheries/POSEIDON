@@ -1,16 +1,13 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
-import fr.ird.osmose.School;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
 import uk.ac.ox.oxfish.biology.AbstractBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.util.*;
 
 /**
  * The local biology object that links up with the OSMOSE cell. In reality delegates everything to the other local osmose
@@ -54,12 +51,14 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     *  @param species       the species fished
-     * @param biomassFished the biomass fished
+     * @param caught
+     * @param notDiscarded
+     * @param biology
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-        delegate.reactToThisAmountOfBiomassBeingFished(species, biomassFished);
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology) {
+        delegate.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded,biology );
     }
 
     /**

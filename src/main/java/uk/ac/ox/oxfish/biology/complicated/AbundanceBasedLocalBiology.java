@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -76,32 +77,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
     }
 
-    /**
-     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
-     * location
-     *
-     * @param species       the species fished
-     * @param maleCatches   the biomass fished
-     * @param femaleCatches
-     */
-    @Override
-    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches)
-    {
-        if(species.isImaginary()) //ignore imaginary catches
-            return;
 
-        final int[][] fish = abundance.get(species);
-        Preconditions.checkArgument(maleCatches.length == femaleCatches.length);
-        Preconditions.checkArgument(maleCatches.length == fish[FishStateUtilities.MALE].length);
-        for(int age=0; age<maleCatches.length; age++)
-        {
-            fish[FishStateUtilities.MALE][age]-=maleCatches[age];
-            Preconditions.checkArgument(fish[FishStateUtilities.MALE][age] >=0, "There is now a negative amount of male fish left at age " + age);
-            fish[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
-            Preconditions.checkArgument(fish[FishStateUtilities.FEMALE][age] >=0, "There is now a negative amount of female fish left at age " + age);
-        }
-        lastComputedBiomass[species.getIndex()]=Double.NaN;
-    }
 
     /**
      * ignored
@@ -128,48 +104,40 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     /**
      * Sends a warning (since that's not usually the kind of behaviour we want) and after that
      * kills off fish starting from the oldest male until enough biomass dies.
-     *
-     * @param species       the species fished
-     * @param biomassToFish the biomass fished
+     * @param caught fish taken from the sea
+     * @param notDiscarded fish put in hold
+     * @param biology biology object
      */
     @Override
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassToFish)
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology biology)
     {
-        if(!warned && Log.WARN) {
-            Log.warn("Using fishing by biomass on a biology designed for fishing by abundance. Might be an error!");
-            warned =true;
-        }
-        if(species.isImaginary()) //ignore imaginary catches
-            return;
-        assert biomassToFish<=getBiomass(species);
+        Preconditions.checkArgument(caught.hasAbundanceInformation());
 
-        final int[][] fish = abundance.get(species);
-        double biomassActuallyFished = 0;
-        for(int age=species.getMaxAge(); age >=0; age--)
-        {
-            for(int sex=0; sex<2;sex++)
+        for(int index = 0; index < caught.numberOfSpecies(); index++) {
+            Species species = biology.getSpecie(index);
+            if(species.isImaginary()) //ignore imaginary catches
+                continue;
+
+            StructuredAbundance catches = caught.getAbundance(species);
+            Preconditions.checkArgument(catches.getSubdivisions()==2, " needs male/female split");
+
+
+            final int[][] abundanceHere = this.abundance.get(species);
+            int[] maleCatches =catches.getAbundance()[FishStateUtilities.MALE];
+            int[] femaleCatches =catches.getAbundance()[FishStateUtilities.FEMALE];
+            Preconditions.checkArgument(maleCatches.length == abundanceHere[FishStateUtilities.MALE].length);
+            for(int age=0; age<maleCatches.length; age++)
             {
-                double biomassLeft = biomassToFish - biomassActuallyFished;
-                if(biomassLeft<=0)
-                    break;
-                double individualWeight = getWeightForThisSex(sex,species,age);
-                if(individualWeight>0)
-                {
-                    int toKill = Math.min(fish[sex][age],(int)(0.5d + biomassLeft/individualWeight) );
-                    assert toKill>=0;
-                    fish[sex][age] -= toKill;
-                    assert fish[sex][age] >=0;
-                    biomassActuallyFished += toKill * individualWeight;
-                }
-
+                abundanceHere[FishStateUtilities.MALE][age]-=maleCatches[age];
+                Preconditions.checkArgument(abundanceHere[FishStateUtilities.MALE][age] >=0,
+                                            "There is now a negative amount of male fish left at age " + age);
+                abundanceHere[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
+                Preconditions.checkArgument(abundanceHere[FishStateUtilities.FEMALE][age] >=0,
+                                            "There is now a negative amount of female fish left at age " + age);
             }
-
-            if(biomassActuallyFished>=biomassToFish)
-                break;
+            lastComputedBiomass[species.getIndex()]=Double.NaN;
         }
-        Arrays.fill(lastComputedBiomass,Double.NaN);
-
-
 
 
     }

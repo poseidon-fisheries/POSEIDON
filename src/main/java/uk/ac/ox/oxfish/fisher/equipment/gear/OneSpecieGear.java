@@ -39,16 +39,16 @@ public class OneSpecieGear implements Gear {
     @Override
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        double[] caught = catchesAsArray(where, hoursSpentFishing, modelBiology, false);
+        double[] caught = catchesAsArray(where, hoursSpentFishing, modelBiology);
         return new Catch(caught);
     }
 
     private double[] catchesAsArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, final boolean safeMode) {
+            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         double[] caught = new double[modelBiology.getSize()];
         if(proportionCaught>0) {
             FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,
-                                                            proportionCaught, safeMode);
+                                                            proportionCaught);
             caught[targetedSpecies.getIndex()] = FishStateUtilities.round(hoursSpentFishing * proportionCaught * where.getBiomass(
                     targetedSpecies));
         }
@@ -66,7 +66,7 @@ public class OneSpecieGear implements Gear {
     @Override
     public double[] expectedHourlyCatch(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        return catchesAsArray(where,1,modelBiology,true);
+        return catchesAsArray(where,1,modelBiology);
     }
 
     /**

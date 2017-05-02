@@ -82,9 +82,11 @@ dependencies
     //commons math
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.2'
 
-    //burlap!
+    //burlap : Reinforcement Learning helper
     compile group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
 
+    //annotations
+    compile group: 'com.intellij', name: 'annotations', version: '12.0'
 
     //testing:
     testCompile "junit:junit:4.12"

@@ -107,7 +107,7 @@ public class TripRecord {
         Integer timesFished = tilesFished.getOrDefault(record.getTileFished(), 0);
         tilesFished.put(record.getTileFished(),timesFished+record.getHoursSpentFishing());
         for(int i=0; i<totalCatch.length; i++)
-            totalCatch[i]+=record.getFishCaught().getPoundsCaught(i);
+            totalCatch[i]+=record.getFishCaught().getWeightCaught(i);
     }
 
     public void recordCosts(double newCosts)

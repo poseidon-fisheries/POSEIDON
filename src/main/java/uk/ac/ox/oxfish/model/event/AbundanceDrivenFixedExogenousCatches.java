@@ -8,7 +8,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HomogeneousGearFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -16,11 +15,9 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -81,7 +78,7 @@ public class AbundanceDrivenFixedExogenousCatches implements ExogenousCatches
                 //catch it
                 Catch fish = gear.fish(null, tile, 1, ((FishState) simState).getBiology());
                 //should only fish one species!
-                double biomassCaught = fish.getPoundsCaught(target);
+                double biomassCaught = fish.getWeightCaught(target);
                 assert biomassCaught ==fish.totalCatchWeight();
                 //account for it
                 toCatch-= biomassCaught;

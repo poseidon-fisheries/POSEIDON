@@ -31,9 +31,9 @@ public class TripLoggerTest
         assertNotNull(logger.getCurrentTrip());
         assertEquals(logger.getFinishedTrips().size(),0);
 
-        logger.recordFishing(new FishingRecord(1,null,mock(SeaTile.class),
-                                               new Catch(new double[]{100,100}),
-                                               mock(Fisher.class),0));
+        logger.recordFishing(new FishingRecord(1,
+                                               mock(SeaTile.class),
+                                               new Catch(new double[]{100,100})));
         logger.recordEarnings(0,100,100);
         logger.recordCosts(200);
         logger.finishTrip(10, mock(Port.class));

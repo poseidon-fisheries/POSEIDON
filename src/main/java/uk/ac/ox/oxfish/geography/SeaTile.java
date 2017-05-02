@@ -1,13 +1,16 @@
 package uk.ac.ox.oxfish.geography;
 
 import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
+import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * This is the "cell", the tile of the sea grid. The plan is for this to have information about whether it is protected or not
@@ -113,15 +116,6 @@ public class SeaTile implements Startable{
         return biology.getBiomass(species);
     }
 
-    /**
-     * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location
-     * @param species the species fished
-     * @param biomassFished the biomass fished
-     */
-    public void reactToThisAmountOfBiomassBeingFished(Species species, Double biomassFished) {
-        biology.reactToThisAmountOfBiomassBeingFished(species, biomassFished);
-    }
-
 
     @Override
     public String toString() {
@@ -191,14 +185,16 @@ public class SeaTile implements Startable{
     }
 
     /**
-     * Tells the local biology that a fisher (or something anyway) fished these many fish (grouped by age) from this
-     * location
-     * @param species the species fished
-     * @param maleCatches the biomass fished
-     * @param femaleCatches
+     * Tells the local biology that a fisher (or something anyway) fished from this location
+     * @param caught fish taken from the sea
+     * @param notDiscarded fish put in hold
+     * @param globalBiology biology object
      */
-    public void reactToThisAmountOfFishBeingCaught(Species species, int[] maleCatches, int[] femaleCatches) {
-        biology.reactToThisAmountOfFishBeingCaught(species, maleCatches, femaleCatches);
+    public void reactToThisAmountOfBiomassBeingFished(
+            Catch caught, Catch notDiscarded, GlobalBiology globalBiology){
+        //don't bother cascading if it's nothing
+        if(caught.totalCatchWeight() >= FishStateUtilities.EPSILON)
+            biology.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded, globalBiology);
     }
 
     /**

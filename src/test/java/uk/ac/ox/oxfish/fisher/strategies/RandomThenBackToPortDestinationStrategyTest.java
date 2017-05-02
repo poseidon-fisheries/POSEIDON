@@ -5,6 +5,7 @@ import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
@@ -141,8 +142,14 @@ public class RandomThenBackToPortDestinationStrategyTest {
     public static FishState generateSimple2x2Map(final int distancePerCell) {
         ObjectGrid2D grid2D = new ObjectGrid2D(2,2);
         //2x2, first column sea, second  column land
-        grid2D.field[0][0] = new SeaTile(0,0,-100, new TileHabitat(0d));
-        grid2D.field[0][1] = new SeaTile(0,1,-100, new TileHabitat(0d));
+        SeaTile seaTile = new SeaTile(0, 0, -100, new TileHabitat(0d));
+        grid2D.field[0][0] = seaTile;
+        seaTile.setBiology(mock(LocalBiology.class));
+
+        SeaTile tile2 = new SeaTile(0, 1, -100, new TileHabitat(0d));
+        grid2D.field[0][1] = tile2;
+        tile2.setBiology(mock(LocalBiology.class));
+
         grid2D.field[1][0] = new SeaTile(1,0,100, new TileHabitat(0d));
         grid2D.field[1][1] = new SeaTile(1,1,100, new TileHabitat(0d));
         //great
