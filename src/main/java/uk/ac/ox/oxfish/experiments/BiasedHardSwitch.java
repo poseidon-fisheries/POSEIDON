@@ -38,8 +38,9 @@ public class BiasedHardSwitch {
 */
 
         //pid tax
-        Path pid = Paths.get("docs","20161012 pid_tax");
+        Path pid = Paths.get("docs","20161012 pid_tax","remake");
 
+        runSwitchScenario("geography.yaml", "anarchy.csv", pid);
         runSwitchScenario("tax.yaml", "crazy_tax.csv", pid);
         runSwitchScenario("optimal_tax.yaml", "optimal_tax.csv", pid);
 
