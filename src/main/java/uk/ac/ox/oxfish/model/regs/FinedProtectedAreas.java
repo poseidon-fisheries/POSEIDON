@@ -106,15 +106,16 @@ public class FinedProtectedAreas implements Regulation{
 
     /**
      * no reaction
-     *
-     * @param where
+     *  @param where
      * @param who
      * @param fishCaught
+     * @param fishRetained
      * @param hoursSpentFishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+            int hoursSpentFishing) {
 
         if(!where.isProtected())
             return;

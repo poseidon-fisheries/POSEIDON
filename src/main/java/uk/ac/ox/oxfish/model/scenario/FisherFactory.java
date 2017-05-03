@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
@@ -37,6 +38,10 @@ public class FisherFactory
 
     private AlgorithmFactory<? extends FishingStrategy> fishingStrategy;
 
+
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy;
+
+
     private AlgorithmFactory<? extends GearStrategy> gearStrategy;
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy;
@@ -63,6 +68,7 @@ public class FisherFactory
             AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
             AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
             AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
             AlgorithmFactory<? extends GearStrategy> gearStrategy,
             AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
             Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
@@ -74,6 +80,7 @@ public class FisherFactory
         this.fishingStrategy = fishingStrategy;
         this.gearStrategy = gearStrategy;
         this.weatherStrategy = weatherStrategy;
+        this.discardingStrategy = discardingStrategy;
         this.boatSupplier = boatSupplier;
         this.holdSupplier = holdSupplier;
         this.gear = gear;
@@ -97,11 +104,11 @@ public class FisherFactory
                                    destinationStrategy.apply(fishState),
                                    fishingStrategy.apply(fishState),
                                    gearStrategy.apply(fishState),
+                                   discardingStrategy.apply(fishState),
                                    weatherStrategy.apply(fishState),
                                    boatSupplier.get(),
                                    holdSupplier.get(),
-                                   gear.apply(fishState),
-                                   fishState.getSpecies().size());
+                                   gear.apply(fishState), fishState.getSpecies().size());
         for(Consumer<Fisher> setup : additionalSetups)
             setup.accept(fisher);
         return fisher;
@@ -320,5 +327,25 @@ public class FisherFactory
      */
     public void setNextID(int nextID) {
         this.nextID = nextID;
+    }
+
+
+    /**
+     * Getter for property 'discardingStrategy'.
+     *
+     * @return Value for property 'discardingStrategy'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategy() {
+        return discardingStrategy;
+    }
+
+    /**
+     * Setter for property 'discardingStrategy'.
+     *
+     * @param discardingStrategy Value to set for property 'discardingStrategy'.
+     */
+    public void setDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        this.discardingStrategy = discardingStrategy;
     }
 }

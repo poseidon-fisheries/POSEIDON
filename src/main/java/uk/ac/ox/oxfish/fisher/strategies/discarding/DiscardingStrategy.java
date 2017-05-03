@@ -5,12 +5,13 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * Created by carrknight on 4/20/17.
  */
-public interface DiscardingStrategy
+public interface DiscardingStrategy extends FisherStartable
 {
 
 

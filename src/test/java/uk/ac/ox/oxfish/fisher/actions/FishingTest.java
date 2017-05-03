@@ -5,15 +5,13 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.equipment.*;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.RandomThenBackToPortDestinationStrategyTest;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.IgnoreWeatherStrategy;
@@ -84,8 +82,10 @@ public class FishingTest {
                                        }
                                    },
                                    new FixedGearStrategy(),
+                                   new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)), new Hold(100.0, 1), gear, 1);
+                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)), new Hold(100.0, 1), gear,
+                                   1);
         fisher.start(fishState);
         fisher.step(fishState);
         assertEquals(0,fisher.getPoundsCarried(),.001);

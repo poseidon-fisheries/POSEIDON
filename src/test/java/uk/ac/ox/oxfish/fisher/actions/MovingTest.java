@@ -6,9 +6,6 @@ import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
@@ -20,6 +17,8 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FixedProbabilityDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -85,8 +84,10 @@ public class MovingTest
 
                                        }
                                    }, new FixedGearStrategy(),
+                                   new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1,1,new Engine(1,1,1),new FuelTank(1000000)), new Hold(100.0, 1), gear, 1);
+                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)), new Hold(100.0, 1), gear,
+                                   1);
         fisher.start(mock(FishState.class));
         //starts at port!
         assertEquals(fishState.getMap().getSeaTile(1, 1), fisher.getLocation());
@@ -162,13 +163,10 @@ public class MovingTest
                                    mock(DepartingStrategy.class),
                                    strategy, mock(FishingStrategy.class),
                                    mock(GearStrategy.class),
-
-
+                                   mock(DiscardingStrategy.class),
                                    new IgnoreWeatherStrategy(),
-
-
-                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)),
-                                   mock(Hold.class), mock(Gear.class), 1);
+                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)), mock(Hold.class),
+                                   mock(Gear.class), 1);
         fisher.start(mock(FishState.class));
 
         //should move and spend 20 hours doing so
@@ -193,10 +191,10 @@ public class MovingTest
         when(strategy.chooseDestination(any(), any(), any(), any())).thenReturn(map.getSeaTile(2, 0));
         Fisher fisher = new Fisher(0, port, new MersenneTwisterFast(), new Anarchy(),
                                    mock(DepartingStrategy.class), strategy,
-                                   mock(FishingStrategy.class),  mock(GearStrategy.class),
+                                   mock(FishingStrategy.class), mock(GearStrategy.class),mock(DiscardingStrategy.class) ,
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)), mock(Hold.class),
-                                   mock(Gear.class), 1);
+                                   new Boat(1, 1, new Engine(1, 1, .1), new FuelTank(1000000)),
+                                   mock(Hold.class), mock(Gear.class), 1);
 
         fisher.start(mock(FishState.class));
         fisher.undock();

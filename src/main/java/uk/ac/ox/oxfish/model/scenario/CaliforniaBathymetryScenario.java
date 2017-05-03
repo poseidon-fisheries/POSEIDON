@@ -29,6 +29,8 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -184,6 +186,10 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                      new Pair<>("Sablefish",2494999.8),
                                      new Pair<>("Shortspine thornyhead",1196999.874)
             );
+
+
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
+
 
     /*
    * fuel efficiency per hour is 57l according to Toft et al
@@ -618,14 +624,15 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                               destinationStrategy.apply(model),
                                               fishingStrategy.apply(model),
                                               gearStrategy.apply(model),
+                                              discardingStrategy.apply(model),
                                               weatherStrategy.apply(model),
                                               new Boat(10, 10,
                                                        new Engine(engineWeight,
                                                                   mileage,
                                                                   speed),
                                                        new FuelTank(fuelCapacity)),
-                                              new Hold(capacity, biology.getSize()), fisherGear,
-                                              model.getSpecies().size());
+                                              new Hold(capacity, biology.getSize()),
+                                              fisherGear, model.getSpecies().size());
                 fisherCounter++;
                 //predictors
                 for(Species species : model.getSpecies())
@@ -692,6 +699,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
+                discardingStrategy,
                 gearStrategy,
                 weatherStrategy,
                 () -> new Boat(10, 10, new Engine(0,
@@ -700,9 +708,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                new FuelTank(fuelTankInLiters.apply(random))),
                 () -> new Hold(holdSizePerBoat.apply(random), biology.getSize()),
                 gear,
-                fisherCounter
 
-        );
+                fisherCounter);
         if(fisherList.size() <=1)
             networkBuilder = new EmptyNetworkBuilder();
 

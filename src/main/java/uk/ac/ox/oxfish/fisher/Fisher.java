@@ -23,8 +23,8 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -146,8 +146,11 @@ public class Fisher implements Steppable, Startable{
     /**
      * the strategy to choose what gear to use when going out.
      */
-    private GearStrategy gearStrategy = new FixedGearStrategy()    ;
+    private GearStrategy gearStrategy;
 
+
+
+    private DiscardingStrategy discardingStrategy;
 
     /**
      * the turnOff switch to call when the fisher is turned off
@@ -218,6 +221,7 @@ public class Fisher implements Steppable, Startable{
      * @param destinationStrategy how the fisher decides where to go
      * @param fishingStrategy how the fisher decides how much to fish
      * @param gearStrategy
+     * @param discardingStrategy
      * @param weatherStrategy
      * @param boat the boat the fisher uses
      * @param hold the space available to load fish
@@ -233,6 +237,7 @@ public class Fisher implements Steppable, Startable{
             DestinationStrategy destinationStrategy,
             FishingStrategy fishingStrategy,
             GearStrategy gearStrategy,
+            DiscardingStrategy discardingStrategy,
             WeatherEmergencyStrategy weatherStrategy,
             //equipment:
             Boat boat, Hold hold, Gear gear,
@@ -251,7 +256,7 @@ public class Fisher implements Steppable, Startable{
         this.fishingStrategy = fishingStrategy;
         this.gearStrategy=gearStrategy;
         this.weatherStrategy = weatherStrategy;
-
+        this.discardingStrategy = discardingStrategy;
 
         //predictors
         dailyCatchesPredictor = new Predictor[numberOfSpecies];
@@ -297,6 +302,7 @@ public class Fisher implements Steppable, Startable{
         departingStrategy.start(state,this);
         gearStrategy.start(state,this);
         weatherStrategy.start(state,this);
+        discardingStrategy.start(state,this);
 
         //start the adaptations
         bimonthlyAdaptation.start(state,this);
@@ -335,6 +341,7 @@ public class Fisher implements Steppable, Startable{
         departingStrategy.turnOff(this);
         weatherStrategy.turnOff(this);
         getRegulation().turnOff(this);
+        discardingStrategy.turnOff(this);
 
         //turn off the adaptations
         bimonthlyAdaptation.turnOff(this);
@@ -622,6 +629,28 @@ public class Fisher implements Steppable, Startable{
         }
     }
 
+
+    public void setDiscardingStrategy(DiscardingStrategy newStrategy) {
+
+        DiscardingStrategy old = this.discardingStrategy;
+        this.discardingStrategy = newStrategy;
+
+        if(state != null) //if we have started already
+        {
+            old.turnOff(this); //turn off old strategy
+            discardingStrategy.start(state,this);
+        }
+    }
+
+    /**
+     * Getter for property 'discardingStrategy'.
+     *
+     * @return Value for property 'discardingStrategy'.
+     */
+    public DiscardingStrategy getDiscardingStrategy() {
+        return discardingStrategy;
+    }
+
     public DepartingStrategy getDepartingStrategy() {
         return departingStrategy;
     }
@@ -714,9 +743,18 @@ public class Fisher implements Steppable, Startable{
 
         //catch fish
         Catch catchOfTheDay = equipment.getGear().fish(this, here, hoursSpentFishing, modelBiology);
+        Catch notDiscarded = discardingStrategy.chooseWhatToKeep(
+                here,
+                this,
+                catchOfTheDay,
+                hoursSpentFishing,
+                getRegulation(),
+                state,
+                grabRandomizer()
+        );
         //if you actually caught something
         if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON)
-            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay,null,modelBiology);
+            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay,notDiscarded,modelBiology);
 
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,
@@ -726,8 +764,8 @@ public class Fisher implements Steppable, Startable{
         memory.registerVisit(here, (int) state.getDay());
 
         //now let regulations and the hold deal with it
-        status.getRegulation().reactToFishing(here,this, catchOfTheDay, hoursSpentFishing);
-        load(catchOfTheDay);
+        status.getRegulation().reactToFishing(here, this, catchOfTheDay,notDiscarded , hoursSpentFishing);
+        load(notDiscarded);
 
         //consume gas
         final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,

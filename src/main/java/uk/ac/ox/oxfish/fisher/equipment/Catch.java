@@ -36,8 +36,19 @@ public class Catch {
      * @param poundsCaught the pounds that have been caugh
      */
     public Catch(Species species, double poundsCaught, GlobalBiology biology) {
+       this(species,poundsCaught,biology.getSize());
+
+
+    }
+
+    /**
+     * single species catch
+     * @param species the species caught
+     * @param poundsCaught the pounds that have been caugh
+     */
+    public Catch(Species species, double poundsCaught, int numberOfSpeciesInTheModel) {
         Preconditions.checkState(poundsCaught >=0);
-        biomassCaught = new double[biology.getSize()];
+        biomassCaught = new double[numberOfSpeciesInTheModel];
         biomassCaught[species.getIndex()] = poundsCaught;
         abundance = null;
 
@@ -79,15 +90,14 @@ public class Catch {
         Preconditions.checkArgument(biology.getSize() == abundance.length);
 
         //weigh them (assuming they are all men!)
-        biomassCaught = new double[biology.getSize()];
-        for(Species species : biology.getSpecies())
-            biomassCaught[species.getIndex()] =
-                    FishStateUtilities.weigh(
-                            abundance[species.getIndex()],
-                            species);
+        biomassCaught = abundanceToBiomass(biology);
         totalWeight = computeTotalWeight();
 
 
+    }
+
+    private double[] abudanceToBiomassVector(GlobalBiology biology) {
+        return new double[biology.getSize()];
     }
 
 
@@ -104,12 +114,7 @@ public class Catch {
             abundance[i] = new StructuredAbundance(ageStructure[i]);
 
         //weigh them (assuming they are all men!)
-        biomassCaught = new double[biology.getSize()];
-        for(Species species : biology.getSpecies())
-            biomassCaught[species.getIndex()] =
-                    FishStateUtilities.weigh(
-                            abundance[species.getIndex()],
-                            species);
+        biomassCaught = abundanceToBiomass(biology);
         totalWeight = computeTotalWeight();
 
 
@@ -129,16 +134,29 @@ public class Catch {
             abundance[i] = new StructuredAbundance(maleAbundance[i],femaleAbundance[i]);
 
         //weigh them (assuming they are all men!)
-        biomassCaught = new double[biology.getSize()];
-        for(Species species : biology.getSpecies())
-            biomassCaught[species.getIndex()] =
-                    FishStateUtilities.weigh(
-                            abundance[species.getIndex()],
-                            species);
+        biomassCaught = abundanceToBiomass(biology);
+
         totalWeight = computeTotalWeight();
 
     }
 
+    private double[] abundanceToBiomass(GlobalBiology biology) {
+        double[] biomasses = new double[biology.getSize()];
+        for(Species species : biology.getSpecies())
+            biomasses[species.getIndex()] =
+                    FishStateUtilities.weigh(
+                            abundance[species.getIndex()],
+                            species);
+        return biomasses;
+    }
+
+    /**
+     * single species abundance catch
+     * @param maleAbundance
+     * @param femaleAbundance
+     * @param correctSpecies
+     * @param biology
+     */
     public Catch(int[] maleAbundance, int[]femaleAbundance, Species correctSpecies, GlobalBiology biology )
     {
         this.abundance = new StructuredAbundance[maleAbundance.length];

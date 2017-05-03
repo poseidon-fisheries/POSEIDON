@@ -19,6 +19,8 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -152,6 +154,13 @@ public class TwoPopulationsScenario implements Scenario{
 
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategyLarge =
             new PerTripImitativeDestinationFactory();
+
+
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall =
+            new NoDiscardingFactory();
+
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge =
+            new NoDiscardingFactory();
     /**
      * factory to produce fishing strategy
      */
@@ -308,6 +317,7 @@ public class TwoPopulationsScenario implements Scenario{
                 departingStrategySmall,
                 destinationStrategySmall,
                 fishingStrategy,
+                discardingStrategySmall,
                 gearStrategy,
                 weatherStrategy,
                 (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
@@ -316,9 +326,8 @@ public class TwoPopulationsScenario implements Scenario{
                                                 new FuelTank(smallFuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(smallHoldSize.apply(random), biology.getSize()),
                 gearSmall,
-                0
 
-        );
+                0);
 
         //create a factory for the large boats too
         FisherFactory largeFishersFactory = new FisherFactory(
@@ -327,6 +336,7 @@ public class TwoPopulationsScenario implements Scenario{
                 departingStrategyLarge,
                 destinationStrategyLarge,
                 fishingStrategy,
+                discardingStrategyLarge,
                 gearStrategy,
                 weatherStrategy,
                 (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
@@ -335,9 +345,8 @@ public class TwoPopulationsScenario implements Scenario{
                                                 new FuelTank(largeFuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(largeHoldSize.apply(random), biology.getSize()),
                 gearLarge,
-                0
 
-        );
+                0);
 
 
         //adds predictors to the fisher if the usepredictors flag is up.

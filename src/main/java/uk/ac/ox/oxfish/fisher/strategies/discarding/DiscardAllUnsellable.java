@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -32,9 +33,11 @@ public class DiscardAllUnsellable implements DiscardingStrategy {
             SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation,
             FishState model, MersenneTwisterFast random) {
 
+        Preconditions.checkArgument(!fishCaught.hasAbundanceInformation(),
+                                    "This discard strategy erases abundance information!");
 
         //go through the regulation object and return everything that isn't kept
-        double[] saved  = new double[model.getSpecies().size()];
+        double[] saved  = new double[fishCaught.numberOfSpecies()];
         for(Species species : model.getSpecies())
         {
             saved[species.getIndex()] = Math.min(fishCaught.getWeightCaught(species),
@@ -42,6 +45,17 @@ public class DiscardAllUnsellable implements DiscardingStrategy {
         }
 
         return new Catch(saved);
+
+    }
+
+
+    @Override
+    public void start(FishState model, Fisher fisher) {
+
+    }
+
+    @Override
+    public void turnOff(Fisher fisher) {
 
     }
 }

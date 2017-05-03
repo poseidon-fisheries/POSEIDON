@@ -23,6 +23,8 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.DestinationStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategies;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FishingStrategies;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -129,6 +131,9 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(LogbookInitializer.class, LogbookInitializers.CONSTRUCTORS);
         NAMES_MAP.put(LogbookInitializer.class, LogbookInitializers.NAMES);
+
+        CONSTRUCTOR_MAP.put(DiscardingStrategy.class, DiscardingStrategies.CONSTRUCTORS);
+        NAMES_MAP.put(DiscardingStrategy.class, DiscardingStrategies.NAMES);
 
 
 

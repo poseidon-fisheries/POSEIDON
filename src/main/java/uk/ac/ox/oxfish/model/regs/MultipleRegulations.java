@@ -126,18 +126,19 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
 
     /**
      * tell the regulation object this much has been caught
-     *
-     * @param where             where the fishing occurred
+     *  @param where             where the fishing occurred
      * @param who               who did the fishing
      * @param fishCaught        catch object
+     * @param fishRetained
      * @param hoursSpentFishing how many hours were spent fishing
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+            int hoursSpentFishing) {
         assert started;
         for(Regulation regulation : regulations)
-            regulation.reactToFishing(where,who,fishCaught,hoursSpentFishing);
+            regulation.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing);
     }
 
 

@@ -25,9 +25,10 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogist
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesFloridaDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FloridaLogitReturnFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
@@ -157,6 +158,10 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends DepartingStrategy> handlinerDepartingStrategy =
             new HandlineFloridaLogisticDepartingFactory();
 
+
+    private AlgorithmFactory<? extends DiscardingStrategy> handlinerDiscardingStrategy = new NoDiscardingFactory();
+
+
     /**
      * factory to produce departing strategy
      */
@@ -216,6 +221,9 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends DestinationStrategy> longlinerDestinationStrategy =
             new FloridaLogitDestinationFactory();
 
+
+
+    private AlgorithmFactory<? extends DiscardingStrategy> longlinerDiscardingStrategy = new NoDiscardingFactory();
 
     /**
      * factory to produce fishing strategy
@@ -408,6 +416,7 @@ public class OsmoseWFSScenario implements Scenario{
                                               longlinerDestinationStrategy.apply(model),
                                               longlinerFishingStrategy.apply(model),
                                               longlinerGearStrategy.apply(model),
+                                              longlinerDiscardingStrategy.apply(model),
                                               longlinerWeatherStrategy.apply(model),
                                               new Boat(10, 10,
                                                        new Engine(engineWeight,
@@ -416,8 +425,8 @@ public class OsmoseWFSScenario implements Scenario{
                                                        new FuelTank(fuelCapacity)),
                                               new Hold(
                                                       longlinerHoldSize.apply(random),
-                                                      biology.getSize()), fisherGear,
-                                              model.getSpecies().size());
+                                                      biology.getSize()),
+                                              fisherGear, model.getSpecies().size());
                 newFisher.getTags().add("large");
                 newFisher.getTags().add("longline");
                 newFisher.getTags().add("ship");
@@ -463,16 +472,16 @@ public class OsmoseWFSScenario implements Scenario{
                                               handlinerDestinationStrategy.apply(model),
                                               handlinerFishingStrategy.apply(model),
                                               handlinerGearStrategy.apply(model),
+                                              handlinerDiscardingStrategy.apply(model   ),
                                               handlinerWeatherStrategy.apply(model),
                                               new Boat(10, 10,
                                                        new Engine(engineWeight,
                                                                   mileage,
                                                                   speed),
-                                                       new FuelTank(fuelCapacity)),
-                                              new Hold(
-                                                      handlinerHoldSize.apply(random),
-                                                      biology.getSize()), fisherGear,
-                                              model.getSpecies().size());
+                                                       new FuelTank(fuelCapacity)), new Hold(
+                        handlinerHoldSize.apply(random),
+                        biology.getSize()),
+                                              fisherGear, model.getSpecies().size());
                 newFisher.getTags().add("small");
                 newFisher.getTags().add("handline");
                 newFisher.getTags().add("boat");

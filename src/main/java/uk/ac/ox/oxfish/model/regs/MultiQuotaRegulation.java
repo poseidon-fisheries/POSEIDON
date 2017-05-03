@@ -43,10 +43,16 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     public boolean isFishingStillAllowed(){
 
-        //all must be strictly positive!
-        return
-                Arrays.stream(quotaRemaining).allMatch(value -> value >= 0);
+        //all quotas must be at least 0 and at least one must be ABOVE 0
+        boolean above0 = false;
+        for(double quota : quotaRemaining) {
+            if (quota < 0)
+                return false;
+            if(quota > 0)
+                above0 = true;
+        }
 
+        return above0;
 
     }
 
@@ -87,13 +93,16 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     /**
      * ignored
-     *  @param where
+     * @param where
      * @param who
      * @param fishCaught catch object
+     * @param fishRetained
      * @param hoursSpentFishing
      */
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
+    public void reactToFishing(
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+            int hoursSpentFishing) {
         //ignored
     }
 

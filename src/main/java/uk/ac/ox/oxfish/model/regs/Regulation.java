@@ -48,9 +48,12 @@ public interface Regulation extends FisherStartable
      * @param where where the fishing occurred
      * @param who who did the fishing
      * @param fishCaught catch object
+     * @param fishRetained
      * @param hoursSpentFishing how many hours were spent fishing
      */
-    void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing);
+    void reactToFishing(
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+            int hoursSpentFishing);
 
     /**
      * tell the regulation object this much of this species has been sold

@@ -11,13 +11,14 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomThenBackToPortFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedList;
@@ -55,11 +56,11 @@ public class StrategyReplicatorTest {
                     mock(DestinationStrategy.class),
                     mock(FishingStrategy.class),
                     mock(GearStrategy.class),
+                    mock(DiscardingStrategy.class),
                     mock(WeatherEmergencyStrategy.class),
                     mock(Boat.class),
-                    mock(Hold.class),
-                    mock(Gear.class), 1
-            );
+                    mock(Hold.class), mock(Gear.class),
+                    1);
             f.start(state);
             fishers.add(f);
 

@@ -70,7 +70,9 @@ public class FishingSeason implements Regulation
      * nothing
      */
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing) {
+    public void reactToFishing(
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+            int hoursSpentFishing) {
 
     }
 

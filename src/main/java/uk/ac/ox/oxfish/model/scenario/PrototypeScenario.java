@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.CarryingCapacityDiffuser;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -25,6 +24,8 @@ import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -174,6 +175,7 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends GearStrategy> gearStrategy =
             new FixedGearStrategyFactory();
 
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
 
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
@@ -334,6 +336,7 @@ public class PrototypeScenario implements Scenario {
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
+                discardingStrategy,
                 gearStrategy,
                 weatherStrategy,
                 (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
@@ -342,9 +345,8 @@ public class PrototypeScenario implements Scenario {
                                                 new FuelTank(fuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(holdSize.apply(random), biology.getSize()),
                 gear,
-                0
 
-        );
+                0);
         //add predictor setup to the factory
         fisherFactory.getAdditionalSetups().add(predictorSetup);
         fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
