@@ -5,6 +5,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -129,32 +130,35 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
             //you  can't predict profits yet (predictor not ready, probably)
             return Double.NaN;
 
-        //for every species
-        for(int species = 0; species < state.getSpecies().size(); species++)
-        {
-            if(species == specieIndex ) //don't count yourself
-                continue;
-            //if we can't predict profits for this species (maybe because we never catch it) then don't count it
-            double predictedCatches = fisher.predictDailyCatches(species);
-            double predictedUnitProfit = fisher.predictUnitProfit(species);
-            if(Double.isNaN(predictedCatches) ||
-                    predictedCatches < FishStateUtilities.EPSILON ||
-                    Double.isNaN(predictedUnitProfit))
-                continue;
 
-            predictedCatches = FishStateUtilities.round5(predictedCatches);
-            predictedUnitProfit = FishStateUtilities.round5(predictedUnitProfit);
-            //quota price (0 if there is no market)
-            ITQOrderBook market = orderBooks.get(species);
-            double quotaPrice = market != null ? market.getLastClosingPrice() : 0;
-            quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
+        //if you don't discard, you need to connect how much of other species' landings you make while fishing this one in particular
+        //todo this is ugly
+        if(fisher.getDiscardingStrategy() instanceof NoDiscarding) {
+            //for every species
+            for (int species = 0; species < state.getSpecies().size(); species++) {
+                if (species == specieIndex) //don't count yourself
+                    continue;
+                //if we can't predict profits for this species (maybe because we never catch it) then don't count it
+                double predictedCatches = fisher.predictDailyCatches(species);
+                double predictedUnitProfit = fisher.predictUnitProfit(species);
+                if (Double.isNaN(predictedCatches) ||
+                        predictedCatches < FishStateUtilities.EPSILON ||
+                        Double.isNaN(predictedUnitProfit))
+                    continue;
 
-            multiplier += (predictedUnitProfit - quotaPrice)
-                    * predictedCatches / dailyCatchesPredicted;
+                predictedCatches = FishStateUtilities.round5(predictedCatches);
+                predictedUnitProfit = FishStateUtilities.round5(predictedUnitProfit);
+                //quota price (0 if there is no market)
+                ITQOrderBook market = orderBooks.get(species);
+                double quotaPrice = market != null ? market.getLastClosingPrice() : 0;
+                quotaPrice = Double.isFinite(quotaPrice) ? quotaPrice : 0; //value it 0 if it's NAN
 
-            Preconditions.checkArgument(Double.isFinite(multiplier));
+                multiplier += (predictedUnitProfit - quotaPrice)
+                        * predictedCatches / dailyCatchesPredicted;
+
+                Preconditions.checkArgument(Double.isFinite(multiplier));
+            }
         }
-
         return multiplier * probability;
 
 

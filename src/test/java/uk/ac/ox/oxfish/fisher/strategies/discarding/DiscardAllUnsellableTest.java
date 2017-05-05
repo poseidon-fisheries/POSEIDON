@@ -33,7 +33,8 @@ public class DiscardAllUnsellableTest {
         when(model.getSpecies()).thenReturn(biology.getSpecies());
 
         Catch caught = new Catch(species1, 100, biology);
-        DiscardingStrategy noDiscarding = new DiscardAllUnsellable();
+        DiscardAllUnsellable noDiscarding = new DiscardAllUnsellable();
+        noDiscarding.setSafetyBuffer(0d);
 
         Regulation mock = mock(Regulation.class);
         //no discarding should occur
@@ -62,7 +63,8 @@ public class DiscardAllUnsellableTest {
         GlobalBiology biology = new GlobalBiology(species1, species2);
         when(model.getSpecies()).thenReturn(biology.getSpecies());
         Catch caught = new Catch(species1, 100, biology);
-        DiscardingStrategy noDiscarding = new DiscardAllUnsellable();
+        DiscardAllUnsellable noDiscarding = new DiscardAllUnsellable();
+        noDiscarding.setSafetyBuffer(0d);
 
         Regulation mock = mock(Regulation.class);
         //no discarding should occur

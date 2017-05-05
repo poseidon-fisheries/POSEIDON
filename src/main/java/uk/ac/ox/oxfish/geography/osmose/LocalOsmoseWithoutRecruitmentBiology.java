@@ -153,7 +153,7 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
             Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
 
-        Preconditions.checkArgument(caught.hasAbundanceInformation(),"Osmose biology isn't adapted through abudance gear. What's going on?");
+        Preconditions.checkArgument(!caught.hasAbundanceInformation(),"Osmose biology isn't adapted through abudance gear. What's going on?");
 
         for(int species = 0; species<caught.numberOfSpecies(); species++) {
             double biomassFished = caught.getWeightCaught(species);

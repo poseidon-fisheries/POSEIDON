@@ -81,14 +81,14 @@ public class FisherTest {
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(),1,.001);
         TripRecord record = fisher.getCurrentTrip();
-        assertEquals(0, fisher.getPoundsCarried(), .001);
+        assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 2, .001);
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 3,.001);
         //ready to go home
-        assertEquals(2.0, fisher.getPoundsCarried(), .001);
+        assertEquals(2.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         //home now
         fisher.step(fishState);
@@ -97,7 +97,7 @@ public class FisherTest {
         assertEquals(fisher.getHoursAtSea(), 4, .001);
         fisher.step(fishState);
         assertEquals(fisher.getHoursAtSea(), 0,.001);
-        assertEquals(0.0, fisher.getPoundsCarried(), .001);
+        assertEquals(0.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         assertEquals(record.isCutShort(), false);
         //2 km, 20 liters of fuel, 10$ each liter
@@ -165,7 +165,7 @@ public class FisherTest {
         assertEquals(fisher.getFuelLeft(), 20.0, 0.0);
         //step it again, it should fish a bit
         fisher.step(fishState);
-        assertEquals(1.0, fisher.getPoundsCarried(), .001);
+        assertEquals(1.0, fisher.getTotalWeightOfCatchInHold(), .001);
         assertEquals(fisher.getFuelLeft(), 10.0, 0.0);
         //and now emergency should kick in and you should go back home
         fisher.step(fishState);

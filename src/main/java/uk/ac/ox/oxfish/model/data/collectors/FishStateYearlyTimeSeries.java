@@ -73,6 +73,13 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                     , Double.NaN);
 
 
+            String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+            registerGatherer(catchesColumn,
+                             FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
+                                     catchesColumn)), 0d);
+
+
+
             registerGatherer(price,
                              new Gatherer<FishState>() {
                                  @Override

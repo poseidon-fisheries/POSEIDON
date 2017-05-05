@@ -7,11 +7,12 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulation> {
 
@@ -27,7 +28,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     /**
      * for each model there is only one quota object being shared
      */
-    private final Map<FishState,MultiQuotaRegulation> modelQuota = new HashMap<>();
+    private final Locker<FishState,MultiQuotaRegulation> modelQuota = new Locker<>();
 
 
     /**
@@ -40,10 +41,17 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
     public MultiQuotaRegulation apply(FishState state)
     {
 
-        if(!modelQuota.containsKey(state))
-            modelQuota.put(state,createInstance(state.getRandom(), state.getSpecies().size(), state));
 
-        return modelQuota.get(state);
+        return modelQuota.presentKey(state,
+                                     new Supplier<MultiQuotaRegulation>() {
+                                         @Override
+                                         public MultiQuotaRegulation get() {
+                                             return  createInstance(state.getRandom(),
+                                                                    state.getSpecies().size(),
+                                                                    state);
+                                         }
+                                     });
+
 
 
 
@@ -56,11 +64,23 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
                                                 FishState state)
     {
 
+        double[] quotas = turnStringIntoQuotaArray(state, yearlyQuotaMaps);
+
+        MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
+        //now create the opportunity costs manager
+      //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
+      //  state.registerStartable(manager);
+
+        return regulations;
+    }
+
+
+    public static double[] turnStringIntoQuotaArray(FishState state, String yearlyQuotaMaps) {
         Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the TAC!");
 
         //here we store the quotas
-        double[] quotas = new double[numberOfSpecies];
+        double[] quotas = new double[state.getSpecies().size()];
         //start them as non-binding
         Arrays.fill(quotas, Double.POSITIVE_INFINITY);
         //go for each input and read the results
@@ -71,13 +91,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
             Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;
         }
-
-        MultiQuotaRegulation regulations = new MultiQuotaRegulation(quotas, state);
-        //now create the opportunity costs manager
-      //  TACOpportunityCostManager manager = new TACOpportunityCostManager(regulations);
-      //  state.registerStartable(manager);
-
-        return regulations;
+        return quotas;
     }
 
     public String getYearlyQuotaMaps() {
@@ -88,7 +102,4 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         this.yearlyQuotaMaps = yearlyQuotaMaps;
     }
 
-    public Map<FishState, MultiQuotaRegulation> getModelQuota() {
-        return modelQuota;
-    }
 }

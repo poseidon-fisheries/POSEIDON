@@ -677,4 +677,23 @@ public class PrototypeScenario implements Scenario {
             AlgorithmFactory<? extends LogbookInitializer> logbook) {
         this.logbook = logbook;
     }
+
+    /**
+     * Getter for property 'discardingStrategy'.
+     *
+     * @return Value for property 'discardingStrategy'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategy() {
+        return discardingStrategy;
+    }
+
+    /**
+     * Setter for property 'discardingStrategy'.
+     *
+     * @param discardingStrategy Value to set for property 'discardingStrategy'.
+     */
+    public void setDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        this.discardingStrategy = discardingStrategy;
+    }
 }

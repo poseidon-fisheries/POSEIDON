@@ -12,12 +12,15 @@ public class FisherDailyCounter extends Counter {
 
     private double[] landings;
 
+    private double[] catches;
+
     private double[] earnings;
 
     public FisherDailyCounter(int numberOfSpecies) {
         super(IntervalPolicy.EVERY_DAY);
         landings = new double[numberOfSpecies];
         earnings = new double[numberOfSpecies];
+        catches = new double[numberOfSpecies];
         super.addColumn(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
         super.addColumn(FisherYearlyTimeSeries.EFFORT);
     }
@@ -30,6 +33,7 @@ public class FisherDailyCounter extends Counter {
         {
             landings[i]=0;
             earnings[i]=0;
+            catches[i]=0;
         }
     }
 
@@ -46,6 +50,10 @@ public class FisherDailyCounter extends Counter {
         earnings[species.getIndex()]+=add;
     }
 
+    public void countCatches(Species species, double add) {
+        catches[species.getIndex()]+=add;
+    }
+
     public double getLandingsPerSpecie(int index)
     {
         return landings[index];
@@ -54,5 +62,9 @@ public class FisherDailyCounter extends Counter {
     public double getEarningsPerSpecie(int index)
     {
         return earnings[index];
+    }
+
+    public double getCatchesPerSpecie(int index){
+        return catches[index];
     }
 }

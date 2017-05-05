@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 
@@ -35,6 +36,7 @@ public class ProportionalQuotaPriceGeneratorTest {
         when(fisher.getDailyData()).thenReturn(mock(FisherDailyTimeSeries.class));
         when(fisher.predictDailyCatches(0)).thenReturn(100d);
         when(fisher.predictDailyCatches(1)).thenReturn(100d);
+        when(fisher.getDiscardingStrategy()).thenReturn(new NoDiscarding());
 
         when(fisher.probabilitySumDailyCatchesBelow(0,123,1)).thenReturn(.5); //50% chance of needing it
 

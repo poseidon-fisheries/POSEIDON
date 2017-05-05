@@ -40,10 +40,11 @@ public class SoftmaxBanditAlgorithmTest {
     public void tenOptionsEMA() throws Exception
     {
 
+
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
-                new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8)), 10, .98);
+                new BanditAverage(10, () -> new ExponentialMovingAverage<>(.8)), 50, .975);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
             double reward = random.nextGaussian() / 2 + arm;
@@ -52,7 +53,7 @@ public class SoftmaxBanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>500);
+        assertTrue(bandit.getNumberOfObservations(9) > 500);
 
 
     }
@@ -62,10 +63,12 @@ public class SoftmaxBanditAlgorithmTest {
     public void tenOptionsMA() throws Exception
     {
 
+        //About 1 out of 5000 trials fail
+
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
-                new BanditAverage(10, () -> new MovingAverage<>(20)), 10, .98);
+                new BanditAverage(10, () -> new MovingAverage<>(20)), 50, .975);
         for (int i = 0; i < 1000; i++) {
             int arm = bandit.chooseArm(random);
             double reward = random.nextGaussian() / 2 + arm;
@@ -74,7 +77,7 @@ public class SoftmaxBanditAlgorithmTest {
 
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
-        assertTrue(bandit.getNumberOfObservations(9)>500);
+        assertTrue(bandit.getNumberOfObservations(9) > 500);
 
 
     }

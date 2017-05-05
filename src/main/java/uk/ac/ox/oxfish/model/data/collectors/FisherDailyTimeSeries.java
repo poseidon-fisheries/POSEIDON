@@ -15,7 +15,7 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
 
     public static final String CASH_COLUMN = FisherYearlyTimeSeries.CASH_COLUMN;
-
+    public static final String CATCHES_COLUMN_NAME = "Catches";
 
 
     public FisherDailyTimeSeries() {
@@ -62,6 +62,17 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
                                  @Override
                                  public Double apply(Fisher fisher) {
                                      return fisher.getDailyCounter().getLandingsPerSpecie(species.getIndex());
+                                 }
+                             }),
+                             Double.NaN);
+
+            final String catches = species + " " + CATCHES_COLUMN_NAME;
+
+            registerGatherer(catches,
+                             (new Gatherer<Fisher>() {
+                                 @Override
+                                 public Double apply(Fisher fisher) {
+                                     return fisher.getDailyCounter().getCatchesPerSpecie(species.getIndex());
                                  }
                              }),
                              Double.NaN);

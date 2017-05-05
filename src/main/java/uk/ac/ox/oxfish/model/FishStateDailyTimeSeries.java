@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
@@ -68,6 +69,22 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                                  }
                              }, Double.NaN);
 
+
+            String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
+            registerGatherer(catchesColumn,
+                             //so "stream" is a trick from Java 8. In this case it just sums up all the data
+                             new Gatherer<FishState>() {
+                                 @Override
+                                 public Double apply(FishState ignored) {
+                                     return observed.getFishers().stream().mapToDouble(
+                                             new ToDoubleFunction<Fisher>() {
+                                                 @Override
+                                                 public double applyAsDouble(Fisher value) {
+                                                     return value.getDailyCounter().getCatchesPerSpecie(species.getIndex());
+                                                 }
+                                             }).sum();
+                                 }
+                             }, 0d);
 
 
         }

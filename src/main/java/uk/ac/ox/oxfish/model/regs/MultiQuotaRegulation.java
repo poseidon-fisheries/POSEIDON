@@ -48,7 +48,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
         for(double quota : quotaRemaining) {
             if (quota < 0)
                 return false;
-            if(quota > 0)
+            if(quota > FishStateUtilities.EPSILON)
                 above0 = true;
         }
 

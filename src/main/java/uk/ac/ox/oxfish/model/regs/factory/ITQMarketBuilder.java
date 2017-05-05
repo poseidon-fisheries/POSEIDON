@@ -4,12 +4,14 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.MonoQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.PricingPolicy;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,25 +88,42 @@ public class ITQMarketBuilder  implements Startable
                                                      }
                                                  },
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Prices Of " + speciesName, new Gatherer<FishState>() {
-                                                     @Override
-                                                     public Double apply(FishState state1) {
-                                                         return market.getDailyAveragePrice();
-                                                     }
-                                                 },
-                                                 Double.NaN);
+        DataColumn priceGatherer =
+                model.getDailyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
+                                                                      new Gatherer<FishState>() {
+                                                                          @Override
+                                                                          public Double apply(FishState state1) {
+                                                                              return market.getDailyAveragePrice();
+                                                                          }
+                                                                      },
+                                                                      Double.NaN);
+        model.getYearlyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
+                                                  FishStateUtilities.generateYearlyAverage(priceGatherer),
+                                                  Double.NaN);
+
+
         model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of " + speciesName, state1 -> {
                                                      return market.getLastClosingPrice();
                                                  },
                                                  Double.NaN);
-        model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName, state1 -> {
-                                                     return market.getDailyQuotasExchanged();
-                                                 },
-                                                 Double.NaN);
+        DataColumn volumeGatherer = model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName, state1 -> {
+                                                                          return market.getDailyQuotasExchanged();
+                                                                      },
+                                                                      Double.NaN);
+        model.getYearlyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
+                                                  FishStateUtilities.generateYearlySum(volumeGatherer),
+                                                  0d);
+
+
         model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName, state1 -> {
-                                                     return market.getDailyQuotasExchanged();
+                                                     return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
                                                  },
                                                  Double.NaN);
+
+
+
+        //make it annual too
+
 
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers()) {

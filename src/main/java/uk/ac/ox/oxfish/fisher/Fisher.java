@@ -698,17 +698,10 @@ public class Fisher implements Steppable, Startable{
      * @param species the species
      * @return lbs of species carried
      */
-    public double getPoundsCarried(Species species) {
+    public double getTotalWeightOfCatchInHold(Species species) {
         return equipment.getHold().getWeightOfCatchInHold(species);
     }
 
-    /**
-     * the total pounds of fish carried
-     * @return pounds carried
-     */
-    public double getPoundsCarried() {
-        return equipment.getHold().getTotalWeightOfCatchInHold();
-    }
 
     /**
      * how much can this fish hold
@@ -753,9 +746,12 @@ public class Fisher implements Steppable, Startable{
                 grabRandomizer()
         );
         //if you actually caught something
-        if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON)
-            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay,notDiscarded,modelBiology);
-
+        if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON) {
+            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);
+            //now count catches (which isn't necessarilly landings)
+            for(Species species : modelBiology.getSpecies())
+                getDailyCounter().countCatches(species,catchOfTheDay.getWeightCaught(species));
+        }
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,
                                                  here, catchOfTheDay);
@@ -764,7 +760,7 @@ public class Fisher implements Steppable, Startable{
         memory.registerVisit(here, (int) state.getDay());
 
         //now let regulations and the hold deal with it
-        status.getRegulation().reactToFishing(here, this, catchOfTheDay,notDiscarded , hoursSpentFishing);
+        status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing);
         load(notDiscarded);
 
         //consume gas
@@ -775,6 +771,8 @@ public class Fisher implements Steppable, Startable{
 
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
         memory.getDailyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
+
+
 
 
         return catchOfTheDay;

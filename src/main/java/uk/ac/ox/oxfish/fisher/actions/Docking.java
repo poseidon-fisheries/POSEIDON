@@ -67,7 +67,7 @@ public class Docking implements Action{
         assert agent.getLocation().equals(port.getLocation());
         assert agent.isAtDestination();
         assert port.isDocked(agent); //shouldn't have docked already!
-        assert agent.getPoundsCarried() ==  0.0;
+        assert agent.getTotalWeightOfCatchInHold() ==  0.0;
         //now stay at port
         return new ActionResult(new AtPort(),hoursLeft);
     }

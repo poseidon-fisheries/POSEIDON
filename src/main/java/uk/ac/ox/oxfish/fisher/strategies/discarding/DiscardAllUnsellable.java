@@ -8,12 +8,16 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * Discards everything that is not sellable (according to the regulation object)
  * Created by carrknight on 5/2/17.
  */
 public class DiscardAllUnsellable implements DiscardingStrategy {
+
+    private double safetyBuffer = FishStateUtilities.EPSILON;
+
     /**
      * This strategy decides the new "catch" object, that is how much of the fish we are actually going to store
      * given how much we caught!
@@ -40,8 +44,16 @@ public class DiscardAllUnsellable implements DiscardingStrategy {
         double[] saved  = new double[fishCaught.numberOfSpecies()];
         for(Species species : model.getSpecies())
         {
-            saved[species.getIndex()] = Math.min(fishCaught.getWeightCaught(species),
-                             regulation.maximumBiomassSellable(who,species,model));
+            //never hold on to more than it is sellable
+            saved[species.getIndex()] = Math.max(0,
+                                                 Math.min(
+                                                         fishCaught.getWeightCaught(species),
+                                                         regulation.maximumBiomassSellable(who,species,model)
+                                                                 - safetyBuffer
+                                                                 - who.getTotalWeightOfCatchInHold(species)
+
+                                                 )
+            );
         }
 
         return new Catch(saved);
@@ -57,5 +69,23 @@ public class DiscardAllUnsellable implements DiscardingStrategy {
     @Override
     public void turnOff(Fisher fisher) {
 
+    }
+
+    /**
+     * Getter for property 'safetyBuffer'.
+     *
+     * @return Value for property 'safetyBuffer'.
+     */
+    public double getSafetyBuffer() {
+        return safetyBuffer;
+    }
+
+    /**
+     * Setter for property 'safetyBuffer'.
+     *
+     * @param safetyBuffer Value to set for property 'safetyBuffer'.
+     */
+    public void setSafetyBuffer(double safetyBuffer) {
+        this.safetyBuffer = safetyBuffer;
     }
 }

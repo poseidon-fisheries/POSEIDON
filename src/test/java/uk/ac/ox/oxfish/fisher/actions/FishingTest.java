@@ -54,6 +54,7 @@ public class FishingTest {
         Species species = new Species("pippo");
         GlobalBiology biology = new GlobalBiology(species);
         when(fishState.getBiology()).thenReturn(biology);
+        when(fishState.getSpecies()).thenReturn(biology.getSpecies());
 
         Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), mock(MarketMap.class), 0);
 
@@ -88,20 +89,20 @@ public class FishingTest {
                                    1);
         fisher.start(fishState);
         fisher.step(fishState);
-        assertEquals(0,fisher.getPoundsCarried(),.001);
+        assertEquals(0, fisher.getTotalWeightOfCatchInHold(), .001);
 
 
         //should have fished 50 pounds
         fisher.step(fishState);
-        assertEquals(50.0,fisher.getPoundsCarried(),.001);
+        assertEquals(50.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         //step again and it will fish 50 more!
         fisher.step(fishState);
-        assertEquals(100.0, fisher.getPoundsCarried(), .001);
+        assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
 
         //fish again does nothing because it's full
         fisher.step(fishState);
-        assertEquals(100.0, fisher.getPoundsCarried(), .001);
+        assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
         verify(gear,times(3)).fish(any(),any(),anyInt(), any());
 
 
