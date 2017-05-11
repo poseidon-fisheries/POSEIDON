@@ -18,7 +18,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
 
     /**
-     * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
+     * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that ALL FISHERS gets 100 quotas a year
      * for species 0 and a random quota of 1 to 100 for species 2. The other species are then assumed NOT TO BE PROTECTED
      * by the quota (and can be fished out freely)
      */
@@ -87,7 +87,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         for(Map.Entry<String,String> input : quotasInputted.entrySet())
         {
             Double yearlyQuota = YamlConstructor.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
-            Preconditions.checkArgument(yearlyQuota>0);
+            Preconditions.checkArgument(yearlyQuota>0, "quotas must start above 0!");
             Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;
         }
