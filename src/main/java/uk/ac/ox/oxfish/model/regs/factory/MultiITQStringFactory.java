@@ -17,15 +17,15 @@ import java.util.Map;
  * A more flexible, if slightly convoluted, way to instantiate an ITQ targeting only a few species
  * Created by carrknight on 11/9/15.
  */
-public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulation>{
+public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegulation>{
 
     /**
-     * an array of order books for each "model" lspiRun
+     * an array of order books for each "model" run
      */
     private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
 
     /**
-     * an array of order book makers for each model lspiRun
+     * an array of order book makers for each model run
      */
     private final Map<FishState,ITQMarketBuilder[]> orderBooksBuilder = new HashMap<>(1);
 
@@ -53,7 +53,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaRegulat
      * @return the function result
      */
     @Override
-    public MultiQuotaRegulation apply(FishState state)
+    public MultiQuotaITQRegulation apply(FishState state)
     {
         Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the ITQ!");

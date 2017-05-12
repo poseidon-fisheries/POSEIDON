@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Function;
 
@@ -21,6 +22,14 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
             double[] yearlyQuota, FishState state, HashMap<Integer,ITQOrderBook> orderBooks) {
         super(yearlyQuota, state);
         this.orderBooks = orderBooks;
+    }
+
+    @Override
+    public boolean isFishingStillAllowed() {
+        return
+                Arrays.stream(quotaRemaining).allMatch(value -> value >= 0);
+
+
     }
 
 

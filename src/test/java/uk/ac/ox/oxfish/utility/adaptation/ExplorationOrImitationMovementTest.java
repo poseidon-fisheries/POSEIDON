@@ -30,6 +30,8 @@ public class ExplorationOrImitationMovementTest
         Fisher optimizer = mock(Fisher.class);
         Fisher friend1 = mock(Fisher.class);
         Fisher friend2 = mock(Fisher.class);
+        when(friend1.isAllowedAtSea()).thenReturn(true);
+        when(friend2.isAllowedAtSea()).thenReturn(true);
         Map<Fisher,Double> fitness = new HashMap<>();
         fitness.put(friend1,100d);
         fitness.put(friend2,10d);
@@ -99,6 +101,8 @@ public class ExplorationOrImitationMovementTest
         Fisher optimizer = mock(Fisher.class);
         Fisher friend1 = mock(Fisher.class);
         Fisher friend2 = mock(Fisher.class);
+        when(friend1.isAllowedAtSea()).thenReturn(true);
+        when(friend2.isAllowedAtSea()).thenReturn(true);
         Map<Fisher,Double> fitness = new HashMap<>();
         fitness.put(friend1,100d);
         fitness.put(friend2,10d);

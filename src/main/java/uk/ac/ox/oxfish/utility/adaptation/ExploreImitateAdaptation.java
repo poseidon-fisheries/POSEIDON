@@ -9,9 +9,12 @@ import uk.ac.ox.oxfish.utility.adaptation.maximization.AdaptationAlgorithm;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A general algorithm to perform exploration/imitaiton/exploitation decisions possibly on a specific variable
@@ -143,7 +146,19 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         //imitate?
         double imitationProbability = probability.getImitationProbability();
 
+        //get your friends (but not those that have been banned from fishing)
+        //todo might want to make this as a funtion of time since last out rather than allowed at sea
         Collection<Fisher> friends = friendsExtractor.apply(new Pair<>(toAdapt, random));
+        if(friends!=null) {
+            List<Fisher> list = new ArrayList<>();
+            for (Fisher friend : friends) {
+                if (friend.isAllowedAtSea() && friend.getHoursAtPort()<24*7) {
+                    list.add(friend);
+                }
+            }
+            friends = list;
+        }
+
         if(imitationProbability>0 && friends!=null &&
                 !friends.isEmpty() && random.nextBoolean(imitationProbability))
         {

@@ -26,7 +26,7 @@ import java.nio.file.Paths;
 class Main{
 
 
-    public static final long SEED = System.currentTimeMillis();
+    public static final long SEED = 0;
     public static final int STEPS_PER_DAY = 1;
 
     //main

@@ -217,6 +217,7 @@ public class FishStateUtilities {
         Set<Map.Entry<Fisher, Double>> friendsFitnesses = friends.stream().
                 //ignore friends who we can't imitate
                         filter(fisher -> sensor.scan(fisher) != null).
+                //ignore fishers who aren't allowed out anyway
                         collect(
                                 Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
                                     @Override

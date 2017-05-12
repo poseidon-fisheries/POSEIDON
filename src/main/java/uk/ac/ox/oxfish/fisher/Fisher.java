@@ -357,10 +357,10 @@ public class Fisher implements Steppable, Startable{
             Log.trace("Fisher " + fisherID + " is going to start his step");
         }
 
-        //tell equipment!
+        //tell equipment!1003.347
         equipment.getBoat().newStep();
 
-        //lspiRun the state machine
+        //run the state machine
         double hoursLeft = model.getHoursPerStep();
         while(true)
         {
@@ -1396,4 +1396,7 @@ public class Fisher implements Steppable, Startable{
     public double getWeightOfCatchInHold(Species species) {
         return equipment.getWeightOfCatchInHold(species);
     }
+
+
+
 }

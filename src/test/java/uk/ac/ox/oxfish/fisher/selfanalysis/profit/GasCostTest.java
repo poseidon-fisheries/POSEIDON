@@ -20,6 +20,7 @@ public class GasCostTest {
     @Test
     public void attached() throws Exception {
 
+
         //if I attach it to a fisher in a real simulation it should compute precisely the gas costs
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(1);
@@ -39,23 +40,25 @@ public class GasCostTest {
                     @Override
                     public void reactToFinishedTrip(TripRecord record) {
                         System.out.println("day : " + state.getDay());
-                        assertEquals(cost.cost(fisher,state,record,0d,fisher.getHoursAtSea() ),
-                                     record.getTotalCosts(),.001d);
+                        assertEquals(cost.cost(fisher, state, record, 0d, fisher.getHoursAtSea()),
+                                     record.getTotalCosts(), .001d);
                         TripRecord simulated = simulator.simulateRecord(fisher, record.getMostFishedTileInTrip(),
                                                                         state, 24 * 5,
                                                                         new double[]{record.getSoldCatch()[0] / record.getEffort()}
                         );
-                        assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
-                        assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
-                        assertEquals(simulated.getEffort(),record.getEffort(),.001d);
-                        assertEquals(simulated.getLitersOfGasConsumed(),record.getLitersOfGasConsumed(),.001d);
-                        assertEquals(simulated.getDurationInHours(),record.getDurationInHours(),.1);
+                        assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
+                        assertEquals(
+                                record.getEffort() + record.getDistanceTravelled() / fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),
+                                0, .1d);
+                        assertEquals(simulated.getEffort(), record.getEffort(), .001d);
+                        assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(), .001d);
+                        assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
 
                     }
                 }
         );
 
-        for(int i=0; i<10000; i++)
+        for (int i = 0; i < 10000; i++)
             state.schedule.step(state);
 
 

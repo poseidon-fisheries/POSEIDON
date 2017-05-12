@@ -24,7 +24,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     private final double[] yearlyQuota;
 
-    private final double[] quotaRemaining;
+    protected final double[] quotaRemaining;
 
     private final FishState state;
 
