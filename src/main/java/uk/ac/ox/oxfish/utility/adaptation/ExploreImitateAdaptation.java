@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * A general algorithm to perform exploration/imitaiton/exploitation decisions possibly on a specific variable
@@ -152,7 +151,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         if(friends!=null) {
             List<Fisher> list = new ArrayList<>();
             for (Fisher friend : friends) {
-                if (friend.isAllowedAtSea() && friend.getHoursAtPort()<24*7) {
+                if (friend.isAllowedAtSea()) {
                     list.add(friend);
                 }
             }

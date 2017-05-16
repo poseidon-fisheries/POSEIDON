@@ -5,13 +5,13 @@ import com.google.common.base.Splitter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
-import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * A more flexible, if slightly convoluted, way to instantiate an ITQ targeting only a few species
@@ -42,9 +42,11 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
     private boolean allowMultipleTrades = false;
 
     /**
-     * the size of quota units (kg) traded each match
+     * the size of quota units (kg) traded each match;
+     * This can be either a simple number (at which point all quotas are traded at the same tick volume) or a map like
+     * "0:100,2:50" at which point the volume traded per match is different for each species
      */
-    private int minimumQuotaTraded = 100;
+    private String minimumQuotaTraded = "100";
 
     /**
      * Applies this function to the given argument.
@@ -55,10 +57,13 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
     @Override
     public MultiQuotaITQRegulation apply(FishState state)
     {
+
+        int numberOfSpecies = state.getSpecies().size();
+        //create map of quotas
         Map<String, String> quotasInputted = Splitter.on(",").withKeyValueSeparator(":").split(yearlyQuotaMaps.trim());
         Preconditions.checkArgument(quotasInputted.size() > 0, "You provided no quota for the ITQ!");
+
         //here we store the quotas
-        int numberOfSpecies = state.getSpecies().size();
         double[] quotas = new double[numberOfSpecies];
         Arrays.fill(quotas,Double.POSITIVE_INFINITY);
         //read them in
@@ -70,6 +75,39 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;
         }
 
+
+
+        //create function of tick sizes
+        Function<Integer,Integer> volumePerMatch;
+        if(minimumQuotaTraded.contains(":"))
+        {
+            Map<String, String> volumesIn = Splitter.on(",").withKeyValueSeparator(":").split(minimumQuotaTraded.trim());
+            Preconditions.checkArgument(volumesIn.size()==quotasInputted.size(),
+                                        "Mismatch between number of markets and minimum quota traded provided");
+            Preconditions.checkArgument(volumesIn.keySet().equals(quotasInputted.keySet()),
+                                        "Mismatch between keys, some markets do not have minimimum quota trades or viceversa");
+            int[] tradeTicks = new int[numberOfSpecies];
+            for(Map.Entry<String,String> input : volumesIn.entrySet())
+            {
+                int tradeTick = Integer.parseInt(input.getValue().trim());
+                Preconditions.checkArgument(tradeTick>0);
+                tradeTicks[Integer.parseInt(input.getKey().trim())] = tradeTick;
+            }
+            volumePerMatch = speciesIndex -> tradeTicks[speciesIndex];
+
+        }
+        else {
+            //it's not a map, ergo all tick sizes are of the same size
+            final int tradeTick = Integer.parseInt(minimumQuotaTraded.trim());
+
+            volumePerMatch =
+                    speciesIndex -> {
+                        return tradeTick;
+                    };
+        }
+
+
+
         /***
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
          *     |  \/  | /_\ | _ \ |/ / __|_   _| | _ ) | | |_ _| |  |   \| __| _ \/ __|
@@ -79,7 +117,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
          */
 
         MultiITQFactory.buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
-                                                allowMultipleTrades, minimumQuotaTraded);
+                                                allowMultipleTrades, volumePerMatch);
 
 
         MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
@@ -121,12 +159,13 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         this.allowMultipleTrades = allowMultipleTrades;
     }
 
+
     /**
      * Getter for property 'minimumQuotaTraded'.
      *
      * @return Value for property 'minimumQuotaTraded'.
      */
-    public int getMinimumQuotaTraded() {
+    public String getMinimumQuotaTraded() {
         return minimumQuotaTraded;
     }
 
@@ -135,7 +174,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
      *
      * @param minimumQuotaTraded Value to set for property 'minimumQuotaTraded'.
      */
-    public void setMinimumQuotaTraded(int minimumQuotaTraded) {
+    public void setMinimumQuotaTraded(String minimumQuotaTraded) {
         this.minimumQuotaTraded = minimumQuotaTraded;
     }
 

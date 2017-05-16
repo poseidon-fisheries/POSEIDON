@@ -114,7 +114,7 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
         if(itq) {
             itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
-            itqFactory.setMinimumQuotaTraded(quotaExchangedPerMatch);
+            itqFactory.setMinimumQuotaTraded(String.valueOf(quotaExchangedPerMatch));
             MultiQuotaRegulation regulation = itqFactory.apply(fishState);
             //set up a startable that divide it by the number of fishers
             fishState.registerStartable(new ITQScaler(regulation));

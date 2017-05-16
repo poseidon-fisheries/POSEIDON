@@ -18,6 +18,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -87,7 +88,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
          *
          */
         buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
-                                allowMultipleTrades, minimumQuotaTraded);
+                                allowMultipleTrades, integer -> minimumQuotaTraded);
 
         MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
                                                                                       orderBooks.get(state));
@@ -107,13 +108,13 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
      * @param orderBooks a map model---> ITQ markets
      * @param orderBooksBuilder a map: model---> ITQ builders
      * @param allowMultipleTradesPerFisher whether a fisher can make multiple trades within the same step
-     * @param unitsTradedPerMatch the size of quotas exchanged at each trade (in kg)
+     * @param unitsTradedPerMatch the size of quotas exchanged at each trade (in kg) as a function index of species ---> size of quota
      */
     public static void buildITQMarketsIfNeeded(
             FishState state, int numberOfSpecies, double[] quotas,
             Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks,
             Map<FishState, ITQMarketBuilder[]> orderBooksBuilder, final boolean allowMultipleTradesPerFisher,
-            final int unitsTradedPerMatch) {
+            final Function<Integer,Integer> unitsTradedPerMatch) {
 
         if(Log.TRACE)
             Log.trace("Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
@@ -167,7 +168,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                             ITQOrderBook market = builders[specieIndex].getMarket();
                             markets.put(specieIndex, market);
                             market.setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
-                            market.setUnitsTradedPerMatch(unitsTradedPerMatch);
+                            market.setUnitsTradedPerMatch(unitsTradedPerMatch.apply(specieIndex));
                         }
 
                         @Override
