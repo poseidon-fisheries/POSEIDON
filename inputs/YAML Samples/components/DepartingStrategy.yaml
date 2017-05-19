@@ -42,3 +42,14 @@ WFS Longline:
   intercept: '-3.626'
   summer: '0.439'
 -------
+WFS Handline:
+  intercept: '-2.075184'
+  priceGagGrouper: '0.649616'
+  priceRedGrouper: '-0.3604'
+  realDieselPrice: '-0.515073'
+  spring: '0.725026'
+  summer: '0.624472'
+  weekend: '-0.097619'
+  windSpeedInKnots: '-0.046672'
+  winter: '0.266862'
+-------

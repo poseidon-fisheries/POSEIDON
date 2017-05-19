@@ -4,6 +4,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 
 /**
  * Basically an abstract class that creates GlobalBiology objects from a list of names; useful for all the simple
@@ -28,6 +29,24 @@ public  abstract class AbstractBiologyInitializer implements BiologyInitializer 
         {
             speciesArray[i] = new Species(names[i]);
         }
+
+        //initialize all the data collection stuff
+        for (Species species : speciesArray) {
+            final String columnName = species + " Recruitment";
+            modelBeingInitialized.getYearlyCounter().addColumn(
+                    columnName);
+            modelBeingInitialized.getYearlyDataSet().registerGatherer(
+                    columnName,
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(
+                                FishState state) {
+                            return modelBeingInitialized.getYearlyCounter().getColumn(
+                                    columnName);
+                        }
+                    }, 0d);
+        }
+
         return new GlobalBiology(speciesArray);
     }
 

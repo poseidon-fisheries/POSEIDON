@@ -6,3 +6,10 @@ Fish Until Full:
 Until Full With Day Limit:
   daysAtSea: '5.0'
 -------
+WFS Logit Return:
+  intercept: '-3.47701'
+  priceGagGrouper: '-0.65122'
+  priceRedGrouper: '0.92395'
+  ratioCatchToFishHold: '4.37828'
+  weekendDummy: '-0.24437'
+-------

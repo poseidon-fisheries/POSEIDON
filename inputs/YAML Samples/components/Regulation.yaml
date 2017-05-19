@@ -42,7 +42,7 @@ Multi-ITQ:
 -------
 Multi-ITQ by List:
   allowMultipleTrades: false
-  minimumQuotaTraded: 100
+  minimumQuotaTraded: '100'
   yearlyQuotaMaps: 0:5000
 -------
 Partial-ITQ:
@@ -61,6 +61,8 @@ Kitchen Sink:
   individualTradeableQuotas: true
   seasonLength: '200.0'
   startDay: '0.0'
+  startingMPAs: [
+    ]
   yearlyQuotaMaps: 0:5000
 -------
 Multi-Quotas from Map:

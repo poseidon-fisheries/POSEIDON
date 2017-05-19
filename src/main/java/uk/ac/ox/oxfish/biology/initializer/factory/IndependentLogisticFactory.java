@@ -1,13 +1,19 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.IndependentLogisticInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.function.Supplier;
 
 /**
  * Factory for IndependentLogisticInitializer
@@ -29,6 +35,9 @@ public class IndependentLogisticFactory implements AlgorithmFactory<BiologyIniti
      */
     @Override
     public BiologyInitializer apply(FishState state) {
+
+
+
         return new IndependentLogisticInitializer(carryingCapacity,
                                                   grower.apply(state));
     }

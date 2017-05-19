@@ -30,6 +30,7 @@ Abstract:
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
+  discardingStrategy: No Discarding
   enginePower: normal 5000.0 100.0
   fishers: 100
   fishingStrategy:

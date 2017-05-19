@@ -120,6 +120,15 @@ Florida Longliner:
   coefficientsFile: /home/carrknight/code/oxfish/temp_wfs/longline.csv
   coefficientsStandardDeviationFile: /home/carrknight/code/oxfish/temp_wfs/longline_std.csv
 -------
+Florida Bare Bones:
+  discretizer:
+    Centroid File Discretization:
+      filePath: temp_wfs/areas.txt
+      xColumnName: eastings
+      yColumnName: northings
+  distanceInKm: '-0.00759009'
+  habitIntercept: '2.53163185'
+-------
 Perfect RPUE Logit:
   discretizer: Identity Discretization
   profitBeta: '1.0'

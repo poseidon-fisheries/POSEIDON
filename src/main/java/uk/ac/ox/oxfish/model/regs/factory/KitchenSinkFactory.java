@@ -5,8 +5,11 @@ import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.KitchenSinkRegulation;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.TemporaryProtectedArea;
+import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+
+import java.util.List;
 
 /**
  * A factory for the kitchen sink regulation, it is itself just a collection of factories
@@ -63,14 +66,6 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
 
     }
 
-    public FishingSeasonFactory getSeasons() {
-        return seasons;
-    }
-
-    public TemporaryProtectedAreasFactory getMpa() {
-        return mpa;
-    }
-
 
     public boolean isIndividualTradeableQuotas() {
         return individualTradeableQuotas;
@@ -103,7 +98,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      * @return Value for property 'startDay'.
      */
     public DoubleParameter getStartDay() {
-        return getMpa().getStartDay();
+        return mpa.getStartDay();
     }
 
     /**
@@ -112,8 +107,27 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      * @param startDay Value to set for property 'startDay'.
      */
     public void setStartDay(DoubleParameter startDay) {
-        getMpa().setStartDay(startDay);
+        mpa.setStartDay(startDay);
     }
+
+    /**
+     * Getter for property 'startingMPAs'.
+     *
+     * @return Value for property 'startingMPAs'.
+     */
+    public List<StartingMPA> getStartingMPAs() {
+        return mpa.getStartingMPAs();
+    }
+
+    /**
+     * Setter for property 'startingMPAs'.
+     *
+     * @param startingMPAs Value to set for property 'startingMPAs'.
+     */
+    public void setStartingMPAs(List<StartingMPA> startingMPAs) {
+        mpa.setStartingMPAs(startingMPAs);
+    }
+
 
     /**
      * Getter for property 'duration'.
@@ -121,7 +135,7 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      * @return Value for property 'duration'.
      */
     public DoubleParameter getDuration() {
-        return getMpa().getDuration();
+        return mpa.getDuration();
     }
 
     /**
@@ -130,6 +144,6 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
      * @param duration Value to set for property 'duration'.
      */
     public void setDuration(DoubleParameter duration) {
-        getMpa().setDuration(duration);
+        mpa.setDuration(duration);
     }
 }

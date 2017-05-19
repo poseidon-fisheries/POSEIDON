@@ -43,6 +43,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
     @Override
     public void step(SimState simState) {
 
+        FishState model = ((FishState) simState);
 
         //remove all the biologies that stopped
         biologies = biologies.stream().filter(
@@ -63,8 +64,16 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
 
                 Double carryingCapacity = biology.getCarryingCapacity(i);
                 if(carryingCapacity > FishStateUtilities.EPSILON) {
+                    double oldBiomass = currentBiomass[i];
                     currentBiomass[i] = Math.min(carryingCapacity, currentBiomass[i] + malthusianParameter[i] *
                             (1d - currentBiomass[i] / carryingCapacity) * currentBiomass[i]);
+                    //store recruitment number, counter should have been initialized by factory!
+                    double recruitment = currentBiomass[i]-oldBiomass;
+                    if(recruitment>0)
+                        model.getYearlyCounter().count(model.getSpecies().get(i) +
+                                                               " Recruitment",
+                                                       recruitment);
+
                 }
                 assert currentBiomass[i] >=0;
             }

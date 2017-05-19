@@ -32,7 +32,7 @@ California Map Scenario:
       daysAtSea: '5.0'
   fixedRecruitmentDistribution: false
   fuelTankInLiters: '45519.577'
-  gasPricePerLiter: '0.667606393'
+  gasPricePerLiter: '0.694094345'
   gear:
     Garbage Gear:
       delegate:

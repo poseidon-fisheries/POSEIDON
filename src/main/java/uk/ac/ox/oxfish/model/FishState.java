@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
@@ -117,6 +118,13 @@ public class FishState  extends SimState{
      */
     private final List<OutputPlugin> outputPlugins = new LinkedList<>();
 
+
+    /**
+     * generic yearly counter keeping track of yearly model stuff (biology mostly)
+     */
+    private final Counter yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
+
+
     /**
      * aggregate steppables for phases where there is no need for randomization
      */
@@ -178,8 +186,13 @@ public class FishState  extends SimState{
     @Override
     public void start() {
 
+
+
         Preconditions.checkState(!started, "Already started!");
         super.start();
+
+        //start the counter
+        yearlyCounter.start(this);
 
         //schedule aggregate steppables
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateYearlySteppables.entrySet()  )
@@ -733,5 +746,14 @@ public class FishState  extends SimState{
      */
     public List<OutputPlugin> getOutputPlugins() {
         return outputPlugins;
+    }
+
+    /**
+     * Getter for property 'yearlyCounter'.
+     *
+     * @return Value for property 'yearlyCounter'.
+     */
+    public Counter getYearlyCounter() {
+        return yearlyCounter;
     }
 }
