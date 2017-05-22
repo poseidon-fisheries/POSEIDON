@@ -88,6 +88,12 @@ Single Species PID Taxation:
 Open/Close Shodan from File:
   pathToXml: /home/carrknight/code/oxfish/inputs/biomassQ.xml
 -------
+Temporary MPA:
+  duration: '300.0'
+  startDay: '0.0'
+  startingMPAs: [
+    ]
+-------
 Multiple Regulations:
   factories:
   - Mono-ITQ:

@@ -53,6 +53,7 @@ import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.factory.WeakMultiTACStringFactory;
 import uk.ac.ox.oxfish.utility.*;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -206,9 +207,59 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> handlinerWeatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> handlinerRegulations =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> handlinerRegulations =  new WeakMultiTACStringFactory();
+    {
+        ((WeakMultiTACStringFactory) handlinerRegulations).setYearlyQuotaMaps(
+                "2:2408575.485,3:3991612.856,4:337000");
+    }
 
 
+    //(4)RED SNAPPER:
+    //quotas from 96 to 2007 red snapper: 2086524.902kg (4.65 million pounds; SEDAR 31, table 2.5.1)
+    //however this was split among all the gulf states; florida west coast only got about 800k pounds
+    //so that the four average 2003-2006 is 337 metric tonnes or 337000kg
+
+    //(3)GAG GROUPER:
+    //SWG quota (for gag grouper) was 3991612.856 (8.8 million pounds, but this was the whole SWG; SEDAR 33 table 2.6.1)
+    //you see landings dropping from 2.6mp to 1.3mp from 2003 to 2007 but the season length of SEDAR is still 320 days
+    //so it's possible that it wasn't quota related and just that this fish is not constraining
+
+    //(2)RED GROUPER:
+    // from 2004, red grouper quota was 2408575.485kg (5.31 million pounds, SEDAR 42, table 2.7.1)
+    //this is a bit weird though because it was routinely exceeded in the landings (6 mp)
+
+
+
+    //commercial landings:
+    //RED SNAPPER:
+    // 337,100 kg (from 2003 to 2006)
+    // 447,800 kg (from 2006 to 2010)
+
+    //GAG GROUPER:
+    // 1,119,175 kg (2003 to 2006)
+    // 477,925 kg (2007 to 2010)
+
+    //RED GROUPER:
+    //2,843,775 kg (2003 to 2006)
+    //2,024,700 kg (2007 to 2010)
+
+
+
+
+
+    //recreational mortality
+    //RED SNAPPER:
+    //2003 to 2007 average (a+b1) seems to be 935,084.25 kg
+
+    //GAG GROUPER:
+    //noaa fisheries harvest (a+b1) 1,607,978.75kg a year on average (2003 to 2006)
+
+    //RED GROUPER:
+    //noaa fisheries harvest (a+b1) 887,488kg a year on average (2003 to 2006)
+
+
+
+    //
     /**
      * factory to produce departing strategy
      */

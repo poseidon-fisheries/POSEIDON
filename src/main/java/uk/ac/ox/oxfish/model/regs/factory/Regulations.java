@@ -89,6 +89,9 @@ public class Regulations
         NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
 
 
+        CONSTRUCTORS.put("Temporary MPA", TemporaryProtectedAreasFactory::new);
+        NAMES.put(TemporaryProtectedAreasFactory.class, "Temporary MPA");
+
         CONSTRUCTORS.put("Multiple Regulations", MultipleRegulationsFactory::new);
         NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");
 
