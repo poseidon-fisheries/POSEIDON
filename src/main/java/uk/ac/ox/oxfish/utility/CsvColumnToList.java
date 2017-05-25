@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 /**
  * Utility to read a csv file into
@@ -21,14 +22,27 @@ public class CsvColumnToList {
 
     private int columnNumber;
 
+    private final Function<Double,Double> transformer;
+
 
     public CsvColumnToList(String pathToCSV, boolean headerInFile, char separator,  int columnNumber) {
         this.pathToCSV = pathToCSV;
         this.headerInFile = headerInFile;
         this.separator = separator;
         this.columnNumber = columnNumber;
+        this.transformer = aDouble -> aDouble;
+
     }
 
+    public CsvColumnToList(
+            String pathToCSV, boolean headerInFile, char separator, int columnNumber,
+            Function<Double, Double> transformer) {
+        this.pathToCSV = pathToCSV;
+        this.headerInFile = headerInFile;
+        this.separator = separator;
+        this.columnNumber = columnNumber;
+        this.transformer = transformer;
+    }
 
     public LinkedList<Double> readColumn()
     {
@@ -46,7 +60,7 @@ public class CsvColumnToList {
 
             LinkedList<Double> column = new LinkedList<Double>();
             while(iterator.hasNext())
-                column.add(Double.parseDouble(iterator.next()[columnNumber]));
+                column.add(transformer.apply(Double.parseDouble(iterator.next()[columnNumber])));
 
             return column;
         } catch (IOException e) {

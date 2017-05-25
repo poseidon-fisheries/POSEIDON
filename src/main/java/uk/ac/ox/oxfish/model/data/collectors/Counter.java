@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public class Counter implements Startable, Steppable
     private Stoppable receipt = null;
 
     public Counter(IntervalPolicy policy) {
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
         view = Collections.unmodifiableMap(data);
         this.policy = policy;
     }

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.base.Supplier;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -20,11 +21,12 @@ import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogisticLogbookFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.HandlineFloridaLogisticDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesFloridaDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingAllUnsellableFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
@@ -45,6 +47,8 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
@@ -52,21 +56,21 @@ import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.WeakMultiTACStringFactory;
 import uk.ac.ox.oxfish.utility.*;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The scenario to lspiRun Osmose WFS.
@@ -82,6 +86,18 @@ public class OsmoseWFSScenario implements Scenario{
     private LinkedHashMap<Port, Integer> longlinersPerPort;
 
     private LinkedHashMap<Port, Integer> handlinersPerPort;
+
+
+    /**
+     * price per kg grabbed from noaa annual west florida landings
+     */
+
+    private DoubleParameter redSnapperPrice = new FixedDoubleParameter(5.424372922);
+
+    private DoubleParameter redGrouperPrice = new FixedDoubleParameter(5.616258398);
+
+    private DoubleParameter gagGrouperPrice = new FixedDoubleParameter(4.414031175);
+
 
 
     private AlgorithmFactory<? extends LogbookInitializer> longlineLogbook =
@@ -141,9 +157,9 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends HabitatInitializer> habitatInitializer = new AllSandyHabitatFactory();
 
 
-    private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.01,3:0.01,4:0.01");
+    private AlgorithmFactory<? extends Gear> longlinerGear = new RandomTrawlStringFactory("2:0.001,3:0.001,4:0.001");
 
-    private AlgorithmFactory<? extends Gear> handlinerGear = new RandomTrawlStringFactory("2:0.01,3:0.01,4:0.01");
+    private AlgorithmFactory<? extends Gear> handlinerGear = new RandomTrawlStringFactory("2:0.001,3:0.001,4:0.001");
 
 
     //comes as 95th percentile from Steve's data on hold-sizes
@@ -157,14 +173,28 @@ public class OsmoseWFSScenario implements Scenario{
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> handlinerDepartingStrategy =
-            new HandlineFloridaLogisticDepartingFactory();
+            new FloridaLogisticDepartingFactory();
+    {
+
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setIntercept(new FixedDoubleParameter(-2.075184));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setSpring(new FixedDoubleParameter(0.725026));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setSummer(new FixedDoubleParameter(0.624472));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setWinter(new FixedDoubleParameter(0.266862));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setWeekend(new FixedDoubleParameter(-0.097619));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setWindSpeedInKnots(new FixedDoubleParameter(-0.046672));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setRealDieselPrice(new FixedDoubleParameter(-0.515073 / 0.219969157));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setPriceRedGrouper(new FixedDoubleParameter(-0.3604 / 2.20462262));
+        ((FloridaLogisticDepartingFactory) handlinerDepartingStrategy).setPriceGagGrouper(new FixedDoubleParameter(0.649616 / 2.20462262));
 
 
-    private AlgorithmFactory<? extends DiscardingStrategy> handlinerDiscardingStrategy = new NoDiscardingFactory();
+    }
+
+
+    private AlgorithmFactory<? extends DiscardingStrategy> handlinerDiscardingStrategy = new DiscardingAllUnsellableFactory();
 
 
     /**
-     * factory to produce departing strategy
+     * factory to produce destination strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> handlinerDestinationStrategy =
             new BarebonesFloridaDestinationFactory();
@@ -191,10 +221,11 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends FishingStrategy> handlinerFishingStrategy =
             new FloridaLogitReturnFactory();
     {
+        //scaled $/kg
         ((FloridaLogitReturnFactory) handlinerFishingStrategy).setIntercept(new FixedDoubleParameter(-3.47701));
-        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(0.92395));
-        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.65122));
-        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setRatioCatchToFishHold(new FixedDoubleParameter(-4.37828));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(0.92395 / 2.20462262));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.65122 / 2.20462262));
+        ((FloridaLogitReturnFactory) handlinerFishingStrategy).setRatioCatchToFishHold(new FixedDoubleParameter(4.37828));
         ((FloridaLogitReturnFactory) handlinerFishingStrategy).setWeekendDummy(new FixedDoubleParameter(-0.24437));
 
 
@@ -207,11 +238,7 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> handlinerWeatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> handlinerRegulations =  new WeakMultiTACStringFactory();
-    {
-        ((WeakMultiTACStringFactory) handlinerRegulations).setYearlyQuotaMaps(
-                "2:2408575.485,3:3991612.856,4:337000");
-    }
+
 
 
     //(4)RED SNAPPER:
@@ -244,6 +271,16 @@ public class OsmoseWFSScenario implements Scenario{
     //2,024,700 kg (2007 to 2010)
 
 
+    private Map<String, String> exogenousCatches = new HashMap<>();
+    {
+        //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
+        //all for the year 2010
+        exogenousCatches.put("RedSnapper",Double.toString(935084.25d));
+        exogenousCatches.put("GagGrouper",Double.toString(1607978.75d));
+        exogenousCatches.put("RedGrouper",Double.toString(887488d));
+
+    }
+
 
 
 
@@ -261,20 +298,40 @@ public class OsmoseWFSScenario implements Scenario{
 
     //
     /**
-     * factory to produce departing strategy
+     * factory to produce Departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> longlinerDepartingStrategy =
-            new LonglineFloridaLogisticDepartingFactory();
+            new FloridaLogisticDepartingFactory();
+
+    {
+
+
+        {
+
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setIntercept(new FixedDoubleParameter(-2.959116));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setSpring(new FixedDoubleParameter(0.770212));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setSummer(new FixedDoubleParameter(0.933939));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setWinter(new FixedDoubleParameter(0.706415));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setWeekend(new NullParameter());
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setWindSpeedInKnots(new FixedDoubleParameter(0.004265));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setRealDieselPrice(new FixedDoubleParameter(-0.125913/ 0.219969157));
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setPriceRedGrouper(new NullParameter());
+            ((FloridaLogisticDepartingFactory) longlinerDepartingStrategy).setPriceGagGrouper(new NullParameter());
+
+
+        }
+
+    }
 
     /**
-     * factory to produce departing strategy
+     * factory to produce destination strategy
      */
     private AlgorithmFactory<? extends DestinationStrategy> longlinerDestinationStrategy =
             new FloridaLogitDestinationFactory();
 
 
 
-    private AlgorithmFactory<? extends DiscardingStrategy> longlinerDiscardingStrategy = new NoDiscardingFactory();
+    private AlgorithmFactory<? extends DiscardingStrategy> longlinerDiscardingStrategy = new DiscardingAllUnsellableFactory();
 
     /**
      * factory to produce fishing strategy
@@ -284,8 +341,8 @@ public class OsmoseWFSScenario implements Scenario{
 
     {
         ((FloridaLogitReturnFactory) longlinerFishingStrategy).setIntercept(new FixedDoubleParameter(-2.74969d));
-        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(-0.12476));
-        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.28232));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceRedGrouper(new FixedDoubleParameter(-0.12476 / 2.20462262));
+        ((FloridaLogitReturnFactory) longlinerFishingStrategy).setPriceGagGrouper(new FixedDoubleParameter(-0.28232 / 2.20462262));
         ((FloridaLogitReturnFactory) longlinerFishingStrategy).setRatioCatchToFishHold(new FixedDoubleParameter(4.53092));
         ((FloridaLogitReturnFactory) longlinerFishingStrategy).setWeekendDummy(new FixedDoubleParameter(-0.15556));
 
@@ -298,7 +355,16 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> longlinerWeatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> longlinerRegulations =  new ProtectedAreasOnlyFactory();
+    private MultipleRegulationsFactory regulations =  new MultipleRegulationsFactory();
+    {
+        regulations.getTags().clear();
+        regulations.getFactories().clear();
+        regulations.getTags().add("all");
+        WeakMultiTACStringFactory tripLimits = new WeakMultiTACStringFactory();
+        tripLimits.setYearlyQuotaMaps("2:2408575.485,3:3991612.856,4:337000");
+        regulations.getFactories().add(tripLimits);
+
+    }
 
 
     private NetworkBuilder networkBuilder =
@@ -375,43 +441,81 @@ public class OsmoseWFSScenario implements Scenario{
 
             PortReader reader = new PortReader();
 
+
+            Supplier<MarketMap> marketSupplier = () -> {
+                //create fixed price market
+                MarketMap marketMap = new MarketMap(global);
+                        /*
+                        market prices for each species
+                        */
+
+                for (Species species : global.getSpecies()) {
+                    if (species.getName().trim().equals("RedGrouper"))
+                        marketMap.addMarket(species,
+                                            new FixedPriceMarket(
+                                                    redGrouperPrice.apply(model.getRandom()))
+                        );
+                    else if (species.getName().trim().equals("GagGrouper"))
+                        marketMap.addMarket(species,
+                                            new FixedPriceMarket(
+                                                    gagGrouperPrice.apply(model.getRandom()))
+                        );
+                    else if (species.getName().trim().equals("RedSnapper"))
+                        marketMap.addMarket(species,
+                                            new FixedPriceMarket(
+                                                    redSnapperPrice.apply(model.getRandom()))
+                        );
+                    else
+                        marketMap.addMarket(species, new FixedPriceMarket(-1d));
+                }
+                return marketMap;
+            };
             longlinersPerPort = reader.readFile(
                     mainDirectory.resolve("longline_ports.csv"),
                     map,
-                    () -> {
-                        MarketMap markets = new MarketMap(global);
-                        for(Species species : global.getSpecies())
-                            markets.addMarket(species, new FixedPriceMarket(1));
-
-                        return markets;
-                    },
-                    0.1234);
+                    marketSupplier,
+                    0);
 
 
             handlinersPerPort = reader.readFile(mainDirectory.resolve("handline_ports.csv"),
                                                 map,
-                                                () -> {
-                                                    MarketMap markets = new MarketMap(global);
-                                                    for(Species species : global.getSpecies())
-                                                        markets.addMarket(species, new FixedPriceMarket(1));
-
-                                                    return markets;
-                                                },
-                                                0.1234);
+                                                marketSupplier,
+                                                0);
 
             for(Port port : reader.getPorts())
                 map.addPort(port);
 
 
             //todo put this somewhere else
-            CsvColumnToList gasPrices = new CsvColumnToList(Paths.get("temp_wfs","steve","Fleet","PriceWSgas.txt").toString(),
-                                                            true,
-                                                            '$',
-                                                            13);
+
+            //transform $/gallon to $/liter
+            CsvColumnToList gasPrices = new CsvColumnToList(
+                    Paths.get("temp_wfs", "steve", "Fleet", "PriceWSgas.txt").toString(),
+                    true,
+                    '$',
+                    13,
+                    new Function<Double, Double>() {
+                        @Override
+                        public Double apply(Double dollarsPerGallon) {
+                            return  dollarsPerGallon * 0.219969157; //ratio
+                        }
+                    }
+            );
             LinkedList<Double> prices = gasPrices.readColumn();
             TimeSeriesActuator gasActuator = TimeSeriesActuator.gasPriceDailySchedule(prices, new ArrayList<>(map.getPorts()));
             gasActuator.step(model);
             model.scheduleEveryDay(gasActuator, StepOrder.POLICY_UPDATE);
+
+
+            //exogenous mortality
+            HashMap<Species,Double>  recast = new HashMap<>();
+            for (Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
+                recast.put(global.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
+            }
+            //start it!
+            BiomassDrivenFixedExogenousCatches recreationalMortality = new BiomassDrivenFixedExogenousCatches(recast);
+            model.registerStartable(recreationalMortality);
+
 
             return new ScenarioEssentials(global,map);
         } catch (IOException e) {
@@ -447,22 +551,23 @@ public class OsmoseWFSScenario implements Scenario{
         LogbookInitializer handlineLog = handlineLogbook.apply(model);
         handlineLog.start(model);
 
+        final double mileage = 2.82481; //this is litre per km and it comes from the california estimate of 1.21 gallons a mile
+        final double engineWeight = 1;
+        final double fuelCapacity = 100000000;
         //longliners
         for(Map.Entry<Port,Integer> entry : longlinersPerPort.entrySet())
 
             for(int i=0;i<entry.getValue();i++)
             {
                 final double speed = longlinerSpeedKph.apply(random);
-                final double engineWeight = 1;
-                final double mileage = 0.7518591; //this is gallon per km and it comes from the california estimate of 1.21 gallons a mile
-                final double fuelCapacity = 100000000;
+
 
                 Gear fisherGear = longlinerGear.apply(model);
 
 
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
                                               model.getRandom(),
-                                              longlinerRegulations.apply(model),
+                                              regulations.apply(model),
                                               longlinerDepartingStrategy.apply(model),
                                               longlinerDestinationStrategy.apply(model),
                                               longlinerFishingStrategy.apply(model),
@@ -508,17 +613,13 @@ public class OsmoseWFSScenario implements Scenario{
             for(int i=0;i<entry.getValue();i++)
             {
                 final double speed = handlinerSpeedKph.apply(random);
-                final double engineWeight = 1;
-                final double mileage = 0.7518591; //this is gallon per km and it comes
-                // from the california estimate of 1.21 gallons a mile
-                final double fuelCapacity = 100000000;
 
                 Gear fisherGear = handlinerGear.apply(model);
 
 
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
                                               model.getRandom(),
-                                              handlinerRegulations.apply(model),
+                                              regulations.apply(model),
                                               handlinerDepartingStrategy.apply(model),
                                               handlinerDestinationStrategy.apply(model),
                                               handlinerFishingStrategy.apply(model),
@@ -719,24 +820,9 @@ public class OsmoseWFSScenario implements Scenario{
         this.longlinerWeatherStrategy = longlinerWeatherStrategy;
     }
 
-    /**
-     * Getter for property 'longlinerRegulations'.
-     *
-     * @return Value for property 'longlinerRegulations'.
-     */
-    public AlgorithmFactory<? extends Regulation> getLonglinerRegulations() {
-        return longlinerRegulations;
-    }
 
-    /**
-     * Setter for property 'longlinerRegulations'.
-     *
-     * @param longlinerRegulations Value to set for property 'longlinerRegulations'.
-     */
-    public void setLonglinerRegulations(
-            AlgorithmFactory<? extends Regulation> longlinerRegulations) {
-        this.longlinerRegulations = longlinerRegulations;
-    }
+
+
 
     /**
      * Getter for property 'longlinerGear'.
@@ -858,13 +944,23 @@ public class OsmoseWFSScenario implements Scenario{
         this.handlinerWeatherStrategy = handlinerWeatherStrategy;
     }
 
-    public AlgorithmFactory<? extends Regulation> getHandlinerRegulations() {
-        return handlinerRegulations;
+
+    /**
+     * Getter for property 'regulations'.
+     *
+     * @return Value for property 'regulations'.
+     */
+    public MultipleRegulationsFactory getRegulations() {
+        return regulations;
     }
 
-    public void setHandlinerRegulations(
-            AlgorithmFactory<? extends Regulation> handlinerRegulations) {
-        this.handlinerRegulations = handlinerRegulations;
+    /**
+     * Setter for property 'regulations'.
+     *
+     * @param regulations Value to set for property 'regulations'.
+     */
+    public void setRegulations(MultipleRegulationsFactory regulations) {
+        this.regulations = regulations;
     }
 
     public DoubleParameter getLonglinerTravellingCosts() {
@@ -889,5 +985,98 @@ public class OsmoseWFSScenario implements Scenario{
 
     public void setHandlinerSpeedKph(DoubleParameter handlinerSpeedKph) {
         this.handlinerSpeedKph = handlinerSpeedKph;
+    }
+
+
+    /**
+     * Getter for property 'redSnapperPrice'.
+     *
+     * @return Value for property 'redSnapperPrice'.
+     */
+    public DoubleParameter getRedSnapperPrice() {
+        return redSnapperPrice;
+    }
+
+    /**
+     * Setter for property 'redSnapperPrice'.
+     *
+     * @param redSnapperPrice Value to set for property 'redSnapperPrice'.
+     */
+    public void setRedSnapperPrice(DoubleParameter redSnapperPrice) {
+        this.redSnapperPrice = redSnapperPrice;
+    }
+
+    /**
+     * Getter for property 'redGrouperPrice'.
+     *
+     * @return Value for property 'redGrouperPrice'.
+     */
+    public DoubleParameter getRedGrouperPrice() {
+        return redGrouperPrice;
+    }
+
+    /**
+     * Setter for property 'redGrouperPrice'.
+     *
+     * @param redGrouperPrice Value to set for property 'redGrouperPrice'.
+     */
+    public void setRedGrouperPrice(DoubleParameter redGrouperPrice) {
+        this.redGrouperPrice = redGrouperPrice;
+    }
+
+    /**
+     * Getter for property 'gagGrouperPrice'.
+     *
+     * @return Value for property 'gagGrouperPrice'.
+     */
+    public DoubleParameter getGagGrouperPrice() {
+        return gagGrouperPrice;
+    }
+
+    /**
+     * Setter for property 'gagGrouperPrice'.
+     *
+     * @param gagGrouperPrice Value to set for property 'gagGrouperPrice'.
+     */
+    public void setGagGrouperPrice(DoubleParameter gagGrouperPrice) {
+        this.gagGrouperPrice = gagGrouperPrice;
+    }
+
+    /**
+     * Getter for property 'handlinerDiscardingStrategy'.
+     *
+     * @return Value for property 'handlinerDiscardingStrategy'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getHandlinerDiscardingStrategy() {
+        return handlinerDiscardingStrategy;
+    }
+
+    /**
+     * Setter for property 'handlinerDiscardingStrategy'.
+     *
+     * @param handlinerDiscardingStrategy Value to set for property 'handlinerDiscardingStrategy'.
+     */
+    public void setHandlinerDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> handlinerDiscardingStrategy) {
+        this.handlinerDiscardingStrategy = handlinerDiscardingStrategy;
+    }
+
+    /**
+     * Getter for property 'longlinerDiscardingStrategy'.
+     *
+     * @return Value for property 'longlinerDiscardingStrategy'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getLonglinerDiscardingStrategy() {
+        return longlinerDiscardingStrategy;
+    }
+
+    /**
+     * Setter for property 'longlinerDiscardingStrategy'.
+     *
+     * @param longlinerDiscardingStrategy Value to set for property 'longlinerDiscardingStrategy'.
+     */
+    public void setLonglinerDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> longlinerDiscardingStrategy) {
+        this.longlinerDiscardingStrategy = longlinerDiscardingStrategy;
     }
 }

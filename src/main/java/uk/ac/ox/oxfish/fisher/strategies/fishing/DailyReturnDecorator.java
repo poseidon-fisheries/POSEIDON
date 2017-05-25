@@ -84,4 +84,9 @@ public class DailyReturnDecorator implements FishingStrategy {
     public double getLastCheck() {
         return lastCheck;
     }
+
+    @VisibleForTesting
+    public  FishingStrategy accessDecorated(){
+        return decorated;
+    }
 }

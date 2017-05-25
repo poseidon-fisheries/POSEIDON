@@ -33,7 +33,7 @@ public class FloridaLogitDestinationFactory implements
 
     private String coefficientsStandardDeviationFile =
             FishStateUtilities.getAbsolutePath(
-                    Paths.get("temp_wfs", "longline_std.csv").toString());
+                    Paths.get("temp_wfs", "longline_dummy.csv").toString());
 
     /**
      * file containing all the centroids

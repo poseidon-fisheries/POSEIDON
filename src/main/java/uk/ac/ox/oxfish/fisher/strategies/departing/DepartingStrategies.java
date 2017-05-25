@@ -61,8 +61,8 @@ public class DepartingStrategies {
         NAMES.put(LonglineFloridaLogisticDepartingFactory.class,"WFS Longline");
 
         CONSTRUCTORS.put("WFS Handline",
-                         HandlineFloridaLogisticDepartingFactory::new);
-        NAMES.put(HandlineFloridaLogisticDepartingFactory.class,"WFS Handline");
+                         FloridaLogisticDepartingFactory::new);
+        NAMES.put(FloridaLogisticDepartingFactory.class, "WFS Handline");
     }
 
     private DepartingStrategies() {}

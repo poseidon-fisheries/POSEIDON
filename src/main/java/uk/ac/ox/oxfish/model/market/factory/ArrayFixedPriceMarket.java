@@ -30,6 +30,11 @@ public class ArrayFixedPriceMarket implements AlgorithmFactory<FixedPriceMarket>
     public ArrayFixedPriceMarket() {
     }
 
+
+    public ArrayFixedPriceMarket(String prices) {
+        this.prices = prices;
+    }
+
     /**
      * Applies this function to the given argument.
      *
@@ -45,6 +50,8 @@ public class ArrayFixedPriceMarket implements AlgorithmFactory<FixedPriceMarket>
 
         FixedPriceMarket market = new FixedPriceMarket(pricesAsNumbers[index]);
         index++;
+        if(index==pricesAsNumbers.length)
+            index=0;
         return market;
     }
 

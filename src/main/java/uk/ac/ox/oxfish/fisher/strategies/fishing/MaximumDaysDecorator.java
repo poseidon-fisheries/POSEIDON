@@ -1,10 +1,8 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
+import com.google.common.annotations.VisibleForTesting;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -12,7 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * The Fisher keep fishing until full or until a limit number of days have passed.
  * Created by carrknight on 6/23/15.
  */
-public class MaximumDaysStrategy implements FishingStrategy
+public class MaximumDaysDecorator implements FishingStrategy
 {
 
 
@@ -20,13 +18,13 @@ public class MaximumDaysStrategy implements FishingStrategy
 
     private final int daysBeforeGoingHome;
 
-    public MaximumDaysStrategy(int daysBeforeGoingHome) {
+    public MaximumDaysDecorator(int daysBeforeGoingHome) {
         this(new FishUntilFullStrategy(1d),daysBeforeGoingHome);
 
 
     }
 
-    public MaximumDaysStrategy(FishingStrategy delegate, int daysBeforeGoingHome) {
+    public MaximumDaysDecorator(FishingStrategy delegate, int daysBeforeGoingHome) {
         this.delegate = delegate;
         this.daysBeforeGoingHome = daysBeforeGoingHome;
     }
@@ -59,5 +57,11 @@ public class MaximumDaysStrategy implements FishingStrategy
     @Override
     public void turnOff(Fisher fisher) {
         delegate.turnOff(fisher);
+    }
+
+
+    @VisibleForTesting
+    public  FishingStrategy accessDecorated(){
+        return delegate;
     }
 }

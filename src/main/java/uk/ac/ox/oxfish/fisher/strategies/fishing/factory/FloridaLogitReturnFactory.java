@@ -6,8 +6,9 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.WeekendExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticClassifier;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.DailyReturnDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.LogitReturnStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -19,7 +20,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Implementation of the WFS logit regression
  * Created by carrknight on 4/19/17.
  */
-public class FloridaLogitReturnFactory implements AlgorithmFactory<MaximumDaysStrategy>{
+public class FloridaLogitReturnFactory implements AlgorithmFactory<DailyReturnDecorator>{
 
     //these are the handline parameters by default
 
@@ -44,53 +45,58 @@ public class FloridaLogitReturnFactory implements AlgorithmFactory<MaximumDaysSt
      * @return the function result
      */
     @Override
-    public MaximumDaysStrategy apply(FishState state) {
-        return new MaximumDaysStrategy(
-                new LogitReturnStrategy
-                        (
-                                new LogisticClassifier
+    public DailyReturnDecorator apply(FishState state) {
+        return
+                //notice the chain of decorators
+                //it only checks once a day (daily return decorator)
+                //and it has a strict upper limit to the number of days to return (Maximum Days Strategy)
+                new DailyReturnDecorator(
+                        new MaximumDaysDecorator(
+                                new LogitReturnStrategy
                                         (
-                                                //intercept:
-                                                new Pair<>(
-                                                        new InterceptExtractor()
-                                                        ,intercept.apply(state.getRandom())),
-                                                //price red grouper
-                                                new Pair<>(
-                                                        new FishPriceExtractor(
-                                                                state.getBiology().getSpecie("RedGrouper")
-                                                        ),
-                                                        priceRedGrouper.apply(state.getRandom())
-                                                ),
-                                                //price gag grouper
-                                                new Pair<>(
-                                                        new FishPriceExtractor(
-                                                                state.getBiology().getSpecie("GagGrouper")
-                                                        ),
-                                                        priceGagGrouper.apply(state.getRandom())
-                                                ),
-                                                //ratio catch to fish hold
-                                                new Pair<>(
-                                                        new ObservationExtractor() {
-                                                            @Override
-                                                            public double extract(
-                                                                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
-                                                                return agent.getTotalWeightOfCatchInHold() / agent.getMaximumHold();
-                                                            }
-                                                        },
-                                                        ratioCatchToFishHold.apply(state.getRandom())
+                                                new LogisticClassifier
+                                                        (
+                                                                //intercept:
+                                                                new Pair<>(
+                                                                        new InterceptExtractor()
+                                                                        ,intercept.apply(state.getRandom())),
+                                                                //price red grouper
+                                                                new Pair<>(
+                                                                        new FishPriceExtractor(
+                                                                                state.getBiology().getSpecie("RedGrouper")
+                                                                        ),
+                                                                        priceRedGrouper.apply(state.getRandom())
+                                                                ),
+                                                                //price gag grouper
+                                                                new Pair<>(
+                                                                        new FishPriceExtractor(
+                                                                                state.getBiology().getSpecie("GagGrouper")
+                                                                        ),
+                                                                        priceGagGrouper.apply(state.getRandom())
+                                                                ),
+                                                                //ratio catch to fish hold
+                                                                new Pair<>(
+                                                                        new ObservationExtractor() {
+                                                                            @Override
+                                                                            public double extract(
+                                                                                    SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
+                                                                                return agent.getTotalWeightOfCatchInHold() / agent.getMaximumHold();
+                                                                            }
+                                                                        },
+                                                                        ratioCatchToFishHold.apply(state.getRandom())
 
 
-                                                ),
-                                                //weekend dummy
-                                                new Pair<>(
-                                                        new WeekendExtractor(),
-                                                        weekendDummy.apply(state.getRandom())
-                                                )
-                                        )
+                                                                ),
+                                                                //weekend dummy
+                                                                new Pair<>(
+                                                                        new WeekendExtractor(),
+                                                                        weekendDummy.apply(state.getRandom())
+                                                                )
+                                                        )
 
 
-                        ),
-                maximumDays.apply(state.getRandom()).intValue());
+                                        ),
+                                maximumDays.apply(state.getRandom()).intValue()));
     }
 
     /**

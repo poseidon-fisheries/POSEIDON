@@ -63,13 +63,13 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
                 //grows logistically
 
                 Double carryingCapacity = biology.getCarryingCapacity(i);
-                if(carryingCapacity > FishStateUtilities.EPSILON) {
+                if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomass[i]) {
                     double oldBiomass = currentBiomass[i];
                     currentBiomass[i] = Math.min(carryingCapacity, currentBiomass[i] + malthusianParameter[i] *
                             (1d - currentBiomass[i] / carryingCapacity) * currentBiomass[i]);
                     //store recruitment number, counter should have been initialized by factory!
                     double recruitment = currentBiomass[i]-oldBiomass;
-                    if(recruitment>0)
+                    if(recruitment>FishStateUtilities.EPSILON)
                         model.getYearlyCounter().count(model.getSpecies().get(i) +
                                                                " Recruitment",
                                                        recruitment);

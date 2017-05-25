@@ -193,6 +193,10 @@ public class YamlConstructor extends  Constructor {
     public static DoubleParameter parseDoubleParameter(String nodeContent) {
         //trim and split
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
+
+        if(split[0].toLowerCase().trim().equals("normal"))
+            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
         if(split.length == 1)
             //fixed
             return new FixedDoubleParameter(Double.parseDouble(split[0]));

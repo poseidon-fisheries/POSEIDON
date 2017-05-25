@@ -6,7 +6,7 @@ Abstract:
       percentageLimitOnDailyMovement: '0.01'
       grower:
           Independent Logistic Grower:
-              steepness: 0.7
+              steepness: 0
   departingStrategy:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'

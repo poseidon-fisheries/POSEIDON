@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.regs;
 
+import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -88,11 +89,12 @@ public class WeakMultiQuotaRegulationTest {
 
 
         FishState model = mock(FishState.class);
-        WeakMultiQuotaRegulation regs = new WeakMultiQuotaRegulation(new double[]{1d,2d}, model);
         Fisher fisher = mock(Fisher.class);
         Species zero = new Species("zero"); zero.resetIndexTo(0);
         Species one = new Species("one"); one.resetIndexTo(1);
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(zero,one));
 
+        WeakMultiQuotaRegulation regs = new WeakMultiQuotaRegulation(new double[]{1d,2d}, model);
 
         assertTrue(regs.allowedAtSea(fisher, model));
         assertEquals(1,regs.getQuotaRemaining(0),FishStateUtilities.EPSILON);

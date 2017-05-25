@@ -1,11 +1,14 @@
 package uk.ac.ox.oxfish.biology;
 
+import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class BiomassLocalBiologyTest
@@ -27,7 +30,9 @@ public class BiomassLocalBiologyTest
         assertEquals(0, bio.getBiomass(species2), .1);
 
         //grow it
-        grower.step(mock(FishState.class));
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0,species1,species2));
+        grower.step(model);
 
         assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
         assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
@@ -35,7 +40,7 @@ public class BiomassLocalBiologyTest
 
         bio.setCurrentBiomass(species1, 399.88);
         //grow it again
-        grower.step(mock(FishState.class));
+        grower.step(model);
         assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
         assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
         assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow

@@ -87,4 +87,8 @@ public class LogisticClassifier {
     }
 
 
+    public int getSize(){
+                return betas.size();
+    }
+
 }

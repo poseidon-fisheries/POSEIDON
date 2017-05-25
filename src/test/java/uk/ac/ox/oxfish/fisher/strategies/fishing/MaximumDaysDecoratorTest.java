@@ -3,9 +3,6 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -14,13 +11,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class MaximumDaysStrategyTest {
+public class MaximumDaysDecoratorTest {
 
 
     @Test
     public void maximumSteps() throws Exception
     {
-        MaximumDaysStrategy steps =  new MaximumDaysStrategy(100);
+        MaximumDaysDecorator steps =  new MaximumDaysDecorator(100);
 
         //fish as long as it is BOTH not full and not being out for too long
         Fisher fisher = mock(Fisher.class);

@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.model.regs.WeakMultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -42,12 +44,28 @@ public class WeakMultiTACStringFactory implements AlgorithmFactory<WeakMultiQuot
                                          @Override
                                          public WeakMultiQuotaRegulation get() {
 
-                                             return new WeakMultiQuotaRegulation(
+                                             WeakMultiQuotaRegulation quotas = new WeakMultiQuotaRegulation(
                                                      MultiTACStringFactory.turnStringIntoQuotaArray(
                                                              state,
                                                              yearlyQuotaMaps
                                                      ),
                                                      state);
+
+                                             for(Species species : state.getSpecies())
+                                             {
+                                                 state.getYearlyDataSet().registerGatherer(
+                                                         "Last Season Day of " + species,
+                                                         new Gatherer<FishState>() {
+                                                             @Override
+                                                             public Double apply(FishState state) {
+                                                                 return (double) quotas.getLastSeasonDay()[species.getIndex()];
+                                                             }
+                                                         },
+                                                         365d
+                                                 );
+                                             }
+
+                                             return quotas;
 
 
                                          }

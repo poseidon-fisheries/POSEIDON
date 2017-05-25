@@ -31,7 +31,8 @@ public class DoubleParameters
         parameters.put("Conditional", () -> new ConditionalDoubleParameter(false,new FixedDoubleParameter(0)));
         names.put(ConditionalDoubleParameter.class,"Conditional");
 
-
+        parameters.put("NullParameter", () -> new NullParameter());
+        names.put(NullParameter.class,"NullParameter");
 
         DOUBLE_PARAMETERS = Collections.unmodifiableMap(parameters);
         DOUBLE_PARAMETERS_NAME = Collections.unmodifiableMap(names);

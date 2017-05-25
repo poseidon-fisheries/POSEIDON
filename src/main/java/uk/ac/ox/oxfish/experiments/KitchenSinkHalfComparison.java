@@ -14,39 +14,42 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by carrknight on 5/18/17.
+ * Created by carrknight on 5/23/17.
  */
-public class TacMixedKitchenSinkComparison {
+public class KitchenSinkHalfComparison {
 
 
     private final static Map<String,Path> scenarios = new HashMap<>();
     public static final long SEED = 0l;
-    private static final long NUMBER_OF_RUNS = 100;
+    public static final int NUMBER_OF_RUNS = 100;
 
     static {
         scenarios.put("tac",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
-                                "kitchensink","mixed","best",
-                                "best-tac-mixed.yaml")
-                      );
+                                "kitchensink","half","best",
+                                "tac.yaml")
+        );
         scenarios.put("kitchensink",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
-                                "kitchensink","mixed","best",
-                                "kitchensink-best.yaml"));
-        scenarios.put("itq",
+                                "kitchensink","half","best",
+                                "kitchensink.yaml"));
+        scenarios.put("mpa",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
-                                "kitchensink","mixed","best",
-                                "itq.yaml")
-        );
-
+                                "kitchensink","half","best",
+                                "mpa-only.yaml"));
         scenarios.put("season",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
-                                "kitchensink","mixed","best",
-                                "season.yaml")
+                                "kitchensink","half","best",
+                                "season.yaml"));
+        scenarios.put("itq",
+                      Paths.get("docs",
+                                "20170511 optimisation_remake",
+                                "kitchensink","half","best",
+                                "itq.yaml")
         );
     }
 
@@ -56,17 +59,17 @@ public class TacMixedKitchenSinkComparison {
     private final static Path outputFolder =
             Paths.get("docs",
                       "20170511 optimisation_remake",
-                      "kitchensink","mixed","best",
-                      "comparison");
+                      "kitchensink","half","best","comparison");
 
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException
+    {
 
 
         Log.set(Log.LEVEL_INFO);
 
-        for (long run = SEED; run < SEED + NUMBER_OF_RUNS; run++) {
+        for(long run = SEED; run < SEED + NUMBER_OF_RUNS; run++) {
 
             for (Map.Entry<String, Path> scenario : scenarios.entrySet()) {
 
@@ -82,7 +85,7 @@ public class TacMixedKitchenSinkComparison {
                 Log.info(scenario.getKey() + " " + run);
 
                 FishStateUtilities.printCSVColumnsToFile(
-                        outputFolder.resolve(scenario.getKey() + "_" + run + ".csv").toFile(),
+                        outputFolder.resolve(scenario.getKey() +"_"+ run + ".csv").toFile(),
                         state.getYearlyDataSet().getColumn("Species 0 Landings"),
                         state.getYearlyDataSet().getColumn("Species 1 Landings"),
                         state.getYearlyDataSet().getColumn("Species 0 Recruitment"),
@@ -101,5 +104,8 @@ public class TacMixedKitchenSinkComparison {
                 Log.info("score: " + score);
             }
         }
+
+
     }
+
 }

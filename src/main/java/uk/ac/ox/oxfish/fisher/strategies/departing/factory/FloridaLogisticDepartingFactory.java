@@ -12,10 +12,13 @@ import uk.ac.ox.oxfish.utility.Season;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 /**
  * Created by carrknight on 4/12/17.
  */
-public class HandlineFloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy>
+public class FloridaLogisticDepartingFactory implements AlgorithmFactory<DailyLogisticDepartingStrategy>
 {
 
 
@@ -25,8 +28,11 @@ public class HandlineFloridaLogisticDepartingFactory implements AlgorithmFactory
     private DoubleParameter winter = new FixedDoubleParameter(0.266862);
     private DoubleParameter weekend = new FixedDoubleParameter(-0.097619);
     private DoubleParameter windSpeedInKnots = new FixedDoubleParameter(-0.046672);
+    //this is in $ / gallon; we convert it in the OSMOSE WFS
     private DoubleParameter realDieselPrice = new FixedDoubleParameter(-0.515073);
+    //this is in $/lbs; we convert it in the OSMOSE WFS
     private DoubleParameter priceRedGrouper = new FixedDoubleParameter(-0.3604);
+    //this is in $/lbs; we convert it in the OSMOSE WFS
     private DoubleParameter priceGagGrouper = new FixedDoubleParameter(0.649616);
 
 
@@ -40,56 +46,47 @@ public class HandlineFloridaLogisticDepartingFactory implements AlgorithmFactory
     @Override
     public DailyLogisticDepartingStrategy apply(FishState state) {
 
+        LinkedHashMap<ObservationExtractor,Double> betas = new LinkedHashMap();
+
+
+
+        Double coefficient = intercept.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new InterceptExtractor(), coefficient);
+        coefficient = spring.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new SeasonExtractor(Season.SPRING), coefficient);
+        coefficient = summer.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new SeasonExtractor(Season.SUMMER), coefficient);
+        coefficient = winter.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new SeasonExtractor(Season.WINTER), coefficient);
+        coefficient = weekend.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new WeekendExtractor(), coefficient);
+        coefficient = windSpeedInKnots.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new WindSpeedExtractor(), coefficient);
+
+        coefficient = realDieselPrice.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put(new GasPriceExtractor(), coefficient);
+
+        coefficient = priceRedGrouper.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put( new FishPriceExtractor(state.getBiology().getSpecie("RedGrouper")), coefficient);
+
+        coefficient = priceGagGrouper.apply(state.getRandom());
+        if(Double.isFinite(coefficient))
+            betas.put( new FishPriceExtractor(state.getBiology().getSpecie("GagGrouper")), coefficient);
+
+
+
+
         return new DailyLogisticDepartingStrategy(
                 new LogisticClassifier(
-                        //intercept:
-                        new Pair<>(
-                                new InterceptExtractor()
-                                ,intercept.apply(state.getRandom())),
-                        //spring
-                        new Pair<>(
-                                new SeasonExtractor(Season.SPRING),
-                                spring.apply(state.getRandom())
-                        ),
-                        //summer
-                        new Pair<>(
-                                new SeasonExtractor(Season.SUMMER),
-                                summer.apply(state.getRandom())
-                        ),
-                        //winter
-                        new Pair<>(
-                                new SeasonExtractor(Season.SUMMER),
-                                winter.apply(state.getRandom())
-                        ),
-                        //weekend
-                        new Pair<>(
-                                new WeekendExtractor(),
-                                weekend.apply(state.getRandom())
-
-                        ),
-                        new Pair<>(new WindSpeedExtractor(),
-                                   windSpeedInKnots.apply(state.getRandom())),
-
-                        //realDieselPrice
-                        new Pair<>(
-                                new GasPriceExtractor(),
-                                realDieselPrice.apply(state.getRandom())
-
-                        ),
-                        //priceRedGrouper
-                        new Pair<>(
-                                new FishPriceExtractor(
-                                        state.getBiology().getSpecie("RedGrouper")
-                                ),
-                                priceRedGrouper.apply(state.getRandom())
-                        ),
-                        //priceGagGrouper
-                        new Pair<>(
-                                new FishPriceExtractor(
-                                        state.getBiology().getSpecie("GagGrouper")
-                                ),
-                                priceGagGrouper.apply(state.getRandom())
-                        )
+                        betas
                 ));
 
 
