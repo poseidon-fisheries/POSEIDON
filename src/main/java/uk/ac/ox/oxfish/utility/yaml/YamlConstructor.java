@@ -194,8 +194,8 @@ public class YamlConstructor extends  Constructor {
         //trim and split
         final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
 
-        if(split[0].toLowerCase().trim().equals("normal"))
-            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+        if(split[0].toLowerCase().trim().equals("nullparameter"))
+            return new NullParameter();
 
         if(split.length == 1)
             //fixed

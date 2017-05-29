@@ -31,7 +31,8 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
     @Override
     public void step(SimState simState) {
-        List<SeaTile> allTiles = ((FishState) simState).getMap().getAllSeaTilesExcludingLandAsList();
+        FishState model = (FishState) simState;
+        List<SeaTile> allTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
 
         lastExogenousCatches.clear();
 
@@ -50,13 +51,13 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             {
 
                 //grab a tile at random
-                SeaTile tile = tiles.get(((FishState) simState).getRandom().nextInt(tiles.size()));
+                SeaTile tile = tiles.get(model.getRandom().nextInt(tiles.size()));
 
 
                 //each tile we pick, grab this much fish out
                 double step = Math.min(totalToCatch / (double) tiles.size(),toCatch);
-                Catch fish = mortalityEvent((FishState) simState, target, tile, step);
-
+                Catch fish = mortalityEvent(model, target, tile, step);
+                tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
 
                 //should only fish one species!
                 double biomassCaught = fish.getWeightCaught(target);

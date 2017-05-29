@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
 import uk.ac.ox.oxfish.biology.AbstractBiomassBasedBiology;
@@ -23,16 +22,17 @@ public class LocalOsmoseByBiomassBiology extends AbstractBiomassBasedBiology
 
     public LocalOsmoseByBiomassBiology(
             ExogenousMortality mortality, CellBiomass counter,
-            int numberOfSpecies, MersenneTwisterFast random,
-            double scalingFactor)
+            int numberOfSpecies,
+            double scalingFactor, final double[] discardMortality)
     {
 
         delegate = new LocalOsmoseWithoutRecruitmentBiology(
                 mortality,
                 counter,
-                random,
                 scalingFactor,
-                new int[numberOfSpecies]
+                new int[numberOfSpecies],
+                discardMortality
+
         );
 
     }

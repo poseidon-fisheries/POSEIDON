@@ -59,12 +59,19 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
     private final HashMap<Integer,Integer> recruitmentAges;
 
     private final double scalingFactor;
+    /**
+     * mortality rates for discarded fish. When not specified, the discard rate is 100% (1d)
+     */
+    private final HashMap<Integer, Double> discardMortalityRate
+            ;
 
 
     public OsmoseBiologyInitializer(
             String osmoseConfigurationFile, boolean preInitializedConfiguration,
             String preInitializedConfigurationDirectory, int burnInYears,
-            double scalingFactor, HashMap<Integer,Integer> recruitmentAges, Integer... speciesToManage) {
+            double scalingFactor, HashMap<Integer,Integer> recruitmentAges,
+            HashMap<Integer,Double> discardMortalityRate,
+            Integer... speciesToManage) {
         this.osmoseConfigurationFile = osmoseConfigurationFile;
         this.preInitializedConfiguration = preInitializedConfiguration;
         this.preInitializedConfigurationDirectory = preInitializedConfigurationDirectory;
@@ -72,6 +79,7 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
         this.recruitmentAges = recruitmentAges;
         this.speciesToManageFromThisSide = speciesToManage;
         this.scalingFactor = scalingFactor;
+        this.discardMortalityRate = discardMortalityRate;
 
     }
 
@@ -103,12 +111,17 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
         for(Map.Entry<Integer,Integer> pair : recruitmentAges.entrySet())
             recruitments[pair.getKey()] = pair.getValue();
 
+        double discardMortality[] = new double[biology.getSize()];
+        Arrays.fill(discardMortality,1d); //by default mortality is 100%
+        for(Map.Entry<Integer,Double> pair : discardMortalityRate.entrySet())
+            discardMortality[pair.getKey()] = pair.getValue();
+
         final LocalOsmoseWithoutRecruitmentBiology local =
                 new LocalOsmoseWithoutRecruitmentBiology(simulation.getMortality(),
                                                          simulation.getCounter().getBiomass(x, height-y-1),
-                                                         random,
                                                          scalingFactor,
-                                                         recruitments);
+                                                         recruitments,
+                                                         discardMortality);
         ((OsmoseGlobalBiology) biology).getStepper().getToReset().add(local);
 
         return local;
@@ -238,5 +251,14 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
 
         return new OsmoseGlobalBiology(osmoseSimulation,stepper,species);
 
+    }
+
+    /**
+     * Getter for property 'discardMortalityRate'.
+     *
+     * @return Value for property 'discardMortalityRate'.
+     */
+    public HashMap<Integer, Double> getDiscardMortalityRate() {
+        return discardMortalityRate;
     }
 }

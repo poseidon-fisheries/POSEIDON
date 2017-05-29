@@ -40,6 +40,10 @@ public class YamlRepresenter extends Representer
                                       String.valueOf(((FixedDoubleParameter) data).getFixedValue())));
 
 
+        this.representers.put(NullParameter.class,
+                              data -> representData("nullparameter"));
+
+
         this.representers.put(NormalDoubleParameter.class,
                               data -> {
                                   final NormalDoubleParameter normal = (NormalDoubleParameter) data;

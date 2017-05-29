@@ -100,7 +100,8 @@ public class DataCharter {
                     if(entry.getKey().size() > entry.getValue().getItemCount())
                     {
                         //should be different only by one at most
-                        assert entry.getValue().getItemCount() == entry.getKey().size() + 1;
+//                        assert entry.getValue().getItemCount() == entry.getKey().size() + 1;
+                        //not true in fast real time situations
                         entry.getValue().add(xColumn.apply((FishState) simState),entry.getKey().getLatest());
 
                     }

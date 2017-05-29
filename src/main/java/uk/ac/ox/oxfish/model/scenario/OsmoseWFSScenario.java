@@ -132,6 +132,9 @@ public class OsmoseWFSScenario implements Scenario{
         biologyInitializer.getRecruitmentAges().put(2,2);
         biologyInitializer.getRecruitmentAges().put(3,2);
         biologyInitializer.getRecruitmentAges().put(4,1);
+        biologyInitializer.getDiscardMortalityRate().put(2,.374); //red grouper SEDAR 42, table 2.12 (assuming the most common depth of fishing)
+        biologyInitializer.getDiscardMortalityRate().put(3,.5); //gag grouper SEDAR 33, figure 6.1 (although it really is a function)
+        biologyInitializer.getDiscardMortalityRate().put(4,0.82875); //red snapper SEDAR 31, table 5.1, average no-venting mortality
     }
 
     private final OsmoseBoundedMapInitializerFactory mapInitializer = new OsmoseBoundedMapInitializerFactory();
@@ -245,6 +248,7 @@ public class OsmoseWFSScenario implements Scenario{
     //quotas from 96 to 2007 red snapper: 2086524.902kg (4.65 million pounds; SEDAR 31, table 2.5.1)
     //however this was split among all the gulf states; florida west coast only got about 800k pounds
     //so that the four average 2003-2006 is 337 metric tonnes or 337000kg
+    //the quota on the gulf dropped a lot in 2007 but there was more or less the same amount of catching in the gulf
 
     //(3)GAG GROUPER:
     //SWG quota (for gag grouper) was 3991612.856 (8.8 million pounds, but this was the whole SWG; SEDAR 33 table 2.6.1)
@@ -273,26 +277,27 @@ public class OsmoseWFSScenario implements Scenario{
 
     private Map<String, String> exogenousCatches = new HashMap<>();
     {
-        //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
-        //all for the year 2010
+        //recreational mortality
+        //RED SNAPPER:
+        //2003 to 2007 average (a+b1) seems to be 935,084.25 kg
+
+        //GAG GROUPER:
+        //noaa fisheries harvest (a+b1) 1,607,978.75kg a year on average (2003 to 2006)
+
+        //RED GROUPER:
+        //noaa fisheries harvest (a+b1) 887,488kg a year on average (2003 to 2006)
+
+
+
         exogenousCatches.put("RedSnapper",Double.toString(935084.25d));
         exogenousCatches.put("GagGrouper",Double.toString(1607978.75d));
         exogenousCatches.put("RedGrouper",Double.toString(887488d));
+
 
     }
 
 
 
-
-    //recreational mortality
-    //RED SNAPPER:
-    //2003 to 2007 average (a+b1) seems to be 935,084.25 kg
-
-    //GAG GROUPER:
-    //noaa fisheries harvest (a+b1) 1,607,978.75kg a year on average (2003 to 2006)
-
-    //RED GROUPER:
-    //noaa fisheries harvest (a+b1) 887,488kg a year on average (2003 to 2006)
 
 
 
@@ -413,6 +418,7 @@ public class OsmoseWFSScenario implements Scenario{
      */
     @Override
     public ScenarioEssentials start(FishState model) {
+
         try {
 
             BiologyInitializer biology = biologyInitializer.apply(model);

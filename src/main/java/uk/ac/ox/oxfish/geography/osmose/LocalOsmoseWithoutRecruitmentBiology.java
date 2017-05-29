@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.osmose;
 
 import com.google.common.base.Preconditions;
-import ec.util.MersenneTwisterFast;
 import fr.ird.osmose.School;
 import uk.ac.ox.ouce.oxfish.ExogenousMortality;
 import uk.ac.ox.ouce.oxfish.cell.CellBiomass;
@@ -13,6 +12,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 /**
  * A modified OSMOSE biology link that ignores all biomass from schools of fish below recruitment age
@@ -35,27 +36,29 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
 
     private final Map<School,Double> biomassFishedFromSchool;
 
-    private final MersenneTwisterFast random;
-
     /**
      * this multiplies the biology weight as stored into OSMOSE before returning it to the model.
      * This is useful because OSMOSE stores weight in tonnes while we want them in kilos.
      */
     private final double scalingFactor;
 
+    /**
+     * mortality from discard. So say .6 means that 60% of all fish discarded will die
+     */
+    private final double[] discardMortality;
 
     public LocalOsmoseWithoutRecruitmentBiology(
             ExogenousMortality mortality, CellBiomass counter,
-            MersenneTwisterFast random,
             final double scalingFactor,
-            final int[] recruitmentAge)
+            final int[] recruitmentAge,
+            final double[] discardMortality)
     {
         this.counter = counter;
         this.mortality = mortality;
-        this.random = random;
         biomassFishedFromSchool = new HashMap<>();
         this.scalingFactor = scalingFactor;
         this.recruitmentAge= recruitmentAge;
+        this.discardMortality = discardMortality;
     }
 
 
@@ -98,14 +101,20 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
         return currentBiomass * scalingFactor;
 
 */
+        double currentBiomass =   counter.getBiomassOfSpecie(species.getIndex());
+        for (Map.Entry<School, Double> pair : biomassFishedFromSchool.entrySet()) {
 
-        double currentBiomass =   counter.getBiomassOfSpecie(species.getIndex()) -
-                biomassFishedFromSchool.values().stream()
-                        .mapToDouble(Double::doubleValue).sum();
+            if(pair.getKey().getSpecies().getIndex() == species.getIndex())
+                currentBiomass -= pair.getValue();
+        }
+
+
 
 
         assert  currentBiomass >= -FishStateUtilities.EPSILON;
-        assert  currentBiomass * scalingFactor >= getBiomass(species); //this includes juveniles so it should be more
+        assert  currentBiomass * scalingFactor >= getBiomass(species) - FishStateUtilities.EPSILON
+                : "biomass with juveniles " + currentBiomass * scalingFactor + ", biomass without juveniles " + getBiomass(species);
+                ; //this includes juveniles so it should be more
         //if recruitment mortality is 0, these two ought to be equal
         // A => B is equivalent to  (!A or B)
         assert  !(recruitmentAge[species.getIndex()]  == 0) || (currentBiomass * scalingFactor == getBiomass(species));
@@ -153,28 +162,45 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
             Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
 
-        Preconditions.checkArgument(!caught.hasAbundanceInformation(),"Osmose biology isn't adapted through abudance gear. What's going on?");
+
+        Preconditions.checkArgument(!caught.hasAbundanceInformation(),"Osmose biology isn't supposed to deal with abudance gear. What's going on?");
 
         for(int species = 0; species<caught.numberOfSpecies(); species++) {
-            double biomassFished = caught.getWeightCaught(species);
+
+            //tokill = catches - surviving discards
+            double biomassToKill = caught.getWeightCaught(species); //catches
+
             //if nothing was fished, then ignore
-            if (biomassFished < FishStateUtilities.EPSILON)
+            if (biomassToKill < FishStateUtilities.EPSILON)
                 continue;
 
-            // do not need to scale since they are both "wrong" and all we care about is their proportion
-            double biomassAvailable = getBiomass(species); //already scaled
+
+            double discards = biomassToKill - notDiscarded.getWeightCaught(species); //discards
+            //make discards survive!
+            biomassToKill -= discards * (1d-discardMortality[species]);
+            assert biomassToKill>=0;
+            assert discards>=0;
+
+            //if nothing was killed, then ignore
+            if (biomassToKill < FishStateUtilities.EPSILON)
+                continue;
+
+
+            //with this getter we get biomass already scaled to kg
+            double biomassAvailable = getBiomass(species);
 
             if (biomassAvailable < FishStateUtilities.EPSILON) //if there is no fish, do not bother
                 continue;
 
-            double proportionFishedPerEachSchool =
-                    biomassFished / biomassAvailable;
+            double proportionFishedPerEachSchool =biomassToKill / biomassAvailable;
 
             assert proportionFishedPerEachSchool >= 0;
-            assert proportionFishedPerEachSchool <= 1;
+            assert (biomassToKill) / (biomassAvailable+ FishStateUtilities.EPSILON) <= 1 : biomassToKill + " --- " + biomassAvailable; //rounding!
+            proportionFishedPerEachSchool = Math.max(0,proportionFishedPerEachSchool);
+            proportionFishedPerEachSchool = Math.min(1d,proportionFishedPerEachSchool);
 
             //you can't fish MORE than what is available right now
-            Preconditions.checkArgument(biomassFished <= biomassAvailable + FishStateUtilities.EPSILON,
+            Preconditions.checkArgument(biomassToKill <= biomassAvailable + FishStateUtilities.EPSILON,
                                         "can't fish this much!");
 
             assert biomassAvailable >= 0;
@@ -183,13 +209,19 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
             //get all the schools of fish that belong to this species
             List<School> schools = counter.getSchoolsPerSpecie(species);
 
-            //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable
-            //variable I have
+            //if I sum up all the biomass from the list of school it should be equal to the biomassAvailable minus what we have caught already
+            //variable I have (accounting for scaling!)
             Integer recruitmentAge = this.recruitmentAge[species];
             assert Math.abs(schools.stream().filter(school -> school.getAge() >= recruitmentAge)
-                                    .mapToDouble(School::getInstantaneousBiomass).sum()
-                                    - biomassAvailable)
-                    < FishStateUtilities.EPSILON;
+                                    .mapToDouble(School::getInstantaneousBiomass).sum() -
+                    biomassFishedFromSchool.entrySet().stream().filter(
+                            pair -> schools.contains(pair.getKey())).mapToDouble(value -> value.getValue()).sum()
+                                    - biomassAvailable/scalingFactor)
+                    < FishStateUtilities.EPSILON : "school stream " +schools.stream().filter(school -> school.getAge() >= recruitmentAge)
+                                                                                                          .mapToDouble(School::getInstantaneousBiomass).sum() +
+                    " biomass available" + biomassAvailable/scalingFactor + ", already caught" +
+                    biomassFishedFromSchool.entrySet().stream().filter(
+                            pair -> schools.contains(pair.getKey())).mapToDouble(value -> value.getValue()).sum();
 
 
             //go through each school
@@ -205,21 +237,36 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
                 //count what has already been depleted
                 final Double schoolEarlierDepletion = biomassFishedFromSchool.get(school);
                 //fish the right proportion
-                double fishedHere = (school.getInstantaneousBiomass() - schoolEarlierDepletion) * proportionFishedPerEachSchool;
+                double currentLocalBiomass = school.getInstantaneousBiomass() - schoolEarlierDepletion;
+                assert currentLocalBiomass >= 0;
+                double fishedHere = currentLocalBiomass * proportionFishedPerEachSchool;
+                assert schoolEarlierDepletion + fishedHere < school.getInstantaneousBiomass() + FishStateUtilities.EPSILON; //never fish more than possible (rounding errors)
+                //make sure further rounding errors do not push you into catching more than the target
+                assert fishedHere <= biomassToKill + FishStateUtilities.EPSILON : "fished here: " + fishedHere  +" , biomass to Kill" + biomassToKill;
+                fishedHere = Math.min(Math.min(fishedHere,currentLocalBiomass),biomassToKill-totalFished);
+                //rounding can push you into negative territory which we don't like
+
+                assert fishedHere<=biomassToKill-totalFished;
                 totalFished += fishedHere;
+                assert totalFished<=biomassToKill + FishStateUtilities.EPSILON : biomassToKill + " , total fished " + totalFished + ", fished here: " + fishedHere;
                 //should be no more than what we want to fish
-                assert fishedHere <= biomassFished;
+                assert fishedHere <= biomassToKill : "fished here: " + fishedHere  +" , biomass to Kill" + biomassToKill;
                 //should be positive or 0
-                assert fishedHere >= 0;
+                assert fishedHere >=-FishStateUtilities.EPSILON;
+                fishedHere = Math.max(0,fishedHere);
+                assert fishedHere >= 0 : "fished here: " + fishedHere;
 
                 //register the catch
                 //with the school
-                biomassFishedFromSchool.put(school, schoolEarlierDepletion + fishedHere);
+
+                biomassFishedFromSchool.put(school, Math.min(schoolEarlierDepletion + fishedHere,school.getInstantaneousBiomass()));
+                assert biomassFishedFromSchool.get(school) >=0;
                 //with the OSMOSE module
                 mortality.incrementCatches(school, fishedHere);
 
             }
-            assert totalFished == biomassFished / scalingFactor;
+            assert Math.abs(totalFished - biomassToKill / scalingFactor) < FishStateUtilities.EPSILON;
+            assert getBiomass(species)>=0;
         }
     }
 
@@ -254,6 +301,8 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
         return Arrays.toString(toPrint);
 
     }
+
+
 }
 
 

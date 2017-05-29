@@ -41,6 +41,8 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
 
     private HashMap<Integer, Integer> recruitmentAges = new HashMap<>();
 
+    private HashMap<Integer,Double> discardMortalityRate = new HashMap<>();
+
 
     /**
      * Applies this function to the given argument.
@@ -66,7 +68,9 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
                                             preInitializedConfigurationDirectory,
                                             numberOfOsmoseStepsToPulseBeforeSimulationStart,
                                             scalingFactor.apply(fishState.getRandom()),
-                                            recruitmentAges, parsed);
+                                            recruitmentAges,
+                                            discardMortalityRate,
+                                            parsed);
     }
 
 
@@ -155,6 +159,24 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
      */
     public void setRecruitmentAges(HashMap<Integer, Integer> recruitmentAges) {
         this.recruitmentAges = recruitmentAges;
+    }
+
+    /**
+     * Getter for property 'discardMortalityRate'.
+     *
+     * @return Value for property 'discardMortalityRate'.
+     */
+    public HashMap<Integer, Double> getDiscardMortalityRate() {
+        return discardMortalityRate;
+    }
+
+    /**
+     * Setter for property 'discardMortalityRate'.
+     *
+     * @param discardMortalityRate Value to set for property 'discardMortalityRate'.
+     */
+    public void setDiscardMortalityRate(HashMap<Integer, Double> discardMortalityRate) {
+        this.discardMortalityRate = discardMortalityRate;
     }
 }
 
