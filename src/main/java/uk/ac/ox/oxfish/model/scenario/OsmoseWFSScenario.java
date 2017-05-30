@@ -81,7 +81,25 @@ public class OsmoseWFSScenario implements Scenario{
 
     public final static Path mainDirectory = Paths.get("temp_wfs");
 
-    private final OsmoseBiologyFactory biologyInitializer = new OsmoseBiologyFactory();
+    private OsmoseBiologyFactory biologyInitializer = new OsmoseBiologyFactory();
+
+
+    {
+        biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2,3,4");
+        biologyInitializer.setOsmoseConfigurationFile(mainDirectory.resolve("wfs").resolve("osm_all-parameters.csv").toAbsolutePath().toString());
+        biologyInitializer.setPreInitializedConfigurationDirectory( mainDirectory.resolve("wfs").resolve("randomStarts").toAbsolutePath().toString());
+        biologyInitializer.setPreInitializedConfiguration(true);
+        biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
+        biologyInitializer.setScalingFactor(new FixedDoubleParameter(1000d));
+        //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
+        //this should take care of selectivityi
+        biologyInitializer.getRecruitmentAges().put(2,2);
+        biologyInitializer.getRecruitmentAges().put(3,2);
+        biologyInitializer.getRecruitmentAges().put(4,1);
+        biologyInitializer.getDiscardMortalityRate().put(2,.374); //red grouper SEDAR 42, table 2.12 (assuming the most common depth of fishing)
+        biologyInitializer.getDiscardMortalityRate().put(3,.5); //gag grouper SEDAR 33, figure 6.1 (although it really is a function)
+        biologyInitializer.getDiscardMortalityRate().put(4,0.82875); //red snapper SEDAR 31, table 5.1, average no-venting mortality
+    }
 
     private LinkedHashMap<Port, Integer> longlinersPerPort;
 
@@ -121,21 +139,6 @@ public class OsmoseWFSScenario implements Scenario{
             new NoLogbookFactory();
 
 
-    {
-        biologyInitializer.setIndexOfSpeciesToBeManagedByThisModel("2,3,4");
-        biologyInitializer.setOsmoseConfigurationFile(mainDirectory.resolve("wfs").resolve("osm_all-parameters.csv").toAbsolutePath().toString());
-        biologyInitializer.setPreInitializedConfiguration(false);
-        biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(114*12);
-        biologyInitializer.setScalingFactor(new FixedDoubleParameter(1000d));
-        //biologyInitializer.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(10);
-        //this should take care of selectivityi
-        biologyInitializer.getRecruitmentAges().put(2,2);
-        biologyInitializer.getRecruitmentAges().put(3,2);
-        biologyInitializer.getRecruitmentAges().put(4,1);
-        biologyInitializer.getDiscardMortalityRate().put(2,.374); //red grouper SEDAR 42, table 2.12 (assuming the most common depth of fishing)
-        biologyInitializer.getDiscardMortalityRate().put(3,.5); //gag grouper SEDAR 33, figure 6.1 (although it really is a function)
-        biologyInitializer.getDiscardMortalityRate().put(4,0.82875); //red snapper SEDAR 31, table 5.1, average no-venting mortality
-    }
 
     private final OsmoseBoundedMapInitializerFactory mapInitializer = new OsmoseBoundedMapInitializerFactory();
     {
@@ -1084,5 +1087,14 @@ public class OsmoseWFSScenario implements Scenario{
     public void setLonglinerDiscardingStrategy(
             AlgorithmFactory<? extends DiscardingStrategy> longlinerDiscardingStrategy) {
         this.longlinerDiscardingStrategy = longlinerDiscardingStrategy;
+    }
+
+    /**
+     * Setter for property 'biologyInitializer'.
+     *
+     * @param biologyInitializer Value to set for property 'biologyInitializer'.
+     */
+    public void setBiologyInitializer(OsmoseBiologyFactory biologyInitializer) {
+        this.biologyInitializer = biologyInitializer;
     }
 }

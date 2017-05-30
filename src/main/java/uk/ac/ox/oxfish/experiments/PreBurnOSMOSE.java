@@ -20,16 +20,16 @@ public class PreBurnOSMOSE {
     /**
      * generated 1000 random starting point for the gulf of mexico setup
      */
-    public static void WFS(String[] args)
+    public static void main(String[] args)
     {
 
 
         //because i am planning on running this once I am just going to hard-code this in.
-        String configurationLocation =  "/home/carrknight/code/config_OSMOSE-WFS_v3u2/osm_all-parameters.csv";
-        final String outputDir = "/home/carrknight/code/config_OSMOSE-WFS_v3u2/randomStarts";
-        String output = outputDir + "osm_snapshot_step1379.nc.0";
+        String configurationLocation =  "/home/carrknight/code/oxfish/temp_wfs/wfs/burning.csv";
+        final String outputDir = "/home/carrknight/code/oxfish/temp_wfs/wfs/randomStarts/";
+        String output ="/home/carrknight/code/oxfish/temp_wfs/wfs/output/restart/osm_snapshot_step1379.nc.0";
 
-        for(int i=0; i<1000; i++)
+        for(int i=20; i<1000; i++)
         {
             PrototypeScenario scenario = new PrototypeScenario();
             scenario.setMapInitializer(new OsmoseMapInitializerFactory());
@@ -40,6 +40,7 @@ public class PreBurnOSMOSE {
             biologyFactory.setNumberOfOsmoseStepsToPulseBeforeSimulationStart(115*12);
             biologyFactory.setOsmoseConfigurationFile(configurationLocation);
             biologyFactory.setPreInitializedConfiguration(false);
+            biologyFactory.setIndexOfSpeciesToBeManagedByThisModel("");
             FishState state = new FishState(i);
             state.setScenario(scenario);
             state.start();
