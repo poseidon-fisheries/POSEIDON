@@ -17,11 +17,12 @@ public class WFSCalibration {
 
 
     public static final int RUNS = 10000;
-    public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170526 gom_catchability", "common","results");
+    public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170526 gom_catchability", "results");
     public static final int YEARS_PER_RUN = 3;
 
     public static void  main(String[] args) throws IOException {
-        runMultipleTimesToBuildHistogram("best_common");
+        //runMultipleTimesToBuildHistogram("best_scalable");
+        runMultipleTimesToBuildHistogram("best_total");
 
 
 

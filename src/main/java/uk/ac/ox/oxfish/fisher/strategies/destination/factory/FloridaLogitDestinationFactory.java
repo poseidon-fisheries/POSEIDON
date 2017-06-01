@@ -27,20 +27,18 @@ public class FloridaLogitDestinationFactory implements
      * file containing all the betas
      */
     private String coefficientsFile =
-            FishStateUtilities.getAbsolutePath(
-                    Paths.get("temp_wfs", "longline.csv").toString());
+
+                    Paths.get("temp_wfs", "longline.csv").toString();
 
 
     private String coefficientsStandardDeviationFile =
-            FishStateUtilities.getAbsolutePath(
-                    Paths.get("temp_wfs", "longline_dummy.csv").toString());
+                    Paths.get("temp_wfs", "longline_dummy.csv").toString();
 
     /**
      * file containing all the centroids
      */
     private String centroidFile =
-            FishStateUtilities.getAbsolutePath(
-                    Paths.get("temp_wfs", "areas.txt").toString());
+                    Paths.get("temp_wfs", "areas.txt").toString();
 
 
     //

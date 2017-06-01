@@ -20,8 +20,8 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
     /**
      * file should be a csv and should contain the two columns we care about
      */
-    private String filePath = FishStateUtilities.getAbsolutePath(
-            Paths.get("temp_wfs", "areas.txt").toString());
+    private String filePath =
+            Paths.get("temp_wfs", "areas.txt").toString();
 
     private String xColumnName = "eastings";
 

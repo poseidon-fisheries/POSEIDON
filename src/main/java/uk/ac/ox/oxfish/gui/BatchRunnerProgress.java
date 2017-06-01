@@ -100,9 +100,9 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
             Toolkit.getDefaultToolkit().beep();
             setProgress(0);
             while(runner.getRunsDone()<numberOfRuns) {
-                taskOutput.append("Starting lspiRun " + runner.getRunsDone()+"\n");
+                taskOutput.append("Starting run " + runner.getRunsDone()+"\n");
                 runner.run();
-                taskOutput.append("Finished lspiRun " + runner.getRunsDone() +"\n");
+                taskOutput.append("Finished run " + runner.getRunsDone() +"\n");
                 publish();
             }
 

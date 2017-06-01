@@ -93,7 +93,7 @@ public class BatchRunner
 
 
         FishStateUtilities.printCSVColumnsToFile(
-                outputFolder.resolve("lspiRun"+runsDone+".csv").toFile(),
+                outputFolder.resolve(simulationName+"_run"+runsDone+".csv").toFile(),
                 columns.toArray(new DataColumn[columns.size()])
         );
 

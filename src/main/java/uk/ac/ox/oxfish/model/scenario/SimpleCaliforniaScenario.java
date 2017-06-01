@@ -119,6 +119,8 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
         FixedProportionGearFactory gear = new FixedProportionGearFactory();
         gear.setCatchabilityPerHour(new FixedDoubleParameter(.001));
         this.setGearLarge(gear);
+        gear = new FixedProportionGearFactory();
+        gear.setCatchabilityPerHour(new FixedDoubleParameter(.001));
         this.setGearSmall(gear);
 
 

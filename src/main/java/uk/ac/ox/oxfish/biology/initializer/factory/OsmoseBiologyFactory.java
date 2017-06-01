@@ -21,17 +21,16 @@ public class OsmoseBiologyFactory implements AlgorithmFactory<OsmoseBiologyIniti
     private int numberOfOsmoseStepsToPulseBeforeSimulationStart = 100;
 
 
-    private String osmoseConfigurationFile = FishStateUtilities.getAbsolutePath(
-            Paths.get("inputs", "osmose", "prototype", "osm_all-parameters.csv").toString());
+    private String osmoseConfigurationFile =
+            Paths.get("inputs", "osmose", "prototype", "osm_all-parameters.csv").toString();
 
 
 
     private boolean preInitializedConfiguration =true;
 
     private String preInitializedConfigurationDirectory =
-            FishStateUtilities.getAbsolutePath(
-                    Paths.get("inputs", "osmose", "prototype", "restart").toString()
-            );
+
+                    Paths.get("inputs", "osmose", "prototype", "restart").toString();
 
 
     private String indexOfSpeciesToBeManagedByThisModel = "0,1,2,3,4,5,6,7,8,9";

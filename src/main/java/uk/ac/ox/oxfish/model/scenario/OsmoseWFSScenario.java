@@ -363,14 +363,15 @@ public class OsmoseWFSScenario implements Scenario{
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> longlinerWeatherStrategy =
             new IgnoreWeatherFactory();
 
-    private MultipleRegulationsFactory regulations =  new MultipleRegulationsFactory();
+    private AlgorithmFactory<? extends Regulation> regulations =  new MultipleRegulationsFactory();
     {
-        regulations.getTags().clear();
-        regulations.getFactories().clear();
-        regulations.getTags().add("all");
+        MultipleRegulationsFactory regs = ((MultipleRegulationsFactory) regulations);
+        regs.getTags().clear();
+        regs.getFactories().clear();
+        regs.getTags().add("all");
         WeakMultiTACStringFactory tripLimits = new WeakMultiTACStringFactory();
         tripLimits.setYearlyQuotaMaps("2:2408575.485,3:3991612.856,4:337000");
-        regulations.getFactories().add(tripLimits);
+        regs.getFactories().add(tripLimits);
 
     }
 
@@ -954,23 +955,7 @@ public class OsmoseWFSScenario implements Scenario{
     }
 
 
-    /**
-     * Getter for property 'regulations'.
-     *
-     * @return Value for property 'regulations'.
-     */
-    public MultipleRegulationsFactory getRegulations() {
-        return regulations;
-    }
 
-    /**
-     * Setter for property 'regulations'.
-     *
-     * @param regulations Value to set for property 'regulations'.
-     */
-    public void setRegulations(MultipleRegulationsFactory regulations) {
-        this.regulations = regulations;
-    }
 
     public DoubleParameter getLonglinerTravellingCosts() {
         return longlinerTravellingCosts;
@@ -1096,5 +1081,42 @@ public class OsmoseWFSScenario implements Scenario{
      */
     public void setBiologyInitializer(OsmoseBiologyFactory biologyInitializer) {
         this.biologyInitializer = biologyInitializer;
+    }
+
+    /**
+     * Getter for property 'exogenousCatches'.
+     *
+     * @return Value for property 'exogenousCatches'.
+     */
+    public Map<String, String> getExogenousCatches() {
+        return exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'exogenousCatches'.
+     *
+     * @param exogenousCatches Value to set for property 'exogenousCatches'.
+     */
+    public void setExogenousCatches(Map<String, String> exogenousCatches) {
+        this.exogenousCatches = exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'regulations'.
+     *
+     * @param regulations Value to set for property 'regulations'.
+     */
+    public void setRegulations(
+            AlgorithmFactory<? extends Regulation> regulations) {
+        this.regulations = regulations;
+    }
+
+    /**
+     * Getter for property 'regulations'.
+     *
+     * @return Value for property 'regulations'.
+     */
+    public AlgorithmFactory<? extends Regulation> getRegulations() {
+        return regulations;
     }
 }

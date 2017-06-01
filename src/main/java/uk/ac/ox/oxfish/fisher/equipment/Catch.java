@@ -234,4 +234,11 @@ public class Catch {
     public boolean hasAbundanceInformation(){
         return abundance !=null;
     }
+
+    /**
+     * returns a copy of the biomass copies
+     */
+    public double[] getBiomassArray() {
+        return Arrays.copyOf(biomassCaught,biomassCaught.length);
+    }
 }

@@ -76,6 +76,9 @@ public class Gears {
                          GarbageGearFactory::new);
         NAMES.put(GarbageGearFactory.class,"Garbage Gear");
 
+        CONSTRUCTORS.put("Hold Upper Limit",
+                         HoldLimitingDecoratorFactory::new);
+        NAMES.put(HoldLimitingDecoratorFactory.class,"Hold Upper Limit");
     }
 
 }

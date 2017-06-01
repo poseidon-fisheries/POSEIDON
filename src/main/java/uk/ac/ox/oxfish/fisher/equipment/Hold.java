@@ -72,6 +72,7 @@ public class Hold {
     }
 
     /**
+     * Proportionally reduces all catches until their sum is equal/below maximum load!
      * CAREFUL: modifies the argument!
      * @param fishHold
      * @param maximumLoad

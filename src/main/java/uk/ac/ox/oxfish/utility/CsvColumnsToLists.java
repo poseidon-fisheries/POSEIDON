@@ -85,6 +85,7 @@ public class CsvColumnsToLists
                 for(int i=0; i<column.length; i++)
                     column[i].add(Double.parseDouble(line[indices.get(i)]));
             }
+            reader.close();
             return column;
         } catch (IOException e) {
             throw new RuntimeException("failed to read or parse " + pathToCSV  + " with exception " + e);
