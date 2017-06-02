@@ -22,11 +22,13 @@ import java.util.stream.Collectors;
 public abstract class AbstractExogenousCatches implements ExogenousCatches {
     protected final Map<Species,Double> exogenousYearlyCatchesInKg;
     private final Map<Species,Double> lastExogenousCatches = new HashMap<>();
+    private final String columnName;
     private Stoppable stoppable;
 
     public AbstractExogenousCatches(
-            Map<Species, Double> exogenousYearlyCatchesInKg) {
+            Map<Species, Double> exogenousYearlyCatchesInKg, final String dataColumnName) {
         this.exogenousYearlyCatchesInKg = exogenousYearlyCatchesInKg;
+        columnName = dataColumnName;
     }
 
     @Override
@@ -44,7 +46,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             final Species target = catches.getKey();
             //worry only about tiles that have this fish
             List<SeaTile> tiles =  allTiles.stream().filter(
-                    seaTile -> seaTile.getBiomass( target)> FishStateUtilities.EPSILON).collect(Collectors.toList());
+                    seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
 
             //as long as there is fish to catch and places with fish
             while(toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty())
@@ -57,7 +59,6 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
                 //each tile we pick, grab this much fish out
                 double step = Math.min(totalToCatch / (double) tiles.size(),toCatch);
                 Catch fish = mortalityEvent(model, target, tile, step);
-                tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
 
                 //should only fish one species!
                 double biomassCaught = fish.getWeightCaught(target);
@@ -66,7 +67,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
                 toCatch-= biomassCaught;
                 totalBiomassCaught += biomassCaught;
                 if(biomassCaught == 0 //if there is too little fish to catch (it's all rounding errors)
-                || tile.getBiomass(target) <= FishStateUtilities.EPSILON) //or you consumed it all
+                || getFishableBiomass(target, tile) <= FishStateUtilities.EPSILON) //or you consumed it all
                     tiles.remove(tile); //then don't worry about this tile anymore!
 
 
@@ -82,8 +83,12 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
     }
 
+    protected Double getFishableBiomass(Species target, SeaTile seaTile) {
+        return seaTile.getBiomass( target);
+    }
+
     /**
-     * simulate exogenous catch
+     * simulate exogenous catch (must call the react to catch function within this)
      * @param simState the model
      * @param target species to kill
      * @param tile where to kill it
@@ -117,7 +122,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
         for(Species species : exogenousYearlyCatchesInKg.keySet())
         {
             model.getYearlyDataSet().registerGatherer(
-                    "Exogenous catches of " + species,
+                    columnName + species,
                     new Gatherer<FishState>() {
                         @Override
                         public Double apply(FishState state) {

@@ -22,7 +22,8 @@ public class WFSCalibration {
 
     public static void  main(String[] args) throws IOException {
         //runMultipleTimesToBuildHistogram("best_scalable");
-        runMultipleTimesToBuildHistogram("best_total");
+        //runMultipleTimesToBuildHistogram("best_total");
+        runMultipleTimesToBuildHistogram("best_total_800");
 
 
 

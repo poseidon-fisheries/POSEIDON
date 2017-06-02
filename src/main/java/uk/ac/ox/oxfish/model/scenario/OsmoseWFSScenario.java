@@ -22,13 +22,11 @@ import uk.ac.ox.oxfish.fisher.log.initializers.LogisticLogbookFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FloridaLogisticDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.LonglineFloridaLogisticDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesFloridaDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FloridaLogitDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingAllUnsellableFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FloridaLogitReturnFactory;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
@@ -47,8 +45,8 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.OsmoseBoundedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
@@ -57,7 +55,6 @@ import uk.ac.ox.oxfish.model.network.NetworkPredicate;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.WeakMultiTACStringFactory;
 import uk.ac.ox.oxfish.utility.*;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -300,7 +297,12 @@ public class OsmoseWFSScenario implements Scenario{
     }
 
 
-
+    /**
+     * this is done separately because mortality is mostly concentrated against juveniles
+     */
+    //this number comes from SEDAR estimate of 1.5M fish aged 0-1 killed by shrimp bycatch weighted at 83.1g which is the 6 months weight of the fish
+   // private DoubleParameter redSnapperMortalityFromShrimpBycatchInKg = new FixedDoubleParameter(124650);
+    private DoubleParameter redSnapperMortalityFromShrimpBycatchInKg = new FixedDoubleParameter(124650);
 
 
 
@@ -525,6 +527,17 @@ public class OsmoseWFSScenario implements Scenario{
             //start it!
             BiomassDrivenFixedExogenousCatches recreationalMortality = new BiomassDrivenFixedExogenousCatches(recast);
             model.registerStartable(recreationalMortality);
+
+            //shrimp mortality
+            HashMap<Species,Double> mortality = new HashMap<>();
+            mortality.put(global.getSpecie("RedSnapper"),redSnapperMortalityFromShrimpBycatchInKg.apply(model.getRandom()));
+            HashMap<Species,Pair<Integer,Integer>> bounds = new HashMap<>();
+            bounds.put(global.getSpecie("RedSnapper"),new Pair<>(0,1));
+
+            OsmoseBoundedExogenousCatches shrimpMortality =  new OsmoseBoundedExogenousCatches(
+                    mortality, bounds, "Shrimp-Bycatch Biomass Lost "
+            );
+            model.registerStartable(shrimpMortality);
 
 
             return new ScenarioEssentials(global,map);
@@ -1118,5 +1131,24 @@ public class OsmoseWFSScenario implements Scenario{
      */
     public AlgorithmFactory<? extends Regulation> getRegulations() {
         return regulations;
+    }
+
+    /**
+     * Getter for property 'redSnapperMortalityFromShrimpBycatchInKg'.
+     *
+     * @return Value for property 'redSnapperMortalityFromShrimpBycatchInKg'.
+     */
+    public DoubleParameter getRedSnapperMortalityFromShrimpBycatchInKg() {
+        return redSnapperMortalityFromShrimpBycatchInKg;
+    }
+
+    /**
+     * Setter for property 'redSnapperMortalityFromShrimpBycatchInKg'.
+     *
+     * @param redSnapperMortalityFromShrimpBycatchInKg Value to set for property 'redSnapperMortalityFromShrimpBycatchInKg'.
+     */
+    public void setRedSnapperMortalityFromShrimpBycatchInKg(
+            DoubleParameter redSnapperMortalityFromShrimpBycatchInKg) {
+        this.redSnapperMortalityFromShrimpBycatchInKg = redSnapperMortalityFromShrimpBycatchInKg;
     }
 }

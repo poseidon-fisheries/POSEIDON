@@ -73,3 +73,8 @@ Garbage Gear:
   garbageSpeciesName: Others
   proportionSimulatedToGarbage: '0.3'
 -------
+Hold Upper Limit:
+  delegate:
+    Fixed Proportion:
+      catchabilityPerHour: '0.01'
+-------
