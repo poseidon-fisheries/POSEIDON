@@ -303,7 +303,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
     //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //190.5$ per hour out
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //151.458333333$ per hour out
 
 
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;

@@ -126,8 +126,8 @@ public class GarbageGearDecoratorTest {
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
         Catch caught = gear.fish(mock(Fisher.class), mock, 1, biology);
         assertEquals(caught.getWeightCaught(0), 19.880139, .001);
-        assertEquals(caught.getWeightCaught(1), 19, .001); //meristics round!
-        assertEquals(caught.getTotalWeight(), 19+19.880139, .001);
+        assertEquals(caught.getWeightCaught(1), 9, .001); //meristics round!
+        assertEquals(caught.getTotalWeight(), 9+19.880139, .001);
 
 
     }

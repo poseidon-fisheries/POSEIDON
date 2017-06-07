@@ -53,7 +53,7 @@ public class MultiQuotaMapFactoryTest {
         factory.setItq(true);
 
         MultiQuotaRegulation apply = factory.apply(state);
-        Log.info("the test read the following string: " + factory.getRepresenter().toString());
+        Log.info("the test read the following string: " + factory.getConvertedInitialQuotas());
 
         assertEquals(apply.getQuotaRemaining(0),1000d,.001);
         assertEquals(apply.getQuotaRemaining(2),10d,.001);
@@ -78,7 +78,7 @@ public class MultiQuotaMapFactoryTest {
         factory.setItq(false);
 
         MultiQuotaRegulation apply = factory.apply(state);
-        Log.info("the test read the following string: " + factory.getRepresenter().toString());
+        Log.info("the test read the following string: " + factory.getConvertedInitialQuotas());
         assertEquals(1000d,apply.getYearlyQuota()[0],.0001);
         assertEquals(10d,apply.getYearlyQuota()[2],.0001);
         assertTrue(Double.isInfinite(apply.getYearlyQuota()[1]));

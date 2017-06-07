@@ -210,4 +210,22 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
     public void setInitialQuotas(HashMap<String, Double> quotas) {
         this.initialQuotas = quotas;
     }
+
+    /**
+     * Getter for property 'convertedInitialQuotas'.
+     *
+     * @return Value for property 'convertedInitialQuotas'.
+     */
+    public String getConvertedInitialQuotas() {
+        return convertedInitialQuotas;
+    }
+
+    /**
+     * Getter for property 'convertedQuotaExchangedPerMatch'.
+     *
+     * @return Value for property 'convertedQuotaExchangedPerMatch'.
+     */
+    public String getConvertedQuotaExchangedPerMatch() {
+        return convertedQuotaExchangedPerMatch;
+    }
 }

@@ -53,8 +53,11 @@ public class GarbageGearDecorator implements Gear {
         if (totalNonGarbageWeight <= FishStateUtilities.EPSILON)
             return nonGarbage; //nothing to add!
 
+        double garbageWeight = totalNonGarbageWeight * ratioToRestOfCatch;
+
         //preserve abundance information if possible
         if (nonGarbage.hasAbundanceInformation()) {
+
             //replicate all abundances
             StructuredAbundance[] newAbundances = new StructuredAbundance[modelBiology.getSize()];
             for (int i = 0; i < modelBiology.getSize(); i++) {
@@ -63,7 +66,7 @@ public class GarbageGearDecorator implements Gear {
                 else {
                     //todo make this sex structured too if needed
                     int[] garbageStructured = new int[garbageSpecies.getMaxAge() + 1];
-                    garbageStructured[0]= (int) (totalNonGarbageWeight/garbageSpecies.getWeightMaleInKg().get(0));
+                    garbageStructured[0]= (int) (garbageWeight/garbageSpecies.getWeightMaleInKg().get(0));
                     newAbundances[i] = new StructuredAbundance(garbageStructured);
                 }
                 //

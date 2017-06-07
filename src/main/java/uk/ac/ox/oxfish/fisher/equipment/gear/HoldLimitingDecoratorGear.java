@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Preconditions;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -17,6 +18,8 @@ public class HoldLimitingDecoratorGear implements Gear {
 
     private final Gear delegate;
 
+    private static boolean warned = false;
+
     public HoldLimitingDecoratorGear(Gear delegate) {
         this.delegate = delegate;
     }
@@ -25,8 +28,11 @@ public class HoldLimitingDecoratorGear implements Gear {
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         Catch original = delegate.fish(fisher, where, hoursSpentFishing, modelBiology);
-        Preconditions.checkArgument(!original.hasAbundanceInformation(),
-                                    "this decorator is not meant to be used with abundance based gear!");
+        if(original.hasAbundanceInformation() && !warned)
+        {
+            Log.warn("this decorator will lose abundance based information!");
+            warned = true;
+        }
         double[] biomassArray = original.getBiomassArray();
         double spaceLeft = fisher.getMaximumHold() - fisher.getTotalWeightOfCatchInHold();
         assert  spaceLeft>=0;
