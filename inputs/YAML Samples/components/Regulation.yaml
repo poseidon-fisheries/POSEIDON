@@ -70,7 +70,8 @@ Multi-Quotas from Map:
     }
   itq: true
   multipleTradesAllowed: false
-  quotaExchangedPerMatch: 100
+  quotaExchangedPerMatch: {
+    }
 -------
 Single Species Threshold Taxation:
   biomassThreshold: '5000000.0'

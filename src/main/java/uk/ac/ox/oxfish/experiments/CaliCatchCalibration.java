@@ -18,16 +18,20 @@ public class CaliCatchCalibration
 
 
     public static final int RUNS = 10000;
-    public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170322 cali_catch", "results");
+    //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170322 cali_catch", "results");
+    public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170606 cali_catchability_2", "results");
     public static final int YEARS_PER_RUN = 3;
 
     public static void  main(String[] args) throws IOException {
-        runMultipleTimesToBuildHistogram("calicatch_nsga_10000");
-        /*runMultipleTimesToBuildHistogram("calicatch_nsga");
+  /*      runMultipleTimesToBuildHistogram("calicatch_nsga_10000");
+        runMultipleTimesToBuildHistogram("calicatch_nsga");
         runMultipleTimesToBuildHistogram("calicatch_dover");
         runMultipleTimesToBuildHistogram("calicatch_landings");
         runMultipleTimesToBuildHistogram("calicatch_profits");
 */
+
+
+        runMultipleTimesToBuildHistogram("nolimits_2011");
 
     }
 

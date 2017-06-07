@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
@@ -89,7 +90,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
             int[] tradeTicks = new int[numberOfSpecies];
             for(Map.Entry<String,String> input : volumesIn.entrySet())
             {
-                int tradeTick = Integer.parseInt(input.getValue().trim());
+                int tradeTick = (int)Double.parseDouble(input.getValue().trim());
                 Preconditions.checkArgument(tradeTick>0);
                 tradeTicks[Integer.parseInt(input.getKey().trim())] = tradeTick;
             }

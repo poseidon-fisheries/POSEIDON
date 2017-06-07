@@ -18,6 +18,7 @@ Abstract 2 Populations:
   destinationStrategyLarge:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
       automaticallyIgnoreMPAs: false
       backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
@@ -35,6 +36,7 @@ Abstract 2 Populations:
   destinationStrategySmall:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
       automaticallyIgnoreMPAs: false
       backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'

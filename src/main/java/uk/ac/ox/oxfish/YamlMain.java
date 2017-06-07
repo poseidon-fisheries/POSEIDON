@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.esotericsoftware.minlog.Log;
+import com.google.common.io.Files;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.IOException;
@@ -44,8 +45,7 @@ public class YamlMain {
          * the first argument is always the scenario file
          */
         Path inputFile = Paths.get(args[0]);
-        String simulationName = inputFile.getFileName().toString();
-        simulationName = simulationName.split("\\.")[0];
+        String simulationName = Files.getNameWithoutExtension(inputFile.getFileName().toString());
 
         YamlMain main = new YamlMain();
         if(args.length>1) //if there are multiple parameters, read them up!

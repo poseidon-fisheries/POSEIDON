@@ -61,6 +61,11 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
     private boolean automaticallyIgnoreMPAs = false;
 
     /**
+     * areas where fishing just will never work are not tried when this flag is set to true
+     */
+    private boolean automaticallyIgnoreAreasWhereFishNeverGrows = false;
+
+    /**
      * Applies this function to the given argument.
      *
      * @param state the function argument
@@ -88,6 +93,14 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
                     }
                 };
 
+        if(automaticallyIgnoreAreasWhereFishNeverGrows)
+            explorationValidator = explorationValidator.and(new Predicate<SeaTile>() {
+                @Override
+                public boolean test(SeaTile seaTile) {
+                    return seaTile.isFishingEvenPossibleHere();
+                }
+            });
+
         if(probabilityUnfriending <= 0)
         { //no unfriending
 
@@ -104,8 +117,17 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
                                                                                         random).intValue(),
                                                                                 10);
         }
+
+        //never start from an invalid spot!
+        SeaTile initialFavoriteSpot;
+        do {
+            initialFavoriteSpot = map.getRandomBelowWaterLineSeaTile(random);
+        }
+        while (!explorationValidator.test(initialFavoriteSpot));
+
+
         return new PerTripIterativeDestinationStrategy(
-                new FavoriteDestinationStrategy(map, random), algorithm,
+                new FavoriteDestinationStrategy(initialFavoriteSpot), algorithm,
                 probability.apply(state),
                 objectiveFunction.apply(state), explorationValidator);
 
@@ -212,5 +234,23 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      */
     public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
         this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
+    }
+
+    /**
+     * Getter for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
+     *
+     * @return Value for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
+     */
+    public boolean isAutomaticallyIgnoreAreasWhereFishNeverGrows() {
+        return automaticallyIgnoreAreasWhereFishNeverGrows;
+    }
+
+    /**
+     * Setter for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
+     *
+     * @param automaticallyIgnoreAreasWhereFishNeverGrows Value to set for property 'automaticallyIgnoreAreasWhereFishNeverGrows'.
+     */
+    public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
+        this.automaticallyIgnoreAreasWhereFishNeverGrows = automaticallyIgnoreAreasWhereFishNeverGrows;
     }
 }

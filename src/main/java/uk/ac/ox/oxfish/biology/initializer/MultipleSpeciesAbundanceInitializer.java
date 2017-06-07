@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -200,6 +201,18 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
                 naturalProcesses.put(species,process);
             }
 
+            //now go back and set as wastelands all tiles that have 0 fish
+            tileloop:
+            for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
+            {
+                for(Species species : biology.getSpecies())
+                    if(tile.getBiomass(species)>0)
+                        continue tileloop;
+                //if you are here, the place is barren; let's just switch to a empty local biomass
+                tile.setBiology(new EmptyLocalBiology());
+                assert !tile.isFishingEvenPossibleHere();
+            }
+
             //done!
             biologicalDirectories.clear();
         }
@@ -234,12 +247,24 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
         if(speciesToReset.getName().equals(FAKE_SPECIES_NAME))
             return;
 
+        HashMap<AbundanceBasedLocalBiology,Double> ratiosLocalCopy = new HashMap<>(biologyToProportionOfFishThere);
+        for (Map.Entry<AbundanceBasedLocalBiology, Double> ratio : biologyToProportionOfFishThere.entrySet()) {
+            //if this is not present in the local list
+            if(!locals.values().contains(ratio.getKey()))
+            {
+                //it must be that we assumed this was a wasteland and will still be so!
+                Preconditions.checkArgument(ratio.getValue()==0);
+                //remove it from the local copy!
+                ratiosLocalCopy.remove(ratio.getKey());
+            }
 
-        Preconditions.checkArgument(locals.values().containsAll(biologyToProportionOfFishThere.keySet()),
+        }
+
+        Preconditions.checkArgument(locals.values().containsAll(ratiosLocalCopy.keySet()),
                                     "Some local biologies in the proportion map are not present in the initializer list");
-        Preconditions.checkArgument(biologyToProportionOfFishThere.keySet().containsAll(locals.values()),
+        Preconditions.checkArgument(ratiosLocalCopy.keySet().containsAll(locals.values()),
                                     "Some local biologies in the masterlist are not present in the proportion map");
-        for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : biologyToProportionOfFishThere.entrySet())
+        for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
         {
 
             //get the ratio back

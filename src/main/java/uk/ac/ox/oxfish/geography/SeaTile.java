@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography;
 
 import sim.util.geo.MasonGeometry;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -195,6 +196,21 @@ public class SeaTile implements Startable{
         //don't bother cascading if it's nothing
         if(caught.totalCatchWeight() >= FishStateUtilities.EPSILON)
             biology.reactToThisAmountOfBiomassBeingFished(caught, notDiscarded, globalBiology);
+    }
+
+
+    /**
+     * checks if the tile is valid for fishing, which means that it's on sea and not land AND that there is a biology in it
+     * that is not always empty; <b>THIS IS NOT A REGULATION CHECK</b>
+     * @return true if this tile can in theory contain fish
+     */
+    public boolean isFishingEvenPossibleHere()
+    {
+        if(altitude > 0 || getBiology() instanceof EmptyLocalBiology)
+            return false;
+        else
+            return true;
+
     }
 
     /**

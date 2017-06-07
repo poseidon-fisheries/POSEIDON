@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  * Dump every scenario and every algorithm factory as an example
  * Created by carrknight on 7/13/15.
  */
-public class BuildSampleInputs
+public class  BuildSampleInputs
 {
 
 

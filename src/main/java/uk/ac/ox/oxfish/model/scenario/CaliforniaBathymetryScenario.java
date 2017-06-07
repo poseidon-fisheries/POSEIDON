@@ -82,7 +82,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * filename containing all the ports
      */
-    private String portFileName = "dts_ports_2010.csv";
+    private String portFileName = "dts_ports_2011.csv";
     /**
      * how much should the model biomass/abundance be given the data we read in?
      */
@@ -143,8 +143,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
 
 
-    private DoubleParameter gasPricePerLiter =new FixedDoubleParameter(0.694094345);
+    private DoubleParameter gasPricePerLiter =
+            //2011: 4.09$/gallon, we translate into liters
+            new FixedDoubleParameter(0.89991382);
+
     //average diesel retail 2010
+    //new FixedDoubleParameter(0.694094345);
     // from https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_SCA_DPG&f=M
 
 
@@ -178,6 +182,34 @@ public class CaliforniaBathymetryScenario implements Scenario {
             new IgnoreWeatherFactory();
 
     private AlgorithmFactory<? extends Regulation> regulation =
+
+
+
+
+            //2011 numbers:
+            new MultiQuotaMapFactory(true,
+                                     new Pair<>("Yelloweye rockfish",600d),
+                                     //        new Pair<>("Canary rockfish",41100d),
+                                     new Pair<>("Dover sole",22234500d),
+                                     new Pair<>("Longspine Thornyhead",1966250d),
+                                     new Pair<>("Sablefish",3077220d),
+                                     new Pair<>("Shortspine thornyhead",1481600.056d)
+            );
+
+    {
+        HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
+        quotaExchangedPerMatch.put("Yelloweye rockfish",6d);
+        quotaExchangedPerMatch.put("Dover sole",500d);
+        quotaExchangedPerMatch.put("Longspine Thornyhead",500d);
+        quotaExchangedPerMatch.put("Sablefish",500d);
+        quotaExchangedPerMatch.put("Shortspine thornyhead",500d);
+        ((MultiQuotaMapFactory) regulation).setQuotaExchangedPerMatch(
+                quotaExchangedPerMatch
+        );
+    }
+
+
+            /* 2015 numbers!
             new MultiQuotaMapFactory(true,
                                      new Pair<>("Yelloweye rockfish",1000d),
                                      new Pair<>("Canary rockfish",41100d),
@@ -186,7 +218,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                                      new Pair<>("Sablefish",2494999.8),
                                      new Pair<>("Shortspine thornyhead",1196999.874)
             );
-
+*/
 
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
 
@@ -202,7 +234,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
             new GarbageGearFactory();
 
     public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
-            // implied by stock assessment: 0.00156832676d;
+    // implied by stock assessment: 0.00156832676d;
 
     {
         //numbers all come from stock assessment
@@ -269,10 +301,9 @@ public class CaliforniaBathymetryScenario implements Scenario {
     /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
-    //136 thousands dollars a year in Variable Costs
-    //0.269835329 proportion of fuel costs over total variable cost         (table 9.1 old catcher vessel report)
-    //1212 hours out on average per DTS boat (table 3.1 of old catcher vessel report)
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(136000d *(1d-0.269835329)/1212d); //81.932669353$ per hour out
+    // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
+    //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //190.5$ per hour out
 
 
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;

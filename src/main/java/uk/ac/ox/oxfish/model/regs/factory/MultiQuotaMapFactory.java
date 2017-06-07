@@ -25,9 +25,18 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
     private HashMap<String,Double> initialQuotas = new HashMap<>();
 
-    private StringBuilder representer;
+    private String convertedInitialQuotas;
 
-    private int quotaExchangedPerMatch = 100;
+    private String convertedQuotaExchangedPerMatch;
+
+    /**
+     * the size of quota units (kg) traded each match;
+     * This can be either a simple number (at which point all quotas are traded at the same tick volume) or a map like
+     * "0:100,2:50" at which point the volume traded per match is different for each species
+     */
+
+    private HashMap<String,Double> quotaExchangedPerMatch = new HashMap<>();
+
 
     private boolean multipleTradesAllowed = false;
 
@@ -50,14 +59,14 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
     /**
      * we parse the file into a string that can be fed to delegate factories
      */
-    private void representMapAsString(List<Species> species){
+    private String representMapAsString(List<Species> species, final HashMap<String, Double> toConvert){
 
         //we will use the string builder to build the string representation of the quota file
-        representer = new StringBuilder();
+        StringBuilder representer = new StringBuilder();
 
         //check that there are some fish being protected or what's the point?
-        Preconditions.checkState(!initialQuotas.isEmpty());
-        for(Map.Entry<String,Double> quota : initialQuotas.entrySet())
+        Preconditions.checkState(!toConvert.isEmpty());
+        for(Map.Entry<String,Double> quota : toConvert.entrySet())
         {
 
 
@@ -77,9 +86,8 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
             }
 
         }
+        return representer.toString();
 
-        itqFactory.setYearlyQuotaMaps(representer.toString());
-        tacFactory.setYearlyQuotaMaps(representer.toString());
 
 
 
@@ -105,16 +113,27 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      */
     @Override
     public MultiQuotaRegulation apply(FishState fishState) {
-        if(representer == null)
-                representMapAsString(fishState.getSpecies()
-                );
+        //turn maps into strings so that they can be fed to the factories
+        if(convertedInitialQuotas == null) {
+            convertedInitialQuotas =representMapAsString(fishState.getSpecies(), initialQuotas);
 
-        assert representer!=null;
+            itqFactory.setYearlyQuotaMaps(convertedInitialQuotas);
+            tacFactory.setYearlyQuotaMaps(convertedInitialQuotas);
+        }
+        assert convertedInitialQuotas!=null;
+
 
 
         if(itq) {
+            if(convertedQuotaExchangedPerMatch == null)
+            {
+                convertedQuotaExchangedPerMatch = representMapAsString(fishState.getSpecies(),quotaExchangedPerMatch);
+                itqFactory.setMinimumQuotaTraded(convertedQuotaExchangedPerMatch);
+
+            }
+            assert convertedQuotaExchangedPerMatch!=null;
+
             itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
-            itqFactory.setMinimumQuotaTraded(String.valueOf(quotaExchangedPerMatch));
             MultiQuotaRegulation regulation = itqFactory.apply(fishState);
             //set up a startable that divide it by the number of fishers
             fishState.registerStartable(new ITQScaler(regulation));
@@ -128,9 +147,6 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
     }
 
-    public StringBuilder getRepresenter() {
-        return representer;
-    }
 
     static class ITQScaler implements Startable
     {
@@ -168,11 +184,22 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
         this.multipleTradesAllowed = multipleTradesAllowed;
     }
 
-    public int getQuotaExchangedPerMatch() {
+
+    /**
+     * Getter for property 'quotaExchangedPerMatch'.
+     *
+     * @return Value for property 'quotaExchangedPerMatch'.
+     */
+    public HashMap<String, Double> getQuotaExchangedPerMatch() {
         return quotaExchangedPerMatch;
     }
 
-    public void setQuotaExchangedPerMatch(int quotaExchangedPerMatch) {
+    /**
+     * Setter for property 'quotaExchangedPerMatch'.
+     *
+     * @param quotaExchangedPerMatch Value to set for property 'quotaExchangedPerMatch'.
+     */
+    public void setQuotaExchangedPerMatch(HashMap<String, Double> quotaExchangedPerMatch) {
         this.quotaExchangedPerMatch = quotaExchangedPerMatch;
     }
 

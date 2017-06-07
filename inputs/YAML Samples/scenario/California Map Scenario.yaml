@@ -10,6 +10,7 @@ California Map Scenario:
   destinationStrategy:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
       automaticallyIgnoreMPAs: false
       backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
@@ -32,7 +33,7 @@ California Map Scenario:
       daysAtSea: '5.0'
   fixedRecruitmentDistribution: false
   fuelTankInLiters: '45519.577'
-  gasPricePerLiter: '0.694094345'
+  gasPricePerLiter: '0.89991382'
   gear:
     Garbage Gear:
       delegate:
@@ -100,7 +101,7 @@ California Map Scenario:
   gearStrategy: Never Change Gear
   gridWidth: 50
   holdSizePerBoat: '20000.0'
-  hourlyTravellingCosts: '81.93266935313531'
+  hourlyTravellingCosts: '151.45833333333334'
   literPerKilometer: '3.547842974'
   mainDirectory: inputs/california
   networkBuilder:
@@ -108,21 +109,25 @@ California Map Scenario:
       allowMutualFriendships: true
       degree: '2.0'
       equalOutDegree: true
-  portFileName: dts_ports_2010.csv
+  portFileName: dts_ports_2011.csv
   priceMap: Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502,Others:1.7646181
   recruitmentNoise: '0.0'
   regulation:
     Multi-Quotas from Map:
       initialQuotas:
-        Dover sole: 2.2231E7
-        Shortspine thornyhead: 1196999.874
-        Sablefish: 2494999.8
-        Yelloweye rockfish: 1000.0
-        Longspine Thornyhead: 1811399.811
-        Canary rockfish: 41100.0
+        Dover sole: 2.22345E7
+        Shortspine thornyhead: 1481600.056
+        Sablefish: 3077220.0
+        Yelloweye rockfish: 600.0
+        Longspine Thornyhead: 1966250.0
       itq: true
       multipleTradesAllowed: false
-      quotaExchangedPerMatch: 100
+      quotaExchangedPerMatch:
+        Dover sole: 500.0
+        Shortspine thornyhead: 500.0
+        Sablefish: 500.0
+        Yelloweye rockfish: 6.0
+        Longspine Thornyhead: 500.0
   resetBiologyAtYear: -1
   usePremadeInput: true
   weatherStrategy: Ignore Weather

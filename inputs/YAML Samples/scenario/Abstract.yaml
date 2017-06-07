@@ -16,6 +16,7 @@ Abstract:
   destinationStrategy:
     Imitator-Explorator:
       alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: false
       automaticallyIgnoreMPAs: false
       backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
