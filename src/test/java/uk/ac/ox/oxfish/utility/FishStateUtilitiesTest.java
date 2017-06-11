@@ -95,7 +95,7 @@ public class FishStateUtilitiesTest {
         when(model.getPorts()).thenReturn(Lists.newArrayList(port1, port2));
         when(model.getYear()).thenReturn(2);
 
-        String table = FishStateUtilities.printTablePerPort(model, "lame");
+        String table = FishStateUtilities.printTablePerPort(model, "lame", 0);
         System.out.println(table);
         assertTrue(table.equals("Shanghai,Seattle\n" +
                 "1500.0,150.0\n" +

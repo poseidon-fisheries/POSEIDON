@@ -27,11 +27,6 @@ import java.util.function.Predicate;
 public class PerTripIterativeDestinationStrategy implements DestinationStrategy {
 
 
-    /**
-     * should we not study trips that were cut short?
-     */
-    private boolean ignoreFailedTrips = false;
-
 
     private final Adaptation<SeaTile> algorithm;
 
@@ -46,12 +41,15 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     private Fisher fisher;
 
 
+
+
     public PerTripIterativeDestinationStrategy(
             FavoriteDestinationStrategy delegate,
             AdaptationAlgorithm<SeaTile> algorithm,
             AdaptationProbability probability,
             final ObjectiveFunction<Fisher> objective,
-            final Predicate<SeaTile> explorationValidator)
+            final Predicate<SeaTile> explorationValidator,
+            boolean ignoreFailedTrips)
     {
         this.delegate = delegate;
         this.algorithm = new ExploreImitateAdaptation<SeaTile>(
@@ -106,8 +104,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
             double randomizationProbability,
             double imitationProbability, final HourlyProfitInTripObjective objective,
             final Predicate<SeaTile> explorationValidator) {
-        this(delegate,algorithm,new FixedProbability(randomizationProbability,imitationProbability),
-             objective,explorationValidator);
+        this(delegate, algorithm, new FixedProbability(randomizationProbability,imitationProbability),
+             objective, explorationValidator, false);
     }
 
 
@@ -129,6 +127,8 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     @Override
     public void start(FishState model, Fisher fisher) {
         delegate.start(model,fisher);
+
+
         this.fisher=fisher;
         fisher.addPerTripAdaptation(algorithm);
     }

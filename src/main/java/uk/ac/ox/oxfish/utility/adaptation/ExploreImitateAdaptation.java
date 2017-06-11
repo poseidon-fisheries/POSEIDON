@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A general algorithm to perform exploration/imitaiton/exploitation decisions possibly on a specific variable
+ * A general algorithm to perform exploration/imitation/exploitation decisions possibly on a specific variable
  * Created by carrknight on 8/6/15.
  */
 public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
@@ -60,6 +60,13 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
      */
     private final Predicate<T> explorationCheck ;
 
+
+    /**
+     * the last action taken was this kind of action
+     *
+     */
+    private ExploreImitateStatus status;
+
     @Override
     public T concreteAdaptation(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
 
@@ -71,6 +78,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         if(explorationStart != null)
         {
             assert imitationStart == null;
+            assert status == ExploreImitateStatus.EXPLORING;
 
 
             Double previousFitness = explorationStart.getSecond();
@@ -98,6 +106,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         else if(imitationStart != null)
         {
             assert explorationStart == null;
+            assert status == ExploreImitateStatus.IMITATING;
             double previousFitness = imitationStart.getPreviousFitness();
             T previous = imitationStart.getPreviousDecision();
             T decision = this.algorithm.judgeImitation(random, toAdapt,
@@ -131,11 +140,13 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
                 T future = algorithm.randomize(random, toAdapt, fitness, current);
                 if(explorationCheck.test(future)) {
                     explorationStart = new Pair<>(current, fitness);
+                    status = ExploreImitateStatus.EXPLORING;
                     return future;
                 }
                 attempts++;
             }
             //failed: nowhere valid to explore!
+            status = ExploreImitateStatus.EXPLOITING;
             return null;
 
         }
@@ -171,13 +182,14 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             {
                 imitationStart = new ImitationStart<>(imitation.getSecond(),fitness,imitation.getFirst());
 
+                status = ExploreImitateStatus.IMITATING;
                 return imitation.getFirst();
             }
 
         }
 
         //exploit
-
+        status=ExploreImitateStatus.EXPLOITING;
         return current;
     }
 
@@ -306,5 +318,14 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
         public K getPreviousDecision() {
             return previousDecision;
         }
+    }
+
+    /**
+     * Getter for property 'status'.
+     *
+     * @return Value for property 'status'.
+     */
+    public ExploreImitateStatus getStatus() {
+        return status;
     }
 }

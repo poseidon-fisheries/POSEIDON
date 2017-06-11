@@ -33,10 +33,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.*;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -981,6 +978,10 @@ public class Fisher implements Steppable, Startable{
 
     public double getYearlyCounterColumn(String columnName) {
         return memory.getYearlyCounter().getColumn(columnName);
+    }
+
+    public Counter getYearlyCounter() {
+        return memory.getYearlyCounter();
     }
 
     public boolean isFuelEmergencyOverride() {

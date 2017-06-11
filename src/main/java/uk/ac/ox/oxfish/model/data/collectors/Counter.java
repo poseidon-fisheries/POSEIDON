@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -54,8 +53,18 @@ public class Counter implements Startable, Steppable
      */
     public void addColumn(String columnName)
     {
-        Preconditions.checkArgument(!data.containsKey(columnName));
+        Preconditions.checkArgument(!hasColumn(columnName));
         data.put(columnName,0d);
+    }
+
+
+    /**
+     * Does this column already exist?
+     * @param columnName
+     * @return
+     */
+    public boolean hasColumn(String columnName){
+        return data.containsKey(columnName);
     }
 
     /**
@@ -77,7 +86,7 @@ public class Counter implements Startable, Steppable
     }
 
 
-    public double getColumn(String columnName){
+    public Double getColumn(String columnName){
         return data.get(columnName);
     }
 

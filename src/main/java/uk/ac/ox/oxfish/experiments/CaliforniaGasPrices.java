@@ -32,7 +32,7 @@ public class CaliforniaGasPrices {
         {
             gasPrice = FishStateUtilities.round5(gasPrice);
             FishState state = run(10,0,gasPrice,new AnarchyFactory());
-            String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+            String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN,0);
 
             FileWriter writer = new FileWriter(Paths.get("runs","caligas","simple_"+gasPrice + ".csv").toFile());
             writer.write(printOut);
@@ -54,7 +54,7 @@ public class CaliforniaGasPrices {
             for(long seed =0; seed<30; seed++) {
                 price = FishStateUtilities.round5(price);
                 FishState state = runSableFish(10, seed, price,null);
-                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN,0);
 
                 FileWriter writer = new FileWriter(
                         Paths.get("runs", "caligas","fishitq", "simple_" + price + "_" + seed +".csv").toFile());
@@ -76,7 +76,7 @@ public class CaliforniaGasPrices {
             for(long seed =30; seed<60; seed++) {
                 gasPrice = FishStateUtilities.round5(gasPrice);
                 FishState state = run(10, seed, gasPrice,new AnarchyFactory());
-                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                String printOut = FishStateUtilities.printTablePerPort(state, FisherYearlyTimeSeries.CASH_FLOW_COLUMN,0);
 
                 FileWriter writer = new FileWriter(
                         Paths.get("runs", "caligas","anarchy", "simple_" + gasPrice + "_" + seed +".csv").toFile());

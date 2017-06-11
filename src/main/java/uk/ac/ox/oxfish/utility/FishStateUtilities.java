@@ -19,8 +19,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.TowHeatmapGatherer;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
@@ -772,7 +772,7 @@ public class FishStateUtilities {
 
 
 
-    public static String printTablePerPort(FishState model,String fisherYearlyColumn)
+    public static String printTablePerPort(FishState model, String fisherYearlyColumn, final int firstValidYear)
     {
         HashMap<String, DataColumn> portColumns = new HashMap<>();
         LinkedList<String> columns = new LinkedList<>();
@@ -785,7 +785,7 @@ public class FishStateUtilities {
         assert columns.size() >0;
         assert model.getYear() >0;
 
-        for(int year=0; year<model.getYear(); year++)
+        for(int year = firstValidYear; year<model.getYear(); year++)
         {
             HashMap<String, DoubleSummaryStatistics> averages = new HashMap<>();
             for(String portName : portColumns.keySet())
@@ -816,7 +816,7 @@ public class FishStateUtilities {
         builder.append("\n");
 
         //write columns
-        for(int row=0; row<model.getYear(); row++)
+        for(int row=0; row<model.getYear()-firstValidYear; row++)
         {
             for(int i=0; i<columns.size(); i++)
             {

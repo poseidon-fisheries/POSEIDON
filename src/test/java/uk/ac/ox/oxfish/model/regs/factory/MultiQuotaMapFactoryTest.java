@@ -47,6 +47,8 @@ public class MultiQuotaMapFactoryTest {
         Log.info("This test tries to read \n" + yaml.dump(factory) + "\n as an ITQ quota");
 
 
+        factory.getQuotaExchangedPerMatch().put("First",5d);
+        factory.getQuotaExchangedPerMatch().put("Third",10d);
 
 
 

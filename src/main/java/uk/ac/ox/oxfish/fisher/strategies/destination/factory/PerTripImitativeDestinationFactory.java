@@ -5,11 +5,12 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.HourlyProfitObjectiveFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.ExploreExploitImitateDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.PerTripIterativeDestinationStrategy;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.BeamHillClimbing;
 import uk.ac.ox.oxfish.utility.adaptation.maximization.DefaultBeamHillClimbing;
@@ -21,10 +22,12 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
 import java.util.function.Predicate;
 
+import static uk.ac.ox.oxfish.fisher.strategies.destination.ExploreExploitImitateDestinationStrategy.*;
+
 /**
  * creates a trip strategy that has imitates friends when not exploring
  */
-public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerTripIterativeDestinationStrategy>
+public class PerTripImitativeDestinationFactory implements AlgorithmFactory<ExploreExploitImitateDestinationStrategy>
 {
 
     private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
@@ -65,6 +68,11 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      */
     private boolean automaticallyIgnoreAreasWhereFishNeverGrows = false;
 
+
+    private boolean ignoreFailedTrips = false;
+
+
+
     /**
      * Applies this function to the given argument.
      *
@@ -72,7 +80,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      * @return the function result
      */
     @Override
-    public PerTripIterativeDestinationStrategy apply(FishState state) {
+    public ExploreExploitImitateDestinationStrategy apply(FishState state) {
 
         MersenneTwisterFast random = state.random;
         NauticalMap map = state.getMap();
@@ -126,12 +134,40 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
         while (!explorationValidator.test(initialFavoriteSpot));
 
 
-        return new PerTripIterativeDestinationStrategy(
+
+        //add gatherer if necessary
+        if(state.getYearlyDataSet().getColumn(EXPLORING_COLUMN_NAME)==null)
+        {
+            registerGatherer(state, EXPLORING_COLUMN_NAME);
+            registerGatherer(state, EXPLOITING_COLUMN_NAME);
+            registerGatherer(state, IMITATING_COLUMN_NAME);
+        }
+
+        return new ExploreExploitImitateDestinationStrategy(
                 new FavoriteDestinationStrategy(initialFavoriteSpot), algorithm,
                 probability.apply(state),
-                objectiveFunction.apply(state), explorationValidator);
+                objectiveFunction.apply(state), explorationValidator,
+                ignoreFailedTrips);
 
 
+    }
+
+    private void registerGatherer(FishState state, final String exploringColumnName) {
+        state.getYearlyDataSet().registerGatherer(exploringColumnName,
+                                                  new Gatherer<FishState>() {
+                                                      @Override
+                                                      public Double apply(FishState fishState) {
+                                                          double sum =0;
+                                                          for(Fisher fisher : fishState.getFishers())
+                                                          {
+                                                              if(fisher.getYearlyCounter().hasColumn(
+                                                                      exploringColumnName))
+                                                                  sum+=fisher.getYearlyCounter().getColumn(
+                                                                          exploringColumnName);
+                                                          }
+                                                          return sum;
+                                                      }
+                                                  }, Double.NaN);
     }
 
     public DoubleParameter getStepSize() {
@@ -252,5 +288,24 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<PerT
      */
     public void setAutomaticallyIgnoreAreasWhereFishNeverGrows(boolean automaticallyIgnoreAreasWhereFishNeverGrows) {
         this.automaticallyIgnoreAreasWhereFishNeverGrows = automaticallyIgnoreAreasWhereFishNeverGrows;
+    }
+
+
+    /**
+     * Getter for property 'ignoreFailedTrips'.
+     *
+     * @return Value for property 'ignoreFailedTrips'.
+     */
+    public boolean isIgnoreFailedTrips() {
+        return ignoreFailedTrips;
+    }
+
+    /**
+     * Setter for property 'ignoreFailedTrips'.
+     *
+     * @param ignoreFailedTrips Value to set for property 'ignoreFailedTrips'.
+     */
+    public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
+        this.ignoreFailedTrips = ignoreFailedTrips;
     }
 }
