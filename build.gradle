@@ -2,13 +2,12 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id "us.kirchmeier.capsule" version "1.0.1"
-    id "jacoco"
+    //id "us.kirchmeier.capsule" version "1.0.1"
+    //id "jacoco"
+    id 'com.github.johnrengelman.shadow' version '2.0.0'
 }
 
-jacoco {
-    toolVersion = "0.7.5+"
-}
+
 
 mainClassName = 'uk.ac.ox.oxfish.Main'
 
@@ -105,24 +104,61 @@ test{
 
 //this just mentions what the gradle version for the "wrapper" gradlew ought to be
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+
+}
+
+
+
+
+task shadowJarFoo(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveName = 'foo.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ configurations.runtime ] //tells the task to shadow in the jars files in the 'runtime' scope
 }
 
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-task fatJar(type: FatCapsule) {
-    archiveName = "oxfish_executable.jar"
-    applicationClass 'uk.ac.ox.oxfish.Main'
- //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
 
-    capsuleManifest {
-        minJavaVersion = '1.8.0'
-        minUpdateVersion =  ['1.8.0':'31']
+task fatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'oxfish_executable.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.Main'
     }
 }
 
 
+
+
+//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
+//distributed
+
+task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+
+    mergeServiceFiles()
+    archiveName = 'yamler.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.YamlMain'
+    }
+
+}
+
+//this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
+//to make optimization.py work correctly
+/*
+task deployHeadless(type: Copy, dependsOn: buildHeadless) {
+    from 'build/libs/'
+    into 'runs/optimization/'
+    include 'yamler.jar'
+}
+*/
+
+/*
 task fatJarBatch(type: FatCapsule) {
     archiveName = "oxfish_batch.jar"
     applicationClass 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
@@ -132,27 +168,7 @@ task fatJarBatch(type: FatCapsule) {
         minUpdateVersion =  ['1.8.0':'31']
     }
 }
-
-
-//this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
-//distributed
-task buildHeadless(type: FatCapsule, dependsOn: jar) {
-    archiveName = "yamler.jar"
-    applicationClass 'uk.ac.ox.oxfish.YamlMain'
-    //   applicationClass 'uk.ac.ox.oxfish.experiments.dedicated.habitat.HabitatDeployment'
-
-    capsuleManifest {
-        minJavaVersion = '1.8.0'
-        minUpdateVersion =  ['1.8.0':'31']
-    }
-}
-//this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
-//to make optimization.py work correctly
-task deployHeadless(type: Copy, dependsOn: buildHeadless) {
-    from 'build/libs/'
-    into 'runs/optimization/'
-    include 'yamler.jar'
-}
+*/
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec){

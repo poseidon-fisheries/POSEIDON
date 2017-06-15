@@ -55,6 +55,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
 
+    //this is really the "rzero" value of the DS algorithm when biomass is virgin
     private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(1.2197524018851934E7);
 
 

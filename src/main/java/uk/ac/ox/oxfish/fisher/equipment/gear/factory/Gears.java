@@ -72,6 +72,10 @@ public class Gears {
                          HeterogeneousGearFactory::new);
         NAMES.put(HeterogeneousGearFactory.class,"Heterogeneous Selectivity Gear");
 
+        CONSTRUCTORS.put("Abundance Fixed Proportion Gear",
+                         FixedProportionHomogeneousGearFactory::new);
+        NAMES.put(FixedProportionHomogeneousGearFactory.class,"Abundance Fixed Proportion Gear");
+
         CONSTRUCTORS.put("Garbage Gear",
                          GarbageGearFactory::new);
         NAMES.put(GarbageGearFactory.class,"Garbage Gear");

@@ -39,7 +39,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
     private final double weightAtRecruitmentMinus1;
 
-    private double previousRecruits;
+    private double lastStepRecruits;
 
 
 
@@ -97,7 +97,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         this.speciesIndex = speciesIndex;
         this.weightAtRecruitment = weightAtRecruitment;
         this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
-        this.previousRecruits = initialRecruits;
+        this.lastStepRecruits = initialRecruits;
     }
 
     /**
@@ -171,10 +171,10 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
                 weightAtRecruitment,
                 rho,
                 weightAtRecruitmentMinus1,
-                previousRecruits
+                lastStepRecruits
         );
         double newBiomass =  bioStep.getBiomass();
-        previousRecruits = bioStep.getRecruits();
+        lastStepRecruits = bioStep.getRecruits();
         //reallocate uniformly. Do not allocate above carrying capacity
         List<BiomassLocalBiology> biologies = new ArrayList<>(this.biologies);
         // Collections.shuffle(biologies);

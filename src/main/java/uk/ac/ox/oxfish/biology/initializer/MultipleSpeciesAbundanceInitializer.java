@@ -25,12 +25,12 @@ import java.util.function.Function;
  * Create multiple species, each abundance (count) based rather than biomass based
  * Created by carrknight on 3/17/16.
  */
-public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
+public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInitializer
 {
 
     public static final String FAKE_SPECIES_NAME = "Others";
     /**
-     * the osmoseWFSPath to the biology folder, which must contain a count.csv and a meristic.yaml file
+     * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
     private final LinkedHashMap<String,Path> biologicalDirectories;
 
@@ -165,7 +165,8 @@ public class MultipleSpeciesAbundanceInitializer implements BiologyInitializer
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
 
         try {
-            for (Species species : biology.getSpecies()) {
+            for (Species species : biology.getSpecies())
+            {
 
                 if(addOtherSpecies && biologicalDirectories.get(species.getName()) == null)
                 {

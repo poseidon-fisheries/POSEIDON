@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import java.util.Arrays;
 
 /**
- * A simple local biology that has carrying capacity and actual biomass. It then grows each species,
+ * A simple local biology that has carrying capacity and actual biomass.
  * Created by carrknight on 5/8/15.
  */
 public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements Startable {

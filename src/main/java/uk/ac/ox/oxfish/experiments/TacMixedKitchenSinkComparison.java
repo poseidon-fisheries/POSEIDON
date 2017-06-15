@@ -24,6 +24,7 @@ public class TacMixedKitchenSinkComparison {
     private static final long NUMBER_OF_RUNS = 100;
 
     static {
+        /*
         scenarios.put("tac",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
@@ -47,6 +48,13 @@ public class TacMixedKitchenSinkComparison {
                                 "20170511 optimisation_remake",
                                 "kitchensink","mixed","best",
                                 "season.yaml")
+        );
+*/
+        scenarios.put("mpaonly",
+                      Paths.get("docs",
+                                "20170511 optimisation_remake",
+                                "kitchensink","mixed","best",
+                                "mpa_only.yaml")
         );
     }
 
