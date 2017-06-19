@@ -19,14 +19,14 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * Created by carrknight on 3/17/16.
  */
-public class CaliforniaBathymetryScenarioTest {
+public class CaliforniaAbundanceScenarioTest {
 
 
     @Test
     public void readsTheRightAmountOfShortspineBiomass() throws Exception {
 
         double target = 274210064.370047;
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         FishState model = new FishState(System.currentTimeMillis());
         model.setScenario(scenario);
         model.start();
@@ -70,7 +70,7 @@ public class CaliforniaBathymetryScenarioTest {
     public void spinsUpCorrectly() throws Exception {
 
 
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
 
 
         scenario.getExogenousCatches().clear();

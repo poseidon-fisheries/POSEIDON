@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -100,7 +100,7 @@ public class CaliforniaComparativeStatics {
         FishState state =  new FishState(seed);
 
         FishYAML yaml = new FishYAML();
-        CaliforniaBathymetryScenario scenario = yaml.loadAs(new FileReader(yamlFile.toFile()), CaliforniaBathymetryScenario.class);
+        CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(yamlFile.toFile()), CaliforniaAbundanceScenario.class);
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
         scenario.setResetBiologyAtYear(resetBiologyAtYear);
         state.setScenario(scenario);
@@ -129,7 +129,7 @@ public class CaliforniaComparativeStatics {
         FishState state =  new FishState(seed);
 
         FishYAML yaml = new FishYAML();
-        CaliforniaBathymetryScenario scenario = yaml.loadAs(new FileReader(yamlFile.toFile()), CaliforniaBathymetryScenario.class);
+        CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(yamlFile.toFile()), CaliforniaAbundanceScenario.class);
         String priceMap = "Dover Sole:0.6698922,Sablefish:" + sablefishPrice + ",Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502"
                 +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181";
         scenario.setPriceMap(

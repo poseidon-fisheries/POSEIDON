@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.experiments;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class CaliforniaFuelExpenditures {
 
         MAIN_DIRECTORY.toFile().mkdirs();
 
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
 
 
         FishState state = new FishState(System.currentTimeMillis());

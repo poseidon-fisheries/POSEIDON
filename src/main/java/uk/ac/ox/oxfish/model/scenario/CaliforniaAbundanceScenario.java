@@ -1,0 +1,274 @@
+package uk.ac.ox.oxfish.model.scenario;
+
+import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.field.geo.GeomGridField;
+import sim.field.geo.GeomVectorField;
+import sim.field.grid.ObjectGrid2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
+import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Boat;
+import uk.ac.ox.oxfish.fisher.equipment.Engine;
+import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
+import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
+import uk.ac.ox.oxfish.geography.CartesianUTMDistance;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
+import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.geography.sampling.SampledMap;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
+import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
+import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.network.NetworkBuilder;
+import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaMapFactory;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.PortReader;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
+/**
+ * Reads the bathymetry file of california and for now not much else.
+ * Created by carrknight on 5/7/15.
+ */
+public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
+
+    private final boolean mortalityAt100PercentForOldestFish = false;
+    /**
+     * how much should the model biomass/abundance be given the data we read in?
+     */
+    private double biomassScaling = 1.0;
+
+
+
+
+
+    //old thinking:
+    //1104.39389 liters of gasoline consumed each day
+    //385.5864 kilometers a day if you cruise the whole time
+    // = about 2.86 liter per kilometer
+    //291.75 gallons consumed each day
+    //10 miles per hour, 240 miles a day
+    // 1.21 gallon per mile
+    //These numbers however are higher than they should be because I am assuming fishers cruise
+    //the whole time so I am just going to assume 1 gallon a day
+    // 3.78541 liters / 1.60934 km
+    // 2.352150571 liters per km
+
+
+    //average diesel retail 2010
+    //new FixedDoubleParameter(0.694094345);
+    // from https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_SCA_DPG&f=M
+
+
+    {
+        //numbers all come from stock assessment
+        ((GarbageGearFactory) gear).setDelegate(
+                new HeterogeneousGearFactory(
+                        new Pair<>("Dover Sole",
+                                   new DoubleNormalGearFactory(38.953, -1.483, 3.967,
+                                                               -0.764, Double.NaN, -2.259,
+                                                               0d, 50d, 1d, 26.962, 1.065, 0.869,
+                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR, DEFAULT_CATCHABILITY)),
+                        new Pair<>("Longspine Thornyhead",
+                                   new LogisticSelectivityGearFactory(23.5035,
+                                                                      9.03702,
+                                                                      21.8035,
+                                                                      1.7773,
+                                                                      0.992661,
+                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                      DEFAULT_CATCHABILITY)),
+                        //todo change this
+                        new Pair<>("Sablefish",
+
+                                   new SablefishGearFactory(DEFAULT_CATCHABILITY,
+                                                            45.5128, 3.12457, 0.910947,
+                                                            LITERS_OF_GAS_CONSUMED_PER_HOUR)
+                        )
+                        ,
+                        new Pair<>("Shortspine Thornyhead",
+                                   new DoubleNormalGearFactory(28.05,-0.3,4.25,
+                                                               4.85,Double.NaN,Double.NaN,
+                                                               0d,75d,1d,23.74,2.42,1d,
+                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                               DEFAULT_CATCHABILITY)),
+                        new Pair<>("Yelloweye Rockfish",
+                                   new LogisticSelectivityGearFactory(36.364, 14.009,
+                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
+                                                                      DEFAULT_CATCHABILITY)
+                        )
+
+                )
+        );
+        //the proportion of garbage comes from DTS data from the catcher vesesl report
+        ((GarbageGearFactory) gear).setGarbageSpeciesName(
+                MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME
+        );
+        ((GarbageGearFactory) gear).setProportionSimulatedToGarbage(
+                new FixedDoubleParameter(0.3221743)
+        );
+    }
+
+    private MultipleSpeciesAbundanceInitializer initializer;
+
+
+    private boolean fixedRecruitmentDistribution = false;
+
+    /**
+     * the multiplicative error to recruitment in a year. For now it applies to all species
+     */
+    private DoubleParameter recruitmentNoise = new FixedDoubleParameter(0);
+
+
+
+
+
+
+    public CaliforniaAbundanceScenario() {
+
+
+    }
+
+    @Override
+    protected GlobalBiology buildBiology(FishState model, LinkedHashMap<String, Path> folderMap) {
+        GlobalBiology biology;
+        initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
+                                                              biomassScaling,
+                                                              fixedRecruitmentDistribution,
+                                                              mortalityAt100PercentForOldestFish,
+                                                              true);
+
+        biology = initializer.generateGlobal(model.getRandom(),
+                                             model);
+
+
+        model.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                for(Species thisSpecies : biology.getSpecies())
+                {
+                    DoubleParameter noise = recruitmentNoise.makeCopy();
+                    initializer.getNaturalProcesses(thisSpecies).addNoise(
+                            new NoiseMaker() {
+                                @Override
+                                public Double get() {
+                                    return noise.apply(model.getRandom());
+                                }
+                            }
+
+                    );
+                }
+            }
+
+            @Override
+            public void turnOff() {
+
+            }
+        });
+
+
+
+        return biology;
+    }
+
+
+    /**
+     * Getter for property 'biomassScaling'.
+     *
+     * @return Value for property 'biomassScaling'.
+     */
+    public double getBiomassScaling() {
+        return biomassScaling;
+    }
+
+    /**
+     * Setter for property 'biomassScaling'.
+     *
+     * @param biomassScaling Value to set for property 'biomassScaling'.
+     */
+    public void setBiomassScaling(double biomassScaling) {
+        this.biomassScaling = biomassScaling;
+    }
+
+
+    public boolean isFixedRecruitmentDistribution() {
+        return fixedRecruitmentDistribution;
+    }
+
+    public void setFixedRecruitmentDistribution(boolean fixedRecruitmentDistribution) {
+        this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
+    }
+
+    /**
+     * Getter for property 'recruitmentNoise'.
+     *
+     * @return Value for property 'recruitmentNoise'.
+     */
+    public DoubleParameter getRecruitmentNoise() {
+        return recruitmentNoise;
+    }
+
+    /**
+     * Setter for property 'recruitmentNoise'.
+     *
+     * @param recruitmentNoise Value to set for property 'recruitmentNoise'.
+     */
+    public void setRecruitmentNoise(DoubleParameter recruitmentNoise) {
+        this.recruitmentNoise = recruitmentNoise;
+    }
+
+
+    @Override
+    public AllocatedBiologyInitializer getBiologyInitializer() {
+        return initializer;
+    }
+}
+
+
+

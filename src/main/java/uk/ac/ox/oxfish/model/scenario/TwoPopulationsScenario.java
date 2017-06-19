@@ -182,6 +182,8 @@ public class TwoPopulationsScenario implements Scenario{
     private AlgorithmFactory<? extends Regulation> regulationLarge =  new ProtectedAreasOnlyFactory();
 
 
+    private boolean allowTwoPopulationFriendships = false;
+
     private NetworkBuilder networkBuilder =
             new EquidegreeBuilder();
 
@@ -392,13 +394,15 @@ public class TwoPopulationsScenario implements Scenario{
 
 
         //don't let large boats befriend small boats
-        networkBuilder.addPredicate(new NetworkPredicate() {
-            @Override
-            public boolean test(Fisher from, Fisher to) {
-                return (from.getTags().contains("small") && to.getTags().contains("small")) ||
-                        (from.getTags().contains("large") && to.getTags().contains("large"));
-            }
-        });
+        if(!allowTwoPopulationFriendships) {
+            networkBuilder.addPredicate(new NetworkPredicate() {
+                @Override
+                public boolean test(Fisher from, Fisher to) {
+                    return (from.getTags().contains("small") && to.getTags().contains("small")) ||
+                            (from.getTags().contains("large") && to.getTags().contains("large"));
+                }
+            });
+        }
         //no friends from separate ports
         networkBuilder.addPredicate(new NetworkPredicate() {
             @Override
@@ -854,6 +858,21 @@ public class TwoPopulationsScenario implements Scenario{
         this.separatePorts = separatePorts;
     }
 
+    /**
+     * Getter for property 'allowTwoPopulationFriendships'.
+     *
+     * @return Value for property 'allowTwoPopulationFriendships'.
+     */
+    public boolean isAllowTwoPopulationFriendships() {
+        return allowTwoPopulationFriendships;
+    }
 
-
+    /**
+     * Setter for property 'allowTwoPopulationFriendships'.
+     *
+     * @param allowTwoPopulationFriendships Value to set for property 'allowTwoPopulationFriendships'.
+     */
+    public void setAllowTwoPopulationFriendships(boolean allowTwoPopulationFriendships) {
+        this.allowTwoPopulationFriendships = allowTwoPopulationFriendships;
+    }
 }

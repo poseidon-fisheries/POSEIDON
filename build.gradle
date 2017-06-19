@@ -99,7 +99,7 @@ dependencies
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test{
-        maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),4)
+        maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),1)
 }
 
 //this just mentions what the gradle version for the "wrapper" gradlew ought to be
@@ -150,13 +150,13 @@ task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
 
 //this task takes the yamler.jar from the build/libs folder and place it in the runs optimization folder. This is important
 //to make optimization.py work correctly
-/*
+
 task deployHeadless(type: Copy, dependsOn: buildHeadless) {
     from 'build/libs/'
     into 'runs/optimization/'
     include 'yamler.jar'
 }
-*/
+
 
 /*
 task fatJarBatch(type: FatCapsule) {
@@ -218,28 +218,6 @@ task batch(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
-
-task testCSV(dependsOn: test){
-    def output = file("build/reports/multitest/" + date + ".csv")
-    doLast {
-        file("build/reports").mkdirs()
-        output.text = '"Project","Test","Time","Result","Duration"\r\n'
-        allprojects.each { project2 ->
-            logger.info("Processing project ${project2.name}")
-            def resultFiles = project2.fileTree("build") { include '**/TEST-*.xml' }
-            resultFiles.each { file ->
-                logger.info("Processing report ${file}")
-                def testsuite = new XmlSlurper().parse(file)
-                testsuite.testcase.each { testcase ->
-                    def result = "pass"
-                    if (!testcase.failure.isEmpty()) { result = "fail" }
-                    else if (!testcase.skipped.isEmpty()) { result = "skip" }
-                    output << "\"${project2.name}\",\"${testcase.@classname}.${testcase.@name}\",\"${testcase.@timestamp}\",\"${result}\",\"${testcase.@time}\"\r\n"
-                }
-            }
-        }
-    }
-}
 
 test {
   useJUnit()

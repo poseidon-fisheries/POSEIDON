@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -298,8 +298,8 @@ public class SocialTuningExercise {
                     ((PrototypeScenario) scenario).setDestinationStrategy(strategy.getValue());
                 else
                 {
-                    assert scenario instanceof CaliforniaBathymetryScenario;
-                    ((CaliforniaBathymetryScenario) scenario).setDestinationStrategy(strategy.getValue());
+                    assert scenario instanceof CaliforniaAbundanceScenario;
+                    ((CaliforniaAbundanceScenario) scenario).setDestinationStrategy(strategy.getValue());
                 }
 
                 FishState state = new FishState(experiment);

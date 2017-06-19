@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -97,7 +97,7 @@ public class CaliforniaGasPrices {
 
         FishState state =  new FishState(seed);
 
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
         scenario.setResetBiologyAtYear(5);
         state.setScenario(scenario);
@@ -123,7 +123,7 @@ public class CaliforniaGasPrices {
         System.out.println(fishPrice);
         FishState state =  new FishState(seed);
 
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         scenario.setPriceMap(
                 "Dover Sole:1.208,Sablefish:"+fishPrice + ",Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
         );

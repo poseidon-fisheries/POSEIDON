@@ -6,7 +6,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.io.geo.ArcInfoASCGridExporter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -20,7 +20,7 @@ public class SaveBathymetryBack {
 
     public static void main(String[] args) throws IOException {
 
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         FishState state = new FishState();
         state.setScenario(scenario);
 

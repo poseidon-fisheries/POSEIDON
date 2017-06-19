@@ -26,10 +26,10 @@ public class FishYAML extends Yaml{
 
         super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
         this.customConstructor = ((YamlConstructor) super.constructor);
-        this.addImplicitResolver(new Tag("!coord"),
+      /*  this.addImplicitResolver(new Tag("!coord"),
                                  Pattern.compile("['\"]?[0-9]+\\.?[0-9]*,[0-9]+\\.?[0-9]*['\"]?"),
                                  "01234567890'\"");
-
+*/
     }
 
     private static DumperOptions dumperOptions() {

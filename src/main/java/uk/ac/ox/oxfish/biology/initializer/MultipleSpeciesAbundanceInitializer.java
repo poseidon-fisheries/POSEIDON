@@ -241,6 +241,20 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     }
 
 
+    /**
+     * you must at all time be ready to reset local biology to its pristine state
+     *
+     * @param species species you want the biomass resetted
+     */
+    @Override
+    public void resetLocalBiology(Species species) {
+
+        resetAllLocalBiologies(species,
+                               initialAbundance.get(species),
+                               initialWeights.get(species));
+
+    }
+
     public void resetAllLocalBiologies(
             Species speciesToReset, int[][] newTotalFishCount,
             HashMap<AbundanceBasedLocalBiology, Double> biologyToProportionOfFishThere)

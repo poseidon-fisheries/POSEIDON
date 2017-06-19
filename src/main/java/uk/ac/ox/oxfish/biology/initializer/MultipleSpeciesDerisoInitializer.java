@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.function.UnaryOperator;
 
 /**
  * Created by carrknight on 6/14/17.
@@ -73,6 +74,11 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
     private final HashMap<Species, DerisoParameters> parameters = new HashMap<>();
 
 
+    /**
+     * stored and used during reset only!
+     */
+    private HashMap<Species,HashMap<BiomassLocalBiology,Double>> originalWeights = new HashMap<>();
+
 
     /**
      * read up a folder that contains deriso.yaml and turn it into a species
@@ -82,12 +88,13 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @throws IOException
      */
     private Species generateSpeciesFromFolder(Path biologicalDirectory,
-                                                    String speciesName)
+                                              String speciesName)
             throws IOException {
         FishYAML yaml = new FishYAML();
         DerisoParameters parameter = yaml.loadAs(
                 new FileReader(biologicalDirectory.resolve("deriso.yaml").toFile()),
                 DerisoParameters.class);
+        parameter.updateLastRecruits();
         Species species = new Species(speciesName, Meristics.FAKE_MERISTICS);
         parameters.put(species,parameter);
         return species;
@@ -151,20 +158,15 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
         if(seaTile.getAltitude() >= 0)
             return new EmptyLocalBiology();
-        for(Species species : biology.getSpecies())
+        else
         {
-            if(species.isImaginary())
-                continue;
-            //if at least one allocator says you have some fish here, then it's a logistic one
-            if(allocators.get(species).apply(seaTile)>0)
-            {
-                BiomassLocalBiology local = new BiomassLocalBiology(0,biology.getSize(),random);
-                localBiologies.put(seaTile,local);
-                return local;
-            }
+
+            BiomassLocalBiology local = new BiomassLocalBiology(0,biology.getSize(),random);
+            localBiologies.put(seaTile,local);
+            return local;
+
         }
-        //if you are here, all the allocations were 0!
-        return new EmptyLocalBiology();
+
 
 
     }
@@ -209,22 +211,22 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                 //we should have covered all locations by now
                 assert localBiologies.values().containsAll(weights.keySet());
                 assert weights.keySet().containsAll(localBiologies.values());
+                originalWeights.put(species,weights);
 
                 //now assign biomass and carrying capacity to each biology
-                DerisoParameters parameter = parameters.get(species);
-                double virginBiomass = parameter.getVirginBiomass();
-                double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
-                        parameter.getEmpiricalYearlyBiomasses().size());
-                for (Map.Entry<BiomassLocalBiology, Double> bio : weights.entrySet()) {
-                    assert bio.getKey().getCarryingCapacity(species) == 0;
-                    assert bio.getKey().getBiomass(species) == 0;
-                    bio.getKey().setCarryingCapacity(species,
-                                                     bio.getValue() *
-                                                             virginBiomass);
-                    assert bio.getKey().getBiomass(species) == 0;
-                    bio.getKey().setCurrentBiomass(species, currentBiomass);
-                }
+                resetLocalBiology(species, weights);
+                DerisoParameters parameter;
+                double virginBiomass;
+                double currentBiomass;
 
+
+                //scale virgin biomass/empirical biomasses now
+                parameter = parameters.get(species);
+                double totalWeight = weights.values().stream().mapToDouble(value -> value).sum();
+                virginBiomass = parameter.getVirginBiomass() * totalWeight;
+                LinkedList<Double> scaledEmpiricalBiomasses = new LinkedList<>(parameter.getEmpiricalYearlyBiomasses());
+                scaledEmpiricalBiomasses.replaceAll(original -> original * totalWeight);
+                currentBiomass = scaledEmpiricalBiomasses.get(scaledEmpiricalBiomasses.size()-1);
                 //hopefully biomass sums up in the end!
                 assert localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
                     @Override
@@ -239,9 +241,12 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                     }
                 }).sum() == currentBiomass;
 
+
+                parameter.updateLastRecruits();
+
                 //schedule the damn grower!
                 DerisoSchnuteCommonGrower grower = new DerisoSchnuteCommonGrower(
-                        parameter.getEmpiricalYearlyBiomasses(),
+                        scaledEmpiricalBiomasses,
                         parameter.getHistoricalYearlySurvival(),
                         parameter.getRho(),
                         parameter.getNaturalSurvivalRate(),
@@ -252,10 +257,32 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                         parameter.getWeightAtRecruitmentMinus1(),
                         parameter.getLastRecruits()
                 );
+                //register all valid biologies to be grown
+                for(BiomassLocalBiology bio : localBiologies.values()) {
+                    if(bio.getCarryingCapacity(species)>0)
+                        grower.getBiologies().add(bio);
+                }
                 model.registerStartable(grower);
                 naturalProcesses.put(species,grower);
 
             }
+            //clear out all empty biologies
+            List<SeaTile> toClear = new LinkedList<>();
+            for (Map.Entry<SeaTile, BiomassLocalBiology> bio : localBiologies.entrySet())
+            {
+                double sum = 0;
+                for(int i=0; i<biology.getSize(); i++)
+                    sum += bio.getValue().getCarryingCapacity(i);
+                if(sum<=0)
+                {
+                    bio.getKey().setBiology(new EmptyLocalBiology());
+                    toClear.add(bio.getKey());
+                }
+            }
+            for(SeaTile bio : toClear)
+                localBiologies.remove(bio);
+
+
             //done!
             biologicalDirectories.clear();
         }
@@ -263,6 +290,38 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             e.printStackTrace();
             Log.error("Failed to locate or read deriso parameters correctly. Could not instantiate the local biology");
             System.exit(-1);
+        }
+    }
+
+
+    /**
+     * you must at all time be ready to reset local biology to its pristine state
+     *
+     * @param species species you want the biomass resetted
+     */
+    @Override
+    public void resetLocalBiology(Species species) {
+        resetLocalBiology(species,originalWeights.get(species));
+    }
+
+    /**
+     * allocates biomass and carrying capacity all around
+     * @param species
+     * @param weights
+     */
+    private void resetLocalBiology(Species species, HashMap<BiomassLocalBiology, Double> weights) {
+        DerisoParameters parameter = parameters.get(species);
+        double virginBiomass = parameter.getVirginBiomass();
+        double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
+                parameter.getEmpiricalYearlyBiomasses().size()-1);
+        for (Map.Entry<BiomassLocalBiology, Double> bio : weights.entrySet()) {
+            assert bio.getKey().getCarryingCapacity(species) == 0;
+            assert bio.getKey().getBiomass(species) == 0;
+            bio.getKey().setCarryingCapacity(species,
+                                             bio.getValue() *
+                                                     virginBiomass);
+            assert bio.getKey().getBiomass(species) == 0;
+            bio.getKey().setCurrentBiomass(species, currentBiomass);
         }
     }
 

@@ -8,7 +8,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
 import java.nio.file.Files;
@@ -92,8 +92,8 @@ public class SerializeTest {
         long seed = System.currentTimeMillis();
         FishState state = new FishState(seed);
         FishState state2 = new FishState(seed);
-        state.setScenario(new CaliforniaBathymetryScenario());
-        state2.setScenario(new CaliforniaBathymetryScenario());
+        state.setScenario(new CaliforniaAbundanceScenario());
+        state2.setScenario(new CaliforniaAbundanceScenario());
         state.start();
         state2.start();
         assertEquals(state.random.nextDouble(),
@@ -163,7 +163,7 @@ public class SerializeTest {
 
 
         FishState state = new FishState(System.currentTimeMillis());
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         state.setScenario(scenario);
         state.start();
         for(int i=0; i<20; i++)
@@ -238,7 +238,7 @@ public class SerializeTest {
 
 
         FishState state = new FishState(System.currentTimeMillis());
-        CaliforniaBathymetryScenario scenario = new CaliforniaBathymetryScenario();
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         scenario.setRegulation(new AnarchyFactory());
         state.setScenario(scenario);
         state.start();

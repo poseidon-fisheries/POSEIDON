@@ -13,7 +13,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
+import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -22,7 +22,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Engine;
 import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.GarbageGearFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -45,7 +45,6 @@ import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
@@ -73,20 +72,9 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * Reads the bathymetry file of california and for now not much else.
- * Created by carrknight on 5/7/15.
+ * Created by carrknight on 6/15/17.
  */
-public class CaliforniaBathymetryScenario implements Scenario {
-
-    private final boolean mortalityAt100PercentForOldestFish = false;
-    /**
-     * filename containing all the ports
-     */
-    private String portFileName = "dts_ports_2011.csv";
-    /**
-     * how much should the model biomass/abundance be given the data we read in?
-     */
-    private double biomassScaling = 1.0;
+public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
     /**
@@ -95,106 +83,26 @@ public class CaliforniaBathymetryScenario implements Scenario {
      */
     private double californiaScaling = 1.0;
 
-    private int gridWidth = 50;
-
-
-
-    private NetworkBuilder networkBuilder =
-            new EquidegreeBuilder();
-
-    /**
-     * boat length in meters
-     */
-    private DoubleParameter boatLength = new FixedDoubleParameter(22.573488); //assuming meters: this is from the data request
-
-    /**
-     * boat breadth in meters
-     */
-    private DoubleParameter boatWidth = new FixedDoubleParameter(7); //assuming meters: this is from the Echo Belle boat
-
-    /**
-     * hold size of the boat in kg
-     */
-    // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
-    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20000);
-
-    private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
-
-    private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
-
-
-    //old thinking:
-    //1104.39389 liters of gasoline consumed each day
-    //385.5864 kilometers a day if you cruise the whole time
-    // = about 2.86 liter per kilometer
-    //291.75 gallons consumed each day
-    //10 miles per hour, 240 miles a day
-    // 1.21 gallon per mile
-    //These numbers however are higher than they should be because I am assuming fishers cruise
-    //the whole time so I am just going to assume 1 gallon a day
-    // 3.78541 liters / 1.60934 km
-    // 2.352150571 liters per km
-
-
-    //new thinking:
-    //liters per hour 57 (toft)
-    //kph 16.0661
-    //liter per km : 57/16.0661
-    private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
-
-
-    private DoubleParameter gasPricePerLiter =
-            //2011: 4.09$/gallon, we translate into liters
-            new FixedDoubleParameter(0.89991382);
-
-    //average diesel retail 2010
-    //new FixedDoubleParameter(0.694094345);
-    // from https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_SCA_DPG&f=M
-
-
-    /**
-     * if this number is positive  then at the given year the biology/abundance will be reset to the original values
-     */
-    private int resetBiologyAtYear = -1;
-
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
-            new FixedRestTimeDepartingFactory();
-
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripImitativeDestinationFactory();
-    /**
-     * factory to produce fishing strategy
-     */
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
-            new MaximumStepsFactory();
-
-
-    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
-            new FixedGearStrategyFactory();
-
-    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
-            new IgnoreWeatherFactory();
-
-    private AlgorithmFactory<? extends Regulation> regulation =
+    public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
+    /*
+       * fuel efficiency per hour is 57l according to Toft et al
+       */
+    protected final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
+    protected AlgorithmFactory<? extends Regulation> regulation =
 
 
 
 
             //2011 numbers:
             new MultiQuotaMapFactory(true,
-                                     new Pair<>("Yelloweye rockfish",600d),
+                                     new Pair<>("Yelloweye rockfish", 600d),
                                      //        new Pair<>("Canary rockfish",41100d),
                                      new Pair<>("Dover sole",22234500d),
                                      new Pair<>("Longspine Thornyhead",1966250d),
                                      new Pair<>("Sablefish",3077220d),
                                      new Pair<>("Shortspine thornyhead",1481600.056d)
             );
+    private int resetBiologyAtYear = -1;
 
     {
         HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
@@ -208,121 +116,13 @@ public class CaliforniaBathymetryScenario implements Scenario {
         );
     }
 
-
-            /* 2015 numbers!
-            new MultiQuotaMapFactory(true,
-                                     new Pair<>("Yelloweye rockfish",1000d),
-                                     new Pair<>("Canary rockfish",41100d),
-                                     new Pair<>("Dover sole",22231000d),
-                                     new Pair<>("Longspine Thornyhead",1811399.811),
-                                     new Pair<>("Sablefish",2494999.8),
-                                     new Pair<>("Shortspine thornyhead",1196999.874)
-            );
-*/
-
-    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
-
-
-    /*
-   * fuel efficiency per hour is 57l according to Toft et al
-   */
-    private final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
     /**
      * gear maker
      */
-    private AlgorithmFactory<? extends Gear> gear =
+    protected AlgorithmFactory<? extends Gear> gear =
             new GarbageGearFactory();
+    protected Map<String, String> exogenousCatches = new HashMap<>();
 
-    public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
-    // implied by stock assessment: 0.00156832676d;
-
-    {
-        //numbers all come from stock assessment
-        ((GarbageGearFactory) gear).setDelegate(
-                new HeterogeneousGearFactory(
-                        new Pair<>("Dover Sole",
-                                   new DoubleNormalGearFactory(38.953, -1.483, 3.967,
-                                                               -0.764, Double.NaN, -2.259,
-                                                               0d, 50d, 1d, 26.962, 1.065, 0.869,
-                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR, DEFAULT_CATCHABILITY)),
-                        new Pair<>("Longspine Thornyhead",
-                                   new LogisticSelectivityGearFactory(23.5035,
-                                                                      9.03702,
-                                                                      21.8035,
-                                                                      1.7773,
-                                                                      0.992661,
-                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                      DEFAULT_CATCHABILITY)),
-                        //todo change this
-                        new Pair<>("Sablefish",
-
-                                   new SablefishGearFactory(DEFAULT_CATCHABILITY,
-                                                            45.5128, 3.12457, 0.910947,
-                                                            LITERS_OF_GAS_CONSUMED_PER_HOUR)
-                        )
-                        ,
-                        new Pair<>("Shortspine Thornyhead",
-                                   new DoubleNormalGearFactory(28.05,-0.3,4.25,
-                                                               4.85,Double.NaN,Double.NaN,
-                                                               0d,75d,1d,23.74,2.42,1d,
-                                                               LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                               DEFAULT_CATCHABILITY)),
-                        new Pair<>("Yelloweye Rockfish",
-                                   new LogisticSelectivityGearFactory(36.364, 14.009,
-                                                                      LITERS_OF_GAS_CONSUMED_PER_HOUR,
-                                                                      DEFAULT_CATCHABILITY)
-                        )
-
-                )
-        );
-        //the proportion of garbage comes from DTS data from the catcher vesesl report
-        ((GarbageGearFactory) gear).setGarbageSpeciesName(
-                MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME
-        );
-        ((GarbageGearFactory) gear).setProportionSimulatedToGarbage(
-                new FixedDoubleParameter(0.3221743)
-        );
-    }
-
-    private MultipleSpeciesAbundanceInitializer initializer;
-
-
-    private Path mainDirectory = Paths.get("inputs","california");
-
-    private boolean usePremadeInput = true;
-
-    private boolean fixedRecruitmentDistribution = false;
-
-    /**
-     * the multiplicative error to recruitment in a year. For now it applies to all species
-     */
-    private DoubleParameter recruitmentNoise = new FixedDoubleParameter(0);
-
-    /**
-     * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
-     */
-    // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
-    //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //151.458333333$ per hour out
-
-
-    private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
-
-    /*
-    //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
-    private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
-            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0";
-    */
-
-    //these prices are averages from the catcher vessel report
-    //2010
-    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502"
-            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181"
-
-            ;
-
-
-    private Map<String, String> exogenousCatches = new HashMap<>();
     {
         //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
         //all for the year 2010
@@ -330,12 +130,76 @@ public class CaliforniaBathymetryScenario implements Scenario {
         exogenousCatches.put("Sablefish",Double.toString(4438.2*1000));
 
     }
+    /**
+     * filename containing all the ports
+     */
+    private String portFileName = "dts_ports_2011.csv";
+    private int gridWidth = 50;
+    private NetworkBuilder networkBuilder =
+            new EquidegreeBuilder();
+    /**
+     * boat length in meters
+     */
+    private DoubleParameter boatLength = new FixedDoubleParameter(22.573488); //assuming meters: this is from the data request
+    /**
+     * boat breadth in meters
+     */
+    private DoubleParameter boatWidth = new FixedDoubleParameter(7); //assuming meters: this is from the Echo Belle boat
+    /**
+     * hold size of the boat in kg
+     */
+    // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
+    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20000);
+    private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
+    private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
+    //new thinking:
+    //liters per hour 57 (toft)
+    //kph 16.0661
+    //liter per km : 57/16.0661
+    private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
+    private DoubleParameter gasPricePerLiter =
+            //2011: 4.09$/gallon, we translate into liters
+            new FixedDoubleParameter(0.89991382);
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
+            new FixedRestTimeDepartingFactory();
+    /**
+     * factory to produce departing strategy
+     */
+    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
+            new PerTripImitativeDestinationFactory();
+    /**
+     * factory to produce fishing strategy
+     */
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
+            new MaximumStepsFactory();
+    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
+            new FixedGearStrategyFactory();
+    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
+            new IgnoreWeatherFactory();
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
+    private Path mainDirectory = Paths.get("inputs", "california");
+    private boolean usePremadeInput = true;
+    /**
+     * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
+     */
+    // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
+    //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //151.458333333$ per hour out
+    private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
+    //these prices are averages from the catcher vessel report
+    //2010
+    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502"
+            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181"
 
-    public CaliforniaBathymetryScenario() {
-
-
-    }
-
+            ;
+    /*
+    //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
+    private String priceMap = "Dover Sole:1.208,Sablefish:3.589,Shortspine Thornyhead:3.292,Longspine Thornyhead:0.7187,Yelloweye Rockfish:1.587"
+            +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.0";
+    */
     /**
      * this is the very first method called by the model when it is started. The scenario needs to instantiate all the
      * essential objects for the model to take place
@@ -431,39 +295,8 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     altitudeGrid.set(x, y,
                                      new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
                 }
-            initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
-                                                                  biomassScaling,
-                                                                  fixedRecruitmentDistribution,
-                                                                  mortalityAt100PercentForOldestFish,
-                                                                  true);
 
-            biology = initializer.generateGlobal(model.getRandom(),
-                                                 model);
-            List<Species> species = biology.getSpecies();
-
-            model.registerStartable(new Startable() {
-                @Override
-                public void start(FishState model) {
-                    for(Species thisSpecies : species)
-                    {
-                        DoubleParameter noise = recruitmentNoise.makeCopy();
-                        initializer.getNaturalProcesses(thisSpecies).addNoise(
-                                new NoiseMaker() {
-                                    @Override
-                                    public Double get() {
-                                        return noise.apply(model.getRandom());
-                                    }
-                                }
-
-                        );
-                    }
-                }
-
-                @Override
-                public void turnOff() {
-
-                }
-            });
+            biology = buildBiology(model, folderMap);
 
             GeomGridField unitedMap = new GeomGridField(altitudeGrid);
             unitedMap.setMBR(sampledMap.getMbr());
@@ -477,16 +310,17 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
 
             //this table contains for each x-y an array telling for each specie what is the average observation at x,y
-            final Table<Integer,Integer,double[]> averagesTable = HashBasedTable.create(gridWidth,gridHeight);
+            final Table<Integer,Integer,double[]> averagesTable = HashBasedTable.create(gridWidth, gridHeight);
             //go through the map
             for(int x=0;x<gridWidth;x++) {
                 for (int y = 0; y < gridHeight; y++) {
-                    double[] averages = new double[species.size()];
+                    double[] averages = new double[biology.getSize()];
                     averagesTable.put(x, y, averages);
                     SeaTile seaTile = map.getSeaTile(x, y);
-                    seaTile.assignLocalWeather(new ConstantWeather(0,0,0));
+                    seaTile.assignLocalWeather(new ConstantWeather(0, 0, 0));
                     seaTile.setBiology(
-                            initializer.generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth));
+                            getBiologyInitializer()
+                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth));
                     //if it's sea (don't bother counting otherwise)
                     if (seaTile.getAltitude() < 0)
                     {
@@ -495,7 +329,7 @@ public class CaliforniaBathymetryScenario implements Scenario {
                         //for each species
                         for (Map.Entry<String, Table<Integer,Integer,LinkedList<Double>>> specieGrid :
                                 sampledMap.getBiologyGrids().entrySet()) {
-                            assert species.get(i).getName().equals(specieGrid.getKey()); //check we got the correct one
+                            assert biology.getSpecie(i).getName().equals(specieGrid.getKey()); //check we got the correct one
                             //average
                             OptionalDouble average = specieGrid.getValue().get(x,
                                                                                y).stream().mapToDouble(
@@ -513,19 +347,20 @@ public class CaliforniaBathymetryScenario implements Scenario {
                 }
             }
             //now that we have the averages, we can compute their sum:
-            final double[] sums = new double[species.size()];
+            final double[] sums = new double[biology.getSize()];
             for(double[] average : averagesTable.values())
                 for(int i=0; i<sums.length; i++)
                     sums[i] += average[i];
 
             //and now finally we can turn all that into allocators
             for(Species current : biology.getSpecies())
-                initializer.putAllocator(current, input ->
+                getBiologyInitializer().putAllocator(current, input ->
                         (averagesTable.get(input.getGridX(), input.getGridY())[current.getIndex()])
                                 /
                                 sums[current.getIndex()]);
 
-            initializer.processMap(biology, map, model.getRandom(), model);
+            getBiologyInitializer().processMap(biology, map, model.getRandom(), model);
+
 
 
             //set yourself up to reset the biology at the given year if needed
@@ -535,13 +370,14 @@ public class CaliforniaBathymetryScenario implements Scenario {
                     public void step(SimState simState) {
                         Log.info("Resetting all local biologies");
                         for(Species current : biology.getSpecies()) {
-                            initializer.resetAllLocalBiologies(current,
-                                                               initializer.getInitialAbundance(current),
-                                                               initializer.getInitialWeights(current));
+                            getBiologyInitializer().resetLocalBiology(current);
 
                         }
                     }
-                }, StepOrder.DAWN,resetBiologyAtYear);
+                }, StepOrder.DAWN, resetBiologyAtYear);
+
+
+
 
             if(Log.TRACE)
                 Log.trace("height: " +map.getHeight());
@@ -600,6 +436,14 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
 
     }
+
+    /**
+     * build the biology part!
+     * @param model
+     * @param folderMap
+     * @return
+     */
+    protected abstract GlobalBiology buildBiology(FishState model, LinkedHashMap<String, Path> folderMap);
 
     /**
      * called shortly after the essentials are set, it is time now to return a list of all the agents
@@ -763,8 +607,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
 
     }
 
-
-
     /**
      * Getter for property 'gridWidth'.
      *
@@ -782,26 +624,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public void setGridWidth(int gridWidth) {
         this.gridWidth = gridWidth;
     }
-
-
-    /**
-     * Getter for property 'biomassScaling'.
-     *
-     * @return Value for property 'biomassScaling'.
-     */
-    public double getBiomassScaling() {
-        return biomassScaling;
-    }
-
-    /**
-     * Setter for property 'biomassScaling'.
-     *
-     * @param biomassScaling Value to set for property 'biomassScaling'.
-     */
-    public void setBiomassScaling(double biomassScaling) {
-        this.biomassScaling = biomassScaling;
-    }
-
 
     /**
      * Getter for property 'networkBuilder'.
@@ -947,7 +769,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.gasPricePerLiter = gasPricePerLiter;
     }
 
-
     public AlgorithmFactory<? extends Gear> getGear() {
         return gear;
     }
@@ -1056,12 +877,6 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.regulation = regulation;
     }
 
-
-
-
-
-
-
     public boolean isUsePremadeInput() {
         return usePremadeInput;
     }
@@ -1106,56 +921,12 @@ public class CaliforniaBathymetryScenario implements Scenario {
         this.hourlyTravellingCosts = hourlyTravellingCosts;
     }
 
-    public boolean isFixedRecruitmentDistribution() {
-        return fixedRecruitmentDistribution;
-    }
-
-    public void setFixedRecruitmentDistribution(boolean fixedRecruitmentDistribution) {
-        this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
-    }
-
-    /**
-     * Getter for property 'recruitmentNoise'.
-     *
-     * @return Value for property 'recruitmentNoise'.
-     */
-    public DoubleParameter getRecruitmentNoise() {
-        return recruitmentNoise;
-    }
-
-    /**
-     * Setter for property 'recruitmentNoise'.
-     *
-     * @param recruitmentNoise Value to set for property 'recruitmentNoise'.
-     */
-    public void setRecruitmentNoise(DoubleParameter recruitmentNoise) {
-        this.recruitmentNoise = recruitmentNoise;
-    }
-
     public String getPriceMap() {
         return priceMap;
     }
 
     public void setPriceMap(String priceMap) {
         this.priceMap = priceMap;
-    }
-
-    /**
-     * Getter for property 'resetBiologyAtYear'.
-     *
-     * @return Value for property 'resetBiologyAtYear'.
-     */
-    public int getResetBiologyAtYear() {
-        return resetBiologyAtYear;
-    }
-
-    /**
-     * Setter for property 'resetBiologyAtYear'.
-     *
-     * @param resetBiologyAtYear Value to set for property 'resetBiologyAtYear'.
-     */
-    public void setResetBiologyAtYear(int resetBiologyAtYear) {
-        this.resetBiologyAtYear = resetBiologyAtYear;
     }
 
     public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
@@ -1165,6 +936,42 @@ public class CaliforniaBathymetryScenario implements Scenario {
     public void setGearStrategy(
             AlgorithmFactory<? extends GearStrategy> gearStrategy) {
         this.gearStrategy = gearStrategy;
+    }
+
+    /**
+     * Getter for property 'portFileName'.
+     *
+     * @return Value for property 'portFileName'.
+     */
+    public String getPortFileName() {
+        return portFileName;
+    }
+
+    /**
+     * Setter for property 'portFileName'.
+     *
+     * @param portFileName Value to set for property 'portFileName'.
+     */
+    public void setPortFileName(String portFileName) {
+        this.portFileName = portFileName;
+    }
+
+    /**
+     * Getter for property 'exogenousCatches'.
+     *
+     * @return Value for property 'exogenousCatches'.
+     */
+    public Map<String, String> getExogenousCatches() {
+        return exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'exogenousCatches'.
+     *
+     * @param exogenousCatches Value to set for property 'exogenousCatches'.
+     */
+    public void setExogenousCatches(Map<String, String> exogenousCatches) {
+        this.exogenousCatches = exogenousCatches;
     }
 
     /**
@@ -1186,43 +993,23 @@ public class CaliforniaBathymetryScenario implements Scenario {
     }
 
 
+    public abstract AllocatedBiologyInitializer getBiologyInitializer();
+
     /**
-     * Getter for property 'portFileName'.
+     * Getter for property 'resetBiologyAtYear'.
      *
-     * @return Value for property 'portFileName'.
+     * @return Value for property 'resetBiologyAtYear'.
      */
-    public String getPortFileName() {
-        return portFileName;
+    public int getResetBiologyAtYear() {
+        return resetBiologyAtYear;
     }
 
     /**
-     * Setter for property 'portFileName'.
+     * Setter for property 'resetBiologyAtYear'.
      *
-     * @param portFileName Value to set for property 'portFileName'.
+     * @param resetBiologyAtYear Value to set for property 'resetBiologyAtYear'.
      */
-    public void setPortFileName(String portFileName) {
-        this.portFileName = portFileName;
-    }
-
-
-    /**
-     * Getter for property 'exogenousCatches'.
-     *
-     * @return Value for property 'exogenousCatches'.
-     */
-    public Map<String, String> getExogenousCatches() {
-        return exogenousCatches;
-    }
-
-    /**
-     * Setter for property 'exogenousCatches'.
-     *
-     * @param exogenousCatches Value to set for property 'exogenousCatches'.
-     */
-    public void setExogenousCatches(Map<String, String> exogenousCatches) {
-        this.exogenousCatches = exogenousCatches;
+    public void setResetBiologyAtYear(int resetBiologyAtYear) {
+        this.resetBiologyAtYear = resetBiologyAtYear;
     }
 }
-
-
-

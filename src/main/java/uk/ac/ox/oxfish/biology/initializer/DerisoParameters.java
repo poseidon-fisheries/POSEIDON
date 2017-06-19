@@ -50,7 +50,12 @@ public class DerisoParameters {
         this.weightAtRecruitment = weightAtRecruitment;
         this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
         this.virginBiomass = virginBiomass;
+    }
 
+    public DerisoParameters() {
+    }
+
+    public void updateLastRecruits(){
         double virginRecruits =
                 virginBiomass * (1d-(1+rho)*naturalSurvivalRate + rho * naturalSurvivalRate * naturalSurvivalRate)
                         /
@@ -63,6 +68,7 @@ public class DerisoParameters {
         Double spawners = empiricalYearlyBiomasses.get(empiricalYearlyBiomasses.size()-recruitmentLag);
         lastRecruits =  spawners /virginBiomass/ (alpha+beta* spawners /virginBiomass);
     }
+
 
     /**
      * Getter for property 'empiricalYearlyBiomasses'.
@@ -385,12 +391,4 @@ public class DerisoParameters {
         this.virginBiomass = virginBiomass;
     }
 
-    /**
-     * Setter for property 'lastRecruits'.
-     *
-     * @param lastRecruits Value to set for property 'lastRecruits'.
-     */
-    public void setLastRecruits(double lastRecruits) {
-        this.lastRecruits = lastRecruits;
-    }
 }

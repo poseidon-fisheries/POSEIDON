@@ -2,11 +2,9 @@ package uk.ac.ox.oxfish.experiments;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.GarbageGearDecorator;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.scenario.CaliforniaBathymetryScenario;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -14,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 /**
  * Created by carrknight on 6/12/17.
@@ -47,7 +44,7 @@ public class CaliforniaHardSwitch {
         FishState state = new FishState(seed);
 
 
-        CaliforniaBathymetryScenario scenario = yaml.loadAs(scenarioYaml, CaliforniaBathymetryScenario.class);
+        CaliforniaAbundanceScenario scenario = yaml.loadAs(scenarioYaml, CaliforniaAbundanceScenario.class);
 
 
         //add special data

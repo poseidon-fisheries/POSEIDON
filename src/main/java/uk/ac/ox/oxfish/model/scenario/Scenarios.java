@@ -28,7 +28,7 @@ public class Scenarios {
         DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
 
 
-        SCENARIOS.put("California Map Scenario", new CaliforniaBathymetryScenario());
+        SCENARIOS.put("California Map Scenario", new CaliforniaAbundanceScenario());
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +
                 "from bathymetry data");
 
@@ -41,7 +41,10 @@ public class Scenarios {
         DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
 
 
-        SCENARIOS.put("Simple California",new SimpleCaliforniaScenario());
+       /* SCENARIOS.put("Simple California",new SimpleCaliforniaScenario());
+        DESCRIPTIONS.put("Simple California","California Scenario for the masses!");
+*/
+   SCENARIOS.put("Simple California",new DorisoCaliforniaScenario());
         DESCRIPTIONS.put("Simple California","California Scenario for the masses!");
 
 

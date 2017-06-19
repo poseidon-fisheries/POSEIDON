@@ -33,6 +33,7 @@ public class YamlConstructor extends  Constructor {
 
         //add the ability to read/write coordinates
 
+
         this.yamlConstructors.put(new Tag("!coord"), new Construct() {
             @Override
             public Object construct(Node node) {

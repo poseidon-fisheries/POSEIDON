@@ -83,6 +83,8 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
 
     public DerisoSchnuteCommonGrower(
+            //doesn't ask for the virgin biomass because it discovers it on its own
+            //by looking at carrying capacity
             List<Double> empiricalYearlyBiomasses,
             List<Double> empiricalSurvivalRates,
             double rho, double naturalSurvivalRate, double recruitmentSteepness,
