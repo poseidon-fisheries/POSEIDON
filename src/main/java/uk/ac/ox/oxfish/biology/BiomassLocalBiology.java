@@ -136,10 +136,15 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
         {
             //if you caught anything
             double biomassFishedOut = caught.getWeightCaught(speciesIndex);
-            if(biomassFishedOut > 0)
+            if(biomassFishedOut > 0 && !biology.getSpecie(speciesIndex).isImaginary())
             {
+                Preconditions.checkArgument(currentBiomass[speciesIndex]>=biomassFishedOut,
+                                            "going to fish more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
+                                                    ", currentBiomass " + currentBiomass[speciesIndex]);
                 currentBiomass[speciesIndex]-= biomassFishedOut;
-                Preconditions.checkState(currentBiomass[speciesIndex] >=0, "fished more biomass than available");
+                Preconditions.checkState(currentBiomass[speciesIndex] >=0,
+                                         "fished more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
+                                                 ", currentBiomass " + currentBiomass[speciesIndex]);
             }
         }
 

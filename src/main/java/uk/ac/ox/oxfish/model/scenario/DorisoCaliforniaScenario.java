@@ -1,11 +1,17 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesDerisoInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -39,5 +45,14 @@ public class DorisoCaliforniaScenario extends CaliforniaAbstractScenario {
     @Override
     public AllocatedBiologyInitializer getBiologyInitializer() {
         return initializer;
+    }
+
+    @NotNull
+    @Override
+    protected ExogenousCatches turnIntoExogenousCatchesObject(
+            HashMap<Species, Double> recast) {
+
+            return new BiomassDrivenFixedExogenousCatches(recast);
+
     }
 }

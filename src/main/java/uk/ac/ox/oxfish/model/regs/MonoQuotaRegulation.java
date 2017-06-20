@@ -28,6 +28,11 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     private double quotaRemaining;
 
+    /**
+     * if this is set to anything above 0, then quota season is in this many days rather than yearly
+     */
+    private final int quotaPeriodInDays;
+
 
     /**
      * when created it sets itself to step every year to reset the quota
@@ -36,8 +41,14 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     //todo turn regulations into startable so they don't need a fish-state reference
     public MonoQuotaRegulation(double yearlyQuota) {
+
+        this(yearlyQuota,-1);
+    }
+
+    public MonoQuotaRegulation(double yearlyQuota, int quotaPeriodInDays) {
         this.yearlyQuota = yearlyQuota;
         this.quotaRemaining = yearlyQuota;
+        this.quotaPeriodInDays = quotaPeriodInDays;
     }
 
     private boolean isFishingStillAllowed(){
@@ -156,7 +167,10 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
     @Override
     public void start(FishState model, Fisher fisher) {
-        model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
+        if(quotaPeriodInDays<=0)
+            model.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
+        else
+            model.scheduleEveryXDay(this,StepOrder.POLICY_UPDATE,quotaPeriodInDays);
 
     }
 

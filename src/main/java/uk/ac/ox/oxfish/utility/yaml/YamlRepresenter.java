@@ -94,7 +94,7 @@ public class YamlRepresenter extends Representer
         this.representers.put(Coordinate.class,
                               data -> {
                                       Coordinate data1 = (Coordinate) data;
-                                      return representScalar(Tag.STR,data1.x +"," + data1.y);
+                                      return representScalar(Tag.STR,"x:"+data1.x +",y:" + data1.y);
                                   }
                               );
 

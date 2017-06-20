@@ -4,6 +4,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.util.regex.Pattern;
+
 import static org.junit.Assert.*;
 
 /**
@@ -27,8 +29,8 @@ public class PortListFactoryTest {
         assertEquals(dump.trim(),
                      "List of Ports:\n" +
                              "  ports:\n" +
-                             "    Washington: '0.0,0.0'\n" +
-                             "    Italy: '5.0,2.0'"
+                             "    Washington: 'x:0.0,y:0.0'\n" +
+                             "    Italy: 'x:5.0,y:2.0'"
                      );
 
     }
@@ -39,11 +41,16 @@ public class PortListFactoryTest {
 
 
         FishYAML yaml = new FishYAML();
+        System.out.println(Pattern.
+                matches("['\"]?x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*['\"]?","x:7.0,y:2.0"));
+
+
         PortListFactory factory = yaml.loadAs("List of Ports:\n" +
                                        "  ports:\n" +
-                                       "    Washington: 0.0,0.0\n" +
-                                       "    Italy: 7.0,2.0",
+                                       "    Washington: x:0.0,y:0.0\n" +
+                                       "    Italy: x:7.0,y:2.0",
                                PortListFactory.class);
+
 
         assertEquals(factory.getPorts().size(),2);
         assertEquals((int)factory.getPorts().get("Italy").x,7);

@@ -59,7 +59,7 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
     /**
      * we parse the file into a string that can be fed to delegate factories
      */
-    private String representMapAsString(List<Species> species, final HashMap<String, Double> toConvert){
+    public static String representMapAsString(List<Species> species, final HashMap<String, Double> toConvert){
 
         //we will use the string builder to build the string representation of the quota file
         StringBuilder representer = new StringBuilder();

@@ -38,7 +38,7 @@ public class YamlConstructor extends  Constructor {
             @Override
             public Object construct(Node node) {
                 String val = (String) constructScalar((ScalarNode) node);
-                String[] split = val.split(",");
+                String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
                 return new Coordinate(
                         Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
                         Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));

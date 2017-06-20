@@ -23,7 +23,7 @@ public class LocalOsmoseWithoutRecruitmentBiologyTest {
         biologyInitializer.getRecruitmentAges().put(2,0); //demersal1 recruits immediately
         biologyInitializer.getRecruitmentAges().put(3,10000); //demersal2 never recruits!
         biologyInitializer.getRecruitmentAges().put(4,1); //demersal3 recruits after 1 year
-        biologyInitializer.setPreInitializedConfiguration(true);
+        biologyInitializer.setPreInitializedConfiguration(false);
 
         scenario.setBiologyInitializer(biologyInitializer);
         scenario.setMapInitializer(new OsmoseMapInitializerFactory());

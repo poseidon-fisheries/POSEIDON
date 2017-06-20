@@ -6,6 +6,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import ec.util.MersenneTwisterFast;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
@@ -48,6 +49,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -420,7 +422,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
             }
             //start it!
-            AbundanceDrivenFixedExogenousCatches catches = new AbundanceDrivenFixedExogenousCatches(recast);
+
+            ExogenousCatches catches = turnIntoExogenousCatchesObject(recast);
             model.registerStartable(catches);
 
 
@@ -436,6 +439,9 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
     }
+
+    @NotNull
+    abstract protected ExogenousCatches turnIntoExogenousCatchesObject(HashMap<Species, Double> recast) ;
 
     /**
      * build the biology part!

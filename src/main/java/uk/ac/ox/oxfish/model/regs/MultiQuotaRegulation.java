@@ -41,6 +41,18 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     }
 
 
+    public MultiQuotaRegulation(double[] yearlyQuota, FishState state,
+                                int quotaPeriod) {
+        this.yearlyQuota = Arrays.copyOf(yearlyQuota,yearlyQuota.length);
+        this.quotaRemaining = Arrays.copyOf(yearlyQuota,yearlyQuota.length);
+        for (double aQuotaRemaining : quotaRemaining) {
+            assert aQuotaRemaining >= 0;
+        }
+        this.state = state;
+        this.state.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE,quotaPeriod);
+    }
+
+
     public boolean isFishingStillAllowed(){
 
         //all quotas must be at least 0 and at least one must be ABOVE 0

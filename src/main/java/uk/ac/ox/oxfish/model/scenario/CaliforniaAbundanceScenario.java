@@ -6,6 +6,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import ec.util.MersenneTwisterFast;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.field.geo.GeomGridField;
@@ -50,6 +51,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -267,6 +269,13 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
     @Override
     public AllocatedBiologyInitializer getBiologyInitializer() {
         return initializer;
+    }
+
+    @NotNull
+    @Override
+    protected ExogenousCatches turnIntoExogenousCatchesObject(
+            HashMap<Species, Double> catchesPerSpecies) {
+        return new AbundanceDrivenFixedExogenousCatches(catchesPerSpecies);
     }
 }
 

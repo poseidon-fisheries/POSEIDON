@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.event;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.OneSpecieGear;
@@ -37,6 +38,16 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches
         OneSpecieGear gear = new OneSpecieGear(target,proportionToCatch);
         //catch it
         Catch fish = gear.fish(null, tile, 1, model.getBiology());
+        //round to be supersafe
+        if(fish.totalCatchWeight()>tile.getBiomass(target)) {
+            //should be by VERY little!
+            assert tile.getBiomass(target) + FishStateUtilities.EPSILON > fish.getTotalWeight();
+            assert proportionToCatch >=1.0;
+            //bound it to what is available
+            fish = new Catch(target,tile.getBiomass(target),model.getBiology());
+            assert (fish.totalCatchWeight()<=tile.getBiomass(target));
+        }
+        assert (fish.totalCatchWeight()<=tile.getBiomass(target));
         tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
         return fish;
     }

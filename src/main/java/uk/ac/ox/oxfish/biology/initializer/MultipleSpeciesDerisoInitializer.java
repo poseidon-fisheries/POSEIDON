@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
@@ -227,6 +228,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                 LinkedList<Double> scaledEmpiricalBiomasses = new LinkedList<>(parameter.getEmpiricalYearlyBiomasses());
                 scaledEmpiricalBiomasses.replaceAll(original -> original * totalWeight);
                 currentBiomass = scaledEmpiricalBiomasses.get(scaledEmpiricalBiomasses.size()-1);
+
                 //hopefully biomass sums up in the end!
                 assert localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
                     @Override
@@ -318,10 +320,10 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             assert bio.getKey().getCarryingCapacity(species) == 0;
             assert bio.getKey().getBiomass(species) == 0;
             bio.getKey().setCarryingCapacity(species,
-                                             bio.getValue() *
+                                             weights.get(bio.getKey()) *
                                                      virginBiomass);
             assert bio.getKey().getBiomass(species) == 0;
-            bio.getKey().setCurrentBiomass(species, currentBiomass);
+            bio.getKey().setCurrentBiomass(species, weights.get(bio.getKey()) * currentBiomass);
         }
     }
 
@@ -335,5 +337,10 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
     public Function<SeaTile, Double> putAllocator(
             Species key, Function<SeaTile, Double> value) {
         return allocators.put(key, value);
+    }
+
+    @VisibleForTesting
+    public HashMap<Species, DerisoSchnuteCommonGrower> getNaturalProcesses() {
+        return naturalProcesses;
     }
 }
