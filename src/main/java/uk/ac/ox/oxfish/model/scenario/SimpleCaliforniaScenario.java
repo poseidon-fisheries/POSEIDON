@@ -127,6 +127,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
         PortListFactory ports = new PortListFactory();
         ports.getPorts().clear();
         ports.getPorts().put("Washington",new Coordinate(10,0));
+        ports.getPorts().put("Oregon",new Coordinate(10,49));
         ports.getPorts().put("California",new Coordinate(10,99));
         this.setPorts(ports);
 
@@ -141,7 +142,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
     protected Supplier<Port> getLargePortSupplier(
             MersenneTwisterFast random, Port[] ports) {
         //random
-        return () -> ports[random.nextInt(ports.length)];
+        return () -> ports[random.nextInt(ports.length-1)+1];
     }
 
     @Override

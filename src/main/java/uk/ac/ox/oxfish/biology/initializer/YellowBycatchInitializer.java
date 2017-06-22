@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * The map initializer for the two species mpa vs itq example with abundance-driven
@@ -50,14 +51,24 @@ public class YellowBycatchInitializer implements BiologyInitializer {
 
 
     /**
-     * any cell with x >= verticalSeparator will include the bycatch species
+     * any cell with x >= habitatSeparator will include the bycatch species
      */
-    final private int verticalSeparator;
+    final private int habitatSeparator;
+
+
+    private final int northSouthSeparator;
+
+
+    /**
+     * returns a relative weight (will be normalized by the initializer) describing how much of the
+     * initial biomass and K is allocated to each seatile!
+     */
+    private final Function<SeaTile,Double> allocator;
 
     /**
      * bycatch tiles
      */
-    private List<BiomassLocalBiology> bycatchBios = new LinkedList<>();
+    private Map<SeaTile,BiomassLocalBiology> bycatchBios = new HashMap<>();
 
     /**
      * northern tiles
@@ -100,7 +111,31 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             double bycatchInitialRecruits, double targetRho, double targetNaturalSurvivalRate,
             double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
             double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double initialVirginRecruits,
-            int verticalSeparator) {
+            int habitatSeparator, int northSouthSeparator) {
+        this(separateBycatchStock, targetSpeciesName, bycatchSpeciesName, bycatchRho,
+             bycatchNaturalSurvivalRate, bycatchRecruitmentSteepness, bycatchRecruitmentLag,
+             bycatchWeightAtRecruitment, bycatchWeightAtRecruitmentMinus1, bycatchVirginBiomass,
+             bycatchInitialRecruits, targetRho, targetNaturalSurvivalRate,
+             targetRecruitmentSteepness, targetRecruitmentLag, targetWeightAtRecruitment,
+             targetWeightAtRecruitmentMinus1, targetVirginBiomass, initialVirginRecruits,
+             habitatSeparator, northSouthSeparator, new Function<SeaTile, Double>() {
+                    @Override
+                    public Double apply(SeaTile seaTile) {
+                        return 1d;
+                    }
+                });
+    }
+
+
+    public YellowBycatchInitializer(
+            boolean separateBycatchStock, String targetSpeciesName, String bycatchSpeciesName, double bycatchRho,
+            double bycatchNaturalSurvivalRate, double bycatchRecruitmentSteepness, int bycatchRecruitmentLag,
+            double bycatchWeightAtRecruitment, double bycatchWeightAtRecruitmentMinus1, double bycatchVirginBiomass,
+            double bycatchInitialRecruits, double targetRho, double targetNaturalSurvivalRate,
+            double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
+            double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double initialVirginRecruits,
+            int habitatSeparator, int northSouthSeparator,
+            Function<SeaTile,Double> allocator) {
         this.separateBycatchStock = separateBycatchStock;
         this.targetSpeciesName = targetSpeciesName;
         this.bycatchSpeciesName = bycatchSpeciesName;
@@ -120,8 +155,11 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         this.targetWeightAtRecruitmentMinus1 = targetWeightAtRecruitmentMinus1;
         this.targetVirginBiomass = targetVirginBiomass;
         this.initialVirginRecruits = initialVirginRecruits;
-        this.verticalSeparator = verticalSeparator;
+        this.habitatSeparator = habitatSeparator;
+        this.northSouthSeparator = northSouthSeparator;
+        this.allocator = allocator;
     }
+
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
@@ -145,12 +183,12 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         BiomassLocalBiology bio = new BiomassLocalBiology(0d,2,random);
 
         //will it contain the bycatch?
-        if(seaTile.getGridX()>=verticalSeparator) {
-            bycatchBios.add(bio);
+        if(seaTile.getGridX()>= habitatSeparator) {
+            bycatchBios.put(seaTile,bio);
 
         }
 
-        if(seaTile.getGridY()<=mapHeightInCells/2)
+        if(seaTile.getGridY()<=northSouthSeparator)
             northBiologies.add(bio);
         else
             southBiologies.add(bio);
@@ -184,21 +222,32 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         double targetBiomass = historicalTargetBiomass == null ? targetVirginBiomass :
                 historicalTargetBiomass.get(historicalTargetBiomass.size()-1);
         targetBiomass /= targetContainers;
+
+        //carrying capacity is assigned by weight
         double carryingCapacityTarget = targetVirginBiomass / targetContainers;
         double bycatchBiomass = historicalBycatchBiomass  == null ?
                 bycatchVirginBiomass : historicalBycatchBiomass.get(historicalBycatchBiomass.size()-1);
-        double carryingCapacityBycatch = bycatchVirginBiomass / bycatchContainers;
-        bycatchBiomass /= bycatchContainers;
 
+
+        //assign weights!
+        Map<BiomassLocalBiology,Double> weights = new HashMap<>();
+        double weightSum = 0;
+        for (Map.Entry<SeaTile, BiomassLocalBiology> bycatchBio : bycatchBios.entrySet()) {
+            double weight = allocator.apply(bycatchBio.getKey());
+            weights.put(bycatchBio.getValue(),weight);
+            weightSum+=weight;
+        }
 
         for(BiomassLocalBiology bio : allBiologies)
         {
             bio.setCarryingCapacity(biology.getSpecie(0),carryingCapacityTarget);
             bio.setCurrentBiomass(biology.getSpecie(0),targetBiomass);
-            if(bycatchBios.contains(bio))
+            if(bycatchBios.values().contains(bio))
             {
-                bio.setCarryingCapacity(biology.getSpecie(1),carryingCapacityBycatch);
-                bio.setCurrentBiomass(biology.getSpecie(1),bycatchBiomass);
+                assert weights.containsKey(bio);
+                double weight = weights.get(bio)/weightSum;
+                bio.setCarryingCapacity(biology.getSpecie(1),bycatchVirginBiomass*weight);
+                bio.setCurrentBiomass(biology.getSpecie(1),bycatchBiomass*weight);
             }
         }
 
@@ -213,7 +262,9 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         //make sure we allocated the right amount of biomass
         assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCurrentBiomass()[0]).sum() -
                                 historicalTargetBiomass.get(historicalTargetBiomass.size()-1)) < FishStateUtilities.EPSILON;
-        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCarryingCapacity(0)).sum() - targetVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(allBiologies.stream().mapToDouble(value -> value.getCarryingCapacity(0)).sum() -
+                                targetVirginBiomass) <
+                FishStateUtilities.EPSILON;
         DerisoSchnuteCommonGrower targetGrower = new DerisoSchnuteCommonGrower(
                 historicalTargetBiomass,
                 historicalTargetSurvivalRate,
@@ -230,9 +281,9 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         targetGrower.getBiologies().addAll(southBiologies);
         model.registerStartable(targetGrower);
 
-        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -
+        assert Math.abs(bycatchBios.values().stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -
                                 historicalBycatchBiomass.get(historicalBycatchBiomass.size()-1)) < FishStateUtilities.EPSILON;
-        assert Math.abs(bycatchBios.stream().mapToDouble(value -> value.getCarryingCapacity(1)).sum() - bycatchVirginBiomass) < FishStateUtilities.EPSILON;
+        assert Math.abs(bycatchBios.values().stream().mapToDouble(value -> value.getCarryingCapacity(1)).sum() - bycatchVirginBiomass) < FishStateUtilities.EPSILON;
         //bycatch growers
         if(!separateBycatchStock)
         {
@@ -250,15 +301,15 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                     bycatchWeightAtRecruitmentMinus1,
                     bycatchInitialRecruits
             );
-            unifiedBycatchGrower.getBiologies().addAll(bycatchBios);
+            unifiedBycatchGrower.getBiologies().addAll(bycatchBios.values());
             model.registerStartable(unifiedBycatchGrower);
         }
         else
         {
 
-            List<BiomassLocalBiology> southBycatch = new LinkedList<>(bycatchBios);
+            List<BiomassLocalBiology> southBycatch = new LinkedList<>(bycatchBios.values());
             southBycatch.removeAll(northBiologies);
-            List<BiomassLocalBiology> northBycatch = new LinkedList<>(bycatchBios);
+            List<BiomassLocalBiology> northBycatch = new LinkedList<>(bycatchBios.values());
             northBycatch.removeAll(southBiologies);
 
 
@@ -439,12 +490,12 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         return initialVirginRecruits;
     }
 
-    public int getVerticalSeparator() {
-        return verticalSeparator;
+    public int getHabitatSeparator() {
+        return habitatSeparator;
     }
 
-    public List<BiomassLocalBiology> getBycatchBios() {
-        return bycatchBios;
+    public Collection<BiomassLocalBiology> getBycatchBios() {
+        return bycatchBios.values();
     }
 
     public List<BiomassLocalBiology> getNorthBiologies() {
@@ -528,4 +579,15 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     public void setHistoricalBycatchSurvivalRate(List<Double> historicalBycatchSurvivalRate) {
         this.historicalBycatchSurvivalRate = historicalBycatchSurvivalRate;
     }
+
+    /**
+     * Getter for property 'northSouthSeparator'.
+     *
+     * @return Value for property 'northSouthSeparator'.
+     */
+    public int getNorthSouthSeparator() {
+        return northSouthSeparator;
+    }
+
+
 }

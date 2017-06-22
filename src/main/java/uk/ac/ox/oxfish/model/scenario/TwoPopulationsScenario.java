@@ -164,8 +164,12 @@ public class TwoPopulationsScenario implements Scenario{
     /**
      * factory to produce fishing strategy
      */
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategyLarge =
             new MaximumStepsFactory();
+
+    private AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall =
+            new MaximumStepsFactory();
+
 
     private AlgorithmFactory<? extends GearStrategy> gearStrategy =
             new FixedGearStrategyFactory();
@@ -318,7 +322,7 @@ public class TwoPopulationsScenario implements Scenario{
                 regulationSmall,
                 departingStrategySmall,
                 destinationStrategySmall,
-                fishingStrategy,
+                fishingStrategySmall,
                 discardingStrategySmall,
                 gearStrategy,
                 weatherStrategy,
@@ -337,7 +341,7 @@ public class TwoPopulationsScenario implements Scenario{
                 separateRegulations ? regulationLarge : regulationSmall,
                 departingStrategyLarge,
                 destinationStrategyLarge,
-                fishingStrategy,
+                fishingStrategyLarge,
                 discardingStrategyLarge,
                 gearStrategy,
                 weatherStrategy,
@@ -678,13 +682,13 @@ public class TwoPopulationsScenario implements Scenario{
         this.destinationStrategyLarge = destinationStrategyLarge;
     }
 
-    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
-        return fishingStrategy;
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategyLarge() {
+        return fishingStrategyLarge;
     }
 
-    public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
-        this.fishingStrategy = fishingStrategy;
+    public void setFishingStrategyLarge(
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategyLarge) {
+        this.fishingStrategyLarge = fishingStrategyLarge;
     }
 
     public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
@@ -874,5 +878,24 @@ public class TwoPopulationsScenario implements Scenario{
      */
     public void setAllowTwoPopulationFriendships(boolean allowTwoPopulationFriendships) {
         this.allowTwoPopulationFriendships = allowTwoPopulationFriendships;
+    }
+
+    /**
+     * Getter for property 'fishingStrategySmall'.
+     *
+     * @return Value for property 'fishingStrategySmall'.
+     */
+    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategySmall() {
+        return fishingStrategySmall;
+    }
+
+    /**
+     * Setter for property 'fishingStrategySmall'.
+     *
+     * @param fishingStrategySmall Value to set for property 'fishingStrategySmall'.
+     */
+    public void setFishingStrategySmall(
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall) {
+        this.fishingStrategySmall = fishingStrategySmall;
     }
 }

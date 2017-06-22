@@ -293,4 +293,40 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     public void setHistoricalBycatchSurvival(List<Double> historicalBycatchSurvival) {
         this.historicalBycatchSurvival = historicalBycatchSurvival;
     }
+
+    /**
+     * Getter for property 'northSouthSeparator'.
+     *
+     * @return Value for property 'northSouthSeparator'.
+     */
+    public DoubleParameter getNorthSouthSeparator() {
+        return factory.getNorthSouthSeparator();
+    }
+
+    /**
+     * Setter for property 'northSouthSeparator'.
+     *
+     * @param northSouthSeparator Value to set for property 'northSouthSeparator'.
+     */
+    public void setNorthSouthSeparator(DoubleParameter northSouthSeparator) {
+        factory.setNorthSouthSeparator(northSouthSeparator);
+    }
+
+    /**
+     * Getter for property 'proportionOfBycatchNorth'.
+     *
+     * @return Value for property 'proportionOfBycatchNorth'.
+     */
+    public DoubleParameter getProportionOfBycatchNorth() {
+        return factory.getProportionOfBycatchNorth();
+    }
+
+    /**
+     * Setter for property 'proportionOfBycatchNorth'.
+     *
+     * @param proportionOfBycatchNorth Value to set for property 'proportionOfBycatchNorth'.
+     */
+    public void setProportionOfBycatchNorth(DoubleParameter proportionOfBycatchNorth) {
+        factory.setProportionOfBycatchNorth(proportionOfBycatchNorth);
+    }
 }

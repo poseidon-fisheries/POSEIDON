@@ -117,10 +117,15 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
         double secondSpeciesRatio = ratioFirstToSecondSpecies.apply(random);
         Preconditions.checkArgument(firstSpeciesCapacity > 0);
         Preconditions.checkArgument(secondSpeciesRatio>=0);
-        Preconditions.checkArgument(secondSpeciesRatio<=1);
+   //     Preconditions.checkArgument(secondSpeciesRatio<=1);
         double secondSpeciesCapacity;
         if(secondSpeciesRatio == 1)
             secondSpeciesCapacity = firstSpeciesCapacity;
+        else if(secondSpeciesRatio>1)
+        {
+            secondSpeciesCapacity = secondSpeciesRatio* firstSpeciesCapacity;
+
+        }
         else
             secondSpeciesCapacity = firstSpeciesCapacity *
                     secondSpeciesRatio/(1-secondSpeciesRatio);

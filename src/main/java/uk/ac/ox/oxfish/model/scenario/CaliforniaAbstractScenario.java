@@ -172,6 +172,9 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
             new PerTripImitativeDestinationFactory();
+    {
+        ((PerTripImitativeDestinationFactory) destinationStrategy).setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+    }
     /**
      * factory to produce fishing strategy
      */
@@ -238,6 +241,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 {
                     String name = folder.getFileName().toString();
                     spatialFiles.put(name, file);
+
+                    /*
                     Preconditions.checkArgument(folder.resolve("count.csv").toFile().exists(),
                                                 "The folder "+ name +
                                                         "  doesn't contain the abundance count.csv");
@@ -245,7 +250,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     Preconditions.checkArgument(folder.resolve("meristics.yaml").toFile().exists(),
                                                 "The folder "+ name +
                                                         "  doesn't contain the abundance count.csv");
-
+*/
                     folderMap.put(folder.getFileName().toString(),folder);
                 }
                 else

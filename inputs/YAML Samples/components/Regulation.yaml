@@ -14,7 +14,7 @@ MPA Chromosome:
 MPA with fine:
   beingCaughtProbability: 1,.2
   canContemplateCheating: false
-  hourlyFines: '100,2000'
+  hourlyFines: 100,2000
   mpas:
   - height: 5
     topLeftX: 0

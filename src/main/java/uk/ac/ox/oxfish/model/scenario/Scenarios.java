@@ -41,11 +41,11 @@ public class Scenarios {
         DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
 
 
-       /* SCENARIOS.put("Simple California",new SimpleCaliforniaScenario());
-        DESCRIPTIONS.put("Simple California","California Scenario for the masses!");
-*/
-   SCENARIOS.put("Simple California",new DorisoCaliforniaScenario());
-        DESCRIPTIONS.put("Simple California","California Scenario for the masses!");
+        SCENARIOS.put("Policy California",new SimpleCaliforniaScenario());
+        DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
+
+   SCENARIOS.put("Simple California",new DerisoCaliforniaScenario());
+        DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
 
 
     }

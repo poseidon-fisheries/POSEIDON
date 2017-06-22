@@ -2,7 +2,7 @@ Fixed Price Market:
   marketPrice: '10.0'
 -------
 Fixed Price Market Array:
-  prices: '10,10'
+  prices: 10,10
 -------
 Congested Market:
   acceptableBiomassThreshold: '7000.0'

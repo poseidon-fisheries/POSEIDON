@@ -23,6 +23,8 @@ public class FishingStrategies {
 
         CONSTRUCTORS.put("Fish Once", FishOnceFactory::new);
         NAMES.put(FishOnceFactory.class,"Fish Once");
+        CONSTRUCTORS.put("Tow Limit", TowLimitFactory::new);
+        NAMES.put(TowLimitFactory.class,"Tow Limit");
         CONSTRUCTORS.put("Fish Until Full", FishUntilFullFactory::new);
         NAMES.put(FishUntilFullFactory.class,"Fish Until Full");
         CONSTRUCTORS.put("Until Full With Day Limit", MaximumStepsFactory::new);

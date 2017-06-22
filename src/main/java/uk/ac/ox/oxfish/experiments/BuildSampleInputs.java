@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.initializer.DerisoParameters;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
@@ -67,6 +68,7 @@ public class  BuildSampleInputs
             writer.close();
 
         }
+
 
 
 
@@ -141,6 +143,8 @@ public class  BuildSampleInputs
         objectStream.writeObject(sampledMap);
         objectStream.close();
 
+
+        DerisoParameters.main(null);
     }
 
 

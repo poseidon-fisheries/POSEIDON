@@ -21,6 +21,7 @@ Abstract:
       backtracksOnBadExploration: true
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
+      ignoreFailedTrips: false
       objectiveFunction:
         Hourly Profit Objective:
           opportunityCosts: true

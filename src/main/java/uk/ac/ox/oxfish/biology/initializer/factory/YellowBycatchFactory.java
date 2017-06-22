@@ -1,10 +1,13 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import uk.ac.ox.oxfish.biology.initializer.YellowBycatchInitializer;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.function.Function;
 
 /**
  * Created by carrknight on 1/21/17.
@@ -59,12 +62,17 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(1.2197524018851934E7);
 
 
+
+    private DoubleParameter northSouthSeparator = new FixedDoubleParameter(50);
+
     /**
      * any cell with x >= verticalSeparator will include the bycatch species
      */
     private DoubleParameter verticalSeparator
             = new FixedDoubleParameter(25);
 
+
+    private DoubleParameter proportionOfBycatchNorth = new FixedDoubleParameter(1d);
 
     /**
      * Applies this function to the given argument.
@@ -74,6 +82,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      */
     @Override
     public YellowBycatchInitializer apply(FishState state) {
+        int northSouthSeparator = this.northSouthSeparator.apply(state.getRandom()).intValue();
         return new YellowBycatchInitializer(
                 separateBycatchStock,
                 targetSpeciesName,
@@ -94,7 +103,17 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
                 targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
                 targetVirginBiomass.apply(state.getRandom()),
                 targetInitialRecruits.apply(state.getRandom()),
-                verticalSeparator.apply(state.getRandom()).intValue());
+                verticalSeparator.apply(state.getRandom()).intValue(),
+                northSouthSeparator,
+                new Function<SeaTile, Double>() {
+                    @Override
+                    public Double apply(SeaTile seaTile) {
+                        if(seaTile.getGridY() < northSouthSeparator)
+                            return proportionOfBycatchNorth.apply(state.getRandom());
+                        else
+                            return 1d;
+                    }
+                });
     }
 
 
@@ -259,5 +278,42 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     public void setVerticalSeparator(DoubleParameter verticalSeparator) {
         this.verticalSeparator = verticalSeparator;
+    }
+
+
+    /**
+     * Getter for property 'northSouthSeparator'.
+     *
+     * @return Value for property 'northSouthSeparator'.
+     */
+    public DoubleParameter getNorthSouthSeparator() {
+        return northSouthSeparator;
+    }
+
+    /**
+     * Setter for property 'northSouthSeparator'.
+     *
+     * @param northSouthSeparator Value to set for property 'northSouthSeparator'.
+     */
+    public void setNorthSouthSeparator(DoubleParameter northSouthSeparator) {
+        this.northSouthSeparator = northSouthSeparator;
+    }
+
+    /**
+     * Getter for property 'proportionOfBycatchNorth'.
+     *
+     * @return Value for property 'proportionOfBycatchNorth'.
+     */
+    public DoubleParameter getProportionOfBycatchNorth() {
+        return proportionOfBycatchNorth;
+    }
+
+    /**
+     * Setter for property 'proportionOfBycatchNorth'.
+     *
+     * @param proportionOfBycatchNorth Value to set for property 'proportionOfBycatchNorth'.
+     */
+    public void setProportionOfBycatchNorth(DoubleParameter proportionOfBycatchNorth) {
+        this.proportionOfBycatchNorth = proportionOfBycatchNorth;
     }
 }

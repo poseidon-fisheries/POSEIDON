@@ -66,6 +66,10 @@ Heterogeneous Selectivity Gear:
   gears: {
     }
 -------
+Abundance Fixed Proportion Gear:
+  averageCatchability: '1.0E-4'
+  litersOfGasConsumed: '0.0'
+-------
 Garbage Gear:
   delegate:
     Fixed Proportion:

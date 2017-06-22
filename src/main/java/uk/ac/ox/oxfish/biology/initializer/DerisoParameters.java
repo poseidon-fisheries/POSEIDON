@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by carrknight on 6/14/17.
@@ -50,6 +52,7 @@ public class DerisoParameters {
         this.weightAtRecruitment = weightAtRecruitment;
         this.weightAtRecruitmentMinus1 = weightAtRecruitmentMinus1;
         this.virginBiomass = virginBiomass;
+        updateLastRecruits();
     }
 
     public DerisoParameters() {
@@ -289,15 +292,144 @@ public class DerisoParameters {
         );
 
 
+        ArrayList<Double> doverSoleBiomassTo2004 = Lists.newArrayList(
+                454464.737022236,
+                454455.142355372,
+                454436.377120975,
+                454408.876243331,
+                454373.078957402,
+                454329.423511648,
+                454282.372675649,
+                454145.340678537,
+                453984.473276064,
+                453822.837315264,
+                453694.58541101,
+                453488.861051895,
+                453125.841149793,
+                452719.035543256,
+                452142.008495977,
+                451525.850519319,
+                450950.637539372,
+                450253.298381689,
+                449609.550822611,
+                448878.545424562,
+                448255.185338069,
+                447793.86961712,
+                447397.543437443,
+                447077.960004407,
+                446739.86536601,
+                446402.748504238,
+                446134.091812606,
+                445793.126972236,
+                445610.893536505,
+                444968.077986714,
+                444410.687519543,
+                443918.803878762,
+                443163.181321141,
+                440423.069546259,
+                439826.799006746,
+                438702.980467699,
+                437031.044365195,
+                435949.483333867,
+                432472.802541433,
+                428903.709179953,
+                423310.217443121,
+                417535.860537664,
+                411113.001350118,
+                408223.395679606,
+                404755.29283876,
+                401929.684310981,
+                399119.011449303,
+                396742.302766497,
+                394817.911244725,
+                392392.719261325,
+                388753.974890726,
+                386636.617058695,
+                383857.942095367,
+                380596.158596699,
+                378017.251547112,
+                375861.695162321,
+                373998.798854156,
+                373729.288471648,
+                372383.302890545,
+                368519.905311815,
+                363878.659273728,
+                359735.901233916,
+                352413.228656262,
+                345944.188758797,
+                340779.619773305,
+                334633.081784908,
+                327618.182576658,
+                321754.562233162,
+                315303.921831028,
+                305427.62577773,
+                299718.716939682,
+                292007.262213911,
+                280361.944707722,
+                270124.80803812,
+                261117.775921805,
+                251249.614537102,
+                244921.819809234,
+                237880.689724215,
+                231466.172631371,
+                224741.741260429,
+                221291.34226459,
+                215532.635261772,
+                212149.129362457,
+                210546.998093771,
+                213865.500684878,
+                215908.178258886,
+                216290.842875025,
+                218632.180749449,
+                222943.697476257,
+                225965.127696632,
+                229202.642755269,
+                234113.947619391,
+                239438.493035321,
+                243521.0191812);
+        //that's in metric tonnes, we want them in kg
+        for(int i=0; i<doverSoleBiomassTo2004.size(); i++)
+            doverSoleBiomassTo2004.set(i,doverSoleBiomassTo2004.get(i)*1000d);
+
+        DerisoParameters sole = new DerisoParameters(
+                (List<Double>) doverSoleBiomassTo2004,
+                (List<Double>) Lists.newArrayList(
+                        0.885791668526681,
+        0.888626296064829
+
+                ),
+                0.965,
+                .914,
+                0.8,
+                8,
+                0.314,
+                0.2674,
+                454464.737022236d
+        );
+
+
 
         yaml.dump(
-                longspineThornyheads,
+                sole,
+                new FileWriter(
+                        Paths.get("inputs","simple_california",
+                                  "biology","Dover Sole","deriso.yaml")
+                                .toFile()
+                )
+        );
+        //todo add numbers till 2011
+
+
+        yaml.dump(
+                sole,
                 new FileWriter(
                         Paths.get("inputs","california",
                                   "biology","Dover Sole","deriso.yaml")
                                 .toFile()
                 )
         );
+
+
         yaml.dump(
                 longspineThornyheads,
                 new FileWriter(
@@ -391,4 +523,9 @@ public class DerisoParameters {
         this.virginBiomass = virginBiomass;
     }
 
+
+    @Deprecated
+    public void setLastRecruits(double lastRecruits) {
+        this.lastRecruits = lastRecruits;
+    }
 }
