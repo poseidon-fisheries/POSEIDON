@@ -4,10 +4,12 @@ import uk.ac.ox.oxfish.biology.initializer.YellowBycatchInitializer;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by carrknight on 1/21/17.
@@ -20,7 +22,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private String bycatchSpeciesName  = "Yelloweye Rockfish";
 
-    private DoubleParameter bycatchRho = new FixedDoubleParameter(1.03);
+    private DoubleParameter bycatchRho = new FixedDoubleParameter(0.981194230283006d);
 
     private DoubleParameter bycatchNaturalSurvivalRate = new FixedDoubleParameter(0.95504);
 
@@ -36,7 +38,7 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
 
-    private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(54.44606 * 1000d);
+    private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(150.48 * 1000d);
 
 
 
@@ -74,6 +76,11 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter proportionOfBycatchNorth = new FixedDoubleParameter(1d);
 
+
+    private DoubleParameter diffusingRate = new FixedDoubleParameter(.0001);
+
+    private Locker<FishState,YellowBycatchInitializer> instance = new Locker<>();
+
     /**
      * Applies this function to the given argument.
      *
@@ -83,37 +90,45 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
     @Override
     public YellowBycatchInitializer apply(FishState state) {
         int northSouthSeparator = this.northSouthSeparator.apply(state.getRandom()).intValue();
-        return new YellowBycatchInitializer(
-                separateBycatchStock,
-                targetSpeciesName,
-                bycatchSpeciesName,
-                bycatchRho.apply(state.getRandom()),
-                bycatchNaturalSurvivalRate.apply(state.getRandom()),
-                bycatchRecruitmentSteepness.apply(state.getRandom()),
-                bycatchRecruitmentLag.apply(state.getRandom()).intValue(),
-                bycatchWeightAtRecruitment.apply(state.getRandom()),
-                bycatchWeightAtRecruitmentMinus1.apply(state.getRandom()),
-                bycatchVirginBiomass.apply(state.getRandom()),
-                bycatchInitialRecruits.apply(state.getRandom()),
-                targetRho.apply(state.getRandom()),
-                targetNaturalSurvivalRate.apply(state.getRandom()),
-                targetRecruitmentSteepness.apply(state.getRandom()),
-                targetRecruitmentLag.apply(state.getRandom()).intValue(),
-                targetWeightAtRecruitment.apply(state.getRandom()),
-                targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
-                targetVirginBiomass.apply(state.getRandom()),
-                targetInitialRecruits.apply(state.getRandom()),
-                verticalSeparator.apply(state.getRandom()).intValue(),
-                northSouthSeparator,
-                new Function<SeaTile, Double>() {
-                    @Override
-                    public Double apply(SeaTile seaTile) {
-                        if(seaTile.getGridY() < northSouthSeparator)
-                            return proportionOfBycatchNorth.apply(state.getRandom());
-                        else
-                            return 1d;
-                    }
-                });
+        return instance.presentKey(state,
+                            new Supplier<YellowBycatchInitializer>() {
+                                @Override
+                                public YellowBycatchInitializer get() {
+                                    return new YellowBycatchInitializer(
+                                            separateBycatchStock,
+                                            targetSpeciesName,
+                                            bycatchSpeciesName,
+                                            bycatchRho.apply(state.getRandom()),
+                                            bycatchNaturalSurvivalRate.apply(state.getRandom()),
+                                            bycatchRecruitmentSteepness.apply(state.getRandom()),
+                                            bycatchRecruitmentLag.apply(state.getRandom()).intValue(),
+                                            bycatchWeightAtRecruitment.apply(state.getRandom()),
+                                            bycatchWeightAtRecruitmentMinus1.apply(state.getRandom()),
+                                            bycatchVirginBiomass.apply(state.getRandom()),
+                                            bycatchInitialRecruits.apply(state.getRandom()),
+                                            targetRho.apply(state.getRandom()),
+                                            targetNaturalSurvivalRate.apply(state.getRandom()),
+                                            targetRecruitmentSteepness.apply(state.getRandom()),
+                                            targetRecruitmentLag.apply(state.getRandom()).intValue(),
+                                            targetWeightAtRecruitment.apply(state.getRandom()),
+                                            targetWeightAtRecruitmentMinus1.apply(state.getRandom()),
+                                            targetVirginBiomass.apply(state.getRandom()),
+                                            targetInitialRecruits.apply(state.getRandom()),
+                                            verticalSeparator.apply(state.getRandom()).intValue(),
+                                            northSouthSeparator,
+                                            new Function<SeaTile, Double>() {
+                                                @Override
+                                                public Double apply(SeaTile seaTile) {
+                                                    if(seaTile.getGridY() < northSouthSeparator)
+                                                        return proportionOfBycatchNorth.apply(state.getRandom());
+                                                    else
+                                                        return 1d;
+                                                }
+                                            },
+                                            diffusingRate.apply(state.getRandom()));
+                                }
+                            });
+
     }
 
 
@@ -315,5 +330,32 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
      */
     public void setProportionOfBycatchNorth(DoubleParameter proportionOfBycatchNorth) {
         this.proportionOfBycatchNorth = proportionOfBycatchNorth;
+    }
+
+    public YellowBycatchInitializer retrieveLastMade(){
+        return instance.presentKey(instance.getCurrentKey(), new Supplier<YellowBycatchInitializer>() {
+            @Override
+            public YellowBycatchInitializer get() {
+                throw new RuntimeException("Not instantiated yet!");
+            }
+        });
+    }
+
+    /**
+     * Getter for property 'diffusingRate'.
+     *
+     * @return Value for property 'diffusingRate'.
+     */
+    public DoubleParameter getDiffusingRate() {
+        return diffusingRate;
+    }
+
+    /**
+     * Setter for property 'diffusingRate'.
+     *
+     * @param diffusingRate Value to set for property 'diffusingRate'.
+     */
+    public void setDiffusingRate(DoubleParameter diffusingRate) {
+        this.diffusingRate = diffusingRate;
     }
 }

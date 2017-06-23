@@ -32,6 +32,13 @@ public class DiscardingStrategies {
         NAMES.put(DiscardingAllUnsellableFactory.class,
                   "Discarding All Unsellable");
 
+
+        CONSTRUCTORS.put("Specific Discarding",
+                         AlwaysDiscardTheseSpeciesFactory::new
+        );
+        NAMES.put(AlwaysDiscardTheseSpeciesFactory.class,
+                  "Specific Discarding");
+
     }
 
 }

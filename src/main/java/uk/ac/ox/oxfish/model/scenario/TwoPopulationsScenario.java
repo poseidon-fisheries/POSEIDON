@@ -15,6 +15,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -198,6 +199,11 @@ public class TwoPopulationsScenario implements Scenario{
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
 
+    private DoubleParameter hourlyTravellingCostLarge = new FixedDoubleParameter(0);
+
+    private DoubleParameter hourlyTravellingCostSmall = new FixedDoubleParameter(0);
+
+
     private List<StartingMPA> startingMPAs  = new LinkedList<>();
     {
         //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
@@ -368,6 +374,10 @@ public class TwoPopulationsScenario implements Scenario{
                 fisher.getTags().add("small");
                 fisher.getTags().add("yellow");
                 fisher.getTags().add("canoe");
+                //add hourly cost
+                fisher.getAdditionalTripCosts().add(
+                        new HourlyCost(hourlyTravellingCostSmall.apply(model.getRandom()))
+                );
             }
         });
         largeFishersFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
@@ -376,8 +386,13 @@ public class TwoPopulationsScenario implements Scenario{
                 fisher.getTags().add("large");
                 fisher.getTags().add("ship");
                 fisher.getTags().add("red");
+                fisher.getAdditionalTripCosts().add(
+                        new HourlyCost(hourlyTravellingCostLarge.apply(model.getRandom()))
+                );
             }
         });
+
+
 
 
 
@@ -897,5 +912,79 @@ public class TwoPopulationsScenario implements Scenario{
     public void setFishingStrategySmall(
             AlgorithmFactory<? extends FishingStrategy> fishingStrategySmall) {
         this.fishingStrategySmall = fishingStrategySmall;
+    }
+
+    /**
+     * Getter for property 'hourlyTravellingCostLarge'.
+     *
+     * @return Value for property 'hourlyTravellingCostLarge'.
+     */
+    public DoubleParameter getHourlyTravellingCostLarge() {
+        return hourlyTravellingCostLarge;
+    }
+
+    /**
+     * Setter for property 'hourlyTravellingCostLarge'.
+     *
+     * @param hourlyTravellingCostLarge Value to set for property 'hourlyTravellingCostLarge'.
+     */
+    public void setHourlyTravellingCostLarge(DoubleParameter hourlyTravellingCostLarge) {
+        this.hourlyTravellingCostLarge = hourlyTravellingCostLarge;
+    }
+
+    /**
+     * Getter for property 'hourlyTravellingCostSmall'.
+     *
+     * @return Value for property 'hourlyTravellingCostSmall'.
+     */
+    public DoubleParameter getHourlyTravellingCostSmall() {
+        return hourlyTravellingCostSmall;
+    }
+
+    /**
+     * Setter for property 'hourlyTravellingCostSmall'.
+     *
+     * @param hourlyTravellingCostSmall Value to set for property 'hourlyTravellingCostSmall'.
+     */
+    public void setHourlyTravellingCostSmall(DoubleParameter hourlyTravellingCostSmall) {
+        this.hourlyTravellingCostSmall = hourlyTravellingCostSmall;
+    }
+
+    /**
+     * Getter for property 'discardingStrategySmall'.
+     *
+     * @return Value for property 'discardingStrategySmall'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategySmall() {
+        return discardingStrategySmall;
+    }
+
+    /**
+     * Setter for property 'discardingStrategySmall'.
+     *
+     * @param discardingStrategySmall Value to set for property 'discardingStrategySmall'.
+     */
+    public void setDiscardingStrategySmall(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategySmall) {
+        this.discardingStrategySmall = discardingStrategySmall;
+    }
+
+    /**
+     * Getter for property 'discardingStrategyLarge'.
+     *
+     * @return Value for property 'discardingStrategyLarge'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategyLarge() {
+        return discardingStrategyLarge;
+    }
+
+    /**
+     * Setter for property 'discardingStrategyLarge'.
+     *
+     * @param discardingStrategyLarge Value to set for property 'discardingStrategyLarge'.
+     */
+    public void setDiscardingStrategyLarge(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge) {
+        this.discardingStrategyLarge = discardingStrategyLarge;
     }
 }

@@ -149,6 +149,9 @@ Yellow Bycatch Factory:
   bycatchVirginBiomass: '8883000.0'
   bycatchWeightAtRecruitment: '1.11909797520236'
   bycatchWeightAtRecruitmentMinus1: '1.01603952895487'
+  diffusingRate: '1.0E-4'
+  northSouthSeparator: '50.0'
+  proportionOfBycatchNorth: '1.0'
   separateBycatchStock: false
   targetInitialRecruits: '1.2197524018851934E7'
   targetNaturalSurvivalRate: '0.923116346386636'
@@ -181,6 +184,8 @@ Yellow Bycatch Factory with History:
   - 2.0
   - 3.0
   historicalTargetSurvival: null
+  northSouthSeparator: '50.0'
+  proportionOfBycatchNorth: '1.0'
   separateBycatchStock: false
   targetInitialRecruits: '1.2197524018851934E7'
   targetNaturalSurvivalRate: '0.923116346386636'

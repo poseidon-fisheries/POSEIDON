@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.*;
@@ -103,6 +104,13 @@ public class YellowBycatchInitializer implements BiologyInitializer {
      */
     private List<Double> historicalBycatchSurvivalRate = null;
 
+    /**
+     * the original biomass assigned for each local biology. Makes resetting quick
+     */
+    private HashMap<BiomassLocalBiology,Double[]> originalBiomass = new HashMap<>();
+
+
+    private final double targetDiffusionRate;
 
     public YellowBycatchInitializer(
             boolean separateBycatchStock, String targetSpeciesName, String bycatchSpeciesName, double bycatchRho,
@@ -111,7 +119,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             double bycatchInitialRecruits, double targetRho, double targetNaturalSurvivalRate,
             double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
             double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double initialVirginRecruits,
-            int habitatSeparator, int northSouthSeparator) {
+            int habitatSeparator, int northSouthSeparator, double targetDiffusionRate) {
         this(separateBycatchStock, targetSpeciesName, bycatchSpeciesName, bycatchRho,
              bycatchNaturalSurvivalRate, bycatchRecruitmentSteepness, bycatchRecruitmentLag,
              bycatchWeightAtRecruitment, bycatchWeightAtRecruitmentMinus1, bycatchVirginBiomass,
@@ -123,7 +131,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                     public Double apply(SeaTile seaTile) {
                         return 1d;
                     }
-                });
+                },targetDiffusionRate );
     }
 
 
@@ -135,7 +143,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
             double targetRecruitmentSteepness, int targetRecruitmentLag, double targetWeightAtRecruitment,
             double targetWeightAtRecruitmentMinus1, double targetVirginBiomass, double initialVirginRecruits,
             int habitatSeparator, int northSouthSeparator,
-            Function<SeaTile,Double> allocator) {
+            Function<SeaTile, Double> allocator, double targetDiffusionRate) {
         this.separateBycatchStock = separateBycatchStock;
         this.targetSpeciesName = targetSpeciesName;
         this.bycatchSpeciesName = bycatchSpeciesName;
@@ -158,6 +166,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         this.habitatSeparator = habitatSeparator;
         this.northSouthSeparator = northSouthSeparator;
         this.allocator = allocator;
+        this.targetDiffusionRate = targetDiffusionRate;
     }
 
 
@@ -249,6 +258,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                 bio.setCarryingCapacity(biology.getSpecie(1),bycatchVirginBiomass*weight);
                 bio.setCurrentBiomass(biology.getSpecie(1),bycatchBiomass*weight);
             }
+            originalBiomass.put(bio, Arrays.copyOf(bio.getCurrentBiomass(), 2));
         }
 
         //if no historical biomass is provided, assume the world has always been at virgin levels
@@ -280,6 +290,12 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         targetGrower.getBiologies().addAll(northBiologies);
         targetGrower.getBiologies().addAll(southBiologies);
         model.registerStartable(targetGrower);
+
+        BiomassDiffuser diffuser = new BiomassDiffuser(map,model.getRandom(),
+                                                       biology,
+                                                       targetDiffusionRate,
+                                                       .1);
+        model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
         assert Math.abs(bycatchBios.values().stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -
                                 historicalBycatchBiomass.get(historicalBycatchBiomass.size()-1)) < FishStateUtilities.EPSILON;
@@ -587,6 +603,20 @@ public class YellowBycatchInitializer implements BiologyInitializer {
      */
     public int getNorthSouthSeparator() {
         return northSouthSeparator;
+    }
+
+    /**
+     * you must at all time be ready to reset local biology to its pristine state
+     * @param species species you want the biomass resetted
+     */
+    public void resetLocalBiology(Species species){
+
+        //reset!
+        for (Map.Entry<BiomassLocalBiology, Double[]> local : originalBiomass.entrySet()) {
+            local.getKey().setCurrentBiomass(species,local.getValue()[species.getIndex()]);
+
+        }
+
     }
 
 

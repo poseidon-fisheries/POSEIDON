@@ -329,4 +329,8 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     public void setProportionOfBycatchNorth(DoubleParameter proportionOfBycatchNorth) {
         factory.setProportionOfBycatchNorth(proportionOfBycatchNorth);
     }
+
+    public YellowBycatchInitializer retrieveLastMade() {
+        return factory.retrieveLastMade();
+    }
 }

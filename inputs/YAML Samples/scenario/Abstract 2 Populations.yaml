@@ -54,8 +54,13 @@ Abstract 2 Populations:
           imitationProbability: '1.0'
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
+  discardingStrategyLarge: No Discarding
+  discardingStrategySmall: No Discarding
   enginePower: normal 5000.0 100.0
-  fishingStrategy:
+  fishingStrategyLarge:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fishingStrategySmall:
     Until Full With Day Limit:
       daysAtSea: '5.0'
   gasPricePerLiter: '0.01'
@@ -75,6 +80,8 @@ Abstract 2 Populations:
       standardDeviationCatchabilityOtherSpecies: '0.0'
   gearStrategy: Never Change Gear
   habitatInitializer: All Sand
+  hourlyTravellingCostLarge: '0.0'
+  hourlyTravellingCostSmall: '0.0'
   largeFishers: 10
   largeFuelTankSize: '100000.0'
   largeHoldSize: '100.0'

@@ -1,6 +1,7 @@
 Fish Once
 -------
 Tow Limit:
+  maxDaysOut: '5.0'
   towLimits: '100.0'
 -------
 Fish Until Full:

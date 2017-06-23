@@ -29,6 +29,8 @@ public class NarrativeBest
 
     private static final Path[] fileNames = new Path[]
             {
+                    otherDirectory.resolve("wider").resolve("small.yaml"),
+                    otherDirectory.resolve("wider").resolve("balanced.yaml"),
                     otherDirectory.resolve("test").resolve("example_fixed.yaml"),
                     otherDirectory.resolve("test").resolve("example_fixed_2.yaml"),
                     originalDirectory.resolve("itqplus_best"),

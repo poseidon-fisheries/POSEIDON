@@ -1,0 +1,33 @@
+!!uk.ac.ox.oxfish.biology.initializer.DerisoParameters
+empiricalYearlyBiomasses:
+- 5.8056E7
+- 5.3888E7
+- 4.9774E7
+- 4.6604E7
+- 4.257E7
+- 3.9346E7
+- 3.693E7
+- 3.6368E7
+- 3.6378E7
+- 3.6968E7
+- 3.8128E7
+- 3.8756E7
+- 3.9916E7
+- 4.212E7
+- 4.4488E7
+- 4.688E7
+- 4.9348E7
+- 5.141E7
+- 5.3542E7
+- 5.5378E7
+historicalYearlySurvival:
+- 0.83651621665322
+- 0.8607299422956973
+lastRecruits: 1.8361900877421767E7
+naturalSurvivalRate: 0.895834135296528
+recruitmentLag: 16
+recruitmentSteepness: 0.6
+rho: 1.05569340594933
+virginBiomass: 7.8268E7
+weightAtRecruitment: 0.16707731172202
+weightAtRecruitmentMinus1: 0.154309182775882
