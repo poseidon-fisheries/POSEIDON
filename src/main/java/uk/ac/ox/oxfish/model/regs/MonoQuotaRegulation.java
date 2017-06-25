@@ -39,7 +39,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param yearlyQuota the yearly quota
      *
      */
-    //todo turn regulations into startable so they don't need a fish-state reference
+
     public MonoQuotaRegulation(double yearlyQuota) {
 
         this(yearlyQuota,-1);

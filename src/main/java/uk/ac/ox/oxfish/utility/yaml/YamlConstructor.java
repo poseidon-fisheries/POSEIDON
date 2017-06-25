@@ -58,6 +58,17 @@ public class YamlConstructor extends  Constructor {
                 NodeId.scalar, new Constructor.ConstructScalar(){
                     @Override
                     public Object construct(Node nnode) {
+                        //if field you are trying to fill is a coordinate
+                        if(nnode.getType().equals(Coordinate.class))
+                        {
+                            String val = (String) constructScalar((ScalarNode) nnode);
+                            String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
+                            return new Coordinate(
+                                    Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
+                                    Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
+
+                        }
+
                         //if the field you are trying to fill is a double parameter
                         if(nnode.getType().equals(DoubleParameter.class))
                             //then a simple scalar must be a fixed double parameter. Build it

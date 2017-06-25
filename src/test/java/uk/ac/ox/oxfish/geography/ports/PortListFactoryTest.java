@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/13/17.
@@ -42,8 +42,9 @@ public class PortListFactoryTest {
 
         FishYAML yaml = new FishYAML();
         System.out.println(Pattern.
-                matches("['\"]?x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*['\"]?","x:7.0,y:2.0"));
-
+                matches("[\\s'\"]*x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*[\\s'\"]*", "x:7.0,y:2.0" ));
+        System.out.println(Pattern.
+                matches("[\\s'\"]*x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*[\\s'\"]*", "  'x:7.0,y:2.0'" ));
 
         PortListFactory factory = yaml.loadAs("List of Ports:\n" +
                                        "  ports:\n" +
@@ -53,6 +54,7 @@ public class PortListFactoryTest {
 
 
         assertEquals(factory.getPorts().size(),2);
+        assertEquals((int)factory.getPorts().get("Washington").x,0);
         assertEquals((int)factory.getPorts().get("Italy").x,7);
 
     }

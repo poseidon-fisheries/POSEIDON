@@ -9,7 +9,6 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.YellowBycatchWithHistoryFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.AlwaysDiscardTheseSpeciesFactory;
@@ -18,12 +17,10 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortListFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.factory.ArrayFixedPriceMarket;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
@@ -31,7 +28,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.model.scenario.CaliforniaAbstractScenario.LITERS_OF_GAS_CONSUMED_PER_HOUR;
@@ -144,7 +140,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
                 2472791d,2345994d,2355185d,2313621d,2385708d
 
         ));
-        biologyInitializer.setHistoricalTargetSurvival(Lists.newArrayList(
+        biologyInitializer.setHistoricalBycatchSurvival(Lists.newArrayList(
                 0.938156881691037,
                 0.932582202042579
         ));
@@ -343,7 +339,6 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
                                 filter(fisher -> fisher.getTags().contains(portname)).
                                 mapToDouble(value -> value.getLatestYearlyObservation(
                                         species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
-
             }
 
 

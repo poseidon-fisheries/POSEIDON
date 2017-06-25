@@ -26,8 +26,8 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.*;
@@ -36,10 +36,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -476,7 +473,8 @@ public class FishState  extends SimState{
 
     public List<Market> getAllMarketsForThisSpecie(Species species)
     {
-        List<Market> toAggregate = new LinkedList<>();
+        //ports can share markets and we don't want to double count
+        Set<Market> toAggregate = new HashSet<>();
         //now get for each port, its markets
         for (Port port : getPorts())
         {
@@ -485,7 +483,7 @@ public class FishState  extends SimState{
                 toAggregate.add(market);
         }
 
-        return toAggregate;
+        return new LinkedList<>(toAggregate);
     }
 
     public static double round(double value, int places) {

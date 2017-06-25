@@ -140,11 +140,11 @@ One Species School:
   waypoints: '0,0 : 40,0 :  40,40: 0,40'
 -------
 Yellow Bycatch Factory:
-  bycatchInitialRecruits: '54446.060000000005'
+  bycatchInitialRecruits: '150480.0'
   bycatchNaturalSurvivalRate: '0.95504'
   bycatchRecruitmentLag: '14.0'
   bycatchRecruitmentSteepness: '0.44056'
-  bycatchRho: '1.03'
+  bycatchRho: '0.981194230283006'
   bycatchSpeciesName: Yelloweye Rockfish
   bycatchVirginBiomass: '8883000.0'
   bycatchWeightAtRecruitment: '1.11909797520236'
@@ -165,11 +165,11 @@ Yellow Bycatch Factory:
   verticalSeparator: '25.0'
 -------
 Yellow Bycatch Factory with History:
-  bycatchInitialRecruits: '54446.060000000005'
+  bycatchInitialRecruits: '150480.0'
   bycatchNaturalSurvivalRate: '0.95504'
   bycatchRecruitmentLag: '14.0'
   bycatchRecruitmentSteepness: '0.44056'
-  bycatchRho: '1.03'
+  bycatchRho: '0.981194230283006'
   bycatchSpeciesName: Yelloweye Rockfish
   bycatchVirginBiomass: '8883000.0'
   bycatchWeightAtRecruitment: '1.11909797520236'

@@ -27,8 +27,8 @@ public class FishYAML extends Yaml{
         super(new YamlConstructor(), new YamlRepresenter(),dumperOptions());
         this.customConstructor = ((YamlConstructor) super.constructor);
         this.addImplicitResolver(new Tag("!coord"),
-                                 Pattern.compile("['\"]?x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*['\"]?"),
-                                 "x '\"");
+                                 Pattern.compile("[\\s'\"]*x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*[\\s'\"]*"),
+                                 null);
 
     }
 
