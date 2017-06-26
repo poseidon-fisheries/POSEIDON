@@ -97,7 +97,7 @@ empiricalYearlyBiomasses:
 historicalYearlySurvival:
 - 0.885791668526681
 - 0.888626296064829
-lastRecruits: 62933.20223168714
+lastRecruits: 62933.186609605465
 naturalSurvivalRate: 0.914
 recruitmentLag: 8
 recruitmentSteepness: 0.8

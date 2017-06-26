@@ -66,7 +66,7 @@ public class DerisoParameters {
         double beta = (5*recruitmentSteepness-1d)/(4d*recruitmentSteepness*virginRecruits);
 
         //deriso schnute formula
-        Double spawners = empiricalYearlyBiomasses.get(empiricalYearlyBiomasses.size()-recruitmentLag);
+        Double spawners = empiricalYearlyBiomasses.get(empiricalYearlyBiomasses.size()-recruitmentLag-1);
         lastRecruits =  spawners /virginBiomass/ (alpha+beta* spawners /virginBiomass);
     }
 
@@ -212,13 +212,13 @@ public class DerisoParameters {
                                 466454189d,455081889d,433774184d,429505494d,421974007d,402971360d,399900476d,394650983d,381593314d,373460329d,366503129d,359845028d,354395185d,349711490d,347253956d,
                                 345399509d,344891059d,343993698d,343317882d,344025143d,345403773d,346390724d,346833531d,347657176d,352224351d,354280712d,356442219d
                         ),
-                        Lists.newArrayList(0.904787532616812,0.906397451712637),
-                        0.813182,
-                        0.923116346386636,
+                        Lists.newArrayList(0.906926410977892,0.90533206481522),
+                        0.813181970802262,
+                        0.92311,
                         0.6,
                         3,
-                        1.03312585773941,
-                        0.634560212266768,
+                        1.03313,
+                        0.63456,
                         527154d*1000
                 );
         yaml.dump(
