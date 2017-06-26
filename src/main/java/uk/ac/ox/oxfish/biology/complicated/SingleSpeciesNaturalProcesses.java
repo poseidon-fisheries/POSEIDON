@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -187,15 +188,17 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //allocate new recruits in a weighted fashion
-        biomassWeight.entrySet().parallelStream().forEach(
-                biologyBiomass -> {
-                    double ratio = biologyBiomass.getValue();
-                    int recruitsHere = (int) (lastRecruits * ratio);
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] = recruitsHere/2;
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] = recruitsHere/2;
-                });
-
-
+        double leftOver = 0;
+        for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+            double ratio = biologyBiomass.getValue();
+            int recruitsHere = (int) ((lastRecruits+leftOver) * ratio);
+            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] = recruitsHere / 2;
+            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] = recruitsHere / 2;
+            leftOver =  ((lastRecruits+leftOver) * ratio) -
+                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
+                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
+            ;
+        }
 
 
     }

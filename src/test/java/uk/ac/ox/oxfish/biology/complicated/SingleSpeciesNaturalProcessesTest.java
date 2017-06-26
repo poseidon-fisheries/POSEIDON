@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
+import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -14,6 +15,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -25,6 +27,59 @@ import static org.mockito.Mockito.when;
 
 public class SingleSpeciesNaturalProcessesTest {
 
+
+    @Test
+    public void excelFile() throws Exception {
+
+
+        Species species = SingleSpeciesAbundanceInitializer.
+                generateSpeciesFromFolder(Paths.get("inputs",
+                                                    "california",
+                                                    "biology",
+                                                    "Sablefish"),"Sablefish");
+
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
+                new NaturalMortalityProcess(),
+                new RecruitmentBySpawningBiomass(
+                        species.getVirginRecruits(),
+                        species.getSteepness(),
+                        species.isAddRelativeFecundityToSpawningBiomass()
+                ),
+                species,
+                false
+        );
+
+        GlobalBiology biology = new GlobalBiology(species);
+        AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
+        AbundanceBasedLocalBiology cell2 = new AbundanceBasedLocalBiology(biology);
+        processes.add(cell1);
+        processes.add(cell2);
+        for(int i=0; i<=species.getMaxAge(); i++)
+        {
+            cell1.getNumberOfFemaleFishPerAge(species)[i] = 5000;
+            cell2.getNumberOfFemaleFishPerAge(species)[i] = 5000;
+        }
+
+
+        processes.step(mock(FishState.class));
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],9231,1);
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0] +
+                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,416140,2);
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0],208070,2);
+
+        processes.step(mock(FishState.class));
+        System.out.println(Arrays.toString(cell1.getNumberOfFemaleFishPerAge(species)));
+        System.out.println(Arrays.toString(cell2.getNumberOfFemaleFishPerAge(species)));
+        System.out.println(Arrays.toString(cell2.getNumberOfMaleFishPerAge(species)));
+        System.out.println(Arrays.toString(cell2.getNumberOfMaleFishPerAge(species)));
+
+
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],8521,1);
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0] +
+                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,384422,50);
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[1]+cell2.getNumberOfFemaleFishPerAge(species)[1] ,192073,2);
+
+    }
 
     @Test
     public void recruitsCorrectly() throws Exception

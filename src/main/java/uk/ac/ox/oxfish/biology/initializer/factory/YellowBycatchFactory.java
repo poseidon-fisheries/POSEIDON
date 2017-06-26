@@ -44,18 +44,18 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
 
 
-    private DoubleParameter  targetRho = new FixedDoubleParameter(0.813182);
+    private DoubleParameter  targetRho = new FixedDoubleParameter(0.813181970802262);
 
-    private DoubleParameter targetNaturalSurvivalRate = new FixedDoubleParameter(0.923116346386636);
+    private DoubleParameter targetNaturalSurvivalRate = new FixedDoubleParameter(0.92311);
 
     private DoubleParameter targetRecruitmentSteepness = new FixedDoubleParameter(0.6);
 
 
     private DoubleParameter targetRecruitmentLag = new FixedDoubleParameter(3);
 
-    private DoubleParameter targetWeightAtRecruitment = new FixedDoubleParameter(1.03312585773941);
+    private DoubleParameter targetWeightAtRecruitment = new FixedDoubleParameter(1.03313);
 
-    private DoubleParameter targetWeightAtRecruitmentMinus1 = new FixedDoubleParameter(0.634560212266768);
+    private DoubleParameter targetWeightAtRecruitmentMinus1 = new FixedDoubleParameter(0.63456);
 
 
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
