@@ -3,13 +3,11 @@ package uk.ac.ox.oxfish.biology.initializer;
 import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by carrknight on 6/14/17.
@@ -215,7 +213,7 @@ public class DerisoParameters {
                                 345399509d,344891059d,343993698d,343317882d,344025143d,345403773d,346390724d,346833531d,347657176d,352224351d,354280712d,356442219d
                         ),
                         Lists.newArrayList(0.904787532616812,0.906397451712637),
-                        0.92267402483245,
+                        0.813182,
                         0.923116346386636,
                         0.6,
                         3,

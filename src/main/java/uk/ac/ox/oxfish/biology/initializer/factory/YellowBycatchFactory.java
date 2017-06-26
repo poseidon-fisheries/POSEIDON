@@ -38,13 +38,13 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);
 
-    private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(150.48 * 1000d);
+    private DoubleParameter bycatchInitialRecruits = new FixedDoubleParameter(111.1395982902 * 1000d);
 
 
 
 
 
-    private DoubleParameter  targetRho = new FixedDoubleParameter(0.92267402483245);
+    private DoubleParameter  targetRho = new FixedDoubleParameter(0.813182);
 
     private DoubleParameter targetNaturalSurvivalRate = new FixedDoubleParameter(0.923116346386636);
 
@@ -60,8 +60,8 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter targetVirginBiomass = new FixedDoubleParameter(527154d * 1000d);
 
-    //this is really the "rzero" value of the DS algorithm when biomass is virgin
-    private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(1.2197524018851934E7);
+    //this is the recruits on the year before the start of the simulation!
+    private DoubleParameter targetInitialRecruits = new FixedDoubleParameter(16713267);
 
 
 
