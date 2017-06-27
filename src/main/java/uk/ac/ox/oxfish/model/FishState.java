@@ -441,8 +441,10 @@ public class FishState  extends SimState{
      */
     public void registerStartable(Startable startable)
     {
-        if(started)
-            startable.start(this);
+        if(started) {
+          //  startable.start(this);
+            scheduleOnce((Steppable) simState -> startable.start(FishState.this), StepOrder.DAWN);
+        }
         else
             toStart.add(startable);
     }

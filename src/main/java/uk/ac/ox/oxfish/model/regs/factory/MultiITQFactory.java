@@ -160,11 +160,12 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                                                                                                           });
                                                            }
                                                        });
-                    state.registerStartable(builders[i]);
+                    final  int speciesIndex = i;
                     //after the builder starts it will create a market, copy it in the array
                     state.registerStartable(new Startable() {
                         @Override
                         public void start(FishState model) {
+                            builders[speciesIndex].start(model);
                             ITQOrderBook market = builders[specieIndex].getMarket();
                             markets.put(specieIndex, market);
                             market.setAllowMultipleTradesPerFisher(allowMultipleTradesPerFisher);
