@@ -79,9 +79,14 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
         receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
 
 
-        fisher.getDailyData().registerGatherer("Reservation Quota Price of " + model.getSpecies().get(specieIndex),
-                                               fisher1 -> lastLambda,
-                                               Double.NaN);
+        if(fisher.getDailyData().getColumn("Reservation Quota Price of " + model.getSpecies().get(specieIndex))==null) {
+            fisher.getDailyData().registerGatherer("Reservation Quota Price of " + model.getSpecies().get(specieIndex),
+                                                   fisher1 -> lastLambda,
+                                                   Double.NaN);
+        }
+        else {
+            assert model.getPorts().size() > 1;
+        }
     }
 
     @Override

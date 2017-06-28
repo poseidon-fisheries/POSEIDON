@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Splitter;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -10,12 +12,14 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by carrknight on 6/19/17.
@@ -26,6 +30,10 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
 
     private MultipleSpeciesDerisoInitializer initializer;
 
+    private HashMap<String,String> movement = new HashMap<>();
+    {
+        movement.put("Sablefish","0.0001");
+    }
 
     /**
      * build the biology part!
@@ -39,8 +47,16 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
             FishState model, LinkedHashMap<String, Path> folderMap) {
         initializer = new MultipleSpeciesDerisoInitializer(folderMap,true);
 
+
+
         GlobalBiology biology = initializer.generateGlobal(model.getRandom(),
                                              model);
+
+        HashMap<Species,Double>  recast = new HashMap<>();
+        for (Map.Entry<String, String> exogenous : movement.entrySet()) {
+            recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
+        }
+        initializer.setMovementRate(recast);
 
         return biology;
     }
@@ -85,5 +101,23 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
         //use 2009 port data (pre-itq but post-buyback)
         super.setPortFileName("dts_ports_2009.csv");
         super.setUsePremadeInput(false);
+    }
+
+    /**
+     * Getter for property 'movement'.
+     *
+     * @return Value for property 'movement'.
+     */
+    public HashMap<String, String> getMovement() {
+        return movement;
+    }
+
+    /**
+     * Setter for property 'movement'.
+     *
+     * @param movement Value to set for property 'movement'.
+     */
+    public void setMovement(HashMap<String, String> movement) {
+        this.movement = movement;
     }
 }

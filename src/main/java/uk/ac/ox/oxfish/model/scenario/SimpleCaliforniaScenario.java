@@ -141,8 +141,9 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
         ));
         biologyInitializer.setHistoricalBycatchSurvival(Lists.newArrayList(
-                0.938156881691037,
-                0.932582202042579
+                0.932582202042579,
+                0.938156881691037
+
         ));
 
         biologyInitializer.setVerticalSeparator(new FixedDoubleParameter(5));
@@ -349,6 +350,15 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
                                                                               FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
 
+
+
+
+            model.getYearlyDataSet().registerGatherer(portname + " Average Distance From Port",
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(portname)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
 
         }
 

@@ -80,47 +80,50 @@ public class ITQMarketBuilder  implements Startable
         //create the market
         market.start(model);
         String speciesName = model.getSpecies().get(speciesIndex).getName();
-        //gather market data
-        model.getDailyDataSet().registerGatherer("ITQ Trades Of " + speciesName, new Gatherer<FishState>() {
-                                                     @Override
-                                                     public Double apply(FishState state1) {
-                                                         return market.getDailyMatches();
-                                                     }
-                                                 },
-                                                 Double.NaN);
-        DataColumn priceGatherer =
-                model.getDailyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
-                                                                      new Gatherer<FishState>() {
-                                                                          @Override
-                                                                          public Double apply(FishState state1) {
-                                                                              return market.getDailyAveragePrice();
-                                                                          }
-                                                                      },
-                                                                      Double.NaN);
-        model.getYearlyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
-                                                  FishStateUtilities.generateYearlyAverage(priceGatherer),
-                                                  Double.NaN);
+        if(model.getDailyDataSet().getColumn("ITQ Trades Of " + speciesName)==null) {
+
+            //gather market data
+            model.getDailyDataSet().registerGatherer("ITQ Trades Of " + speciesName, new Gatherer<FishState>() {
+                                                         @Override
+                                                         public Double apply(FishState state1) {
+                                                             return market.getDailyMatches();
+                                                         }
+                                                     },
+                                                     Double.NaN);
+            DataColumn priceGatherer =
+                    model.getDailyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
+                                                             new Gatherer<FishState>() {
+                                                                 @Override
+                                                                 public Double apply(FishState state1) {
+                                                                     return market.getDailyAveragePrice();
+                                                                 }
+                                                             },
+                                                             Double.NaN);
+            model.getYearlyDataSet().registerGatherer("ITQ Prices Of " + speciesName,
+                                                      FishStateUtilities.generateYearlyAverage(priceGatherer),
+                                                      Double.NaN);
 
 
-        model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of " + speciesName, state1 -> {
-                                                     return market.getLastClosingPrice();
-                                                 },
-                                                 Double.NaN);
-        DataColumn volumeGatherer = model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName, state1 -> {
-                                                                          return market.getDailyQuotasExchanged();
-                                                                      },
-                                                                      Double.NaN);
-        model.getYearlyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
-                                                  FishStateUtilities.generateYearlySum(volumeGatherer),
-                                                  0d);
+            model.getDailyDataSet().registerGatherer("ITQ Last Closing Price Of " + speciesName, state1 -> {
+                                                         return market.getLastClosingPrice();
+                                                     },
+                                                     Double.NaN);
+            DataColumn volumeGatherer = model.getDailyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
+                                                                                 state1 -> {
+                                                                                     return market.getDailyQuotasExchanged();
+                                                                                 },
+                                                                                 Double.NaN);
+            model.getYearlyDataSet().registerGatherer("ITQ Volume Of " + speciesName,
+                                                      FishStateUtilities.generateYearlySum(volumeGatherer),
+                                                      0d);
 
 
-        model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName, state1 -> {
-                                                     return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
-                                                 },
-                                                 Double.NaN);
+            model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName, state1 -> {
+                                                         return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
+                                                     },
+                                                     Double.NaN);
 
-
+        }
 
         //make it annual too
 

@@ -294,7 +294,8 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         BiomassDiffuser diffuser = new BiomassDiffuser(map,model.getRandom(),
                                                        biology,
                                                        targetDiffusionRate,
-                                                       .1);
+                                                       .1,
+                                                       0); //only sablefish moves!
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
         assert Math.abs(bycatchBios.values().stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -

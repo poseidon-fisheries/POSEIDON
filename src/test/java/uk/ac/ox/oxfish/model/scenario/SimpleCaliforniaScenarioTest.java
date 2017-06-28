@@ -4,7 +4,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultiITQStringFactory;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.io.FileReader;
+import java.nio.file.Paths;
+import java.util.HashMap;
 
 /**
  * Created by carrknight on 6/26/17.
@@ -41,6 +47,65 @@ public class SimpleCaliforniaScenarioTest {
         double finalBiomass = state.getLatestYearlyObservation("Biomass Sablefish");
         System.out.println(finalBiomass/1000);
         Assert.assertEquals(finalBiomass/1000,364137.4,1);
+    }
+
+
+    @Test
+    public void replicateTestSablefishWithRealGeography() throws Exception {
+
+
+        FishYAML yaml = new FishYAML();
+        DerisoCaliforniaScenario scenario = yaml.loadAs(
+                new FileReader(
+                Paths.get("inputs","tests","deriso_comparison.yaml").toFile()),
+                DerisoCaliforniaScenario.class
+        ) ;
+        HashMap<String, String> exogenousCatches = new HashMap<>();
+        exogenousCatches.put("Sablefish","8000000");
+        scenario.setExogenousCatches(exogenousCatches);
+        scenario.setRegulation(new FishingSeasonFactory(0,true));
+
+
+        FishState state = new FishState(System.currentTimeMillis());
+        state.setScenario(scenario);
+        state.start();
+        while (state.getYear()<10) {
+
+            state.schedule.step(state);
+            if(state.getDayOfTheYear()==1)
+                System.out.println(state.getTotalBiomass(state.getSpecies().get(0))/1000);
+        }
+        state.schedule.step(state);
+        double finalBiomass = state.getLatestYearlyObservation("Biomass Sablefish");
+        System.out.println(finalBiomass/1000);
+        Assert.assertEquals(finalBiomass/1000,364137.4,1);
+    }
+
+    @Test
+    public void replicateTestYelloweye() throws Exception {
+
+
+
+        SimpleCaliforniaScenario scenario = new SimpleCaliforniaScenario();
+        scenario.setLargeFishers(0);
+        scenario.setSmallFishers(0);
+
+        //8000t
+        scenario.setExogenousYelloweyeCatches(20000);
+
+        FishState state = new FishState(System.currentTimeMillis());
+        state.setScenario(scenario);
+        state.start();
+        while (state.getYear()<10) {
+
+            state.schedule.step(state);
+            if(state.getDayOfTheYear()==1)
+                System.out.println(state.getTotalBiomass(state.getSpecies().get(1))/1000);
+        }
+        state.schedule.step(state);
+        double finalBiomass = state.getLatestYearlyObservation("Biomass Yelloweye Rockfish");
+        System.out.println(finalBiomass/1000);
+        Assert.assertEquals(finalBiomass/1000,3092.21,.01);
     }
 
 

@@ -30,6 +30,9 @@ public class BiomassDiffuser  implements Steppable {
 
     private final GlobalBiology biology;
 
+    //todo make movement an array rather than this!
+    private final int[] speciesThatMove;
+
 
     public BiomassDiffuser(
             NauticalMap map, MersenneTwisterFast random,
@@ -40,6 +43,21 @@ public class BiomassDiffuser  implements Steppable {
         this.differentialPercentageToMove = differentialPercentageToMove;
         this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
         this.biology = biology;
+        speciesThatMove = new int[biology.getSize()];
+        for(int i=0; i<speciesThatMove.length; i++)
+            speciesThatMove[i] = i;
+    }
+
+    public BiomassDiffuser(
+            NauticalMap map, MersenneTwisterFast random,
+            GlobalBiology biology, double differentialPercentageToMove,
+            double percentageLimitOnDailyMovement,int... speciesThatMove) {
+        this.map = map;
+        this.random = random;
+        this.differentialPercentageToMove = differentialPercentageToMove;
+        this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
+        this.biology = biology;
+        this.speciesThatMove = speciesThatMove;
     }
 
     /**
@@ -73,7 +91,7 @@ public class BiomassDiffuser  implements Steppable {
             //for each neighbor
             for (SeaTile neighbor : neighborList) {
                 //for each specie
-                for (int i = 0; i < biology.getSize(); i++) {
+                for (int i : speciesThatMove) {
                     //if here there are more than there
                     final Species species = biology.getSpecie(i);
 

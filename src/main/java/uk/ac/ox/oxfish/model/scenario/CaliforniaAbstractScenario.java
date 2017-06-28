@@ -50,6 +50,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
+import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -467,23 +468,6 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
         LinkedList<Fisher> fisherList = new LinkedList<>();
 
-        //compute catchability
-    /*
-        double inputedCatchability = 0.00000074932 / (1d / initializer.getNumberOfFishableTiles());
-
-        for(HomogeneousGearFactory factory : gear.getGears().values())
-            factory.setAverageCatchability(new FixedDoubleParameter(
-                    inputedCatchability));
-
-                    if(Log.DEBUG) {
-            Log.debug("the inputed catchability is : " + inputedCatchability
-                              + ", due to these many number of tiles being available"
-                              + initializer.getNumberOfFishableTiles());
-        }
-*/
-
-
-
         GlobalBiology biology = model.getBiology();
         NauticalMap map = model.getMap();
         MersenneTwisterFast random = model.getRandom();
@@ -598,6 +582,43 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 fisherCounter);
         if(fisherList.size() <=1)
             networkBuilder = new EmptyNetworkBuilder();
+
+
+        //add port counters
+        for(Port port : model.getPorts()) {
+
+            for(Species species : model.getBiology().getSpecies())
+            {
+
+                model.getYearlyDataSet().registerGatherer(
+                        port.getName() + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                        fishState -> fishState.getFishers().stream().
+                                filter(fisher -> fisher.getHomePort().equals(port)).
+                                mapToDouble(value -> value.getLatestYearlyObservation(
+                                        species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+            }
+
+
+            model.getYearlyDataSet().registerGatherer(port.getName() + " Total Income",
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getHomePort().equals(port)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
+
+
+
+            model.getYearlyDataSet().registerGatherer(port.getName() + " Average Distance From Port",
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getHomePort().equals(port)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
+        }
+
+
 
         //allow friendships only within people from the same port!
         networkBuilder.addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));

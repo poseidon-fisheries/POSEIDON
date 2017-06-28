@@ -31,9 +31,9 @@ public class YellowBycatchFactory implements AlgorithmFactory<YellowBycatchIniti
 
     private DoubleParameter bycatchRecruitmentLag = new FixedDoubleParameter(14);
 
-    private DoubleParameter bycatchWeightAtRecruitment = new FixedDoubleParameter(1.11909797520236);
+    private DoubleParameter bycatchWeightAtRecruitment = new FixedDoubleParameter(1.11910);
 
-    private DoubleParameter bycatchWeightAtRecruitmentMinus1 = new FixedDoubleParameter(1.01603952895487);
+    private DoubleParameter bycatchWeightAtRecruitmentMinus1 = new FixedDoubleParameter(1.01604);
 
 
     private DoubleParameter bycatchVirginBiomass = new FixedDoubleParameter(8883d * 1000d);

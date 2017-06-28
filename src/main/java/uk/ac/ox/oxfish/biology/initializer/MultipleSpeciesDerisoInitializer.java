@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
@@ -80,6 +81,9 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      */
     private HashMap<Species,HashMap<BiomassLocalBiology,Double>> originalWeights = new HashMap<>();
 
+
+
+    private HashMap<Species,Double> movementRate = new HashMap<>();
 
     /**
      * read up a folder that contains deriso.yaml and turn it into a species
@@ -236,12 +240,12 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                         return value.getCarryingCapacity(species);
                     }
                 }).sum() == virginBiomass;
-                assert localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
+                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
                     @Override
                     public double applyAsDouble(BiomassLocalBiology value) {
                         return value.getBiomass(species);
                     }
-                }).sum() == currentBiomass;
+                }).sum() - currentBiomass)<.01;
 
 
                 parameter.updateLastRecruits();
@@ -285,6 +289,15 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                 localBiologies.remove(bio);
 
 
+            //movement rates
+            for (Map.Entry<Species, Double> movement : movementRate.entrySet()) {
+                assert movement.getValue()>0;
+                BiomassDiffuser diffuser = new BiomassDiffuser(map, random, biology, movement.getValue(), .001d,
+                                                               movement.getKey().getIndex());
+
+                model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
+            }
+
             //done!
             biologicalDirectories.clear();
         }
@@ -312,6 +325,8 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @param weights
      */
     private void resetLocalBiology(Species species, HashMap<BiomassLocalBiology, Double> weights) {
+        if(species.isImaginary())
+            return;
         DerisoParameters parameter = parameters.get(species);
         double virginBiomass = parameter.getVirginBiomass();
         double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
@@ -342,5 +357,23 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
     @VisibleForTesting
     public HashMap<Species, DerisoSchnuteCommonGrower> getNaturalProcesses() {
         return naturalProcesses;
+    }
+
+    /**
+     * Getter for property 'movementRate'.
+     *
+     * @return Value for property 'movementRate'.
+     */
+    public HashMap<Species, Double> getMovementRate() {
+        return movementRate;
+    }
+
+    /**
+     * Setter for property 'movementRate'.
+     *
+     * @param movementRate Value to set for property 'movementRate'.
+     */
+    public void setMovementRate(HashMap<Species, Double> movementRate) {
+        this.movementRate = movementRate;
     }
 }

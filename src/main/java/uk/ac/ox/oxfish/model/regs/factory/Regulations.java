@@ -47,6 +47,9 @@ public class Regulations
         CONSTRUCTORS.put("MPA with fine", FinedProtectedAreasFactory::new);
         NAMES.put(FinedProtectedAreasFactory.class,"MPA with fine");
 
+        CONSTRUCTORS.put("MPA by depth", DepthMPAFactory::new);
+        NAMES.put(DepthMPAFactory.class,"MPA by depth");
+
         CONSTRUCTORS.put("Mono-TAC", () -> TAC_MONO_FACTORY);
         NAMES.put(TACMonoFactory.class,"Mono-TAC");
 

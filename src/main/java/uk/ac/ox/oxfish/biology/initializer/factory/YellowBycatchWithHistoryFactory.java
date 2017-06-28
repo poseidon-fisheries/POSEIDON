@@ -333,4 +333,23 @@ public class YellowBycatchWithHistoryFactory implements AlgorithmFactory<YellowB
     public YellowBycatchInitializer retrieveLastMade() {
         return factory.retrieveLastMade();
     }
+
+
+    /**
+     * Getter for property 'diffusingRate'.
+     *
+     * @return Value for property 'diffusingRate'.
+     */
+    public DoubleParameter getDiffusingRate() {
+        return factory.getDiffusingRate();
+    }
+
+    /**
+     * Setter for property 'diffusingRate'.
+     *
+     * @param diffusingRate Value to set for property 'diffusingRate'.
+     */
+    public void setDiffusingRate(DoubleParameter diffusingRate) {
+        factory.setDiffusingRate(diffusingRate);
+    }
 }
