@@ -358,7 +358,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
                                                               fishState.getFishers().stream().
                                                                       filter(fisher -> fisher.getTags().contains(portname)).
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+                                                                              FisherYearlyTimeSeries.FISHING_DISTANCE)).sum(), Double.NaN);
 
         }
 
