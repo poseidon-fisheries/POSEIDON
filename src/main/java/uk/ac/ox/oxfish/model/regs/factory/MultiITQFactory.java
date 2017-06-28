@@ -2,9 +2,12 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.market.itq.PriceGenerator;
 import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
@@ -161,8 +164,7 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                                                            }
                                                        });
                     final  int speciesIndex = i;
-                    //after the builder starts it will create a market, copy it in the array
-                    state.registerStartable(new Startable() {
+                    Startable setupStep = new Startable() {
                         @Override
                         public void start(FishState model) {
                             builders[speciesIndex].start(model);
@@ -176,8 +178,20 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
                         public void turnOff() {
 
                         }
-                    });
+                    };
+                    //after the builder starts it will create a market, copy it in the array
+                    if(!state.isStarted()) {
 
+                        state.registerStartable(setupStep);
+                    }
+                    else{
+                        state.scheduleOnce(new Steppable() {
+                            @Override
+                            public void step(SimState simState) {
+                                setupStep.start(state);
+                            }
+                        }, StepOrder.DAWN);
+                    }
                 }
             }
         }
