@@ -240,4 +240,8 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     public List<Regulation> getRegulations() {
         return regulations;
     }
+
+    public boolean containsRegulation(Regulation regulation){
+        return regulations.contains(regulation);
+    }
 }

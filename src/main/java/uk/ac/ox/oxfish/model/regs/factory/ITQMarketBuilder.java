@@ -131,7 +131,9 @@ public class ITQMarketBuilder  implements Startable
         //and give to each fisher a price-maker
         for(Fisher fisher : model.getFishers()) {
             //todo remove this ugly hack~!
-           if (traders.contains(fisher.getRegulation()) || fisher.getRegulation() instanceof MultipleRegulations) {
+           if (traders.contains(fisher.getRegulation()) ||
+                   (fisher.getRegulation() instanceof MultipleRegulations && isMatch(
+                           ((MultipleRegulations) fisher.getRegulation())))) {
                 PriceGenerator reservationPricer = priceGeneratorMaker.get();
                 reservationPricer.start(model, fisher);
                 market.registerTrader(fisher, reservationPricer);
@@ -144,6 +146,20 @@ public class ITQMarketBuilder  implements Startable
 
     }
 
+    /**
+     * checks if the multiple regulation is valid for this market
+     * @param regulations
+     * @return
+     */
+    private boolean isMatch(MultipleRegulations regulations){
+
+        for(Regulation trader : traders)
+            if(regulations.containsRegulation(trader))
+                return true;
+        return false;
+
+
+    }
 
 
     /**
