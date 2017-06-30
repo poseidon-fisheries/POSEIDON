@@ -147,7 +147,7 @@ public class NauticalMap implements Startable
         for(Object element : rasterBackingGrid.elements())
         {
             SeaTile tile = (SeaTile) element; //cast
-            tile.setBiology(initializer.generateLocal(biology, tile, random, getHeight(), getWidth())); //put new biology in
+            tile.setBiology(initializer.generateLocal(biology, tile, random, getHeight(), getWidth(),this )); //put new biology in
         }
 
     }

@@ -42,7 +42,7 @@ public class TwoSpeciesBoxInitializerTest
                                           new SeaTile(0, 0, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
                                           100,
-                                          100
+                                          100,
                 );
 
         assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
@@ -54,7 +54,7 @@ public class TwoSpeciesBoxInitializerTest
                                           new SeaTile(5,5, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
                                           100,
-                                          100
+                                          100,
                 );
         assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
         assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
@@ -66,7 +66,7 @@ public class TwoSpeciesBoxInitializerTest
                                           new SeaTile(10,10, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
                                           100,
-                                          100
+                                          100,
                 );
         assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)),100,.0001 );
         assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)),0,.0001 );

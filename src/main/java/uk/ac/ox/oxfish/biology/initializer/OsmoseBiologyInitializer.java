@@ -11,7 +11,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,17 +84,17 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *
-     * @param biology          the global biology (species' list) object
+     *  @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells  width of the map
+     * @param map
      */
     @Override
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells) {
+            int mapWidthInCells, NauticalMap map) {
         OsmoseSimulation simulation = ((OsmoseGlobalBiology) biology).getSimulation();
 
         if(seaTile.getAltitude()>0)

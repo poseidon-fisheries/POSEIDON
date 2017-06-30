@@ -26,10 +26,11 @@ public interface BiologyInitializer
      * @param random the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells width of the map
+     * @param map
      */
     LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells);
+            int mapWidthInCells, NauticalMap map);
 
 
     /**

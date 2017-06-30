@@ -63,17 +63,17 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *
-     * @param biology          the global biology (species' list) object
+     *  @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells  width of the map
+     * @param map
      */
     @Override
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells) {
+            int mapWidthInCells, NauticalMap map) {
         return generateAbundanceBiologyExceptOnLand(biology, seaTile, locals);
     }
 

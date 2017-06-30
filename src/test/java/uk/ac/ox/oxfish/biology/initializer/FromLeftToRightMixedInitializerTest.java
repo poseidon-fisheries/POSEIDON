@@ -29,15 +29,15 @@ public class FromLeftToRightMixedInitializerTest {
         GlobalBiology biology = new GlobalBiology(species1,species2);
 
         left.setBiology(
-                initializer.generateLocal(biology, left, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100)
+                initializer.generateLocal(biology, left, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
         );
 
         middle.setBiology(
-                initializer.generateLocal(biology, middle, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100)
+                initializer.generateLocal(biology, middle, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
         );
 
         right.setBiology(
-                initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100)
+                initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
         );
 
 

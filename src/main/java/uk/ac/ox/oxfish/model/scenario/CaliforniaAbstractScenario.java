@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -48,7 +47,6 @@ import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
@@ -328,7 +326,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     seaTile.assignLocalWeather(new ConstantWeather(0, 0, 0));
                     seaTile.setBiology(
                             getBiologyInitializer()
-                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth));
+                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth, ));
                     //if it's sea (don't bother counting otherwise)
                     if (seaTile.getAltitude() < 0)
                     {

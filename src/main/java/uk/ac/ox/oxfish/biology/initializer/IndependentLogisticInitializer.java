@@ -6,7 +6,6 @@ import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -51,17 +50,17 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *
-     * @param biology          the global biology (species' list) object
+     *  @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells  width of the map
+     * @param map
      */
     @Override
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells) {
+            int mapWidthInCells, NauticalMap map) {
 
         if (seaTile.getAltitude() >= 0)
             return new EmptyLocalBiology();

@@ -68,18 +68,20 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
 
     /**
      * this gets called for each tile by the map as the tile is created. Do not expect it to come in order
-     *  @param biology          the global biology (species' list) object
+     * @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells  width of the map
+     * @param map
      */
     @Override
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile,
-            MersenneTwisterFast random, int mapHeightInCells, int mapWidthInCells) {
+            MersenneTwisterFast random, int mapHeightInCells, int mapWidthInCells,
+            NauticalMap map) {
         //it must be a logistic biology to come out of the diffusing logistic biology!
-        LocalBiology generated = delegate.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells);
+        LocalBiology generated = delegate.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells, );
         if(seaTile.getAltitude()>0)
             return generated;
         BiomassLocalBiology local = (BiomassLocalBiology) generated;

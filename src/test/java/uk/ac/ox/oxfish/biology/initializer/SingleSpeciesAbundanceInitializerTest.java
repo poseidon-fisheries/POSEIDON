@@ -45,7 +45,7 @@ public class SingleSpeciesAbundanceInitializerTest {
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             element.setBiology(initializer.generateLocal(biology,
-                    element, new MersenneTwisterFast(),4, 4)); //put new biology in
+                    element, new MersenneTwisterFast(),4, 4, )); //put new biology in
         }
         //by default the abundance initializer splits total count uniformly
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);

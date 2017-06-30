@@ -75,20 +75,23 @@ public class SampledMap implements Serializable
         bioGrid.setMBR(mbr);
 
         //now collect observations
-        Table<Integer,Integer,LinkedList<Double>> backingBioTable = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid, biologySample);
+        Table<Integer,Integer,LinkedList<Double>> backingBioTable = fileToGrid(bioGrid, biologySample,
+                                                                               getGridWith(), getGridHeight());
         biologyGrids.put(firstBiology.getKey(), backingBioTable);
         //read the altitude
         //read raster bathymetry
         GeographicalSample altitudeSample = new GeographicalSample(bathymetryFile,false);
-        altitudeGrid = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid, altitudeSample);
+        altitudeGrid = fileToGrid( bioGrid, altitudeSample, getGridWith(),
+                                  getGridHeight());
 
 
         //now do the others
         while (biologyIterator.hasNext())
         {
             Map.Entry<String, Path> biologyFile = biologyIterator.next();
-            backingBioTable = fileToGrid(HashBasedTable.create(gridWidth,gridHeight), bioGrid,
-                                        new GeographicalSample(biologyFile.getValue(), true));
+            backingBioTable = fileToGrid(bioGrid,
+                                         new GeographicalSample(biologyFile.getValue(), true), getGridWith(),
+                                         getGridHeight());
             biologyGrids.put(biologyFile.getKey(),backingBioTable);
 
         }
@@ -102,15 +105,19 @@ public class SampledMap implements Serializable
      * @param backingGrid the backing grid to fill (it will also be returned)
      * @param coordinateSpace a geo-spatial grid that can be used to transform data coordinates into grid coordinates
      * @param preformattedCSV the data from CSV preformatted
+     * @param gridWith
+     * @param gridHeight
      * @return the backing grid after it has been filled (it will be made of LinkedList objects, containing double observations
      */
-    private Table<Integer,Integer,LinkedList<Double>> fileToGrid(
-            Table<Integer, Integer, LinkedList<Double>> backingGrid,
+    public static Table<Integer,Integer,LinkedList<Double>> fileToGrid(
             GeomGridField coordinateSpace,
-            GeographicalSample preformattedCSV) {
+            GeographicalSample preformattedCSV,
+            final int gridWith,
+            final int gridHeight) {
 
-        for(int x = 0; x< getGridWith(); x++)
-            for(int y = 0; y< getGridHeight(); y++)
+        Table<Integer, Integer, LinkedList<Double>> backingGrid = HashBasedTable.create(gridWith,gridHeight);
+        for(int x = 0; x< gridWith; x++)
+            for(int y = 0; y< gridHeight; y++)
                 backingGrid.put(x,y,new LinkedList<Double>());
         Iterator<Double> eastings = preformattedCSV.getEastings().iterator();
         Iterator<Double> northings = preformattedCSV.getNorthings().iterator();
@@ -121,7 +128,7 @@ public class SampledMap implements Serializable
             int y = coordinateSpace.toYCoord(northings.next());
             double obs = observations.next();
             //the very edge might get cut
-            if(x>=0 && x < getGridWith() && y >=0 && y < getGridHeight())
+            if(x>=0 && x < gridWith && y >=0 && y < gridHeight)
                 ((List) backingGrid.get(x,y)).add(obs);
             if(i % 10000 == 0 && Log.TRACE)
                 Log.trace("Transformed " +i + "  sampled lines into a grid" );

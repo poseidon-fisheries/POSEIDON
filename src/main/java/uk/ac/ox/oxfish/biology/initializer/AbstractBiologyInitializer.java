@@ -21,7 +21,9 @@ public  abstract class AbstractBiologyInitializer implements BiologyInitializer 
      * @return a global biology object
      */
     @Override
-    public GlobalBiology generateGlobal(MersenneTwisterFast random, FishState modelBeingInitialized) {
+    public GlobalBiology generateGlobal(
+            MersenneTwisterFast random,
+            FishState modelBeingInitialized) {
         //turn list of names into list of species
         String[] names = getSpeciesNames();
         Species[] speciesArray = new Species[names.length];

@@ -32,7 +32,7 @@ public class WellMixedBiologyInitializerTest {
         BiomassLocalBiology biology = (BiomassLocalBiology) initializer.generateLocal(mock(GlobalBiology.class),
                                                                                       tile,
                                                                                       new MersenneTwisterFast(), 50,
-                                                                                      50);
+                                                                                      50, );
 
 
         Species zero = new Species("zero"); zero.resetIndexTo(0);

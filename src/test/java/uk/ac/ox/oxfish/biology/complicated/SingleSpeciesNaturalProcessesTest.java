@@ -113,7 +113,7 @@ public class SingleSpeciesNaturalProcessesTest {
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             LocalBiology localBiology = initializer.generateLocal(biology,
-                                                              element, new MersenneTwisterFast(), 4, 4);
+                                                              element, new MersenneTwisterFast(), 4, 4, );
             element.setBiology(localBiology); //put new biology in
             processes.add((AbundanceBasedLocalBiology) localBiology);
         }
@@ -173,7 +173,7 @@ public class SingleSpeciesNaturalProcessesTest {
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             LocalBiology localBiology = initializer.generateLocal(biology,
-                                                                  element, new MersenneTwisterFast(), 4, 4);
+                                                                  element, new MersenneTwisterFast(), 4, 4, );
             element.setBiology(localBiology); //put new biology in
             processes.add((AbundanceBasedLocalBiology) localBiology);
             if(element.getGridX()==1 && element.getGridY()==1)

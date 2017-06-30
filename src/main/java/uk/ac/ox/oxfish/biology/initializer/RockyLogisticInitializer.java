@@ -66,17 +66,17 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     /**
      * the carrying capacity is an average between the rocky and the sandy one depending on how rocky
      * the tile is
-     *
-     * @param biology          the global biology (species' list) object
+     *  @param biology          the global biology (species' list) object
      * @param seaTile          the sea-tile to populate
      * @param random           the randomizer
      * @param mapHeightInCells height of the map
      * @param mapWidthInCells  width of the map
+     * @param map
      */
     @Override
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
-            int mapWidthInCells) {
+            int mapWidthInCells, NauticalMap map) {
         if(seaTile.getAltitude() >=0)
             return new EmptyLocalBiology();
         else

@@ -41,6 +41,9 @@ public class MapInitializers {
                          OsmoseBoundedMapInitializerFactory::new);
         NAMES.put(OsmoseBoundedMapInitializerFactory.class,"OSMOSE Bounded Map");
 
+        CONSTRUCTORS.put("From File Map",
+                         FromFileMapInitializerFactory::new);
+        NAMES.put(FromFileMapInitializerFactory.class,"From File Map");
 
 
     }

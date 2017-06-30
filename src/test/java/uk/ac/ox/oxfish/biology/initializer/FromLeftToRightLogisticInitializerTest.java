@@ -32,8 +32,8 @@ public class FromLeftToRightLogisticInitializerTest {
         when(tile.getGridX()).thenReturn(0);
         BiomassLocalBiology local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);
+        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(), )).thenReturn(local);
+        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100, );
         verify(local).setCarryingCapacity(species,100d);
 
         //in the middle you lose 50%
@@ -41,8 +41,8 @@ public class FromLeftToRightLogisticInitializerTest {
         when(tile.getGridX()).thenReturn(50);
         local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);
+        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(), )).thenReturn(local);
+        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100, );
         verify(local).setCarryingCapacity(species,50d);
 
 
@@ -51,8 +51,8 @@ public class FromLeftToRightLogisticInitializerTest {
         when(tile.getGridX()).thenReturn(99);
         local = mock(BiomassLocalBiology.class);
         when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt())).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100);
+        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(), )).thenReturn(local);
+        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100, );
         verify(local).setCarryingCapacity(species,10d);
 
     }
