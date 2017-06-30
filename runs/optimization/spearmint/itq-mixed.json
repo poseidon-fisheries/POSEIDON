@@ -1,0 +1,28 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "itq.py",
+    "experiment-name" : "itq-mixed",
+    "likelihood"      : "GAUSSIAN",
+    "resources" : {
+        "my-machine" : {
+            "scheduler"         : "local",
+            "max-concurrent"    : 3,
+            "max-finished-jobs" : 200
+        }
+    },
+    "variables" : {
+        "x" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 10000
+        },
+        "y" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 10000
+        }
+    }
+}
+
