@@ -52,7 +52,8 @@ public class MultipleSpeciesAbundanceInitializerTest
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4, )); //put new biology in
+                                                         element, new MersenneTwisterFast(),4, 4,                                          mock(NauticalMap.class)
+            )); //put new biology in
         }
         //force it to process the map uniformly
         initializer.putAllocator(fakeSpecies,
@@ -107,7 +108,8 @@ public class MultipleSpeciesAbundanceInitializerTest
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4, )); //put new biology in
+                                                         element, new MersenneTwisterFast(),4, 4,                                          mock(NauticalMap.class)
+            )); //put new biology in
         }
         //force it to put everything in tile 1,1
         initializer.putAllocator(fakeSpecies,

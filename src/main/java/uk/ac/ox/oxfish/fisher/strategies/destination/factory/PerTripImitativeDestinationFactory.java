@@ -101,14 +101,17 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
                     }
                 };
 
-        if(automaticallyIgnoreAreasWhereFishNeverGrows)
-            explorationValidator = explorationValidator.and(new Predicate<SeaTile>() {
+        if(automaticallyIgnoreAreasWhereFishNeverGrows) {
+            final Predicate<SeaTile> previosValidator = explorationValidator;
+            explorationValidator = new Predicate<SeaTile>() {
                 @Override
                 public boolean test(SeaTile seaTile) {
-                    return seaTile.isFishingEvenPossibleHere();
+                    return
+                            previosValidator.test(seaTile) &&
+                                    seaTile.isFishingEvenPossibleHere();
                 }
-            });
-
+            };
+        }
         if(probabilityUnfriending <= 0)
         { //no unfriending
 

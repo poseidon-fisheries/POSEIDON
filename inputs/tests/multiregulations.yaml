@@ -51,9 +51,6 @@ Abstract 2 Populations:
           incrementMultiplier: '0.02'
       stepSize: uniform 1.0 10.0
   enginePower: normal 5000.0 100.0
-  fishingStrategy:
-    Until Full With Day Limit:
-      daysAtSea: '5.0'
   gasPricePerLiter: '0.05'
   gearLarge:
     Random Catchability:

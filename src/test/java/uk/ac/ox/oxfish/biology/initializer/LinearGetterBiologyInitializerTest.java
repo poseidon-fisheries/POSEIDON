@@ -3,11 +3,12 @@ package uk.ac.ox.oxfish.biology.initializer;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,11 +44,13 @@ public class LinearGetterBiologyInitializerTest {
         zeroZero.setBiology(initializer.generateLocal(globalBiology,
                                                                  zeroZero,
                                                                  new MersenneTwisterFast(),
-                                                                 5,5, ));
+                                                                 5,5,                                          mock(NauticalMap.class)
+        ));
         fiveFive.setBiology(initializer.generateLocal(globalBiology,
                                                       fiveFive,
                                                       new MersenneTwisterFast(),
-                                                      5,5, ));
+                                                      5,5,                                          mock(NauticalMap.class)
+        ));
 
         zeroZero.start(state);
         fiveFive.start(state);

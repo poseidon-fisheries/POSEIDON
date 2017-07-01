@@ -22,7 +22,7 @@ import java.util.Map;
 public class GenericBiomassInitializer extends AbstractBiologyInitializer
 {
 
-    private final DoubleParameter carryingCapacity;
+    private final List<DoubleParameter> carryingCapacity;
 
 
     private final DoubleParameter minInitialCapacity;
@@ -54,7 +54,8 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
 
 
     public GenericBiomassInitializer(
-            DoubleParameter carryingCapacity, DoubleParameter minInitialCapacity,
+            List<DoubleParameter> carryingCapacity,
+            DoubleParameter minInitialCapacity,
             DoubleParameter maxInitialCapacity, double percentageLimitOnDailyMovement,
             double differentialPercentageToMove,
             LogisticGrowerInitializer grower,
@@ -111,8 +112,8 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
         Double[] currentCapacity = new Double[biology.getSize()];
         for(Species species : biology.getSpecies())
         {
-            Double k = carryingCapacity.apply(random) *
-                    manager.getWeight(species, seaTile);
+            Double k = carryingCapacity.get(species.getIndex()).apply(random) *
+                    manager.getWeight(species, seaTile,map ,random );
             carringCapacities[species.getIndex()] = k;
 
             Double min = minInitialCapacity.apply(random);

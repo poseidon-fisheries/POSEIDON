@@ -18,7 +18,8 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.function.ToDoubleFunction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -54,7 +55,10 @@ public class MultipleSpeciesDerisoInitializerTest {
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4, )); //put new biology in
+                                                         element, new MersenneTwisterFast(),
+                                                         4, 4,
+                                                         mock(NauticalMap.class)
+            )); //put new biology in
         }
         //force it to process the map uniformly (but at double total)
         initializer.putAllocator(fakeSpecies,
@@ -113,7 +117,9 @@ public class MultipleSpeciesDerisoInitializerTest {
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             element.setBiology(initializer.generateLocal(biology,
-                                                         element, new MersenneTwisterFast(),4, 4, )); //put new biology in
+                                                         element, new MersenneTwisterFast(),4, 4,
+                                                         mock(NauticalMap.class)
+            )); //put new biology in
         }
         //force it to put everything in tile 1,1
         initializer.putAllocator(fakeSpecies,

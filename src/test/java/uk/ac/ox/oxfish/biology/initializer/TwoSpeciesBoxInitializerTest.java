@@ -1,13 +1,18 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedConstantAllocator;
+import uk.ac.ox.oxfish.biology.initializer.factory.TwoSpeciesBoxFactory;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +26,22 @@ public class TwoSpeciesBoxInitializerTest
     @Test
     public void killsOffCorrectly() throws Exception {
 
+
+        GenericBiomassInitializer initializer = new
+                GenericBiomassInitializer(
+                Lists.newArrayList(
+                        new FixedDoubleParameter(100d),new FixedDoubleParameter(100d)),
+                new FixedDoubleParameter(0),
+                new FixedDoubleParameter(1),
+                0d,0d,
+                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d)),
+                Lists.newArrayList(
+                        new BoundedConstantAllocator(0,0,9,9,false),
+                        new BoundedConstantAllocator(0,0,9,9,true)
+                )
+        );
+
+        /*
         //simple box 0,0 to 9,9
         TwoSpeciesBoxInitializer initializer = new TwoSpeciesBoxInitializer(
                 0,
@@ -33,7 +54,7 @@ public class TwoSpeciesBoxInitializerTest
                 0d,0d,
                 new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d))
         );
-
+*/
 
         GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
         //at 0,0 there is no species 0
@@ -43,6 +64,7 @@ public class TwoSpeciesBoxInitializerTest
                                           new MersenneTwisterFast(),
                                           100,
                                           100,
+                                          mock(NauticalMap.class)
                 );
 
         assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
@@ -55,6 +77,8 @@ public class TwoSpeciesBoxInitializerTest
                                           new MersenneTwisterFast(),
                                           100,
                                           100,
+                                          mock(NauticalMap.class)
+
                 );
         assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
         assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
@@ -67,8 +91,83 @@ public class TwoSpeciesBoxInitializerTest
                                           new MersenneTwisterFast(),
                                           100,
                                           100,
+                                          mock(NauticalMap.class)
+
                 );
         assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)),100,.0001 );
         assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)),0,.0001 );
+    }
+
+    @Test
+    public void fromFactory() throws Exception {
+
+                /*
+        //simple box 0,0 to 9,9
+        TwoSpeciesBoxInitializer initializer = new TwoSpeciesBoxInitializer(
+                0,
+                0,
+                10,
+                10,
+                false,
+                new FixedDoubleParameter(100),
+                new FixedDoubleParameter(1d),
+                0d,0d,
+                new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d))
+        );
+*/
+
+
+        TwoSpeciesBoxFactory factory = new TwoSpeciesBoxFactory();
+        factory.setBoxHeight(new FixedDoubleParameter(10d));
+        factory.setBoxWidth(new FixedDoubleParameter(10d));
+        factory.setDifferentialPercentageToMove(new FixedDoubleParameter(0));
+        factory.setPercentageLimitOnDailyMovement(new FixedDoubleParameter(0));
+        factory.setSpecies0InsideTheBox(false);
+        factory.setFirstSpeciesCapacity(new FixedDoubleParameter(100d));
+        factory.setRatioFirstToSecondSpecies(new FixedDoubleParameter(1d));
+
+        GenericBiomassInitializer initializer = factory.apply(mock(FishState.class));
+
+        GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
+        //at 0,0 there is no species 0
+        BiomassLocalBiology zerozero = (BiomassLocalBiology)
+                initializer.generateLocal(biology,
+                                          new SeaTile(0, 0, -100, mock(TileHabitat.class)),
+                                          new MersenneTwisterFast(),
+                                          100,
+                                          100,
+                                          mock(NauticalMap.class)
+                );
+
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
+        assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+
+        //at 5,5 also no species 0
+        BiomassLocalBiology fivefive = (BiomassLocalBiology)
+                initializer.generateLocal(biology,
+                                          new SeaTile(5,5, -100, mock(TileHabitat.class)),
+                                          new MersenneTwisterFast(),
+                                          100,
+                                          100,
+                                          mock(NauticalMap.class)
+
+                );
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(0)),0,.0001 );
+        assertEquals(fivefive.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
+
+
+        //at 10,10 there is no species 1
+        BiomassLocalBiology tenten = (BiomassLocalBiology)
+                initializer.generateLocal(biology,
+                                          new SeaTile(10,10, -100, mock(TileHabitat.class)),
+                                          new MersenneTwisterFast(),
+                                          100,
+                                          100,
+                                          mock(NauticalMap.class)
+
+                );
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(0)),100,.0001 );
+        assertEquals(tenten.getCarryingCapacity(biology.getSpecie(1)),0,.0001 );
+
     }
 }

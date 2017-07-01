@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -32,7 +33,9 @@ public class WellMixedBiologyInitializerTest {
         BiomassLocalBiology biology = (BiomassLocalBiology) initializer.generateLocal(mock(GlobalBiology.class),
                                                                                       tile,
                                                                                       new MersenneTwisterFast(), 50,
-                                                                                      50, );
+                                                                                      50,
+                                                                                      mock(NauticalMap.class)
+        );
 
 
         Species zero = new Species("zero"); zero.resetIndexTo(0);

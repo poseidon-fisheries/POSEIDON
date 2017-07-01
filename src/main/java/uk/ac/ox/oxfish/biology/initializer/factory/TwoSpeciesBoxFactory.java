@@ -1,8 +1,11 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import com.google.common.collect.Lists;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
-import uk.ac.ox.oxfish.biology.initializer.TwoSpeciesBoxInitializer;
+import uk.ac.ox.oxfish.biology.initializer.GenericBiomassInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedConstantAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -12,7 +15,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * A more general two-species initializer, the "father" of well-mixed, split in half and half bycatch
  * Created by carrknight on 1/4/16.
  */
-public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxInitializer> {
+public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInitializer> {
 
 
     /**
@@ -22,18 +25,57 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
      * @return the function result
      */
     @Override
-    public TwoSpeciesBoxInitializer apply(FishState fishState) {
-        return new TwoSpeciesBoxInitializer(
-                lowestX.apply(fishState.getRandom()).intValue(),
-                lowestY.apply(fishState.getRandom()).intValue(),
-                boxHeight.apply(fishState.getRandom()).intValue(),
-                boxWidth.apply(fishState.getRandom()).intValue(),
-                species0InsideTheBox,
-                firstSpeciesCapacity,
-                ratioFirstToSecondSpecies,
+    public GenericBiomassInitializer apply(FishState fishState) {
+
+
+        double x = lowestX.apply(fishState.getRandom());
+        double y = lowestY.apply(fishState.getRandom());
+        double width = getBoxWidth().apply(fishState.getRandom());
+        double height = getBoxHeight().apply(fishState.getRandom());
+
+
+        return  new GenericBiomassInitializer(
+
+
+                Lists.newArrayList(
+                        firstSpeciesCapacity,
+                        //this was a very stupid way of doing ratios I am carrying over for backward compatibility
+                        new DoubleParameter() {
+                            @Override
+                            public DoubleParameter makeCopy() {
+                                return this;
+                            }
+
+                            @Override
+                            public Double apply(MersenneTwisterFast mersenneTwisterFast) {
+                                Double ratio = ratioFirstToSecondSpecies.apply(mersenneTwisterFast);
+                                double firstSpecies = firstSpeciesCapacity.apply(mersenneTwisterFast);
+                                double secondSpeciesCapacity = 0;
+                                if(ratio == 1)
+                                    secondSpeciesCapacity = firstSpecies;
+                                else if(ratio>1)
+                                {
+                                    secondSpeciesCapacity = ratio* firstSpecies;
+
+                                }
+                                else
+                                    secondSpeciesCapacity = firstSpecies *
+                                            ratio/(1-ratio);
+                                return  secondSpeciesCapacity;
+                            }
+                        }
+                ),
+                new FixedDoubleParameter(0),
+                new FixedDoubleParameter(1d),
                 percentageLimitOnDailyMovement.apply(fishState.getRandom()),
                 differentialPercentageToMove.apply(fishState.getRandom()),
-                grower.apply(fishState)
+                grower.apply(fishState),
+                Lists.newArrayList(
+                        new BoundedConstantAllocator(x, y, x+width-1, y+height-1, false),
+                        new BoundedConstantAllocator(x, y, x+width-1, y+height-1,true)
+                )
+
+
         );
     }
 
@@ -73,7 +115,6 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<TwoSpeciesBoxIniti
      * ratio of maxCapacitySecond/maxCapacityFirst
      */
     private DoubleParameter ratioFirstToSecondSpecies = new FixedDoubleParameter(1d);
-
 
     /**
      * fixes a limit on how much biomass can leave the sea-tile
