@@ -8,9 +8,7 @@ import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.geography.CartesianUTMDistance;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.*;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.sampling.GeographicalSample;
@@ -45,11 +43,17 @@ public class FromFileMapInitializer implements MapInitializer {
 
     final private boolean header;
 
+    /**
+     * true if coordinates are in latlong, otherwise assume UTM
+     */
+    final private boolean latLong;
 
-    public FromFileMapInitializer(Path filePath, int gridWidthInCells, boolean header) {
+
+    public FromFileMapInitializer(Path filePath, int gridWidthInCells, boolean header, boolean latLong) {
         this.filePath = filePath;
         this.gridWidthInCells = gridWidthInCells;
         this.header = header;
+        this.latLong = latLong;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class FromFileMapInitializer implements MapInitializer {
 
             switch (fileExtension.trim().toLowerCase())
             {
+                //assuming here you saved already the nautical map
                 case "data":
                     ObjectInputStream stream = new ObjectInputStream(
                             new FileInputStream(filePath.toFile()));
@@ -76,15 +81,16 @@ public class FromFileMapInitializer implements MapInitializer {
                     return sampledAltitudeToNauticalMap(sampledMap.getAltitudeGrid(),
                                                         sampledMap.getMbr(),
                                                         sampledMap.getGridHeight(),
-                                                        sampledMap.getGridWith());
+                                                        sampledMap.getGridWith(), latLong);
 
                 default:
                 case "csv":
-
+                    //otherwise read from data
                     GeographicalSample altitudeSample = new GeographicalSample(filePath,
                                                                                header);
+                    //create the mbr from max-min stuff
                     Envelope mbr = new Envelope(altitudeSample.getMinEasting(), altitudeSample.getMaxEasting(),
-                                       altitudeSample.getMinNorthing(), altitudeSample.getMaxNorthing());
+                                                altitudeSample.getMinNorthing(), altitudeSample.getMaxNorthing());
                     //find ratio height to width
                     double heightToWidth = mbr.getHeight()/mbr.getWidth();
                     int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);
@@ -102,7 +108,8 @@ public class FromFileMapInitializer implements MapInitializer {
                             gridHeightInCells
                     );
 
-                    return sampledAltitudeToNauticalMap(sampledAltitudeGrid, mbr, gridHeightInCells, gridWidthInCells);
+                    return sampledAltitudeToNauticalMap(sampledAltitudeGrid, mbr, gridHeightInCells, gridWidthInCells,
+                                                        latLong);
 
             }
 
@@ -117,8 +124,11 @@ public class FromFileMapInitializer implements MapInitializer {
 
 
     public static NauticalMap sampledAltitudeToNauticalMap(
-            Table<Integer, Integer, LinkedList<Double>> sampledAltitudeGrid, Envelope mbr, int gridHeightInCells,
-            int gridWidthInCells) {
+            Table<Integer, Integer,
+                    LinkedList<Double>> sampledAltitudeGrid,
+            Envelope mbr, int gridHeightInCells,
+            int gridWidthInCells,
+            final boolean latLong) {
         //turn it into a proper map
         ObjectGrid2D altitudeGrid = new ObjectGrid2D(gridWidthInCells, gridHeightInCells);
 
@@ -139,15 +149,18 @@ public class FromFileMapInitializer implements MapInitializer {
         unitedMap.setMBR(mbr);
 
         //create the map
-        CartesianUTMDistance distance = new CartesianUTMDistance();
+        Distance distance = latLong ? new EquirectangularDistanceByCoordinate() : new CartesianUTMDistance() ;
         NauticalMap nauticalMap = new NauticalMap(unitedMap, new GeomVectorField(),
                                                   distance,
                                                   new AStarPathfinder(distance));
 
         //cell distance:
-        System.out.println(distance.distance(nauticalMap.getSeaTile(0,0),
-                                             nauticalMap.getSeaTile(0,1),
-                                             nauticalMap));
+        System.out.println("coordinates for 0,0 are: " + nauticalMap.getCoordinates(0,0) );
+        System.out.println("coordinates for 1,1 are: " + nauticalMap.getCoordinates(1,1) );
+        System.out.println("the distance between 0,0 and 1,1 is: " +
+                                   distance.distance(nauticalMap.getSeaTile(0,0),
+                                                     nauticalMap.getSeaTile(1,1),
+                                                     nauticalMap) );
 
         return nauticalMap;
     }

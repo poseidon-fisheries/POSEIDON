@@ -14,12 +14,14 @@ import java.nio.file.Paths;
 public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileMapInitializer> {
 
 
-    private Path  mapFile =  Paths.get("inputs","indonesia","indonesia.csv");
+    private Path  mapFile =  Paths.get("inputs","indonesia","indonesia_latlong.csv");
 
 
-    private DoubleParameter gridWidthInCell = new FixedDoubleParameter(50);
+    private DoubleParameter gridWidthInCell = new FixedDoubleParameter(100);
 
     private boolean header = true;
+
+    private boolean latLong = true;
 
     public FromFileMapInitializerFactory() {
     }
@@ -34,7 +36,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     @Override
     public FromFileMapInitializer apply(FishState state) {
         return new FromFileMapInitializer(mapFile,
-                                          gridWidthInCell.apply(state.getRandom()).intValue(), header);
+                                          gridWidthInCell.apply(state.getRandom()).intValue(), header, latLong);
     }
 
     /**
@@ -89,5 +91,23 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      */
     public void setHeader(boolean header) {
         this.header = header;
+    }
+
+    /**
+     * Getter for property 'latLong'.
+     *
+     * @return Value for property 'latLong'.
+     */
+    public boolean isLatLong() {
+        return latLong;
+    }
+
+    /**
+     * Setter for property 'latLong'.
+     *
+     * @param latLong Value to set for property 'latLong'.
+     */
+    public void setLatLong(boolean latLong) {
+        this.latLong = latLong;
     }
 }
