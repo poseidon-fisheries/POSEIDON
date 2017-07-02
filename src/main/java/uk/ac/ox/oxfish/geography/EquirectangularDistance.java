@@ -17,7 +17,7 @@ public class EquirectangularDistance extends BaseDistance {
      */
     private final double gridSize;
 
-    private final static double EARTH_RADIUS = 6373;
+    public final static double EARTH_RADIUS = 6373;
 
     public EquirectangularDistance(double lowerLeftLatitude, double gridSize) {
         this.lowerLeftLatitude = lowerLeftLatitude;

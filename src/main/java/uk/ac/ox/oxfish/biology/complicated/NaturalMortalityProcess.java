@@ -23,8 +23,8 @@ public class NaturalMortalityProcess
         Preconditions.checkArgument(male.length==female.length);
         for(int i=0;i<male.length; i++)
         {
-            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality));
-            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality));
+            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality) + 0.5d);
+            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality) + 0.5d);
         }
 
     }

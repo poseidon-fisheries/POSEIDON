@@ -4,10 +4,12 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 
 public class FromLeftToRightInitializerTest {
@@ -28,15 +30,18 @@ public class FromLeftToRightInitializerTest {
         GlobalBiology biology = new GlobalBiology(species);
 
         left.setBiology(
-                initializer.generateLocal(biology, left, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
+                initializer.generateLocal(biology, left, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100,                                          mock(NauticalMap.class)
+                )
         );
 
         middle.setBiology(
-                initializer.generateLocal(biology, middle, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
+                initializer.generateLocal(biology, middle, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100,                                          mock(NauticalMap.class)
+                )
         );
 
         right.setBiology(
-                initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100, )
+                initializer.generateLocal(biology, right, new MersenneTwisterFast(System.currentTimeMillis()), 100, 100,                                          mock(NauticalMap.class)
+                )
         );
 
 

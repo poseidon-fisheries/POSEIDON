@@ -178,7 +178,9 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
                                                           toAdapt, fitness, current,
                                                           friends, objective, getSensor());
             //if there is somebody to imitate and the imitation does not involve just doing what I am doing anyway
-            if(imitation.getSecond() != null && !imitation.getFirst().equals(current) && explorationCheck.test(imitation.getFirst()))
+            if(imitation.getSecond() != null
+                    && !imitation.getFirst().equals(current)
+                    && explorationCheck.test(imitation.getFirst()))
             {
                 imitationStart = new ImitationStart<>(imitation.getSecond(),fitness,imitation.getFirst());
 
@@ -327,5 +329,14 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
      */
     public ExploreImitateStatus getStatus() {
         return status;
+    }
+
+    /**
+     * Getter for property 'explorationCheck'.
+     *
+     * @return Value for property 'explorationCheck'.
+     */
+    public Predicate<T> getExplorationCheck() {
+        return explorationCheck;
     }
 }

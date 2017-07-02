@@ -81,7 +81,8 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
             MersenneTwisterFast random, int mapHeightInCells, int mapWidthInCells,
             NauticalMap map) {
         //it must be a logistic biology to come out of the diffusing logistic biology!
-        LocalBiology generated = delegate.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells, );
+        LocalBiology generated = delegate.generateLocal(
+                biology, seaTile, random, mapHeightInCells, mapWidthInCells,map );
         if(seaTile.getAltitude()>0)
             return generated;
         BiomassLocalBiology local = (BiomassLocalBiology) generated;

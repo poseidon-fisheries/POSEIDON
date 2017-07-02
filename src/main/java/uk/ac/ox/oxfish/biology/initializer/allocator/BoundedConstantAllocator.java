@@ -20,9 +20,12 @@ public class BoundedConstantAllocator implements BiomassAllocator {
 
     private final double highestY;
 
+    private final boolean insideTheBox;
 
-    public BoundedConstantAllocator(double lowestX, double lowestY,
-                                    double highestX, double highestY) {
+    public BoundedConstantAllocator(
+            double lowestX, double lowestY,
+            double highestX, double highestY, boolean insideTheBox) {
+        this.insideTheBox = insideTheBox;
         Preconditions.checkArgument(lowestX<=highestX, "allocator bound badly defined");
         Preconditions.checkArgument(lowestY<=highestY,"allocator bound badly defined");
         this.lowestX = lowestX;
@@ -46,9 +49,9 @@ public class BoundedConstantAllocator implements BiomassAllocator {
 
         if(tile.getGridY()>=lowestY && tile.getGridY()<=highestY &&
                 tile.getGridX()>=lowestX && tile.getGridX()<=highestX)
-            return 1d;
+            return insideTheBox ? 1d : 0d;
         else
-            return 0d;
+            return insideTheBox ? 0d : 1d;
 
 
 

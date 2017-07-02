@@ -15,3 +15,8 @@ OSMOSE Bounded Map:
   upLeftEasting: -73291.664
   upLeftNorthing: 3445097.299
 -------
+From File Map:
+  gridWidthInCell: '50.0'
+  header: true
+  mapFile: inputs/indonesia/indonesia.csv
+-------

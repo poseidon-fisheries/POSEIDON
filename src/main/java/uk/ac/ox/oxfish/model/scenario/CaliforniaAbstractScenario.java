@@ -326,7 +326,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     seaTile.assignLocalWeather(new ConstantWeather(0, 0, 0));
                     seaTile.setBiology(
                             getBiologyInitializer()
-                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth, ));
+                                    .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth,map ));
                     //if it's sea (don't bother counting otherwise)
                     if (seaTile.getAltitude() < 0)
                     {

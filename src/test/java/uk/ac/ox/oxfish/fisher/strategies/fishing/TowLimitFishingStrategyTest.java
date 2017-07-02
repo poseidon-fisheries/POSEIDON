@@ -8,7 +8,8 @@ import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.TowLimitFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,19 +28,21 @@ public class TowLimitFishingStrategyTest {
         FishingStrategy strategy = factory.apply(mock(FishState.class));
         TripRecord record = mock(TripRecord.class);
         when(record.getEffort()).thenReturn(1);
+        Fisher fisher = mock(Fisher.class);
+        when(fisher.getMaximumHold()).thenReturn(100d);
         assertTrue(
-                strategy.shouldFish(mock(Fisher.class), new MersenneTwisterFast(),
+                strategy.shouldFish(fisher, new MersenneTwisterFast(),
                                     mock(FishState.class), record)
         );
         when(record.getEffort()).thenReturn(100);
         assertTrue(
-                strategy.shouldFish(mock(Fisher.class), new MersenneTwisterFast(),
+                strategy.shouldFish(fisher, new MersenneTwisterFast(),
                                     mock(FishState.class), record)
         );
 
         when(record.getEffort()).thenReturn(101);
         assertFalse(
-                strategy.shouldFish(mock(Fisher.class), new MersenneTwisterFast(),
+                strategy.shouldFish(fisher, new MersenneTwisterFast(),
                                     mock(FishState.class), record)
         );
     }
