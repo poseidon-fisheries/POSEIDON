@@ -202,14 +202,14 @@ public class ParticleSwarmAlgorithm<T> implements AdaptationAlgorithm<T>
         Optional<Fisher> bestFriend = friends.stream().max(new Comparator<Fisher>() {
             @Override
             public int compare(Fisher o1, Fisher o2) {
-                return Double.compare(objectiveFunction.computeCurrentFitness(o1),
-                                      objectiveFunction.computeCurrentFitness(o2));
+                return Double.compare(objectiveFunction.computeCurrentFitness(o1, o1),
+                                      objectiveFunction.computeCurrentFitness(o1, o2));
             }
         });
 
 
-        double[] socialCoordinates = bestFriend.isPresent() && objectiveFunction.computeCurrentFitness(agent)<
-                objectiveFunction.computeCurrentFitness(bestFriend.get())?
+        double[] socialCoordinates = bestFriend.isPresent() && objectiveFunction.computeCurrentFitness(agent, agent)<
+                objectiveFunction.computeCurrentFitness(agent, bestFriend.get())?
                 transformers.toCoordinates(getBestMemory.apply(bestFriend.get()),
                                            agent,model) :
                 null;

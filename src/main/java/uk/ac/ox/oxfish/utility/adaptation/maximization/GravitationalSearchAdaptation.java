@@ -1,29 +1,21 @@
 package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
-import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.MutablePair;
-import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.AbstractAdaptation;
 import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 /**
  * Created by carrknight on 10/4/16.
@@ -129,7 +121,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
             if(currentCoordinates==null)
                 return null;
         }
-        double personalMass = mass.computeCurrentFitness(toAdapt);
+        double personalMass = mass.computeCurrentFitness(toAdapt, toAdapt);
         //don't bother if you don't have mass or coordinates
         Preconditions.checkNotNull(currentCoordinates);
         Preconditions.checkState(Double.isFinite(personalMass), Arrays.toString(currentCoordinates));
@@ -140,7 +132,7 @@ public class GravitationalSearchAdaptation<T> extends AbstractAdaptation<T>
                 fisher ->
                         new MutablePair<>(
                                 transformer.toCoordinates(getSensor().scan(fisher), fisher, state),
-                                mass.computeCurrentFitness(fisher)
+                                mass.computeCurrentFitness(toAdapt, fisher)
                         ))
                 //ignore those that have no coordinates or no utility
                 .filter(pair -> pair.getFirst() != null &&

@@ -27,7 +27,7 @@ public class KnifeEdgePerTripObjective extends TripBasedObjectiveFunction {
 
     @Override
     protected double extractUtilityFromTrip(
-            TripRecord tripRecord, Fisher fisher) {
+            Fisher observer, TripRecord tripRecord, Fisher Observed) {
         return tripRecord.getProfitPerHour(opportunityCosts) >= minimumProfitPerHour ?
                 +1 : -1;
     }

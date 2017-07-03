@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
@@ -117,4 +118,13 @@ public class HeterogeneousAbundanceGear implements Gear
     public HashMap<Species, HomogeneousAbundanceGear> getGears() {
         return gears;
     }
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HeterogeneousAbundanceGear that = (HeterogeneousAbundanceGear) o;
+        return Objects.equals(getGears(), that.getGears());
+    }
+
 }

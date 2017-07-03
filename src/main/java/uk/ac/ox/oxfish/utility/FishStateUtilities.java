@@ -178,7 +178,8 @@ public class FishStateUtilities {
 
     public static <T> Pair<T,Fisher> imitateFriendAtRandom(
             MersenneTwisterFast random, double fitness, T current, Collection<Fisher> friends,
-            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
+            ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher, T> sensor,
+            Fisher fisherThinkingOfImitating) {
         //get random friend
         List<Fisher> friendList = friends.stream().
                 //remove friends we can't imitate
@@ -191,7 +192,8 @@ public class FishStateUtilities {
             return new Pair<>(current,null);
         else {
             Fisher friend = friendList.get(random.nextInt(friendList.size()));
-            double friendFitness = objectiveFunction.computeCurrentFitness(friend);
+            double friendFitness = objectiveFunction.computeCurrentFitness(fisherThinkingOfImitating,
+                                                                           friend);
             if(friendFitness > fitness && Double.isFinite(friendFitness) && Double.isFinite(fitness)) {
                 return new Pair<>(sensor.scan(friend),friend);
             }
@@ -202,10 +204,11 @@ public class FishStateUtilities {
     }
 
 
-    public static <T> Pair<T,Fisher> imitateBestFriend(MersenneTwisterFast random, double fitness,
-                                                       T current, Collection<Fisher> friends,
-                                                       ObjectiveFunction<Fisher> objectiveFunction,
-                                                       Sensor<Fisher,T> sensor)
+    public static <T> Pair<T,Fisher> imitateBestFriend(
+            MersenneTwisterFast random, Fisher fisherDoingTheImitation, double fitness,
+            T current, Collection<Fisher> friends,
+            ObjectiveFunction<Fisher> objectiveFunction,
+            Sensor<Fisher, T> sensor)
     {
 
         //if you have no friends, keep doing what you currently are doing
@@ -223,7 +226,8 @@ public class FishStateUtilities {
                                     @Override
                                     public Double apply(Fisher fisher) {
                                         //get your friend fitness
-                                        double friendFitness = objectiveFunction.computeCurrentFitness(fisher);
+                                        double friendFitness = objectiveFunction.computeCurrentFitness(
+                                                fisherDoingTheImitation, fisher);
                                         //if it is finite check if it is better than what we already have
                                         if(Double.isFinite(friendFitness))
                                             maxFitness[0] = Math.max(maxFitness[0], friendFitness);

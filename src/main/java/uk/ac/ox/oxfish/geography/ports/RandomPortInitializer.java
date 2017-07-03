@@ -21,6 +21,7 @@ public class RandomPortInitializer implements PortInitializer {
     private final int ports;
 
 
+
     public RandomPortInitializer(int ports) {
         this.ports = ports;
     }
@@ -31,7 +32,8 @@ public class RandomPortInitializer implements PortInitializer {
      */
     public static List<Port> addRandomPortsToMap(NauticalMap map,int ports,
                                            Function<SeaTile,MarketMap> marketFactory,
-                                           MersenneTwisterFast random){
+                                           MersenneTwisterFast random,
+                                                 double gasPrice){
 
         List<Port> toReturn = new LinkedList<>();
 
@@ -69,7 +71,7 @@ public class RandomPortInitializer implements PortInitializer {
 
         Collections.shuffle(candidateTiles, new Random(random.nextLong()));
         for(int i=0; i<ports; i++) {
-            Port port = new Port("Port " + i, candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)), 0);
+            Port port = new Port("Port " + i, candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)), gasPrice);
             map.addPort(port);
             toReturn.add(port);
         }
@@ -86,14 +88,17 @@ public class RandomPortInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
+     * @param gasPrice
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model) {
-        return addRandomPortsToMap(map,getPorts(),marketFactory,mapmakerRandom);
+            FishState model, double gasPrice) {
+        return addRandomPortsToMap(map,getPorts(),marketFactory,mapmakerRandom,gasPrice);
     }
+
+
 
     /**
      * Getter for property 'ports'.

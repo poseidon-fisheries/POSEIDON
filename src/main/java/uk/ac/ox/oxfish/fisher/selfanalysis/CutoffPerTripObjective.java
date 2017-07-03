@@ -31,12 +31,14 @@ public class CutoffPerTripObjective implements ObjectiveFunction<Fisher>{
     /**
      * compute current fitness of the agent
      *
+     *
+     * @param observer
      * @param observed agent whose fitness we are trying to compute
      * @return a fitness value: the higher the better
      */
     @Override
-    public double computeCurrentFitness(Fisher observed) {
-        return censor(delegate.computeCurrentFitness(observed));
+    public double computeCurrentFitness(Fisher observer, Fisher observed) {
+        return censor(delegate.computeCurrentFitness(observer, observed));
     }
 
     private double censor(double profit) {

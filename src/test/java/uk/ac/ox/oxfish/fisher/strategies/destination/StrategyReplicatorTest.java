@@ -12,7 +12,6 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomThenBackToPortFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscarding;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
@@ -24,7 +23,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +71,8 @@ public class StrategyReplicatorTest {
         options.add(new RandomThenBackToPortFactory());
         options.add(new RandomThenBackToPortFactory());
         //utility is index * 10
-        ObjectiveFunction<Fisher> objectiveFunction = observed -> (((ReplicatorDrivenDestinationStrategy) observed.getDestinationStrategy()).getStrategyIndex()+1) * 10;
+        ObjectiveFunction<Fisher> objectiveFunction = (observer, observed) ->
+                (((ReplicatorDrivenDestinationStrategy) observed.getDestinationStrategy()).getStrategyIndex()+1) * 10;
         //give random utility
         for(Fisher fisher : fishers)
             fisher.setDestinationStrategy(new ReplicatorDrivenDestinationStrategy(random.nextInt(2),mock(DestinationStrategy.class)));

@@ -22,7 +22,8 @@ public class RandomPortFactory implements AlgorithmFactory<RandomPortInitializer
      */
     @Override
     public RandomPortInitializer apply(FishState fishState) {
-        return new RandomPortInitializer(numberOfPorts.apply(fishState.getRandom()).intValue());
+        return new RandomPortInitializer(
+                numberOfPorts.apply(fishState.getRandom()).intValue() );
     }
 
     /**

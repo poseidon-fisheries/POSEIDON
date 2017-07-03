@@ -27,7 +27,8 @@ public class HourlyProfitInTripObjective extends TripBasedObjectiveFunction
 
 
     @Override
-    protected double extractUtilityFromTrip(TripRecord tripRecord, Fisher fisher) {
+    protected double extractUtilityFromTrip(
+            Fisher observer, TripRecord tripRecord, Fisher Observed) {
         return tripRecord.getProfitPerHour(includingOpportunityCosts);
     }
 }

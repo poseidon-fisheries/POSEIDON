@@ -44,9 +44,9 @@ public class KnifeEdgeCashflowObjectiveTest {
 
         }
         //cash should now be 6, 6 days ago it was 6
-        assertEquals(6,objective.computeCurrentFitness(fisher),.0001);
-        assertEquals(1,knifeEdge.computeCurrentFitness(fisher),.0001);
-        assertEquals(-1,knifeEdge2.computeCurrentFitness(fisher),.0001);
+        assertEquals(6, objective.computeCurrentFitness(fisher, fisher), .0001);
+        assertEquals(1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
+        assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
 
         //let's add some garbage
         for(int i=0; i<6; i++)
@@ -55,9 +55,9 @@ public class KnifeEdgeCashflowObjectiveTest {
             data.step(mock(FishState.class));
         }
         //now it should be -99
-        assertEquals(-99,objective.computeCurrentFitness(fisher),.0001);
-        assertEquals(-1,knifeEdge.computeCurrentFitness(fisher),.0001);
-        assertEquals(-1,knifeEdge2.computeCurrentFitness(fisher),.0001);
+        assertEquals(-99, objective.computeCurrentFitness(fisher, fisher), .0001);
+        assertEquals(-1, knifeEdge.computeCurrentFitness(fisher, fisher), .0001);
+        assertEquals(-1, knifeEdge2.computeCurrentFitness(fisher, fisher), .0001);
 
     }
 

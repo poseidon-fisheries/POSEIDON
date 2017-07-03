@@ -239,9 +239,10 @@ public class TwoPopulations {
         PrototypeScenario scenario = (PrototypeScenario) state.getScenario();
         EquidegreeBuilder builder = (EquidegreeBuilder) scenario.getNetworkBuilder();
         //connect people that have the same hold to avoid stupid imitation noise.
+
         builder.addPredicate((from, to) -> {
-            return (from.getID() <50 && to.getID() < 50) ||   (from.getID() >=50 && to.getID() >= 50);
-            //return Math.abs(from.getMaximumHold() - to.getMaximumHold()) < 1;
+           // return (from.getID() <50 && to.getID() < 50) ||   (from.getID() >=50 && to.getID() >= 50);
+            return Math.abs(from.getMaximumHold() - to.getMaximumHold()) < 1;
         });
         scenario.setNetworkBuilder(builder);
 

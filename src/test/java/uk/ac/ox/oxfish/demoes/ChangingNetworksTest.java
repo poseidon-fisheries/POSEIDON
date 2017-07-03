@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.demoes;
 
-import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.SplitInitializerFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
@@ -20,7 +19,12 @@ import static org.junit.Assert.assertTrue;
 
 public class ChangingNetworksTest {
 
-    @Test
+    //@Test
+    //this test stopped being true
+    //we used to have people switching friends because they would copy them but they had the wrong gear
+    //so that the network would converge to people only befriending others with same gear
+    //however we made imitation smarter which in turn made this segregation effect not happening
+    //because now I just ahead of time stop
     public void networksRemainSegregated() throws Exception {
         FishState state = new FishState(System.currentTimeMillis());
         PrototypeScenario scenario = new PrototypeScenario();

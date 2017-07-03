@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Basically this decorator is added so that for every catch, regardless of the gear used, a fixed proportion of garbage
@@ -142,4 +143,16 @@ public class GarbageGearDecorator implements Gear {
     public double getRatioToRestOfCatch() {
         return ratioToRestOfCatch;
     }
+
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GarbageGearDecorator that = (GarbageGearDecorator) o;
+        return Double.compare(that.getRatioToRestOfCatch(), getRatioToRestOfCatch()) == 0 &&
+                Objects.equals(getGarbageSpecies(), that.getGarbageSpecies()) &&
+                Objects.equals(delegate, that.delegate);
+    }
+
 }

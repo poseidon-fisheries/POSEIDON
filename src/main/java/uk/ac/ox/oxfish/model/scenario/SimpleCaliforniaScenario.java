@@ -17,9 +17,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.PortListFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
-import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.factory.ArrayFixedPriceMarket;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.*;
@@ -328,39 +326,6 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
         }
 
-        for(Port port : model.getPorts()) {
-            String portname = port.getName();
-
-            for(Species species : model.getBiology().getSpecies())
-            {
-
-                model.getYearlyDataSet().registerGatherer(
-                        portname + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                        fishState -> fishState.getFishers().stream().
-                                filter(fisher -> fisher.getTags().contains(portname)).
-                                mapToDouble(value -> value.getLatestYearlyObservation(
-                                        species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
-            }
-
-
-            model.getYearlyDataSet().registerGatherer(portname + " Total Income",
-                                                      fishState ->
-                                                              fishState.getFishers().stream().
-                                                                      filter(fisher -> fisher.getTags().contains(portname)).
-                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
-
-
-
-
-            model.getYearlyDataSet().registerGatherer(portname + " Average Distance From Port",
-                                                      fishState ->
-                                                              fishState.getFishers().stream().
-                                                                      filter(fisher -> fisher.getTags().contains(portname)).
-                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.FISHING_DISTANCE)).average().orElse(Double.NaN), Double.NaN);
-
-        }
 
 
 

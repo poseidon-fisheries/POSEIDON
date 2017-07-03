@@ -170,42 +170,6 @@ public class Fisher implements Steppable, Startable{
      */
     private final AdaptationPerTripScheduler tripAdaptation = new AdaptationPerTripScheduler();
 
-    /**
-     * list of costs to pay at the end of the trip. Any amount computed is spent. Wages would be a good example.
-     */
-    private final LinkedList<Cost> additionalTripCosts = new LinkedList<>();
-
-    /**
-     * list of additional costs to account for on trip record but not to actually burn money on.
-     */
-    private final LinkedList<Cost> opportunityCosts = new LinkedList<>();
-
-
-
-    private Predictor[] dailyCatchesPredictor;
-            /*MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
-                                                                                            fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
-                                                                                            90);
-                                                                                            */
-
-    private Predictor[] profitPerUnitPredictor;
-            /*
-            MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
-                                                                                               fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
-                                                                                                       0),
-                                                                                               30);
-                                                                                               */
-
-
-    private Predictor dailyProfitsPredictor = new FixedPredictor(Double.NaN);
-            /*
-            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                                      fisher ->
-                                                                                              fisher.getDailyData().
-                                                                                                      getColumn(
-                                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN).getLatest(),
-                                                                                      365);
-*/
 
 
     /**
@@ -256,8 +220,10 @@ public class Fisher implements Steppable, Startable{
         this.discardingStrategy = discardingStrategy;
 
         //predictors
-        dailyCatchesPredictor = new Predictor[numberOfSpecies];
-        profitPerUnitPredictor = new Predictor[numberOfSpecies];
+        Predictor[] dailyCatchesPredictor = new Predictor[numberOfSpecies];
+        status.setDailyCatchesPredictor(dailyCatchesPredictor);
+        Predictor[] profitPerUnitPredictor = new Predictor[numberOfSpecies];
+        status.setProfitPerUnitPredictor(profitPerUnitPredictor);
         for(int i=0; i<dailyCatchesPredictor.length; i++)
         {
             dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
@@ -307,13 +273,13 @@ public class Fisher implements Steppable, Startable{
         tripAdaptation.start(state, this);
 
         //start the predictors
-        for(int i=0; i<dailyCatchesPredictor.length; i++)
+        for(int i=0; i<status.getDailyCatchesPredictor().length; i++)
         {
-            dailyCatchesPredictor[i].start(state, this);
-            profitPerUnitPredictor[i].start(state,this);
+            status.getDailyCatchesPredictor()[i].start(state, this);
+            status.getProfitPerUnitPredictor()[i].start(state,this);
 
         }
-        dailyProfitsPredictor.start(state,this);
+        status.getDailyProfitsPredictor().start(state,this);
 
 
     }
@@ -520,12 +486,12 @@ public class Fisher implements Steppable, Startable{
         }
 
         //spend money on all new costs
-        for(Cost realCosts : additionalTripCosts) {
+        for(Cost realCosts : status.getAdditionalTripCosts()) {
             double cost = realCosts.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
             spendForTrip(cost);
         }
         //account for opportunity costs
-        for(Cost opportunityCost : opportunityCosts) {
+        for(Cost opportunityCost : status.getOpportunityCosts()) {
             double cost = opportunityCost.cost(this, state, getCurrentTrip(), getCurrentTrip().getEarnings(),status.getHoursAtSea() );
             recordOpportunityCosts(cost);
         }
@@ -1054,40 +1020,40 @@ public class Fisher implements Steppable, Startable{
 
     public double predictUnitProfit(int specieIndex)
     {
-        return profitPerUnitPredictor[specieIndex].predict();
+        return status.getProfitPerUnitPredictor()[specieIndex].predict();
     }
 
 
     public double predictDailyCatches(int specieIndex)
     {
-        return dailyCatchesPredictor[specieIndex].predict();
+        return status.getDailyCatchesPredictor()[specieIndex].predict();
     }
 
     public double probabilityDailyCatchesBelowLevel(int specieIndex, double level)
     {
-        return dailyCatchesPredictor[specieIndex].probabilityBelowThis(level);
+        return status.getDailyCatchesPredictor()[specieIndex].probabilityBelowThis(level);
     }
 
     public double probabilitySumDailyCatchesBelow(int specieIndex, double level, int daysToSum)
     {
-        return dailyCatchesPredictor[specieIndex].probabilitySumBelowThis(level,daysToSum);
+        return status.getDailyCatchesPredictor()[specieIndex].probabilitySumBelowThis(level,daysToSum);
     }
 
 
     public double predictDailyProfits()
     {
-        return dailyProfitsPredictor.predict();
+        return status.getDailyProfitsPredictor().predict();
     }
 
     public void assignDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
 
         if(state != null)
         {
-            this.dailyProfitsPredictor.turnOff(this);
+            this.status.getDailyProfitsPredictor().turnOff(this);
             dailyProfitsPredictor.start(state,this);
         }
 
-        this.dailyProfitsPredictor = dailyProfitsPredictor;
+        status.setDailyProfitsPredictor(dailyProfitsPredictor);
 
 
     }
@@ -1097,15 +1063,15 @@ public class Fisher implements Steppable, Startable{
         if(state!=null)
         {
             newPredictor.start(state, this);
-            dailyCatchesPredictor[specieIndex].turnOff(this);
+            status.getDailyCatchesPredictor()[specieIndex].turnOff(this);
         }
-        dailyCatchesPredictor[specieIndex] = newPredictor;
+        status.getDailyCatchesPredictor()[specieIndex] = newPredictor;
 
     }
 
     public void resetDailyCatchesPredictors()
     {
-        for(Predictor predictor : dailyCatchesPredictor)
+        for(Predictor predictor : status.getDailyCatchesPredictor())
             predictor.reset();
     }
 
@@ -1114,9 +1080,9 @@ public class Fisher implements Steppable, Startable{
         if(state!=null)
         {
             newPredictor.start(state, this);
-            profitPerUnitPredictor[specieIndex].turnOff(this);
+            status.getProfitPerUnitPredictor()[specieIndex].turnOff(this);
         }
-        profitPerUnitPredictor[specieIndex] = newPredictor;
+        status.getProfitPerUnitPredictor()[specieIndex] = newPredictor;
 
     }
 
@@ -1297,7 +1263,7 @@ public class Fisher implements Steppable, Startable{
      * @return Value for property 'additionalTripCosts'.
      */
     public LinkedList<Cost> getAdditionalTripCosts() {
-        return additionalTripCosts;
+        return status.getAdditionalTripCosts();
     }
 
     /**
@@ -1306,7 +1272,7 @@ public class Fisher implements Steppable, Startable{
      * @return Value for property 'opportunityCosts'.
      */
     public LinkedList<Cost> getOpportunityCosts() {
-        return opportunityCosts;
+        return status.getOpportunityCosts();
     }
 
 
@@ -1399,5 +1365,25 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    /**
+     * Setter for property 'homePort'.
+     *
+     * @param homePort Value to set for property 'homePort'.
+     */
+    public void setHomePort(Port homePort) {
+        status.setHomePort(homePort);
+    }
 
+    public void teleport(SeaTile tile)
+    {
+        status.setLocation(tile);
+    }
+
+    /**
+     * grabs the state reference from the fisher
+     * @return
+     */
+    public FishState grabState(){
+        return state;
+    }
 }

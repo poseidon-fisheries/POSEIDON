@@ -111,13 +111,13 @@ public class BeamHillClimbing<T> implements AdaptationAlgorithm<T>
             MersenneTwisterFast random, Fisher agent, double fitness, T current, Collection<Fisher> friends,
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
         if(copyAlwaysBest)
-            return FishStateUtilities.imitateBestFriend(random, fitness,
-                                                            current, friends,
-                                                            objectiveFunction, sensor);
+            return FishStateUtilities.imitateBestFriend(random,agent ,
+                                                        fitness, current,
+                                                        friends, objectiveFunction, sensor);
         else
             return FishStateUtilities.imitateFriendAtRandom(random, fitness,
                                                             current, friends,
-                                                            objectiveFunction, sensor);
+                                                            objectiveFunction, sensor,agent );
     }
 
     @Override

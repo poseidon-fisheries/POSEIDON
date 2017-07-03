@@ -107,4 +107,16 @@ public class RandomCatchabilityTrawl implements Gear
                 catchabilityMeanPerSpecie) + ", catchabilityDeviationPerSpecie=" + Arrays.toString(
                 catchabilityDeviationPerSpecie) + ", gasPerHourFished=" + gasPerHourFished + '}';
     }
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RandomCatchabilityTrawl that = (RandomCatchabilityTrawl) o;
+        return Double.compare(that.getGasPerHourFished(), getGasPerHourFished()) == 0 &&
+                Arrays.equals(getCatchabilityMeanPerSpecie(), that.getCatchabilityMeanPerSpecie()) &&
+                Arrays.equals(getCatchabilityDeviationPerSpecie(), that.getCatchabilityDeviationPerSpecie());
+    }
+
+
 }

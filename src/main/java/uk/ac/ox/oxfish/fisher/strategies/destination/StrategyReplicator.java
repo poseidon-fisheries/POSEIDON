@@ -86,7 +86,7 @@ public class StrategyReplicator implements Startable,Steppable{
         {
 
             int index = ((ReplicatorDrivenDestinationStrategy) fisher.getDestinationStrategy()).getStrategyIndex();
-            statistics[index].accept(objectiveFunction.computeCurrentFitness(fisher));
+            statistics[index].accept(objectiveFunction.computeCurrentFitness(fisher, fisher));
         }
         for(int i=0; i<options.size(); i++)
         {

@@ -39,4 +39,11 @@ public interface Gear {
 
 
     Gear makeCopy();
+
+    /**
+     * are the two gears the same (keeping away from modifying equals)
+     * @param o gear we are comparing to
+     * @return
+     */
+    public boolean isSame(Gear o);
 }

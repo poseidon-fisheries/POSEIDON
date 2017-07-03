@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.data.collectors;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -11,7 +12,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.Iterator;
-import java.util.function.Consumer;
+import java.util.List;
 import java.util.function.DoublePredicate;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -247,6 +248,77 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                         observed.getFishers().size();
             }
         }, 0d);
+
+
+        if(state.getPorts().size()>1)
+        {
+            //add data on profits in each port
+            for(Port port : state.getPorts())
+            {
+
+                String portname = port.getName();
+                for(Species species : state.getBiology().getSpecies())
+                {
+
+                    state.getYearlyDataSet().registerGatherer(
+                            portname + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
+                            fishState -> fishState.getFishers().stream().
+                                    filter(fisher -> fisher.getHomePort().equals(port)).
+                                    mapToDouble(value -> value.getLatestYearlyObservation(
+                                            species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+                }
+
+
+                state.getYearlyDataSet().registerGatherer(portname + " Total Income",
+                                                          fishState ->
+                                                                  fishState.getFishers().stream().
+                                                                          filter(fisher -> fisher.getHomePort().equals(port)).
+                                                                          mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
+                state.getYearlyDataSet().registerGatherer(portname + " Average Distance From Port",
+                                                          fishState ->
+                                                                  fishState.getFishers().stream().
+                                                                          filter(fisher -> fisher.getHomePort().equals(port)).
+                                                                          mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                                  FisherYearlyTimeSeries.FISHING_DISTANCE)).average().orElse(Double.NaN), Double.NaN);
+
+
+
+                state.getYearlyDataSet().registerGatherer(portname + " Number Of Fishers",
+                                                          fishState ->
+                                                                  (double)fishState.getFishers().stream().
+                                                                          filter(fisher ->
+                                                                                         fisher.getHomePort().
+                                                                                                 equals(port)).count(),
+                                                          Double.NaN);
+
+
+                state.getYearlyDataSet().registerGatherer("Average Cash-Flow at " + port.getName(),
+                                                          new Gatherer<FishState>() {
+                                                              @Override
+                                                              public Double apply(FishState observed) {
+                                                                  List<Fisher> fishers = observed.getFishers().stream().
+                                                                          filter(new Predicate<Fisher>() {
+                                                                              @Override
+                                                                              public boolean test(Fisher fisher) {
+                                                                                  return fisher.getHomePort().equals(port);
+                                                                              }
+                                                                          }).collect(Collectors.toList());
+                                                                  return fishers.stream().
+                                                                          mapToDouble(
+                                                                                  new ToDoubleFunction<Fisher>() {
+                                                                                      @Override
+                                                                                      public double applyAsDouble(Fisher value) {
+                                                                                          return value.getLatestYearlyObservation(
+                                                                                                  FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                                                                                      }
+                                                                                  }).sum() /
+                                                                          fishers.size();
+                                                              }
+                                                          }, Double.NaN);
+            }
+        }
 
 
     }

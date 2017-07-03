@@ -44,9 +44,11 @@ public class Scenarios {
         SCENARIOS.put("Policy California",new SimpleCaliforniaScenario());
         DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
 
-   SCENARIOS.put("Simple California",new DerisoCaliforniaScenario());
+        SCENARIOS.put("Simple California",new DerisoCaliforniaScenario());
         DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
 
 
+        SCENARIOS.put("Indonesia",new IndonesiaScenario());
+        DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
     }
 }

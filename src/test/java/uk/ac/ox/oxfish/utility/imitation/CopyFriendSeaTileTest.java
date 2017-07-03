@@ -33,34 +33,37 @@ public class CopyFriendSeaTileTest
         ObjectiveFunction<Fisher> friendFunction = mock(ObjectiveFunction.class);
 
         //going to choose your own T because you have no friend
-        SeaTile chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                               0d, newT, new ArrayList<>(),
-                                                               friendFunction, fisher -> friendT).getFirst();
+        SeaTile chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+                                                               0d, newT,
+                                                               new ArrayList<>(), friendFunction, fisher -> friendT).getFirst();
 
 
         assertEquals(chosen, newT);
 
         //you have a friend but he has no fitness
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(Double.NaN);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                               10d, newT, Collections.singletonList(mock(Fisher.class)),
-                                                               friendFunction, fisher -> friendT).getFirst();
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(Double.NaN);
+        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(), mock(Fisher.class),
+                                                       10d, newT,
+                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
+                                                       fisher -> friendT).getFirst();
 
         assertEquals(chosen,newT);
 
         //you have a friend with fitness but no seatile
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(0d);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                       10d, newT, Collections.singletonList(mock(Fisher.class)),
-                                                       friendFunction, fisher -> null).getFirst();
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
+        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
+                                                       10d, newT,
+                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
+                                                       fisher -> null).getFirst();
 
         assertEquals(chosen,newT);
 
         //you have a normal friend but he has low fitness
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(0d);
-        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                       10d, newT, Collections.singletonList(mock(Fisher.class)),
-                                                       friendFunction, fisher -> friendT).getFirst();
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
+        chosen  = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
+                                                       10d, newT,
+                                                       Collections.singletonList(mock(Fisher.class)), friendFunction,
+                                                       fisher -> friendT).getFirst();
 
         assertEquals(chosen,newT);
 
@@ -80,37 +83,37 @@ public class CopyFriendSeaTileTest
 
 
         //best fitness is the new
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(0d);
-        Pair<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                                                       10d, newT,
-                                                                                       Collections.singletonList(
-                                                                                               mock(Fisher.class)),
-                                                                                       friendFunction,
-                                                                                       fisher -> friendT);
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(0d);
+        Pair<SeaTile, Fisher> imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
+                                                                               10d,
+                                                                               newT,
+                                                                               Collections.singletonList(
+                                                                                       mock(Fisher.class)),
+                                                                               friendFunction, fisher -> friendT);
         SeaTile chosen  = imitation.getFirst();
         assertNull(imitation.getSecond()); // we didn't imitate anyone
         assertEquals(chosen,newT);
 
         //best fitness is friend
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(100d);
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(100d);
         Fisher friend = mock(Fisher.class);
-        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                                                       10d, newT,
-                                                                                       Collections.singletonList(
-                                                                                               friend),
-                                                                                       friendFunction,
-                                                                                       fisher -> friendT);
+        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
+                                                         10d,
+                                                         newT,
+                                                         Collections.singletonList(
+                                                                 friend),
+                                                         friendFunction, fisher -> friendT);
         assertEquals(imitation.getFirst(),friendT);
         assertEquals(imitation.getSecond(),friend); // we imitated our friend
 
         //friends lose ties
-        when(friendFunction.computeCurrentFitness(any())).thenReturn(10d);
-        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),
-                                                                                       10d, newT,
-                                                                                       Collections.singletonList(
-                                                                                               mock(Fisher.class)),
-                                                                                       friendFunction,
-                                                                                       fisher -> friendT);
+        when(friendFunction.computeCurrentFitness(any(), any())).thenReturn(10d);
+        imitation = FishStateUtilities.imitateBestFriend(new MersenneTwisterFast(),mock(Fisher.class) ,
+                                                         10d,
+                                                         newT,
+                                                         Collections.singletonList(
+                                                                 mock(Fisher.class)),
+                                                         friendFunction, fisher -> friendT);
         assertEquals(imitation.getFirst(),newT);
         assertNull(imitation.getSecond()); // we didn't imitate anyone
 

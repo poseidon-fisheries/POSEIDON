@@ -9,6 +9,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Objects;
+
 /**
  * A test gear that only catches one specie and always a fixed proportion of what is available where the fishing takes place!
  * Created by carrknight on 4/20/15.
@@ -93,4 +95,16 @@ public class OneSpecieGear implements Gear {
     public double getProportionCaught() {
         return proportionCaught;
     }
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OneSpecieGear that = (OneSpecieGear) o;
+        return Double.compare(that.getProportionCaught(), getProportionCaught()) == 0 &&
+                Objects.equals(getTargetedSpecies(), that.getTargetedSpecies());
+    }
+
+
+
 }

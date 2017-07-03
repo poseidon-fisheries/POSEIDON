@@ -67,26 +67,27 @@ public class TwoPortsInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
+     * @param gasPrice
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map,
             MersenneTwisterFast mapmakerRandom,
-            Function<SeaTile, MarketMap> marketFactory, FishState model) {
+            Function<SeaTile, MarketMap> marketFactory, FishState model, double gasPrice) {
 
         //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 
         SeaTile first = map.getSeaTile(port1PositionX, port1PositionY);
         Port port1 = new Port(namePort1, first,
                              marketFactory.apply(first),
-                              0);
+                              gasPrice);
         map.addPort(port1);
 
         SeaTile second = map.getSeaTile(port2PositionX,port2PositionY);
         Port port2 = new Port(namePort2, second,
                               marketFactory.apply(second),
-                              0);
+                              gasPrice);
         map.addPort(port2);
 
         return Lists.newArrayList(port1,port2);

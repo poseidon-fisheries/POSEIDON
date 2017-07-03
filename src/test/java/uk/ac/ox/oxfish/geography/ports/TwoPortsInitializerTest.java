@@ -34,10 +34,11 @@ public class TwoPortsInitializerTest {
                                                             2,
                                                             "North",
                                                             "South");
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class),mock(FishState.class) );
+        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class),mock(FishState.class), 3);
         assertEquals(map.getPorts().size(),2);
         for(Port port : map.getPorts())
         {
+            assertEquals(port.getGasPricePerLiter(),3,.0001d);
             assertEquals(port.getLocation().getGridX(),3);
             if(port.getName().equals("North"))
                 assertEquals(port.getLocation().getGridY(),1);

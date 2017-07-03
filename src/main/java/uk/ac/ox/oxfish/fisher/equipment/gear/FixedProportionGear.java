@@ -79,4 +79,13 @@ public class FixedProportionGear implements Gear
     public double getProportionFished() {
         return proportionFished;
     }
-}
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FixedProportionGear that = (FixedProportionGear) o;
+        return Double.compare(that.getProportionFished(), getProportionFished()) == 0;
+    }
+
+   }

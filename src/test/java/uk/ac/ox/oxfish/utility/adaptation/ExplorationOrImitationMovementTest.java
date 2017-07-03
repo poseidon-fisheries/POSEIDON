@@ -67,7 +67,7 @@ public class ExplorationOrImitationMovementTest
                 },
                 new ObjectiveFunction<Fisher>() {
                     @Override
-                    public double computeCurrentFitness(Fisher observed) {
+                    public double computeCurrentFitness(Fisher observer, Fisher observed) {
                         return fitness.get(observed);
                     }
 
@@ -135,7 +135,7 @@ public class ExplorationOrImitationMovementTest
                 fisher -> locations.get(fisher),
                 new ObjectiveFunction<Fisher>() {
                     @Override
-                    public double computeCurrentFitness(Fisher observed) {
+                    public double computeCurrentFitness(Fisher observer, Fisher observed) {
                         return fitness.get(observed);
                     }
 
@@ -199,7 +199,7 @@ public class ExplorationOrImitationMovementTest
                 fisher -> locations.get(fisher),
                 new ObjectiveFunction<Fisher>() {
                     @Override
-                    public double computeCurrentFitness(Fisher observed) {
+                    public double computeCurrentFitness(Fisher observer, Fisher observed) {
                         return fitness.get(observed);
                     }
 

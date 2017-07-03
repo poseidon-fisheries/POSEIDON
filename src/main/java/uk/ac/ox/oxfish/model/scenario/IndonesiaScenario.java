@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
@@ -37,22 +36,18 @@ import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.AllSandyHabitatFactory;
 import uk.ac.ox.oxfish.geography.habitat.HabitatInitializer;
+import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
-import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.geography.ports.FromFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.ports.RandomPortInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
-import uk.ac.ox.oxfish.model.network.NetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
-import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
@@ -60,24 +55,22 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * This is the most general conceptual scenario we have. Almost everything is pluggable
- * Created by carrknight on 4/20/15.
+ * Very ugly repeat of prototype scenario because I need a proper refactor of port
+ * initializers
+ * Created by carrknight on 7/2/17.
  */
-public class PrototypeScenario implements Scenario {
+public class IndonesiaScenario implements Scenario {
 
-
-    /**
-     * number of ports
-     */
-    private int ports = 1;
 
 
 
@@ -88,46 +81,37 @@ public class PrototypeScenario implements Scenario {
             new ConstantWeatherFactory();
 
 
-    private AlgorithmFactory<? extends MapInitializer> mapInitializer =
-            new SimpleMapInitializerFactory();
-
-
-
-    /**
-     * the number of fishers
-     */
-    private int fishers = 100;
-
-
-    /**
-     * are agents allowed to cheat?
-     */
-    private boolean cheaters = false;
-
+    private FromFileMapInitializerFactory mapInitializer =
+            new FromFileMapInitializerFactory();
 
 
     /**
      * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
      * for ITQs to work
      */
-    private boolean usePredictors = false;
+    private boolean usePredictors = true;
 
 
-    /**
-     * the X position of the port on the grid. If null or a negative number the position is randomized
-     */
-    private Integer portPositionX = -1;
-    /**
-     * the X position of the port on the grid. If null or a negative number the position is randomized
-     */
-    private Integer portPositionY = -1;
+    private final FromFilePortInitializer portInitializer =
+            new FromFilePortInitializer(Paths.get("inputs","indonesia","mwm_ports.csv"));
+    private boolean cheaters = false;
 
     /**
-     * to use if you really want to port to be somewhere specific
+     * Getter for property 'filePath'.
+     *
+     * @return Value for property 'filePath'.
      */
-    public void forcePortPosition(int[] forcedPortPosition) {
-        portPositionX = forcedPortPosition[0];
-        portPositionY = forcedPortPosition[1];
+    public Path getPortFilePath() {
+        return portInitializer.getFilePath();
+    }
+
+    /**
+     * Setter for property 'filePath'.
+     *
+     * @param filePath Value to set for property 'filePath'.
+     */
+    public void setPortFilePath(Path filePath) {
+        portInitializer.setFilePath(filePath);
     }
 
     /**
@@ -193,13 +177,6 @@ public class PrototypeScenario implements Scenario {
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
 
 
-    private List<StartingMPA> startingMPAs  = new LinkedList<>();
-    {
-        //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
-        //best third:
-        //startingMPAs.add(new StartingMPA(0,26,34,40));
-    }
-
     /**
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
      * in the biology/fishery
@@ -211,7 +188,7 @@ public class PrototypeScenario implements Scenario {
             new NoLogbookFactory();
 
 
-    public PrototypeScenario() {
+    public IndonesiaScenario() {
     }
 
 
@@ -225,7 +202,7 @@ public class PrototypeScenario implements Scenario {
     @Override
     public ScenarioEssentials start(FishState model) {
 
-        MersenneTwisterFast random = model.random;
+        MersenneTwisterFast originalRandom = model.random;
 
         MersenneTwisterFast mapMakerRandom = model.random;
         if(mapMakerDedicatedRandomSeed != null)
@@ -240,11 +217,11 @@ public class PrototypeScenario implements Scenario {
         WeatherInitializer weather = weatherInitializer.apply(model);
 
         //create global biology
-        GlobalBiology global = biology.generateGlobal(mapMakerRandom,model);
+        GlobalBiology global = biology.generateGlobal(mapMakerRandom, model);
 
 
         MapInitializer mapMaker = mapInitializer.apply(model);
-        NauticalMap map = mapMaker.makeMap(mapMakerRandom,global,model);
+        NauticalMap map = mapMaker.makeMap(mapMakerRandom, global, model);
 
         //set habitats
         HabitatInitializer habitat = habitatInitializer.apply(model);
@@ -257,41 +234,28 @@ public class PrototypeScenario implements Scenario {
                                          global, model);
 
 
-        //create fixed price market
-        MarketMap marketMap = new MarketMap(global);
-        /*
-      market prices for each species
-     */
 
 
 
-        for(Species species : global.getSpecies())
-            marketMap.addMarket(species, market.apply(model));
-
-        //create random ports, all sharing the same market
-        if(portPositionX == null || portPositionX < 0)
-            RandomPortInitializer.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom,
-                                                      gasPricePerLiter.apply(mapMakerRandom));
-        else
-        {
-            Port port = new Port("Port 0", map.getSeaTile(portPositionX, portPositionY),
-                                 marketMap, 0);
-            map.addPort(port);
-        }
-
-        //create initial mpas
-        if(startingMPAs != null)
-            for(StartingMPA mpa : startingMPAs)
-            {
-                if(Log.INFO)
-                    Log.info("building MPA at " + mpa.getTopLeftX() + ", " + mpa.getTopLeftY());
-                mpa.buildMPA(map);
-            }
-
-        //todo make sure the mapmaker randomizer is dead everywhere
+        portInitializer.buildPorts(map,
+                                   mapMakerRandom,
+                                   new Function<SeaTile, MarketMap>() {
+                                       @Override
+                                       public MarketMap apply(SeaTile seaTile) {
+                                           //create fixed price market
+                                           MarketMap marketMap = new MarketMap(global);
+                                           //set market for each species
+                                           for(Species species : global.getSpecies())
+                                               marketMap.addMarket(species, market.apply(model));
+                                           return marketMap;
+                                       }
+                                       },
+                                   model,
+                                   gasPricePerLiter.apply(mapMakerRandom)
+        );
 
         //substitute back the original randomizer
-        model.random = random;
+        model.random = originalRandom;
 
 
 
@@ -314,11 +278,15 @@ public class PrototypeScenario implements Scenario {
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
 
-
+        //no friends from separate ports
+        networkBuilder.addPredicate(new NetworkPredicate() {
+            @Override
+            public boolean test(Fisher from, Fisher to) {
+                return from.getHomePort().equals(to.getHomePort());
+            }
+        });
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
-        for(Port port : ports)
-            port.setGasPricePerLiter(gasPricePerLiter.apply(random));
 
         //create logbook initializer
         LogbookInitializer log = logbook.apply(model);
@@ -331,6 +299,12 @@ public class PrototypeScenario implements Scenario {
 
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
+        Supplier<Boat> boatSupplier = () -> new Boat(10, 10, new Engine(enginePower.apply(random),
+                                                                        literPerKilometer.apply(random),
+                                                                        speedInKmh.apply(random)),
+                                                     new FuelTank(fuelTankSize.apply(random)));
+        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random), biology.getSize());
+
         FisherFactory fisherFactory = new FisherFactory(
                 () -> ports[random.nextInt(ports.length)],
                 regulation,
@@ -340,11 +314,8 @@ public class PrototypeScenario implements Scenario {
                 discardingStrategy,
                 gearStrategy,
                 weatherStrategy,
-                (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                   literPerKilometer.apply(random),
-                                                                   speedInKmh.apply(random)),
-                                                new FuelTank(fuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(holdSize.apply(random), biology.getSize()),
+                boatSupplier,
+                holdSupplier,
                 gear,
 
                 0);
@@ -386,17 +357,23 @@ public class PrototypeScenario implements Scenario {
 
 
         //call the factory to keep creating fishers
-        for(int i=0;i<fishers;i++)
+        for(Port port : ports)
         {
-            Fisher newFisher = fisherFactory.buildFisher(model);
-            fisherList.add(newFisher);
+            Integer fishersHere = portInitializer.getFishersPerPort(port);
+            for(int i = 0; i< fishersHere; i++) {
+                //create fisher
+                Fisher newFisher = fisherFactory.buildFisher(model);
+                //teleport it to the right port
+                newFisher.getHomePort().depart(newFisher);
+                newFisher.setHomePort(port);
+                newFisher.teleport(port.getLocation());
+                port.dock(newFisher);
+                fisherList.add(newFisher);
+            }
         }
 
-        assert fisherList.size()==fishers;
-        assert fisherFactory.getNextID()==fishers;
-
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
+            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), fisherFactory );
         else {
             return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
         }
@@ -405,13 +382,6 @@ public class PrototypeScenario implements Scenario {
 
 
 
-    public int getPorts() {
-        return ports;
-    }
-
-    public void setPorts(int ports) {
-        this.ports = ports;
-    }
 
     public DoubleParameter getSpeedInKmh() {
         return speedInKmh;
@@ -555,13 +525,6 @@ public class PrototypeScenario implements Scenario {
         this.weatherInitializer = weatherInitializer;
     }
 
-    public int getFishers() {
-        return fishers;
-    }
-
-    public void setFishers(int fishers) {
-        this.fishers = fishers;
-    }
 
     public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
         return weatherStrategy;
@@ -593,34 +556,7 @@ public class PrototypeScenario implements Scenario {
         return mapInitializer;
     }
 
-    public void setMapInitializer(
-            AlgorithmFactory<? extends MapInitializer> mapInitializer) {
-        this.mapInitializer = mapInitializer;
-    }
 
-    public List<StartingMPA> getStartingMPAs() {
-        return startingMPAs;
-    }
-
-    public void setStartingMPAs(List<StartingMPA> startingMPAs) {
-        this.startingMPAs = startingMPAs;
-    }
-
-    public Integer getPortPositionX() {
-        return portPositionX;
-    }
-
-    public void setPortPositionX(Integer portPositionX) {
-        this.portPositionX = portPositionX;
-    }
-
-    public Integer getPortPositionY() {
-        return portPositionY;
-    }
-
-    public void setPortPositionY(Integer portPositionY) {
-        this.portPositionY = portPositionY;
-    }
 
 
     /**

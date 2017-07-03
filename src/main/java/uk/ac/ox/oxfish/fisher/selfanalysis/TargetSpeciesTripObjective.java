@@ -22,12 +22,14 @@ public class TargetSpeciesTripObjective extends TripBasedObjectiveFunction {
 
     /**
      * the utility is earnings for selected species - total costs
+     *
+     * @param observer
      * @param tripRecord
-     * @param fisher
      * @return
      */
     @Override
-    protected double extractUtilityFromTrip(TripRecord tripRecord, Fisher fisher) {
+    protected double extractUtilityFromTrip(
+            Fisher observer, TripRecord tripRecord, Fisher Observed) {
         double profits = tripRecord.getEarningsOfSpecies(species.getIndex()) - tripRecord.getTotalCosts();
         profits= opportunityCosts ? profits-tripRecord.getOpportunityCosts() :profits;
         profits/=  tripRecord.getDurationInHours();

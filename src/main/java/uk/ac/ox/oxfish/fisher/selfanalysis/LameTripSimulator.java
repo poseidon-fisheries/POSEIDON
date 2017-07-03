@@ -24,7 +24,7 @@ import java.util.Iterator;
 public class LameTripSimulator {
 
 
-    public TripRecord simulateRecord(
+    public static TripRecord simulateRecord(
             Fisher fisher, SeaTile fishingSpot, FishState state,
             double maxHoursOut,
             double[] expectedHourlyCatches)

@@ -38,8 +38,7 @@ public class CutoffPerTripObjectiveTest {
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
-        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher), 10d, .001);
-        Assert.assertEquals(tripFunction.computePreviousFitness(fisher),0d,.001);
+        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
 
 
         CutoffPerTripObjectiveFactory factory = new CutoffPerTripObjectiveFactory();
@@ -47,11 +46,11 @@ public class CutoffPerTripObjectiveTest {
         factory.getLowThreshold().setValue(new FixedDoubleParameter(5d));
         factory.getLowThreshold().setActive(true);
         CutoffPerTripObjective objective = factory.apply(mock(FishState.class));
-        Assert.assertEquals(objective.computeCurrentFitness(fisher), 10d, .001);
+        Assert.assertEquals(objective.computeCurrentFitness(fisher, fisher), 10d, .001);
         factory.getHighThreshold().setValue(new FixedDoubleParameter(7d));
         factory.getHighThreshold().setActive(true);
         objective = factory.apply(mock(FishState.class));
-        Assert.assertEquals(objective.computeCurrentFitness(fisher), 7d, .001);
+        Assert.assertEquals(objective.computeCurrentFitness(fisher, fisher), 7d, .001);
 
     }
 

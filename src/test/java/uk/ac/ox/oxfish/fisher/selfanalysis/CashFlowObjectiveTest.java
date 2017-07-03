@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +31,7 @@ public class CashFlowObjectiveTest
 
         }
         //cash should now be 99, 6 days ago it was 93
-        assertEquals(6,objective.computeCurrentFitness(fisher),.0001);
+        assertEquals(6, objective.computeCurrentFitness(mock(Fisher.class), fisher), .0001);
 
         //let's add some garbage
         for(int i=0; i<6; i++)
@@ -40,7 +40,7 @@ public class CashFlowObjectiveTest
             data.step(mock(FishState.class));
         }
         //now it should be -99
-        assertEquals(-99,objective.computeCurrentFitness(fisher),.0001);
+        assertEquals(-99, objective.computeCurrentFitness(mock(Fisher.class), fisher), .0001);
 
     }
 }

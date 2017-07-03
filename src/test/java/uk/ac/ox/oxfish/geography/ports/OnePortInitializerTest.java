@@ -29,8 +29,9 @@ public class OnePortInitializerTest {
                                                mock(FishState.class));
 
         OnePortInitializer ports = new OnePortInitializer(3,1);
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class), mock(FishState.class));
+        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class), mock(FishState.class),2d );
         assertEquals(map.getPorts().size(),1);
+        assertEquals(map.getPorts().get(0).getGasPricePerLiter(),2d,.0001d);
         assertEquals(map.getPorts().iterator().next().getLocation().getGridX(),3);
         assertEquals(map.getPorts().iterator().next().getLocation().getGridY(),1);
 

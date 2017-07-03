@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.google.common.base.Supplier;
 import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -35,6 +34,7 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapDiscretizer;
 import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -454,7 +454,7 @@ public class OsmoseWFSScenario implements Scenario{
             PortReader reader = new PortReader();
 
 
-            Supplier<MarketMap> marketSupplier = () -> {
+            Function<SeaTile,MarketMap> marketSupplier = (location) -> {
                 //create fixed price market
                 MarketMap marketMap = new MarketMap(global);
                         /*

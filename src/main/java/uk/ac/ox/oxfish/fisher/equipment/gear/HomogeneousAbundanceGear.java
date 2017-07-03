@@ -13,6 +13,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Objects;
+
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
@@ -174,6 +176,14 @@ public class HomogeneousAbundanceGear implements Gear {
 
     }
 
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HomogeneousAbundanceGear that = (HomogeneousAbundanceGear) o;
+        return Double.compare(that.litersOfGasConsumedEachHourFishing, litersOfGasConsumedEachHourFishing) == 0 &&
+                Objects.equals(filters, that.filters);
+    }
 
 
 }

@@ -71,7 +71,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
     public T concreteAdaptation(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
 
         //check your fitness and where you are
-        double fitness = objective.computeCurrentFitness(toAdapt);
+        double fitness = objective.computeCurrentFitness(toAdapt, toAdapt);
         T current =  getSensor().scan(toAdapt);
 
         //if you explored in the previous step

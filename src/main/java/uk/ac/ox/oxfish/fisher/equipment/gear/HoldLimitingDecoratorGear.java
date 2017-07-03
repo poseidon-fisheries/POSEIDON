@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
-import com.google.common.base.Preconditions;
 import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -8,6 +7,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.Objects;
 
 /**
  * Blocks agents from ever fishing more than their hold
@@ -72,4 +73,15 @@ public class HoldLimitingDecoratorGear implements Gear {
         return
                 new HoldLimitingDecoratorGear(delegate.makeCopy());
     }
+
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HoldLimitingDecoratorGear that = (HoldLimitingDecoratorGear) o;
+        return Objects.equals(delegate, that.delegate);
+    }
+
+
 }

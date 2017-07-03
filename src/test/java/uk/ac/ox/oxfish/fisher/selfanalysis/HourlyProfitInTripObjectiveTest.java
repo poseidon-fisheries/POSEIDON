@@ -34,6 +34,6 @@ public class HourlyProfitInTripObjectiveTest {
         when(fisher.getLastFinishedTrip()).thenReturn(logger.getLastFinishedTrip());
 
         HourlyProfitInTripObjective tripFunction = new HourlyProfitInTripObjective();
-        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher),10d,.001);
+        Assert.assertEquals(tripFunction.computeCurrentFitness(fisher, fisher), 10d, .001);
     }
 }

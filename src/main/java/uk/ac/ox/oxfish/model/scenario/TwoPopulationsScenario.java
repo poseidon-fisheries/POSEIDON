@@ -189,6 +189,8 @@ public class TwoPopulationsScenario implements Scenario{
 
     private boolean allowTwoPopulationFriendships = false;
 
+    private boolean allowFriendshipsBetweenPorts = false;
+
     private NetworkBuilder networkBuilder =
             new EquidegreeBuilder();
 
@@ -283,7 +285,7 @@ public class TwoPopulationsScenario implements Scenario{
         PortInitializer portInitializer = ports.apply(model);
         portInitializer.buildPorts(map,
                                    mapMakerRandom,
-                                   seaTile -> marketMap,model );
+                                   seaTile -> marketMap,model, gasPricePerLiter.apply(mapMakerRandom));
 
 
         //create initial mpas
@@ -422,14 +424,16 @@ public class TwoPopulationsScenario implements Scenario{
                 }
             });
         }
-        //no friends from separate ports
-        networkBuilder.addPredicate(new NetworkPredicate() {
-            @Override
-            public boolean test(Fisher from, Fisher to) {
-                return from.getHomePort().equals(to.getHomePort());
-            }
-        });
 
+        if(!allowFriendshipsBetweenPorts) {
+            //no friends from separate ports
+            networkBuilder.addPredicate(new NetworkPredicate() {
+                @Override
+                public boolean test(Fisher from, Fisher to) {
+                    return from.getHomePort().equals(to.getHomePort());
+                }
+            });
+        }
 
         model.getYearlyDataSet().registerGatherer("Small Fishers Total Income",
                                                   fishState ->
@@ -986,5 +990,23 @@ public class TwoPopulationsScenario implements Scenario{
     public void setDiscardingStrategyLarge(
             AlgorithmFactory<? extends DiscardingStrategy> discardingStrategyLarge) {
         this.discardingStrategyLarge = discardingStrategyLarge;
+    }
+
+    /**
+     * Getter for property 'allowFriendshipsBetweenPorts'.
+     *
+     * @return Value for property 'allowFriendshipsBetweenPorts'.
+     */
+    public boolean isAllowFriendshipsBetweenPorts() {
+        return allowFriendshipsBetweenPorts;
+    }
+
+    /**
+     * Setter for property 'allowFriendshipsBetweenPorts'.
+     *
+     * @param allowFriendshipsBetweenPorts Value to set for property 'allowFriendshipsBetweenPorts'.
+     */
+    public void setAllowFriendshipsBetweenPorts(boolean allowFriendshipsBetweenPorts) {
+        this.allowFriendshipsBetweenPorts = allowFriendshipsBetweenPorts;
     }
 }

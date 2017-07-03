@@ -4,6 +4,9 @@ import ec.util.MersenneTwisterFast;
 import org.metawidget.inspector.annotation.UiHidden;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
+import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -11,6 +14,7 @@ import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 
 /**
  * contains all the transitory variables of  a fisher including:
@@ -22,6 +26,11 @@ import java.io.Serializable;
  * </ul>
  */
 public class FisherStatus implements Serializable {
+
+
+
+
+
     /**
      * the location of the port!
      */
@@ -44,7 +53,7 @@ public class FisherStatus implements Serializable {
     /**
      * Home is where the port is
      */
-    final private Port homePort;
+    private Port homePort;
 
     public Port getHomePort() {
         return homePort;
@@ -148,6 +157,44 @@ public class FisherStatus implements Serializable {
     }
 
 
+
+
+    /**
+     * list of costs to pay at the end of the trip. Any amount computed is spent. Wages would be a good example.
+     */
+    private final LinkedList<Cost> additionalTripCosts = new LinkedList<>();
+
+    /**
+     * list of additional costs to account for on trip record but not to actually burn money on.
+     */
+    private final LinkedList<Cost> opportunityCosts = new LinkedList<>();
+
+
+
+    private Predictor[] dailyCatchesPredictor;
+            /*MovingAveragePredictor.dailyMAPredictor("Predicted Daily Catches",
+                                                                                            fisher -> fisher.getDailyCounter().getLandingsPerSpecie(0),
+                                                                                            90);
+                                                                                            */
+
+    private Predictor[] profitPerUnitPredictor;
+            /*
+            MovingAveragePredictor.perTripMAPredictor("Predicted Unit Profit",
+                                                                                               fisher -> fisher.getLastFinishedTrip().getUnitProfitPerSpecie(
+                                                                                                       0),
+                                                                                               30);
+                                                                                               */
+
+
+    private Predictor dailyProfitsPredictor = new FixedPredictor(Double.NaN);
+            /*
+            MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
+                                                                                      fisher ->
+                                                                                              fisher.getDailyData().
+                                                                                                      getColumn(
+                                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN).getLatest(),
+                                                                                      365);
+*/
 
 
     /**
@@ -307,5 +354,87 @@ public class FisherStatus implements Serializable {
      */
     public void setExogenousEmergencyOverride(boolean exogenousEmergencyOverride) {
         this.exogenousEmergencyOverride = exogenousEmergencyOverride;
+    }
+
+    /**
+     * Setter for property 'homePort'.
+     *
+     * @param homePort Value to set for property 'homePort'.
+     */
+    public void setHomePort(Port homePort) {
+        this.homePort = homePort;
+    }
+
+
+    /**
+     * Getter for property 'additionalTripCosts'.
+     *
+     * @return Value for property 'additionalTripCosts'.
+     */
+    public LinkedList<Cost> getAdditionalTripCosts() {
+        return additionalTripCosts;
+    }
+
+    /**
+     * Getter for property 'opportunityCosts'.
+     *
+     * @return Value for property 'opportunityCosts'.
+     */
+    public LinkedList<Cost> getOpportunityCosts() {
+        return opportunityCosts;
+    }
+
+    /**
+     * Getter for property 'dailyCatchesPredictor'.
+     *
+     * @return Value for property 'dailyCatchesPredictor'.
+     */
+    public Predictor[] getDailyCatchesPredictor() {
+        return dailyCatchesPredictor;
+    }
+
+    /**
+     * Setter for property 'dailyCatchesPredictor'.
+     *
+     * @param dailyCatchesPredictor Value to set for property 'dailyCatchesPredictor'.
+     */
+    public void setDailyCatchesPredictor(Predictor[] dailyCatchesPredictor) {
+        this.dailyCatchesPredictor = dailyCatchesPredictor;
+    }
+
+    /**
+     * Getter for property 'profitPerUnitPredictor'.
+     *
+     * @return Value for property 'profitPerUnitPredictor'.
+     */
+    public Predictor[] getProfitPerUnitPredictor() {
+        return profitPerUnitPredictor;
+    }
+
+    /**
+     * Setter for property 'profitPerUnitPredictor'.
+     *
+     * @param profitPerUnitPredictor Value to set for property 'profitPerUnitPredictor'.
+     */
+    public void setProfitPerUnitPredictor(Predictor[] profitPerUnitPredictor) {
+        this.profitPerUnitPredictor = profitPerUnitPredictor;
+    }
+
+    /**
+     * Getter for property 'dailyProfitsPredictor'.
+     *
+     * @return Value for property 'dailyProfitsPredictor'.
+     */
+    public Predictor getDailyProfitsPredictor() {
+        return dailyProfitsPredictor;
+    }
+
+    /**
+     * Setter for property 'dailyProfitsPredictor'.
+     *
+     * @param dailyProfitsPredictor Value to set for property 'dailyProfitsPredictor'.
+     */
+    public void setDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
+        this.dailyProfitsPredictor = dailyProfitsPredictor;
     }
 }

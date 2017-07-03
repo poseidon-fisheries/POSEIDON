@@ -48,7 +48,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -394,7 +393,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             numberOfFishersPerPort = reader.readFile(
                     mainDirectory.resolve(portFileName),
                     map,
-                    () -> {
+                    (location) -> {
                         MarketMap markets = new MarketMap(biology);
                         //these prices come from  http://pacfin.psmfc.org/pacfin_pub/data_rpts_pub/pfmc_rpts_pub/r058Wtwl_p15.txt
 
@@ -580,41 +579,6 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 fisherCounter);
         if(fisherList.size() <=1)
             networkBuilder = new EmptyNetworkBuilder();
-
-
-        //add port counters
-        for(Port port : model.getPorts()) {
-
-            for(Species species : model.getBiology().getSpecies())
-            {
-
-                model.getYearlyDataSet().registerGatherer(
-                        port.getName() + " " + species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME,
-                        fishState -> fishState.getFishers().stream().
-                                filter(fisher -> fisher.getHomePort().equals(port)).
-                                mapToDouble(value -> value.getLatestYearlyObservation(
-                                        species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
-            }
-
-
-            model.getYearlyDataSet().registerGatherer(port.getName() + " Total Income",
-                                                      fishState ->
-                                                              fishState.getFishers().stream().
-                                                                      filter(fisher -> fisher.getHomePort().equals(port)).
-                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
-
-
-
-
-            model.getYearlyDataSet().registerGatherer(port.getName() + " Average Distance From Port",
-                                                      fishState ->
-                                                              fishState.getFishers().stream().
-                                                                      filter(fisher -> fisher.getHomePort().equals(port)).
-                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
-
-        }
 
 
 

@@ -12,7 +12,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,7 +67,8 @@ public class GravitationalSearchAdaptationTest {
                             },
                             new ObjectiveFunction<Fisher>() {
                                 @Override
-                                public double computeCurrentFitness(Fisher observed) {
+                                public double computeCurrentFitness(
+                                        Fisher observer, Fisher observed) {
                                     double[] coord = coordinates.get(observed);
                                     return -Math.pow(coord[0]-10,2)
                                             -Math.pow(coord[1]-20,2)

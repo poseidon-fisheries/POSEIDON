@@ -107,4 +107,19 @@ public class HabitatAwareRandomCatchability implements Gear {
 
 
     }
+
+    @Override
+    public boolean isSame(Gear o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HabitatAwareRandomCatchability that = (HabitatAwareRandomCatchability) o;
+        return Double.compare(that.thrawlSpeed, thrawlSpeed) == 0 &&
+                Arrays.equals(sandyCatchabilityMeanPerSpecie, that.sandyCatchabilityMeanPerSpecie) &&
+                Arrays.equals(sandyCatchabilityDeviationPerSpecie, that.sandyCatchabilityDeviationPerSpecie) &&
+                Arrays.equals(rockCatchabilityMeanPerSpecie, that.rockCatchabilityMeanPerSpecie) &&
+                Arrays.equals(rockCatchabilityDeviationPerSpecie, that.rockCatchabilityDeviationPerSpecie);
+    }
+
+
+
 }

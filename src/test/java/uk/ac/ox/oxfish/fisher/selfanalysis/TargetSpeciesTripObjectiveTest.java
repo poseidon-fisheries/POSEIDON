@@ -27,11 +27,11 @@ public class TargetSpeciesTripObjectiveTest {
         Species species = mock(Species.class);
         when(species.getIndex()).thenReturn(0);
         TargetSpeciesTripObjective obj = new TargetSpeciesTripObjective(species,false);
-        assertEquals(obj.extractUtilityFromTrip(record, null), (20-50d)/10d, .001d);
+        assertEquals(obj.extractUtilityFromTrip(null, record, null), (20-50d)/10d, .001d);
 
         when(species.getIndex()).thenReturn(1);
         obj = new TargetSpeciesTripObjective(species,true);
-        assertEquals(obj.extractUtilityFromTrip(record,null ), (200-50-50)/10d, .001d);
+        assertEquals(obj.extractUtilityFromTrip(null, record, null), (200-50-50)/10d, .001d);
 
 
 

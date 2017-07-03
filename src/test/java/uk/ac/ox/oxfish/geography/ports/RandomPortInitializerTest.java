@@ -30,13 +30,14 @@ public class RandomPortInitializerTest {
                                               new GlobalBiology(new Species("fake")),
                                               mock(FishState.class));
 
-        RandomPortInitializer ports = new RandomPortInitializer(4);
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class), mock(FishState.class));
+        RandomPortInitializer ports = new RandomPortInitializer(4 );
+        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class), mock(FishState.class),5 );
         assertEquals(map.getPorts().size(),4);
         assertTrue(map.getSeaTile(3,0).isPortHere());
         assertTrue(map.getSeaTile(3,1).isPortHere());
         assertTrue(map.getSeaTile(3,2).isPortHere());
         assertTrue(map.getSeaTile(3,3).isPortHere());
+        assertEquals(map.getPorts().get(0).getGasPricePerLiter(),5d,.00001d);
 
     }
 

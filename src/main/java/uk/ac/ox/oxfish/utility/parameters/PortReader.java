@@ -2,7 +2,6 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -35,7 +34,7 @@ public class PortReader {
      */
     public LinkedHashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
-            Supplier<MarketMap> marketmap, double gasPrice)
+            Function<SeaTile,MarketMap> marketmap, double gasPrice)
             throws IOException {
 
         List<String> fileLines = Files.readAllLines(pathToFile);
@@ -76,7 +75,7 @@ public class PortReader {
                                     location = correctLocation(location,map,portName);
 
                                     //build the port
-                                    return new Port(portName,location,marketmap.get(),gasPrice);
+                                    return new Port(portName,location,marketmap.apply(location),gasPrice);
                                 }
                             });
             toReturn.put(port,Integer.parseInt(splitLine[1]));

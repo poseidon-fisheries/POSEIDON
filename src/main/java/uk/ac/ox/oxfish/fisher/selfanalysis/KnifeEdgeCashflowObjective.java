@@ -22,12 +22,14 @@ public class KnifeEdgeCashflowObjective implements  ObjectiveFunction<Fisher>{
     /**
      * compute current fitness of the agent
      *
+     *
+     * @param observer
      * @param observed agent whose fitness we are trying to compute
      * @return a fitness value: the higher the better
      */
     @Override
-    public double computeCurrentFitness(Fisher observed) {
-        return delegate.computeCurrentFitness(observed) >= threshold ? +1 : -1;
+    public double computeCurrentFitness(Fisher observer, Fisher observed) {
+        return delegate.computeCurrentFitness(observer, observed) >= threshold ? +1 : -1;
     }
 
 

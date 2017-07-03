@@ -46,7 +46,7 @@ public class DiscreteRandomAlgorithm<T> implements AdaptationAlgorithm<T>
             ObjectiveFunction<Fisher> objectiveFunction, Sensor<Fisher,T> sensor) {
         return FishStateUtilities.imitateFriendAtRandom(random, fitness,
                                                         current, friends,
-                                                        objectiveFunction, sensor);
+                                                        objectiveFunction, sensor,agent );
 
 
     }
