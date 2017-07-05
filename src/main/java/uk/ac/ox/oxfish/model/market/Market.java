@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.market;
 import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
@@ -22,13 +23,14 @@ public interface Market extends Startable {
 
     /**
      * Sells the a specific amount of fish here
-     * @param biomass pounds of fish sold
+     * @param hold the cargo of the agent
      * @param fisher the seller
      * @param regulation the regulation object the seller abides to
      * @param state the model
      */
     TradeInfo sellFish(
-            double biomass, Fisher fisher,
+            Hold hold,
+            Fisher fisher,
             Regulation regulation, FishState state,
             Species species);
 

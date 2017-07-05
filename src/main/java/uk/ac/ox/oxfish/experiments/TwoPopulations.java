@@ -205,7 +205,7 @@ public class TwoPopulations {
                                                 fisher.getBoat().getWidth(),
                                                 fisher.getBoat().getEngine(),
                                                 new FuelTank(500)));
-                        fisher.setHold(new Hold(10, model.getSpecies().size()));
+                        fisher.setHold(new Hold(10, model.getBiology()));
                         RandomCatchabilityTrawlFactory gearFactory = new RandomCatchabilityTrawlFactory();
                         gearFactory.setMeanCatchabilityFirstSpecies(new FixedDoubleParameter(.001));
                         fisher.setGear(gearFactory.apply(model));

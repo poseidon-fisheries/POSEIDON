@@ -1386,4 +1386,9 @@ public class Fisher implements Steppable, Startable{
     public FishState grabState(){
         return state;
     }
+
+
+    public Hold getHold() {
+        return equipment.getHold();
+    }
 }

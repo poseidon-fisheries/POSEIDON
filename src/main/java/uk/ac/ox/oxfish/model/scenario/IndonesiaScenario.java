@@ -303,7 +303,7 @@ public class IndonesiaScenario implements Scenario {
                                                                         literPerKilometer.apply(random),
                                                                         speedInKmh.apply(random)),
                                                      new FuelTank(fuelTankSize.apply(random)));
-        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random), biology.getSize());
+        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random),  biology);
 
         FisherFactory fisherFactory = new FisherFactory(
                 () -> ports[random.nextInt(ports.length)],

@@ -15,7 +15,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
  * A market where there is a linear demand p = a - b *q where q is the lagged MA (moving average) of previous days sales
  * Created by carrknight on 1/6/16.
  */
-public class MACongestedMarket extends AbstractMarket implements Steppable {
+public class MACongestedMarket extends AbstractBiomassMarket implements Steppable {
 
     /**
      * the moving average holding the previous days sales and whose smoothed value represents the price congestion

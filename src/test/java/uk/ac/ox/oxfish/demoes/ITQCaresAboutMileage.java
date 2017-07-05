@@ -52,7 +52,6 @@ public class ITQCaresAboutMileage {
         System.out.println("seed " + seed);
         System.out.println("Correlation: " +
                          Double.toString(FishStateUtilities.computeCorrelation(mileage, catches)));
-        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
         //efficiency is 100%
         assertEquals(400000.0, DoubleStream.of(catches).sum(), .1);
 
@@ -69,6 +68,7 @@ public class ITQCaresAboutMileage {
         //sum up the last 365 days of observations
         assertEquals(400000,landedCatches,.1);
 
+        assertTrue(FishStateUtilities.computeCorrelation(mileage, catches) < -.45);
 
 
 

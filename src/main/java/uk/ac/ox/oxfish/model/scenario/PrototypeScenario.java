@@ -344,7 +344,7 @@ public class PrototypeScenario implements Scenario {
                                                                    literPerKilometer.apply(random),
                                                                    speedInKmh.apply(random)),
                                                 new FuelTank(fuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(holdSize.apply(random), biology.getSize()),
+                (Supplier<Hold>) () -> new Hold(holdSize.apply(random),biology),
                 gear,
 
                 0);

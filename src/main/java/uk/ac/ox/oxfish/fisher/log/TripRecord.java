@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
@@ -161,7 +162,8 @@ public class TripRecord {
      */
     public  double getProfitPerSpecie(int specie, boolean countOpportunityCosts)
     {
-        assert soldCatch[specie] <= totalCatch[specie]; //never sells more than it has!
+        assert FishState.round(soldCatch[specie],3) <=
+                FishState.round(totalCatch[specie],3); //never sells more than it has!
         if(soldCatch[specie]<= FishStateUtilities.EPSILON)
             return Double.NaN;
         double totalWeightSold = DoubleStream.of(soldCatch).sum();

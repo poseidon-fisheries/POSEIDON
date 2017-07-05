@@ -159,7 +159,7 @@ public class Catch {
      */
     public Catch(int[] maleAbundance, int[]femaleAbundance, Species correctSpecies, GlobalBiology biology )
     {
-        this.abundance = new StructuredAbundance[maleAbundance.length];
+        this.abundance = new StructuredAbundance[biology.getSize()];
         for(Species index : biology.getSpecies())
         {
             if(correctSpecies==index)

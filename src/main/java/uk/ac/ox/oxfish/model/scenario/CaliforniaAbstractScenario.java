@@ -498,7 +498,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                                                   mileage,
                                                                   speed),
                                                        new FuelTank(fuelCapacity)),
-                                              new Hold(capacity, biology.getSize()),
+                                              new Hold(capacity, biology),
                                               fisherGear, model.getSpecies().size());
                 fisherCounter++;
                 //predictors
@@ -573,7 +573,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                                   literPerKilometer.apply(random),
                                                   cruiseSpeedInKph.apply(random)),
                                new FuelTank(fuelTankInLiters.apply(random))),
-                () -> new Hold(holdSizePerBoat.apply(random), biology.getSize()),
+                () -> new Hold(holdSizePerBoat.apply(random), biology),
                 gear,
 
                 fisherCounter);

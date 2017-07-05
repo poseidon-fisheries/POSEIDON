@@ -14,7 +14,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
  * A market where price drops if too much biomass accumulates
  * Created by carrknight on 8/11/15.
  */
-public class CongestedMarket extends AbstractMarket implements Steppable{
+public class CongestedMarket extends AbstractBiomassMarket implements Steppable{
 
 
     /**

@@ -74,7 +74,7 @@ public class FisherTest {
                                    new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
                                    new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(1000000)),
-                                   new Hold(2, 1), gear, 1);
+                                   new Hold(2,biology), gear, 1);
         fisher.start(fishState);
         fishmarket.start(fishState);
         //step it, it should reach the sea tile and do nothing
@@ -152,7 +152,8 @@ public class FisherTest {
                                    new FixedGearStrategy(),
                                    new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(30)), new Hold(2, 1),
+                                   new Boat(1, 1, new Engine(1, litersPerKm, kph), new FuelTank(30)),
+                                   new Hold(2,biology),
                                    gear, 1);
 
 

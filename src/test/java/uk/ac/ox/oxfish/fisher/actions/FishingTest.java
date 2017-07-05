@@ -85,7 +85,8 @@ public class FishingTest {
                                    new FixedGearStrategy(),
                                    new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)), new Hold(100.0, 1), gear,
+                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)),
+                                   new Hold(100.0, biology), gear,
                                    1);
         fisher.start(fishState);
         fisher.step(fishState);

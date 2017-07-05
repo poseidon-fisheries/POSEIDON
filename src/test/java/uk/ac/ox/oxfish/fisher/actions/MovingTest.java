@@ -5,6 +5,8 @@ import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
+import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Engine;
@@ -86,7 +88,9 @@ public class MovingTest
                                    }, new FixedGearStrategy(),
                                    new NoDiscarding(),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1, 1, new Engine(1, 1, 1), new FuelTank(1000000)), new Hold(100.0, 1), gear,
+                                   new Boat(1, 1, new Engine(1, 1, 1),
+                                            new FuelTank(1000000)),
+                                   new Hold(100.0,new GlobalBiology(mock(Species.class))), gear,
                                    1);
         fisher.start(mock(FishState.class));
         //starts at port!
@@ -165,7 +169,8 @@ public class MovingTest
                                    mock(GearStrategy.class),
                                    mock(DiscardingStrategy.class),
                                    new IgnoreWeatherStrategy(),
-                                   new Boat(1,1,new Engine(1,1,.1),new FuelTank(1000000)), mock(Hold.class),
+                                   new Boat(1,1,new Engine(1,1,.1),
+                                            new FuelTank(1000000)), mock(Hold.class),
                                    mock(Gear.class), 1);
         fisher.start(mock(FishState.class));
 

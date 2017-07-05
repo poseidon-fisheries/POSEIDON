@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.model.market;
 import com.esotericsoftware.minlog.Log;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.Counter;
@@ -90,30 +91,24 @@ public abstract class AbstractMarket implements Market {
     /**
      * Sells the a specific amount of fish here by calling sellFishImplementation and then store the trade result details
      *
-     * @param biomass     pounds of fish sold
+     * @param hold
      * @param fisher      the seller
      * @param regulation the regulation object the seller abides to
      * @param state       the model
      */
     @Override
-    final public TradeInfo sellFish(double biomass, Fisher fisher, Regulation regulation,
-                                    FishState state, Species species) {
-        TradeInfo receipt = sellFishImplementation(biomass, fisher, regulation, state, species);
+    final public TradeInfo sellFish(
+            Hold hold, Fisher fisher, Regulation regulation,
+            FishState state, Species species) {
+        TradeInfo receipt = sellFishImplementation(
+                hold,
+                fisher, regulation, state, species);
         recordTrade(receipt);
         return receipt;
     }
 
-    /**
-     * the only method to implement for subclasses. Needs to actually do the trading and return the result
-     * @param biomass the biomass caught by the seller
-     * @param fisher the seller
-     * @param regulation the rules the seller abides to
-     * @param state the model
-     * @return TradeInfo  results
-     */
-    protected abstract TradeInfo sellFishImplementation(double biomass, Fisher fisher,
-                                                        Regulation regulation, FishState state,
-                                                        Species species);
+    protected abstract TradeInfo sellFishImplementation(
+            Hold hold, Fisher fisher, Regulation regulation, FishState state, Species species);
 
 
     public void recordTrade(TradeInfo info)

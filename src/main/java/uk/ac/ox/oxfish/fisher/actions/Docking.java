@@ -38,29 +38,28 @@ public class Docking implements Action{
 
 
 
-        //sell your stuff
-        Catch toSell = agent.unload();
-        //log it
-        if(Log.TRACE)
-            Log.trace(agent + " returns to port with catch: " + toSell);
+
 
         GlobalBiology biology = model.getBiology();
 
         MarketMap marketMap =port.getMarketMap(agent);
         for(Species species : biology.getSpecies())
         {
-            double biomass = toSell.getWeightCaught(species);
 
 
-            assert  biomass>=0;
-            if(biomass>0) {
+            if(agent.getTotalWeightOfCatchInHold(species)>0) {
                 //this should take care of everything including transferring cash
-                TradeInfo tradeInfo = marketMap.sellFish(species, biomass, agent, regulation, model);
+                TradeInfo tradeInfo = marketMap.sellFish(agent.getHold(), species, agent, regulation, model);
                 //bean counting happens here:
                 agent.processTradeData(tradeInfo);
             }
         }
 
+        //sell your stuff
+        Catch toSell = agent.unload();
+        //log it
+        if(Log.TRACE)
+            Log.trace(agent + " returns to port with catch: " + toSell);
         //anchor/refill
         agent.dock();
 

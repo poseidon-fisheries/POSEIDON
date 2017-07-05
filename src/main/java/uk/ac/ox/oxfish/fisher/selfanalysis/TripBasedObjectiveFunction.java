@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 
@@ -34,17 +33,12 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
             return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
         else
         {
-            //if different gear, then do not imitate!
-            //todo how about different hold size? How about different regulations?
-            if(! (observed.getGear().isSame(observer.getGear())))
-            {
-                Log.warn("Can't imitate if the gear is different!");
-                return Double.NaN;
-            }
-            else
-            {
+
+
+
                 //if they are from the same port, then again return the memory
-                if(observed.getHomePort().equals(observer.getHomePort()))
+                if((observed.getGear().isSame(observer.getGear()) &&
+                        observed.getHomePort().equals(observer.getHomePort())))
                     return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
                 else
                 //otherwise simulate!
@@ -67,7 +61,7 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
                     return extractUtilityFromTrip(observer,simulatedTrip,observed);
                 }
 
-            }
+
         }
 
     }

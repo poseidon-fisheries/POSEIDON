@@ -86,15 +86,16 @@ public class GearImitationAnalysis
                             new RandomStep<Hold>() {
                                 public Hold randomStep(
                                         FishState state, MersenneTwisterFast random, Fisher fisher, Hold current) {
-                                    return new Hold(fisher.getMaximumHold() * (.8 + .4 * random.nextDouble()),
-                                                    species);
+                                    return new Hold(fisher.getMaximumHold() *
+                                                            (.8 + .4 * random.nextDouble()),
+                                                    state.getBiology());
                                 }
                             }
 
                     ), (fisher1, change, model1) -> fisher1.changeHold(change),
                     fisher1 -> {
                         //create a new hold for scanning. Helps with safety plus we can't get Fisher hold
-                        return new Hold(fisher1.getMaximumHold(), species);
+                        return new Hold(fisher1.getMaximumHold(), model.getBiology());
                     }, new CashFlowObjective(60), .15, .6, new Predicate<Hold>() {
                         @Override
                         public boolean test(Hold a) {

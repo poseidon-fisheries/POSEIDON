@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -35,10 +36,11 @@ public class MarketMap {
     }
 
 
-    public TradeInfo sellFish(Species species, double biomass, Fisher fisher,
-                              Regulation regulation, FishState state)
+    public TradeInfo sellFish(
+            Hold hold, Species species, Fisher fisher,
+            Regulation regulation, FishState state)
     {
-        return marketList[species.getIndex()].sellFish(biomass, fisher, regulation, state, species);
+        return marketList[species.getIndex()].sellFish(hold, fisher, regulation, state, species);
 
     }
 

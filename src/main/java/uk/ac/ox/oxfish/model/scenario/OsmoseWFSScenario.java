@@ -604,7 +604,7 @@ public class OsmoseWFSScenario implements Scenario{
                                                        new FuelTank(fuelCapacity)),
                                               new Hold(
                                                       longlinerHoldSize.apply(random),
-                                                      biology.getSize()),
+                                                      biology),
                                               fisherGear, model.getSpecies().size());
                 newFisher.getTags().add("large");
                 newFisher.getTags().add("longline");
@@ -654,8 +654,7 @@ public class OsmoseWFSScenario implements Scenario{
                                                                   mileage,
                                                                   speed),
                                                        new FuelTank(fuelCapacity)), new Hold(
-                        handlinerHoldSize.apply(random),
-                        biology.getSize()),
+                        handlinerHoldSize.apply(random), biology),
                                               fisherGear, model.getSpecies().size());
                 newFisher.getTags().add("small");
                 newFisher.getTags().add("handline");

@@ -9,7 +9,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
  * The simplest market, the price is constant no matter how much stuff gets sold every day
  * Created by carrknight on 5/3/15.
  */
-public class FixedPriceMarket extends AbstractMarket {
+public class FixedPriceMarket extends AbstractBiomassMarket {
 
     private double price;
 

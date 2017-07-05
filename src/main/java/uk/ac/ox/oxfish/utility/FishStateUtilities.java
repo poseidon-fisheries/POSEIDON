@@ -222,19 +222,19 @@ public class FishStateUtilities {
                         filter(fisher -> sensor.scan(fisher) != null).
                 //ignore fishers who aren't allowed out anyway
                         collect(
-                                Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
-                                    @Override
-                                    public Double apply(Fisher fisher) {
-                                        //get your friend fitness
-                                        double friendFitness = objectiveFunction.computeCurrentFitness(
-                                                fisherDoingTheImitation, fisher);
-                                        //if it is finite check if it is better than what we already have
-                                        if(Double.isFinite(friendFitness))
-                                            maxFitness[0] = Math.max(maxFitness[0], friendFitness);
-                                        //return it
-                                        return friendFitness;
-                                    }
-                                })).entrySet();
+                        Collectors.toMap((friend) -> friend, new Function<Fisher, Double>() {
+                            @Override
+                            public Double apply(Fisher fisher) {
+                                //get your friend fitness
+                                double friendFitness = objectiveFunction.computeCurrentFitness(
+                                        fisherDoingTheImitation, fisher);
+                                //if it is finite check if it is better than what we already have
+                                if(Double.isFinite(friendFitness))
+                                    maxFitness[0] = Math.max(maxFitness[0], friendFitness);
+                                //return it
+                                return friendFitness;
+                            }
+                        })).entrySet();
 
         //make sure it's finite and at least as good as our current fitness
         if(Double.isNaN(fitness) && Double.isNaN(maxFitness[0]))
@@ -632,6 +632,27 @@ public class FishStateUtilities {
 
     }
 
+
+    /**
+     * used to weigh only one bin of the structured abundance catch
+     * @param abundance
+     * @param species
+     * @param binIndex
+     * @return
+     */
+    public static double weigh(StructuredAbundance abundance, Species species,int binIndex)
+    {
+        //no female-male split
+        if(abundance.getSubdivisions() == 1)
+            return species.getWeightMaleInKg().get(binIndex) * abundance.getAbundanceInBin(binIndex);
+        if(abundance.getSubdivisions() == 2)
+            return abundance.getAbundance()[MALE][binIndex] * species.getWeightMaleInKg().get(binIndex) +
+                    abundance.getAbundance()[FEMALE][binIndex] * species.getWeightFemaleInKg().get(binIndex);
+
+        throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
+
+
+    }
 
     /**
      * weights this number of fish  assuming they are all male

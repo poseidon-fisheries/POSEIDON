@@ -338,7 +338,7 @@ public class TwoPopulationsScenario implements Scenario{
                                                                    smallLitersPerKilometer.apply(random),
                                                                    smallSpeed.apply(random)),
                                                 new FuelTank(smallFuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(smallHoldSize.apply(random), biology.getSize()),
+                (Supplier<Hold>) () -> new Hold(smallHoldSize.apply(random),biology),
                 gearSmall,
 
                 0);
@@ -357,7 +357,7 @@ public class TwoPopulationsScenario implements Scenario{
                                                                    largeLitersPerKilometer.apply(random),
                                                                    largeSpeed.apply(random)),
                                                 new FuelTank(largeFuelTankSize.apply(random))),
-                (Supplier<Hold>) () -> new Hold(largeHoldSize.apply(random), biology.getSize()),
+                (Supplier<Hold>) () -> new Hold(largeHoldSize.apply(random), biology),
                 gearLarge,
 
                 0);
