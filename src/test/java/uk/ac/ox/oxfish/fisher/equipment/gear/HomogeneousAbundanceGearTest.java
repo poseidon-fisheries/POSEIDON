@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
@@ -34,12 +34,13 @@ public class HomogeneousAbundanceGearTest
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test",Meristics.FAKE_MERISTICS);
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
 
         Catch fish = gear.fish(mock(Fisher.class), tile, 1, biology);
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(new int[]{0}, new int[]{25}, species), .001);
+        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+                new int[]{0}, new int[]{25}, species.getMeristics()), .001);
 
         assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],25);
 
@@ -60,12 +61,13 @@ public class HomogeneousAbundanceGearTest
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test",Meristics.FAKE_MERISTICS);
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         Catch fish = gear.fish(mock(Fisher.class), tile,1, biology);
 
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(new int[]{0}, new int[]{50}, species), .001);
+        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+                new int[]{0}, new int[]{50}, species.getMeristics()), .001);
 
 
     }
@@ -85,12 +87,13 @@ public class HomogeneousAbundanceGearTest
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test",Meristics.FAKE_MERISTICS);
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         double fish[] = gear.expectedHourlyCatch(mock(Fisher.class), tile,1, biology);
 
-        assertEquals(fish[0], FishStateUtilities.weigh(new int[]{0},new int[]{50},species),.001);
+        assertEquals(fish[0], FishStateUtilities.weigh(new int[]{0},
+                                                       new int[]{50},species.getMeristics()),.001);
 
 
     }
@@ -108,13 +111,14 @@ public class HomogeneousAbundanceGearTest
         when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test",Meristics.FAKE_MERISTICS);
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         Catch fish = gear.fish(mock(Fisher.class), tile, 2, biology);
 
         //you are going to catch 50 on the first hour and 50 in the other second (this is because seatile is mocked and doesn't kill off biology)
-        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(new int[]{0}, new int[]{50+50}, species), .001);
+        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+                new int[]{0}, new int[]{50+50}, species.getMeristics()), .001);
         assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],100);
 
 

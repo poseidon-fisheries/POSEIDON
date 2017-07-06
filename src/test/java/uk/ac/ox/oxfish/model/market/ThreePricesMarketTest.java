@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -23,12 +24,13 @@ public class ThreePricesMarketTest {
     public void sellsAndNotifiesCorrectly() throws Exception {
 
         //set up copied from the holdsize test
-        Species first = mock(Species.class);
-        when(first.getIndex()).thenReturn(0);
-        Species second = mock(Species.class);
-        when(second.getIndex()).thenReturn(1);
+        StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
+        StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
+        Species firstSpecies = new Species("first",first);
+        Species secondSpecies = new Species("second",second);
 
-        GlobalBiology bio = new GlobalBiology(first, second);
+
+        GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
@@ -64,7 +66,7 @@ public class ThreePricesMarketTest {
                 new Catch(
                         new int[]{0,2,3},
                         new int[]{5,0,0},
-                        first,
+                        firstSpecies,
                         bio
 
                 )
@@ -89,7 +91,7 @@ public class ThreePricesMarketTest {
                         fisher,
                         regulation,
                         mock(FishState.class),
-                        first);
+                        firstSpecies);
         verify(fisher).earn(
                 (10*5*100d+20*2*100d+30*3*100d)
 
@@ -104,15 +106,17 @@ public class ThreePricesMarketTest {
     public void regulationHalves() throws Exception {
 
         //set up copied from the holdsize test
-        Species first = mock(Species.class);
-        when(first.getIndex()).thenReturn(0);
-        Species second = mock(Species.class);
-        when(second.getIndex()).thenReturn(1);
+        StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
+        StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
+        Species firstSpecies = new Species("first",first);
+        Species secondSpecies = new Species("second",second);
 
-        GlobalBiology bio = new GlobalBiology(first, second);
+
+        GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
+
 
         when(first.getWeightFemaleInKg()).thenReturn(
                 ImmutableList.of(
@@ -146,7 +150,7 @@ public class ThreePricesMarketTest {
                 new Catch(
                         new int[]{0,2,3},
                         new int[]{5,0,0},
-                        first,
+                        firstSpecies,
                         bio
 
                 )
@@ -171,7 +175,7 @@ public class ThreePricesMarketTest {
                         fisher,
                         regulation,
                         mock(FishState.class),
-                        first);
+                        firstSpecies);
         verify(fisher).earn(
                 //you only sold half of the total value
                 (10*5*100d+20*2*100d+30*3*100d)/2d

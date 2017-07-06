@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -398,29 +398,29 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     public GlobalBiology generateGlobal(
             MersenneTwisterFast random,
             FishState modelBeingInitialized) {
-        Meristics fake = new Meristics(1,
-                                       1,
-                                       0,
-                                       0,
-                                       1,
-                                       1,
-                                       1,
-                                       0,
-                                       1,
-                                       0,
-                                       0,
-                                       1,
-                                       1,
-                                       1,
-                                       0,
-                                       1,
-                                       0,
-                                       0,
-                                       0,
-                                       0,
-                                       1,
-                                       1,
-                                       false);
+        StockAssessmentCaliforniaMeristics fake = new StockAssessmentCaliforniaMeristics(1,
+                                                                                         1,
+                                                                                         0,
+                                                                                         0,
+                                                                                         1,
+                                                                                         1,
+                                                                                         1,
+                                                                                         0,
+                                                                                         1,
+                                                                                         0,
+                                                                                         0,
+                                                                                         1,
+                                                                                         1,
+                                                                                         1,
+                                                                                         0,
+                                                                                         1,
+                                                                                         0,
+                                                                                         0,
+                                                                                         0,
+                                                                                         0,
+                                                                                         1,
+                                                                                         1,
+                                                                                         false);
         Species target = new Species(targetSpeciesName,
                                      fake);
         Species bycatch = new Species(bycatchSpeciesName,

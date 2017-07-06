@@ -87,7 +87,8 @@ public class Hold {
             StructuredAbundance abundance = caught.getAbundance(species);
             for (int bin = 0; bin < abundance.getBins(); bin++)
             {
-                double additionalWeight = FishStateUtilities.weigh(abundance, biology.getSpecie(species), bin);
+                double additionalWeight = FishStateUtilities.weigh(abundance,
+                                                                   biology.getSpecie(species).getMeristics(), bin);
                 abundanceCaught[species][bin] += additionalWeight;
                 kgCarried += additionalWeight;
                 fishHold[species] += additionalWeight;

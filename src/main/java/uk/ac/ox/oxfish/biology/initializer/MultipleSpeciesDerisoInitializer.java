@@ -5,7 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
-import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -98,7 +98,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                 new FileReader(biologicalDirectory.resolve("deriso.yaml").toFile()),
                 DerisoParameters.class);
         parameter.updateLastRecruits();
-        Species species = new Species(speciesName, Meristics.FAKE_MERISTICS);
+        Species species = new Species(speciesName, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         parameters.put(species,parameter);
         return species;
     }
@@ -129,7 +129,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             //need to add an additional species to catch "all"
             if(addOtherSpecies)
                 speciesList.add(new Species(FAKE_SPECIES_NAME,
-                                            Meristics.FAKE_MERISTICS,
+                                            StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
                                             true));
 
 

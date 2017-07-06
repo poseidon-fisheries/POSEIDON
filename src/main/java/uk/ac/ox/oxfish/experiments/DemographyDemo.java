@@ -1,10 +1,10 @@
 package uk.ac.ox.oxfish.experiments;
 
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,10 +22,10 @@ public class DemographyDemo {
     public static void main(String[] args) throws IOException {
 
         //Take DoverSole
-        Meristics sole = new Meristics(69,50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
-                                       0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
-                                       0.1165, 35, -0.775, 1, 0, 404138330,
-                                       0.8, false);
+        StockAssessmentCaliforniaMeristics sole = new StockAssessmentCaliforniaMeristics(69, 50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
+                                                                                         0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
+                                                                                         0.1165, 35, -0.775, 1, 0, 404138330,
+                                                                                         0.8, false);
         Species species = new Species("Dover Sole");
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomass(sole.getVirginRecruits(),
                                                                           sole.getSteepness(),

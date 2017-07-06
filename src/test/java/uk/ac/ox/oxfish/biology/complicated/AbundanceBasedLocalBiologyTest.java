@@ -1,25 +1,21 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class AbundanceBasedLocalBiologyTest
 {
 
-    final static private Meristics meristics=  new Meristics(80,40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                             0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                             0.111313, 17.826, -1.79, 1,
-                                                             0, 168434124,
-                                                             0.6, false);
+    final static private StockAssessmentCaliforniaMeristics meristics=  new StockAssessmentCaliforniaMeristics(80, 40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                                               0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                                               0.111313, 17.826, -1.79, 1,
+                                                                                                               0, 168434124,
+                                                                                                               0.6, false);
 
 
     @Test

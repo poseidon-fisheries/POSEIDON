@@ -8,9 +8,9 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.MockNaturalProcess;
 import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -136,7 +136,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
             }
             //need to add an additional species to catch "all"
             if(addOtherSpecies)
-                speciesList.add(new Species(FAKE_SPECIES_NAME, Meristics.FAKE_MERISTICS,true));
+                speciesList.add(new Species(FAKE_SPECIES_NAME, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, true));
 
 
             return new GlobalBiology(speciesList.toArray(new Species[speciesList.size()]));

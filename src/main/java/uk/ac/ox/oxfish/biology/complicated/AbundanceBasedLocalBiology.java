@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -69,7 +68,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
                     abundance.get(species)[FishStateUtilities.MALE],
                     abundance.get(species)[FishStateUtilities.FEMALE],
-                    species
+                    species.getMeristics()
             );
             assert !Double.isNaN(lastComputedBiomass[species.getIndex()] );
         }

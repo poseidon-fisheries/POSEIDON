@@ -38,7 +38,7 @@ public class MeristicsInputTest {
                                                             "youngLengthMale: 18.717",
                                                     MeristicsInput.class);
 
-        Meristics yellowEye = new Meristics(meristicsInput);
+        StockAssessmentCaliforniaMeristics yellowEye = new StockAssessmentCaliforniaMeristics(meristicsInput);
         assertEquals(yellowEye.getLengthFemaleInCm().get(5),26.4837518217,.001);
         assertEquals(yellowEye.getLengthMaleInCm().get(5),26.8991271545,.001);
 

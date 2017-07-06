@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     public MockNaturalProcess(
             Species species) {
-        super(null, null, species, true);
+        super(null, null, species, null);
     }
 
 

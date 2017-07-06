@@ -40,10 +40,10 @@ public class ReplicateDemographyDemo {
         final long startTime = System.currentTimeMillis();
 
         //Take DoverSole
-        Meristics sole = new Meristics(69,50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
-                                       0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
-                                       0.1165, 35, -0.775, 1, 0, 404138330,
-                                       0.8, false);
+        StockAssessmentCaliforniaMeristics sole = new StockAssessmentCaliforniaMeristics(69, 50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
+                                                                                         0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
+                                                                                         0.1165, 35, -0.775, 1, 0, 404138330,
+                                                                                         0.8, false);
         Species species = new Species("Dover Sole", sole);
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomassDelayed(sole.getVirginRecruits(),
                                                                                  sole.getSteepness(),
@@ -79,7 +79,7 @@ public class ReplicateDemographyDemo {
         }
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
-                                                                                    false);
+                                                                                    new StandardAgingProcess(false));
         processes.add(biology);
 
         StringBuilder builder = new StringBuilder();
@@ -127,10 +127,10 @@ public class ReplicateDemographyDemo {
         final long startTime = System.currentTimeMillis();
 
         //Take DoverSole
-        Meristics sole = new Meristics(69,50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
-                                       0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
-                                       0.1165, 35, -0.775, 1, 0, 404138330,
-                                       0.8, false);
+        StockAssessmentCaliforniaMeristics sole = new StockAssessmentCaliforniaMeristics(69, 50 , 1, 9.04, 39.91, 0.1713, 0.000002231, 3.412,
+                                                                                         0.1417, 1, 5.4, 47.81, 0.1496, 0.000002805, 3.345,
+                                                                                         0.1165, 35, -0.775, 1, 0, 404138330,
+                                                                                         0.8, false);
         Species species = new Species("Dover Sole", sole);
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomassDelayed(sole.getVirginRecruits(),
                                                                                  sole.getSteepness(),
@@ -172,7 +172,7 @@ public class ReplicateDemographyDemo {
         }
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
-                                                                                    false);
+                                                                                    new StandardAgingProcess(false));
         processes.add(biology1);
         processes.add(biology2);
 

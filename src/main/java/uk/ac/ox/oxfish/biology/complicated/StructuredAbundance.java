@@ -78,7 +78,7 @@ public class StructuredAbundance {
      * @return a weight
      */
     public double computeWeight(Species species){
-        return  FishStateUtilities.weigh(this,species);
+        return  FishStateUtilities.weigh(this,species.getMeristics());
 
 
     }

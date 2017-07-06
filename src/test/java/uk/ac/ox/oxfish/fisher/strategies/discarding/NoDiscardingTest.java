@@ -4,14 +4,14 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -23,8 +23,8 @@ public class NoDiscardingTest {
     @Test
     public void testing1() throws Exception {
 
-        Species species1 = new Species("first", Meristics.FAKE_MERISTICS);
-        Species species2 = new Species("second", Meristics.FAKE_MERISTICS);
+        Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
+        Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
 
         GlobalBiology biology = new GlobalBiology(species1,species2);
 

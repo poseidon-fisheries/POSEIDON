@@ -54,34 +54,41 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
         {
             //grow fish
 
-            Double[] currentBiomass = biology.getCurrentBiomass();
-            assert (currentBiomass.length==malthusianParameter.length);
+            Double[] currentBiomasses = biology.getCurrentBiomass();
+            assert (currentBiomasses.length==malthusianParameter.length);
 
-            for(int i=0; i<currentBiomass.length; i++)
+            for(int i=0; i<currentBiomasses.length; i++)
             {
-                assert currentBiomass[i] >=0;
+                assert currentBiomasses[i] >=0;
                 //grows logistically
 
                 Double carryingCapacity = biology.getCarryingCapacity(i);
-                if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomass[i]) {
-                    double oldBiomass = currentBiomass[i];
-                    currentBiomass[i] = Math.min(carryingCapacity, currentBiomass[i] + malthusianParameter[i] *
-                            (1d - currentBiomass[i] / carryingCapacity) * currentBiomass[i]);
+                if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[i]) {
+                    double oldBiomass = currentBiomasses[i];
+                    currentBiomasses[i] = logisticStep(currentBiomasses[i],
+                                                       carryingCapacity,
+                                                       malthusianParameter[i]);
                     //store recruitment number, counter should have been initialized by factory!
-                    double recruitment = currentBiomass[i]-oldBiomass;
+                    double recruitment = currentBiomasses[i]-oldBiomass;
                     if(recruitment>FishStateUtilities.EPSILON)
                         model.getYearlyCounter().count(model.getSpecies().get(i) +
                                                                " Recruitment",
                                                        recruitment);
 
                 }
-                assert currentBiomass[i] >=0;
+                assert currentBiomasses[i] >=0;
             }
         }
 
 
         if(biologies.size()==0) //if you removed all the biologies then we are done
             turnOff();
+    }
+
+    public static double logisticStep(
+            double currentBiomasses, double carryingCapacity, double malthusianParameter) {
+        return Math.min(carryingCapacity, currentBiomasses + malthusianParameter *
+                (1d - currentBiomasses / carryingCapacity) * currentBiomasses);
     }
 
     /**

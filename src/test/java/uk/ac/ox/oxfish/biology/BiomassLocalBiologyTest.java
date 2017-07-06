@@ -6,9 +6,7 @@ import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class BiomassLocalBiologyTest
@@ -19,7 +17,8 @@ public class BiomassLocalBiologyTest
         BiomassLocalBiology bio = new BiomassLocalBiology(
                 new Double[]{100d,200d}, new Double[]{100d,400d}
         );
-        IndependentLogisticBiomassGrower grower = new IndependentLogisticBiomassGrower(new Double[]{.5,.5});
+        IndependentLogisticBiomassGrower grower =
+                new IndependentLogisticBiomassGrower(new Double[]{.5,.5});
         grower.getBiologies().add(bio);
         Species species0 = new Species("0"); species0.resetIndexTo(0);
         Species species1 = new Species("1"); species1.resetIndexTo(1);

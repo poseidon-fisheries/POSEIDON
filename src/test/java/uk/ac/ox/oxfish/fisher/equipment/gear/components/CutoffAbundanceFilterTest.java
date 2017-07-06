@@ -2,7 +2,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.assertEquals;
@@ -17,11 +17,11 @@ public class CutoffAbundanceFilterTest {
      */
     @Test
     public void computesCorrectly() throws Exception {
-        Species species = new Species("Longspine", new Meristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                 0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                 0.111313, 17.826, -1.79, 1,
-                                                                 0, 168434124,
-                                                                 0.6, false));
+        Species species = new Species("Longspine", new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                          0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                          0.111313, 17.826, -1.79, 1,
+                                                                                          0, 168434124,
+                                                                                          0.6, false));
         CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10,false);
         double[][] selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][3], 1, .001);
@@ -39,11 +39,11 @@ public class CutoffAbundanceFilterTest {
 
     @Test
     public void filtersCorrectly() throws Exception {
-        Species species = new Species("Longspine",new Meristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                0.111313, 17.826, -1.79, 1,
-                                                                0, 168434124,
-                                                                0.6, false));
+        Species species = new Species("Longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                         0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                         0.111313, 17.826, -1.79, 1,
+                                                                                         0, 168434124,
+                                                                                         0.6, false));
         CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10,true);
 
         int[] male = new int[81];

@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.biology;
 
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 /**
  * A collection of all information regarding a species (for now just a name)
@@ -32,7 +33,7 @@ public class Species {
      * @param name the name of the specie
      */
     public Species(String name) {
-        this(name,Meristics.FAKE_MERISTICS,false);
+        this(name, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, false);
 
     }
 
@@ -79,49 +80,8 @@ public class Species {
         return meristics.getMaxAge();
     }
 
-    public double getYoungAgeMale() {
-        return meristics.getYoungAgeMale();
-    }
 
-    public ImmutableList<Double> getRelativeFecundity() {
-        return meristics.getRelativeFecundity();
-    }
 
-    public ImmutableList<Double> getPhi() {
-        return meristics.getPhi();
-    }
-
-    public double getWeightParameterBFemale() {
-        return meristics.getWeightParameterBFemale();
-    }
-
-    public double getYoungAgeFemale() {
-        return meristics.getYoungAgeFemale();
-    }
-
-    public double getMaturitySlope() {
-        return meristics.getMaturitySlope();
-    }
-
-    public ImmutableList<Double> getCumulativeSurvivalFemale() {
-        return meristics.getCumulativeSurvivalFemale();
-    }
-
-    public double getMaxLengthFemale() {
-        return meristics.getMaxLengthFemale();
-    }
-
-    public double getWeightParameterAMale() {
-        return meristics.getWeightParameterAMale();
-    }
-
-    public double getMaturityInflection() {
-        return meristics.getMaturityInflection();
-    }
-
-    public double getWeightParameterAFemale() {
-        return meristics.getWeightParameterAFemale();
-    }
 
     public ImmutableList<Double> getWeightMaleInKg() {
         return meristics.getWeightMaleInKg();
@@ -129,47 +89,6 @@ public class Species {
 
     public ImmutableList<Double> getLengthMaleInCm() {
         return meristics.getLengthMaleInCm();
-    }
-
-    public double getFecundityIntercept() {
-        return meristics.getFecundityIntercept();
-    }
-
-    public double getMaxLengthMale() {
-        return meristics.getMaxLengthMale();
-    }
-
-
-    public double getCumulativePhi() {
-        return meristics.getCumulativePhi();
-    }
-
-    public double getLengthParameterFemale() {
-        return meristics.getLengthParameterFemale();
-    }
-
-    public double getYoungLengthMale() {
-        return meristics.getYoungLengthMale();
-    }
-
-    public double getLengthParameterMale() {
-        return meristics.getLengthParameterMale();
-    }
-
-    public double getMortalityParameterMMale() {
-        return meristics.getMortalityParameterMMale();
-    }
-
-    public double getKParameterMale() {
-        return meristics.getKParameterMale();
-    }
-
-    public double getWeightParameterBMale() {
-        return meristics.getWeightParameterBMale();
-    }
-
-    public void setCumulativePhi(double cumulativePhi) {
-        meristics.setCumulativePhi(cumulativePhi);
     }
 
     /**
@@ -190,37 +109,18 @@ public class Species {
         return meristics.getSteepness();
     }
 
-    public double getYoungLengthFemale() {
-        return meristics.getYoungLengthFemale();
-    }
 
-    public double getMortalityParameterMFemale() {
-        return meristics.getMortalityParameterMFemale();
-    }
-
-    public double getFecunditySlope() {
-        return meristics.getFecunditySlope();
-    }
-
-    public ImmutableList<Double> getCumulativeSurvivalMale() {
-        return meristics.getCumulativeSurvivalMale();
-    }
 
     public ImmutableList<Double> getWeightFemaleInKg() {
         return meristics.getWeightFemaleInKg();
     }
 
-    public ImmutableList<Double> getMaturity() {
-        return meristics.getMaturity();
-    }
+
 
     public ImmutableList<Double> getLengthFemaleInCm() {
         return meristics.getLengthFemaleInCm();
     }
 
-    public double getKParameterFemale() {
-        return meristics.getKParameterFemale();
-    }
 
     /**
      * Getter for property 'addRelativeFecundityToSpawningBiomass'.
@@ -238,5 +138,26 @@ public class Species {
      */
     public boolean isImaginary() {
         return imaginary;
+    }
+
+
+    public double getMortalityParameterMMale() {
+        return meristics.getMortalityParameterMMale();
+    }
+
+    public double getMortalityParameterMFemale() {
+        return meristics.getMortalityParameterMFemale();
+    }
+
+    public ImmutableList<Double> getMaturity() {
+        return meristics.getMaturity();
+    }
+
+    public ImmutableList<Double> getRelativeFecundity() {
+        return meristics.getRelativeFecundity();
+    }
+
+    public double getCumulativePhi() {
+        return meristics.getCumulativePhi();
     }
 }

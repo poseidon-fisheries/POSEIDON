@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Fishing;
@@ -589,16 +590,16 @@ public class FishStateUtilities {
      * weights this number of fish (split into age cohorts) into the total amount of biomass
      * @param male
      * @param female
-     * @param species
+     * @param meristics
      * @return
      */
-    public static double weigh(int[] male, int[] female, Species species)
+    public static double weigh(int[] male, int[] female, Meristics meristics)
     {
-        final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
-        final ImmutableList<Double> femaleWeights = species.getWeightFemaleInKg();
+        final ImmutableList<Double> maleWeights = meristics.getWeightMaleInKg();
+        final ImmutableList<Double> femaleWeights = meristics.getWeightFemaleInKg();
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
-        for(int age=0; age<species.getMaxAge()+1; age++)
+        for(int age = 0; age< meristics.getMaxAge()+1; age++)
         {
             totalWeight += maleWeights.get(age) * male[age];
             totalWeight += femaleWeights.get(age) * female[age];
@@ -613,17 +614,17 @@ public class FishStateUtilities {
     /**
      * weights this number of fish  assuming they are all male
      * @param abundance number of fish per size
-     * @param species species object containig the details
+     * @param meristics species object containig the details
      * @return the weight of hte fish
      */
-    public static double weigh(StructuredAbundance abundance, Species species)
+    public static double weigh(StructuredAbundance abundance, Meristics meristics)
     {
         if(abundance.getSubdivisions() == 1)
-            return weigh(abundance.getAbundance()[0],species);
+            return weigh(abundance.getAbundance()[0], meristics);
         if(abundance.getSubdivisions() == 2)
             return weigh(abundance.getAbundance()[MALE],
                          abundance.getAbundance()[FEMALE],
-                         species);
+                         meristics);
 
         throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
 
@@ -636,18 +637,19 @@ public class FishStateUtilities {
     /**
      * used to weigh only one bin of the structured abundance catch
      * @param abundance
-     * @param species
+     * @param meristics
      * @param binIndex
      * @return
      */
-    public static double weigh(StructuredAbundance abundance, Species species,int binIndex)
+    public static double weigh(StructuredAbundance abundance,
+                               Meristics meristics, int binIndex)
     {
         //no female-male split
         if(abundance.getSubdivisions() == 1)
-            return species.getWeightMaleInKg().get(binIndex) * abundance.getAbundanceInBin(binIndex);
+            return meristics.getWeightMaleInKg().get(binIndex) * abundance.getAbundanceInBin(binIndex);
         if(abundance.getSubdivisions() == 2)
-            return abundance.getAbundance()[MALE][binIndex] * species.getWeightMaleInKg().get(binIndex) +
-                    abundance.getAbundance()[FEMALE][binIndex] * species.getWeightFemaleInKg().get(binIndex);
+            return abundance.getAbundance()[MALE][binIndex] * meristics.getWeightMaleInKg().get(binIndex) +
+                    abundance.getAbundance()[FEMALE][binIndex] * meristics.getWeightFemaleInKg().get(binIndex);
 
         throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
 
@@ -660,7 +662,7 @@ public class FishStateUtilities {
      * @param species species object containig the details
      * @return the weight of hte fish
      */
-    private static double weigh(int[] ageStructure, Species species)
+    private static double weigh(int[] ageStructure, Meristics species)
     {
         final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
         double totalWeight = 0;

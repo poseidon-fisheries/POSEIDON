@@ -46,8 +46,7 @@ public class SingleSpeciesNaturalProcessesTest {
                         species.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
-                false
-        );
+                new StandardAgingProcess(false));
 
         GlobalBiology biology = new GlobalBiology(species);
         AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
@@ -108,7 +107,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 culler,
                 recruiter,
                 fakeSpecies,
-                false);
+                new StandardAgingProcess(false));
 
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
@@ -168,7 +167,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 culler,
                 recruiter,
                 fakeSpecies,
-                false);
+                new StandardAgingProcess(false));
 
         HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
@@ -224,8 +223,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                false
-        );
+                new StandardAgingProcess(false));
 
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
@@ -253,8 +251,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                true
-        );
+                new StandardAgingProcess(true));
         processes.add(local);
         processes.step(model);
         assertEquals(447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);

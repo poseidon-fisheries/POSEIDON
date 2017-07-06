@@ -146,7 +146,7 @@ public class Catch {
             biomasses[species.getIndex()] =
                     FishStateUtilities.weigh(
                             abundance[species.getIndex()],
-                            species);
+                            species.getMeristics());
         return biomasses;
     }
 
@@ -174,7 +174,7 @@ public class Catch {
             biomassCaught[species.getIndex()] =
                     FishStateUtilities.weigh(
                             abundance[species.getIndex()],
-                            species);
+                            species.getMeristics());
         totalWeight = computeTotalWeight();
 
     }

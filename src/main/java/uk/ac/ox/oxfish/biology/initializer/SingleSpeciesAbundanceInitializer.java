@@ -30,6 +30,7 @@ import java.util.Map;
 public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 {
 
+    private static StandardAgingProcess agingProcess;
     /**
      * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
@@ -161,6 +162,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Collection<AbundanceBasedLocalBiology> locals,
             final boolean preserveLastAge, final int yearDelay) {
         //schedule recruitment and natural mortality
+        agingProcess = new StandardAgingProcess(preserveLastAge);
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
                 yearDelay > 0 ?
@@ -176,7 +178,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                         species.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
-                preserveLastAge);
+                agingProcess);
         for(AbundanceBasedLocalBiology local : locals)
             processes.add(local);
         model.registerStartable(processes);
@@ -250,7 +252,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         FishYAML yaml = new FishYAML();
         String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
         MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
-        Meristics meristics = new Meristics(input);
+        StockAssessmentCaliforniaMeristics meristics = new StockAssessmentCaliforniaMeristics(input);
         return new Species(speciesName, meristics);
     }
 
@@ -283,4 +285,21 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
 
+    /**
+     * Getter for property 'agingProcess'.
+     *
+     * @return Value for property 'agingProcess'.
+     */
+    public static StandardAgingProcess getAgingProcess() {
+        return agingProcess;
+    }
+
+    /**
+     * Setter for property 'agingProcess'.
+     *
+     * @param agingProcess Value to set for property 'agingProcess'.
+     */
+    public static void setAgingProcess(StandardAgingProcess agingProcess) {
+        SingleSpeciesAbundanceInitializer.agingProcess = agingProcess;
+    }
 }

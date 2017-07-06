@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.ToDoubleFunction;
 
 /**
  * An aggregator of natural processes that applies recruitment, mortality
@@ -41,10 +42,8 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private final Species species;
 
 
-    /**
-     * when this is true mortality rate of the oldest class is 100%
-     */
-    private final boolean preserveLastAge;
+
+    private final AgingProcess agingProcess;
 
 
     /**
@@ -56,11 +55,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
             RecruitmentProcess recruitment, Species species,
-            boolean preserveLastAge) {
+            AgingProcess agingProcess) {
         this.species = species;
         this.mortalityProcess = mortalityProcess;
         this.recruitment = recruitment;
-        this.preserveLastAge = preserveLastAge;
+        this.agingProcess = agingProcess;
     }
 
     private final LinkedList<AbundanceBasedLocalBiology> biologies = new LinkedList<>();
@@ -136,8 +135,19 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
             //reweight so they add up to 1
             for(AbundanceBasedLocalBiology bio : biomassWeight.keySet())
                 biomassWeight.put(bio,FishStateUtilities.round5(biomassWeight.get(bio)/totalBiomass));
+
+
         }
 
+        //make sure it all sum up to 1!
+        assert Math.abs(biomassWeight.values().stream().
+                mapToDouble(
+                        new ToDoubleFunction<Double>() {
+                            @Override
+                            public double applyAsDouble(Double value) {
+                                return value;
+                            }
+                        }).sum()-1d)<.001d;
         /***
          *      __  __         _        _ _ _
          *     |  \/  |___ _ _| |_ __ _| (_) |_ _  _
@@ -162,20 +172,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         biologies.parallelStream().forEach(new Consumer<AbundanceBasedLocalBiology>() {
             @Override
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-                int[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
-                int[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
-
-                int oldestMale = males[males.length-1];
-                int oldestFemale = females[females.length-1];
-
-                System.arraycopy(males,0,males,1,males.length-1);
-                System.arraycopy(females,0,females,1,females.length-1);
-                if(preserveLastAge)
-                {
-                    males[males.length - 1] += oldestMale;
-                    females[females.length - 1] += oldestFemale;
-
-                }
+                agingProcess.ageLocally(abundanceBasedLocalBiology,species,model);
             }
         });
 
@@ -192,8 +189,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
             double ratio = biologyBiomass.getValue();
             int recruitsHere = (int) ((lastRecruits+leftOver) * ratio);
-            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] = recruitsHere / 2;
-            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] = recruitsHere / 2;
+            //add recruits to smallest bin
+            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2;
+            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2;
             leftOver =  ((lastRecruits+leftOver) * ratio) -
                     biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
                     biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]

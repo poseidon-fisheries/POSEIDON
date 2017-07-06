@@ -23,7 +23,7 @@ public class NaturalMortalityProcessTest {
 
         int male[] = new int[]{10000,10000,10000};
         int female[] = new int[]{5000,4000,3000};
-        Meristics meristics = mock(Meristics.class);
+        Meristics meristics = mock(StockAssessmentCaliforniaMeristics.class);
         when(meristics.getMortalityParameterMFemale()).thenReturn(.2);
         when(meristics.getMortalityParameterMMale()).thenReturn(.1);
 

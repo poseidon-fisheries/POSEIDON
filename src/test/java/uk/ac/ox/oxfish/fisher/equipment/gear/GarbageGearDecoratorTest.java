@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -13,10 +13,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
@@ -95,13 +93,13 @@ public class GarbageGearDecoratorTest {
     @Test
     public void catchesCorrectly() throws Exception {
 
-        Species longspine = new Species("longspine",new Meristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                          0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                          0.111313, 17.826, -1.79, 1,
-                                          0, 168434124,
-                                          0.6, false));
+        Species longspine = new Species("longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                           0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                                           0.111313, 17.826, -1.79, 1,
+                                                                                           0, 168434124,
+                                                                                           0.6, false));
         longspine.resetIndexTo(0);
-        Species imaginary = new Species("imaginary",Meristics.FAKE_MERISTICS,true);
+        Species imaginary = new Species("imaginary", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, true);
         imaginary.resetIndexTo(1);
 
 

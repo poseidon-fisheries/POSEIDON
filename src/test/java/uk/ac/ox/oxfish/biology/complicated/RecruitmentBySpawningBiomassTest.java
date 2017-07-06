@@ -27,7 +27,6 @@ public class RecruitmentBySpawningBiomassTest {
         Arrays.fill(male, 0);
         Arrays.fill(female, 10000);
 
-        System.out.println(species.getPhi());
         System.out.println(species.getVirginRecruits());
         System.out.println(species.getSteepness());
         System.out.println(species.isAddRelativeFecundityToSpawningBiomass());
