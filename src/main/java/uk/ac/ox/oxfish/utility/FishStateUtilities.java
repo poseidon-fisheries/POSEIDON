@@ -1073,5 +1073,21 @@ public class FishStateUtilities {
 
             };
     }
+
+    /**
+     * 8.123 is rounded to 9 with probability of 12.3%
+     * @param x number to round
+     * @param random randomiser
+     * @return x either ceiled or floored
+     */
+    public static int randomRounding(double x, MersenneTwisterFast random){
+        double signum = Math.signum(x);
+        x = Math.abs(x);
+        boolean ceiling = random.nextDouble() < x- (int)x;
+        int toReturn = (int)(ceiling ? Math.ceil(x) : Math.floor(x));
+
+        return signum > 0 ? toReturn : -toReturn;
+    }
+
 }
 
