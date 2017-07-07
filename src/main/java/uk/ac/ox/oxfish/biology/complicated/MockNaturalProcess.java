@@ -2,9 +2,9 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import sim.engine.SimState;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.HashMap;
 
 /**
  * a natural process that actually does nothing
@@ -47,10 +47,10 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      * register this biology so that it can be accessed by recruits and so on
      *
      * @param abundanceBasedLocalBiology
+     * @param tile
      */
     @Override
-    public boolean add(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-        return true;
+    public void add(AbundanceBasedLocalBiology abundanceBasedLocalBiology, SeaTile tile) {
     }
 
     @Override
@@ -58,25 +58,6 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
         return 0;
     }
 
-    /**
-     * Getter for property 'fixedRecruitmentWeight'.
-     *
-     * @return Value for property 'fixedRecruitmentWeight'.
-     */
-    @Override
-    public HashMap<AbundanceBasedLocalBiology, Double> getFixedRecruitmentWeight() {
-        return super.getFixedRecruitmentWeight();
-    }
-
-    /**
-     * Setter for property 'fixedRecruitmentWeight'.
-     *
-     * @param fixedRecruitmentWeight Value to set for property 'fixedRecruitmentWeight'.
-     */
-    @Override
-    public void setFixedRecruitmentWeight(
-            HashMap<AbundanceBasedLocalBiology, Double> fixedRecruitmentWeight) {
-    }
 
     /**
      * give a function to generate noise as % of recruits this year
@@ -85,5 +66,43 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
      */
     @Override
     public void addNoise(NoiseMaker noiseMaker) {
+    }
+
+    /**
+     * Getter for property 'diffuser'.
+     *
+     * @return Value for property 'diffuser'.
+     */
+    @Override
+    public AbundanceDiffuser getDiffuser() {
+        return null;
+    }
+
+    /**
+     * Setter for property 'diffuser'.
+     *
+     * @param diffuser Value to set for property 'diffuser'.
+     */
+    @Override
+    public void setDiffuser(AbundanceDiffuser diffuser) {
+    }
+
+    /**
+     * Getter for property 'recruitsAllocator'.
+     *
+     * @return Value for property 'recruitsAllocator'.
+     */
+    @Override
+    public BiomassAllocator getRecruitsAllocator() {
+        return null;
+    }
+
+    /**
+     * Setter for property 'recruitsAllocator'.
+     *
+     * @param recruitsAllocator Value to set for property 'recruitsAllocator'.
+     */
+    @Override
+    public void setRecruitsAllocator(BiomassAllocator recruitsAllocator) {
     }
 }

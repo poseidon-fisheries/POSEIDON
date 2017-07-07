@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -51,8 +52,8 @@ public class SingleSpeciesNaturalProcessesTest {
         GlobalBiology biology = new GlobalBiology(species);
         AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
         AbundanceBasedLocalBiology cell2 = new AbundanceBasedLocalBiology(biology);
-        processes.add(cell1);
-        processes.add(cell2);
+        processes.add(cell1, mock(SeaTile.class));
+        processes.add(cell2,mock(SeaTile.class) );
         for(int i=0; i<=species.getMaxAge(); i++)
         {
             cell1.getNumberOfFemaleFishPerAge(species)[i] = 5000;
@@ -115,7 +116,7 @@ public class SingleSpeciesNaturalProcessesTest {
                                                               element, new MersenneTwisterFast(), 4, 4,                                          mock(NauticalMap.class)
             );
             element.setBiology(localBiology); //put new biology in
-            processes.add((AbundanceBasedLocalBiology) localBiology);
+            processes.add((AbundanceBasedLocalBiology) localBiology,element );
         }
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
 
@@ -176,14 +177,21 @@ public class SingleSpeciesNaturalProcessesTest {
                                                                   element, new MersenneTwisterFast(), 4, 4,                                          mock(NauticalMap.class)
             );
             element.setBiology(localBiology); //put new biology in
-            processes.add((AbundanceBasedLocalBiology) localBiology);
+            processes.add((AbundanceBasedLocalBiology) localBiology, element);
             if(element.getGridX()==1 && element.getGridY()==1)
                 allocator.put((AbundanceBasedLocalBiology) localBiology, 1d);
             else
                 allocator.put((AbundanceBasedLocalBiology) localBiology, 0d);
         }
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        processes.setFixedRecruitmentWeight(allocator);
+        processes.setRecruitsAllocator(
+                new BiomassAllocator() {
+                    @Override
+                    public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+                        return allocator.get(((AbundanceBasedLocalBiology) tile.getBiology()));
+                    }
+                }
+        );
         //because the count is uniform I should see recruits distributed uniformly as well
         assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
         assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
@@ -232,7 +240,7 @@ public class SingleSpeciesNaturalProcessesTest {
         local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
         local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=0;
         local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=0;
-        processes.add(local);
+        processes.add(local, mock(SeaTile.class));
 
         //when false the oldest all die
         FishState model = mock(FishState.class);
@@ -252,7 +260,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 recruitment,
                 species,
                 new StandardAgingProcess(true));
-        processes.add(local);
+        processes.add(local,mock(SeaTile.class) );
         processes.step(model);
         assertEquals(447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);
         assertEquals(447,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]);

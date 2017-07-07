@@ -17,7 +17,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +141,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Log.error("Failed to locate or read count.csv correctly. Could not instantiate the local biology");
             System.exit(-1);
         }
-        initializeNaturalProcesses(model, species, locals.values(), false, 2);
+        initializeNaturalProcesses(model, species, locals, false, 2);
 
 
     }
@@ -159,7 +158,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
             FishState model, Species species,
-            Collection<AbundanceBasedLocalBiology> locals,
+            Map<SeaTile,AbundanceBasedLocalBiology> locals,
             final boolean preserveLastAge, final int yearDelay) {
         //schedule recruitment and natural mortality
         agingProcess = new StandardAgingProcess(preserveLastAge);
@@ -179,8 +178,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 ),
                 species,
                 agingProcess);
-        for(AbundanceBasedLocalBiology local : locals)
-            processes.add(local);
+
+        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
+            processes.add(entry.getValue(),entry.getKey());
+        }
         model.registerStartable(processes);
         return processes;
     }

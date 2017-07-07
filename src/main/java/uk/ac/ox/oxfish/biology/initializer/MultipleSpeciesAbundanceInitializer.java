@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.MockNaturalProcess;
 import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -195,10 +196,18 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                        model, species, locals.values(), preserveLastAge, 2);
+                        model, species, locals, preserveLastAge, 2);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
-                if(fixedRecruitmentDistribution)
-                    process.setFixedRecruitmentWeight(currentWeightMap);
+                if(fixedRecruitmentDistribution) {
+                    process.setRecruitsAllocator(
+                            new BiomassAllocator() {
+                                @Override
+                                public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+                                    return currentWeightMap.get(locals.get(tile));
+                                }
+                            }
+                    );
+                }
                 naturalProcesses.put(species,process);
             }
 

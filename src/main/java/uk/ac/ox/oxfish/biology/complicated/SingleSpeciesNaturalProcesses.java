@@ -1,16 +1,17 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
@@ -46,11 +47,14 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private final AgingProcess agingProcess;
 
 
+    private AbundanceDiffuser diffuser = null;
+
+
     /**
      * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
      * on where there is more biomass
      */
-    private HashMap<AbundanceBasedLocalBiology,Double> fixedRecruitmentWeight;
+    private BiomassAllocator recruitsAllocator;
 
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
@@ -62,7 +66,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         this.agingProcess = agingProcess;
     }
 
-    private final LinkedList<AbundanceBasedLocalBiology> biologies = new LinkedList<>();
+    private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new HashMap<>();
 
     /**
      * schedules itself every year
@@ -72,7 +76,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     @Override
     public void start(FishState model)
     {
+
         model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
+
+        if(diffuser != null)
+            model.scheduleEveryDay(diffuser,StepOrder.BIOLOGY_PHASE);
+
     }
 
     /**
@@ -102,7 +111,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         //we need to sum up all the male/female
         int totalMale[] = new int[species.getMaxAge()+1];
         int totalFemale[] = new int[species.getMaxAge()+1];
-        biologies.stream().forEach(abundanceBasedLocalBiology -> {
+        biologies.values().stream().forEach(abundanceBasedLocalBiology -> {
             int[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
             int[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
             for(int age=0; age<totalMale.length; age++)
@@ -115,18 +124,31 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
                                            totalFemale, totalMale);
 
-        //either take the given recruitment weight or compute it as current weight
+        //either allocate recruits with given allocator or proportional to where biomass is
         HashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
-        if(fixedRecruitmentWeight != null) {
-            if(Log.TRACE)
-                Log.trace("using fixed recruitment weight, total weight(should be one): " + fixedRecruitmentWeight.values().
-                        stream().mapToDouble(Double::doubleValue).sum());
-            biomassWeight = fixedRecruitmentWeight;
+        if(recruitsAllocator != null) {
+
+            double sum = 0;
+            biomassWeight = new HashMap<>();
+            for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : biologies.entrySet()) {
+                double weight = recruitsAllocator.allocate(entry.getKey(),
+                                                             model.getMap(),
+                                                             model.getRandom());
+                sum+=weight;
+                biomassWeight.put(entry.getValue(), weight);
+
+            }
+            assert sum > 0;
+            for (AbundanceBasedLocalBiology biology : biologies.values()) {
+                biomassWeight.replace(biology,biomassWeight.get(biology)/sum);
+            }
+
+
         }
         else {
             biomassWeight = new HashMap<>();
             //map for each biology its total weight
-            double totalBiomass = biologies.stream().mapToDouble(
+            double totalBiomass = biologies.values().stream().mapToDouble(
                     value -> {
                         Double biomass = value.getBiomass(species);
                         biomassWeight.put(value, biomass);
@@ -155,7 +177,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     |_|  |_\___/_|  \__\__,_|_|_|\__|\_, |
          *                                      |__/
          */
-        biologies.parallelStream().forEach(
+        biologies.values().parallelStream().forEach(
                 abundanceBasedLocalBiology -> mortalityProcess.cull(abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species),
                                                                     abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species),
                                                                     species.getMeristics()));
@@ -169,7 +191,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     /_/ \_\__, |_|_||_\__, |
          *           |___/       |___/
          */
-        biologies.parallelStream().forEach(new Consumer<AbundanceBasedLocalBiology>() {
+        biologies.values().parallelStream().forEach(new Consumer<AbundanceBasedLocalBiology>() {
             @Override
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
                 agingProcess.ageLocally(abundanceBasedLocalBiology,species,model);
@@ -204,8 +226,10 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     /**
      * register this biology so that it can be accessed by recruits and so on
      */
-    public boolean add(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-        return biologies.add(abundanceBasedLocalBiology);
+    public void add(AbundanceBasedLocalBiology localBiology, SeaTile tile) {
+        Preconditions.checkArgument(!biologies.containsKey(tile));
+        Preconditions.checkArgument(!biologies.containsKey(localBiology));
+        biologies.put(tile, localBiology);
     }
 
 
@@ -214,24 +238,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         return lastRecruits;
     }
 
-    /**
-     * Getter for property 'fixedRecruitmentWeight'.
-     *
-     * @return Value for property 'fixedRecruitmentWeight'.
-     */
-    public HashMap<AbundanceBasedLocalBiology, Double> getFixedRecruitmentWeight() {
-        return fixedRecruitmentWeight;
-    }
 
-    /**
-     * Setter for property 'fixedRecruitmentWeight'.
-     *
-     * @param fixedRecruitmentWeight Value to set for property 'fixedRecruitmentWeight'.
-     */
-    public void setFixedRecruitmentWeight(
-            HashMap<AbundanceBasedLocalBiology, Double> fixedRecruitmentWeight) {
-        this.fixedRecruitmentWeight = fixedRecruitmentWeight;
-    }
 
     /**
      * give a function to generate noise as % of recruits this year
@@ -239,5 +246,41 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      */
     public void addNoise(NoiseMaker noiseMaker) {
         recruitment.addNoise(noiseMaker);
+    }
+
+    /**
+     * Getter for property 'diffuser'.
+     *
+     * @return Value for property 'diffuser'.
+     */
+    public AbundanceDiffuser getDiffuser() {
+        return diffuser;
+    }
+
+    /**
+     * Setter for property 'diffuser'.
+     *
+     * @param diffuser Value to set for property 'diffuser'.
+     */
+    public void setDiffuser(AbundanceDiffuser diffuser) {
+        this.diffuser = diffuser;
+    }
+
+    /**
+     * Getter for property 'recruitsAllocator'.
+     *
+     * @return Value for property 'recruitsAllocator'.
+     */
+    public BiomassAllocator getRecruitsAllocator() {
+        return recruitsAllocator;
+    }
+
+    /**
+     * Setter for property 'recruitsAllocator'.
+     *
+     * @param recruitsAllocator Value to set for property 'recruitsAllocator'.
+     */
+    public void setRecruitsAllocator(BiomassAllocator recruitsAllocator) {
+        this.recruitsAllocator = recruitsAllocator;
     }
 }

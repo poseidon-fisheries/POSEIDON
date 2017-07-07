@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.experiments.DemographyDemo;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Files;
@@ -80,7 +81,7 @@ public class ReplicateDemographyDemo {
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
                                                                                     new StandardAgingProcess(false));
-        processes.add(biology);
+        processes.add(biology,mock(SeaTile.class) );
 
         StringBuilder builder = new StringBuilder();
         builder.append("simulation_year,sex,age,number").append("\n");
@@ -173,8 +174,8 @@ public class ReplicateDemographyDemo {
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
                                                                                     new StandardAgingProcess(false));
-        processes.add(biology1);
-        processes.add(biology2);
+        processes.add(biology1,mock(SeaTile.class)  );
+        processes.add(biology2,mock(SeaTile.class) );
 
         StringBuilder builder = new StringBuilder();
         builder.append("simulation_year,sex,age,number").append("\n");
