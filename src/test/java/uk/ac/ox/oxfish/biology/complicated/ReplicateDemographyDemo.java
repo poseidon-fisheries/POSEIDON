@@ -80,7 +80,8 @@ public class ReplicateDemographyDemo {
         }
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
-                                                                                    new StandardAgingProcess(false));
+                                                                                    new StandardAgingProcess(false),
+                                                                                    new NoAbundanceDiffusion());
         processes.add(biology,mock(SeaTile.class) );
 
         StringBuilder builder = new StringBuilder();
@@ -173,7 +174,8 @@ public class ReplicateDemographyDemo {
         }
 
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
-                                                                                    new StandardAgingProcess(false));
+                                                                                    new StandardAgingProcess(false),
+                                                                                    new NoAbundanceDiffusion());
         processes.add(biology1,mock(SeaTile.class)  );
         processes.add(biology2,mock(SeaTile.class) );
 

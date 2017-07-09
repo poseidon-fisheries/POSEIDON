@@ -47,7 +47,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private final AgingProcess agingProcess;
 
 
-    private AbundanceDiffuser diffuser = null;
+    private final AbundanceDiffuser diffuser;
 
 
     /**
@@ -59,11 +59,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
             RecruitmentProcess recruitment, Species species,
-            AgingProcess agingProcess) {
+            AgingProcess agingProcess, AbundanceDiffuser diffuser) {
         this.species = species;
         this.mortalityProcess = mortalityProcess;
         this.recruitment = recruitment;
         this.agingProcess = agingProcess;
+        this.diffuser = diffuser;
     }
 
     private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new HashMap<>();
@@ -79,8 +80,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
         model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
 
-        if(diffuser != null)
-            model.scheduleEveryDay(diffuser,StepOrder.BIOLOGY_PHASE);
+        model.scheduleEveryDay(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                diffuser.step(species,biologies,model);
+            }
+        }, StepOrder.BIOLOGY_PHASE);
 
     }
 
@@ -132,8 +137,8 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
             biomassWeight = new HashMap<>();
             for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : biologies.entrySet()) {
                 double weight = recruitsAllocator.allocate(entry.getKey(),
-                                                             model.getMap(),
-                                                             model.getRandom());
+                                                           model.getMap(),
+                                                           model.getRandom());
                 sum+=weight;
                 biomassWeight.put(entry.getValue(), weight);
 
@@ -257,14 +262,6 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         return diffuser;
     }
 
-    /**
-     * Setter for property 'diffuser'.
-     *
-     * @param diffuser Value to set for property 'diffuser'.
-     */
-    public void setDiffuser(AbundanceDiffuser diffuser) {
-        this.diffuser = diffuser;
-    }
 
     /**
      * Getter for property 'recruitsAllocator'.

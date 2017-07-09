@@ -27,6 +27,14 @@ public class MeristicsFileFactory
                                                 "meristics.yaml");
 
 
+    public MeristicsFileFactory(Path pathToMeristicFile) {
+        this.pathToMeristicFile = pathToMeristicFile;
+    }
+
+
+    public MeristicsFileFactory() {
+    }
+
     /**
      * Applies this function to the given argument.
      *

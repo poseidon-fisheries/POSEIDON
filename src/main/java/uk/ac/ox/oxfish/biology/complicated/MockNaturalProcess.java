@@ -13,7 +13,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     public MockNaturalProcess(
             Species species) {
-        super(null, null, species, null);
+        super(null, null, species, null, new NoAbundanceDiffusion() );
     }
 
 
@@ -78,14 +78,6 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
         return null;
     }
 
-    /**
-     * Setter for property 'diffuser'.
-     *
-     * @param diffuser Value to set for property 'diffuser'.
-     */
-    @Override
-    public void setDiffuser(AbundanceDiffuser diffuser) {
-    }
 
     /**
      * Getter for property 'recruitsAllocator'.

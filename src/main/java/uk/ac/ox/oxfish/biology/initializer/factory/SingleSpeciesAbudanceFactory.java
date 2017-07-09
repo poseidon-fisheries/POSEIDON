@@ -32,7 +32,8 @@ public class SingleSpeciesAbudanceFactory implements AlgorithmFactory<SingleSpec
         return new SingleSpeciesAbundanceInitializer(
                 Paths.get(folderPath),
                 speciesName,
-                scaling
+                scaling,
+                fishState
         );
     }
 

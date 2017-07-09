@@ -6,8 +6,6 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.Map;
-
 /**
  * Basically a transposition of the BiomassDiffuser to abundance
  * Created by carrknight on 7/7/17.
@@ -21,10 +19,9 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
 
 
     public ConstantRateAbundanceDiffuser(
-            Species species,
-            Map<SeaTile, AbundanceBasedLocalBiology> biologies, int diffusingRange,
+            int diffusingRange,
             double diffusingRate) {
-        super(species, biologies, diffusingRange);
+        super(diffusingRange);
         Preconditions.checkArgument(diffusingRate >=0);
         Preconditions.checkArgument(diffusingRate <=1);
         this.diffusingRate = diffusingRate;
@@ -33,7 +30,7 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
      *
-     * @param random
+     * @param species      species moving!
      * @param here         departing point
      * @param biologyHere  departing local biology
      * @param there        arriving point
@@ -41,11 +38,13 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
      * @param delta        number of fish here - number of fish there (always positive or this isn't called)
      * @param bin          bin/age studied
      * @param male         whether it's male or female
+     * @param random
      */
     @Override
     public void move(
-            MersenneTwisterFast random, SeaTile here, AbundanceBasedLocalBiology biologyHere, SeaTile there,
-            AbundanceBasedLocalBiology biologyThere, int delta, int bin, boolean male)
+            Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere,
+            SeaTile there, AbundanceBasedLocalBiology biologyThere, int delta, int bin, boolean male,
+            MersenneTwisterFast random)
     {
 
         int movement = FishStateUtilities.randomRounding(delta * diffusingRate,
@@ -56,17 +55,17 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
 
             //move!
             if(male) {
-                biologyHere.getNumberOfMaleFishPerAge(getSpecies())[bin] -= movement;
-                assert biologyHere.getNumberOfMaleFishPerAge(getSpecies())[bin] >= 0;
-                biologyThere.getNumberOfMaleFishPerAge(getSpecies())[bin] += movement;
-                assert biologyThere.getNumberOfMaleFishPerAge(getSpecies())[bin] >= 0;
+                biologyHere.getNumberOfMaleFishPerAge(species)[bin] -= movement;
+                assert biologyHere.getNumberOfMaleFishPerAge(species)[bin] >= 0;
+                biologyThere.getNumberOfMaleFishPerAge(species)[bin] += movement;
+                assert biologyThere.getNumberOfMaleFishPerAge(species)[bin] >= 0;
             }
             else
             {
-                biologyHere.getNumberOfFemaleFishPerAge(getSpecies())[bin] -= movement;
-                assert biologyHere.getNumberOfFemaleFishPerAge(getSpecies())[bin] >= 0;
-                biologyThere.getNumberOfFemaleFishPerAge(getSpecies())[bin] += movement;
-                assert biologyThere.getNumberOfFemaleFishPerAge(getSpecies())[bin] >= 0;
+                biologyHere.getNumberOfFemaleFishPerAge(species)[bin] -= movement;
+                assert biologyHere.getNumberOfFemaleFishPerAge(species)[bin] >= 0;
+                biologyThere.getNumberOfFemaleFishPerAge(species)[bin] += movement;
+                assert biologyThere.getNumberOfFemaleFishPerAge(species)[bin] >= 0;
             }
         }
 

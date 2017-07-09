@@ -37,6 +37,8 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     public RecruitmentBySpawningBiomass(int virginRecruits,
                                         double steepness,
                                         boolean addRelativeFecundityToSpawningBiomass) {
+        Preconditions.checkArgument(virginRecruits>0);
+        Preconditions.checkArgument(steepness>0);
         this.virginRecruits = virginRecruits;
         this.steepness = steepness;
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;

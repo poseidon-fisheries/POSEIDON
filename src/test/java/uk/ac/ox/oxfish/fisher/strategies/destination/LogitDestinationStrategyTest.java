@@ -66,7 +66,7 @@ public class LogitDestinationStrategyTest
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap().getSeaTile(3,3)),
                 random
-                );
+        );
 
         int counter = 0;
         for(int i=0; i<1000; i++)
@@ -94,52 +94,51 @@ public class LogitDestinationStrategyTest
         MersenneTwisterFast random = new MersenneTwisterFast();
 
         FishState state = MovingTest.generateSimple4x4Map();
-        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(0,1));
+        MapDiscretization discretization = new MapDiscretization(new SquaresMapDiscretizer(0, 1));
         discretization.discretize(state.getMap());
         //make sure the discretization is correct
         assertTrue(discretization.isValid(0));
         assertTrue(discretization.isValid(1));
-        assertEquals(2,discretization.getNumberOfGroups());
-        for(int i=0; i<100; i++) {
+        assertEquals(2, discretization.getNumberOfGroups());
+        for (int i = 0; i < 100; i++) {
             SeaTile tile = discretization.getGroup(0).get(random.nextInt(discretization.getGroup(0).size()));
-            assertTrue(tile.getGridX()<=1);
+            assertTrue(tile.getGridX() <= 1);
         }
 
         //create the logistic
         //give it more betas than necessary, it will be okay
         //0 has about 75% of being selected  compared to 1
         double[][] beta = new double[3][];
-        beta[0]=new double[]{1};
-        beta[1]=new double[]{0};
-        beta[2]=new double[]{-1}; //should get ignored
+        beta[0] = new double[]{1};
+        beta[1] = new double[]{0};
+        beta[2] = new double[]{-1}; //should get ignored
 
         ObservationExtractor[][] extractors = new ObservationExtractor[3][];
-        extractors[0]= new ObservationExtractor[]{
+        extractors[0] = new ObservationExtractor[]{
                 new InterceptExtractor(1d)
         };
-        extractors[1]=extractors[0];
-        extractors[2]= null;
+        extractors[1] = extractors[0];
+        extractors[2] = null;
 
         LogitDestinationStrategy strategy = new LogitDestinationStrategy(
-                beta,extractors,
-                Lists.newArrayList(1,0,2),
+                beta, extractors,
+                Lists.newArrayList(1, 0, 2),
                 discretization,
-                new FavoriteDestinationStrategy(state.getMap().getSeaTile(3,3)),
+                new FavoriteDestinationStrategy(state.getMap().getSeaTile(3, 3)),
                 random
         );
 
         int counter = 0;
-        for(int i=0; i<1000; i++)
-        {
-            strategy.adapt(state,random,mock(Fisher.class));
+        for (int i = 0; i < 10000; i++) {
+            strategy.adapt(state, random, mock(Fisher.class));
             SeaTile tile = strategy.getCurrentTarget();
-            if(tile.getGridX()<=1)
+            if (tile.getGridX() <= 1)
                 counter++;
         }
 
         System.out.println(counter);
-        assertTrue(counter>100);
-        assertTrue(counter<300);
+        assertTrue(counter > 1000);
+        assertTrue(counter < 3000);
 
     }
 

@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ public class RecruitmentBySpawningBiomassTest {
     @Test
     public void recruitment() throws Exception {
 
-        Species species = SingleSpeciesAbundanceInitializer.
+        Species species = MultipleSpeciesAbundanceInitializer.
                 generateSpeciesFromFolder(Paths.get("inputs",
                                                     "california",
                                                     "biology",

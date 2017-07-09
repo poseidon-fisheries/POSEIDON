@@ -54,8 +54,6 @@ public class AgeLimitedConstantRateDiffuserTest {
         tiles.put(empty,emptyBio);
 
         AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
-                species,
-                tiles,
                 1,
                 .5,
                 1,2
@@ -71,7 +69,7 @@ public class AgeLimitedConstantRateDiffuserTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
 
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{1000,250,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,5});
@@ -112,8 +110,6 @@ public class AgeLimitedConstantRateDiffuserTest {
         tiles.put(empty,emptyBio);
 
         AgeLimitedConstantRateDiffuser diffuser = new AgeLimitedConstantRateDiffuser(
-                species,
-                tiles,
                 1,
                 .1,
                 0,1
@@ -129,14 +125,14 @@ public class AgeLimitedConstantRateDiffuserTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
 
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{900,450,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,10});
 
         assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new int[]{100,50,0});
         assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,0});
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{820,410,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,10});
 

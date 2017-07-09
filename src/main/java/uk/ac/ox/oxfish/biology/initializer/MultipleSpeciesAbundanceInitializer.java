@@ -7,17 +7,17 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.MockNaturalProcess;
-import uk.ac.ox.oxfish.biology.complicated.SingleSpeciesNaturalProcesses;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundanceFromFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -90,6 +90,42 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     private final HashMap<Species, int[][]> initialAbundance = new HashMap<>();
 
+    /**
+     * the generate local made static so the MultipleSpeciesInitializer can use it too
+     *
+     * @param biology global biology file
+     * @param seaTile seatile
+     * @param locals a map seatiles---> abundance local biologies that gets filled if this is not a land tile
+     * @return empty biology on land, abundance biology in water
+     */
+    public static LocalBiology generateAbundanceBiologyExceptOnLand(
+            GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceBasedLocalBiology> locals) {
+        if(seaTile.getAltitude() >= 0)
+            return new EmptyLocalBiology();
+
+
+
+
+        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
+        locals.put(seaTile,local);
+        return local;
+    }
+
+    /**
+     * read up a folder that contains meristics.yaml and turn it into a species object
+     * @param biologicalDirectory the folder containing meristics.yaml
+     * @param speciesName the name of the species
+     * @return the new species
+     * @throws IOException
+     */
+    public static Species generateSpeciesFromFolder(Path biologicalDirectory, String speciesName) throws IOException {
+        FishYAML yaml = new FishYAML();
+        String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
+        MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
+        StockAssessmentCaliforniaMeristics meristics = new StockAssessmentCaliforniaMeristics(input);
+        return new Species(speciesName, meristics);
+    }
+
     public int[][] getInitialAbundance (Species species)
     {
         return initialAbundance.get(species);
@@ -109,7 +145,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
-        return SingleSpeciesAbundanceInitializer.generateAbundanceBiologyExceptOnLand(biology,seaTile,
+        return generateAbundanceBiologyExceptOnLand(biology,seaTile,
                                                                                       locals);
     }
 
@@ -129,7 +165,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
         try {
             for(Map.Entry<String,Path> directory : biologicalDirectories.entrySet())
             {
-                speciesList.add(SingleSpeciesAbundanceInitializer.
+                speciesList.add(
                         generateSpeciesFromFolder(directory.getValue(),
                                                   directory.getKey()));
 
@@ -177,8 +213,11 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                     continue;
                 }
 
-                int[][] totalCount = SingleSpeciesAbundanceInitializer.
-                        turnCountsFileIntoAbundanceArray(species, biologicalDirectories.get(species.getName()));
+                InitialAbundanceFromFileFactory factory =
+                        new InitialAbundanceFromFileFactory(
+                                biologicalDirectories.get(species.getName()).resolve("count.csv")
+                        );
+                int[][] totalCount = factory.apply(model).getAbundance();
                 initialAbundance.put(species,totalCount);
 
                 //prepare the map biology-->ratio of fish to put there
@@ -196,7 +235,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                        model, species, locals, preserveLastAge, 2);
+                        model, species, locals, preserveLastAge, 2, new NoAbundanceDiffusion());
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(

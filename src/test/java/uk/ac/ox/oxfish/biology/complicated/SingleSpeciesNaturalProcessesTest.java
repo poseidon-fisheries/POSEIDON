@@ -7,6 +7,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
@@ -33,7 +34,7 @@ public class SingleSpeciesNaturalProcessesTest {
     public void excelFile() throws Exception {
 
 
-        Species species = SingleSpeciesAbundanceInitializer.
+        Species species = MultipleSpeciesAbundanceInitializer.
                 generateSpeciesFromFolder(Paths.get("inputs",
                                                     "california",
                                                     "biology",
@@ -47,7 +48,8 @@ public class SingleSpeciesNaturalProcessesTest {
                         species.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
-                new StandardAgingProcess(false));
+                new StandardAgingProcess(false),
+                new NoAbundanceDiffusion());
 
         GlobalBiology biology = new GlobalBiology(species);
         AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
@@ -86,16 +88,16 @@ public class SingleSpeciesNaturalProcessesTest {
     {
         Log.info("Fixing the recruits they are allocated uniformly if the biomass is uniform");
 
+        FishState model = MovingTest.generateSimple4x4Map();
 
 
         //lifted from SingleSpeciesAbundanceInitializerTest
         //4x4 map with test
         Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
         SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(
-                testInput, "fake", 2.0);
+                testInput, "fake", 2.0,model);
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         Species fakeSpecies = biology.getSpecie(0);
-        FishState model = MovingTest.generateSimple4x4Map();
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
@@ -108,7 +110,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 culler,
                 recruiter,
                 fakeSpecies,
-                new StandardAgingProcess(false));
+                new StandardAgingProcess(false), new NoAbundanceDiffusion());
 
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
@@ -118,6 +120,7 @@ public class SingleSpeciesNaturalProcessesTest {
             element.setBiology(localBiology); //put new biology in
             processes.add((AbundanceBasedLocalBiology) localBiology,element );
         }
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
 
         //because the count is uniform I should see recruits distributed uniformly as well
@@ -145,6 +148,7 @@ public class SingleSpeciesNaturalProcessesTest {
     public void recruitsWithFixedWeight() throws Exception
     {
 
+        FishState model = MovingTest.generateSimple4x4Map();
 
 
 
@@ -152,10 +156,10 @@ public class SingleSpeciesNaturalProcessesTest {
         //4x4 map with test
         Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
         SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(
-                testInput, "fake", 2.0);
-        GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
+                testInput, "fake", 2.0,model);
+        MersenneTwisterFast random = new MersenneTwisterFast();
+        GlobalBiology biology = initializer.generateGlobal(random, mock(FishState.class));
         Species fakeSpecies = biology.getSpecie(0);
-        FishState model = MovingTest.generateSimple4x4Map();
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
@@ -168,13 +172,13 @@ public class SingleSpeciesNaturalProcessesTest {
                 culler,
                 recruiter,
                 fakeSpecies,
-                new StandardAgingProcess(false));
+                new StandardAgingProcess(false), new NoAbundanceDiffusion());
 
         HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             LocalBiology localBiology = initializer.generateLocal(biology,
-                                                                  element, new MersenneTwisterFast(), 4, 4,                                          mock(NauticalMap.class)
+                                                                  element, random, 4, 4, mock(NauticalMap.class)
             );
             element.setBiology(localBiology); //put new biology in
             processes.add((AbundanceBasedLocalBiology) localBiology, element);
@@ -183,7 +187,9 @@ public class SingleSpeciesNaturalProcessesTest {
             else
                 allocator.put((AbundanceBasedLocalBiology) localBiology, 0d);
         }
-        initializer.processMap(biology, map, new MersenneTwisterFast(), model);
+        when(model.getRandom()).thenReturn(random);
+
+        initializer.processMap(biology, map, random, model);
         processes.setRecruitsAllocator(
                 new BiomassAllocator() {
                     @Override
@@ -216,6 +222,7 @@ public class SingleSpeciesNaturalProcessesTest {
 
     @Test
     public void lastClassMortality() throws Exception {
+        FishState model = mock(FishState.class);
 
         Log.info("if you set preserve old age to false, the last class has mortality of 100%");
         RecruitmentProcess recruitment = mock(RecruitmentProcess.class);
@@ -224,14 +231,14 @@ public class SingleSpeciesNaturalProcessesTest {
         //grab a fake species
         Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
         SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(
-                testInput, "fake", 2.0);
+                testInput, "fake", 2.0,model);
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         Species species = biology.getSpecie(0);
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                new StandardAgingProcess(false));
+                new StandardAgingProcess(false),new NoAbundanceDiffusion() );
 
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
@@ -243,7 +250,6 @@ public class SingleSpeciesNaturalProcessesTest {
         processes.add(local, mock(SeaTile.class));
 
         //when false the oldest all die
-        FishState model = mock(FishState.class);
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         processes.step(model);
         assertEquals(0,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);
@@ -259,7 +265,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                new StandardAgingProcess(true));
+                new StandardAgingProcess(true),new NoAbundanceDiffusion() );
         processes.add(local,mock(SeaTile.class) );
         processes.step(model);
         assertEquals(447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]);

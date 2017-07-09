@@ -1,6 +1,14 @@
 package uk.ac.ox.oxfish.utility;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
+import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
+import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.factory.AbundanceDiffusers;
+import uk.ac.ox.oxfish.biology.complicated.factory.Agings;
+import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundances;
+import uk.ac.ox.oxfish.biology.complicated.factory.MeristicFactories;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowers;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -118,25 +126,25 @@ public class AlgorithmFactories {
         NAMES_MAP.put(BanditSupplier.class, BanditAlgorithms.NAMES);
         CONSTRUCTOR_MAP.put(Averager.class, Averages.CONSTRUCTORS);
         NAMES_MAP.put(Averager.class, Averages.NAMES);
-
-
         CONSTRUCTOR_MAP.put(PortInitializer.class, PortInitializers.CONSTRUCTORS);
         NAMES_MAP.put(PortInitializer.class, PortInitializers.NAMES);
-
         CONSTRUCTOR_MAP.put(MapDiscretizer.class, MapDiscretizers.CONSTRUCTORS);
         NAMES_MAP.put(MapDiscretizer.class, MapDiscretizers.NAMES);
-
         CONSTRUCTOR_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.CONSTRUCTORS);
         NAMES_MAP.put(LogisticGrowerInitializer.class, LogisticGrowers.NAMES);
-
         CONSTRUCTOR_MAP.put(LogbookInitializer.class, LogbookInitializers.CONSTRUCTORS);
         NAMES_MAP.put(LogbookInitializer.class, LogbookInitializers.NAMES);
-
         CONSTRUCTOR_MAP.put(DiscardingStrategy.class, DiscardingStrategies.CONSTRUCTORS);
         NAMES_MAP.put(DiscardingStrategy.class, DiscardingStrategies.NAMES);
 
-
-
+        CONSTRUCTOR_MAP.put(Meristics.class, MeristicFactories.CONSTRUCTORS);
+        NAMES_MAP.put(Meristics.class, MeristicFactories.NAMES);
+        CONSTRUCTOR_MAP.put(AbundanceDiffuser.class, AbundanceDiffusers.CONSTRUCTORS);
+        NAMES_MAP.put(AbundanceDiffuser.class, AbundanceDiffusers.NAMES);
+        CONSTRUCTOR_MAP.put(AgingProcess.class, Agings.CONSTRUCTORS);
+        NAMES_MAP.put(AgingProcess.class, Agings.NAMES);
+        CONSTRUCTOR_MAP.put(InitialAbundance.class, InitialAbundances.CONSTRUCTORS);
+        NAMES_MAP.put(InitialAbundance.class, InitialAbundances.NAMES);
     }
 
 

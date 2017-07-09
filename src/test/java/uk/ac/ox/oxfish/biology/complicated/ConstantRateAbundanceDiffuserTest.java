@@ -54,8 +54,6 @@ public class ConstantRateAbundanceDiffuserTest {
         tiles.put(empty,emptyBio);
 
         ConstantRateAbundanceDiffuser diffuser = new ConstantRateAbundanceDiffuser(
-                species,
-                tiles,
                 1,
                 .5
 
@@ -70,7 +68,7 @@ public class ConstantRateAbundanceDiffuserTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
 
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{500,250,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,5});
@@ -111,8 +109,6 @@ public class ConstantRateAbundanceDiffuserTest {
         tiles.put(empty,emptyBio);
 
         ConstantRateAbundanceDiffuser diffuser = new ConstantRateAbundanceDiffuser(
-                species,
-                tiles,
                 1,
                 .1
 
@@ -127,14 +123,14 @@ public class ConstantRateAbundanceDiffuserTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
 
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{900,450,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,9});
 
         assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new int[]{100,50,0});
         assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,1});
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{820,410,0});
         assertEquals(fullBio.getNumberOfFemaleFishPerAge(species)[2],9,1); //there is some randomness involved
 
@@ -174,8 +170,6 @@ public class ConstantRateAbundanceDiffuserTest {
         tiles.put(empty,emptyBio);
 
         ConstantRateAbundanceDiffuser diffuser = new ConstantRateAbundanceDiffuser(
-                species,
-                tiles,
                 1,
                 .5
 
@@ -190,7 +184,7 @@ public class ConstantRateAbundanceDiffuserTest {
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
-        diffuser.step(state);
+        diffuser.step(species,tiles,state);
 
         assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{500,250,0});
         assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,5});

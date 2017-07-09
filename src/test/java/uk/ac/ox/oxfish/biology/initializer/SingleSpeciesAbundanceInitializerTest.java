@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 public class SingleSpeciesAbundanceInitializerTest {
@@ -23,12 +24,17 @@ public class SingleSpeciesAbundanceInitializerTest {
     @Test
     public void readsCorrectly() throws Exception {
 
+
+        //create a 4x4 map of the world.
+        FishState model = MovingTest.generateSimple4x4Map();
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
+
         Path testInput = Paths.get("inputs","tests","abundance","fake");
         Log.info("I pass the directory " + testInput + " to the single species initializer. That directory contains a fake simple species of which I know all the characteristic" +
                          "and I make sure the initializer instantiates correctly.");
 
         //create an initializer (scales to double the number from file)
-        SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(testInput,"fake",2.0);
+        SingleSpeciesAbundanceInitializer initializer = new SingleSpeciesAbundanceInitializer(testInput,"fake",2.0,model);
         //create biology object
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         //check that name and meristics are correct
@@ -38,8 +44,6 @@ public class SingleSpeciesAbundanceInitializerTest {
         assertEquals(3, fakeSpecies.getMaxAge());
 
 
-        //create a 4x4 map of the world.
-        FishState model = MovingTest.generateSimple4x4Map();
         //put biology in there
         NauticalMap map = model.getMap();
         for(SeaTile element : map.getAllSeaTilesAsList())
