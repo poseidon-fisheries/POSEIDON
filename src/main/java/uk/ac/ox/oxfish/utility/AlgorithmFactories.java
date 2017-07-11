@@ -1,18 +1,14 @@
 package uk.ac.ox.oxfish.utility;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
-import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
-import uk.ac.ox.oxfish.biology.complicated.factory.AbundanceDiffusers;
-import uk.ac.ox.oxfish.biology.complicated.factory.Agings;
-import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundances;
-import uk.ac.ox.oxfish.biology.complicated.factory.MeristicFactories;
+import uk.ac.ox.oxfish.biology.complicated.*;
+import uk.ac.ox.oxfish.biology.complicated.factory.*;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowers;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializers;
+import uk.ac.ox.oxfish.biology.initializer.allocator.Allocators;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
@@ -145,6 +141,11 @@ public class AlgorithmFactories {
         NAMES_MAP.put(AgingProcess.class, Agings.NAMES);
         CONSTRUCTOR_MAP.put(InitialAbundance.class, InitialAbundances.CONSTRUCTORS);
         NAMES_MAP.put(InitialAbundance.class, InitialAbundances.NAMES);
+        CONSTRUCTOR_MAP.put(RecruitmentProcess.class, Recruitments.CONSTRUCTORS);
+        NAMES_MAP.put(RecruitmentProcess.class, Recruitments.NAMES);
+
+        CONSTRUCTOR_MAP.put(BiomassAllocator.class, Allocators.CONSTRUCTORS);
+        NAMES_MAP.put(BiomassAllocator.class, Allocators.NAMES);
     }
 
 

@@ -20,6 +20,9 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      */
     private final double steepness;
 
+
+    private final double cumulativePhi;
+
     /**
      * if true the spawning biomass counts relative fecundity (this is true for yelloweye rockfish)
      */
@@ -34,9 +37,11 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     };
 
 
-    public RecruitmentBySpawningBiomass(int virginRecruits,
-                                        double steepness,
-                                        boolean addRelativeFecundityToSpawningBiomass) {
+    public RecruitmentBySpawningBiomass(
+            int virginRecruits,
+            double steepness,
+            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass) {
+        this.cumulativePhi = cumulativePhi;
         Preconditions.checkArgument(virginRecruits>0);
         Preconditions.checkArgument(steepness>0);
         this.virginRecruits = virginRecruits;
@@ -82,7 +87,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
                 (int) FishStateUtilities.round(
                         (1d+noisemaker.get()) * (
                                 (4 * steepness * virginRecruits * spawningBiomass)/
-                        ((virginRecruits*meristics.getCumulativePhi()*(1-steepness)) +
+                        ((virginRecruits*cumulativePhi*(1-steepness)) +
                                 (((5*steepness)-1)*spawningBiomass))
                         )
                 );

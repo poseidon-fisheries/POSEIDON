@@ -45,6 +45,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 new RecruitmentBySpawningBiomass(
                         species.getVirginRecruits(),
                         species.getSteepness(),
+                        species.getCumulativePhi(),
                         species.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
@@ -62,14 +63,15 @@ public class SingleSpeciesNaturalProcessesTest {
             cell2.getNumberOfFemaleFishPerAge(species)[i] = 5000;
         }
 
-
-        processes.step(mock(FishState.class));
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],9231,1);
+        FishState model = mock(FishState.class);
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
+        processes.step(model);
+        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],9231,2);
         Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0] +
-                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,416140,2);
+                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,416140,4);
         Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0],208070,2);
 
-        processes.step(mock(FishState.class));
+        processes.step(model);
         System.out.println(Arrays.toString(cell1.getNumberOfFemaleFishPerAge(species)));
         System.out.println(Arrays.toString(cell2.getNumberOfFemaleFishPerAge(species)));
         System.out.println(Arrays.toString(cell2.getNumberOfMaleFishPerAge(species)));
@@ -89,7 +91,7 @@ public class SingleSpeciesNaturalProcessesTest {
         Log.info("Fixing the recruits they are allocated uniformly if the biomass is uniform");
 
         FishState model = MovingTest.generateSimple4x4Map();
-
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
         //lifted from SingleSpeciesAbundanceInitializerTest
         //4x4 map with test
@@ -149,7 +151,7 @@ public class SingleSpeciesNaturalProcessesTest {
     {
 
         FishState model = MovingTest.generateSimple4x4Map();
-
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
         //lifted from SingleSpeciesAbundanceInitializerTest
@@ -223,6 +225,7 @@ public class SingleSpeciesNaturalProcessesTest {
     @Test
     public void lastClassMortality() throws Exception {
         FishState model = mock(FishState.class);
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
 
         Log.info("if you set preserve old age to false, the last class has mortality of 100%");
         RecruitmentProcess recruitment = mock(RecruitmentProcess.class);

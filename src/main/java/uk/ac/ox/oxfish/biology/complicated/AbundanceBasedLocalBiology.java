@@ -111,7 +111,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     public void reactToThisAmountOfBiomassBeingFished(
             Catch caught, Catch notDiscarded, GlobalBiology biology)
     {
-        Preconditions.checkArgument(caught.hasAbundanceInformation());
+        Preconditions.checkArgument(caught.hasAbundanceInformation(), "This biology requires a gear that catches per age bins rather than biomass directly!");
 
         for(int index = 0; index < caught.numberOfSpecies(); index++) {
             Species species = biology.getSpecie(index);

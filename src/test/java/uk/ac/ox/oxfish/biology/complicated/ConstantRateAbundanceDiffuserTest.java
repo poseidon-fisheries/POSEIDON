@@ -28,7 +28,8 @@ public class ConstantRateAbundanceDiffuserTest {
     public void movesCorrectly() throws Exception {
 
         //there is only one species of fish, with 3 age structures
-        Meristics meristics = new FromListMeristics(Double.NaN,10d,20d,30d);
+        Meristics meristics = new FromListMeristics(Double.NaN,new Double[]{0d,0d,0d},
+                                                    new Double[]{10d,20d,30d});
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -83,7 +84,8 @@ public class ConstantRateAbundanceDiffuserTest {
     public void movesTwice() throws Exception {
 
         //there is only one species of fish, with 3 age structures
-        Meristics meristics = new FromListMeristics(Double.NaN,10d,20d,30d);
+        Meristics meristics = new FromListMeristics(Double.NaN,new Double[]{0d,0d,0d},
+                                                    new Double[]{10d,20d,30d});
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -143,7 +145,8 @@ public class ConstantRateAbundanceDiffuserTest {
     public void movesInBothDirection() throws Exception {
 
         //there is only one species of fish, with 3 age structures
-        Meristics meristics = new FromListMeristics(Double.NaN,10d,20d,30d);
+        Meristics meristics = new FromListMeristics(Double.NaN,new Double[]{0d,0d,0d},
+                                                    new Double[]{10d,20d,30d});
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 

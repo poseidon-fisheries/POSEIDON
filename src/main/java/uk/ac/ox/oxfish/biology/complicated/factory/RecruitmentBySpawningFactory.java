@@ -25,6 +25,9 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      */
     private DoubleParameter steepness = new FixedDoubleParameter(0.6);
 
+
+    private DoubleParameter cumulativePhi = new FixedDoubleParameter(14.2444066771724);
+
     /**
      * if true the spawning biomass counts relative fecundity (this is true for yelloweye rockfish)
      */
@@ -49,15 +52,17 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
             return new RecruitmentBySpawningBiomass(
                     virginRecruits.apply(state.getRandom()).intValue(),
                     steepness.apply(state.getRandom()),
+                    cumulativePhi.apply(state.getRandom()),
                     addRelativeFecundityToSpawningBiomass
             );
         else
             return new RecruitmentBySpawningBiomassDelayed(
                     virginRecruits.apply(state.getRandom()).intValue(),
                     steepness.apply(state.getRandom()),
+                    cumulativePhi.apply(state.getRandom()),
+
                     addRelativeFecundityToSpawningBiomass,
-                    delay
-            );
+                    delay);
     }
 
     /**
@@ -112,5 +117,41 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      */
     public void setAddRelativeFecundityToSpawningBiomass(boolean addRelativeFecundityToSpawningBiomass) {
         this.addRelativeFecundityToSpawningBiomass = addRelativeFecundityToSpawningBiomass;
+    }
+
+    /**
+     * Getter for property 'cumulativePhi'.
+     *
+     * @return Value for property 'cumulativePhi'.
+     */
+    public DoubleParameter getCumulativePhi() {
+        return cumulativePhi;
+    }
+
+    /**
+     * Setter for property 'cumulativePhi'.
+     *
+     * @param cumulativePhi Value to set for property 'cumulativePhi'.
+     */
+    public void setCumulativePhi(DoubleParameter cumulativePhi) {
+        this.cumulativePhi = cumulativePhi;
+    }
+
+    /**
+     * Getter for property 'yearlyDelay'.
+     *
+     * @return Value for property 'yearlyDelay'.
+     */
+    public DoubleParameter getYearlyDelay() {
+        return yearlyDelay;
+    }
+
+    /**
+     * Setter for property 'yearlyDelay'.
+     *
+     * @param yearlyDelay Value to set for property 'yearlyDelay'.
+     */
+    public void setYearlyDelay(DoubleParameter yearlyDelay) {
+        this.yearlyDelay = yearlyDelay;
     }
 }

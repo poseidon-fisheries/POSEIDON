@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 /**
  * Within the bound it allocates weight (1-x/width)^exponent
  *
+ *
  * Created by carrknight on 6/30/17.
  */
 public class FromLeftToRightBiomassAllocator implements BiomassAllocator {

@@ -34,6 +34,7 @@ public class RecruitmentBySpawningBiomassTest {
         RecruitmentBySpawningBiomass process = new RecruitmentBySpawningBiomass(
                 species.getVirginRecruits(),
                 species.getSteepness(),
+                species.getCumulativePhi(),
                 species.isAddRelativeFecundityToSpawningBiomass()
         );
 

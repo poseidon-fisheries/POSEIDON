@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
@@ -65,6 +66,12 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     private final AbundanceDiffuser diffuser;
 
 
+    /**
+     * possibly null allocator to choose where recruits go
+     */
+    private final BiomassAllocator recruitmentAllocator;
+    private SingleSpeciesNaturalProcesses processes;
+
     public SingleSpeciesAbundanceInitializer(
             String speciesName,
             AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory,
@@ -73,7 +80,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Meristics meristics,
             double scaling,
             RecruitmentProcess recruitmentProcess,
-            AbundanceDiffuser diffuser) {
+            AbundanceDiffuser diffuser,
+            BiomassAllocator recruitmentAllocator) {
         this.initialAbundanceFactory = initialAbundanceFactory;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
@@ -82,6 +90,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.scaling = scaling;
         this.recruitmentProcess = recruitmentProcess;
         this.diffuser = diffuser;
+        this.recruitmentAllocator = recruitmentAllocator;
     }
 
     /**
@@ -110,6 +119,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         recruitmentProcess = new RecruitmentBySpawningBiomass(
                 meristics.getVirginRecruits(),
                 meristics.getSteepness(),
+                meristics.getCumulativePhi(),
                 meristics.isAddRelativeFecundityToSpawningBiomass()
         );
         aging = new StandardAgingProcess(false);
@@ -118,6 +128,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.speciesName = speciesName;
         this.scaling = scaling;
         this.diffuser = new NoAbundanceDiffusion();
+        this.recruitmentAllocator = null;
     }
 
 
@@ -218,16 +229,18 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 //        initializeNaturalProcesses(model, species, locals, false, 2);
 
         //create the natural process
-        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
+        processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
                 recruitmentProcess,
                 species,
                 aging,
                 diffuser
         );
+        if(recruitmentAllocator !=null)
+            processes.setRecruitsAllocator(recruitmentAllocator);
         //tell it to deal with our biologies
         for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
-            processes.add(entry.getValue(),entry.getKey());
+            processes.add(entry.getValue(), entry.getKey());
         }
         //start it!
         model.registerStartable(processes);
@@ -258,12 +271,13 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                         new RecruitmentBySpawningBiomassDelayed(
                                 species.getVirginRecruits(),
                                 species.getSteepness(),
+                                species.getCumulativePhi(),
                                 species.isAddRelativeFecundityToSpawningBiomass(),
-                                yearDelay
-                        ) :
+                                yearDelay) :
                         new RecruitmentBySpawningBiomass(
                                 species.getVirginRecruits(),
                                 species.getSteepness(),
+                                species.getCumulativePhi(),
                                 species.isAddRelativeFecundityToSpawningBiomass()
                         ),
                 species,
@@ -312,4 +326,14 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         return scaling;
     }
 
+
+    /**
+     * Getter for property 'processes'.
+     *
+     * @return Value for property 'processes'.
+     */
+    @VisibleForTesting
+    public SingleSpeciesNaturalProcesses getProcesses() {
+        return processes;
+    }
 }

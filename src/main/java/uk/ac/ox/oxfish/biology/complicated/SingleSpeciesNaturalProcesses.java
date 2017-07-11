@@ -212,19 +212,36 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //allocate new recruits in a weighted fashion
-        double leftOver = 0;
-        for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
-            double ratio = biologyBiomass.getValue();
-            int recruitsHere = (int) ((lastRecruits+leftOver) * ratio);
-            //add recruits to smallest bin
-            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2;
-            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2;
-            leftOver =  ((lastRecruits+leftOver) * ratio) -
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
-            ;
-        }
+        if(lastRecruits > 0)
+            if(randomRounding)
+            {
+                for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+                    double ratio = biologyBiomass.getValue();
+                    int recruitsHere = (int) ((lastRecruits) * ratio);
+                    //add recruits to smallest bin
+                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] +=
+                            FishStateUtilities.randomRounding(recruitsHere / 2d,
+                                                              model.getRandom());
+                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] +=
+                            FishStateUtilities.randomRounding(recruitsHere / 2d,
+                                                              model.getRandom());
+                }
 
+            }
+            else {
+                double leftOver = 0;
+                for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+                    double ratio = biologyBiomass.getValue();
+                    int recruitsHere = (int) ((lastRecruits + leftOver) * ratio);
+                    //add recruits to smallest bin
+                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2;
+                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2;
+                    leftOver = ((lastRecruits + leftOver) * ratio) -
+                            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
+                            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
+                    ;
+                }
+            }
 
     }
 
@@ -279,5 +296,25 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      */
     public void setRecruitsAllocator(BiomassAllocator recruitsAllocator) {
         this.recruitsAllocator = recruitsAllocator;
+    }
+
+    private boolean randomRounding = true;
+
+    /**
+     * Getter for property 'randomRounding'.
+     *
+     * @return Value for property 'randomRounding'.
+     */
+    public boolean isRandomRounding() {
+        return randomRounding;
+    }
+
+    /**
+     * Setter for property 'randomRounding'.
+     *
+     * @param randomRounding Value to set for property 'randomRounding'.
+     */
+    public void setRandomRounding(boolean randomRounding) {
+        this.randomRounding = randomRounding;
     }
 }

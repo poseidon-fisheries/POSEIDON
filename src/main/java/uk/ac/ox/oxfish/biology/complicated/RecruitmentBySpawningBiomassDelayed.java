@@ -17,8 +17,8 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
 
     public RecruitmentBySpawningBiomassDelayed(
             int virginRecruits, double steepness,
-            boolean addRelativeFecundityToSpawningBiomass, int yearDelay) {
-        super(virginRecruits, steepness, addRelativeFecundityToSpawningBiomass);
+            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass, int yearDelay) {
+        super(virginRecruits, steepness, cumulativePhi, addRelativeFecundityToSpawningBiomass);
         this.yearDelay = yearDelay;
     }
 

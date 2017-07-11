@@ -29,6 +29,7 @@ public class DemographyDemo {
         Species species = new Species("Dover Sole");
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomass(sole.getVirginRecruits(),
                                                                           sole.getSteepness(),
+                                                                          sole.getCumulativePhi(),
                                                                           sole.isAddRelativeFecundityToSpawningBiomass());
         NaturalMortalityProcess mortality = new NaturalMortalityProcess();
 

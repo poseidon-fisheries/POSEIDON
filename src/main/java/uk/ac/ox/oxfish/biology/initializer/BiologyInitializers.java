@@ -84,9 +84,15 @@ public class BiologyInitializers {
         NAMES.put(TwoSpeciesBoxFactory.class,"Two Species Box");
 
 
+        CONSTRUCTORS.put("Single Species Abundance From Directory",
+                         SingleSpeciesAbundanceFromDirectoryFactory::new);
+        NAMES.put(SingleSpeciesAbundanceFromDirectoryFactory.class, "Single Species Abundance From Directory");
+
         CONSTRUCTORS.put("Single Species Abundance",
-                         SingleSpeciesAbudanceFactory::new);
-        NAMES.put(SingleSpeciesAbudanceFactory.class,"Single Species Abundance");
+                         SingleSpeciesAbundanceFactory::new);
+        NAMES.put(SingleSpeciesAbundanceFactory.class, "Single Species Abundance");
+
+
 
 
         CONSTRUCTORS.put("One Species School",

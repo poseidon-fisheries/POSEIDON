@@ -10,7 +10,7 @@ import java.nio.file.Paths;
  * The factory that generates the single species abundance biology.
  * Created by carrknight on 3/11/16.
  */
-public class SingleSpeciesAbudanceFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer>
+public class SingleSpeciesAbundanceFromDirectoryFactory implements AlgorithmFactory<SingleSpeciesAbundanceInitializer>
 {
 
 
@@ -18,7 +18,7 @@ public class SingleSpeciesAbudanceFactory implements AlgorithmFactory<SingleSpec
 
     private String speciesName = "Dover Sole";
 
-    private double scaling = 0.1;
+    private double scaling = 1d;
 
 
     /**

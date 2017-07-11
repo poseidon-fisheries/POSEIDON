@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.esotericsoftware.minlog.Log;
+import ec.util.MersenneTwisterFast;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -48,6 +49,7 @@ public class ReplicateDemographyDemo {
         Species species = new Species("Dover Sole", sole);
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomassDelayed(sole.getVirginRecruits(),
                                                                                  sole.getSteepness(),
+                                                                                 sole.getCumulativePhi(),
                                                                                  sole.isAddRelativeFecundityToSpawningBiomass(),
                                                                                  2);
         NaturalMortalityProcess mortality = new NaturalMortalityProcess();
@@ -82,11 +84,14 @@ public class ReplicateDemographyDemo {
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(mortality, recruitment, species,
                                                                                     new StandardAgingProcess(false),
                                                                                     new NoAbundanceDiffusion());
+        processes.setRandomRounding(false); //can't let randomness do anything here
         processes.add(biology,mock(SeaTile.class) );
 
         StringBuilder builder = new StringBuilder();
         builder.append("simulation_year,sex,age,number").append("\n");
         FishState model = mock(FishState.class);
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
+
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         for(int simulationYear = 0; simulationYear<50; simulationYear++)
         {
@@ -136,6 +141,7 @@ public class ReplicateDemographyDemo {
         Species species = new Species("Dover Sole", sole);
         RecruitmentProcess recruitment = new RecruitmentBySpawningBiomassDelayed(sole.getVirginRecruits(),
                                                                                  sole.getSteepness(),
+                                                                                 sole.getCumulativePhi(),
                                                                                  sole.isAddRelativeFecundityToSpawningBiomass(),
                                                                                  2);
         NaturalMortalityProcess mortality = new NaturalMortalityProcess();
@@ -182,6 +188,8 @@ public class ReplicateDemographyDemo {
         StringBuilder builder = new StringBuilder();
         builder.append("simulation_year,sex,age,number").append("\n");
         FishState model = mock(FishState.class);
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
+
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         for(int simulationYear = 0; simulationYear<50; simulationYear++)
         {

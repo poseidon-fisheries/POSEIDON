@@ -17,8 +17,10 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
     /**
      * gets turned into a list of doubles
      */
-    private String weightsPerBin = "10,50,100";
+    private String weightsPerBin = ".1,1,5";
 
+
+    private String maturityPerBin = "0,0.5,1";
 
     private DoubleParameter mortalityRate = new FixedDoubleParameter(0.08);
 
@@ -33,16 +35,22 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
     public FromListMeristics apply(FishState fishState) {
 
 
-        //turn into weights
-        Double[] weights = Arrays.stream(weightsPerBin.split(",")).map(new Function<String, Double>() {
+        //turn into weights array
+        Function<String, Double> mapper = new Function<String, Double>() {
             @Override
             public Double apply(String s) {
                 return Double.parseDouble(s.trim());
             }
-        }).toArray(Double[]::new);
+        };
+
+        Double[] weights = Arrays.stream(weightsPerBin.split(",")).map(mapper).toArray(Double[]::new);
+
+        //turn into maturity array
+        Double[] maturities = Arrays.stream(maturityPerBin.split(",")).map(mapper).toArray(Double[]::new);
 
         //create a meristic!
         return new FromListMeristics(mortalityRate.apply(fishState.getRandom()),
+                                     maturities,
                                      weights);
 
 
@@ -85,5 +93,23 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
      */
     public void setMortalityRate(DoubleParameter mortalityRate) {
         this.mortalityRate = mortalityRate;
+    }
+
+    /**
+     * Getter for property 'maturityPerBin'.
+     *
+     * @return Value for property 'maturityPerBin'.
+     */
+    public String getMaturityPerBin() {
+        return maturityPerBin;
+    }
+
+    /**
+     * Setter for property 'maturityPerBin'.
+     *
+     * @param maturityPerBin Value to set for property 'maturityPerBin'.
+     */
+    public void setMaturityPerBin(String maturityPerBin) {
+        this.maturityPerBin = maturityPerBin;
     }
 }

@@ -31,7 +31,7 @@ public class DrawHeatmaps
 {
 
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "paper2","heatmap_examples");
-    public static final FishState FISH_STATE = MovingTest.generateSimple10x10Map();
+    public static final FishState FISH_STATE = MovingTest.generateSimple10x10MapWithVaryingDepth();
 
 
     public static void main(String[] args) throws Exception {

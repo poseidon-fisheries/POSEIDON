@@ -316,12 +316,12 @@ public class MovingTest
 
 
     //all sea tiles!
-    public static FishState generateSimple10x10Map() {
+    public static FishState generateSimple10x10MapWithVaryingDepth() {
         ObjectGrid2D grid2D = new ObjectGrid2D(10,10);
         //2x2, first column sea, second  column land
         for(int i=0;i<10;i++)
             for(int j=0;j<10;j++)
-                grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
+                grid2D.field[i][j] = new SeaTile(i,j,-100-i-j, new TileHabitat(0d));
 
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),

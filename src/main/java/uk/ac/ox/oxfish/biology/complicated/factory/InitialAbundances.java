@@ -28,6 +28,10 @@ public class InitialAbundances {
                          InitialAbundanceFromFileFactory::new);
         NAMES.put(InitialAbundanceFromFileFactory.class,"Abundance From File");
 
+        CONSTRUCTORS.put("Abundance From String",
+                         InitialAbundanceFromStringFactory::new);
+        NAMES.put(InitialAbundanceFromStringFactory.class,"Abundance From String");
+
         CONSTRUCTORS.put("Abundance From List",
                          InitialAbundanceFromListFactory::new);
         NAMES.put(InitialAbundanceFromListFactory.class,"Abundance From List");
