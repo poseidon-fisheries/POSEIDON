@@ -38,7 +38,7 @@ public class  BuildSampleInputs
         Path directory = Paths.get("inputs", "YAML Samples","scenario");
         directory.toFile().mkdirs();
         //start with each Scenario; populate them with the standard variables
-        for(Scenario scenario : Scenarios.SCENARIOS.values())
+        for(Supplier<Scenario> scenario : Scenarios.SCENARIOS.values())
         {
             String name = Scenarios.SCENARIOS.inverse().get(scenario);
             final Path file = directory.resolve(name+ ".yaml");

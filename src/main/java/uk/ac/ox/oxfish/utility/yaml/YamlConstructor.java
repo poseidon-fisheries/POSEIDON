@@ -126,7 +126,7 @@ public class YamlConstructor extends  Constructor {
 
                         //grab first element, ought to be the name of the scenario
                         final  Scenario scenario =
-                                Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue());
+                                Scenarios.SCENARIOS.get(((ScalarNode) ((MappingNode) node).getValue().get(0).getKeyNode()).getValue()).get();
 
                         //now we can deal with filling it through beans
                         //first allocate subnodes correctly

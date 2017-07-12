@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * The customized representer YAML object, useful to show pretty yaml output. In reality this performs a something of a
@@ -174,12 +175,12 @@ public class YamlRepresenter extends Representer
 
 
         //get all the scenarios
-        final List<Scenario> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
+        final List<Supplier<Scenario>> scenarios = new LinkedList<>(Scenarios.SCENARIOS.values());
         //for each scenario create a representer that shows it as a map
-        for(Scenario s : scenarios) {
-            this.addClassTag(s.getClass(), Tag.MAP);
+        for(Supplier<Scenario> s : scenarios) {
+            this.addClassTag(s.get().getClass(), Tag.MAP);
 
-            this.representers.put(s.getClass(),
+            this.representers.put(s.get().getClass(),
                                   new Represent()
                                   {
                                       @Override
@@ -191,7 +192,7 @@ public class YamlRepresenter extends Representer
                                               //prepare the node
                                               final Set<Property> properties;
 
-                                              properties = getProperties(s.getClass());
+                                              properties = getProperties(s.get().getClass());
 
 
                                               //if you have no properties don't bother making a map, just return your full name

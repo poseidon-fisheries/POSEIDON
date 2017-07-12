@@ -52,8 +52,8 @@ public class CongestedMarketTest
     {
         CongestedMarket market = new CongestedMarket(100,10,0.01,150);
         Species species = mock(Species.class);
-        market.start(mock(FishState.class));
         market.setSpecies(species);
+        market.start(mock(FishState.class));
 
         //decongested
         Assert.assertEquals(market.getMarginalPrice(),10,.0001d);

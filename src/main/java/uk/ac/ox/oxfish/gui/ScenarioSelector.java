@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A panel to select scenarios and modify them before the simulation starts
@@ -45,9 +46,9 @@ public class ScenarioSelector extends JPanel implements ActionListener
         this.add(scenariosPanel, BorderLayout.WEST);
         //populate radio button group
         radioButtonGroup = new ButtonGroup();
-        for(Map.Entry<String,Scenario> scenarioItem : Scenarios.SCENARIOS.entrySet())
+        for(Map.Entry<String,Supplier<Scenario>> scenarioItem : Scenarios.SCENARIOS.entrySet())
         {
-            addScenarioOption(scenarioItem.getKey(),scenarioItem.getValue());
+            addScenarioOption(scenarioItem.getKey(),scenarioItem.getValue().get());
 
 
         }
@@ -63,11 +64,12 @@ public class ScenarioSelector extends JPanel implements ActionListener
     }
 
     public void addScenarioOption(String name, Scenario scenario) {
-        scenarioMap.put(name,scenario);
+        Scenario instance = scenario;
+        scenarioMap.put(name, instance);
         final JRadioButton scenarioButton = new JRadioButton(name);
         scenarioButton.setActionCommand(name);
         scenarioButton.setToolTipText(Scenarios.DESCRIPTIONS.get(name));
-        final ScenarioJComponent widget = new ScenarioJComponent(scenario);
+        final ScenarioJComponent widget = new ScenarioJComponent(instance);
         widgets.put(name,widget);
         settings.add(name,widget.getJComponent());
 

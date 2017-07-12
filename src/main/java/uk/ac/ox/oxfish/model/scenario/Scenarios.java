@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 import java.util.LinkedHashMap;
+import java.util.function.Supplier;
 
 /**
  * contains the scenario masterlist
@@ -15,7 +16,7 @@ public class Scenarios {
     /**
      * list of all the scenarios. Useful for instantiating them
      */
-    final public static BiMap<String, Scenario> SCENARIOS = HashBiMap.create(4);
+    final public static BiMap<String, Supplier<Scenario>> SCENARIOS = HashBiMap.create(4);
 
     /**
      * A quick description of each scenario available.
@@ -24,31 +25,31 @@ public class Scenarios {
 
     static
     {
-        SCENARIOS.put("Abstract",new PrototypeScenario());
+        SCENARIOS.put("Abstract",PrototypeScenario::new);
         DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
 
 
-        SCENARIOS.put("California Map Scenario", new CaliforniaAbundanceScenario());
+        SCENARIOS.put("California Map Scenario", CaliforniaAbundanceScenario::new);
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +
                 "from bathymetry data");
 
 
-        SCENARIOS.put("Abstract 2 Populations",new TwoPopulationsScenario());
+        SCENARIOS.put("Abstract 2 Populations",TwoPopulationsScenario::new);
         DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
 
 
-        SCENARIOS.put("OSMOSE WFS",new OsmoseWFSScenario());
+        SCENARIOS.put("OSMOSE WFS",OsmoseWFSScenario::new);
         DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
 
 
-        SCENARIOS.put("Policy California",new SimpleCaliforniaScenario());
+        SCENARIOS.put("Policy California",SimpleCaliforniaScenario::new);
         DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
 
-        SCENARIOS.put("Simple California",new DerisoCaliforniaScenario());
+        SCENARIOS.put("Simple California",DerisoCaliforniaScenario::new);
         DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
 
 
-        SCENARIOS.put("Indonesia",new IndonesiaScenario());
+        SCENARIOS.put("Indonesia",IndonesiaScenario::new);
         DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
     }
 }
