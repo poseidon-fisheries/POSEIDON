@@ -93,5 +93,10 @@ public interface Market extends Startable {
     double getMarginalPrice();
 
 
+    public Species getSpecies();
+
+    public void setSpecies(Species species);
+
+
 
 }

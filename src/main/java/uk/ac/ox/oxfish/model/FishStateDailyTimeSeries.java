@@ -6,15 +6,15 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.*;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Aggregate data. Goes through all the ports and all the markets and
@@ -44,35 +44,36 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         {
             //get all the markets for this species
             final List<Market> toAggregate = observed.getAllMarketsForThisSpecie(species);
-            //now register it!
-            final String landingsColumnName = AbstractMarket.LANDINGS_COLUMN_NAME;
-            final String earningsColumnName = AbstractMarket.EARNINGS_COLUMN_NAME;
-            registerGatherer(species + " " + landingsColumnName,
-                             //so "stream" is a trick from Java 8. In this case it just sums up all the data
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState model) {
-                                     return toAggregate.stream().mapToDouble(
-                                             value -> value.getData().getLatestObservation(landingsColumnName))
-                                             .sum();
-                                 }
-                             }, Double.NaN);
+            List<String> allPossibleColumns = getAllMarketColumns(toAggregate);
 
-            registerGatherer(species + " " + earningsColumnName,
-                             //so "stream" is a trick from Java 8. In this case it just sums up all the data
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState model) {
-                                     return toAggregate.stream().mapToDouble(
-                                             value -> value.getData().getLatestObservation(earningsColumnName))
-                                             .sum();
-                                 }
-                             }, Double.NaN);
+            //now register each
 
+            for(String columnName : allPossibleColumns) {
+                //todo this would fail if some markets have a column and others don't; too lazy to fix right now
+                registerGatherer(species + " " + columnName,
+                                 //so "stream" is a trick from Java 8. In this case it just sums up all the data
+                                 new Gatherer<FishState>() {
+                                     @Override
+                                     public Double apply(FishState model) {
+                                         return toAggregate.stream().mapToDouble(
+                                                 value -> value.getData().getLatestObservation(columnName))
+                                                 .sum();
+                                     }
+                                 }, Double.NaN);
+            }
+
+
+
+
+
+        }
+
+        //add a counter for all catches (including discards) by asking each fisher individually
+        for(Species species : observed.getSpecies())
+        {
 
             String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
             registerGatherer(catchesColumn,
-                             //so "stream" is a trick from Java 8. In this case it just sums up all the data
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState ignored) {
@@ -85,8 +86,6 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                                              }).sum();
                                  }
                              }, 0d);
-
-
         }
 
         final List<Fisher> fishers = state.getFishers();
@@ -172,5 +171,23 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
 
 
         super.start(state, observed);
+    }
+
+    public static List<String> getAllMarketColumns(List<Market> toAggregate) {
+        //get all important columns
+        return toAggregate.stream().flatMap(
+                new Function<Market, Stream<String>>() {
+                    @Override
+                    public Stream<String> apply(Market market) {
+                        return market.getData().getColumns().stream().map(new Function<DataColumn, String>() {
+                            @Override
+                            public String apply(DataColumn doubles) {
+                                return doubles.getName();
+                            }
+                        });
+
+                    }
+                }
+        ).distinct().collect(Collectors.toList());
     }
 }

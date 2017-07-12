@@ -80,8 +80,8 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
         setSelectedEncoding("Depth");
 
-        defaultFishColors.add(Color.BLUE);
         defaultFishColors.add(Color.RED);
+        defaultFishColors.add(Color.BLUE);
         defaultFishColors.add(Color.BLUE);
         defaultFishColors.add(Color.ORANGE);
         defaultFishColors.add(Color.YELLOW);
@@ -113,9 +113,14 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
 
             Color color =  defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll();
-            encodings.put(species.getName(), new ColorEncoding(new SimpleColorMap(0, max, Color.WHITE, color),
-                                                               seaTile ->
-                                                                       BIOMASS_TRANSFORM.apply(seaTile.getBiomass(species)), false));
+            encodings.put(species.getName(), new SelfAdjustingColorEncoding(
+                    new SimpleColorMap(0, max, Color.WHITE, color),
+                    seaTile ->
+                            BIOMASS_TRANSFORM.apply(
+                                    seaTile.getBiomass(species)),
+                    false,
+                    max,
+                    0));
         }
 
     }

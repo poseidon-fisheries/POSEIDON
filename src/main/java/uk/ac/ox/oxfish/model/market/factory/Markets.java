@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.market.factory;
 
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -45,6 +46,11 @@ public class Markets {
         NAMES.put(MACongestedMarketFactory.class,
                   "Moving Average Congested Market");
 
+        CONSTRUCTORS.put("Three Prices Market",
+                         ThreePricesMarketFactory::new
+        );
+        NAMES.put(ThreePricesMarketFactory.class,
+                  "Three Prices Market");
 
 
     }

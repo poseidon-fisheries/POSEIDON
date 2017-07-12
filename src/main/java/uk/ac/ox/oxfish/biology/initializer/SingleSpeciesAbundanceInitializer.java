@@ -65,6 +65,14 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
     private final AbundanceDiffuser diffuser;
 
+    /**
+     * By default (if this is null) any area where there is no fish initially is marked as wasteland;
+     * If this is not null, then even if there is no fish initially an area where this allocator returns > 0
+     * will be livable
+     *
+     */
+    final private BiomassAllocator habitabilityAllocator;
+
 
     /**
      * possibly null allocator to choose where recruits go
@@ -81,7 +89,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             double scaling,
             RecruitmentProcess recruitmentProcess,
             AbundanceDiffuser diffuser,
-            BiomassAllocator recruitmentAllocator) {
+            BiomassAllocator recruitmentAllocator,
+            BiomassAllocator habitabilityAllocator) {
         this.initialAbundanceFactory = initialAbundanceFactory;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
@@ -91,6 +100,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.recruitmentProcess = recruitmentProcess;
         this.diffuser = diffuser;
         this.recruitmentAllocator = recruitmentAllocator;
+        this.habitabilityAllocator = habitabilityAllocator;
     }
 
     /**
@@ -129,6 +139,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.scaling = scaling;
         this.diffuser = new NoAbundanceDiffusion();
         this.recruitmentAllocator = null;
+        this.habitabilityAllocator = null;
     }
 
 
@@ -158,7 +169,11 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                                                           map,
                                                           random);
         //weights of 0 or below are wastelands
-        if(weight <= 0)
+        if(weight <= 0 && (habitabilityAllocator == null || habitabilityAllocator.allocate(
+                seaTile,
+                map,
+                random
+        )  <= 0))
             return  new EmptyLocalBiology();
         else {
             AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);

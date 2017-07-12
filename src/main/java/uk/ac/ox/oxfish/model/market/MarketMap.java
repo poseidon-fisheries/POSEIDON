@@ -28,6 +28,7 @@ public class MarketMap {
     {
         Preconditions.checkArgument( marketList[species.getIndex()]==null);
         marketList[species.getIndex()]=market;
+        market.setSpecies(species);
     }
 
     public Market getMarket(Species species)

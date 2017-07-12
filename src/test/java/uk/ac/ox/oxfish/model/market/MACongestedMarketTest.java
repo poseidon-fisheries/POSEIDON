@@ -17,18 +17,20 @@ public class MACongestedMarketTest {
     public void congested() throws Exception {
 
         MACongestedMarket oldman = new MACongestedMarket(10,1,10);
+        Species species = mock(Species.class);
+        oldman.setSpecies(species);
 
         oldman.start(mock(FishState.class));
         assertEquals(10,oldman.getMarginalPrice(),.0001d);
 
         TradeInfo tradeInfo = oldman.sellFishImplementation(2, mock(Fisher.class), new Anarchy(),
-                                                            mock(FishState.class), mock(Species.class));
+                                                            mock(FishState.class), species);
         assertEquals(2*10,tradeInfo.getMoneyExchanged(),.0001);
         assertEquals(2,tradeInfo.getBiomassTraded(),.0001);
 
         //trading on the same day there is no hit to the congestion
         tradeInfo = oldman.sellFishImplementation(2, mock(Fisher.class), new Anarchy(),
-                                                            mock(FishState.class), mock(Species.class));
+                                                  mock(FishState.class), species);
         assertEquals(2*10,tradeInfo.getMoneyExchanged(),.0001);
         assertEquals(2,tradeInfo.getBiomassTraded(),.0001);
 
@@ -40,7 +42,7 @@ public class MACongestedMarketTest {
         oldman.step(mock(FishState.class));
         assertEquals(8,oldman.getMarginalPrice(),.0001d);
         tradeInfo = oldman.sellFishImplementation(100, mock(Fisher.class), new Anarchy(),
-                                                  mock(FishState.class), mock(Species.class));
+                                                  mock(FishState.class), species);
         assertEquals(100*8,tradeInfo.getMoneyExchanged(),.0001);
         assertEquals(100,tradeInfo.getBiomassTraded(),.0001);
 

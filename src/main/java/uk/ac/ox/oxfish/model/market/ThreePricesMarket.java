@@ -4,6 +4,8 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -27,6 +29,7 @@ public class ThreePricesMarket extends AbstractMarket {
     private final double priceAboveThresholds;
 
 
+
     public ThreePricesMarket(
             int lowAgeThreshold,
             int highAgeThreshold,
@@ -38,6 +41,43 @@ public class ThreePricesMarket extends AbstractMarket {
         this.priceBelowThreshold = priceBelowThreshold;
         this.priceBetweenThresholds = priceBetweenThresholds;
         this.priceAboveThresholds = priceAboveThresholds;
+    }
+
+
+    /**
+     * starts gathering data. If called multiple times all the calls after the first are ignored
+     *
+     * @param state the model
+     */
+    @Override
+    public void start(FishState state) {
+        super.start(state);
+
+
+        for(int age =0; age<getSpecies().getMaxAge()+1;age++) {
+            String columnName = LANDINGS_COLUMN_NAME + " - age bin " + age;
+            getDailyCounter().addColumn(columnName);
+            String finalColumnName1 = columnName;
+            getData().registerGatherer(columnName, new Gatherer<Market>() {
+                                           @Override
+                                           public Double apply(Market market) {
+                                               return getDailyCounter().getColumn(finalColumnName1);
+                                           }
+                                       },
+                                       0);
+
+
+            columnName = EARNINGS_COLUMN_NAME + " - age bin " + age;
+            getDailyCounter().addColumn(columnName);
+            String finalColumnName = columnName;
+            getData().registerGatherer(columnName, new Gatherer<Market>() {
+                                           @Override
+                                           public Double apply(Market market) {
+                                               return getDailyCounter().getColumn(finalColumnName);
+                                           }
+                                       },
+                                       0);
+        }
     }
 
     /**
@@ -60,6 +100,9 @@ public class ThreePricesMarket extends AbstractMarket {
             FishState state,
             Species species)
     {
+
+
+
         //find out legal biomass sold
         double proportionActuallySellable =
                 Math.min(1d,
@@ -88,8 +131,10 @@ public class ThreePricesMarket extends AbstractMarket {
             double soldThisBin =  hold.getWeightOfBin(species,age);
             //reweight because you might be not allowed to sell more than x
             soldThisBin *= proportionActuallySellable;
-
+            getDailyCounter().count(LANDINGS_COLUMN_NAME + " - age bin " + age,soldThisBin);
             earnings+= soldThisBin *price;
+            getDailyCounter().count(EARNINGS_COLUMN_NAME + " - age bin " + age,soldThisBin *price);
+
             sold+= soldThisBin;
         }
 

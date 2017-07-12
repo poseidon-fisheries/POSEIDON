@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.gui;
 
 import java.awt.Color;
 
+import com.google.common.base.Preconditions;
 import sim.util.gui.ColorMap;
 import sim.util.gui.SimpleColorMap;
 
@@ -24,9 +25,14 @@ import sim.util.gui.SimpleColorMap;
  */
 public class TriColorMap implements ColorMap
 {
-    private final SimpleColorMap lowerHalf;
-    private final SimpleColorMap upperHalf;
+    private SimpleColorMap lowerHalf;
+    private SimpleColorMap upperHalf;
     private final double mid;
+    private final Color minColor;
+    private final Color midColorLow;
+    private final Color midColorHigh;
+    private final Color maxColor;
+
 
 
     public TriColorMap(double min, double mid, double max, Color minColor, Color midColor, Color maxColor) {
@@ -39,6 +45,10 @@ public class TriColorMap implements ColorMap
         this.mid = mid;
         lowerHalf = new SimpleColorMap(min, mid, minColor, midColorLow);
         upperHalf = new SimpleColorMap(mid, max, midColorHigh, maxColor);
+        this.minColor=minColor;
+        this.midColorLow=midColorLow;
+        this.midColorHigh=midColorHigh;
+        this.maxColor=maxColor;
     }
 
     @Override
@@ -89,5 +99,19 @@ public class TriColorMap implements ColorMap
     @Override
     public double defaultValue() {
         return mid;
+    }
+
+
+    public void resetMax(double max)
+    {
+        Preconditions.checkArgument(max>mid);
+        upperHalf = new SimpleColorMap(mid, max, midColorHigh, maxColor);
+    }
+
+
+    public void resetMin(double min)
+    {
+        Preconditions.checkArgument(min<mid);
+        upperHalf = new SimpleColorMap(min, mid, minColor, midColorLow);
     }
 }

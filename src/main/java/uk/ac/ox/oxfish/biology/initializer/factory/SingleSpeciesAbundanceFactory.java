@@ -29,7 +29,9 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
     private AlgorithmFactory<? extends AbundanceDiffuser> diffuser = new NoDiffuserFactory();
 
-    private AlgorithmFactory<? extends BiomassAllocator> recruitDiffuser = new ConstantAllocatorFactory();
+    private AlgorithmFactory<? extends BiomassAllocator> recruitAllocator = new ConstantAllocatorFactory();
+
+    private AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator = new ConstantAllocatorFactory();
 
 
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
@@ -52,7 +54,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
                 scaling.apply(state.getRandom()),
                 recruitment.apply(state),
                 diffuser.apply(state),
-                recruitDiffuser.apply(state));
+                recruitAllocator.apply(state),
+                habitabilityAllocator.apply(state));
 
 
     }
@@ -163,22 +166,22 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
     }
 
     /**
-     * Getter for property 'recruitDiffuser'.
+     * Getter for property 'recruitAllocator'.
      *
-     * @return Value for property 'recruitDiffuser'.
+     * @return Value for property 'recruitAllocator'.
      */
-    public AlgorithmFactory<? extends BiomassAllocator> getRecruitDiffuser() {
-        return recruitDiffuser;
+    public AlgorithmFactory<? extends BiomassAllocator> getRecruitAllocator() {
+        return recruitAllocator;
     }
 
     /**
-     * Setter for property 'recruitDiffuser'.
+     * Setter for property 'recruitAllocator'.
      *
-     * @param recruitDiffuser Value to set for property 'recruitDiffuser'.
+     * @param recruitAllocator Value to set for property 'recruitAllocator'.
      */
-    public void setRecruitDiffuser(
-            AlgorithmFactory<? extends BiomassAllocator> recruitDiffuser) {
-        this.recruitDiffuser = recruitDiffuser;
+    public void setRecruitAllocator(
+            AlgorithmFactory<? extends BiomassAllocator> recruitAllocator) {
+        this.recruitAllocator = recruitAllocator;
     }
 
     /**
@@ -226,5 +229,24 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
     public void setInitialAbundanceFactory(
             AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory) {
         this.initialAbundanceFactory = initialAbundanceFactory;
+    }
+
+    /**
+     * Getter for property 'habitabilityAllocator'.
+     *
+     * @return Value for property 'habitabilityAllocator'.
+     */
+    public AlgorithmFactory<? extends BiomassAllocator> getHabitabilityAllocator() {
+        return habitabilityAllocator;
+    }
+
+    /**
+     * Setter for property 'habitabilityAllocator'.
+     *
+     * @param habitabilityAllocator Value to set for property 'habitabilityAllocator'.
+     */
+    public void setHabitabilityAllocator(
+            AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator) {
+        this.habitabilityAllocator = habitabilityAllocator;
     }
 }

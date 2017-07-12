@@ -129,6 +129,8 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
                                            totalFemale, totalMale);
 
+
+        //allocate stuff before mortality hits!
         //either allocate recruits with given allocator or proportional to where biomass is
         HashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
         if(recruitsAllocator != null) {
@@ -143,9 +145,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                 biomassWeight.put(entry.getValue(), weight);
 
             }
-            assert sum > 0;
+            Preconditions.checkArgument(sum > 0,"No area valid for recruits!");
             for (AbundanceBasedLocalBiology biology : biologies.values()) {
                 biomassWeight.replace(biology,biomassWeight.get(biology)/sum);
+                Preconditions.checkArgument(Double.isFinite(biomassWeight.get(biology)),
+                                            "some weights are not finite");
             }
 
 
@@ -166,15 +170,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
         }
 
-        //make sure it all sum up to 1!
-        assert Math.abs(biomassWeight.values().stream().
-                mapToDouble(
-                        new ToDoubleFunction<Double>() {
-                            @Override
-                            public double applyAsDouble(Double value) {
-                                return value;
-                            }
-                        }).sum()-1d)<.001d;
+
         /***
          *      __  __         _        _ _ _
          *     |  \/  |___ _ _| |_ __ _| (_) |_ _  _
@@ -212,9 +208,27 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //allocate new recruits in a weighted fashion
-        if(lastRecruits > 0)
-            if(randomRounding)
-            {
+        if(lastRecruits > 0) {
+
+
+            System.out.println(Math.abs(biomassWeight.values().stream().
+                    mapToDouble(
+                            new ToDoubleFunction<Double>() {
+                                @Override
+                                public double applyAsDouble(Double value) {
+                                    return value;
+                                }
+                            }).sum()-1d));
+            //make sure it all sum up to 1!
+            assert Math.abs(biomassWeight.values().stream().
+                    mapToDouble(
+                            new ToDoubleFunction<Double>() {
+                                @Override
+                                public double applyAsDouble(Double value) {
+                                    return value;
+                                }
+                            }).sum()-1d)<.001d;
+            if (randomRounding) {
                 for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
                     double ratio = biologyBiomass.getValue();
                     int recruitsHere = (int) ((lastRecruits) * ratio);
@@ -225,10 +239,10 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                     biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] +=
                             FishStateUtilities.randomRounding(recruitsHere / 2d,
                                                               model.getRandom());
+
                 }
 
-            }
-            else {
+            } else {
                 double leftOver = 0;
                 for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
                     double ratio = biologyBiomass.getValue();
@@ -242,7 +256,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                     ;
                 }
             }
-
+        }
     }
 
     /**

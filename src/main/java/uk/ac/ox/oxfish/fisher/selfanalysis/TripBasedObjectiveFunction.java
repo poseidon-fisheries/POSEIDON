@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.fisher.selfanalysis;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 /**
  * A simple abstract class that judges the objective given the last or secondlast trip. How to turn the tripRecord
@@ -34,32 +35,36 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         else
         {
 
+            //don't bother copying if discarding strategy is different!
+            if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) ||
+                    !(observed.getGear().isSame(observer.getGear())) )
+                return Double.NaN;
 
 
-                //if they are from the same port, then again return the memory
-                if((observed.getGear().isSame(observer.getGear()) &&
-                        observed.getHomePort().equals(observer.getHomePort())))
-                    return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
-                else
-                //otherwise simulate!
-                {
-                    //compute empirical CPUE
-                    double[] cpue = lastFinishedTrip.getTotalCatch();
-                    for(int i=0; i<cpue.length; i++)
-                        cpue[i] = cpue[i]/ (double)lastFinishedTrip.getEffort();
-                    //use it to simulate a trip
-                    TripRecord simulatedTrip = LameTripSimulator.simulateRecord(
-                            observer,
-                            lastFinishedTrip.getMostFishedTileInTrip(),
-                            observer.grabState(),
-                            5 * 24d,//todo change this
-                            cpue
-                    );
-                    if(simulatedTrip == null) //if area is unreacheable from our port
-                        return Double.NaN;
-                    //extract utility from SIMULATED trip
-                    return extractUtilityFromTrip(observer,simulatedTrip,observed);
-                }
+            //if they are from the same port, then again return the memory
+            if((
+                    observed.getHomePort().equals(observer.getHomePort())) )
+                return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
+            else
+            //otherwise simulate!
+            {
+                //compute empirical CPUE
+                double[] cpue = lastFinishedTrip.getTotalCatch();
+                for(int i=0; i<cpue.length; i++)
+                    cpue[i] = cpue[i]/ (double)lastFinishedTrip.getEffort();
+                //use it to simulate a trip
+                TripRecord simulatedTrip = LameTripSimulator.simulateRecord(
+                        observer,
+                        lastFinishedTrip.getMostFishedTileInTrip(),
+                        observer.grabState(),
+                        5 * 24d,//todo change this
+                        cpue
+                );
+                if(simulatedTrip == null) //if area is unreacheable from our port
+                    return Double.NaN;
+                //extract utility from SIMULATED trip
+                return extractUtilityFromTrip(observer,simulatedTrip,observed);
+            }
 
 
         }

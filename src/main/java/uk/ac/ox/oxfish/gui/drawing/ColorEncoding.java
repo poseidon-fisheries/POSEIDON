@@ -22,6 +22,10 @@ public class ColorEncoding {
      */
     private final boolean immutable;
 
+
+
+
+
     public ColorEncoding(
             ColorMap map, Function<SeaTile, Double> encoding, boolean immutable) {
         this.map = map;
@@ -40,4 +44,7 @@ public class ColorEncoding {
     public boolean isImmutable() {
         return immutable;
     }
+
+
+
 }

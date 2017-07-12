@@ -18,6 +18,8 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
+import static uk.ac.ox.oxfish.model.FishStateDailyTimeSeries.getAllMarketColumns;
+
 /**
  * Aggregate data, yearly. Mostly just sums up what the daily data-set discovered
  * Created by carrknight on 6/29/15.
@@ -61,19 +63,17 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         for(Species species : observed.getSpecies())
         {
 
-            final String earnings =  species + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
-            final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
-            final String price = species + " Average Sale Price";
-            registerGatherer(landings,
-                             FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
-                                     landings))
-                    , Double.NaN);
-            registerGatherer(earnings,
-                             FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
-                                     earnings))
-                    , Double.NaN);
+
+            List<String> allPossibleColumns = getAllMarketColumns(observed.getAllMarketsForThisSpecie(species));
+            for(String column : allPossibleColumns)
+                registerGatherer(species + " " + column,
+                FishStateUtilities.generateYearlySum(
+                        originalGatherer.getColumn(species + " " + column)),0d);
 
 
+
+
+            //catches (includes discards)
             String catchesColumn = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME;
             registerGatherer(catchesColumn,
                              FishStateUtilities.generateYearlySum(originalGatherer.getColumn(
@@ -81,10 +81,14 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
 
 
+
+            final String price = species + " Average Sale Price";
             registerGatherer(price,
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState fishState) {
+                                     final String earnings =  species + " " +AbstractMarket.EARNINGS_COLUMN_NAME;
+                                     final String landings = species + " " + AbstractMarket.LANDINGS_COLUMN_NAME;
 
                                      DataColumn numerator = originalGatherer.getColumn(earnings);
                                      DataColumn denominator = originalGatherer.getColumn(landings);

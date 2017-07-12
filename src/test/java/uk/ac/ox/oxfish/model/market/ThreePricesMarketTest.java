@@ -79,6 +79,7 @@ public class ThreePricesMarketTest {
                 20,
                 30
         );
+        market.setSpecies(firstSpecies);
         market.start(mock(FishState.class));
         Regulation regulation = mock(Regulation.class);
         when(regulation.maximumBiomassSellable(any(),
@@ -163,6 +164,7 @@ public class ThreePricesMarketTest {
                 20,
                 30
         );
+        market.setSpecies(firstSpecies);
         market.start(mock(FishState.class));
         Regulation regulation = mock(Regulation.class);
         when(regulation.maximumBiomassSellable(any(),

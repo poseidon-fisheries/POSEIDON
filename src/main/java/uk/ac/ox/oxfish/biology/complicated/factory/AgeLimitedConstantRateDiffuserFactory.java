@@ -15,16 +15,16 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
     /**
      * % of differential that moves from here to there
      */
-    private final DoubleParameter diffusingRate = new FixedDoubleParameter(.001);
+    private DoubleParameter diffusingRate = new FixedDoubleParameter(.001);
     /**
      * max distance in cells fish can move within a day
      */
-    private final DoubleParameter diffusingRange = new FixedDoubleParameter(1);
+    private DoubleParameter diffusingRange = new FixedDoubleParameter(1);
 
 
-    private final DoubleParameter smallestMovingBin = new FixedDoubleParameter(0);
+    private DoubleParameter smallestMovingBin = new FixedDoubleParameter(0);
 
-    private final DoubleParameter largestMovingBin = new FixedDoubleParameter(10000);
+    private DoubleParameter largestMovingBin = new FixedDoubleParameter(10000);
 
     /**
      * Applies this function to the given argument.
@@ -77,5 +77,41 @@ public class AgeLimitedConstantRateDiffuserFactory implements AlgorithmFactory<A
      */
     public DoubleParameter getLargestMovingBin() {
         return largestMovingBin;
+    }
+
+    /**
+     * Setter for property 'diffusingRate'.
+     *
+     * @param diffusingRate Value to set for property 'diffusingRate'.
+     */
+    public void setDiffusingRate(DoubleParameter diffusingRate) {
+        this.diffusingRate = diffusingRate;
+    }
+
+    /**
+     * Setter for property 'diffusingRange'.
+     *
+     * @param diffusingRange Value to set for property 'diffusingRange'.
+     */
+    public void setDiffusingRange(DoubleParameter diffusingRange) {
+        this.diffusingRange = diffusingRange;
+    }
+
+    /**
+     * Setter for property 'smallestMovingBin'.
+     *
+     * @param smallestMovingBin Value to set for property 'smallestMovingBin'.
+     */
+    public void setSmallestMovingBin(DoubleParameter smallestMovingBin) {
+        this.smallestMovingBin = smallestMovingBin;
+    }
+
+    /**
+     * Setter for property 'largestMovingBin'.
+     *
+     * @param largestMovingBin Value to set for property 'largestMovingBin'.
+     */
+    public void setLargestMovingBin(DoubleParameter largestMovingBin) {
+        this.largestMovingBin = largestMovingBin;
     }
 }

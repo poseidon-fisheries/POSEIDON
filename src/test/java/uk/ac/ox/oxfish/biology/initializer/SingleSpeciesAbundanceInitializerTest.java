@@ -32,7 +32,7 @@ public class SingleSpeciesAbundanceInitializerTest {
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SingleSpeciesAbundanceFactory factory = new SingleSpeciesAbundanceFactory();
         factory.setDiffuser(new NoDiffuserFactory());
-        factory.setRecruitDiffuser(
+        factory.setRecruitAllocator(
                 new AlgorithmFactory<BiomassAllocator>() {
                     @Override
                     public BiomassAllocator apply(FishState state) {

@@ -1,9 +1,11 @@
 package uk.ac.ox.oxfish.model;
 
+import com.beust.jcommander.internal.Lists;
 import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -13,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,9 +40,17 @@ public class FishStateDailyTimeSeriesTest {
         Market market1 = mock(Market.class); TimeSeries<Market> data1 = mock(TimeSeries.class);
         when(data1.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-100d);
         when(data1.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(100d);
+        when(data1.getColumns()).thenReturn(
+                Lists.newArrayList(new DataColumn(AbstractMarket.LANDINGS_COLUMN_NAME),
+                                   new DataColumn(AbstractMarket.EARNINGS_COLUMN_NAME))
+        );
         when(market1.getData()).thenReturn(data1);
 
-        Market market2 = mock(Market.class); TimeSeries<Market> data2 = mock(TimeSeries.class);
+        Market market2 = mock(Market.class,RETURNS_DEEP_STUBS); TimeSeries<Market> data2 = mock(TimeSeries.class);
+        when(data2.getColumns()).thenReturn(
+                Lists.newArrayList(new DataColumn(AbstractMarket.LANDINGS_COLUMN_NAME),
+                                   new DataColumn(AbstractMarket.EARNINGS_COLUMN_NAME))
+        );
         when(data2.getLatestObservation(AbstractMarket.LANDINGS_COLUMN_NAME)).thenReturn(-200d);
         when(data2.getLatestObservation(AbstractMarket.EARNINGS_COLUMN_NAME)).thenReturn(200d);
         when(market2.getData()).thenReturn(data2);

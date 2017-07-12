@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.market;
 
 import com.esotericsoftware.minlog.Log;
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -23,7 +24,7 @@ public abstract class AbstractMarket implements Market {
     public static final String PRICE_COLUMN_NAME = "Marginal Price";
 
 
-    private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
+    private final Counter dailyCounter;
 
 
     private final TimeSeries<Market> dailyObservations = new TimeSeries<>(IntervalPolicy.EVERY_DAY);
@@ -31,10 +32,23 @@ public abstract class AbstractMarket implements Market {
     /**
      * flag to avoid starting multiple times if start is called repeatedly
      */
-    private boolean started = false;
+    protected boolean started = false;
+
+    /**
+     * species we are trading
+     */
+    private Species species;
 
     public AbstractMarket() {
+        dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
+    }
 
+    public Species getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(Species species) {
+        this.species = species;
     }
 
     /**
@@ -44,6 +58,7 @@ public abstract class AbstractMarket implements Market {
     @Override
     public void start(FishState state)
     {
+        Preconditions.checkArgument(species!=null, " market doesn't know the species to trade in");
         if(started) //don't start twice
             return;
 
@@ -100,6 +115,7 @@ public abstract class AbstractMarket implements Market {
     final public TradeInfo sellFish(
             Hold hold, Fisher fisher, Regulation regulation,
             FishState state, Species species) {
+        Preconditions.checkArgument(species== this.species, "trading the wrong species!");
         TradeInfo receipt = sellFishImplementation(
                 hold,
                 fisher, regulation, state, species);
@@ -125,5 +141,9 @@ public abstract class AbstractMarket implements Market {
 
     public TimeSeries<Market> getData() {
         return dailyObservations;
+    }
+
+    protected Counter getDailyCounter() {
+        return dailyCounter;
     }
 }

@@ -39,6 +39,13 @@ public class DiscardingStrategies {
         NAMES.put(AlwaysDiscardTheseSpeciesFactory.class,
                   "Specific Discarding");
 
+
+        CONSTRUCTORS.put("Age Discarding",
+                         DiscardUnderagedFactory::new
+        );
+        NAMES.put(DiscardUnderagedFactory.class,
+                  "Age Discarding");
+
     }
 
 }
