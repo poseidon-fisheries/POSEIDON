@@ -36,14 +36,14 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         {
 
             //don't bother copying if discarding strategy is different!
-            if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) ||
-                    !(observed.getGear().isSame(observer.getGear())) )
+            if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) )
                 return Double.NaN;
 
 
             //if they are from the same port, then again return the memory
             if((
-                    observed.getHomePort().equals(observer.getHomePort())) )
+                    observed.getHomePort().equals(observer.getHomePort())) &&
+                    (observed.getGear().isSame(observer.getGear())))
                 return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
             else
             //otherwise simulate!

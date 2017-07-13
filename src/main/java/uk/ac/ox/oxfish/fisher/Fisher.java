@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.*;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -712,8 +713,16 @@ public class Fisher implements Steppable, Startable{
         if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON) {
             here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);
             //now count catches (which isn't necessarilly landings)
-            for(Species species : modelBiology.getSpecies())
-                getDailyCounter().countCatches(species,catchOfTheDay.getWeightCaught(species));
+            for(Species species : modelBiology.getSpecies()) {
+                getDailyCounter().countCatches(species, catchOfTheDay.getWeightCaught(species));
+                if(catchOfTheDay.hasAbundanceInformation() && species.getMaxAge() > 0)
+                    for(int age=0; age<species.getMaxAge()+1; age++)
+                    {
+                        state.getDailyCounter().count(species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age,
+                                                      catchOfTheDay.getWeightCaught(species,age));
+                    }
+
+            }
         }
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,

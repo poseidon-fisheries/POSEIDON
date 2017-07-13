@@ -45,13 +45,12 @@ public class FromListMeristics implements Meristics {
 
     @Override
     public ImmutableList<Double> getLengthMaleInCm() {
-        throw  new UnsupportedOperationException("Null Meristics doesn't do length");
+        return null;
     }
 
     @Override
     public ImmutableList<Double> getLengthFemaleInCm() {
-        throw  new UnsupportedOperationException("Null Meristics doesn't do length");
-
+        return null;
     }
 
     @Override
@@ -72,13 +71,13 @@ public class FromListMeristics implements Meristics {
     @Override
     public ImmutableList<Double> getRelativeFecundity() {
 
-        throw  new UnsupportedOperationException("Null Meristics doesn't do fecundity");
+        return null;
     }
 
     @Override
     public double getCumulativePhi() {
 
-        throw  new UnsupportedOperationException("Null Meristics doesn't do phi");
+       return Double.NaN;
     }
 
     @Override
@@ -89,11 +88,11 @@ public class FromListMeristics implements Meristics {
 
     @Override
     public int getVirginRecruits() {
-        throw  new UnsupportedOperationException("Null Meristics doesn't do virgin recruits");
+        return  - 1;
     }
 
     @Override
     public double getSteepness() {
-        throw  new UnsupportedOperationException("Null Meristics doesn't do steepness");
+        return Double.NaN;
     }
 }

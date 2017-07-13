@@ -45,71 +45,309 @@ public class IndonesiaDiscarding {
 
     public static void main(String[] args) throws IOException {
 
-        File outputFile = Paths.get("docs", "20170715 minimum_indonesia", "discarding.csv").toFile();
+        File outputFile = Paths.get("docs", "20170715 minimum_indonesia", "discarding_fine.csv").toFile();
         FileWriter writer = new FileWriter(outputFile);
-        writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents");
+        writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
         writer.write("\n");
         writer.flush();
-        for(double fine=9; fine>-100; fine= fine-.1d)
+        for(double fine=10; fine>-30; fine= fine-1d)
         {
-            FishState state = new FishState(System.currentTimeMillis());
-            FishYAML yaml = new FishYAML();
-            IndonesiaScenario scenario = yaml.loadAs(
-                    new FileReader(
-                            scenarioFile.toFile()
-                    ), IndonesiaScenario.class
-            );
-            state.setScenario(scenario);
 
-            ThreePricesMarketFactory market = new ThreePricesMarketFactory();
-            scenario.setMarket(market);
-            market.setLowAgeThreshold(new FixedDoubleParameter(0));
-            market.setPriceBelowThreshold(new FixedDoubleParameter(fine));
-
-            state.start();
-            while (state.getYear()<=5)
-                state.schedule.step(state);
-
-            for(Fisher fisher : state.getFishers())
-            {
-                DiscardUnderagedFactory discardUnderagedFactory = new DiscardUnderagedFactory();
-                discardUnderagedFactory.setMinAgeRetained(new FixedDoubleParameter(1d));
-                PeriodicUpdateDiscarding discarding = new PeriodicUpdateDiscarding(
-                        Lists.newArrayList(NoDiscarding.class,
-                                           DiscardUnderaged.class),
-                        Lists.newArrayList(new NoDiscardingFactory(),
-                                           discardUnderagedFactory)
+            for(int run=0; run<5; run++) {
+                FishState state = new FishState(System.currentTimeMillis());
+                FishYAML yaml = new FishYAML();
+                IndonesiaScenario scenario = yaml.loadAs(
+                        new FileReader(
+                                scenarioFile.toFile()
+                        ), IndonesiaScenario.class
                 );
-                discarding.start(state,fisher);
-                fisher.setRegulation(new Anarchy());
+                state.setScenario(scenario);
+
+                ThreePricesMarketFactory market = new ThreePricesMarketFactory();
+                scenario.setMarket(market);
+                market.setLowAgeThreshold(new FixedDoubleParameter(0));
+                market.setPriceBelowThreshold(new FixedDoubleParameter(fine));
+                market.setPriceBetweenThresholds(new FixedDoubleParameter(10));
+
+                state.start();
+                while (state.getYear() <= 5)
+                    state.schedule.step(state);
+
+                for (Fisher fisher : state.getFishers()) {
+                    DiscardUnderagedFactory discardUnderagedFactory = new DiscardUnderagedFactory();
+                    discardUnderagedFactory.setMinAgeRetained(new FixedDoubleParameter(1d));
+                    PeriodicUpdateDiscarding discarding = new PeriodicUpdateDiscarding(
+                            Lists.newArrayList(NoDiscarding.class,
+                                               DiscardUnderaged.class),
+                            Lists.newArrayList(new NoDiscardingFactory(),
+                                               discardUnderagedFactory)
+                    );
+                    discarding.start(state, fisher);
+
+                    fisher.setRegulation(new Anarchy());
+                }
+
+                while (state.getYear() <= 20)
+                    state.schedule.step(state);
+
+
+                StringBuffer observation = new StringBuffer();
+                observation.append(fine).append(",");
+                observation.append(10d).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Earnings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Average Cash-Flow")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 0")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 1")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 2")).append(",");
+
+
+                int discarders = 0;
+                for (Fisher fisher : state.getFishers())
+                    if (!fisher.getDiscardingStrategy().getClass().equals(NoDiscarding.class))
+                        discarders++;
+
+                observation.append(discarders).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Catches - age bin 0")).append("\n");
+                writer.write(observation.toString());
+                writer.flush();
+                System.out.println(observation);
+
             }
 
-            while (state.getYear()<=15)
-                state.schedule.step(state);
+        }
 
 
-            StringBuffer observation = new StringBuffer();
-            observation.append(fine).append(",");
-            observation.append(10d).append(",");
-            observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
-            observation.append(state.getLatestYearlyObservation("Red Fish Earnings")).append(",");
-            observation.append(state.getLatestYearlyObservation("Average Cash-Flow")).append(",");
-            observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 0")).append(",");
-            observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 1")).append(",");
-            observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 2")).append(",");
+
+    }
+
+    public static void nodiscardingFine(String[] args) throws IOException {
+
+        File outputFile = Paths.get("docs", "20170715 minimum_indonesia", "nodiscarding_fine.csv").toFile();
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
+        writer.write("\n");
+        writer.flush();
+        for(double fine=10; fine>-30; fine= fine-1d)
+        {
+
+            for(int run=0; run<5; run++) {
+                FishState state = new FishState(System.currentTimeMillis());
+                FishYAML yaml = new FishYAML();
+                IndonesiaScenario scenario = yaml.loadAs(
+                        new FileReader(
+                                scenarioFile.toFile()
+                        ), IndonesiaScenario.class
+                );
+                state.setScenario(scenario);
+
+                ThreePricesMarketFactory market = new ThreePricesMarketFactory();
+                scenario.setMarket(market);
+                market.setLowAgeThreshold(new FixedDoubleParameter(0));
+                market.setPriceBelowThreshold(new FixedDoubleParameter(fine));
+                market.setPriceBetweenThresholds(new FixedDoubleParameter(10));
+
+                state.start();
+                while (state.getYear() <= 5)
+                    state.schedule.step(state);
+
+                for (Fisher fisher : state.getFishers()) {
+                /*    DiscardUnderagedFactory discardUnderagedFactory = new DiscardUnderagedFactory();
+                    discardUnderagedFactory.setMinAgeRetained(new FixedDoubleParameter(1d));
+                    PeriodicUpdateDiscarding discarding = new PeriodicUpdateDiscarding(
+                            Lists.newArrayList(NoDiscarding.class,
+                                               DiscardUnderaged.class),
+                            Lists.newArrayList(new NoDiscardingFactory(),
+                                               discardUnderagedFactory)
+                    );
+                    discarding.start(state, fisher);
+                    */
+                    fisher.setRegulation(new Anarchy());
+                }
+
+                while (state.getYear() <= 20)
+                    state.schedule.step(state);
 
 
-            int discarders = 0;
-            for(Fisher fisher: state.getFishers())
-                if(!fisher.getDiscardingStrategy().getClass().equals(NoDiscarding.class))
-                    discarders++;
+                StringBuffer observation = new StringBuffer();
+                observation.append(fine).append(",");
+                observation.append(10d).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Earnings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Average Cash-Flow")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 0")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 1")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 2")).append(",");
 
-            observation.append(discarders).append("\n");
-            writer.write(observation.toString());
-            writer.flush();
-            System.out.println(observation);
+
+                int discarders = 0;
+                for (Fisher fisher : state.getFishers())
+                    if (!fisher.getDiscardingStrategy().getClass().equals(NoDiscarding.class))
+                        discarders++;
+
+                observation.append(discarders).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Catches - age bin 0")).append("\n");
+                writer.write(observation.toString());
+                writer.flush();
+                System.out.println(observation);
+
+            }
+
+        }
 
 
+
+    }
+
+
+    public static void noDiscardingSubsidy(String[] args) throws IOException {
+
+        File outputFile = Paths.get("docs", "20170715 minimum_indonesia", "nodiscarding_subsidy.csv").toFile();
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
+        writer.write("\n");
+        writer.flush();
+        for(double subsidy=9; subsidy<100; subsidy= subsidy+1d)
+        {
+
+            for(int run=0; run<5; run++) {
+                FishState state = new FishState(System.currentTimeMillis());
+                FishYAML yaml = new FishYAML();
+                IndonesiaScenario scenario = yaml.loadAs(
+                        new FileReader(
+                                scenarioFile.toFile()
+                        ), IndonesiaScenario.class
+                );
+                state.setScenario(scenario);
+
+                ThreePricesMarketFactory market = new ThreePricesMarketFactory();
+                scenario.setMarket(market);
+                market.setLowAgeThreshold(new FixedDoubleParameter(0));
+                market.setPriceBelowThreshold(new FixedDoubleParameter(10));
+                market.setPriceBetweenThresholds(new FixedDoubleParameter(subsidy));
+
+                state.start();
+                while (state.getYear() <= 5)
+                    state.schedule.step(state);
+
+                for (Fisher fisher : state.getFishers()) {
+                /*    DiscardUnderagedFactory discardUnderagedFactory = new DiscardUnderagedFactory();
+                    discardUnderagedFactory.setMinAgeRetained(new FixedDoubleParameter(1d));
+                    PeriodicUpdateDiscarding discarding = new PeriodicUpdateDiscarding(
+                            Lists.newArrayList(NoDiscarding.class,
+                                               DiscardUnderaged.class),
+                            Lists.newArrayList(new NoDiscardingFactory(),
+                                               discardUnderagedFactory)
+                    );
+                    discarding.start(state, fisher);
+                    */
+                    fisher.setRegulation(new Anarchy());
+                }
+
+                while (state.getYear() <= 20)
+                    state.schedule.step(state);
+
+
+                StringBuffer observation = new StringBuffer();
+                observation.append(10d).append(",");
+                observation.append(subsidy).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Earnings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Average Cash-Flow")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 0")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 1")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 2")).append(",");
+
+
+                int discarders = 0;
+                for (Fisher fisher : state.getFishers())
+                    if (!fisher.getDiscardingStrategy().getClass().equals(NoDiscarding.class))
+                        discarders++;
+
+                observation.append(discarders).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Catches - age bin 0")).append("\n");
+                writer.write(observation.toString());
+                writer.flush();
+                System.out.println(observation);
+
+            }
+
+        }
+
+
+
+    }
+
+    public static void discarding(String[] args) throws IOException {
+
+        File outputFile = Paths.get("docs", "20170715 minimum_indonesia", "discarding_subsidy.csv").toFile();
+        FileWriter writer = new FileWriter(outputFile);
+        writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
+        writer.write("\n");
+        writer.flush();
+        for(double subsidy=9; subsidy<100; subsidy= subsidy+1d)
+        {
+
+            for(int run=0; run<5; run++) {
+                FishState state = new FishState(System.currentTimeMillis());
+                FishYAML yaml = new FishYAML();
+                IndonesiaScenario scenario = yaml.loadAs(
+                        new FileReader(
+                                scenarioFile.toFile()
+                        ), IndonesiaScenario.class
+                );
+                state.setScenario(scenario);
+
+                ThreePricesMarketFactory market = new ThreePricesMarketFactory();
+                scenario.setMarket(market);
+                market.setLowAgeThreshold(new FixedDoubleParameter(0));
+                market.setPriceBelowThreshold(new FixedDoubleParameter(10));
+                market.setPriceBetweenThresholds(new FixedDoubleParameter(subsidy));
+
+                state.start();
+                while (state.getYear() <= 5)
+                    state.schedule.step(state);
+
+                for (Fisher fisher : state.getFishers()) {
+                    DiscardUnderagedFactory discardUnderagedFactory = new DiscardUnderagedFactory();
+                    discardUnderagedFactory.setMinAgeRetained(new FixedDoubleParameter(1d));
+                    PeriodicUpdateDiscarding discarding = new PeriodicUpdateDiscarding(
+                            Lists.newArrayList(NoDiscarding.class,
+                                               DiscardUnderaged.class),
+                            Lists.newArrayList(new NoDiscardingFactory(),
+                                               discardUnderagedFactory)
+                    );
+                    discarding.start(state, fisher);
+                    fisher.setRegulation(new Anarchy());
+                }
+
+                while (state.getYear() <= 20)
+                    state.schedule.step(state);
+
+
+                StringBuffer observation = new StringBuffer();
+                observation.append(10d).append(",");
+                observation.append(subsidy).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Earnings")).append(",");
+                observation.append(state.getLatestYearlyObservation("Average Cash-Flow")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 0")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 1")).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Landings - age bin 2")).append(",");
+
+
+                int discarders = 0;
+                for (Fisher fisher : state.getFishers())
+                    if (!fisher.getDiscardingStrategy().getClass().equals(NoDiscarding.class))
+                        discarders++;
+
+                observation.append(discarders).append(",");
+                observation.append(state.getLatestYearlyObservation("Red Fish Catches - age bin 0")).append("\n");
+                writer.write(observation.toString());
+                writer.flush();
+                System.out.println(observation);
+
+            }
 
         }
 
@@ -183,7 +421,7 @@ class PeriodicUpdateDiscarding implements FisherStartable
                             }
                         },
                         new CashFlowObjective(60),
-                        new FixedProbability(.2, .6),
+                        new FixedProbability(.1, .8),
                         new Predicate<Class<? extends DiscardingStrategy>>() {
                             @Override
                             public boolean test(Class<? extends DiscardingStrategy> aClass) {

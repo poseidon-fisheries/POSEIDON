@@ -24,11 +24,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
-import uk.ac.ox.oxfish.model.data.collectors.Counter;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
+import uk.ac.ox.oxfish.model.data.collectors.*;
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.scenario.*;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -123,6 +121,11 @@ public class FishState  extends SimState{
 
 
     /**
+     * generic yearly counter keeping track of yearly model stuff (biology mostly)
+     */
+    private final Counter dailyCounter = new Counter(IntervalPolicy.EVERY_DAY);
+
+    /**
      * aggregate steppables for phases where there is no need for randomization
      */
     private HashMap<StepOrder,AggregateSteppable> aggregateYearlySteppables = new HashMap<>();
@@ -190,6 +193,7 @@ public class FishState  extends SimState{
 
         //start the counter
         yearlyCounter.start(this);
+        dailyCounter.start(this);
 
         //schedule aggregate steppables
         for(Map.Entry<StepOrder,AggregateSteppable> steppable :aggregateYearlySteppables.entrySet()  )
@@ -207,6 +211,29 @@ public class FishState  extends SimState{
         //      map.addCities("cities/cities.shp");
 
         biology = initialization.getBiology();
+        //add counters for catches if there is any need (aggregate catches are counted by fishers, here we want abundance based)
+        for(Species species : biology.getSpecies())
+            if(species.getMaxAge()>0)
+                for(int age=0; age<species.getMaxAge()+1; age++)
+                {
+                    String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age;
+                    dailyCounter.addColumn(
+                            columnName);
+                    DataColumn dailyCatches = dailyDataSet.registerGatherer(
+                            columnName,
+                            new Gatherer<FishState>() {
+                                @Override
+                                public Double apply(FishState state) {
+                                    return dailyCounter.getColumn(columnName);
+                                }
+                            },0
+                    );
+                    yearlyDataSet.registerGatherer(columnName,
+                                                   FishStateUtilities.generateYearlySum(dailyCatches),
+                                                   0d);
+
+                }
+
 
 
 
@@ -755,5 +782,14 @@ public class FishState  extends SimState{
      */
     public Counter getYearlyCounter() {
         return yearlyCounter;
+    }
+
+    /**
+     * Getter for property 'dailyCounter'.
+     *
+     * @return Value for property 'dailyCounter'.
+     */
+    public Counter getDailyCounter() {
+        return dailyCounter;
     }
 }

@@ -5,7 +5,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.Counter;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -18,6 +17,7 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 public class ThreePricesMarket extends AbstractMarket {
 
 
+    public static final String AGE_BIN_PREFIX = " - age bin ";
     private final int lowAgeThreshold;
 
     private final int highAgeThreshold;
@@ -55,7 +55,7 @@ public class ThreePricesMarket extends AbstractMarket {
 
 
         for(int age =0; age<getSpecies().getMaxAge()+1;age++) {
-            String columnName = LANDINGS_COLUMN_NAME + " - age bin " + age;
+            String columnName = LANDINGS_COLUMN_NAME + AGE_BIN_PREFIX + age;
             getDailyCounter().addColumn(columnName);
             String finalColumnName1 = columnName;
             getData().registerGatherer(columnName, new Gatherer<Market>() {

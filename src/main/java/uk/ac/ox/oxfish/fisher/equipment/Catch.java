@@ -194,6 +194,11 @@ public class Catch {
         return biomassCaught.length;
     }
 
+    public double getWeightCaught(Species species, int bin)
+    {
+        Preconditions.checkArgument(hasAbundanceInformation());
+        return FishStateUtilities.weigh(abundance[species.getIndex()],species.getMeristics(),bin);
+    }
 
     @Nullable
     public StructuredAbundance getAbundance(Species species)
