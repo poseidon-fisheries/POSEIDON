@@ -9,7 +9,7 @@ import spearmint
 import yaml
 from spearmint.main import parse_resources_from_config, load_jobs, remove_broken_jobs
 
-SPACING = 300
+SPACING = 500
 
 
 def print_dict(d, level=1):
@@ -254,5 +254,10 @@ def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearm
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170403 narrative/climate/tac/")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170403 narrative/climate/itq/")
 
-plot(config_directory="/home/carrknight/code/oxfish/docs/20170407 climate/base/")
-plot(config_directory="/home/carrknight/code/oxfish/docs/20170407 climate/climate/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170407 climate/base/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170407 climate/climate/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_mixed/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_mixed/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_half/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_half/")
+plot(config_directory="/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_single_profits")

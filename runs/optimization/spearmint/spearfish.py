@@ -59,8 +59,66 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170403 narrative/climate/itq/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170403 narrative/climate/tac/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170407 climate/climate/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170407 climate/base/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170407 climate/base/"
 
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_mixed/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_mixed/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_half/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_half/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/tac-mixed/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/mpa_alone/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/mpa_simple/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/season_length_alone/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/half/kitchensink/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/half/kitchensink/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/half/mpa_alone/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/half/season_length_alone/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/common/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/common-scalable/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/total/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/total-limited/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/total-limited-nonscalable/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/single-limited/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/total-limited-2/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170526 gom_catchability/total-limited-shrimp/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_ignoring"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_ignoring_narrow"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/policymaking/season_length/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_single_profits"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/policymaking/sablefish_control/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/6/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/7/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/8/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/9/"
+
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/6/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/7/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/8/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/5/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/9/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/200/10/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170615 ashleigh/heterogeneous/200/"
+
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/itq/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/tac/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/tac-box/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/itq-box-2/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/itq-box-3/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/tac-box-2/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/tac-box-3/"
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/general/"
+
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
@@ -126,7 +184,8 @@ def main():
 
     ##now run spearmint
     os.chdir(SPEARMINT_DIRECTORY)
-    subprocess.call(["python2", "main.py", EXPERIMENT_DIRECTORY])
+    console = open(EXPERIMENT_DIRECTORY + '/console.txt', "w")
+    subprocess.call(["python2", "main.py", EXPERIMENT_DIRECTORY ], stdout = console, stderr = console )
 
     #now plot
     #output_to_r.plot()
