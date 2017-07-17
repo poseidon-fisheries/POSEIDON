@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BarebonesContinuousDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
@@ -40,6 +41,7 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
 import uk.ac.ox.oxfish.geography.CartesianUTMDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -83,34 +85,35 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     private double californiaScaling = 1.0;
 
+    private Path mainDirectory = Paths.get("inputs", "california");
+
+
     public static final double DEFAULT_CATCHABILITY = 0.00156832676d;
     /*
        * fuel efficiency per hour is 57l according to Toft et al
        */
-    protected final static  Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
+    protected final static Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
     protected AlgorithmFactory<? extends Regulation> regulation =
-
-
 
 
             //2011 numbers:
             new MultiQuotaMapFactory(true,
                                      new Pair<>("Yelloweye rockfish", 600d),
                                      //        new Pair<>("Canary rockfish",41100d),
-                                     new Pair<>("Dover sole",22234500d),
-                                     new Pair<>("Longspine Thornyhead",1966250d),
-                                     new Pair<>("Sablefish",3077220d),
-                                     new Pair<>("Shortspine thornyhead",1481600.056d)
+                                     new Pair<>("Dover sole", 22234500d),
+                                     new Pair<>("Longspine Thornyhead", 1966250d),
+                                     new Pair<>("Sablefish", 3077220d),
+                                     new Pair<>("Shortspine thornyhead", 1481600.056d)
             );
     private int resetBiologyAtYear = -1;
 
     {
         HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
-        quotaExchangedPerMatch.put("Yelloweye rockfish",6d);
-        quotaExchangedPerMatch.put("Dover sole",500d);
-        quotaExchangedPerMatch.put("Longspine Thornyhead",500d);
-        quotaExchangedPerMatch.put("Sablefish",500d);
-        quotaExchangedPerMatch.put("Shortspine thornyhead",500d);
+        quotaExchangedPerMatch.put("Yelloweye rockfish", 6d);
+        quotaExchangedPerMatch.put("Dover sole", 500d);
+        quotaExchangedPerMatch.put("Longspine Thornyhead", 500d);
+        quotaExchangedPerMatch.put("Sablefish", 500d);
+        quotaExchangedPerMatch.put("Shortspine thornyhead", 500d);
         ((MultiQuotaMapFactory) regulation).setQuotaExchangedPerMatch(
                 quotaExchangedPerMatch
         );
@@ -126,10 +129,11 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     {
         //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
         //all for the year 2010
-        exogenousCatches.put("Dover Sole",Double.toString(676.9*1000));
-        exogenousCatches.put("Sablefish",Double.toString(4438.2*1000));
+        exogenousCatches.put("Dover Sole", Double.toString(676.9 * 1000));
+        exogenousCatches.put("Sablefish", Double.toString(4438.2 * 1000));
 
     }
+
     /**
      * filename containing all the ports
      */
@@ -140,7 +144,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     /**
      * boat length in meters
      */
-    private DoubleParameter boatLength = new FixedDoubleParameter(22.573488); //assuming meters: this is from the data request
+    private DoubleParameter boatLength = new FixedDoubleParameter(
+            22.573488); //assuming meters: this is from the data request
     /**
      * boat breadth in meters
      */
@@ -149,9 +154,11 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      * hold size of the boat in kg
      */
     // the Echo Belle has GRT of 54 tonnes, but how much is the net is just a guess
-    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(20000);
-    private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(45519.577); //this is from data request, transformed in liters from gallons
-    private DoubleParameter cruiseSpeedInKph =  new FixedDoubleParameter(16.0661); //this is 8.675 knots from the data request
+    private DoubleParameter holdSizePerBoat = new FixedDoubleParameter(8000);
+    private DoubleParameter fuelTankInLiters = new FixedDoubleParameter(
+            45519.577); //this is from data request, transformed in liters from gallons
+    private DoubleParameter cruiseSpeedInKph = new FixedDoubleParameter(
+            16.0661); //this is 8.675 knots from the data request
     //new thinking:
     //liters per hour 57 (toft)
     //kph 16.0661
@@ -170,9 +177,32 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
             new PerTripImitativeDestinationFactory();
-    {
+
+    /*{
         ((PerTripImitativeDestinationFactory) destinationStrategy).setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+    }*/
+
+    {
+            this.destinationStrategy = new BarebonesContinuousDestinationFactory();
+        CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
+        discretizer.setFilePath(mainDirectory.resolve("logit").resolve("centroids_utm10N.csv").toString());
+        discretizer.setAutomaticallyIgnoreWastelands(true);
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setDiscretizer(
+                discretizer
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setDistanceInKm(
+                new FixedDoubleParameter(-0.0152236867527225)
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitIntercept(
+                new FixedDoubleParameter(0.00394629681249468)
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitPeriodInDays(
+                new FixedDoubleParameter(365)
+        );
+
     }
+
+
     /**
      * factory to produce fishing strategy
      */
@@ -183,7 +213,6 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
-    private Path mainDirectory = Paths.get("inputs", "california");
     private boolean usePremadeInput = true;
     /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip

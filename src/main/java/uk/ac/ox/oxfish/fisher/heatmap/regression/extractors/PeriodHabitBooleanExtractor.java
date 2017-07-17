@@ -9,15 +9,16 @@ import uk.ac.ox.oxfish.model.FishState;
  * If I have been to this area (discretized) over the past ```period``` days, that's 1 otherwise 0
  * Created by carrknight on 2/13/17.
  */
-public class PeriodHabitExtractor implements ObservationExtractor {
+public class PeriodHabitBooleanExtractor implements ObservationExtractor {
 
 
     private final MapDiscretization discretization;
     private final int period;
 
 
-    public PeriodHabitExtractor(MapDiscretization discretization,
-                                final int period) {
+
+    public PeriodHabitBooleanExtractor(MapDiscretization discretization,
+                                       final int period) {
         this.discretization = discretization;
         this.period = period;
     }
@@ -28,7 +29,7 @@ public class PeriodHabitExtractor implements ObservationExtractor {
         //it it has been less than ```period``` days since you went there, you get the habit bonus!
         return  model.getDay() -
                 agent.getDiscretizedLocationMemory()
-                        .getLastDayVisited()[discretization.getGroup(tile)] < period ?
+                        .getLastDayVisited(discretization.getGroup(tile)) < period ?
                 1 : 0;
     }
 }

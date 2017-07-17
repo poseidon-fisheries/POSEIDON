@@ -148,7 +148,7 @@ public class LogisticLogbookFactory
 
         if(periodHabit>0)
         {
-            extractors.add(new PeriodHabitExtractor(discretized,periodHabit));
+            extractors.add(new PeriodHabitBooleanExtractor(discretized, periodHabit));
             names.add("habit");
             //the logit discretized memory this extractor depends on is produced by
             // LogistiLogbookInitializer

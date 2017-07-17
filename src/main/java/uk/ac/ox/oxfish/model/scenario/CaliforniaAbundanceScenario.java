@@ -81,7 +81,7 @@ import java.util.*;
  */
 public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
 
-    private final boolean mortalityAt100PercentForOldestFish = false;
+    private boolean mortalityAt100PercentForOldestFish = true;
     /**
      * how much should the model biomass/abundance be given the data we read in?
      */
@@ -276,6 +276,24 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
     protected ExogenousCatches turnIntoExogenousCatchesObject(
             HashMap<Species, Double> catchesPerSpecies) {
         return new AbundanceDrivenFixedExogenousCatches(catchesPerSpecies);
+    }
+
+    /**
+     * Getter for property 'mortalityAt100PercentForOldestFish'.
+     *
+     * @return Value for property 'mortalityAt100PercentForOldestFish'.
+     */
+    public boolean isMortalityAt100PercentForOldestFish() {
+        return mortalityAt100PercentForOldestFish;
+    }
+
+    /**
+     * Setter for property 'mortalityAt100PercentForOldestFish'.
+     *
+     * @param mortalityAt100PercentForOldestFish Value to set for property 'mortalityAt100PercentForOldestFish'.
+     */
+    public void setMortalityAt100PercentForOldestFish(boolean mortalityAt100PercentForOldestFish) {
+        this.mortalityAt100PercentForOldestFish = mortalityAt100PercentForOldestFish;
     }
 }
 

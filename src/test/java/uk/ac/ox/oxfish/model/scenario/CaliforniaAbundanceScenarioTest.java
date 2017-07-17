@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.List;
 
@@ -63,6 +65,33 @@ public class CaliforniaAbundanceScenarioTest {
             Log.info("Distance " + i + " cells away from Morro Bay is " +
                              model.getMap().distance(morro,model.getMap().getSeaTile(29-i,104)));
         }
+    }
+
+
+    @Test
+    public void checkBiomass() throws Exception {
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
+
+        FishingSeasonFactory regulation = new FishingSeasonFactory();
+        //no fishing whatsoever
+        regulation.setSeasonLength(new FixedDoubleParameter(0));
+        scenario.setRegulation(regulation);
+        scenario.getExogenousCatches().clear();
+        scenario.setResetBiologyAtYear(5);
+
+        FishState state = new FishState(System.currentTimeMillis());
+
+        state.setScenario(scenario);
+        state.start();
+
+
+        while(state.getYear()<15) {
+            state.schedule.step(state);
+            if(state.getDayOfTheYear()==1)
+                System.out.println(state.getYear() + " ----- " + state.getTotalBiomass(state.getBiology().getSpecie("Sablefish"))/1000);
+        }
+
+
     }
 
 

@@ -70,7 +70,7 @@ public class MapDiscretization {
                 assert !grouped.containsKey(tile);
                 grouped.put(tile, i);
             }
-        assert allTilesAreInAGroup(map);
+      //  assert allTilesAreInAGroup(map); not true anymore because you could decide to ignore certain seatiles (usually wastelands)
 
     }
 
@@ -101,6 +101,9 @@ public class MapDiscretization {
      */
     public Integer getGroup(SeaTile tile)
     {
+        if(!grouped.containsKey(tile)) {
+            return null;
+        }
         assert grouped.containsKey(tile);
         assert tile.getAltitude()<=0;
         return grouped.get(tile);

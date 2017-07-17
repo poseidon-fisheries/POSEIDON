@@ -12,17 +12,19 @@ import java.util.*;
  * 1 to 1 discretizer, that is each tile is in its own group
  * Created by carrknight on 2/6/17.
  */
-public class IdentityDiscretizer implements MapDiscretizer {
+public class IdentityDiscretizer extends AbstractMapDiscretizer {
+
+
     /**
-     * assign all tiles to an array of groups (all groups must be disjoint)
+     * return groups but only for seatiles in the tiles list (which is all the seatiles we consider valid)
      *
-     * @param map the map to discretize
-     * @return an array of lists, each list representing a group.
+     * @param map           the nautical map
+     * @param tiles the list of valid seatiles
+     * @return groups
      */
     @Override
-    public List<SeaTile>[] discretize(NauticalMap map) {
+    public List<SeaTile>[] discretize(NauticalMap map, List<SeaTile> tiles) {
 
-        List<SeaTile> tiles = new ArrayList<>(map.getAllSeaTilesExcludingLandAsList());
         tiles.sort(new Comparator<SeaTile>() {
             @Override
             public int compare(SeaTile o1, SeaTile o2) {
@@ -43,6 +45,7 @@ public class IdentityDiscretizer implements MapDiscretizer {
         }
 
 
-        return groups;
-    }
+        return groups;    }
+
+
 }

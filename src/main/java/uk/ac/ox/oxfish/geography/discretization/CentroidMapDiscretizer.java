@@ -13,7 +13,7 @@ import java.util.List;
  * Splits ties by letting the earliest centroid (in terms of insertion) win
  * Created by carrknight on 11/30/16.
  */
-public class CentroidMapDiscretizer implements MapDiscretizer{
+public class CentroidMapDiscretizer extends AbstractMapDiscretizer{
 
 
 
@@ -27,21 +27,19 @@ public class CentroidMapDiscretizer implements MapDiscretizer{
 
 
     /**
-     * assign all tiles to an array of groups (all groups must be disjoint)
+     * return groups but only for seatiles in the tiles list (which is all the seatiles we consider valid)
      *
-     * @param map the map to discretize
-     * @return an array of lists, each list representing a group.
+     * @param map           the nautical map
+     * @param tiles the list of valid seatiles
+     * @return groups
      */
     @Override
-    public List<SeaTile>[] discretize(NauticalMap map)
-    {
-
+    public List<SeaTile>[] discretize(NauticalMap map, List<SeaTile> tiles) {
 
         List<SeaTile>[] groups = new List[centroids.size()];
         for(int i=0; i<groups.length; i++)
             groups[i] = new LinkedList<>();
 
-        List<SeaTile> tiles = map.getAllSeaTilesAsList();
         //for every tile look for the closest centroid
         for(SeaTile tile : tiles)
         {
@@ -67,13 +65,9 @@ public class CentroidMapDiscretizer implements MapDiscretizer{
         }
 
         return groups;
-
     }
 
-
-
-
-    private double distance(double x1,double x2, double y1, double y2){
+    private double distance(double x1, double x2, double y1, double y2){
         return Math.pow(x1-x2,2) + Math.pow(y1-y2,2);
     }
 }

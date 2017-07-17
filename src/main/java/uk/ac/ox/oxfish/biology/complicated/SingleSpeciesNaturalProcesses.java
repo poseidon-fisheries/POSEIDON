@@ -211,14 +211,6 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         if(lastRecruits > 0) {
 
 
-            System.out.println(Math.abs(biomassWeight.values().stream().
-                    mapToDouble(
-                            new ToDoubleFunction<Double>() {
-                                @Override
-                                public double applyAsDouble(Double value) {
-                                    return value;
-                                }
-                            }).sum()-1d));
             //make sure it all sum up to 1!
             assert Math.abs(biomassWeight.values().stream().
                     mapToDouble(

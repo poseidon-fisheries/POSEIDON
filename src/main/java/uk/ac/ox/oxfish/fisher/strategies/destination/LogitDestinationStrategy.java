@@ -166,9 +166,20 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         if(log!=null)
             log.recordChoice(armChosen);
 
-        List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
-        SeaTile destination = group.get(random.nextInt(group.size()));
-        delegate.setFavoriteSpot(destination);
+
+        while (true) {
+            List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
+
+            for (int i = 0; i < 100; i++) {
+                SeaTile destination = group.get(random.nextInt(group.size()));
+                if (destination.isFishingEvenPossibleHere())
+                {
+                    delegate.setFavoriteSpot(destination);
+                    return;
+                }
+            }
+
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.junit.After;
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
@@ -93,7 +94,10 @@ public class SerializeTest {
         FishState state = new FishState(seed);
         FishState state2 = new FishState(seed);
         state.setScenario(new CaliforniaAbundanceScenario());
+        ((CaliforniaAbundanceScenario) state.getScenario()).setDestinationStrategy(new PerTripImitativeDestinationFactory());
         state2.setScenario(new CaliforniaAbundanceScenario());
+        ((CaliforniaAbundanceScenario) state2.getScenario()).setDestinationStrategy(new PerTripImitativeDestinationFactory());
+
         state.start();
         state2.start();
         assertEquals(state.random.nextDouble(),
@@ -164,6 +168,7 @@ public class SerializeTest {
 
         FishState state = new FishState(System.currentTimeMillis());
         CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
+        scenario.setDestinationStrategy(new PerTripImitativeDestinationFactory());
         state.setScenario(scenario);
         state.start();
         for(int i=0; i<20; i++)
@@ -239,6 +244,7 @@ public class SerializeTest {
 
         FishState state = new FishState(System.currentTimeMillis());
         CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
+        scenario.setDestinationStrategy(new PerTripImitativeDestinationFactory());
         scenario.setRegulation(new AnarchyFactory());
         state.setScenario(scenario);
         state.start();

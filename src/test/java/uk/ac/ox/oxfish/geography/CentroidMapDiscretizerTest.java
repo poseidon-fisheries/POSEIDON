@@ -11,8 +11,10 @@ import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -43,6 +45,7 @@ public class CentroidMapDiscretizerTest {
                         new Coordinate(1,0)
                 )
         );
+
         MapDiscretization discretization = new MapDiscretization(discretizer);
         discretization.discretize(state.getMap());
 
@@ -53,6 +56,9 @@ public class CentroidMapDiscretizerTest {
         assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
 
     }
+
+
+
 
 
     //same as above, but builds the map from factory
@@ -86,6 +92,49 @@ public class CentroidMapDiscretizerTest {
         assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
 
     }
+
+
+    //like above but not allowing 0,0 to be grouped
+    @Test
+    public void centroidFiltered() throws Exception {
+
+
+        FishState state = MovingTest.generateSimple4x4Map();
+        state.getMap().getRasterBathymetry().setMBR(
+                new Envelope(
+                        0,1,
+                        0,1
+                )
+        );
+
+        assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
+        assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
+
+
+        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(
+                Lists.newArrayList(
+                        new Coordinate(0,1),
+                        new Coordinate(1,0)
+                )
+        );
+        discretizer.addFilter(new Predicate<SeaTile>() {
+            @Override
+            public boolean test(SeaTile tile) {
+                return tile.getGridY() >0 || tile.getGridX() > 0;
+            }
+        });
+
+        MapDiscretization discretization = new MapDiscretization(discretizer);
+        discretization.discretize(state.getMap());
+
+        assertNull(discretization.getGroup(state.getMap().getSeaTile(0,0)));
+        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(1,1)),0);
+        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(0,1)),0);
+        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(2,2)),1);
+        assertEquals((int)discretization.getGroup(state.getMap().getSeaTile(3,3)),1);
+
+    }
+
 
 
 }

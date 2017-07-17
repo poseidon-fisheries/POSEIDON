@@ -10,7 +10,7 @@ import java.util.List;
  * Splits the map in a set of rectangles, each containing a set of cells
  * Created by carrknight on 11/9/16.
  */
-public class SquaresMapDiscretizer implements MapDiscretizer {
+public class SquaresMapDiscretizer extends AbstractMapDiscretizer {
 
     /**
      * number of ticks on the y axis
@@ -23,8 +23,16 @@ public class SquaresMapDiscretizer implements MapDiscretizer {
     private final int xSplits;
 
 
+    /**
+     * return groups but only for seatiles in the tiles list (which is all the seatiles we consider valid)
+     *
+     * @param map           the nautical map
+     * @param validSeatiles the list of valid seatiles
+     * @return groups
+     */
     @Override
-    public List<SeaTile>[] discretize(NauticalMap map) {
+    public List<SeaTile>[] discretize(NauticalMap map, List<SeaTile> validSeatiles)
+    {
         List<SeaTile>[] groups = new List[(ySplits +1)*(xSplits +1)];
         for(int i=0;  i<groups.length; i++)
             groups[i] = new ArrayList<>();
@@ -40,7 +48,9 @@ public class SquaresMapDiscretizer implements MapDiscretizer {
                 int height = y / groupHeight;
                 int width = x / groupWidth;
                 int group = height * (xSplits +1) + width;
-                groups[group].add(map.getSeaTile(x,y));
+                SeaTile tile = map.getSeaTile(x, y);
+                if(validSeatiles.contains(tile))
+                    groups[group].add(tile);
             }
 
         return groups;

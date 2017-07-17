@@ -477,8 +477,12 @@ public class Fisher implements Steppable, Startable{
         spendForTrip(gasExpenditure);
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_EXPENDITURE, gasExpenditure);
         if(status.getHoursAtSea()>0) //if you have been somewhere at all
+        {
             memory.getYearlyCounter().count(FisherYearlyTimeSeries.TRIPS, 1);
-
+            //log all areas as just visited!
+            for(SeaTile tile : getCurrentTrip().getTilesFished())
+                memory.registerVisit(tile, (int) state.getDay());
+        }
 
         //notify listeners
         for(DockingListener listener : dockingListeners)
@@ -729,7 +733,6 @@ public class Fisher implements Steppable, Startable{
                                                  here, catchOfTheDay);
         memory.getTripLogger().recordFishing(record);
         memory.getCatchMemories().memorize(catchOfTheDay, here);
-        memory.registerVisit(here, (int) state.getDay());
 
         //now let regulations and the hold deal with it
         status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing);

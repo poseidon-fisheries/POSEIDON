@@ -95,10 +95,16 @@ public class DestinationStrategies
                   "Florida Longliner");
 
 
-        CONSTRUCTORS.put("Florida Bare Bones",
+        CONSTRUCTORS.put("Boolean Bare Bones",
                          BarebonesFloridaDestinationFactory::new);
         NAMES.put(BarebonesFloridaDestinationFactory.class,
-                  "Florida Bare Bones");
+                  "Boolean Bare Bones");
+
+        CONSTRUCTORS.put("Continuous Bare Bones",
+                         BarebonesContinuousDestinationFactory::new);
+        NAMES.put(BarebonesContinuousDestinationFactory.class,
+                  "Continuous Bare Bones");
+
 
 
         CONSTRUCTORS.put("Perfect RPUE Logit",

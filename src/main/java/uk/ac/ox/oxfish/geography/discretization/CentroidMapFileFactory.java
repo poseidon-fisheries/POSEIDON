@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.discretization;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
@@ -9,6 +10,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 /**
  * Creates centroid maps from files
@@ -28,6 +30,7 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
     private String yColumnName = "northings";
 
 
+    private boolean automaticallyIgnoreWastelands = false;
 
 
     /**
@@ -51,7 +54,17 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
                                            lists[1].get(i),
                                            0));
 
-        return new CentroidMapDiscretizer(coordinates);
+
+        CentroidMapDiscretizer discretizer = new CentroidMapDiscretizer(coordinates);
+        if(automaticallyIgnoreWastelands)
+            discretizer.addFilter(new Predicate<SeaTile>() {
+                @Override
+                public boolean test(SeaTile tile) {
+                    return tile.isFishingEvenPossibleHere();
+                }
+            });
+
+        return discretizer;
     }
 
 
@@ -107,5 +120,13 @@ public class CentroidMapFileFactory implements AlgorithmFactory<CentroidMapDiscr
      */
     public void setyColumnName(String yColumnName) {
         this.yColumnName = yColumnName;
+    }
+
+    public boolean isAutomaticallyIgnoreWastelands() {
+        return automaticallyIgnoreWastelands;
+    }
+
+    public void setAutomaticallyIgnoreWastelands(boolean automaticallyIgnoreWastelands) {
+        this.automaticallyIgnoreWastelands = automaticallyIgnoreWastelands;
     }
 }

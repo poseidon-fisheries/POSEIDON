@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.CsvColumnsToLists;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Locker;
 
 import java.nio.file.Paths;
@@ -105,7 +104,7 @@ public class FloridaLogitDestinationFactory implements
                 //distance
                 new PortDistanceExtractor(),
                 //habit
-                new PeriodHabitExtractor(discretization,90),
+                new PeriodHabitBooleanExtractor(discretization, 90),
                 //fuel_price TODO: adjust from gallon
                 new GasPriceExtractor(),
                 //wind_speed TODO: adjust from mph
