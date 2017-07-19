@@ -245,7 +245,7 @@ public class SerializeTest {
         FishState state = new FishState(System.currentTimeMillis());
         CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
         scenario.setDestinationStrategy(new PerTripImitativeDestinationFactory());
-        scenario.setRegulation(new AnarchyFactory());
+        scenario.setRegulationPreReset(new AnarchyFactory());
         state.setScenario(scenario);
         state.start();
         for(int i=0; i<20; i++)

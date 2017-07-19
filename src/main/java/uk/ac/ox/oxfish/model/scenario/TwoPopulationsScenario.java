@@ -45,6 +45,7 @@ import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
@@ -285,7 +286,8 @@ public class TwoPopulationsScenario implements Scenario{
         PortInitializer portInitializer = ports.apply(model);
         portInitializer.buildPorts(map,
                                    mapMakerRandom,
-                                   seaTile -> marketMap,model, gasPricePerLiter.apply(mapMakerRandom));
+                                   seaTile -> marketMap, model,
+                                   new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom)));
 
 
         //create initial mpas

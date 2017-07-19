@@ -45,10 +45,12 @@ import uk.ac.ox.oxfish.geography.mapmakers.OsmoseBoundedMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.OsmoseBoundedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.TimeSeriesGasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkPredicate;
@@ -482,24 +484,6 @@ public class OsmoseWFSScenario implements Scenario{
                 }
                 return marketMap;
             };
-            longlinersPerPort = reader.readFile(
-                    mainDirectory.resolve("longline_ports.csv"),
-                    map,
-                    marketSupplier,
-                    0);
-
-
-            handlinersPerPort = reader.readFile(mainDirectory.resolve("handline_ports.csv"),
-                                                map,
-                                                marketSupplier,
-                                                0);
-
-            for(Port port : reader.getPorts())
-                map.addPort(port);
-
-
-            //todo put this somewhere else
-
             //transform $/gallon to $/liter
             CsvColumnToList gasPrices = new CsvColumnToList(
                     Paths.get("temp_wfs", "steve", "Fleet", "PriceWSgas.txt").toString(),
@@ -514,9 +498,28 @@ public class OsmoseWFSScenario implements Scenario{
                     }
             );
             LinkedList<Double> prices = gasPrices.readColumn();
-            TimeSeriesActuator gasActuator = TimeSeriesActuator.gasPriceDailySchedule(prices, new ArrayList<>(map.getPorts()));
-            gasActuator.step(model);
-            model.scheduleEveryDay(gasActuator, StepOrder.POLICY_UPDATE);
+            TimeSeriesGasPriceMaker gasPriceMaker = new TimeSeriesGasPriceMaker(
+                    prices,
+                    true,
+                    IntervalPolicy.EVERY_DAY
+            );
+            longlinersPerPort = reader.readFile(
+                    mainDirectory.resolve("longline_ports.csv"),
+                    map,
+                    marketSupplier,
+                    gasPriceMaker,
+                    model
+                    );
+
+
+            handlinersPerPort = reader.readFile(mainDirectory.resolve("handline_ports.csv"),
+                                                map,
+                                                marketSupplier,
+                                                gasPriceMaker,
+                                                model);
+
+            for(Port port : reader.getPorts())
+                map.addPort(port);
 
 
             //exogenous mortality

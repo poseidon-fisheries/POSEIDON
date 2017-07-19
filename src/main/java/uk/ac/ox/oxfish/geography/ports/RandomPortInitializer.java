@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 
 import java.util.*;
 import java.util.function.Function;
@@ -29,11 +30,13 @@ public class RandomPortInitializer implements PortInitializer {
     /**
      * add random ports to the map
      * @param map
+     * @param maker
+     * @param model
      */
-    public static List<Port> addRandomPortsToMap(NauticalMap map,int ports,
-                                           Function<SeaTile,MarketMap> marketFactory,
-                                           MersenneTwisterFast random,
-                                                 double gasPrice){
+    public static List<Port> addRandomPortsToMap(
+            NauticalMap map, int ports,
+            Function<SeaTile, MarketMap> marketFactory,
+            MersenneTwisterFast random, GasPriceMaker maker, FishState model){
 
         List<Port> toReturn = new LinkedList<>();
 
@@ -71,7 +74,9 @@ public class RandomPortInitializer implements PortInitializer {
 
         Collections.shuffle(candidateTiles, new Random(random.nextLong()));
         for(int i=0; i<ports; i++) {
-            Port port = new Port("Port " + i, candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)), gasPrice);
+            Port port = new Port("Port " + i, candidateTiles.get(i), marketFactory.apply(candidateTiles.get(i)),
+                                 maker.supplyInitialPrice(candidateTiles.get(i),"Port " + i));
+            maker.start(port,model);
             map.addPort(port);
             toReturn.add(port);
         }
@@ -88,14 +93,14 @@ public class RandomPortInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
-     * @param gasPrice
+     * @param gasPriceMaker
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, double gasPrice) {
-        return addRandomPortsToMap(map,getPorts(),marketFactory,mapmakerRandom,gasPrice);
+            FishState model, GasPriceMaker gasPriceMaker) {
+        return addRandomPortsToMap(map, getPorts(), marketFactory, mapmakerRandom, gasPriceMaker,model);
     }
 
 

@@ -26,6 +26,8 @@ public class PseudoLogisticLoggerTest {
 
         FishState state = MovingTest.generateSimple4x4Map();
         when(state.getDay()).thenReturn(0);
+        when(state.getYear()).thenReturn(123);
+        when(state.getDayOfTheYear()).thenReturn(456); //meaningless, just to check that it gets logged correctly
         MapDiscretization discretization = new MapDiscretization(
                 new SquaresMapDiscretizer(3,3));
         discretization.discretize(state.getMap());
@@ -71,8 +73,8 @@ public class PseudoLogisticLoggerTest {
 
         }
         //check that rows are correct
-        //id,trip#,arm,chosen,x,y,time
-        assertTrue("0,0,6,no,2.0,1.0,0.0".equals(csv[6]));
+        //id,trip#,year,day,arm,chosen,x,y,time
+        assertTrue("0,0,123,456,6,no,2.0,1.0,0.0".equals(csv[6]));
 
 
         //add one more observation
@@ -95,7 +97,7 @@ public class PseudoLogisticLoggerTest {
 
         }
         //check that rows are correct
-        //id,trip#,arm,chosen,x,y,time
-        assertTrue("0,1,0,yes,0.0,0.0,100.0".equals(csv[16]));
+        //id,trip#,year,day,arm,chosen,x,y,time
+        assertTrue("0,1,123,456,0,yes,0.0,0.0,100.0".equals(csv[16]));
     }
 }

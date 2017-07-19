@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 
 import java.util.function.Function;
 
@@ -34,7 +35,8 @@ public class TwoPortsInitializerTest {
                                                             2,
                                                             "North",
                                                             "South");
-        ports.buildPorts(map,new MersenneTwisterFast(),mock(Function.class),mock(FishState.class), 3);
+        ports.buildPorts(map, new MersenneTwisterFast(), mock(Function.class), mock(FishState.class),
+                         new FixedGasPrice(3));
         assertEquals(map.getPorts().size(),2);
         for(Port port : map.getPorts())
         {

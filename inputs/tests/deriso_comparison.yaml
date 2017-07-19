@@ -32,7 +32,6 @@ Simple California:
     Until Full With Day Limit:
       daysAtSea: '5.0'
   fuelTankInLiters: '45519.577'
-  gasPricePerLiter: '0.3689'
   gear:
     Hold Upper Limit:
       delegate:

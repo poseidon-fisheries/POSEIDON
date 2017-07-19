@@ -23,7 +23,7 @@ public class LogisticLog {
     {
         this.id = id;
         StringBuilder columns = new StringBuilder();
-        columns.append("id,episode,option,choice");
+        columns.append("id,episode,year,day,option,choice");
         for(String column : columnNames)
             columns.append(",").append(column);
         this.columnNames = columns.toString();
@@ -44,13 +44,15 @@ public class LogisticLog {
         lastInput = x;
     }
 
-    public void recordChoice(int choice)
+    public void recordChoice(int choice, int year, int dayOfTheYear)
     {
         Preconditions.checkArgument(lastInput != null, "don't have a matching input!");
         for(int arm= 0; arm< lastInput.length; arm++)
         {
             data.append(id).append(",").
                     append(episode).append(",").
+                    append(year).append(",").
+                    append(dayOfTheYear).append(",").
                     append(arm).append(",").
                     append(choice==arm ? "yes" : "no");
             for(int i=0; i<lastInput[arm].length; i++)

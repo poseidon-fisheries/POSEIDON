@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.io.IOException;
@@ -42,17 +43,19 @@ public class FromFilePortInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
-     * @param gasPrice
+     * @param gasPriceMaker
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, double gasPrice) {
+            FishState model, GasPriceMaker gasPriceMaker) {
         try {
             portMap = reader.readFile(
                     filePath,map,marketFactory,
-                    gasPrice
+                    gasPriceMaker,
+                    model
+
             );
         } catch (IOException e) {
             e.printStackTrace();

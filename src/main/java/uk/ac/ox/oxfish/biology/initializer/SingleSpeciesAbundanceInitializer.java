@@ -263,49 +263,6 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
     /**
-     * for a specific species create the natural processes object (which will be returned)
-     * and register it as startable in the model
-     * @param model the model
-     * @param species the species you need the natural processes set up
-     * @param locals a map of all the areas where fish can live
-     * @param preserveLastAge
-     * @param yearDelay
-     * @param diffuser
-     * @return the already scheduled naturalProcesses object
-     */
-    public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
-            FishState model, Species species,
-            Map<SeaTile, AbundanceBasedLocalBiology> locals,
-            final boolean preserveLastAge, final int yearDelay,
-            final NoAbundanceDiffusion diffuser) {
-        //schedule recruitment and natural mortality
-        AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
-        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
-                yearDelay > 0 ?
-                        new RecruitmentBySpawningBiomassDelayed(
-                                species.getVirginRecruits(),
-                                species.getSteepness(),
-                                species.getCumulativePhi(),
-                                species.isAddRelativeFecundityToSpawningBiomass(),
-                                yearDelay) :
-                        new RecruitmentBySpawningBiomass(
-                                species.getVirginRecruits(),
-                                species.getSteepness(),
-                                species.getCumulativePhi(),
-                                species.isAddRelativeFecundityToSpawningBiomass()
-                        ),
-                species,
-                agingProcess, diffuser);
-
-        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
-            processes.add(entry.getValue(),entry.getKey());
-        }
-        model.registerStartable(processes);
-        return processes;
-    }
-
-    /**
      * creates the global biology object for the model
      *
      * @param random                the random number generator

@@ -24,7 +24,7 @@ public class TimeSeriesActuator implements Steppable
     /**
      * list containing the elements to set
      */
-    private final LinkedList<Double> timeSeries;
+    private final List<Double> timeSeries;
 
     /**
      * the function we are going to call
@@ -33,6 +33,10 @@ public class TimeSeriesActuator implements Steppable
 
     private Iterator<Double> iterator;
 
+    /**
+     * if we run out of things to read, do we start from the top?
+     */
+    private final boolean startOver;
 
     /**
      * helper static constructor for gas time series
@@ -51,8 +55,8 @@ public class TimeSeriesActuator implements Steppable
                         for(Port port : ports)
                             port.setGasPricePerLiter(nextPrice);
                     }
-                }
-        );
+                },
+                true);
 
     }
 
@@ -75,13 +79,15 @@ public class TimeSeriesActuator implements Steppable
                         for(ConstantWeather weather : weathers)
                             weather.setWindSpeed(windSpeed);
                     }
-                }
-        );
+                },
+                true);
 
     }
 
-    public TimeSeriesActuator(LinkedList<Double> timeSeries,
-                              Consumer<Double> actuator) {
+    public TimeSeriesActuator(
+            List<Double> timeSeries,
+            Consumer<Double> actuator, boolean startOver) {
+        this.startOver = startOver;
         Preconditions.checkArgument(timeSeries.size()>0);
 
         this.timeSeries = timeSeries;
@@ -97,8 +103,15 @@ public class TimeSeriesActuator implements Steppable
     {
 
         //starting or finished the list? start again!
-        if(iterator == null || !iterator.hasNext())
+        if(iterator == null)
             iterator= timeSeries.iterator();
+
+        if(!iterator.hasNext()) {
+            if (startOver)
+                iterator = timeSeries.iterator();
+            else
+                return;
+        }
 
         Double nextGasPrice = iterator.next();
         actuator.accept(nextGasPrice);

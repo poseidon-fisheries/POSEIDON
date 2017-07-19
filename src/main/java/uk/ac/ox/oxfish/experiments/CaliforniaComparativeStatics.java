@@ -4,11 +4,11 @@ import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
+ * THIS IS MOTHBALLED BECAUSE WE STOPPED DOING RESETS AT YEARS DIFFERENT FROM 1 (otherwise there would be subtle errors in the natural processes)
  * Created by carrknight on 6/10/17.
  */
 public class CaliforniaComparativeStatics {
@@ -33,6 +34,7 @@ public class CaliforniaComparativeStatics {
             Paths.get("docs", "20170606 cali_catchability_2", "results", "calicatch_2011_ignoring_narrow_4b.yaml");
     public static final int NUMBER_OF_RUNS = 30;
 
+    /*
     public static void mainGas(String[] args) throws IOException {
 
         List<Double> gasPricesAllowed = Lists.newArrayList(1.78d, 0.89d);
@@ -101,12 +103,12 @@ public class CaliforniaComparativeStatics {
 
         FishYAML yaml = new FishYAML();
         CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(yamlFile.toFile()), CaliforniaAbundanceScenario.class);
-        scenario.setGasPricePerLiter(new FixedDoubleParameter(gasPrice));
+        scenario.setGasPriceMaker(new FixedGasFactory(gasPrice));
         scenario.setResetBiologyAtYear(resetBiologyAtYear);
         state.setScenario(scenario);
 
         if(regulation!=null)
-            scenario.setRegulation(regulation);
+            scenario.setRegulationPreReset(regulation);
 
         state.start();
         while(state.getYear()<numberOfYears)
@@ -138,7 +140,7 @@ public class CaliforniaComparativeStatics {
         state.setScenario(scenario);
 
         if(regulation!=null)
-            scenario.setRegulation(regulation);
+            scenario.setRegulationPreReset(regulation);
 
         state.start();
         while(state.getYear()<numberOfYears)
@@ -148,5 +150,5 @@ public class CaliforniaComparativeStatics {
 
 
     }
-
+*/
 }

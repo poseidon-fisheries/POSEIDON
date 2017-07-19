@@ -45,6 +45,7 @@ import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.*;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
@@ -251,7 +252,7 @@ public class IndonesiaScenario implements Scenario {
                                        }
                                        },
                                    model,
-                                   gasPricePerLiter.apply(mapMakerRandom)
+                                   new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom))
         );
 
         //substitute back the original randomizer

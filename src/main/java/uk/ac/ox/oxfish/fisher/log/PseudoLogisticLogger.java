@@ -100,8 +100,9 @@ public class PseudoLogisticLogger implements TripListener {
                     switcher.getArm(
                             discretization.getGroup(
                                     record.getMostFishedTileInTrip())
-                    )
-            );
+                    ),
+                    state.getYear(),
+                    state.getDayOfTheYear());
         }
         assert !log.waitingForChoice();
         log.recordInput(inputter.getRegressionInput(fisher,state));

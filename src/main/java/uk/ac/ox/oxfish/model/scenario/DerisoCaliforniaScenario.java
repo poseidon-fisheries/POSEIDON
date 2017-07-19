@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.nio.file.Path;
@@ -87,7 +88,7 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
         super.setHourlyTravellingCosts(new FixedDoubleParameter((2789d-546d)/24d));
 
         //average gasoline prices in california was 2.166 gallons an hour in 2004
-        super.setGasPricePerLiter(new FixedDoubleParameter(0.476453195));
+        super.setGasPriceMaker(new FixedGasFactory(0.476453195));
 
         //prices are just annual revenues/landings in the noaa data-set for 2004
         super.setPriceMap(

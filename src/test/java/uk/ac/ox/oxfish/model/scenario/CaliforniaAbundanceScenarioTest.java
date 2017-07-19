@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -75,9 +76,10 @@ public class CaliforniaAbundanceScenarioTest {
         FishingSeasonFactory regulation = new FishingSeasonFactory();
         //no fishing whatsoever
         regulation.setSeasonLength(new FixedDoubleParameter(0));
-        scenario.setRegulation(regulation);
+        scenario.setRegulationPreReset(regulation);
+        scenario.setRegulationPostReset(regulation);
         scenario.getExogenousCatches().clear();
-        scenario.setResetBiologyAtYear(5);
+        scenario.setResetBiologyAtYear1(true);
 
         FishState state = new FishState(System.currentTimeMillis());
 
@@ -105,7 +107,9 @@ public class CaliforniaAbundanceScenarioTest {
         scenario.getExogenousCatches().clear();
         scenario.getExogenousCatches().put("Dover Sole", String.valueOf(12345678d));
 
-        scenario.setResetBiologyAtYear(1);
+        scenario.setResetBiologyAtYear1(true);
+   //     scenario.setRegulationPreReset(new AnarchyFactory());
+   //     scenario.setRegulationPostReset(new AnarchyFactory());
         FishState state = new FishState(System.currentTimeMillis());
 
         state.setScenario(scenario);
@@ -129,7 +133,7 @@ public class CaliforniaAbundanceScenarioTest {
                 );
 
             }
-        }, StepOrder.FISHER_PHASE, 364);
+        }, StepOrder.FISHER_PHASE, 363);
 
 
         state.scheduleOnceInXDays(new Steppable() {
@@ -142,7 +146,7 @@ public class CaliforniaAbundanceScenarioTest {
                 );
 
             }
-        }, StepOrder.FISHER_PHASE, 365);
+        }, StepOrder.FISHER_PHASE, 364);
 
 
         for (int i = 0; i < 366; i++)

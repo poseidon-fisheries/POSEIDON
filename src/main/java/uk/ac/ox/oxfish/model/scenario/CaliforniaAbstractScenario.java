@@ -23,7 +23,8 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.GarbageGearFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
+import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
+import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
@@ -48,17 +49,20 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaMapFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -72,6 +76,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by carrknight on 6/15/17.
@@ -93,7 +98,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
        * fuel efficiency per hour is 57l according to Toft et al
        */
     protected final static Double LITERS_OF_GAS_CONSUMED_PER_HOUR = 57d;
-    protected AlgorithmFactory<? extends Regulation> regulation =
+
+    private boolean resetBiologyAtYear1 = true;
+
+    protected AlgorithmFactory<? extends Regulation> regulationPostReset =
 
 
             //2011 numbers:
@@ -105,7 +113,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                      new Pair<>("Sablefish", 3077220d),
                                      new Pair<>("Shortspine thornyhead", 1481600.056d)
             );
-    private int resetBiologyAtYear = -1;
+
+
 
     {
         HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
@@ -114,10 +123,23 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         quotaExchangedPerMatch.put("Longspine Thornyhead", 500d);
         quotaExchangedPerMatch.put("Sablefish", 500d);
         quotaExchangedPerMatch.put("Shortspine thornyhead", 500d);
-        ((MultiQuotaMapFactory) regulation).setQuotaExchangedPerMatch(
+        ((MultiQuotaMapFactory) regulationPostReset).setQuotaExchangedPerMatch(
                 quotaExchangedPerMatch
         );
     }
+
+
+    /**
+     * regulation to use before the biology reset. (if there is no reset, then this regulation stands forever)
+     */
+    protected AlgorithmFactory<? extends Regulation> regulationPreReset =
+
+            new AnarchyFactory();
+
+
+
+    private AlgorithmFactory<? extends LogbookInitializer> logbook =
+            new NoLogbookFactory();
 
     /**
      * gear maker
@@ -164,9 +186,11 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     //kph 16.0661
     //liter per km : 57/16.0661
     private DoubleParameter literPerKilometer = new FixedDoubleParameter(3.547842974);
-    private DoubleParameter gasPricePerLiter =
-            //2011: 4.09$/gallon, we translate into liters
-            new FixedDoubleParameter(0.89991382);
+
+    private AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker =
+            new FixedGasFactory(0.89991382);
+
+
     /**
      * factory to produce departing strategy
      */
@@ -183,7 +207,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     }*/
 
     {
-            this.destinationStrategy = new BarebonesContinuousDestinationFactory();
+        this.destinationStrategy = new BarebonesContinuousDestinationFactory();
         CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
         discretizer.setFilePath(mainDirectory.resolve("logit").resolve("centroids_utm10N.csv").toString());
         discretizer.setAutomaticallyIgnoreWastelands(true);
@@ -194,7 +218,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 new FixedDoubleParameter(-0.0152236867527225)
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitIntercept(
-                new FixedDoubleParameter(0.00394629681249468)
+                new FixedDoubleParameter(0.172763449106076)
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitPeriodInDays(
                 new FixedDoubleParameter(365)
@@ -398,19 +422,32 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
             //set yourself up to reset the biology at the given year if needed
-            if(resetBiologyAtYear>0)
-                model.scheduleOnceAtTheBeginningOfYear(new Steppable() {
+            if(resetBiologyAtYear1) {
+                model.scheduleOnceInXDays(new Steppable() {
                     @Override
                     public void step(SimState simState) {
                         Log.info("Resetting all local biologies");
-                        for(Species current : biology.getSpecies()) {
+                        for (Species current : biology.getSpecies()) {
                             getBiologyInitializer().resetLocalBiology(current);
 
                         }
                     }
-                }, StepOrder.DAWN, resetBiologyAtYear);
+                }, StepOrder.DAWN, 364);
+                model.scheduleOnceAtTheBeginningOfYear(
+                        new Steppable() {
+                            @Override
+                            public void step(SimState simState) {
+                                Log.info("Resetting all rules");
 
+                                for(Fisher fisher : model.getFishers())
+                                    fisher.setRegulation(regulationPostReset.apply(model));
+                            }
+                        },
+                        StepOrder.DAWN,
+                        1
+                );
 
+            }
 
 
             if(Log.TRACE)
@@ -435,7 +472,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                         return markets;
 
                     },
-                    gasPricePerLiter.apply(model.getRandom()));
+                    gasPriceMaker.apply(model),
+                    model);
 
             for(Port port : numberOfFishersPerPort.keySet())
                 map.addPort(port);
@@ -499,7 +537,13 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         MersenneTwisterFast random = model.getRandom();
 
 
+        //create logbook initializer
+        LogbookInitializer log = logbook.apply(model);
+        log.start(model);
+
         int fisherCounter=0;
+        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(true,
+                                                                            biology);
         for(Map.Entry<Port,Integer> entry : numberOfFishersPerPort.entrySet())
 
             for(int id=0;id<entry.getValue();id++)
@@ -515,7 +559,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
                 Fisher newFisher = new Fisher(fisherCounter, entry.getKey(),
                                               random,
-                                              regulation.apply(model),
+                                              regulationPreReset.apply(model),
                                               departingStrategy.apply(model),
                                               destinationStrategy.apply(model),
                                               fishingStrategy.apply(model),
@@ -530,55 +574,13 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                               new Hold(capacity, biology),
                                               fisherGear, model.getSpecies().size());
                 fisherCounter++;
-                //predictors
-                for(Species species : model.getSpecies())
-                {
-
-                    //create the predictors
-
-                    newFisher.setDailyCatchesPredictor(species.getIndex(),
-                                                       MovingAveragePredictor.dailyMAPredictor(
-                                                               "Predicted Daily Catches of " + species,
-                                                               fisher1 ->
-                                                                       //check the daily counter but do not input new values
-                                                                       //if you were not allowed at sea
-                                                                       fisher1.getDailyCounter().getLandingsPerSpecie(
-                                                                               species.getIndex())
-
-                                                               ,
-                                                               365));
 
 
-
-
-                    newFisher.setProfitPerUnitPredictor(species.getIndex(), MovingAveragePredictor.perTripMAPredictor(
-                            "Predicted Unit Profit " + species,
-                            fisher1 -> fisher1.getLastFinishedTrip().getUnitProfitPerSpecie(species.getIndex()),
-                            30));
-
-
-
-                }
-
-
-                //daily profits predictor
-                newFisher.assignDailyProfitsPredictor(
-                        MovingAveragePredictor.dailyMAPredictor("Predicted Daily Profits",
-                                                                fisher ->
-                                                                        //check the daily counter but do not input new values
-                                                                        //if you were not allowed at sea
-                                                                        fisher.isAllowedAtSea() ?
-                                                                                fisher.getDailyCounter().
-                                                                                        getColumn(
-                                                                                                FisherYearlyTimeSeries.CASH_FLOW_COLUMN)
-                                                                                :
-                                                                                Double.NaN
-                                ,
-
-                                                                7));
+                predictorSetup.accept(newFisher);
 
                 fisherList.add(newFisher);
 
+                log.add(newFisher,model);
                 //add other trip costs
                 newFisher.getAdditionalTripCosts().add(
                         new HourlyCost(hourlyTravellingCosts.apply(random))
@@ -591,7 +593,15 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         //while the model is running
         FisherFactory fisherFactory = new FisherFactory(
                 () -> numberOfFishersPerPort.keySet().iterator().next(),
-                regulation,
+                new AlgorithmFactory<Regulation>() {
+                    @Override
+                    public Regulation apply(FishState state) {
+                        if(state.getYear()<1 || !resetBiologyAtYear1)
+                            return getRegulationPreReset().apply(state);
+                        else
+                            return getRegulationPostReset().apply(state);
+                    }
+                },
                 departingStrategy,
                 destinationStrategy,
                 fishingStrategy,
@@ -606,6 +616,15 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                 gear,
 
                 fisherCounter);
+        fisherFactory.getAdditionalSetups().add(predictorSetup);
+        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+            @Override
+            public void accept(Fisher fisher) {
+                log.add(fisher,model);
+            }
+        });
+
+
         if(fisherList.size() <=1)
             networkBuilder = new EmptyNetworkBuilder();
 
@@ -774,22 +793,24 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         this.literPerKilometer = literPerKilometer;
     }
 
+
     /**
-     * Getter for property 'gasPricePerLiter'.
+     * Getter for property 'gasPriceMaker'.
      *
-     * @return Value for property 'gasPricePerLiter'.
+     * @return Value for property 'gasPriceMaker'.
      */
-    public DoubleParameter getGasPricePerLiter() {
-        return gasPricePerLiter;
+    public AlgorithmFactory<? extends GasPriceMaker> getGasPriceMaker() {
+        return gasPriceMaker;
     }
 
     /**
-     * Setter for property 'gasPricePerLiter'.
+     * Setter for property 'gasPriceMaker'.
      *
-     * @param gasPricePerLiter Value to set for property 'gasPricePerLiter'.
+     * @param gasPriceMaker Value to set for property 'gasPriceMaker'.
      */
-    public void setGasPricePerLiter(DoubleParameter gasPricePerLiter) {
-        this.gasPricePerLiter = gasPricePerLiter;
+    public void setGasPriceMaker(
+            AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker) {
+        this.gasPriceMaker = gasPriceMaker;
     }
 
     public AlgorithmFactory<? extends Gear> getGear() {
@@ -886,18 +907,18 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @return Value for property 'regulation'.
      */
-    public AlgorithmFactory<? extends Regulation> getRegulation() {
-        return regulation;
+    public AlgorithmFactory<? extends Regulation> getRegulationPreReset() {
+        return regulationPreReset;
     }
 
     /**
      * Setter for property 'regulation'.
      *
-     * @param regulation Value to set for property 'regulation'.
+     * @param regulationPreReset Value to set for property 'regulation'.
      */
-    public void setRegulation(
-            AlgorithmFactory<? extends Regulation> regulation) {
-        this.regulation = regulation;
+    public void setRegulationPreReset(
+            AlgorithmFactory<? extends Regulation> regulationPreReset) {
+        this.regulationPreReset = regulationPreReset;
     }
 
     public boolean isUsePremadeInput() {
@@ -1018,21 +1039,60 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
     public abstract AllocatedBiologyInitializer getBiologyInitializer();
 
+
     /**
-     * Getter for property 'resetBiologyAtYear'.
+     * Getter for property 'logbook'.
      *
-     * @return Value for property 'resetBiologyAtYear'.
+     * @return Value for property 'logbook'.
      */
-    public int getResetBiologyAtYear() {
-        return resetBiologyAtYear;
+    public AlgorithmFactory<? extends LogbookInitializer> getLogbook() {
+        return logbook;
     }
 
     /**
-     * Setter for property 'resetBiologyAtYear'.
+     * Setter for property 'logbook'.
      *
-     * @param resetBiologyAtYear Value to set for property 'resetBiologyAtYear'.
+     * @param logbook Value to set for property 'logbook'.
      */
-    public void setResetBiologyAtYear(int resetBiologyAtYear) {
-        this.resetBiologyAtYear = resetBiologyAtYear;
+    public void setLogbook(
+            AlgorithmFactory<? extends LogbookInitializer> logbook) {
+        this.logbook = logbook;
+    }
+
+    /**
+     * Getter for property 'resetBiologyAtYear1'.
+     *
+     * @return Value for property 'resetBiologyAtYear1'.
+     */
+    public boolean isResetBiologyAtYear1() {
+        return resetBiologyAtYear1;
+    }
+
+    /**
+     * Setter for property 'resetBiologyAtYear1'.
+     *
+     * @param resetBiologyAtYear1 Value to set for property 'resetBiologyAtYear1'.
+     */
+    public void setResetBiologyAtYear1(boolean resetBiologyAtYear1) {
+        this.resetBiologyAtYear1 = resetBiologyAtYear1;
+    }
+
+    /**
+     * Getter for property 'regulationPostReset'.
+     *
+     * @return Value for property 'regulationPostReset'.
+     */
+    public AlgorithmFactory<? extends Regulation> getRegulationPostReset() {
+        return regulationPostReset;
+    }
+
+    /**
+     * Setter for property 'regulationPostReset'.
+     *
+     * @param regulationPostReset Value to set for property 'regulationPostReset'.
+     */
+    public void setRegulationPostReset(
+            AlgorithmFactory<? extends Regulation> regulationPostReset) {
+        this.regulationPostReset = regulationPostReset;
     }
 }

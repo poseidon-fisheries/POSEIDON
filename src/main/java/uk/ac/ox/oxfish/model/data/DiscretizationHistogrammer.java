@@ -46,7 +46,7 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
     public void reactToFinishedTrip(TripRecord record) {
         if(!effortCounter) {
             SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
-            if(mostFishedTileInTrip != null)
+            if(mostFishedTileInTrip != null && discretization.getGroup(mostFishedTileInTrip) != null)
                 counts[discretization.getGroup(mostFishedTileInTrip)]++;
         }
         else

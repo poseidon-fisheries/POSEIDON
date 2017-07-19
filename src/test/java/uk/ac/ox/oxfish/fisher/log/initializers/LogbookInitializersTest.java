@@ -60,7 +60,7 @@ public class LogbookInitializersTest {
         System.out.println(output);
 
         String[] entries = output.split("\n");
-        assertEquals(entries[0],"id,episode,option,choice,grid_x,grid_y,intercept");
+        assertEquals(entries[0],"id,episode,year,day,option,choice,grid_x,grid_y,intercept");
         entries[0] = "0,no"; //ignore the header now
         for(String entry : entries)
         {

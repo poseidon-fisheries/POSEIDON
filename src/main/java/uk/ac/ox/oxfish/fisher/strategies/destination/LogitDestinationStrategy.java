@@ -164,7 +164,9 @@ public class LogitDestinationStrategy implements DestinationStrategy{
             log.recordInput(input);
         int armChosen = classifier.choose(input, random);
         if(log!=null)
-            log.recordChoice(armChosen);
+            log.recordChoice(armChosen,
+                    state.getYear(),
+                             state.getDayOfTheYear());
 
 
         while (true) {

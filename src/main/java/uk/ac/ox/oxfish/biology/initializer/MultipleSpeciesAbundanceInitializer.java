@@ -126,6 +126,49 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
         return new Species(speciesName, meristics);
     }
 
+    /**
+     * for a specific species create the natural processes object (which will be returned)
+     * and register it as startable in the model
+     * @param model the model
+     * @param species the species you need the natural processes set up
+     * @param locals a map of all the areas where fish can live
+     * @param preserveLastAge
+     * @param yearDelay
+     * @param diffuser
+     * @return the already scheduled naturalProcesses object
+     */
+    public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
+            FishState model, Species species,
+            Map<SeaTile, AbundanceBasedLocalBiology> locals,
+            final boolean preserveLastAge, final int yearDelay,
+            final NoAbundanceDiffusion diffuser) {
+        //schedule recruitment and natural mortality
+        AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
+        SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
+                new NaturalMortalityProcess(),
+                yearDelay > 0 ?
+                        new RecruitmentBySpawningBiomassDelayed(
+                                species.getVirginRecruits(),
+                                species.getSteepness(),
+                                species.getCumulativePhi(),
+                                species.isAddRelativeFecundityToSpawningBiomass(),
+                                yearDelay) :
+                        new RecruitmentBySpawningBiomass(
+                                species.getVirginRecruits(),
+                                species.getSteepness(),
+                                species.getCumulativePhi(),
+                                species.isAddRelativeFecundityToSpawningBiomass()
+                        ),
+                species,
+                agingProcess, diffuser);
+
+        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
+            processes.add(entry.getValue(),entry.getKey());
+        }
+        model.registerStartable(processes);
+        return processes;
+    }
+
     public int[][] getInitialAbundance (Species species)
     {
         return initialAbundance.get(species);
@@ -234,8 +277,8 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 resetAllLocalBiologies(species, totalCount, currentWeightMap);
 
                 //start the natural process (use single species abundance since it's easier)
-                SingleSpeciesNaturalProcesses process = SingleSpeciesAbundanceInitializer.initializeNaturalProcesses(
-                        model, species, locals, preserveLastAge, 2, new NoAbundanceDiffusion());
+                SingleSpeciesNaturalProcesses process = initializeNaturalProcesses(
+                        model, species, locals, preserveLastAge, 0, new NoAbundanceDiffusion());
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(

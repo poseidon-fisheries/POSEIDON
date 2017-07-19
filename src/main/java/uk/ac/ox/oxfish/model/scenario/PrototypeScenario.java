@@ -46,6 +46,7 @@ import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
+import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
 import uk.ac.ox.oxfish.model.network.NetworkBuilder;
@@ -271,7 +272,9 @@ public class PrototypeScenario implements Scenario {
         //create random ports, all sharing the same market
         if(portPositionX == null || portPositionX < 0)
             RandomPortInitializer.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom,
-                                                      gasPricePerLiter.apply(mapMakerRandom));
+                                                      new FixedGasPrice(
+                                                              gasPricePerLiter.apply(mapMakerRandom)),
+                                                      model);
         else
         {
             Port port = new Port("Port 0", map.getSeaTile(portPositionX, portPositionY),

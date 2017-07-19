@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 
 import java.util.List;
 import java.util.Objects;
@@ -67,28 +68,32 @@ public class TwoPortsInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
-     * @param gasPrice
+     * @param gasPriceMaker
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map,
             MersenneTwisterFast mapmakerRandom,
-            Function<SeaTile, MarketMap> marketFactory, FishState model, double gasPrice) {
+            Function<SeaTile, MarketMap> marketFactory, FishState model,
+            GasPriceMaker gasPriceMaker) {
 
         //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 
         SeaTile first = map.getSeaTile(port1PositionX, port1PositionY);
         Port port1 = new Port(namePort1, first,
                              marketFactory.apply(first),
-                              gasPrice);
+                              gasPriceMaker.supplyInitialPrice(first,namePort1));
         map.addPort(port1);
 
         SeaTile second = map.getSeaTile(port2PositionX,port2PositionY);
         Port port2 = new Port(namePort2, second,
                               marketFactory.apply(second),
-                              gasPrice);
+                              gasPriceMaker.supplyInitialPrice(second,namePort2));
         map.addPort(port2);
+
+        gasPriceMaker.start(port1,model);
+        gasPriceMaker.start(port2,model);
 
         return Lists.newArrayList(port1,port2);
     }

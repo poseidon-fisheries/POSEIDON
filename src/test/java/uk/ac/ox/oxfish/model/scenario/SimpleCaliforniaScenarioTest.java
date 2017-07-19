@@ -63,7 +63,8 @@ public class SimpleCaliforniaScenarioTest {
         HashMap<String, String> exogenousCatches = new HashMap<>();
         exogenousCatches.put("Sablefish","8000000");
         scenario.setExogenousCatches(exogenousCatches);
-        scenario.setRegulation(new FishingSeasonFactory(0,true));
+        scenario.setRegulationPreReset(new FishingSeasonFactory(0, true));
+        scenario.setResetBiologyAtYear1(false);
 
 
         FishState state = new FishState(System.currentTimeMillis());

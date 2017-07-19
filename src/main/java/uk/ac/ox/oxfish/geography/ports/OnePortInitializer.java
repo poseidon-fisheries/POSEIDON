@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 
 import java.util.List;
 import java.util.function.Function;
@@ -41,16 +42,18 @@ public class OnePortInitializer implements PortInitializer {
      * @param mapmakerRandom the randomizer
      * @param marketFactory  a function that returns the market associated with a location. We might refactor this at some point*
      * @param model
-     * @param gasPrice
+     * @param gasPriceMaker
      * @return the list of ports that have been built and added to the map. It can be ignored.
      */
     @Override
     public List<Port> buildPorts(
             NauticalMap map, MersenneTwisterFast mapmakerRandom, Function<SeaTile, MarketMap> marketFactory,
-            FishState model, double gasPrice) {
+            FishState model, GasPriceMaker gasPriceMaker) {
         SeaTile here = map.getSeaTile(portPositionX, portPositionY);
         Port port = new Port("Port 0", here,
-                             marketFactory.apply(here), gasPrice);
+                             marketFactory.apply(here),
+                             gasPriceMaker.supplyInitialPrice(here,"Port 0"));
+        gasPriceMaker.start(port,model);
 
         map.addPort(port);
 

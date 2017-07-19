@@ -6,7 +6,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +36,8 @@ public class PortReader {
      */
     public LinkedHashMap<Port,Integer> readFile(
             Path pathToFile, NauticalMap map,
-            Function<SeaTile,MarketMap> marketmap, double gasPrice)
+            Function<SeaTile, MarketMap> marketmap,
+            GasPriceMaker gasPriceMaker, FishState model)
             throws IOException {
 
         List<String> fileLines = Files.readAllLines(pathToFile);
@@ -75,7 +78,10 @@ public class PortReader {
                                     location = correctLocation(location,map,portName);
 
                                     //build the port
-                                    return new Port(portName,location,marketmap.apply(location),gasPrice);
+                                    Port toReturn = new Port(portName, location, marketmap.apply(location),
+                                                          gasPriceMaker.supplyInitialPrice(location,portName));
+                                    gasPriceMaker.start(toReturn,model);
+                                    return toReturn;
                                 }
                             });
             toReturn.put(port,Integer.parseInt(splitLine[1]));

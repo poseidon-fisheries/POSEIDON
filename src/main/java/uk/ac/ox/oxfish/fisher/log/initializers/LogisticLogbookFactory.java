@@ -42,6 +42,8 @@ public class LogisticLogbookFactory
 
     private int periodHabit = -1;
 
+    private int periodHabitContinuous = -1;
+
     /**
      * useful (in fact, needed) if you have multiple logbooks running at once!
      */
@@ -150,6 +152,15 @@ public class LogisticLogbookFactory
         {
             extractors.add(new PeriodHabitBooleanExtractor(discretized, periodHabit));
             names.add("habit");
+            //the logit discretized memory this extractor depends on is produced by
+            // LogistiLogbookInitializer
+
+        }
+
+        if(periodHabitContinuous>0)
+        {
+            extractors.add(new PeriodHabitContinuousExtractor(discretized, periodHabitContinuous));
+            names.add("habit_continuous");
             //the logit discretized memory this extractor depends on is produced by
             // LogistiLogbookInitializer
 
@@ -409,6 +420,24 @@ public class LogisticLogbookFactory
      */
     public void setPeriodHabit(int periodHabit) {
         this.periodHabit = periodHabit;
+    }
+
+    /**
+     * Getter for property 'periodHabitContinuous'.
+     *
+     * @return Value for property 'periodHabitContinuous'.
+     */
+    public int getPeriodHabitContinuous() {
+        return periodHabitContinuous;
+    }
+
+    /**
+     * Setter for property 'periodHabitContinuous'.
+     *
+     * @param periodHabitContinuous Value to set for property 'periodHabitContinuous'.
+     */
+    public void setPeriodHabitContinuous(int periodHabitContinuous) {
+        this.periodHabitContinuous = periodHabitContinuous;
     }
 
     public String getIdentifier() {
