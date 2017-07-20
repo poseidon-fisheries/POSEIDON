@@ -42,7 +42,7 @@ public class  BuildSampleInputs
         {
             String name = Scenarios.SCENARIOS.inverse().get(scenario);
             final Path file = directory.resolve(name+ ".yaml");
-            final String dump = yaml.dump(scenario);
+            final String dump = yaml.dump(scenario.get());
             FileWriter writer = new FileWriter(file.toFile());
             if(Objects.equals(name, "Prototype"))
             {

@@ -4,7 +4,6 @@ import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
@@ -21,13 +20,26 @@ import java.util.Optional;
 public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulation>{
 
 
-    private boolean itq=true;
 
     private HashMap<String,Double> initialQuotas = new HashMap<>();
 
     private String convertedInitialQuotas;
 
     private String convertedQuotaExchangedPerMatch;
+
+    public enum QuotaType {
+
+
+        ITQ,
+
+        TAC,
+
+        IQ
+
+
+    }
+
+    private QuotaType quotaType = QuotaType.ITQ;
 
     /**
      * the size of quota units (kg) traded each match;
@@ -45,13 +57,15 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
     private MultiTACStringFactory tacFactory  = new MultiTACStringFactory();
 
+    private MultiIQStringFactory iqFactory = new MultiIQStringFactory();
+
 
     public MultiQuotaMapFactory() {
     }
 
-    public MultiQuotaMapFactory(boolean itq, Pair<String,Double>... pairs) {
+    public MultiQuotaMapFactory(QuotaType quotaType, Pair<String,Double>... pairs) {
 
-        this.itq = itq;
+        this.quotaType = quotaType;
         for(Pair<String,Double> pair : pairs)
             initialQuotas.put(pair.getFirst(),pair.getSecond());
     }
@@ -97,13 +111,6 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
 
 
-    public boolean isItq() {
-        return itq;
-    }
-
-    public void setItq(boolean itq) {
-        this.itq = itq;
-    }
 
     /**
      * Applies this function to the given argument.
@@ -119,62 +126,47 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
             itqFactory.setYearlyQuotaMaps(convertedInitialQuotas);
             tacFactory.setYearlyQuotaMaps(convertedInitialQuotas);
+            iqFactory.setYearlyQuotaMaps(convertedInitialQuotas);
         }
         assert convertedInitialQuotas!=null;
 
 
+        switch(quotaType){
+            case ITQ:
+                if(convertedQuotaExchangedPerMatch == null)
+                {
+                    convertedQuotaExchangedPerMatch = representMapAsString(fishState.getSpecies(),quotaExchangedPerMatch);
+                    itqFactory.setMinimumQuotaTraded(convertedQuotaExchangedPerMatch);
 
-        if(itq) {
-            if(convertedQuotaExchangedPerMatch == null)
-            {
-                convertedQuotaExchangedPerMatch = representMapAsString(fishState.getSpecies(),quotaExchangedPerMatch);
-                itqFactory.setMinimumQuotaTraded(convertedQuotaExchangedPerMatch);
+                }
+                assert convertedQuotaExchangedPerMatch!=null;
 
-            }
-            assert convertedQuotaExchangedPerMatch!=null;
+                itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
+                MultiQuotaRegulation regulation = itqFactory.apply(fishState);
+                //set up a startable that divide it by the number of fishers
+                fishState.registerStartable(new ITQScaler(regulation));
+                return regulation;
 
-            itqFactory.setAllowMultipleTrades(multipleTradesAllowed);
-            MultiQuotaRegulation regulation = itqFactory.apply(fishState);
-            //set up a startable that divide it by the number of fishers
-            fishState.registerStartable(new ITQScaler(regulation));
-            return regulation;
+            case TAC:
+                return tacFactory.apply(fishState);
+            case IQ:
+                MultiQuotaRegulation iq = iqFactory.apply(fishState); //create but scale
+                fishState.registerStartable(new ITQScaler(iq));
+                return iq;
+            default:
+                throw new RuntimeException("Not a valid quota type was supplied: " + quotaType);
+
         }
-        else
-            return tacFactory.apply(fishState);
+
+
+
+
 
 
 
 
     }
 
-
-    static class ITQScaler implements Startable
-    {
-
-        private final MultiQuotaRegulation toScale;
-
-        public ITQScaler(MultiQuotaRegulation toScale) {
-            this.toScale = toScale;
-        }
-
-        @Override
-        public void start(FishState model) {
-            for (int i = 0; i < model.getSpecies().size(); i++) {
-                double availableQuota = toScale.getQuotaRemaining(i);
-                if (Double.isFinite(availableQuota))
-                    toScale.setYearlyQuota(i,
-                                              availableQuota /
-                                                      model.getNumberOfFishers());
-            }
-
-        }
-
-        @Override
-        public void turnOff() {
-
-        }
-
-    }
 
     public boolean isMultipleTradesAllowed() {
         return multipleTradesAllowed;
@@ -227,5 +219,26 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      */
     public String getConvertedQuotaExchangedPerMatch() {
         return convertedQuotaExchangedPerMatch;
+    }
+
+
+
+
+    /**
+     * Getter for property 'quotaType'.
+     *
+     * @return Value for property 'quotaType'.
+     */
+    public QuotaType getQuotaType() {
+        return quotaType;
+    }
+
+    /**
+     * Setter for property 'quotaType'.
+     *
+     * @param quotaType Value to set for property 'quotaType'.
+     */
+    public void setQuotaType(QuotaType quotaType) {
+        this.quotaType = quotaType;
     }
 }

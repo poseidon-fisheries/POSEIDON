@@ -58,7 +58,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Safe Everywhere
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -122,14 +122,27 @@ Florida Longliner:
   coefficientsFile: temp_wfs/longline.csv
   coefficientsStandardDeviationFile: temp_wfs/longline_dummy.csv
 -------
-Florida Bare Bones:
+Boolean Bare Bones:
   discretizer:
     Centroid File Discretization:
+      automaticallyIgnoreWastelands: false
       filePath: temp_wfs/areas.txt
       xColumnName: eastings
       yColumnName: northings
   distanceInKm: '-0.00759009'
   habitIntercept: '2.53163185'
+  habitPeriodInDays: '90.0'
+-------
+Continuous Bare Bones:
+  discretizer:
+    Centroid File Discretization:
+      automaticallyIgnoreWastelands: false
+      filePath: temp_wfs/areas.txt
+      xColumnName: eastings
+      yColumnName: northings
+  distanceInKm: '-0.00759009'
+  habitIntercept: '2.53163185'
+  habitPeriodInDays: '90.0'
 -------
 Perfect RPUE Logit:
   discretizer: Identity Discretization

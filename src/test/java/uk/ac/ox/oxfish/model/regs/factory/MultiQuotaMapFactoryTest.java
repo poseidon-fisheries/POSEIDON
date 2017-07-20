@@ -2,13 +2,28 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
+import javafx.collections.ObservableList;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
+
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -52,15 +67,43 @@ public class MultiQuotaMapFactoryTest {
 
 
 
-        factory.setItq(true);
+        factory.setQuotaType(MultiQuotaMapFactory.QuotaType.ITQ);
 
+        verify(state,never()).registerStartable(any(ITQScaler.class));
         MultiQuotaRegulation apply = factory.apply(state);
         Log.info("the test read the following string: " + factory.getConvertedInitialQuotas());
 
         assertEquals(apply.getQuotaRemaining(0),1000d,.001);
         assertEquals(apply.getQuotaRemaining(2),10d,.001);
         //i am going to force the itq scaler to start
-        MultiQuotaMapFactory.ITQScaler scaler = new MultiQuotaMapFactory.ITQScaler(apply);
+        ITQScaler scaler = new ITQScaler(apply);
+        scaler.start(state);
+        assertEquals(apply.getQuotaRemaining(0),10,.001);
+        assertEquals(apply.getQuotaRemaining(2),0.1,.001);
+        assertEquals(apply.getYearlyQuota()[0],10,.001);
+        assertEquals(apply.getYearlyQuota()[2],0.1,.001);
+
+    }
+
+
+    @Test
+    public void multiIQ() throws Exception
+    {
+
+        FishYAML yaml = new FishYAML();
+        Log.info("This test tries to read \n" + yaml.dump(factory) + "\n as an IQ quota");
+
+
+        factory.setQuotaType(MultiQuotaMapFactory.QuotaType.IQ);
+
+        MultiQuotaRegulation apply = factory.apply(state);
+        Log.info("the test read the following string: " + factory.getConvertedInitialQuotas());
+        verify(state).registerStartable(any(ITQScaler.class));
+
+        assertEquals(apply.getQuotaRemaining(0),1000d,.001);
+        assertEquals(apply.getQuotaRemaining(2),10d,.001);
+        //i am going to force the itq scaler to start
+        ITQScaler scaler = new ITQScaler(apply);
         scaler.start(state);
         assertEquals(apply.getQuotaRemaining(0),10,.001);
         assertEquals(apply.getQuotaRemaining(2),0.1,.001);
@@ -77,9 +120,11 @@ public class MultiQuotaMapFactoryTest {
         FishYAML yaml = new FishYAML();
         Log.info("This test tries to read \n" + yaml.dump(factory) + "\n as a TAC quota");
 
-        factory.setItq(false);
+        factory.setQuotaType(MultiQuotaMapFactory.QuotaType.TAC);
 
         MultiQuotaRegulation apply = factory.apply(state);
+        verify(state,never()).registerStartable(any(ITQScaler.class));
+
         Log.info("the test read the following string: " + factory.getConvertedInitialQuotas());
         assertEquals(1000d,apply.getYearlyQuota()[0],.0001);
         assertEquals(10d,apply.getYearlyQuota()[2],.0001);
@@ -90,4 +135,86 @@ public class MultiQuotaMapFactoryTest {
 
 
     }
+
+    @Test
+    public void scalesCorrectlyIQ() throws Exception
+    {
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(2);
+        scenario.setBiologyInitializer(new FromLeftToRightFactory());
+        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+        map.setHeight(new FixedDoubleParameter(4));
+        map.setWidth(new FixedDoubleParameter(4));
+        map.setMaxLandWidth(new FixedDoubleParameter(1));
+        scenario.setMapInitializer(map);
+
+        FishState model = new FishState();
+        model.setScenario(scenario);
+        MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
+                MultiQuotaMapFactory.QuotaType.IQ,
+                new Pair<>("Species 0",100.0)
+        );
+        scenario.setRegulation(factory);
+
+        //should divide the quota in half!
+        model.start();
+        model.schedule.step(model);
+        Fisher fisher = model.getFishers().get(0);
+        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+                fisher,
+                model.getSpecies().get(0),
+                model
+        ), 50.0, FishStateUtilities.EPSILON);
+        fisher = model.getFishers().get(1);
+        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+                fisher,
+                model.getSpecies().get(0),
+                model
+        ),50.0,FishStateUtilities.EPSILON);
+
+
+    }
+
+    @Test
+    public void scalesCorrectlyITQ() throws Exception
+    {
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(2);
+        scenario.setBiologyInitializer(new FromLeftToRightFactory());
+        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+        map.setHeight(new FixedDoubleParameter(4));
+        map.setWidth(new FixedDoubleParameter(4));
+        map.setMaxLandWidth(new FixedDoubleParameter(1));
+        scenario.setMapInitializer(map);
+
+        FishState model = new FishState();
+        model.setScenario(scenario);
+        MultiQuotaMapFactory factory = new MultiQuotaMapFactory(
+                MultiQuotaMapFactory.QuotaType.ITQ,
+                new Pair<>("Species 0",100.0)
+        );
+        HashMap<String, Double> quotaExchangedPerMatch = new HashMap<>();
+        quotaExchangedPerMatch.put("Species 0", 200.0);
+        factory.setQuotaExchangedPerMatch(quotaExchangedPerMatch);
+        scenario.setRegulation(factory);
+
+        //should divide the quota in half!
+        model.start();
+        model.schedule.step(model);
+        Fisher fisher = model.getFishers().get(0);
+        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+                fisher,
+                model.getSpecies().get(0),
+                model
+        ), 50.0, FishStateUtilities.EPSILON);
+        fisher = model.getFishers().get(1);
+        assertEquals(fisher.getRegulation().maximumBiomassSellable(
+                fisher,
+                model.getSpecies().get(0),
+                model
+        ),50.0,FishStateUtilities.EPSILON);
+
+
+    }
+
 }

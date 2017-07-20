@@ -16,3 +16,10 @@ Moving Average Congested Market:
   demandSlope: '0.001'
   observationWindow: '30.0'
 -------
+Three Prices Market:
+  highAgeThreshold: '10.0'
+  lowAgeThreshold: '1.0'
+  priceAboveThresholds: '10.0'
+  priceBelowThreshold: '10.0'
+  priceBetweenThresholds: '10.0'
+-------

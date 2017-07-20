@@ -125,10 +125,36 @@ Two Species Box:
   ratioFirstToSecondSpecies: '1.0'
   species0InsideTheBox: false
 -------
-Single Species Abundance:
+Single Species Abundance From Directory:
   folderPath: inputs/california/biology/Dover Sole/
-  scaling: 0.1
+  scaling: 1.0
   speciesName: Dover Sole
+-------
+Single Species Abundance:
+  aging:
+    Proportional Aging:
+      proportionAging: '0.2'
+  diffuser: No Diffusion
+  habitabilityAllocator: Equal Allocation
+  initialAbundanceAllocator: Equal Allocation
+  initialAbundanceFactory:
+    Abundance From List:
+      fishPerBinPerSex:
+      - 10000000
+      - 1000000
+      - 10000
+  meristics:
+    Weight List Meristics:
+      maturityPerBin: 0,0.5,1
+      mortalityRate: '0.08'
+      weightsPerBin: .1,1,5
+  recruitAllocator: Equal Allocation
+  recruitment:
+    Logistic Recruitment:
+      carryingCapacity: '1.0E8'
+      malthusianParameter: '0.6'
+  scaling: '1.0'
+  speciesName: Red Fish
 -------
 One Species School:
   biomassEach: '10000.0'

@@ -78,11 +78,12 @@ public class MetaInspector extends Inspector
                                     new MarketWidgetBuilder(toSyncAgainst),
                                     new GeographicalRegressionWidget(toSyncAgainst),
                                     new DiscretizationWidget(toSyncAgainst),
+                                    new EnumWidgetBuilder(),
+                                    new PathWidgetBuilder(),
+                                    new HashMapWidgetBuilder(),
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
-                                    new SwingWidgetBuilder(),
-                                    new PathWidgetBuilder(),
-                                    new HashMapWidgetBuilder()
+                                    new SwingWidgetBuilder()
                             )
             );
             widget.setWidgetBuilder(composite);
@@ -91,11 +92,12 @@ public class MetaInspector extends Inspector
             CompositeWidgetBuilder<JComponent, SwingMetawidget> composite = new CompositeWidgetBuilder<>(
                     new CompositeWidgetBuilderConfig<JComponent, SwingMetawidget>().
                             setWidgetBuilders(
+                                    new EnumWidgetBuilder(),
+                                    new PathWidgetBuilder(),
+                                    new HashMapWidgetBuilder(),
                                     new OverriddenWidgetBuilder(),
                                     new ReadOnlyWidgetBuilder(),
-                                    new SwingWidgetBuilder(),
-                                    new PathWidgetBuilder(),
-                                    new HashMapWidgetBuilder()
+                                    new SwingWidgetBuilder()
                             )
             );
             widget.setWidgetBuilder(composite);

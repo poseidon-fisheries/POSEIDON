@@ -52,6 +52,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
+import uk.ac.ox.oxfish.model.market.gas.CsvTimeSeriesGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasFactory;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
@@ -105,7 +106,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
             //2011 numbers:
-            new MultiQuotaMapFactory(true,
+            new MultiQuotaMapFactory(MultiQuotaMapFactory.QuotaType.ITQ,
                                      new Pair<>("Yelloweye rockfish", 600d),
                                      //        new Pair<>("Canary rockfish",41100d),
                                      new Pair<>("Dover sole", 22234500d),
@@ -190,6 +191,16 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     private AlgorithmFactory<? extends GasPriceMaker> gasPriceMaker =
             new FixedGasFactory(0.89991382);
 
+    {
+        //read from data!
+        gasPriceMaker = new CsvTimeSeriesGasFactory();
+        ((CsvTimeSeriesGasFactory) gasPriceMaker).setScaling(0.219969157);
+        ((CsvTimeSeriesGasFactory) gasPriceMaker).setLoopThroughTheCSV(false);
+        ((CsvTimeSeriesGasFactory) gasPriceMaker).setCsvFile(
+                Paths.get("inputs","california","2010_gasprice.csv")
+        );
+
+    }
 
     /**
      * factory to produce departing strategy
@@ -206,6 +217,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         ((PerTripImitativeDestinationFactory) destinationStrategy).setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
     }*/
 
+    //pre-ITQ:
+    /*
     {
         this.destinationStrategy = new BarebonesContinuousDestinationFactory();
         CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
@@ -219,6 +232,27 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitIntercept(
                 new FixedDoubleParameter(0.172763449106076)
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitPeriodInDays(
+                new FixedDoubleParameter(365)
+        );
+
+    }
+    */
+    //post-ITQ:
+    {
+        this.destinationStrategy = new BarebonesContinuousDestinationFactory();
+        CentroidMapFileFactory discretizer = new CentroidMapFileFactory();
+        discretizer.setFilePath(mainDirectory.resolve("logit").resolve("centroids_utm10N.csv").toString());
+        discretizer.setAutomaticallyIgnoreWastelands(true);
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setDiscretizer(
+                discretizer
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setDistanceInKm(
+                new FixedDoubleParameter(-0.0135515257873626)
+        );
+        ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitIntercept(
+                new FixedDoubleParameter(0.282719257782064)
         );
         ((BarebonesContinuousDestinationFactory) destinationStrategy).setHabitPeriodInDays(
                 new FixedDoubleParameter(365)

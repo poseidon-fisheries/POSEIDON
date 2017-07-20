@@ -1,4 +1,5 @@
 Abstract 2 Populations:
+  allowFriendshipsBetweenPorts: false
   allowTwoPopulationFriendships: false
   biologyInitializer:
     Diffusing Logistic:

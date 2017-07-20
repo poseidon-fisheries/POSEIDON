@@ -74,7 +74,6 @@ public class ProportionalQuotaPriceGenerator  implements PriceGenerator, Steppab
     public void start(FishState model, Fisher fisher) {
         this.fisher = fisher;
         this.state = model;
-        assert model.getSpecies().size() > 1; //more than one specie or  you are better off using just Monoquota
 
         receipt = model.scheduleEveryDay(this, StepOrder.AGGREGATE_DATA_GATHERING);
 

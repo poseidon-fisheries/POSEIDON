@@ -118,7 +118,9 @@ import os
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170619 matt/general/"
 
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
+
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 

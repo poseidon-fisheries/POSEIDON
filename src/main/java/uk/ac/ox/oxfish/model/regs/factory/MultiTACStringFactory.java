@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -46,9 +45,8 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
                                      new Supplier<MultiQuotaRegulation>() {
                                          @Override
                                          public MultiQuotaRegulation get() {
-                                             return  createInstance(state.getRandom(),
-                                                                    state.getSpecies().size(),
-                                                                    state);
+                                             return  createInstance(
+                                                     state, MultiTACStringFactory.this.yearlyQuotaMaps);
                                          }
                                      });
 
@@ -60,8 +58,8 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
 
 
 
-    private MultiQuotaRegulation createInstance(MersenneTwisterFast random, int numberOfSpecies,
-                                                FishState state)
+    public static MultiQuotaRegulation createInstance(
+            FishState state, final String yearlyQuotaMaps)
     {
 
         double[] quotas = turnStringIntoQuotaArray(state, yearlyQuotaMaps);

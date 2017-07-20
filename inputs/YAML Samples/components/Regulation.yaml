@@ -72,10 +72,10 @@ Kitchen Sink:
 Multi-Quotas from Map:
   initialQuotas: {
     }
-  itq: true
   multipleTradesAllowed: false
   quotaExchangedPerMatch: {
     }
+  quotaType: ITQ
 -------
 Single Species Threshold Taxation:
   biomassThreshold: '5000000.0'
