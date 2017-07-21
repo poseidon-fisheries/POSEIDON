@@ -1,0 +1,3 @@
+conversion was carried out from here:
+http://www.zonums.com/online/coords/cotrans.php?module=13
+Assuming we wanted a 10N UTM projection
