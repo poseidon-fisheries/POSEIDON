@@ -120,7 +120,8 @@ import os
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
 
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration_noprofits/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
@@ -175,6 +176,9 @@ def run_experiment(input2yaml,
 
 # find the experiment name and create directory from it
 def main():
+    import sys
+    print(sys.path)
+
     import json
     os.chdir(EXPERIMENT_DIRECTORY)
     experiment_name = json.load(open("config.json"))["experiment-name"]
