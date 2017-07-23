@@ -281,7 +281,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
     //these prices are averages from the catcher vessel report
     //2010
-    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502"
+    private String priceMap = "Dover Sole:0.6698922,Sablefish:4.3235295," +
+            "Shortspine Thornyhead:1.0428510," +
+            "Longspine Thornyhead:1.0428510," +
+            "Yelloweye Rockfish:1.0754502"
             +"," + MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME+":1.7646181"
 
             ;

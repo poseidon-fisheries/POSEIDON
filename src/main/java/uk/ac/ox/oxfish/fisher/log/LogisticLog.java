@@ -64,6 +64,10 @@ public class LogisticLog {
     }
 
 
+    public void reset(){
+        lastInput = null;
+    }
+
     /**
      * Getter for property 'data'.
      *

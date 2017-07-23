@@ -1,9 +1,10 @@
 package uk.ac.ox.oxfish.fisher.log;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
@@ -95,14 +96,29 @@ public class PseudoLogisticLogger implements TripListener {
     {
         //if we recorded an input at the end of the last trip, now we reveal the choice
         if(log.waitingForChoice()) {
-            //you have to turn the tile fished into the map group first and then from that to the bandit arm
-            log.recordChoice(
-                    switcher.getArm(
-                            discretization.getGroup(
-                                    record.getMostFishedTileInTrip())
-                    ),
-                    state.getYear(),
-                    state.getDayOfTheYear());
+            if(record.getMostFishedTileInTrip()== null)
+            {
+                log.reset();
+            }
+            else {
+                Preconditions.checkArgument(log != null);
+                Preconditions.checkArgument(switcher != null);
+                Preconditions.checkArgument(discretization != null);
+                Preconditions.checkArgument(record.getMostFishedTileInTrip() != null);
+                Preconditions.checkArgument(discretization.getGroup(
+                        record.getMostFishedTileInTrip()) != null);
+                Preconditions.checkArgument(switcher.getArm(discretization.getGroup(
+                        record.getMostFishedTileInTrip())) != null);
+                //you have to turn the tile fished into the map group first and then from that to the bandit arm
+                log.recordChoice(
+                        switcher.getArm(
+                                discretization.getGroup(
+                                        record.getMostFishedTileInTrip())
+                        ),
+                        state.getYear(),
+                        state.getDayOfTheYear());
+            }
+
         }
         assert !log.waitingForChoice();
         log.recordInput(inputter.getRegressionInput(fisher,state));

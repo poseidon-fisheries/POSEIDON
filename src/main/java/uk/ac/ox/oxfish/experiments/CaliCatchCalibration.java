@@ -13,8 +13,7 @@ import java.nio.file.Paths;
 /**
  * Created by carrknight on 3/31/17.
  */
-public class CaliCatchCalibration
-{
+public class CaliCatchCalibration {
 
 
     public static final int RUNS = 1000;
@@ -23,7 +22,7 @@ public class CaliCatchCalibration
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170730 validation", "best");
     public static final int YEARS_PER_RUN = 5;
 
-    public static void  main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
   /*      runMultipleTimesToBuildHistogram("calicatch_nsga_10000");
         runMultipleTimesToBuildHistogram("calicatch_nsga");
         runMultipleTimesToBuildHistogram("calicatch_dover");
@@ -36,28 +35,37 @@ public class CaliCatchCalibration
         //runMultipleTimesToBuildHistogram("calicatch_2011_ignoring_narrow");
         //runMultipleTimesToBuildHistogram("calicatch_2011_ignoring_narrow_2");
         //runMultipleTimesToBuildHistogram("calicatch_2011_simple_profits");
-      //  runMultipleTimesToBuildHistogram("calicatch_2011_simple_profits2");
+        //  runMultipleTimesToBuildHistogram("calicatch_2011_simple_profits2");
         //runMultipleTimesToBuildHistogram("calicatch_2011_ignoring_narrow_enlarged");
         //runMultipleTimesToBuildHistogram("calicatch_2011_ignoring");
 
 
-
-      //  runMultipleTimesToBuildHistogram("itq_only_profits");
-        runMultipleTimesToBuildHistogram("itq_only_noprofits_130");
+        //  runMultipleTimesToBuildHistogram("itq_only_profits");
+        // runMultipleTimesToBuildHistogram("itq_only_noprofits_130");
+        //runMultipleTimesToBuildHistogram("itq_only_fixedrecruitment");
+//        runMultipleTimesToBuildHistogram("attainment");
+        //runMultipleTimesToBuildHistogram("attainment_530");
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb");
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb2");
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb3");
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb4");
+        runMultipleTimesToBuildHistogram("attainment_530_dumb5");
+        //runMultipleTimesToBuildHistogram("attainment_prop");
+        //runMultipleTimesToBuildHistogram("profit_prop_137");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
         //write header
         FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve(input + ".csv").toFile());
-        writer.write("year,run,average_profits,hours_out,sole,sablefish,short_thornyheads,long_thornyheads,rockfish");
+        writer.write(
+                "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish");
         writer.write("\n");
         writer.flush();
 
 
-        for(int run = 0; run<RUNS; run++)
-        {
+        for (int run = 0; run < RUNS; run++) {
 
-            FishYAML yaml  = new FishYAML();
+            FishYAML yaml = new FishYAML();
             Scenario scenario = yaml.loadAs(new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
                                             Scenario.class);
 
@@ -66,21 +74,25 @@ public class CaliCatchCalibration
 
             //run the model
             state.start();
-            while(state.getYear()< YEARS_PER_RUN) {
+            state.schedule.step(state);
+            state.schedule.step(state);
+
+            while (state.getYear() < YEARS_PER_RUN) {
                 state.schedule.step(state);
-                if(state.getDayOfTheYear()==1)
-                    writer.write(state.getYear() + "," + run +"," +
-                            state.getLatestYearlyObservation("Average Cash-Flow") + ","+
-                                    state.getLatestYearlyObservation("Average Hours Out") + ","+
-                                    state.getLatestYearlyObservation("Dover Sole Landings") + ","+
-                                    state.getLatestYearlyObservation("Sablefish Landings") + ","+
-                                    state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + ","+
-                                    state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
-                                    state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "\n"
+                if (state.getDayOfTheYear() == 1)
+                    writer.write(state.getYear() + "," + run + "," +
+                                         state.getLatestYearlyObservation("Average Cash-Flow") + "," +
+                                         state.getLatestYearlyObservation("Average Hours Out") + "," +
+                                         state.getLatestYearlyObservation("Dover Sole Landings") + "," +
+                                         state.getLatestYearlyObservation("Sablefish Landings") + "," +
+                                         state.getLatestYearlyObservation("Sablefish Catches") + "," +
+                                         state.getLatestYearlyObservation("Biomass Sablefish") + "," +
+                                         state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + "," +
+                                         state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
+                                         state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "\n"
                     );
             }
             state.schedule.step(state);
-
 
 
             writer.flush();
