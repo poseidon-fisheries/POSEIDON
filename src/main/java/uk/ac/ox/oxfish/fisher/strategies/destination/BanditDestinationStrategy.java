@@ -79,9 +79,11 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     public void choose(SeaTile lastDestination, double reward, MersenneTwisterFast random){
 
 
-        int armPlayed = fromMapGroupToBanditArm(discretization.getGroup(lastDestination));
-        algorithm.observeReward(reward,armPlayed);
-
+        Integer group = discretization.getGroup(lastDestination);
+        if(group!= null) {
+            int armPlayed = fromMapGroupToBanditArm(group);
+            algorithm.observeReward(reward, armPlayed);
+        }
         //make new decision
         int armToPlay = algorithm.chooseArm(random);
         int groupToFishIn = fromBanditArmToMapGroup(armToPlay);

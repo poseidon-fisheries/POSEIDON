@@ -96,7 +96,8 @@ public class PseudoLogisticLogger implements TripListener {
     {
         //if we recorded an input at the end of the last trip, now we reveal the choice
         if(log.waitingForChoice()) {
-            if(record.getMostFishedTileInTrip()== null)
+            if(record.getMostFishedTileInTrip()== null || discretization.getGroup(
+                    record.getMostFishedTileInTrip()) == null)
             {
                 log.reset();
             }
