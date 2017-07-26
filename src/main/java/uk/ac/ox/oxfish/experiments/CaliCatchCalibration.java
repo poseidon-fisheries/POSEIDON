@@ -48,8 +48,9 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("attainment_530_dumb");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb2");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb3");
-        //runMultipleTimesToBuildHistogram("attainment_530_dumb4");
-        runMultipleTimesToBuildHistogram("attainment_530_dumb5");
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb4"+);
+        //runMultipleTimesToBuildHistogram("attainment_530_dumb5");
+        runMultipleTimesToBuildHistogram("kernel_101");
         //runMultipleTimesToBuildHistogram("attainment_prop");
         //runMultipleTimesToBuildHistogram("profit_prop_137");
     }
