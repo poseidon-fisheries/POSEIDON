@@ -1,14 +1,13 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -57,7 +56,9 @@ public class AlwaysDiscardTheseSpecies implements DiscardingStrategy {
             SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
             MersenneTwisterFast random) {
 
-        Preconditions.checkArgument(!fishCaught.hasAbundanceInformation(), "not coded for abudance!");
+        if(fishCaught.hasAbundanceInformation())
+            Log.warn("This strategy erases abundance information!");
+        //Preconditions.checkArgument(!fishCaught.hasAbundanceInformation(), "not coded for abudance!");
 
         double[] biomassArray = fishCaught.getBiomassArray();
         for(Integer index : indicesOfSpeciesToThrowOverboard)
