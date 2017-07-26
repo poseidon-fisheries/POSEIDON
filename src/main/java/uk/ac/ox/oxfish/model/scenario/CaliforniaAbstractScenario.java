@@ -1132,4 +1132,23 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             AlgorithmFactory<? extends Regulation> regulationPostReset) {
         this.regulationPostReset = regulationPostReset;
     }
+
+    /**
+     * Getter for property 'discardingStrategy'.
+     *
+     * @return Value for property 'discardingStrategy'.
+     */
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategy() {
+        return discardingStrategy;
+    }
+
+    /**
+     * Setter for property 'discardingStrategy'.
+     *
+     * @param discardingStrategy Value to set for property 'discardingStrategy'.
+     */
+    public void setDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        this.discardingStrategy = discardingStrategy;
+    }
 }
