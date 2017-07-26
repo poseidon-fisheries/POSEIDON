@@ -50,7 +50,8 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("attainment_530_dumb3");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb4"+);
         //runMultipleTimesToBuildHistogram("attainment_530_dumb5");
-        runMultipleTimesToBuildHistogram("kernel_101");
+       // runMultipleTimesToBuildHistogram("kernel_101");
+        //runMultipleTimesToBuildHistogram("random");
         //runMultipleTimesToBuildHistogram("attainment_prop");
         //runMultipleTimesToBuildHistogram("profit_prop_137");
     }
@@ -59,7 +60,8 @@ public class CaliCatchCalibration {
         //write header
         FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve(input + ".csv").toFile());
         writer.write(
-                "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish");
+                "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish" +
+                        ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
         writer.write("\n");
         writer.flush();
 
@@ -90,7 +92,17 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Biomass Sablefish") + "," +
                                          state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + "," +
                                          state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
-                                         state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "\n"
+                                         state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
+                                 // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
+                                         state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish") + "," +
+                                         state.getLatestYearlyObservation("ITQ Prices Of Dover Sole") + "," +
+                                         state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead") + "," +
+                                         state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead") + "," +
+                                         state.getLatestYearlyObservation("ITQ Prices Of Sablefish") + "," +
+                                         state.getLatestYearlyObservation("Average Distance From Port") + "," +
+                                         state.getLatestYearlyObservation("Average Trip Duration") + "\n"
+
+
                     );
             }
             state.schedule.step(state);
