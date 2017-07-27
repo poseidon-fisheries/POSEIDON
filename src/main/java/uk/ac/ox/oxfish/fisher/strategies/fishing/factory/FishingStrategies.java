@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.QuotaLimitDecorator;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -25,6 +26,8 @@ public class FishingStrategies {
         NAMES.put(FishOnceFactory.class,"Fish Once");
         CONSTRUCTORS.put("Tow Limit", TowLimitFactory::new);
         NAMES.put(TowLimitFactory.class,"Tow Limit");
+        CONSTRUCTORS.put("Quota Bound", QuotaLimitDecoratorFactory::new);
+        NAMES.put(QuotaLimitDecoratorFactory.class,"Quota Bound");
         CONSTRUCTORS.put("Fish Until Full", FishUntilFullFactory::new);
         NAMES.put(FishUntilFullFactory.class,"Fish Until Full");
         CONSTRUCTORS.put("Until Full With Day Limit", MaximumStepsFactory::new);

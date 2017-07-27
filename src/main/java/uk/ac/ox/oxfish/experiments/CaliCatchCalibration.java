@@ -48,12 +48,15 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("attainment_530_dumb");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb2");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb3");
-        //runMultipleTimesToBuildHistogram("attainment_530_dumb4"+);
+        //  runMultipleTimesToBuildHistogram("attainment_530_dumb4");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb5");
        // runMultipleTimesToBuildHistogram("kernel_101");
         //runMultipleTimesToBuildHistogram("random");
         //runMultipleTimesToBuildHistogram("attainment_prop");
         //runMultipleTimesToBuildHistogram("profit_prop_137");
+        //runMultipleTimesToBuildHistogram("best_eei_100");
+        //runMultipleTimesToBuildHistogram("random");
+        runMultipleTimesToBuildHistogram("fixed_return_2");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {

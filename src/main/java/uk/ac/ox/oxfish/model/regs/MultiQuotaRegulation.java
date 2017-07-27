@@ -199,7 +199,14 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
         return yearlyQuota;
     }
 
-
+    /**
+     * Getter for property 'quotaRemaining'.
+     *
+     * @return Value for property 'quotaRemaining'.
+     */
+    public double[] getQuotaRemaining() {
+        return quotaRemaining;
+    }
 
     protected FishState getState() {
         return state;
