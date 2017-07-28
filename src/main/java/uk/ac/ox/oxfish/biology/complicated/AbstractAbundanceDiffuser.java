@@ -61,18 +61,22 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
                 {
                     AbundanceBasedLocalBiology thereBiology = biologies.get(there);
                     //move male
-                    int maleDelta = here.getValue().getNumberOfMaleFishPerAge(species)[bin] -
-                            thereBiology.getNumberOfMaleFishPerAge(species)[bin];
-                    if(maleDelta > 0) //move only in one direction
-                        move(species, here.getKey(),
-                               here.getValue(), there, thereBiology, maleDelta, bin, true, model.getRandom());
+                    int fishHere = here.getValue().getNumberOfMaleFishPerAge(species)[bin];
+                    int fishThere = thereBiology.getNumberOfMaleFishPerAge(species)[bin];
+                    int maleDelta = fishHere -
+                            fishThere;
+                    //move always get called, regardless of what the delta is!
+                    move(species, here.getKey(),
+                         here.getValue(), there, thereBiology, maleDelta,fishHere ,fishThere , bin, true, model.getRandom());
 
                     //move female
-                    int femaleDelta = here.getValue().getNumberOfFemaleFishPerAge(species)[bin] -
-                            thereBiology.getNumberOfFemaleFishPerAge(species)[bin];
-                    if(femaleDelta > 0) //move only in one direction
-                        move(species, here.getKey(),
-                               here.getValue(), there, thereBiology, femaleDelta, bin, false, model.getRandom());
+                    fishHere = here.getValue().getNumberOfFemaleFishPerAge(species)[bin];
+                    fishThere = thereBiology.getNumberOfFemaleFishPerAge(species)[bin];
+                    int femaleDelta = fishHere -
+                            fishThere;
+                    //move always get called, regardless of what the delta is!
+                    move(species, here.getKey(),
+                         here.getValue(), there, thereBiology, femaleDelta,fishHere ,fishThere , bin, false, model.getRandom());
 
 
                 }
@@ -94,6 +98,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
      * @param there arriving point
      * @param biologyThere arriving local biology
      * @param delta number of fish here - number of fish there (always positive or this isn't called)
+     * @param fishHere
+     * @param fishThere
      * @param bin bin/age studied
      * @param male whether it's male or female
      * @param random
@@ -101,8 +107,13 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
     public abstract void move(
             Species species,
             SeaTile here,
-            AbundanceBasedLocalBiology biologyHere, SeaTile there,
-            AbundanceBasedLocalBiology biologyThere, int delta, int bin, boolean male, MersenneTwisterFast random);
+            AbundanceBasedLocalBiology biologyHere,
+            SeaTile there,
+            AbundanceBasedLocalBiology biologyThere,
+            int delta,
+            int fishHere, int fishThere, int bin,
+            boolean male,
+            MersenneTwisterFast random);
 
 
 

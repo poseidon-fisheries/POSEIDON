@@ -33,13 +33,14 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
 
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
-     *
-     * @param species
+     *  @param species
      * @param here         departing point
      * @param biologyHere  departing local biology
      * @param there        arriving point
      * @param biologyThere arriving local biology
      * @param delta        number of fish here - number of fish there (always positive or this isn't called)
+     * @param fishHere
+     * @param fishThere
      * @param bin          bin/age studied
      * @param male         whether it's male or female
      * @param random
@@ -50,10 +51,12 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
             SeaTile here, AbundanceBasedLocalBiology biologyHere,
             SeaTile there,
             AbundanceBasedLocalBiology biologyThere,
-            int delta, int bin, boolean male,
+            int delta, int fishHere, int fishThere, int bin, boolean male,
             MersenneTwisterFast random) {
 
+        if(delta<=0)
+            return;
         if(bin >= minMovementAge && bin<=maxMovementAge)
-            super.move(species, here, biologyHere, there, biologyThere, delta, bin, male, random);
+            super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random);
     }
 }

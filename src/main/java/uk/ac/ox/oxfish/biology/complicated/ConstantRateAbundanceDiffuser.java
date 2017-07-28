@@ -29,13 +29,14 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
 
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
-     *
-     * @param species      species moving!
+     *  @param species      species moving!
      * @param here         departing point
      * @param biologyHere  departing local biology
      * @param there        arriving point
      * @param biologyThere arriving local biology
      * @param delta        number of fish here - number of fish there (always positive or this isn't called)
+     * @param fishHere
+     * @param fishThere
      * @param bin          bin/age studied
      * @param male         whether it's male or female
      * @param random
@@ -43,9 +44,12 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
     @Override
     public void move(
             Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere,
-            SeaTile there, AbundanceBasedLocalBiology biologyThere, int delta, int bin, boolean male,
+            SeaTile there, AbundanceBasedLocalBiology biologyThere, int delta, int fishHere, int fishThere, int bin,
+            boolean male,
             MersenneTwisterFast random)
     {
+        if(delta<=0)
+            return;
 
         int movement = FishStateUtilities.randomRounding(delta * diffusingRate,
                                                          random);

@@ -412,12 +412,19 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     }
 
     /**
+
+     */
+    public HashMap<AbundanceBasedLocalBiology,Double> getInitialWeights(Species species) {
+        return initialWeights.get(species);
+    }
+
+    /**
      * Getter for property 'locals'.
      *
      * @return Value for property 'locals'.
      */
-    public HashMap<AbundanceBasedLocalBiology,Double> getInitialWeights(Species species) {
-        return initialWeights.get(species);
+    public HashMap<SeaTile, AbundanceBasedLocalBiology> getLocals() {
+        return locals;
     }
 
     /**

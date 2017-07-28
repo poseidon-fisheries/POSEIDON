@@ -56,10 +56,16 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("profit_prop_137");
         //runMultipleTimesToBuildHistogram("best_eei_100");
         //runMultipleTimesToBuildHistogram("random");
-        runMultipleTimesToBuildHistogram("fixed_return_2");
+        //runMultipleTimesToBuildHistogram("fixed_return_2");
+        //runMultipleTimesToBuildHistogram("fixed_return_600_dumb2");
+        //runMultipleTimesToBuildHistogram("mark2_eei_80");
+        //runMultipleTimesToBuildHistogram("mark2_bandit_50");
+        runMultipleTimesToBuildHistogram("mark2_eei_looks_95");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
+
+        System.out.println(input);
         //write header
         FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve(input + ".csv").toFile());
         writer.write(

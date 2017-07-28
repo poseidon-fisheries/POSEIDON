@@ -15,6 +15,7 @@ import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
+import uk.ac.ox.oxfish.biology.complicated.WeightedAbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
@@ -88,6 +89,8 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
     private double biomassScaling = 1.0;
 
 
+
+    private double sablefishDiffusingRate = 0;
 
 
 
@@ -215,6 +218,36 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
         });
 
 
+        //diffusing
+        if(sablefishDiffusingRate > 0)
+        {
+
+            model.registerStartable(new Startable() {
+                @Override
+                public void start(FishState model) {
+
+                    Species sablefish = model.getBiology().getSpecie("Sablefish");
+                    WeightedAbundanceDiffuser diffuser = new WeightedAbundanceDiffuser(
+                            1,
+                            sablefishDiffusingRate,
+                            initializer.getInitialWeights(sablefish)
+                    );
+                    model.scheduleEveryDay(new Steppable() {
+                        @Override
+                        public void step(SimState simState) {
+                            diffuser.step(sablefish,initializer.getLocals(),model);
+                        }
+                    }, StepOrder.BIOLOGY_PHASE);
+                }
+
+                @Override
+                public void turnOff() {
+
+                }
+            });
+
+
+        }
 
         return biology;
     }
@@ -294,6 +327,24 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
      */
     public void setMortalityAt100PercentForOldestFish(boolean mortalityAt100PercentForOldestFish) {
         this.mortalityAt100PercentForOldestFish = mortalityAt100PercentForOldestFish;
+    }
+
+    /**
+     * Getter for property 'sablefishDiffusingRate'.
+     *
+     * @return Value for property 'sablefishDiffusingRate'.
+     */
+    public double getSablefishDiffusingRate() {
+        return sablefishDiffusingRate;
+    }
+
+    /**
+     * Setter for property 'sablefishDiffusingRate'.
+     *
+     * @param sablefishDiffusingRate Value to set for property 'sablefishDiffusingRate'.
+     */
+    public void setSablefishDiffusingRate(double sablefishDiffusingRate) {
+        this.sablefishDiffusingRate = sablefishDiffusingRate;
     }
 }
 

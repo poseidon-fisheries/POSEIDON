@@ -277,7 +277,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     // https://dataexplorer.northwestscience.fisheries.noaa.gov/fisheye/PerformanceMetrics/
     //median variable cost per day in  in 2011 was  4,684$  to which we remove the fuel costs of 1,049
-    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(3635d/24d); //151.458333333$ per hour out
+    //if you do this on average for the years we have data (2011-2015) we get 165$ an hour
+    private DoubleParameter hourlyTravellingCosts = new FixedDoubleParameter(165.066666666667);
     private LinkedHashMap<Port,Integer> numberOfFishersPerPort;
     //these prices are averages from the catcher vessel report
     //2010
