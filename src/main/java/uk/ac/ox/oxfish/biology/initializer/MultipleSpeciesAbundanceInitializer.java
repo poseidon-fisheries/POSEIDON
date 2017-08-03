@@ -53,6 +53,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * for everything else that is not directly modeled?
      */
     private final boolean addOtherSpecies;
+    private String countFileName = "count.csv";
 
     public MultipleSpeciesAbundanceInitializer(
             LinkedHashMap<String, Path> biologicalDirectories, double scaling,
@@ -258,7 +259,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
                 InitialAbundanceFromFileFactory factory =
                         new InitialAbundanceFromFileFactory(
-                                biologicalDirectories.get(species.getName()).resolve("count.csv")
+                                biologicalDirectories.get(species.getName()).resolve(countFileName)
                         );
                 int[][] totalCount = factory.apply(model).getAbundance();
                 initialAbundance.put(species,totalCount);
@@ -434,5 +435,23 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     public SingleSpeciesNaturalProcesses getNaturalProcesses(Species species) {
         return naturalProcesses.get(species);
+    }
+
+    /**
+     * Getter for property 'countFileName'.
+     *
+     * @return Value for property 'countFileName'.
+     */
+    public String getCountFileName() {
+        return countFileName;
+    }
+
+    /**
+     * Setter for property 'countFileName'.
+     *
+     * @param countFileName Value to set for property 'countFileName'.
+     */
+    public void setCountFileName(String countFileName) {
+        this.countFileName = countFileName;
     }
 }

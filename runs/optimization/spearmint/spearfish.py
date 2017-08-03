@@ -120,8 +120,15 @@ import os
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
 
-#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration_noprofits/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-hours/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/bandit-inference/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/kernel-inference/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-movement/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration_noprofits/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/twostep/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
@@ -190,7 +197,7 @@ def main():
 
     ##now run spearmint
     os.chdir(SPEARMINT_DIRECTORY)
-    console = open(EXPERIMENT_DIRECTORY + '/console.txt', "w")
+    console = open(EXPERIMENT_DIRECTORY + '/console_' + experiment_name + '.txt', "w")
     subprocess.call(["python2", "main.py", EXPERIMENT_DIRECTORY ], stdout = console, stderr = console )
 
     #now plot

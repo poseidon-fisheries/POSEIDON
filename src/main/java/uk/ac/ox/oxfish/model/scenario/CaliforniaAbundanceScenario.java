@@ -82,6 +82,7 @@ import java.util.*;
  */
 public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
 
+    private String countFileName = "count.csv";
     private boolean mortalityAt100PercentForOldestFish = true;
     /**
      * how much should the model biomass/abundance be given the data we read in?
@@ -91,7 +92,6 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
 
 
     private double sablefishDiffusingRate = 0;
-
 
 
     //old thinking:
@@ -188,6 +188,7 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
                                                               fixedRecruitmentDistribution,
                                                               mortalityAt100PercentForOldestFish,
                                                               true);
+        initializer.setCountFileName(countFileName);
 
         biology = initializer.generateGlobal(model.getRandom(),
                                              model);
@@ -346,6 +347,27 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
     public void setSablefishDiffusingRate(double sablefishDiffusingRate) {
         this.sablefishDiffusingRate = sablefishDiffusingRate;
     }
+
+    /**
+     * Getter for property 'countFileName'.
+     *
+     * @return Value for property 'countFileName'.
+     */
+    public String getCountFileName() {
+        return countFileName;
+    }
+
+    /**
+     * Setter for property 'countFileName'.
+     *
+     * @param countFileName Value to set for property 'countFileName'.
+     */
+    public void setCountFileName(String countFileName) {
+        this.countFileName = countFileName;
+    }
+
+
+
 }
 
 

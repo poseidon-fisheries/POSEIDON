@@ -3,6 +3,7 @@ California Map Scenario:
   boatLength: '22.573488'
   boatWidth: '7.0'
   californiaScaling: 1.0
+  countFileName: count.csv
   cruiseSpeedInKph: '16.0661'
   departingStrategy:
     Fixed Rest:
@@ -18,6 +19,7 @@ California Map Scenario:
       distanceInKm: '-0.0135515257873626'
       habitIntercept: '0.282719257782064'
       habitPeriodInDays: '365.0'
+  discardingStrategy: No Discarding
   exogenousCatches:
     Sablefish: '4438200.0'
     Dover Sole: '676900.0'
@@ -102,7 +104,7 @@ California Map Scenario:
   gearStrategy: Never Change Gear
   gridWidth: 50
   holdSizePerBoat: '8000.0'
-  hourlyTravellingCosts: '151.45833333333334'
+  hourlyTravellingCosts: '165.066666666667'
   literPerKilometer: '3.547842974'
   logbook: No Logbook
   mainDirectory: inputs/california
@@ -133,5 +135,6 @@ California Map Scenario:
       quotaType: ITQ
   regulationPreReset: Anarchy
   resetBiologyAtYear1: true
+  sablefishDiffusingRate: 0.0
   usePremadeInput: true
   weatherStrategy: Ignore Weather

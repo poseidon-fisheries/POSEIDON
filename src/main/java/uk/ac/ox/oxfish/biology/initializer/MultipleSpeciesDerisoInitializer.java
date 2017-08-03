@@ -38,6 +38,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * for everything else that is not directly modeled?
      */
     private final boolean addOtherSpecies;
+    private String derisoYamlFileName = "deriso.yaml";
 
 
     /**
@@ -85,7 +86,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
     /**
      * read up a folder that contains deriso.yaml and turn it into a species
-     * @param biologicalDirectory the folder containing meristics.yaml
+     * @param biologicalDirectory the folder containing deriso.yaml
      * @param speciesName the name of the species
      * @return the new species
      * @throws IOException
@@ -95,7 +96,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             throws IOException {
         FishYAML yaml = new FishYAML();
         DerisoParameters parameter = yaml.loadAs(
-                new FileReader(biologicalDirectory.resolve("deriso.yaml").toFile()),
+                new FileReader(biologicalDirectory.resolve(derisoYamlFileName).toFile()),
                 DerisoParameters.class);
         parameter.updateLastRecruits();
         Species species = new Species(speciesName, StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
@@ -373,5 +374,24 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      */
     public void setMovementRate(HashMap<Species, Double> movementRate) {
         this.movementRate = movementRate;
+    }
+
+
+    /**
+     * Getter for property 'derisoYamlFileName'.
+     *
+     * @return Value for property 'derisoYamlFileName'.
+     */
+    public String getDerisoYamlFileName() {
+        return derisoYamlFileName;
+    }
+
+    /**
+     * Setter for property 'derisoYamlFileName'.
+     *
+     * @param derisoYamlFileName Value to set for property 'derisoYamlFileName'.
+     */
+    public void setDerisoYamlFileName(String derisoYamlFileName) {
+        this.derisoYamlFileName = derisoYamlFileName;
     }
 }

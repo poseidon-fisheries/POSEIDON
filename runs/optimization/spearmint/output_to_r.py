@@ -260,4 +260,5 @@ def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearm
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_mixed/")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_half/")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_half/")
-plot(config_directory="/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_single_profits")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_single_profits")
+plot(config_directory="/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/")

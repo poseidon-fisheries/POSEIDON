@@ -1,6 +1,8 @@
 package uk.ac.ox.oxfish.experiments;
 
+import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -60,7 +62,11 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("fixed_return_600_dumb2");
         //runMultipleTimesToBuildHistogram("mark2_eei_80");
         //runMultipleTimesToBuildHistogram("mark2_bandit_50");
-        runMultipleTimesToBuildHistogram("mark2_eei_looks_95");
+        //runMultipleTimesToBuildHistogram("mark2_eei_looks_95");
+        //runMultipleTimesToBuildHistogram("mark3_eei_16");
+        //runMultipleTimesToBuildHistogram("mark3_eei_29");
+        //runMultipleTimesToBuildHistogram("mark3_twosteps_800");
+        runMultipleTimesToBuildHistogram("mark3_twosteps_1200");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -78,8 +84,9 @@ public class CaliCatchCalibration {
         for (int run = 0; run < RUNS; run++) {
 
             FishYAML yaml = new FishYAML();
-            Scenario scenario = yaml.loadAs(new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
-                                            Scenario.class);
+            CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
+                                            CaliforniaAbundanceScenario.class);
+            scenario.setLogbook(new NoLogbookFactory());
 
             FishState state = new FishState(run);
             state.setScenario(scenario);
