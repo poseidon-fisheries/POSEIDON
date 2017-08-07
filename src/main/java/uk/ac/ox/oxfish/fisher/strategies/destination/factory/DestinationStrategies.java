@@ -105,6 +105,10 @@ public class DestinationStrategies
         NAMES.put(BarebonesContinuousDestinationFactory.class,
                   "Continuous Bare Bones");
 
+        CONSTRUCTORS.put("Continuous Bare Bones With Intercepts",
+                         BarebonesContinuousInterceptedDestinationFactory::new);
+        NAMES.put(BarebonesContinuousInterceptedDestinationFactory.class,
+                  "Continuous Bare Bones With Intercepts");
 
 
         CONSTRUCTORS.put("Perfect RPUE Logit",

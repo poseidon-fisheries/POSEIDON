@@ -57,6 +57,11 @@ public class LogisticLogbookFactory
     private Locker<FishState, MapDiscretization> locker = new Locker<>() ;
 
     /**
+     * if this is positive, that's when the histogrammer starts
+     */
+    private int histogrammerStartYear = -1;
+
+    /**
      * Applies this function to the given argument.
      *
      * @param state the function argument
@@ -178,7 +183,7 @@ public class LogisticLogbookFactory
                 discretized,
                 observations,
                 nameArray,
-                identifier
+                histogrammerStartYear, identifier
         );
 
 
@@ -448,5 +453,21 @@ public class LogisticLogbookFactory
         this.identifier = identifier;
     }
 
+    /**
+     * Getter for property 'histogrammerStartYear'.
+     *
+     * @return Value for property 'histogrammerStartYear'.
+     */
+    public int getHistogrammerStartYear() {
+        return histogrammerStartYear;
+    }
 
+    /**
+     * Setter for property 'histogrammerStartYear'.
+     *
+     * @param histogrammerStartYear Value to set for property 'histogrammerStartYear'.
+     */
+    public void setHistogrammerStartYear(int histogrammerStartYear) {
+        this.histogrammerStartYear = histogrammerStartYear;
+    }
 }

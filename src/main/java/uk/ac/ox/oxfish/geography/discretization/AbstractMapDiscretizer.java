@@ -34,7 +34,7 @@ public abstract class AbstractMapDiscretizer implements MapDiscretizer {
     public List<SeaTile>[] discretize(NauticalMap map) {
 
         return discretize(map,
-                          map.getAllSeaTilesAsList().stream().filter(filter).collect(Collectors.toList()));
+                          map.getAllSeaTilesExcludingLandAsList().stream().filter(filter).collect(Collectors.toList()));
     }
 
     /**

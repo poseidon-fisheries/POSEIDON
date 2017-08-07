@@ -126,7 +126,8 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-hours/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/bandit-inference/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/kernel-inference/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-movement/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-movement/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-only/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration_noprofits/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/twostep/"
 

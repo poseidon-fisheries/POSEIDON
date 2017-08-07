@@ -114,26 +114,13 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
                          }, Double.NaN);
         registerGatherer(TRIP_DURATION,
                          new Gatherer<Fisher>() {
-                             final HashSet<TripRecord> alreadyExaminedTrips = new HashSet<>();
 
                              @Override
                              public Double apply(Fisher fisher) {
 
-                                 LinkedList<TripRecord> trips = new LinkedList<>(fisher.getFinishedTrips());
-                                 boolean removedSome = trips.removeAll(alreadyExaminedTrips);
-                                 assert removedSome ^ alreadyExaminedTrips.isEmpty();
-                                 DoubleSummaryStatistics timeOut = new DoubleSummaryStatistics();
-                                 for(TripRecord record : trips)
-                                 {
-                                    timeOut.accept(record.getDurationInHours());
-                                 }
-                                 assert timeOut.getAverage() > 0 || timeOut.getCount()==0;
-                                 alreadyExaminedTrips.addAll(trips);
 
-                                 if(timeOut.getCount()==0)
-                                     return Double.NaN;
-                                 else
-                                     return timeOut.getAverage();
+                                 return observed.getYearlyCounterColumn(HOURS_OUT)/
+                                         observed.getYearlyCounterColumn(TRIPS);
 
                              }
                          }, Double.NaN);

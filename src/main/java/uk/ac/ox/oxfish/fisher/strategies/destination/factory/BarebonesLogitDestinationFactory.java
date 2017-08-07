@@ -62,29 +62,14 @@ public abstract class  BarebonesLogitDestinationFactory implements
         //every area is valid
         int areas = discretization.getNumberOfGroups();
         List<Integer> validAreas = new LinkedList<>();
-        validAreas.add(0);
-
-
-        //the same parameters for all the choices
-        double[][] betas = new double[areas][2];
-        betas[0][0] = habitIntercept.apply(state.getRandom());
-        betas[0][1] = distanceInKm.apply(state.getRandom());
-        for(int i=1; i<areas; i++)
-        {
-            betas[i][0] = betas[0][0];
-            betas[i][1] = betas[0][1];
-            validAreas.add(i);
-        }
-
-        //get the extractors
-        ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
-        ObservationExtractor[] commonExtractor = new ObservationExtractor[]{
-                buildHabitExtractor(discretization,
-                                    getHabitPeriodInDays().apply(state.getRandom()).intValue()),
-                new PortDistanceExtractor()
-        };
         for(int i=0; i<areas; i++)
-            extractors[i] = commonExtractor;
+            validAreas.add(i);
+
+
+        double[][] betas = buildBetas(state, areas, validAreas);
+
+        ObservationExtractor[][] extractors = buildExtractors(state, discretization, areas, betas);
+
 
         return new LogitDestinationStrategy(
                 betas,
@@ -96,6 +81,34 @@ public abstract class  BarebonesLogitDestinationFactory implements
         );
 
 
+    }
+
+    @NotNull
+    protected ObservationExtractor[][] buildExtractors(
+            FishState state, MapDiscretization discretization, int areas, double[][] betas) {
+        //get the extractors
+        ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
+        ObservationExtractor[] commonExtractor = new ObservationExtractor[]{
+                buildHabitExtractor(discretization,
+                                    getHabitPeriodInDays().apply(state.getRandom()).intValue()),
+                new PortDistanceExtractor()
+        };
+        for(int i=0; i<areas; i++)
+            extractors[i] = commonExtractor;
+        return extractors;
+    }
+
+    protected double[][] buildBetas(FishState state, int areas, List<Integer> validAreas) {
+        //the same parameters for all the choices
+        double[][] betas = new double[areas][2];
+        betas[0][0] = habitIntercept.apply(state.getRandom());
+        betas[0][1] = distanceInKm.apply(state.getRandom());
+        for(int i=1; i<areas; i++)
+        {
+            betas[i][0] = betas[0][0];
+            betas[i][1] = betas[0][1];
+        }
+        return betas;
     }
 
     @NotNull

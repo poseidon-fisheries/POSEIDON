@@ -42,7 +42,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
 
     /**
-     * the object containing the extractors and building logisti inputs
+     * the object containing the extractors and building logistic inputs
      */
     private final LogisticInputMaker input;
 
@@ -66,7 +66,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                                     MapDiscretization discretization,
                                     FavoriteDestinationStrategy delegate,
                                     MersenneTwisterFast random
-                                    )
+    )
     {
 
         Preconditions.checkArgument(rowNames.size()==betas.length,"Row names do not match number of betas");
@@ -104,7 +104,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                     List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
                     return group.get(random.nextInt(group.size()));
                 }
-                );
+        );
         this.classifier = new LogisticMultiClassifier(
                 effectiveBetas.toArray(new double[effectiveBetas.size()][]));
 
@@ -165,24 +165,21 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         int armChosen = classifier.choose(input, random);
         if(log!=null)
             log.recordChoice(armChosen,
-                    state.getYear(),
+                             state.getYear(),
                              state.getDayOfTheYear());
 
 
-        while (true) {
-            List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
+        List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
 
-            for (int i = 0; i < 100; i++) {
-                SeaTile destination = group.get(random.nextInt(group.size()));
-                if (destination.isFishingEvenPossibleHere())
-                {
-                    delegate.setFavoriteSpot(destination);
-                    return;
-                }
-            }
+        SeaTile destination = group.get(random.nextInt(group.size()));
+        if (destination.isFishingEvenPossibleHere())
 
-        }
+            delegate.setFavoriteSpot(destination);
+
+
+
     }
+
 
     @Override
     public void turnOff(Fisher fisher) {

@@ -183,7 +183,7 @@ public class ITQOrderBook implements Steppable,Startable{
                     ((QuotaPerSpecieRegulation) fisher.getRegulation()).getQuotaRemaining(
                             specieIndex) >= unitsTradedPerMatch &&
                     !penaltyBox.has(fisher)) {
-                double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), .5)),
+                double salePrice = Math.max(FishStateUtilities.round(Math.max(price * (1 + markup), markup)),
                                             buyPrice + FishStateUtilities.EPSILON) //never let bids and ask cross, even if markup is 0!
                         ;
                 assert buyPrice < salePrice;

@@ -66,7 +66,10 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("mark3_eei_16");
         //runMultipleTimesToBuildHistogram("mark3_eei_29");
         //runMultipleTimesToBuildHistogram("mark3_twosteps_800");
-        runMultipleTimesToBuildHistogram("mark3_twosteps_1200");
+        //runMultipleTimesToBuildHistogram("mark3_twosteps_1200");
+        //runMultipleTimesToBuildHistogram("mark4_600");
+        runMultipleTimesToBuildHistogram("mark4_eei_235");
+        //runMultipleTimesToBuildHistogram("mark4_600_random");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -76,7 +79,7 @@ public class CaliCatchCalibration {
         FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve(input + ".csv").toFile());
         writer.write(
                 "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish" +
-                        ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
+                        ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips");
         writer.write("\n");
         writer.flush();
 
@@ -116,7 +119,9 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead") + "," +
                                          state.getLatestYearlyObservation("ITQ Prices Of Sablefish") + "," +
                                          state.getLatestYearlyObservation("Average Distance From Port") + "," +
-                                         state.getLatestYearlyObservation("Average Trip Duration") + "\n"
+                                         state.getLatestYearlyObservation("Average Trip Duration") + ","  +
+                                         state.getLatestYearlyObservation("Average Number of Trips") +
+                                         "\n"
 
 
                     );

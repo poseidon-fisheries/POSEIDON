@@ -1,9 +1,11 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import static org.junit.Assert.assertEquals;
@@ -85,6 +87,44 @@ public class PrototypeScenarioTest {
 
     }
 
+    @Test
+    public void countersAreCorrect() throws Exception {
+
+        CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
+
+
+        FishState state = new FishState(123l);
+        state.setScenario(scenario);
+        state.start();
+
+        for (int i = 0; i < 366; i++)
+            state.schedule.step(state);
+
+        double sumHours = 0;
+        double sumTrips = 0;
+        double sumDuration = 0;
+        for(Fisher fisher : state.getFishers()) {
+            double hours = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT); sumHours+=hours;
+            double trips = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS); sumTrips+=trips;
+            double duration = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIP_DURATION); sumDuration+=duration;
+            System.out.println(hours + " " + trips + " " + duration + " --> " + (hours/trips) );
+            assertEquals(hours/trips,duration,.0001);
+        }
+        System.out.println("===========================================================");
+        System.out.println(sumHours + " " + sumTrips + " " + sumDuration/state.getFishers().size() + " --> " + (sumHours/sumTrips) );
+
+        //they might not be equal because you need to reweigh them!
+
+
+        System.out.println("===========================================================");
+
+        double hours = state.getLatestYearlyObservation("Average Hours Out");
+        double trips = state.getLatestYearlyObservation("Average Number of Trips");
+        double duration = state.getLatestYearlyObservation("Average Trip Duration");
+        System.out.println(hours + " " + trips + " " + duration + " --> " + (hours/trips) );
+        assertEquals(hours/trips,duration,.0001);
+
+    }
 
     @Test
     public void fixingTheSeedWorks() throws Exception

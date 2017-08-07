@@ -176,8 +176,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                             public double applyAsDouble(Fisher value) {
                                 return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
                             }
-                        }).sum() /
-                        observed.getFishers().size();
+                        }).average().orElse(0d);
             }
         }, 0d);
 
@@ -218,23 +217,26 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             }
         }, 0d);
 
+        //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
         registerGatherer("Average Trip Duration", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
+                double hoursOut = observed.getFishers().stream().mapToDouble(
                         new ToDoubleFunction<Fisher>() {
                             @Override
                             public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIP_DURATION);
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
                             }
-                        }).filter(
-                        new DoublePredicate() {
+                        }).sum();
+                double trips = observed.getFishers().stream().mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
                             @Override
-                            public boolean test(double d) {
-                                return Double.isFinite(d);
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
                             }
-                        }).sum() /
-                        observed.getFishers().size();
+                        }).sum();
+
+                return hoursOut/trips;
             }
         }, 0d);
 
@@ -248,8 +250,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                             public double applyAsDouble(Fisher value) {
                                 return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
                             }
-                        }).sum() /
-                        observed.getFishers().size();
+                        }).average().orElse(0d);
             }
         }, 0d);
 
@@ -285,7 +286,8 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                   fishState.getFishers().stream().
                                                                           filter(fisher -> fisher.getHomePort().equals(port)).
                                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                                  FisherYearlyTimeSeries.FISHING_DISTANCE)).average().orElse(Double.NaN), Double.NaN);
+                                                                                  FisherYearlyTimeSeries.FISHING_DISTANCE)).average().
+                                                                          orElse(Double.NaN), Double.NaN);
 
 
 
