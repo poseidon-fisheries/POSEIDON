@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.experiments;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
@@ -72,7 +71,9 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("boolean-bold");
         //runMultipleTimesToBuildHistogram("intercepts-2-450");
         //runMultipleTimesToBuildHistogram("intercepts-879-manual1");
-        runMultipleTimesToBuildHistogram("clamped_uncalibrated");
+        //runMultipleTimesToBuildHistogram("clamped_uncalibrated");
+        //runMultipleTimesToBuildHistogram("clamped_300");
+        runMultipleTimesToBuildHistogram("clamped_300_manualmovement");
         //runMultipleTimesToBuildHistogram("mark4_600_random");
     }
 

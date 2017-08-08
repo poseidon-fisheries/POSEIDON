@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.util.Arrays;
+
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
@@ -45,6 +47,24 @@ public class StructuredAbundance {
         abundance[FEMALE] = femaleAbundance;
     }
 
+
+    /**
+     * empty abundance
+     * @param subdivisions
+     * @param bins
+     */
+    public StructuredAbundance(int subdivisions,int bins){
+        Preconditions.checkArgument(subdivisions<=2, "no more than 2 subdivisions are allowed!");
+        abundance = new int[subdivisions][];
+        for(int i=0; i<subdivisions; i++)
+            abundance[i] = new int[bins];
+    }
+
+    public StructuredAbundance(StructuredAbundance other) {
+        this.abundance = new int[other.getSubdivisions()][other.getBins()];
+        for(int i=0; i<abundance.length; i++)
+            abundance[i] = Arrays.copyOf(other.abundance[i],other.abundance[i].length);
+    }
 
     public int getAbundanceInBin(int bin)
     {

@@ -1,7 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
 import ec.util.MersenneTwisterFast;
-import org.jfree.util.Log;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -56,15 +56,28 @@ public class AlwaysDiscardTheseSpecies implements DiscardingStrategy {
             SeaTile where, Fisher who, Catch fishCaught, int hoursSpentFishing, Regulation regulation, FishState model,
             MersenneTwisterFast random) {
 
-        if(fishCaught.hasAbundanceInformation())
-            Log.warn("This strategy erases abundance information!");
-        //Preconditions.checkArgument(!fishCaught.hasAbundanceInformation(), "not coded for abudance!");
 
-        double[] biomassArray = fishCaught.getBiomassArray();
-        for(Integer index : indicesOfSpeciesToThrowOverboard)
-            biomassArray[index] = 0;
-        return new Catch(biomassArray);
 
+        if(!fishCaught.hasAbundanceInformation())
+        {
+            double[] biomassArray = fishCaught.getBiomassArray();
+            for (Integer index : indicesOfSpeciesToThrowOverboard)
+                biomassArray[index] = 0;
+            return new Catch(biomassArray);
+        }
+        else
+        {
+            StructuredAbundance[] abundance = new StructuredAbundance[fishCaught.numberOfSpecies()];
+            for (int species=0; species< fishCaught.numberOfSpecies(); species++)
+            {
+                if(indicesOfSpeciesToThrowOverboard.contains(species))
+                    abundance[species] = new StructuredAbundance(fishCaught.getAbundance(species).getSubdivisions(),
+                                                                 fishCaught.getAbundance(species).getBins());
+                else
+                    abundance[species] = new StructuredAbundance(fishCaught.getAbundance(species));
+            }
+            return new Catch(abundance,model.getBiology());
+        }
 
     }
 }
