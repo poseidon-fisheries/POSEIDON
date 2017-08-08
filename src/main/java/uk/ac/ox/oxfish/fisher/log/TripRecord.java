@@ -263,6 +263,8 @@ public class TripRecord {
 
         if(tilesFished.size() == 0)
             return null;
+        if(tilesFished.size()==1)
+            return tilesFished.keySet().iterator().next();
         return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
 
     }

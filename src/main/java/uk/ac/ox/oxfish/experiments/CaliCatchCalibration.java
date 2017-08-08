@@ -68,7 +68,11 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("mark3_twosteps_800");
         //runMultipleTimesToBuildHistogram("mark3_twosteps_1200");
         //runMultipleTimesToBuildHistogram("mark4_600");
-        runMultipleTimesToBuildHistogram("mark4_eei_235");
+        //runMultipleTimesToBuildHistogram("mark4_eei_235");
+        //runMultipleTimesToBuildHistogram("boolean-bold");
+        //runMultipleTimesToBuildHistogram("intercepts-2-450");
+        //runMultipleTimesToBuildHistogram("intercepts-879-manual1");
+        runMultipleTimesToBuildHistogram("clamped_uncalibrated");
         //runMultipleTimesToBuildHistogram("mark4_600_random");
     }
 

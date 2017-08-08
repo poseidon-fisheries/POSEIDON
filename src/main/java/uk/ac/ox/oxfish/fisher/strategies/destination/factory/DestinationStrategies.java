@@ -111,6 +111,12 @@ public class DestinationStrategies
                   "Continuous Bare Bones With Intercepts");
 
 
+        CONSTRUCTORS.put("Clamped to Data",
+                         ClampedDestinationFactory::new);
+        NAMES.put(ClampedDestinationFactory.class,
+                  "Clamped to Data");
+
+
         CONSTRUCTORS.put("Perfect RPUE Logit",
                          LogitRPUEDestinationFactory::new);
         NAMES.put(LogitRPUEDestinationFactory.class,

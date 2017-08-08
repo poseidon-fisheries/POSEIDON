@@ -119,7 +119,7 @@ public class LogisticLogbookInitializer implements LogbookInitializer {
         fisher.addTripListener(pseudoLogger);
         //add histogrammer now or when it is time!
         if(histogrammerStartYear>=0) { //don't do anything if the start year is negative!
-            if (state.getYear() > histogrammerStartYear)
+            if (state.getYear() >= histogrammerStartYear)
                 fisher.addTripListener(histogrammer);
             else
                 state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
