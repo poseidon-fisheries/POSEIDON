@@ -227,7 +227,12 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                             public double applyAsDouble(Fisher value) {
                                 return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
                             }
-                        }).sum();
+                        }).filter(new DoublePredicate() { //skip boats that made no trips
+                    @Override
+                    public boolean test(double value) {
+                        return Double.isFinite(value);
+                    }
+                }).sum();
                 double trips = observed.getFishers().stream().mapToDouble(
                         new ToDoubleFunction<Fisher>() {
                             @Override
