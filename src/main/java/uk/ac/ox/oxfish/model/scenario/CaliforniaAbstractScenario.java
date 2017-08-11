@@ -460,6 +460,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
 
 
+
+
             //set yourself up to reset the biology at the given year if needed
             if(resetBiologyAtYear1) {
 
@@ -475,6 +477,13 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     @Override
                     public void step(SimState simState) {
                         Log.info("Resetting all local biologies");
+
+                        //stop protecting
+                        for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
+                            tile.setBiology(
+                                    ((UnfishableLocalBiologyDecorator) tile.getBiology()).getDecorated()
+                                    ,
+                                    false);
                         for (Species current : biology.getSpecies()) {
                             getBiologyInitializer().resetLocalBiology(current);
 

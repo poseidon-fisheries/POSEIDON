@@ -106,4 +106,13 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
         this.state = null;
         decorated.turnOff();
     }
+
+    /**
+     * Getter for property 'decorated'.
+     *
+     * @return Value for property 'decorated'.
+     */
+    public LocalBiology getDecorated() {
+        return decorated;
+    }
 }
