@@ -63,6 +63,11 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("WFS Handline",
                          FloridaLogisticDepartingFactory::new);
         NAMES.put(FloridaLogisticDepartingFactory.class, "WFS Handline");
+
+
+        CONSTRUCTORS.put("Exit Decorator",
+                         ExitDecoratorFactory::new);
+        NAMES.put(ExitDecoratorFactory.class,"Exit Decorator");
     }
 
     private DepartingStrategies() {}

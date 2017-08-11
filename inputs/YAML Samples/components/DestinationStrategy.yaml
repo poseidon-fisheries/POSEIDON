@@ -58,7 +58,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -143,6 +143,92 @@ Continuous Bare Bones:
   distanceInKm: '-0.00759009'
   habitIntercept: '2.53163185'
   habitPeriodInDays: '90.0'
+-------
+Continuous Bare Bones With Intercepts:
+  discretizer:
+    Centroid File Discretization:
+      automaticallyIgnoreWastelands: false
+      filePath: temp_wfs/areas.txt
+      xColumnName: eastings
+      yColumnName: northings
+  distanceInKm: '-0.00759009'
+  dummyIntercepts:
+  - 0.0
+  - 0.952581990919771
+  - 0.509322251168221
+  - -16.018090230252
+  - 0.825325980430791
+  - -16.758350120163
+  - 2.22550022667415
+  - -0.138135388415003
+  - -16.3278799379491
+  - 1.86916204885509
+  - 1.80244069634983
+  - 2.69254564577946
+  - 1.95866194001552
+  - 3.03465178784789
+  - 2.43391940965832
+  - 2.84185679984747
+  - -0.115068606633148
+  - 3.61408775494346
+  - 1.70583832748963
+  - 3.10467795852511
+  - 1.33548927991838
+  - -17.3507571259775
+  - 2.5902048442124
+  - 1.06849043721051
+  - 1.49731063611348
+  - -0.740473040664187
+  - 2.38804627530531
+  - -18.7033584944
+  - -15.1932115106845
+  - 3.90488386910226
+  - -0.0210724717780951
+  - 0.212637158885711
+  habitIntercept: '2.53163185'
+  habitPeriodInDays: '90.0'
+-------
+Clamped to Data:
+  discretizer:
+    Centroid File Discretization:
+      automaticallyIgnoreWastelands: false
+      filePath: temp_wfs/areas.txt
+      xColumnName: eastings
+      yColumnName: northings
+  maxDistance: '200.0'
+  preferences:
+  - 0.00586319218241042
+  - 0.00260586319218241
+  - 0.0560260586319218
+  - 0.0182410423452769
+  - 0.0130293159609121
+  - 0.0
+  - 0.00195439739413681
+  - 0.0
+  - 0.0501628664495114
+  - 0.00325732899022801
+  - 0.0
+  - 0.10228013029316
+  - 0.0130293159609121
+  - 0.00977198697068404
+  - 0.0208469055374593
+  - 0.0534201954397394
+  - 0.0514657980456026
+  - 0.0495114006514658
+  - 6.51465798045603E-4
+  - 0.0638436482084691
+  - 0.00977198697068404
+  - 0.193485342019544
+  - 0.0104234527687296
+  - 0.0
+  - 0.0592833876221498
+  - 0.0377850162866449
+  - 0.044299674267101
+  - 0.0143322475570033
+  - 0.0957654723127036
+  - 0.00130293159609121
+  - 0.0
+  - 0.0175895765472313
 -------
 Perfect RPUE Logit:
   discretizer: Identity Discretization

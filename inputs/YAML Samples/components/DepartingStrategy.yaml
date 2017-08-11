@@ -53,3 +53,9 @@ WFS Handline:
   windSpeedInKnots: '-0.046672'
   winter: '0.266862'
 -------
+Exit Decorator:
+  consecutiveLossYearsBeforeQuitting: '2.0'
+  decorated:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+-------

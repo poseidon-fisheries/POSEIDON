@@ -76,10 +76,12 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("clamped_uncalibrated");
         //runMultipleTimesToBuildHistogram("clamped_300");
         //runMultipleTimesToBuildHistogram("clamped_300_manualmovement");
-        //runMultipleTimesToBuildHistogram("clamped_thorough_63");
+        //runMultipleTimesToBuildHistogram("clamped_thorough    _63");
         //runMultipleTimesToBuildHistogram("clamped_moving_thorough_200");
        // runMultipleTimesToBuildHistogram("manual2_151_trading");
-        runMultipleTimesToBuildHistogram("manual2_500_trading");
+        //runMultipleTimesToBuildHistogram("manual2_500_trading");
+        //runMultipleTimesToBuildHistogram("manual2_500_trading_blocked");
+        runMultipleTimesToBuildHistogram("manual2_500_trading_blocked_exit");
 
         //runMultipleTimesToBuildHistogram("mark4_600_random");
     }
