@@ -13,6 +13,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.UnfishableLocalBiologyDecorator;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
@@ -461,6 +462,15 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
             //set yourself up to reset the biology at the given year if needed
             if(resetBiologyAtYear1) {
+
+                //protect all biomass
+                for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
+                    tile.setBiology(
+                            new UnfishableLocalBiologyDecorator(1,
+                                                                tile.getBiology())
+                            ,
+                            false);
+
                 model.scheduleOnceInXDays(new Steppable() {
                     @Override
                     public void step(SimState simState) {

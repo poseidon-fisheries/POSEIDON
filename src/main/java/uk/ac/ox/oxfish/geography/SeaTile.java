@@ -105,9 +105,17 @@ public class SeaTile implements Startable{
      * @param biology the local biology
      */
     public void setBiology(LocalBiology biology) {
-        this.biology = biology;
+
+       this.setBiology(biology,true);
     }
 
+
+    public void setBiology(LocalBiology biology,boolean turnOffPreviousOne) {
+
+        if(turnOffPreviousOne && this.biology != null)
+            this.biology.turnOff();
+        this.biology = biology;
+    }
     /**
      * the biomass at this location for a single species.
      * @param species  the species you care about
