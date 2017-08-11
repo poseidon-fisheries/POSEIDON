@@ -143,6 +143,32 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             }
         }, 0d);
 
+        registerGatherer("Actual Average Cash-Flow", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().
+                        filter(
+                                new Predicate<Fisher>() {
+                                    @Override
+                                    public boolean test(Fisher fisher) {
+                                        return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
+
+                                    }
+                                }
+                        ).
+
+                        mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                            }
+                        }).average().orElse(0d);
+            }
+        }, 0d);
+
+
+
         registerGatherer("Total Effort",
                          FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")), 0d);
 
@@ -239,11 +265,40 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                             public double applyAsDouble(Fisher value) {
                                 return value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
                             }
-                        }).sum();
+                        }).filter(new DoublePredicate() { //skip boats that made no trips
+                    @Override
+                    public boolean test(double value) {
+                        return Double.isFinite(value);
+                    }
+                }).sum();
 
-                return hoursOut/trips;
+                return trips > 0 ? hoursOut/trips : 0d;
             }
         }, 0d);
+
+        registerGatherer("Actual Average Hours Out", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return observed.getFishers().stream().
+                        filter(
+                                new Predicate<Fisher>() {
+                                    @Override
+                                    public boolean test(Fisher fisher) {
+                                        return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
+
+                                    }
+                                }
+                        ).
+                        mapToDouble(
+                        new ToDoubleFunction<Fisher>() {
+                            @Override
+                            public double applyAsDouble(Fisher value) {
+                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT);
+                            }
+                        }).average().orElse(0d);
+            }
+        }, 0d);
+
 
 
         registerGatherer("Average Hours Out", new Gatherer<FishState>() {
