@@ -13,7 +13,6 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.UnfishableLocalBiologyDecorator;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
@@ -112,7 +111,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                      //        new Pair<>("Canary rockfish",41100d),
                                      new Pair<>("Dover sole", 22234500d),
                                      new Pair<>("Longspine Thornyhead", 1966250d),
-                                     new Pair<>("Sablefish", 3077220d),
+                                     new Pair<>("Sablefish", 2724935d), //averaged out till 2014, and with south included
                                      new Pair<>("Shortspine thornyhead", 1481600.056d)
             );
 

@@ -193,6 +193,24 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
             }
         }, 0d);
 
+        //weighs by trips
+        registerGatherer("Weighted Average Distance From Port", new Gatherer<FishState>() {
+                             @Override
+                             public Double apply(FishState ignored) {
+                                 double sum = 0;
+                                 double trips = 0;
+                                 for (Fisher fisher : state.getFishers()) {
+                                     double trip = fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS);
+                                     if(trip>0) {
+                                         sum += fisher.getLatestYearlyObservation(
+                                                 FisherYearlyTimeSeries.FISHING_DISTANCE) * trip;
+                                         trips += trip;
+                                     }
+                                 }
+                                 return trips > 0 ?  sum / trips : 0d;
+                             }
+                         },0d);
+
         registerGatherer("Average Number of Trips", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
