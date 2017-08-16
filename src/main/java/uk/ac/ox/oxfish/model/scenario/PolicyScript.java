@@ -1,15 +1,22 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.base.Preconditions;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+
+import java.util.function.Consumer;
 
 /**
  * A bunch of factories to apply to a model, usually to change its policies or something similar
@@ -23,6 +30,15 @@ public class PolicyScript
      * factory to produce departing strategy
      */
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
+
+
+    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy;
+
+    /**
+     * this REPLACES all the other additional trip costs!
+     */
+    private DoubleParameter hourlyTravellingCosts;
+
 
     /**
      * factory to produce departing strategy
@@ -53,6 +69,7 @@ public class PolicyScript
     public void apply(FishState state)
     {
 
+        System.out.println("Starting a polcy script!");
         //apply regulations
         if(regulation != null) {
             for (Fisher fisher : state.getFishers()) {
@@ -74,32 +91,67 @@ public class PolicyScript
             for (Fisher fisher : state.getFishers()) {
                 fisher.setDepartingStrategy(departingStrategy.apply(state));
             }
-            //new fishers will use the new gear
-            state.getFisherFactory().setGear(gear);
+            //new fishers will use the new strategy
+            state.getFisherFactory().setDepartingStrategy(departingStrategy);
         }
 
         if(destinationStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setDestinationStrategy(destinationStrategy.apply(state));
             }
-            //new fishers will use the new gear
-            state.getFisherFactory().setGear(gear);
+            //new fishers will use the new strategy
+            state.getFisherFactory().setDestinationStrategy(destinationStrategy);
+        }
+
+        if(discardingStrategy != null)
+        {
+            for (Fisher fisher : state.getFishers()) {
+                fisher.setDiscardingStrategy(discardingStrategy.apply(state));
+            }
+            //new fishers will use the new strategy
+            state.getFisherFactory().setDiscardingStrategy(discardingStrategy);
+        }
+
+        if(hourlyTravellingCosts != null)
+        {
+            for (Fisher fisher : state.getFishers()) {
+                Preconditions.checkArgument(fisher.getAdditionalTripCosts().size() <=1,
+                                            "replacing more than one additional cost, this is probably not what you want");
+                if(fisher.getAdditionalTripCosts().size()==1)
+                    Log.warn("Replacing the previous additional trip cost object with the new one");
+
+                fisher.getAdditionalTripCosts().clear();
+                fisher.getAdditionalTripCosts().add(new HourlyCost(
+                        hourlyTravellingCosts.apply(state.getRandom())
+                ));
+            }
+            state.getFisherFactory().getAdditionalSetups().add(
+                    new Consumer<Fisher>() {
+                        @Override
+                        public void accept(Fisher fisher) {
+                            fisher.getAdditionalTripCosts().clear();
+                            fisher.getAdditionalTripCosts().add(new HourlyCost(
+                                    hourlyTravellingCosts.apply(state.getRandom())
+                            ));
+                        }
+                    }
+            );
         }
 
         if(fishingStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setFishingStrategy(fishingStrategy.apply(state));
             }
-            //new fishers will use the new gear
-            state.getFisherFactory().setGear(gear);
+            //new fishers will use the new strategy
+            state.getFisherFactory().setFishingStrategy(fishingStrategy);
         }
 
         if(weatherStrategy != null) {
             for (Fisher fisher : state.getFishers()) {
                 fisher.setWeatherStrategy(weatherStrategy.apply(state));
             }
-            //new fishers will use the new gear
-            state.getFisherFactory().setGear(gear);
+            //new fishers will use the new strategy
+            state.getFisherFactory().setWeatherStrategy(weatherStrategy);
         }
 
 
@@ -241,5 +293,32 @@ public class PolicyScript
      */
     public void setGasPricePerLiter(Double gasPricePerLiter) {
         this.gasPricePerLiter = gasPricePerLiter;
+    }
+
+    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategy() {
+        return discardingStrategy;
+    }
+
+    public void setDiscardingStrategy(
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
+        this.discardingStrategy = discardingStrategy;
+    }
+
+    /**
+     * Getter for property 'hourlyTravellingCosts'.
+     *
+     * @return Value for property 'hourlyTravellingCosts'.
+     */
+    public DoubleParameter getHourlyTravellingCosts() {
+        return hourlyTravellingCosts;
+    }
+
+    /**
+     * Setter for property 'hourlyTravellingCosts'.
+     *
+     * @param hourlyTravellingCosts Value to set for property 'hourlyTravellingCosts'.
+     */
+    public void setHourlyTravellingCosts(DoubleParameter hourlyTravellingCosts) {
+        this.hourlyTravellingCosts = hourlyTravellingCosts;
     }
 }

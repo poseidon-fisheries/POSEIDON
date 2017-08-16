@@ -31,6 +31,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new SquaresMapDiscretizerFactory();
 
 
+    private boolean automaticallyIgnoreMPAs = true;
+
 
     /**
      * Applies this function to the given argument.
@@ -62,7 +64,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
                 ),
                 bandit.apply(state),
                 map,
-                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()));
+                new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+                automaticallyIgnoreMPAs);
     }
 
 
@@ -121,5 +124,23 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
     public void setDiscretizer(
             AlgorithmFactory<? extends MapDiscretizer> discretizer) {
         this.discretizer = discretizer;
+    }
+
+    /**
+     * Getter for property 'respectMPA'.
+     *
+     * @return Value for property 'respectMPA'.
+     */
+    public boolean isAutomaticallyIgnoreMPAs() {
+        return automaticallyIgnoreMPAs;
+    }
+
+    /**
+     * Setter for property 'respectMPA'.
+     *
+     * @param automaticallyIgnoreMPAs Value to set for property 'respectMPA'.
+     */
+    public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
+        this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
     }
 }

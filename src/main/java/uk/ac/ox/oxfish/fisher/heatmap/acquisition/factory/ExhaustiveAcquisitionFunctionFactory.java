@@ -14,6 +14,8 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
 
 
     private DoubleParameter proportionSearched = new FixedDoubleParameter(1d);
+    private boolean ignoreProtectedAreas = true;
+    private boolean ignoreWastelands = true;
 
     /**
      * Applies this function to the given argument.
@@ -23,7 +25,8 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
      */
     @Override
     public ExhaustiveAcquisitionFunction apply(FishState state) {
-        return new ExhaustiveAcquisitionFunction(proportionSearched.apply(state.getRandom()));
+        return new ExhaustiveAcquisitionFunction(proportionSearched.apply(state.getRandom()), ignoreProtectedAreas,
+                                                 ignoreWastelands);
     }
 
 
@@ -33,5 +36,41 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
 
     public void setProportionSearched(DoubleParameter proportionSearched) {
         this.proportionSearched = proportionSearched;
+    }
+
+    /**
+     * Getter for property 'ignoreProtectedAreas'.
+     *
+     * @return Value for property 'ignoreProtectedAreas'.
+     */
+    public boolean isIgnoreProtectedAreas() {
+        return ignoreProtectedAreas;
+    }
+
+    /**
+     * Setter for property 'ignoreProtectedAreas'.
+     *
+     * @param ignoreProtectedAreas Value to set for property 'ignoreProtectedAreas'.
+     */
+    public void setIgnoreProtectedAreas(boolean ignoreProtectedAreas) {
+        this.ignoreProtectedAreas = ignoreProtectedAreas;
+    }
+
+    /**
+     * Getter for property 'ignoreWastelands'.
+     *
+     * @return Value for property 'ignoreWastelands'.
+     */
+    public boolean isIgnoreWastelands() {
+        return ignoreWastelands;
+    }
+
+    /**
+     * Setter for property 'ignoreWastelands'.
+     *
+     * @param ignoreWastelands Value to set for property 'ignoreWastelands'.
+     */
+    public void setIgnoreWastelands(boolean ignoreWastelands) {
+        this.ignoreWastelands = ignoreWastelands;
     }
 }

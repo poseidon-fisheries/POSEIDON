@@ -105,6 +105,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_CONSUMPTION);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.FUEL_EXPENDITURE);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
+        yearlyCounter.addColumn(FisherYearlyTimeSeries.EARNINGS);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.TRIPS);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.EFFORT);
         yearlyCounter.addColumn(FisherYearlyTimeSeries.HOURS_OUT);
