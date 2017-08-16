@@ -6,8 +6,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
-
 /**
  * Given a set of weights to drive movement towards better habitat
  * Created by carrknight on 7/28/17.
@@ -48,6 +46,8 @@ public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
             Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere, SeaTile there,
             AbundanceBasedLocalBiology biologyThere, int delta, int fishHere, int fishThere, int bin, boolean male,
             MersenneTwisterFast random) {
+
+
 
         //reweights
         double weightHere = weights.get(biologyHere);

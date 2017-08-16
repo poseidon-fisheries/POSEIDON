@@ -56,13 +56,20 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             Collections.shuffle(potential);
             for(SeaTile there : potential) {
                 assert biologies.containsKey(there);
+                AbundanceBasedLocalBiology thereBiology = biologies.get(there);
+                int[] malesHere = here.getValue().getNumberOfMaleFishPerAge(species);
+                int[] malesThere = thereBiology.getNumberOfMaleFishPerAge(species);
+
+                int[] femaleHere = here.getValue().getNumberOfFemaleFishPerAge(species);
+                int[] femaleThere = thereBiology.getNumberOfFemaleFishPerAge(species);
+
+
                 //check for difference in abundance between each bin
                 for (int bin = 0; bin < species.getMaxAge() + 1; bin++)
                 {
-                    AbundanceBasedLocalBiology thereBiology = biologies.get(there);
                     //move male
-                    int fishHere = here.getValue().getNumberOfMaleFishPerAge(species)[bin];
-                    int fishThere = thereBiology.getNumberOfMaleFishPerAge(species)[bin];
+                    int fishHere = malesHere[bin];
+                    int fishThere = malesThere[bin];
                     int maleDelta = fishHere -
                             fishThere;
                     //move always get called, regardless of what the delta is!
@@ -70,8 +77,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
                          here.getValue(), there, thereBiology, maleDelta,fishHere ,fishThere , bin, true, model.getRandom());
 
                     //move female
-                    fishHere = here.getValue().getNumberOfFemaleFishPerAge(species)[bin];
-                    fishThere = thereBiology.getNumberOfFemaleFishPerAge(species)[bin];
+                    fishHere = femaleHere[bin];
+                    fishThere = femaleThere[bin];
                     int femaleDelta = fishHere -
                             fishThere;
                     //move always get called, regardless of what the delta is!

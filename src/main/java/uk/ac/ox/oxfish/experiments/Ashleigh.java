@@ -16,12 +16,12 @@ public class Ashleigh {
 
 
     public static final int FISHERS = 100;
-    public static final int RUNS = 10;
+    public static final int RUNS = 100;
     public static final int YEARS = 30;
 
     public static void main(String[] args) throws IOException {
 
-        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun.csv").toFile());
+        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun2.csv").toFile());
 
         String[] columns = new String[]{
                "Trips Exploring",
