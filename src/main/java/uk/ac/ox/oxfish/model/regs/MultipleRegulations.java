@@ -98,7 +98,7 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
 
 
         Preconditions.checkArgument(!regulations.isEmpty(), "No regulations, not even anarchy, for fisher" +
-        fisher);
+                fisher);
         //clear to make sure you don't do it twice!
         started = true;
     }
@@ -209,21 +209,30 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     private QuotaPerSpecieRegulation delegateHack = null;
 
     private QuotaPerSpecieRegulation getQuotaDelegate(){
-        if(delegateHack== null)
-            delegateHack = (QuotaPerSpecieRegulation) getRegulations().stream().filter(
-                new Predicate<Regulation>() {
-                    @Override
-                    public boolean test(Regulation regulation) {
-                        return regulation instanceof QuotaPerSpecieRegulation;
-                    }
-                }).collect(Collectors.toList()).get(0);
+        if(delegateHack== null) {
+            List<Regulation> quotaRules = getRegulations().stream().filter(
+                    new Predicate<Regulation>() {
+                        @Override
+                        public boolean test(Regulation regulation) {
+                            return regulation instanceof QuotaPerSpecieRegulation;
+                        }
+                    }).collect(Collectors.toList());
+            if(quotaRules.isEmpty())
+                return null;
+            else
+                delegateHack = (QuotaPerSpecieRegulation) quotaRules.get(0);
+        }
 
         return delegateHack;
     }
 
     @Override
     public double getQuotaRemaining(int specieIndex) {
-        return getQuotaDelegate().getQuotaRemaining(specieIndex);
+        QuotaPerSpecieRegulation quotaDelegate = getQuotaDelegate();
+        if(quotaDelegate!= null)
+            return quotaDelegate.getQuotaRemaining(specieIndex);
+        else
+            return Double.POSITIVE_INFINITY;
     }
 
     @Override

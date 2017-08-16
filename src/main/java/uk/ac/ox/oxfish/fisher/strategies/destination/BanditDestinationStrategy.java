@@ -38,6 +38,10 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     private final BanditAverage banditAverage;
     private Adaptation concreteAdaptation;
 
+    private Fisher fisher;
+
+    final private boolean respectMPA;
+    private FishState model;
 
     /**
      * the constructor looks a bit weird but it's just due to the fact that we need to first
@@ -45,12 +49,13 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      * @param averagerMaker builds the bandit average given the number of arms
      * @param banditMaker builds the bandit algorithm given the bandit average
      * @param delegate the delegate strategy
+     * @param respectMPA
      */
     public BanditDestinationStrategy(
             Function<Integer, BanditAverage> averagerMaker,
             BanditSupplier banditMaker,
             MapDiscretization discretization,
-            FavoriteDestinationStrategy delegate) {
+            FavoriteDestinationStrategy delegate, boolean respectMPA) {
         //map arms to valid map groups
         this.discretization = discretization;
 
@@ -62,6 +67,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         algorithm = banditMaker.apply(banditAverage);
 
         this.delegate = delegate;
+        this.respectMPA = respectMPA;
     }
 
     private int fromBanditArmToMapGroup(int banditArm){
@@ -90,14 +96,24 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         assert discretization.isValid(groupToFishIn);
         //assuming here the map discretization has already removed all the land tiles
         List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
-        SeaTile tile = mapGroup.get(random.nextInt(
-                mapGroup.size()));
+        int attempts = 0;
+        SeaTile tile;
+        do {
+            tile =
+                    mapGroup.get(random.nextInt(mapGroup.size()));
+
+            attempts++;
+
+        }while (respectMPA && attempts<100 && fisher.isAllowedToFishHere(tile,model));
+
         delegate.setFavoriteSpot(tile);
     }
 
     @Override
     public void start(FishState model, Fisher fisher) {
 
+        this.fisher = fisher;
+        this.model = model;
         delegate.start(model,fisher);
         concreteAdaptation = new Adaptation() {
             @Override

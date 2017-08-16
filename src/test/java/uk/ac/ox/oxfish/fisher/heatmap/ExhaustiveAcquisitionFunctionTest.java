@@ -31,7 +31,7 @@ public class ExhaustiveAcquisitionFunctionTest {
         when(state.getRandom()).thenReturn(random);
         when(state.getHoursSinceStart()).thenReturn(120d);
 
-        ExhaustiveAcquisitionFunction acquisitionFunction = new ExhaustiveAcquisitionFunction();
+        ExhaustiveAcquisitionFunction acquisitionFunction = new ExhaustiveAcquisitionFunction(1d,false,false);
 
         GeographicalRegression regression = mock(GeographicalRegression.class);
         when(regression.predict(any(SeaTile.class), eq(120d), any(),any() )).thenAnswer((Answer<Double>) invocation -> {

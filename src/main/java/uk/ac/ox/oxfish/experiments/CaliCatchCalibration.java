@@ -5,11 +5,13 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -53,7 +55,7 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("attainment_530_dumb3");
         //  runMultipleTimesToBuildHistogram("attainment_530_dumb4");
         //runMultipleTimesToBuildHistogram("attainment_530_dumb5");
-       // runMultipleTimesToBuildHistogram("kernel_101");
+        // runMultipleTimesToBuildHistogram("kernel_101");
         //runMultipleTimesToBuildHistogram("random");
         //runMultipleTimesToBuildHistogram("attainment_prop");
         //runMultipleTimesToBuildHistogram("profit_prop_137");
@@ -78,29 +80,54 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("clamped_300_manualmovement");
         //runMultipleTimesToBuildHistogram("clamped_thorough    _63");
         //runMultipleTimesToBuildHistogram("clamped_moving_thorough_200");
-       // runMultipleTimesToBuildHistogram("manual2_151_trading");
+        // runMultipleTimesToBuildHistogram("manual2_151_trading");
         //runMultipleTimesToBuildHistogram("manual2_500_trading");
         //runMultipleTimesToBuildHistogram("manual2_500_trading_blocked");
-        runMultipleTimesToBuildHistogram("manual2_500_trading_blocked_exit");
-
+        //runMultipleTimesToBuildHistogram("manual2_500_trading_blocked_exit");
+        //runMultipleTimesToBuildHistogram("exit2_600");
+        //runMultipleTimesToBuildHistogram("exit2_640");
+        //runMultipleTimesToBuildHistogram("exit2_640_manualeei");
+        //runMultipleTimesToBuildHistogram("mpaed_150");
+        //runMultipleTimesToBuildHistogram("mpaed2_150");
+        //runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_eei");
+        //runMultipleTimesToBuildHistogram("mpaed2_850");
+        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_eei_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);
+       /* runMultipleTimesToBuildHistogram("mpaed_eei_log_350_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);
+                                         */
+        //runMultipleTimesToBuildHistogram("mpaed_eei_log_350");
         //runMultipleTimesToBuildHistogram("mark4_600_random");
+        //runMultipleTimesToBuildHistogram("mpaed2_850_exitexperiment");
+        //runMultipleTimesToBuildHistogram("mpaed_eei_log_350_exitexperiment");
+//        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_150");
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
+
+        runMultipleTimesToBuildHistogram(input,null,MAIN_DIRECTORY,YEARS_PER_RUN);
+    }
+
+    private static void runMultipleTimesToBuildHistogram(
+            final String input, String policyFile, final Path mainDirectory, final int yearsPerRun) throws IOException {
 
 
         boolean header = true;
         System.out.println(input);
         //write header
-        FileWriter writer = new FileWriter(MAIN_DIRECTORY.resolve(input + ".csv").toFile());
+        FileWriter writer = new FileWriter(mainDirectory.resolve(input + ".csv").toFile());
 
 
 
         for (int run = 0; run < RUNS; run++) {
 
             FishYAML yaml = new FishYAML();
-            CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(MAIN_DIRECTORY.resolve(input + ".yaml").toFile()),
-                                            CaliforniaAbundanceScenario.class);
+            CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(mainDirectory.resolve(input + ".yaml").toFile()),
+                                                               CaliforniaAbundanceScenario.class);
             scenario.setLogbook(new NoLogbookFactory());
 
             FishState state = new FishState(run);
@@ -108,6 +135,16 @@ public class CaliCatchCalibration {
 
             //run the model
             state.start();
+
+            //if you have a policy script, then follow it
+            if(policyFile != null)
+            {
+                String policyScriptString = new String(Files.readAllBytes(mainDirectory.resolve(policyFile + ".yaml")));
+                PolicyScripts scripts = yaml.loadAs(policyScriptString, PolicyScripts.class);
+                state.registerStartable(scripts);
+            }
+
+
             state.schedule.step(state);
             state.schedule.step(state);
 
@@ -116,18 +153,19 @@ public class CaliCatchCalibration {
             {
                 writer.write(
                         "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish" +
-                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips");
+                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits,actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings" );
 
                 for(Port port : state.getPorts())
-                    writer.write(","+port.getName()+"_trips,"+port.getName()+"_profits");
+                    writer.write(","+port.getName()+"_trips,"+port.getName()+"_fishers,"+port.getName()+"_profits");
                 writer.write("\n");
                 writer.flush();
                 header = false;
             }
 
-            while (state.getYear() < YEARS_PER_RUN) {
+            while (state.getYear() < yearsPerRun) {
                 state.schedule.step(state);
                 if (state.getDayOfTheYear() == 1) {
+                    boolean isITQOn = state.getYearlyDataSet().getColumn("ITQ Prices Of Sablefish") != null ;
                     writer.write(state.getYear() + "," + run + "," +
                                          state.getLatestYearlyObservation("Average Cash-Flow") + "," +
                                          state.getLatestYearlyObservation("Average Hours Out") + "," +
@@ -139,21 +177,27 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
                                          state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
                                          // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
-                                         state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish") + "," +
-                                         state.getLatestYearlyObservation("ITQ Prices Of Dover Sole") + "," +
-                                         state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead") + "," +
-                                         state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead") + "," +
-                                         state.getLatestYearlyObservation("ITQ Prices Of Sablefish") + "," +
+                                         (!isITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Sablefish")) + "," +
                                          state.getLatestYearlyObservation("Average Distance From Port") + "," +
                                          state.getLatestYearlyObservation("Average Trip Duration") + "," +
-                                         state.getLatestYearlyObservation("Average Number of Trips")
+                                         state.getLatestYearlyObservation("Average Number of Trips") + "," +
+                                         state.getLatestYearlyObservation("Actual Average Cash-Flow") + "," +
+                                         state.getLatestYearlyObservation("Actual Average Hours Out") + "," +
+                                         state.getLatestYearlyObservation("Weighted Average Distance From Port") + "," +
+                                         state.getLatestYearlyObservation("Number Of Active Fishers")+ "," +
+                                         state.getLatestYearlyObservation("Total Variable Costs")+ "," +
+                                         state.getLatestYearlyObservation("Total Earnings")
 
 
                     );
                     for (Port port : state.getPorts())
-                        writer.write("," + state.getLatestYearlyObservation(
-                                port.getName() + " " + FisherYearlyTimeSeries.TRIPS) +
-                                             "," +
+                        writer.write("," +
+                                             state.getLatestYearlyObservation(port.getName() + " " + FisherYearlyTimeSeries.TRIPS) + "," +
+                                             state.getLatestYearlyObservation(port.getName() + " Number Of Active Fishers") + "," +
                                              state.getLatestYearlyObservation("Average Cash-Flow at " + port.getName())
                         );
                     writer.write("\n");

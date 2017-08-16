@@ -20,13 +20,17 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
     private double proportionSearched;
 
-    public ExhaustiveAcquisitionFunction() {
-        this(1d);
-    }
+    private final boolean ignoreProtectedAreas;
+
+    private final boolean ignoreWastelands;
 
 
-    public ExhaustiveAcquisitionFunction(double proportionSearched) {
+
+    public ExhaustiveAcquisitionFunction(
+            double proportionSearched, boolean ignoreProtectedAreas, boolean ignoreWastelands) {
         this.proportionSearched = proportionSearched;
+        this.ignoreProtectedAreas = ignoreProtectedAreas;
+        this.ignoreWastelands = ignoreWastelands;
     }
 
     /**
@@ -54,7 +58,10 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
         assert Double.isFinite(best.getSecond());
         for(SeaTile tile : seaTiles)
         {
-            if(random.nextBoolean(proportionSearched))
+            if(
+                    (!ignoreWastelands || tile.isFishingEvenPossibleHere()) &&
+                            (!ignoreProtectedAreas || fisher.isAllowedToFishHere(tile,state)) &&
+                            random.nextBoolean(proportionSearched))
             {
                 double predicted = regression.predict(tile, state.getHoursSinceStart(), fisher,state );
                 if(Double.isFinite(predicted) && predicted > best.getSecond())
@@ -64,7 +71,7 @@ public class ExhaustiveAcquisitionFunction  implements AcquisitionFunction
 
 
 
-       return best.getFirst();
+        return best.getFirst();
 
     }
 }

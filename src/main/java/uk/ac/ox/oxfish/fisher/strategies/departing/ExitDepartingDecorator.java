@@ -82,12 +82,15 @@ public class ExitDepartingDecorator implements DepartingStrategy {
 
     public void checkIfQuit(Fisher fisher){
         if(!hasQuit) {
-            DataColumn profitData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-            if(profitData.size() >= consecutiveYearsNegative) {
-                Iterator<Double> profitsIterator = profitData.descendingIterator();
+            DataColumn earningsData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.EARNINGS);
+            DataColumn costData = fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
+            if(earningsData.size() >= consecutiveYearsNegative) {
+                Iterator<Double> earningsIterator = earningsData.descendingIterator();
+                Iterator<Double> costsIterator = costData.descendingIterator();
                 double sum = 0;
                 for(int i=0; i<consecutiveYearsNegative; i++) {
-                    sum+=profitsIterator.next();
+                    sum+=earningsIterator.next();
+                    sum-=costsIterator.next();
                 }
                 //you are here, all your profits were negative!
                 if(sum<0)

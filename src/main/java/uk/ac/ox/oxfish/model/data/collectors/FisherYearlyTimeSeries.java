@@ -30,6 +30,7 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
     public static final String FUEL_CONSUMPTION = "FUEL_CONSUMPTION";
     public static final String FUEL_EXPENDITURE = "FUEL_EXPENDITURE";
     public static final String VARIABLE_COSTS = "VARIABLE_COSTS";
+    public static final String EARNINGS = "EARNINGS";
     public static final String TRIPS = "NUMBER_OF_TRIPS";
     public static final String EFFORT = "HOURS_OF_EFFORT";
     public static final String FISHING_DISTANCE = "DISTANCE_TOW_TO_PORT";
@@ -72,6 +73,9 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
 
         registerGatherer(VARIABLE_COSTS,
                          fisher -> observed.getYearlyCounterColumn(VARIABLE_COSTS),Double.NaN);
+
+        registerGatherer(EARNINGS,
+                         fisher -> observed.getYearlyCounterColumn(EARNINGS),Double.NaN);
 
         registerGatherer(TRIPS,
                          fisher -> observed.getYearlyCounterColumn(TRIPS),Double.NaN);
