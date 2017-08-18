@@ -21,7 +21,7 @@ public class Ashleigh {
 
     public static void main(String[] args) throws IOException {
 
-        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun_100.csv").toFile());
+        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun2.csv").toFile());
 
         String[] columns = new String[]{
                "Trips Exploring",
