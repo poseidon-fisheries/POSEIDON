@@ -37,6 +37,8 @@ public abstract class  BarebonesLogitDestinationFactory implements
     private DoubleParameter distanceInKm =
             new FixedDoubleParameter(-0.00759009);
     private DoubleParameter habitPeriodInDays = new FixedDoubleParameter(90);
+    private boolean automaticallyAvoidMPA = true;
+    private boolean automaticallyAvoidWastelands = true;
 
     /**
      * Applies this function to the given argument.
@@ -71,14 +73,16 @@ public abstract class  BarebonesLogitDestinationFactory implements
         ObservationExtractor[][] extractors = buildExtractors(state, discretization, areas, betas);
 
 
+        automaticallyAvoidMPA = true;
+        automaticallyAvoidWastelands = true;
         return new LogitDestinationStrategy(
                 betas,
                 extractors,
                 validAreas,
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                state.getRandom()
-        );
+                state.getRandom(),
+                automaticallyAvoidMPA, automaticallyAvoidWastelands);
 
 
     }
@@ -185,5 +189,42 @@ public abstract class  BarebonesLogitDestinationFactory implements
      */
     public void setHabitPeriodInDays(DoubleParameter habitPeriodInDays) {
         this.habitPeriodInDays = habitPeriodInDays;
+    }
+
+
+    /**
+     * Getter for property 'automaticallyAvoidMPA'.
+     *
+     * @return Value for property 'automaticallyAvoidMPA'.
+     */
+    public boolean isAutomaticallyAvoidMPA() {
+        return automaticallyAvoidMPA;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidMPA'.
+     *
+     * @param automaticallyAvoidMPA Value to set for property 'automaticallyAvoidMPA'.
+     */
+    public void setAutomaticallyAvoidMPA(boolean automaticallyAvoidMPA) {
+        this.automaticallyAvoidMPA = automaticallyAvoidMPA;
+    }
+
+    /**
+     * Getter for property 'automaticallyAvoidWastelands'.
+     *
+     * @return Value for property 'automaticallyAvoidWastelands'.
+     */
+    public boolean isAutomaticallyAvoidWastelands() {
+        return automaticallyAvoidWastelands;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidWastelands'.
+     *
+     * @param automaticallyAvoidWastelands Value to set for property 'automaticallyAvoidWastelands'.
+     */
+    public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
+        this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
     }
 }

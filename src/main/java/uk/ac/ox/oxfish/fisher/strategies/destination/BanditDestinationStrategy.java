@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
@@ -43,6 +44,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     final private boolean respectMPA;
     private FishState model;
 
+    private final boolean ignoreWastelands;
+
     /**
      * the constructor looks a bit weird but it's just due to the fact that we need to first
      * figure out the right number of arms from the discretization
@@ -50,12 +53,13 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      * @param banditMaker builds the bandit algorithm given the bandit average
      * @param delegate the delegate strategy
      * @param respectMPA
+     * @param ignoreWastelands
      */
     public BanditDestinationStrategy(
             Function<Integer, BanditAverage> averagerMaker,
             BanditSupplier banditMaker,
             MapDiscretization discretization,
-            FavoriteDestinationStrategy delegate, boolean respectMPA) {
+            FavoriteDestinationStrategy delegate, boolean respectMPA, boolean ignoreWastelands) {
         //map arms to valid map groups
         this.discretization = discretization;
 
@@ -68,6 +72,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
 
         this.delegate = delegate;
         this.respectMPA = respectMPA;
+        this.ignoreWastelands = ignoreWastelands;
     }
 
     private int fromBanditArmToMapGroup(int banditArm){
@@ -96,15 +101,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         assert discretization.isValid(groupToFishIn);
         //assuming here the map discretization has already removed all the land tiles
         List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
-        int attempts = 0;
-        SeaTile tile;
-        do {
-            tile =
-                    mapGroup.get(random.nextInt(mapGroup.size()));
-
-            attempts++;
-
-        }while (respectMPA && attempts<100 && fisher.isAllowedToFishHere(tile,model));
+        SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(random, mapGroup, respectMPA, fisher, model, ignoreWastelands,
+                                                                   100);
 
         delegate.setFavoriteSpot(tile);
     }

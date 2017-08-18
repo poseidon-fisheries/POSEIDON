@@ -61,12 +61,12 @@ public class LogitDestinationStrategyTest
         extractors[2]= null;
 
         LogitDestinationStrategy strategy = new LogitDestinationStrategy(
-                beta,extractors,
+                beta, extractors,
                 Lists.newArrayList(new Integer(0),new Integer(1),new Integer(2)),
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap().getSeaTile(3,3)),
-                random
-        );
+                random,
+                false, false);
 
         int counter = 0;
         for(int i=0; i<1000; i++)
@@ -125,8 +125,8 @@ public class LogitDestinationStrategyTest
                 Lists.newArrayList(1, 0, 2),
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap().getSeaTile(3, 3)),
-                random
-        );
+                random,
+                false, false);
 
         int counter = 0;
         for (int i = 0; i < 10000; i++) {
@@ -178,12 +178,12 @@ public class LogitDestinationStrategyTest
         int counter = 0;
 
         LogitDestinationStrategy strategy = new LogitDestinationStrategy(
-                beta,extractors,
+                beta, extractors,
                 Lists.newArrayList(1,0,2),
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap().getSeaTile(3,3)),
-                random
-        );
+                random,
+                false, false);
 
         for(int i=0; i<1000; i++)
         {

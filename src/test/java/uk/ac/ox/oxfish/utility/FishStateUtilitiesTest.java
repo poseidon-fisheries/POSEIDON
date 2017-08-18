@@ -1,15 +1,18 @@
 package uk.ac.ox.oxfish.utility;
 
 import com.beust.jcommander.internal.Lists;
+import ec.util.MersenneTwisterFast;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -108,5 +111,45 @@ public class FishStateUtilitiesTest {
 
 
 
+    }
+
+
+    @Test
+    public void getValidSeatileFromGroup() throws Exception {
+
+        SeaTile tile1 = mock(SeaTile.class);
+        SeaTile tile2 = mock(SeaTile.class);
+        SeaTile tile3 = mock(SeaTile.class);
+        SeaTile tile4 = mock(SeaTile.class);
+        SeaTile tile5 = mock(SeaTile.class);
+        when(tile1.isFishingEvenPossibleHere()).thenReturn(true);
+        when(tile2.isFishingEvenPossibleHere()).thenReturn(true);
+        when(tile3.isFishingEvenPossibleHere()).thenReturn(true);
+        when(tile4.isFishingEvenPossibleHere()).thenReturn(true);
+        when(tile5.isFishingEvenPossibleHere()).thenReturn(false); //tile 5 should be ignored
+
+        List<SeaTile> tiles = Lists.newArrayList(tile1,tile2,tile3,tile4,tile5);
+        Fisher fisher = mock(Fisher.class);
+        FishState model = mock(FishState.class);
+
+
+        //tile 1 to 3 should also be ignored!
+        when(fisher.isAllowedToFishHere(tile1,model)).thenReturn(false);
+        when(fisher.isAllowedToFishHere(tile2,model)).thenReturn(false);
+        when(fisher.isAllowedToFishHere(tile3,model)).thenReturn(false);
+        when(fisher.isAllowedToFishHere(tile4,model)).thenReturn(true);
+        when(fisher.isAllowedToFishHere(tile5,model)).thenReturn(true);
+
+        for(int i=0; i<100; i++)
+        {
+            SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(new MersenneTwisterFast(),
+                                                                       tiles,
+                                                                       true,
+                                                                       fisher,
+                                                                       model,
+                                                                       true,
+                                                                       100);
+            assertEquals(tile,tile4);
+        }
     }
 }

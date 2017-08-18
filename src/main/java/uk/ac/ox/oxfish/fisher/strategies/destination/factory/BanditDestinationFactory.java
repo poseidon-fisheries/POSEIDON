@@ -33,6 +33,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
     private boolean automaticallyIgnoreMPAs = true;
 
+    private boolean automaticallyIgnoreWastelands = true;
+
 
     /**
      * Applies this function to the given argument.
@@ -65,7 +67,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
                 bandit.apply(state),
                 map,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                automaticallyIgnoreMPAs);
+                automaticallyIgnoreMPAs, automaticallyIgnoreWastelands);
     }
 
 
@@ -142,5 +144,23 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      */
     public void setAutomaticallyIgnoreMPAs(boolean automaticallyIgnoreMPAs) {
         this.automaticallyIgnoreMPAs = automaticallyIgnoreMPAs;
+    }
+
+    /**
+     * Getter for property 'automaticallyIgnoreWastelands'.
+     *
+     * @return Value for property 'automaticallyIgnoreWastelands'.
+     */
+    public boolean isAutomaticallyIgnoreWastelands() {
+        return automaticallyIgnoreWastelands;
+    }
+
+    /**
+     * Setter for property 'automaticallyIgnoreWastelands'.
+     *
+     * @param automaticallyIgnoreWastelands Value to set for property 'automaticallyIgnoreWastelands'.
+     */
+    public void setAutomaticallyIgnoreWastelands(boolean automaticallyIgnoreWastelands) {
+        this.automaticallyIgnoreWastelands = automaticallyIgnoreWastelands;
     }
 }

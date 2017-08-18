@@ -121,11 +121,11 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170630 fixed_gear/calibration/geographic"
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/"
-#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/annealing-inference/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-hours/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/bandit-inference/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/kernel-inference/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/kernel-inference/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-movement/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/tweaking/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-only/"

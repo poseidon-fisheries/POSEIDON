@@ -91,20 +91,58 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("mpaed2_150");
         //runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_eei");
         //runMultipleTimesToBuildHistogram("mpaed2_850");
-        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_eei_preitq",
+//        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_eei_preitq",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+//                                         10);
+/*
+        runMultipleTimesToBuildHistogram("mpaed_eei_log_350_preitq",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
                                          10);
-       /* runMultipleTimesToBuildHistogram("mpaed_eei_log_350_preitq",
-                                         "itq_switch_script",
-                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
-                                         10);
-                                         */
+*/
         //runMultipleTimesToBuildHistogram("mpaed_eei_log_350");
         //runMultipleTimesToBuildHistogram("mark4_600_random");
         //runMultipleTimesToBuildHistogram("mpaed2_850_exitexperiment");
         //runMultipleTimesToBuildHistogram("mpaed_eei_log_350_exitexperiment");
 //        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_150");
+        //runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200");
+/*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
+
+        // runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300");
+//        runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300_preitq",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+//                                         10);
+        //runMultipleTimesToBuildHistogram("mpaed150_annealing_log_200");
+//        runMultipleTimesToBuildHistogram("mpaed150_annealing_log_200_preitq",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+//                                         10);
+
+
+//        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_random");
+/*        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_random_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
+
+
+//        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_intercepts");
+/*        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_intercepts_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
+
+        //runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_clamped");
+        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_clamped_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);
+
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {

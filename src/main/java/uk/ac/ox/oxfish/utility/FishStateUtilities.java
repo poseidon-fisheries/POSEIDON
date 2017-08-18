@@ -1089,5 +1089,28 @@ public class FishStateUtilities {
         return signum > 0 ? toReturn : -toReturn;
     }
 
+    public static SeaTile getValidSeatileFromGroup(
+            MersenneTwisterFast random, List<SeaTile> mapGroup, boolean respectMPA, Fisher fisher, FishState model,
+            boolean ignoreWastelands, final int maxAttempts) {
+        int attempts = 0;
+        SeaTile tile;
+        do {
+            tile =
+                    mapGroup.get(random.nextInt(mapGroup.size()));
+
+            attempts++;
+
+            if(attempts > maxAttempts)
+                break;
+
+        }while (
+                (respectMPA && !fisher.isAllowedToFishHere(tile, model))  ||
+                (ignoreWastelands && !tile.isFishingEvenPossibleHere()));
+        if(attempts < maxAttempts) {
+            assert !respectMPA || fisher.isAllowedToFishHere(tile, model);
+            assert !ignoreWastelands || tile.isFishingEvenPossibleHere();
+        }
+        return tile;
+    }
 }
 

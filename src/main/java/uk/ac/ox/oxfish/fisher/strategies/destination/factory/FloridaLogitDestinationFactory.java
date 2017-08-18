@@ -48,6 +48,13 @@ public class FloridaLogitDestinationFactory implements
      * everybody shares the parent same destination logit strategy
      */
     private Locker<FishState,MapDiscretization> discretizationLocker = new Locker<>();
+
+    private boolean automaticallyAvoidMPA = true;
+
+    private boolean automaticallyAvoidWastelands = true;
+
+
+
     /**
      * Applies this function to the given argument.
      *
@@ -92,7 +99,7 @@ public class FloridaLogitDestinationFactory implements
 
         return new LogitDestinationStrategy(betas, extractors, rowNames, discretization,
                                             new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                                            state.getRandom());
+                                            state.getRandom(), automaticallyAvoidMPA, automaticallyAvoidWastelands);
 
     }
 
@@ -134,5 +141,41 @@ public class FloridaLogitDestinationFactory implements
 
     public void setCentroidFile(String centroidFile) {
         this.centroidFile = centroidFile;
+    }
+
+    /**
+     * Getter for property 'automaticallyAvoidMPA'.
+     *
+     * @return Value for property 'automaticallyAvoidMPA'.
+     */
+    public boolean isAutomaticallyAvoidMPA() {
+        return automaticallyAvoidMPA;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidMPA'.
+     *
+     * @param automaticallyAvoidMPA Value to set for property 'automaticallyAvoidMPA'.
+     */
+    public void setAutomaticallyAvoidMPA(boolean automaticallyAvoidMPA) {
+        this.automaticallyAvoidMPA = automaticallyAvoidMPA;
+    }
+
+    /**
+     * Getter for property 'automaticallyAvoidWastelands'.
+     *
+     * @return Value for property 'automaticallyAvoidWastelands'.
+     */
+    public boolean isAutomaticallyAvoidWastelands() {
+        return automaticallyAvoidWastelands;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidWastelands'.
+     *
+     * @param automaticallyAvoidWastelands Value to set for property 'automaticallyAvoidWastelands'.
+     */
+    public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
+        this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
     }
 }

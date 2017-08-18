@@ -8,6 +8,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Arrays;
+
 /**
  * A recursive kernel predictor. Because it needs to predict always in the same spot time will be a forgetting factor
  * instead of the more appropriate additional data dimension.
@@ -64,7 +66,8 @@ public class KernelTilePredictor{
 
         //update denominator
         currentDenominator = currentDenominator * forgettingFactor + kernel;
-        Preconditions.checkArgument(Double.isFinite(currentDenominator));
+        Preconditions.checkArgument(Double.isFinite(currentDenominator), currentDenominator + " , " +
+        forgettingFactor + " , " + kernel + " , " + Arrays.toString(bandwidths));
         //update predictor
         if (currentDenominator > 0)
             currentPrediction += (observation.getValue() - currentPrediction) * kernel / currentDenominator;

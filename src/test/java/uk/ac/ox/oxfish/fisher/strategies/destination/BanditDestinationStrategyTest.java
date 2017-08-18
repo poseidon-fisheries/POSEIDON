@@ -44,7 +44,7 @@ public class BanditDestinationStrategyTest {
                 banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,.1),
                 discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                false);
+                false, false);
 
         //option 2 is the best, you should pick it!
 
@@ -81,7 +81,7 @@ public class BanditDestinationStrategyTest {
                 banditAverage -> banditAlgorithm,
                 discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                false);
+                false, false);
 
 
         int[][] chosen = new int[3][3];

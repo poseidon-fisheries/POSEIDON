@@ -14,6 +14,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.Arrays;
 import java.util.List;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.getValidSeatileFromGroup;
+
 /**
  * A destination strategy that is given a fixed propensity to visit each map location and picks one in proportion
  * by softmax (up to a distance limit!)
@@ -98,18 +100,17 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
             //grab a random seatile for each group
             SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
             for(int group = 0; group<discretization.getNumberOfGroups(); group++) {
-                int attempts = 0;
                 List<SeaTile> tileGroup = discretization.getGroup(group);
-
-                while(tileGroup.size() > 0 && candidates[group] == null) {
-                    candidates[group] =
-                            tileGroup.get(random.nextInt(tileGroup.size()));
-                    if (attempts< 100 && candidates[group] != null && (candidates[group].isProtected() || !fisher.isAllowedToFishHere(
-                            candidates[group], state)))
-                        candidates[group] = null; //do not go to protected areas or unfishable areas, please.
-                    attempts++;
-
-                }
+                if(tileGroup.size() > 0)
+                    candidates[group] = getValidSeatileFromGroup(
+                            random,
+                            tileGroup,
+                            true,
+                            fisher,
+                            state,
+                            true,
+                            100
+                    );
             }
             assert candidates.length ==  propensities.length;
             double[] currentPropensities = Arrays.copyOf(propensities,candidates.length);

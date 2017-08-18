@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.bandit.BanditSwitch;
 
@@ -54,20 +55,34 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     private LogisticLog log;
 
 
+    private boolean started = false;
+
+    private Fisher fisher;
+    private FishState model;
+
+    private final boolean automaticallyAvoidMPA;
+
+    private final boolean automaticallyAvoidWastelands;
+
+
     /**
-     *
-     * @param betas table of all the betas (some might be ignored if the map doesn't cover them)
+     *  @param betas table of all the betas (some might be ignored if the map doesn't cover them)
      * @param covariates table of all hte observation extractors (generate x on the spot)
      * @param rowNames column that assign to each row of betas the group it belongs to
      * @param discretization the discretization map
+     * @param automaticallyAvoidMPA automatically avoid not allowed areas
+     * @param automaticallyAvoidWastelands automatically avoid areas where fish can't grow
      */
-    public LogitDestinationStrategy(double[][] betas, ObservationExtractor[][] covariates,
-                                    List<Integer> rowNames,
-                                    MapDiscretization discretization,
-                                    FavoriteDestinationStrategy delegate,
-                                    MersenneTwisterFast random
-    )
+    public LogitDestinationStrategy(
+            double[][] betas, ObservationExtractor[][] covariates,
+            List<Integer> rowNames,
+            MapDiscretization discretization,
+            FavoriteDestinationStrategy delegate,
+            MersenneTwisterFast random,
+            boolean automaticallyAvoidMPA, boolean automaticallyAvoidWastelands)
     {
+        this.automaticallyAvoidMPA = automaticallyAvoidMPA;
+        this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
 
         Preconditions.checkArgument(rowNames.size()==betas.length,"Row names do not match number of betas");
         Preconditions.checkArgument(rowNames.size()==covariates.length,"Row names do not match number of covariates");
@@ -102,6 +117,13 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                 effectiveCovariates.toArray(new ObservationExtractor[effectiveCovariates.size()][]),
                 arm -> {
                     List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
+                    FishStateUtilities.getValidSeatileFromGroup(random,
+                                                                group,
+                                                                this.automaticallyAvoidMPA,
+                                                                fisher,
+                                                                model,
+                                                                this.automaticallyAvoidWastelands,
+                                                                50);
                     return group.get(random.nextInt(group.size()));
                 }
         );
@@ -141,11 +163,15 @@ public class LogitDestinationStrategy implements DestinationStrategy{
     };
 
 
-    boolean started = false;
+
+
     @Override
     public void start(FishState model, Fisher fisher) {
+
         Preconditions.checkState(!started,"Already started!");
         started = true;
+        this.model = model;
+        this.fisher = fisher;
         delegate.start(model, fisher);
         fisher.addPerTripAdaptation(adaptation);
         //keep in memory the last time the arm was chosen
@@ -171,7 +197,13 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
         List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
 
-        SeaTile destination = group.get(random.nextInt(group.size()));
+        SeaTile destination = FishStateUtilities.getValidSeatileFromGroup(random,
+                                                                          group,
+                                                                          this.automaticallyAvoidMPA,
+                                                                          fisher,
+                                                                          model,
+                                                                          this.automaticallyAvoidWastelands,
+                                                                          50);
         if (destination.isFishingEvenPossibleHere())
 
             delegate.setFavoriteSpot(destination);

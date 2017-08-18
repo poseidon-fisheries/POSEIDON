@@ -1,15 +1,10 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyCostExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyProfitExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.SimulatedHourlyRevenueExtractor;
-import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
@@ -41,6 +36,8 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
 
     private DoubleParameter profitBeta = new FixedDoubleParameter(1d);
+    private boolean automaticallyAvoidMPA = true;
+    private boolean automaticallyAvoidWastelands = true;
 
 
     /**
@@ -97,7 +94,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
                         rowNames,
                         discretization,
                         new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
-                        state.getRandom());
+                        state.getRandom(), automaticallyAvoidMPA, automaticallyAvoidWastelands);
 
 
     }
@@ -149,5 +146,41 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      */
     public void setProfitBeta(DoubleParameter profitBeta) {
         this.profitBeta = profitBeta;
+    }
+
+    /**
+     * Getter for property 'automaticallyAvoidMPA'.
+     *
+     * @return Value for property 'automaticallyAvoidMPA'.
+     */
+    public boolean isAutomaticallyAvoidMPA() {
+        return automaticallyAvoidMPA;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidMPA'.
+     *
+     * @param automaticallyAvoidMPA Value to set for property 'automaticallyAvoidMPA'.
+     */
+    public void setAutomaticallyAvoidMPA(boolean automaticallyAvoidMPA) {
+        this.automaticallyAvoidMPA = automaticallyAvoidMPA;
+    }
+
+    /**
+     * Getter for property 'automaticallyAvoidWastelands'.
+     *
+     * @return Value for property 'automaticallyAvoidWastelands'.
+     */
+    public boolean isAutomaticallyAvoidWastelands() {
+        return automaticallyAvoidWastelands;
+    }
+
+    /**
+     * Setter for property 'automaticallyAvoidWastelands'.
+     *
+     * @param automaticallyAvoidWastelands Value to set for property 'automaticallyAvoidWastelands'.
+     */
+    public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
+        this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
     }
 }
