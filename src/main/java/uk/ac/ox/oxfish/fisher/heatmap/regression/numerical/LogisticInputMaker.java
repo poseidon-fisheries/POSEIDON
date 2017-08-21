@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.HashMap;
 import java.util.function.Function;
 
 /**
@@ -28,6 +29,8 @@ public class LogisticInputMaker {
      */
     private final Function<Integer,SeaTile> armToTileExtractor;
 
+    private HashMap<Integer,SeaTile> lastExtraction = null;
+
 
     public LogisticInputMaker(
             ObservationExtractor[][] extractors,
@@ -50,13 +53,16 @@ public class LogisticInputMaker {
     public double[][] getRegressionInput(Fisher fisher, FishState state)
     {
         //compute all the x ahead of time
+        lastExtraction = new HashMap<>();
         final double[][] x = new double[extractors.length][];
         for(int i=0; i<extractors.length; i++)
         {
             x[i] = new double[extractors[0].length];
-            for(int j=0; j<extractors[0].length; j++)
-                x[i][j] = extractors[i][j].extract(armToTileExtractor.apply(i),
-                                                   state.getHoursSinceStart(),fisher,state);
+            for(int j=0; j<extractors[0].length; j++) {
+                lastExtraction.put(i,armToTileExtractor.apply(i));
+                x[i][j] = extractors[i][j].extract(lastExtraction.get(i),
+                                                   state.getHoursSinceStart(), fisher, state);
+            }
 
         }
 
@@ -81,5 +87,14 @@ public class LogisticInputMaker {
      */
     public Function<Integer, SeaTile> getArmToTileExtractor() {
         return armToTileExtractor;
+    }
+
+    /**
+     * Getter for property 'lastExtraction'.
+     *
+     * @return Value for property 'lastExtraction'.
+     */
+    public HashMap<Integer, SeaTile> getLastExtraction() {
+        return lastExtraction;
     }
 }

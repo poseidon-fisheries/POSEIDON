@@ -4,9 +4,9 @@ import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticInputMaker;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.LogisticMultiClassifier;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
 import uk.ac.ox.oxfish.fisher.log.LogisticLog;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -194,19 +194,10 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                              state.getYear(),
                              state.getDayOfTheYear());
 
+        
+        SeaTile destination = this.input.getLastExtraction().get(armChosen);
 
-        List<SeaTile> group = discretization.getGroup(switcher.getGroup(armChosen));
-
-        SeaTile destination = FishStateUtilities.getValidSeatileFromGroup(random,
-                                                                          group,
-                                                                          this.automaticallyAvoidMPA,
-                                                                          fisher,
-                                                                          model,
-                                                                          this.automaticallyAvoidWastelands,
-                                                                          50);
-        if (destination.isFishingEvenPossibleHere())
-
-            delegate.setFavoriteSpot(destination);
+        delegate.setFavoriteSpot(destination);
 
 
 
