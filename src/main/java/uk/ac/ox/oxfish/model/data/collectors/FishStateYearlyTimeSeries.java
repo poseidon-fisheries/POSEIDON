@@ -440,7 +440,8 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                                                   fishState.getFishers().stream().
                                                                           filter(fisher -> fisher.getHomePort().equals(port)).
                                                                           mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                                  FisherYearlyTimeSeries.FISHING_DISTANCE)).average().
+                                                                                  FisherYearlyTimeSeries.FISHING_DISTANCE)).
+                                                                          filter(Double::isFinite).average().
                                                                           orElse(Double.NaN), Double.NaN);
 
                 state.getYearlyDataSet().registerGatherer(portname + " " +FisherYearlyTimeSeries.TRIPS,

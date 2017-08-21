@@ -28,7 +28,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     private final FishState state;
 
-    private boolean respectMPA = true;
+    private boolean respectMPA;
 
     public MultiQuotaRegulation(double[] yearlyQuota, FishState state) {
         this.yearlyQuota = Arrays.copyOf(yearlyQuota,yearlyQuota.length);
@@ -38,6 +38,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
         }
         this.state = state;
         this.state.scheduleEveryYear(this, StepOrder.POLICY_UPDATE);
+        respectMPA = true;
     }
 
 
@@ -50,6 +51,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
         }
         this.state = state;
         this.state.scheduleEveryXDay(this, StepOrder.POLICY_UPDATE,quotaPeriod);
+        respectMPA = true;
     }
 
 
