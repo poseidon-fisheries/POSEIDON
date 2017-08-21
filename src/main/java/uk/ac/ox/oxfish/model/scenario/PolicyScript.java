@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -59,6 +60,8 @@ public class PolicyScript
     private AlgorithmFactory<? extends Regulation> regulation;
 
     private Double gasPricePerLiter = null;
+
+    private boolean removeAllMPAs = false;
 
     private Integer changeInNumberOfFishers = null;
 
@@ -136,6 +139,14 @@ public class PolicyScript
                         }
                     }
             );
+        }
+
+        if(removeAllMPAs)
+        {
+            for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
+                tile.assignMpa(null);
+                assert !tile.isProtected();
+            }
         }
 
         if(fishingStrategy != null) {
@@ -320,5 +331,23 @@ public class PolicyScript
      */
     public void setHourlyTravellingCosts(DoubleParameter hourlyTravellingCosts) {
         this.hourlyTravellingCosts = hourlyTravellingCosts;
+    }
+
+    /**
+     * Getter for property 'removeAllMPAs'.
+     *
+     * @return Value for property 'removeAllMPAs'.
+     */
+    public boolean isRemoveAllMPAs() {
+        return removeAllMPAs;
+    }
+
+    /**
+     * Setter for property 'removeAllMPAs'.
+     *
+     * @param removeAllMPAs Value to set for property 'removeAllMPAs'.
+     */
+    public void setRemoveAllMPAs(boolean removeAllMPAs) {
+        this.removeAllMPAs = removeAllMPAs;
     }
 }

@@ -25,7 +25,8 @@ public class ExhaustiveAcquisitionFunctionFactory implements AlgorithmFactory<Ex
      */
     @Override
     public ExhaustiveAcquisitionFunction apply(FishState state) {
-        return new ExhaustiveAcquisitionFunction(proportionSearched.apply(state.getRandom()), ignoreProtectedAreas,
+        return new ExhaustiveAcquisitionFunction(proportionSearched.apply(state.getRandom()),
+                                                 ignoreProtectedAreas,
                                                  ignoreWastelands);
     }
 

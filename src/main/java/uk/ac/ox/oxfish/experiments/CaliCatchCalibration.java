@@ -163,18 +163,69 @@ public class CaliCatchCalibration {
                                          "itq_switch_script_nocosting",
                                          Paths.get("docs", "20170730 validation", "policies"),
                                          10);*/
+/*
+        runMultipleTimesToBuildHistogram("nompa_noitq_eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         YEARS_PER_RUN);
+*/
+/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);*/
+//        runMultipleTimesToBuildHistogram("yesmpa_noitq_eei",
+//                                         "removempa_script",
+//                                         Paths.get("docs", "20170730 validation", "policies"),
+//                                         16);
+
+/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+                                         "removempa_script",
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);*/
+
+        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);
+
+//best of
 
 /*        runMultipleTimesToBuildHistogram("clamped",
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);        */
 
-        runMultipleTimesToBuildHistogram("eei",
+/*        runMultipleTimesToBuildHistogram("eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
+
+/*        runMultipleTimesToBuildHistogram("intercepts",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
+/*
+        runMultipleTimesToBuildHistogram("kernel",
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);
-
-
+                                         */
+/*
+        runMultipleTimesToBuildHistogram("bandit",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
+/*
+        runMultipleTimesToBuildHistogram("annealing",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
+/*        runMultipleTimesToBuildHistogram("random",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -189,7 +240,8 @@ public class CaliCatchCalibration {
         boolean header = true;
         System.out.println(input);
         //write header
-        FileWriter writer = new FileWriter(mainDirectory.resolve(input + ".csv").toFile());
+        FileWriter writer = policyFile == null ? new FileWriter(mainDirectory.resolve(input + ".csv").toFile()) :
+                new FileWriter(mainDirectory.resolve(input + "_withscript.csv").toFile()) ;
 
 
 
