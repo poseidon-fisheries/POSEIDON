@@ -27,6 +27,8 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
 
     private String convertedQuotaExchangedPerMatch;
 
+    private boolean respectMPA = true;
+
     public enum QuotaType {
 
 
@@ -145,13 +147,17 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
                 MultiQuotaRegulation regulation = itqFactory.apply(fishState);
                 //set up a startable that divide it by the number of fishers
                 fishState.registerStartable(new ITQScaler(regulation));
+                regulation.setRespectMPA(respectMPA);
                 return regulation;
 
             case TAC:
-                return tacFactory.apply(fishState);
+                MultiQuotaRegulation tac = tacFactory.apply(fishState);
+                tac.setRespectMPA(respectMPA);
+                return tac;
             case IQ:
                 MultiQuotaRegulation iq = iqFactory.apply(fishState); //create but scale
                 fishState.registerStartable(new ITQScaler(iq));
+                iq.setRespectMPA(respectMPA);
                 return iq;
             default:
                 throw new RuntimeException("Not a valid quota type was supplied: " + quotaType);
@@ -240,5 +246,23 @@ public class MultiQuotaMapFactory implements AlgorithmFactory<MultiQuotaRegulati
      */
     public void setQuotaType(QuotaType quotaType) {
         this.quotaType = quotaType;
+    }
+
+    /**
+     * Getter for property 'respectMPA'.
+     *
+     * @return Value for property 'respectMPA'.
+     */
+    public boolean isRespectMPA() {
+        return respectMPA;
+    }
+
+    /**
+     * Setter for property 'respectMPA'.
+     *
+     * @param respectMPA Value to set for property 'respectMPA'.
+     */
+    public void setRespectMPA(boolean respectMPA) {
+        this.respectMPA = respectMPA;
     }
 }

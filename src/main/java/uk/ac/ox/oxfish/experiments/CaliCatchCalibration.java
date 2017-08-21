@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 public class CaliCatchCalibration {
 
 
-    public static final int RUNS = 1000;
+    public static final int RUNS = 15;
     //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170322 cali_catch", "results");
     //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170606 cali_catchability_2", "results");
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170730 validation", "best");
@@ -106,17 +106,17 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("mpaed2_850_exitexperiment");
         //runMultipleTimesToBuildHistogram("mpaed_eei_log_350_exitexperiment");
 //        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_150");
-        //runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200");
+  //      runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200");
 /*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
                                          10);*/
 
-        // runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300");
-//        runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300_preitq",
-//                                         "itq_switch_script",
-//                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
-//                                         10);
+         //runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300");
+/*        runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300_preitq",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
         //runMultipleTimesToBuildHistogram("mpaed150_annealing_log_200");
 //        runMultipleTimesToBuildHistogram("mpaed150_annealing_log_200_preitq",
 //                                         "itq_switch_script",
@@ -138,11 +138,94 @@ public class CaliCatchCalibration {
                                          10);*/
 
         //runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_clamped");
-        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_clamped_preitq",
+/*        runMultipleTimesToBuildHistogram("mpaed2_150_120blocked_clamped_preitq",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
-                                         10);
+                                         10);*/
 
+
+
+
+//policies
+  /*      runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_nompa",
+                                        null,
+                                        Paths.get("docs", "20170730 validation", "policies"),
+                                      //  YEARS_PER_RUN);
+                                        10);
+*/
+/*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_yelloweyefine",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         //YEARS_PER_RUN);
+                                         10);*/
+
+/*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
+                                         "itq_switch_script_nocosting",
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         10);*/
+/*
+        runMultipleTimesToBuildHistogram("nompa_noitq_eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         YEARS_PER_RUN);
+*/
+/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);*/
+//        runMultipleTimesToBuildHistogram("yesmpa_noitq_eei",
+//                                         "removempa_script",
+//                                         Paths.get("docs", "20170730 validation", "policies"),
+//                                         16);
+
+/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+                                         "removempa_script",
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);*/
+
+        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "policies"),
+                                         16);
+
+//best of
+
+/*        runMultipleTimesToBuildHistogram("clamped",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);        */
+
+/*        runMultipleTimesToBuildHistogram("eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
+
+/*        runMultipleTimesToBuildHistogram("intercepts",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
+/*
+        runMultipleTimesToBuildHistogram("kernel",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
+/*
+        runMultipleTimesToBuildHistogram("bandit",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
+/*
+        runMultipleTimesToBuildHistogram("annealing",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
+/*        runMultipleTimesToBuildHistogram("random",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -157,7 +240,8 @@ public class CaliCatchCalibration {
         boolean header = true;
         System.out.println(input);
         //write header
-        FileWriter writer = new FileWriter(mainDirectory.resolve(input + ".csv").toFile());
+        FileWriter writer = policyFile == null ? new FileWriter(mainDirectory.resolve(input + ".csv").toFile()) :
+                new FileWriter(mainDirectory.resolve(input + "_withscript.csv").toFile()) ;
 
 
 
@@ -194,7 +278,7 @@ public class CaliCatchCalibration {
                                 ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits,actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings" );
 
                 for(Port port : state.getPorts())
-                    writer.write(","+port.getName()+"_trips,"+port.getName()+"_fishers,"+port.getName()+"_profits");
+                    writer.write(","+port.getName()+"_trips,"+port.getName()+"_fishers,"+port.getName()+"_profits,"+port.getName()+"_distance");
                 writer.write("\n");
                 writer.flush();
                 header = false;
@@ -204,6 +288,7 @@ public class CaliCatchCalibration {
                 state.schedule.step(state);
                 if (state.getDayOfTheYear() == 1) {
                     boolean isITQOn = state.getYearlyDataSet().getColumn("ITQ Prices Of Sablefish") != null ;
+                    boolean isyelloweyeITQOn = state.getYearlyDataSet().getColumn("ITQ Prices Of Yelloweye Rockfish") != null ;
                     writer.write(state.getYear() + "," + run + "," +
                                          state.getLatestYearlyObservation("Average Cash-Flow") + "," +
                                          state.getLatestYearlyObservation("Average Hours Out") + "," +
@@ -215,7 +300,7 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
                                          state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
                                          // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
-                                         (!isITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
+                                         (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
                                          (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
                                          (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
                                          (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
@@ -236,7 +321,8 @@ public class CaliCatchCalibration {
                         writer.write("," +
                                              state.getLatestYearlyObservation(port.getName() + " " + FisherYearlyTimeSeries.TRIPS) + "," +
                                              state.getLatestYearlyObservation(port.getName() + " Number Of Active Fishers") + "," +
-                                             state.getLatestYearlyObservation("Average Cash-Flow at " + port.getName())
+                                             state.getLatestYearlyObservation("Average Cash-Flow at " + port.getName()) + "," +
+                                             state.getLatestYearlyObservation(port.getName() + " Average Distance From Port")
                         );
                     writer.write("\n");
                 }
