@@ -186,7 +186,7 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
         initializer = new MultipleSpeciesAbundanceInitializer(folderMap,
                                                               biomassScaling,
                                                               fixedRecruitmentDistribution,
-                                                              mortalityAt100PercentForOldestFish,
+                                                              !mortalityAt100PercentForOldestFish,
                                                               true);
         initializer.setCountFileName(countFileName);
 

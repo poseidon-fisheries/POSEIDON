@@ -57,11 +57,11 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
     public MultipleSpeciesAbundanceInitializer(
             LinkedHashMap<String, Path> biologicalDirectories, double scaling,
-            boolean fixedRecruitmentDistribution, final boolean preserveLastAge, boolean addOtherSpecies) {
+            boolean fixedRecruitmentDistribution, final boolean mortality100Percent, boolean addOtherSpecies) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
-        this.preserveLastAge = preserveLastAge;
+        this.preserveLastAge = !mortality100Percent;
         this.addOtherSpecies = addOtherSpecies;
     }
 
@@ -371,18 +371,33 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                                     "Some local biologies in the proportion map are not present in the initializer list");
         Preconditions.checkArgument(ratiosLocalCopy.keySet().containsAll(locals.values()),
                                     "Some local biologies in the masterlist are not present in the proportion map");
+
+        double maleRemainder[] = new double[speciesToReset.getMaxAge()+1];
+        double femaleRemainder[] = new double[speciesToReset.getMaxAge()+1];
         for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
         {
 
             //get the ratio back
             AbundanceBasedLocalBiology local = ratio.getKey();
+
             for(int i=0; i<=speciesToReset.getMaxAge(); i++)
             {
 
+
+                double doubleMale = scaling * newTotalFishCount[FishStateUtilities.MALE][i] * ratio.getValue()  +
+                        maleRemainder[i];
                 local.getNumberOfMaleFishPerAge(speciesToReset)[i] =
-                        (int) (0.5d + scaling * newTotalFishCount[FishStateUtilities.MALE][i] *ratio.getValue());
+                        (int) (doubleMale );
+                maleRemainder[i] =  (doubleMale-local.getNumberOfMaleFishPerAge(speciesToReset)[i]);
+
+
+                double doubleFemale = scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] * ratio.getValue()  +
+                        femaleRemainder[i];
                 local.getNumberOfFemaleFishPerAge(speciesToReset)[i] =
-                        (int) (0.5d + scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] *ratio.getValue());
+                        (int) (doubleFemale);
+                femaleRemainder[i] =  (doubleFemale-local.getNumberOfFemaleFishPerAge(speciesToReset)[i]);
+
+
             }
         }
         if(Log.DEBUG)

@@ -21,7 +21,7 @@ public class Ashleigh {
 
     public static void main(String[] args) throws IOException {
 
-        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun2.csv").toFile());
+        FileWriter writer = new FileWriter(Paths.get("/home/carrknight/Dropbox/poseidon_exec/ashleigh2_04_multirun4.csv").toFile());
 
         String[] columns = new String[]{
                "Trips Exploring",
@@ -49,14 +49,14 @@ public class Ashleigh {
         System.out.print(header);
         writer.write(header.toString());
         writer.flush();
-        for(int eei = 0; eei<= FISHERS; eei++)
+        for(int eei = 85; eei<= FISHERS; eei++)
         {
             for(int runs = 0; runs< RUNS; runs++)
             {
                 FishState state = new FishState(runs);
                 FishYAML yaml = new FishYAML();
                 TwoPopulationsScenario scenario = yaml.loadAs(new FileReader(
-                        Paths.get("social_3A2.yaml").toFile()
+                        Paths.get("/home/carrknight/Dropbox/poseidon_exec/Ashleigh/yamls/Scope/social_3A_heterogeneous.yaml").toFile()
                 ), TwoPopulationsScenario.class);
 
                 scenario.setAllowTwoPopulationFriendships(true);

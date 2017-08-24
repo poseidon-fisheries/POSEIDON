@@ -13,6 +13,7 @@ import sim.field.geo.GeomVectorField;
 import sim.field.grid.IntGrid2D;
 import sim.field.grid.SparseGrid2D;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -36,6 +37,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 
 /**
  *
@@ -460,6 +463,28 @@ public class FishState  extends SimState{
     public double getTotalBiomass(Species species)
     {
         return map.getTotalBiology(species);
+    }
+
+    public int getTotalAbundance(Species species,int age)
+    {
+        return
+                map.getAllSeaTilesExcludingLandAsList().stream().filter(
+                        new Predicate<SeaTile>() {
+                            @Override
+                            public boolean test(SeaTile seaTile) {
+                                return ! (seaTile.getBiology() instanceof EmptyLocalBiology);
+                            }
+                        }
+                ).
+        mapToInt(
+                new ToIntFunction<SeaTile>() {
+                    @Override
+                    public int applyAsInt(SeaTile value) {
+                        return value.getNumberOfFemaleFishPerAge(species)[age] +
+                                value.getNumberOfMaleFishPerAge(species)[age];
+                    }
+                }
+        ).sum();
     }
 
     /**

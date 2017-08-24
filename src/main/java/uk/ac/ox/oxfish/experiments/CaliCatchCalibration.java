@@ -106,13 +106,13 @@ public class CaliCatchCalibration {
         //runMultipleTimesToBuildHistogram("mpaed2_850_exitexperiment");
         //runMultipleTimesToBuildHistogram("mpaed_eei_log_350_exitexperiment");
 //        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_150");
-  //      runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200");
+        //      runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200");
 /*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
                                          10);*/
 
-         //runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300");
+        //runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300");
 /*        runMultipleTimesToBuildHistogram("mpaed150_bandit_log_300_preitq",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
@@ -143,7 +143,20 @@ public class CaliCatchCalibration {
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
                                          10);*/
 
+/*        runMultipleTimesToBuildHistogram("perfect",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
 
+/*        runMultipleTimesToBuildHistogram("intercepts",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
+/*
+        runMultipleTimesToBuildHistogram("eei2",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
 
 
 //policies
@@ -178,15 +191,17 @@ public class CaliCatchCalibration {
 //                                         Paths.get("docs", "20170730 validation", "policies"),
 //                                         16);
 
-/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+/*
+        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
                                          "removempa_script",
                                          Paths.get("docs", "20170730 validation", "policies"),
-                                         16);*/
+                                         25);
+*/
 
-        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
+/*        runMultipleTimesToBuildHistogram("yesmpa_noitq_kernel",
                                          null,
                                          Paths.get("docs", "20170730 validation", "policies"),
-                                         16);
+                                         25);*/
 
 //best of
 
@@ -198,7 +213,14 @@ public class CaliCatchCalibration {
 /*        runMultipleTimesToBuildHistogram("eei",
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
-                                         YEARS_PER_RUN);*/
+                                         YEARS_PER_RUN);
+                                         */
+/*
+        runMultipleTimesToBuildHistogram("eei2",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);
+                                         */
 
 /*        runMultipleTimesToBuildHistogram("intercepts",
                                          null,
@@ -210,12 +232,14 @@ public class CaliCatchCalibration {
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);
                                          */
+
+
 /*
         runMultipleTimesToBuildHistogram("bandit",
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);
-                                         */
+*/
 /*
         runMultipleTimesToBuildHistogram("annealing",
                                          null,
@@ -226,6 +250,137 @@ public class CaliCatchCalibration {
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);*/
+
+
+//cpue_map
+        //best
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+//        runMultipleTimesToBuildHistogram("random",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("default",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+//                runMultipleTimesToBuildHistogram("eei",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+
+
+//uncalibrated
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("default",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("random",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+//                                         YEARS_PER_RUN);
+
+        //uncalibrated - pretopost
+
+
+//        runMultipleTimesToBuildHistogram("default",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+//
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+//
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
+
+        runMultipleTimesToBuildHistogram("bandit",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "cpue_map",
+                                                   "uncalibrated", "pre-to-post"),
+                                         10);
+
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {

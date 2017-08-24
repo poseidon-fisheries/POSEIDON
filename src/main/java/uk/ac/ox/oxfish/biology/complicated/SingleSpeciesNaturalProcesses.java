@@ -165,7 +165,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                     }).sum();
             //reweight so they add up to 1
             for(AbundanceBasedLocalBiology bio : biomassWeight.keySet())
-                biomassWeight.put(bio,FishStateUtilities.round5(biomassWeight.get(bio)/totalBiomass));
+                biomassWeight.put(bio,biomassWeight.get(bio)/totalBiomass);
 
 
         }
@@ -220,22 +220,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                                     return value;
                                 }
                             }).sum()-1d)<.001d;
-            if (randomRounding) {
-                for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
-                    double ratio = biologyBiomass.getValue();
-                    int recruitsHere = (int) ((lastRecruits) * ratio);
-                    //add recruits to smallest bin
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] +=
-                            FishStateUtilities.randomRounding(recruitsHere / 2d,
-                                                              model.getRandom());
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] +=
-                            FishStateUtilities.randomRounding(recruitsHere / 2d,
-                                                              model.getRandom());
-
-                }
-
-            } else {
-                double leftOver = 0;
+            double leftOver = 0;
                 for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
                     double ratio = biologyBiomass.getValue();
                     int recruitsHere = (int) ((lastRecruits + leftOver) * ratio);
@@ -247,7 +232,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                             biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
                     ;
                 }
-            }
+
         }
     }
 

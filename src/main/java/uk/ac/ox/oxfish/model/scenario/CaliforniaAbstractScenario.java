@@ -114,7 +114,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                      new Pair<>("Sablefish", 2724935d), //averaged out till 2014, and with south included
                                      new Pair<>("Shortspine thornyhead", 1481600.056d)
             );
-
+    private String spatialFileName = "spatial.csv";
 
 
     {
@@ -325,7 +325,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             for(Path folder : sortedFolders)
             {
 
-                Path file = folder.resolve("spatial.csv");
+
+                Path file = folder.resolve(spatialFileName);
                 if(file.toFile().exists())
                 {
                     String name = folder.getFileName().toString();
@@ -1174,5 +1175,23 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     public void setDiscardingStrategy(
             AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
         this.discardingStrategy = discardingStrategy;
+    }
+
+    /**
+     * Getter for property 'spatialFileName'.
+     *
+     * @return Value for property 'spatialFileName'.
+     */
+    public String getSpatialFileName() {
+        return spatialFileName;
+    }
+
+    /**
+     * Setter for property 'spatialFileName'.
+     *
+     * @param spatialFileName Value to set for property 'spatialFileName'.
+     */
+    public void setSpatialFileName(String spatialFileName) {
+        this.spatialFileName = spatialFileName;
     }
 }

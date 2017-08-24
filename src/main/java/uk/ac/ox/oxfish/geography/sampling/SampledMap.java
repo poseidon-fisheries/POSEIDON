@@ -65,6 +65,8 @@ public class SampledMap implements Serializable
         GeographicalSample biologySample = new GeographicalSample(firstBiology.getValue(), true);
         mbr = new Envelope(biologySample.getMinEasting(), biologySample.getMaxEasting(),
                            biologySample.getMinNorthing(), biologySample.getMaxNorthing());
+        System.out.println("Map Info\nEastings from" + biologySample.getMinEasting() + " to " + biologySample.getMaxEasting());
+        System.out.println("Northings from" + biologySample.getMinNorthing() + " to " + biologySample.getMaxNorthing());
         //find ratio height to width
         double heightToWidth = mbr.getHeight()/mbr.getWidth();
         gridHeight = (int) Math.round(gridWidth * heightToWidth);

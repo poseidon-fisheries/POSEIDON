@@ -10,6 +10,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 public class NaturalMortalityProcess
 {
 
+
     /**
      * as a side-effect modifies male and female cohorts by killing a % of its population equal to the mortality rate.
      * @param male array containing male fish per age
@@ -23,8 +24,8 @@ public class NaturalMortalityProcess
         Preconditions.checkArgument(male.length==female.length);
         for(int i=0;i<male.length; i++)
         {
-            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality) + 0.5d);
-            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality) + 0.5d);
+            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality) );
+            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality));
         }
 
     }
