@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.extractors;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -11,11 +12,10 @@ import uk.ac.ox.oxfish.model.FishState;
  */
 public class SimulatedHourlyProfitExtractor implements ObservationExtractor {
 
-    private final static LameTripSimulator simulator = new LameTripSimulator();
-    private final double maxHoursOut;
+    private final ProfitFunction simulator;
 
     public SimulatedHourlyProfitExtractor(final double maxHoursOut) {
-        this.maxHoursOut = maxHoursOut;
+        simulator= new ProfitFunction(new LameTripSimulator(),maxHoursOut);
     }
 
 
@@ -24,15 +24,15 @@ public class SimulatedHourlyProfitExtractor implements ObservationExtractor {
             SeaTile tile, double timeOfObservation, Fisher agent, FishState model) {
 
 
-        TripRecord simulation = simulator.simulateRecord(agent,
-                                                         tile,
-                                                         model,
-                                                         maxHoursOut,
-                                                         //using perfect knowledge!
-                                                         agent.getGear().expectedHourlyCatch(agent, tile, 1,
-                                                                                             model.getBiology()));
-        if(simulation== null)
+        Double hourlyProfits = simulator.simulateHourlyProfits(agent,
+                                                               agent.getGear().expectedHourlyCatch(agent, tile, 1,
+                                                                                                   model.getBiology()),
+                                                               tile,
+                                                               model,
+                                                               false);
+        if(!Double.isFinite(hourlyProfits))
             return -10000;
-        return simulation.getProfitPerHour(true);
+        else
+            return hourlyProfits;
     }
 }

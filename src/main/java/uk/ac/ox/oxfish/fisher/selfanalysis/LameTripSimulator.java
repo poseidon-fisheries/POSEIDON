@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
@@ -36,7 +37,7 @@ public class LameTripSimulator {
         double timeSpentAtSea = 0;
         double gasConsumed = 0;
 
-        //get osmoseWFSPath from port to fishing spot
+        //get path from port to fishing spot
         Port homePort = fisher.getHomePort();
         Deque<SeaTile> routeToAndFrom = state.getMap().getRoute(homePort.getLocation(), fishingSpot);
         if(routeToAndFrom == null)
@@ -92,6 +93,7 @@ public class LameTripSimulator {
 
         record.addToDistanceTravelled(distanceTravelled);
         record.recordGasConsumption(gasConsumed);
+
         record.completeTrip(timeSpentAtSea + fishingHours, homePort);
 
 

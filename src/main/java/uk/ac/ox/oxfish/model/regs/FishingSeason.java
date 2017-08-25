@@ -44,7 +44,7 @@ public class FishingSeason implements Regulation
      */
     @Override
     public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
-        return  seasonOpen(model) && (!respectMPAs || !tile.isProtected());
+        return   (!respectMPAs || !tile.isProtected());
     }
 
     /**

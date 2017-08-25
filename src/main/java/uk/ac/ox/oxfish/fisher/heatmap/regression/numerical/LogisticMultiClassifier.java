@@ -16,6 +16,10 @@ import java.util.function.Function;
 public class LogisticMultiClassifier {
 
     /**
+     * reward associated with NaN
+     */
+    public static final double INVALID_PENALTY = -100000000d;
+    /**
      * the coefficients to use. one array for each possible Y
      */
     private final double[][] betas;
@@ -34,6 +38,7 @@ public class LogisticMultiClassifier {
     public Integer choose(final double[][] x, MersenneTwisterFast random)
     {
 
+
         return SoftmaxBanditAlgorithm.drawFromSoftmax(
                 random,
                 getNumberOfOptions(),
@@ -46,7 +51,11 @@ public class LogisticMultiClassifier {
                         double sum = 0;
                         for(int i=0; i<beta.length ;i++)
                             sum += beta[i] *  x[arm][i];
-                        return sum;
+                        //there might be some very invalid ones
+                        if(Double.isFinite(sum))
+                            return sum;
+                        else
+                            return INVALID_PENALTY;
                     }
                 }
 

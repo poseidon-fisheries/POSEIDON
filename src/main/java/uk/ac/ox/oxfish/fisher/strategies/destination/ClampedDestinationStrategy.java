@@ -94,54 +94,53 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
     @Override
     public void reactToFinishedTrip(TripRecord record) {
         double sum = 0;
-        while(true) {
-            MersenneTwisterFast random = state.getRandom();
-            NauticalMap map = state.getMap();
-            //grab a random seatile for each group
-            SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
-            for(int group = 0; group<discretization.getNumberOfGroups(); group++) {
-                List<SeaTile> tileGroup = discretization.getGroup(group);
-                if(tileGroup.size() > 0)
-                    candidates[group] = getValidSeatileFromGroup(
-                            random,
-                            tileGroup,
-                            true,
-                            fisher,
-                            state,
-                            true,
-                            100
-                    );
-            }
-            assert candidates.length ==  propensities.length;
-            double[] currentPropensities = Arrays.copyOf(propensities,candidates.length);
-
-
-            //set propensity to 0 for all tiles further than the max distance
-
-            sum = 0;
-            for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
-                if (candidates[group] == null ||
-                        map.distance(candidates[group], fisher.getHomePort().getLocation()) > distanceMaximum)
-                    currentPropensities[group] = 0;
-                else
-                    sum += currentPropensities[group];
-            }
-
-            //turn it into a cumulative distribution
-            double[] cdf = new double[currentPropensities.length];
-            cdf[0] = currentPropensities[0] / sum;
-            for (int i = 1; i < currentPropensities.length; i++)
-                cdf[i] = cdf[i - 1] + currentPropensities[i] / sum;
-
-
-            if(sum>0) {
-                int index = Arrays.binarySearch(cdf, random.nextDouble());
-                index = (index >= 0) ? index : (-index - 1);
-                SeaTile candidate = candidates[index];
-                delegate.setFavoriteSpot(candidate);
-                return;
-            }
+        MersenneTwisterFast random = state.getRandom();
+        NauticalMap map = state.getMap();
+        //grab a random seatile for each group
+        SeaTile[] candidates = new SeaTile[discretization.getNumberOfGroups()];
+        for(int group = 0; group<discretization.getNumberOfGroups(); group++) {
+            List<SeaTile> tileGroup = discretization.getGroup(group);
+            if(tileGroup.size() > 0)
+                candidates[group] = getValidSeatileFromGroup(
+                        random,
+                        tileGroup,
+                        true,
+                        fisher,
+                        state,
+                        true,
+                        100
+                );
         }
+        assert candidates.length ==  propensities.length;
+        double[] currentPropensities = Arrays.copyOf(propensities,candidates.length);
+
+
+        //set propensity to 0 for all tiles further than the max distance
+
+        sum = 0;
+        for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
+            if (candidates[group] == null ||
+                    map.distance(candidates[group], fisher.getHomePort().getLocation()) > distanceMaximum)
+                currentPropensities[group] = 0;
+            else
+                sum += currentPropensities[group];
+        }
+
+        //turn it into a cumulative distribution
+        double[] cdf = new double[currentPropensities.length];
+        cdf[0] = currentPropensities[0] / sum;
+        for (int i = 1; i < currentPropensities.length; i++)
+            cdf[i] = cdf[i - 1] + currentPropensities[i] / sum;
+
+
+        if(sum>0) {
+            int index = Arrays.binarySearch(cdf, random.nextDouble());
+            index = (index >= 0) ? index : (-index - 1);
+            SeaTile candidate = candidates[index];
+            delegate.setFavoriteSpot(candidate);
+            return;
+        }
+
 
     }
 }

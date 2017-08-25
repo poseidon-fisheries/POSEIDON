@@ -58,10 +58,14 @@ public class LogisticInputMaker {
         for(int i=0; i<extractors.length; i++)
         {
             x[i] = new double[extractors[0].length];
+            SeaTile tile = armToTileExtractor.apply(i);
+            lastExtraction.put(i, tile);
             for(int j=0; j<extractors[0].length; j++) {
-                lastExtraction.put(i,armToTileExtractor.apply(i));
-                x[i][j] = extractors[i][j].extract(lastExtraction.get(i),
-                                                   state.getHoursSinceStart(), fisher, state);
+                if(tile!=null)
+                    x[i][j] = extractors[i][j].extract(lastExtraction.get(i),
+                                                       state.getHoursSinceStart(), fisher, state);
+                else
+                    x[i][j] = Double.NaN;
             }
 
         }

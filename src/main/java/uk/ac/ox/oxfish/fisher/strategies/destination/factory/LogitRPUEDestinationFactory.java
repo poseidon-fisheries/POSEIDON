@@ -100,7 +100,6 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     }
 
     private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups) {
-        LameTripSimulator simulator = new LameTripSimulator();
         ObservationExtractor[] commonExtractor = new ObservationExtractor[1];
         commonExtractor[0] = new SimulatedHourlyProfitExtractor(5*24d);
         ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];

@@ -1106,10 +1106,11 @@ public class FishStateUtilities {
         }while (
                 (respectMPA && !fisher.isAllowedToFishHere(tile, model))  ||
                 (ignoreWastelands && !tile.isFishingEvenPossibleHere()));
-        if(attempts < maxAttempts) {
-            assert !respectMPA || fisher.isAllowedToFishHere(tile, model);
-            assert !ignoreWastelands || tile.isFishingEvenPossibleHere();
+        if(attempts > maxAttempts) {
+           return null;
         }
+        assert !respectMPA || fisher.isAllowedToFishHere(tile, model);
+        assert !ignoreWastelands || tile.isFishingEvenPossibleHere();
         return tile;
     }
 }

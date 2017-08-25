@@ -158,6 +158,11 @@ public class CaliCatchCalibration {
                                          Paths.get("docs", "20170730 validation", "pre-to-post"),
                                          10);*/
 
+/*        runMultipleTimesToBuildHistogram("truly_perfect",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "pre-to-post"),
+                                         10);*/
+
 
 //policies
   /*      runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_nompa",
@@ -209,6 +214,10 @@ public class CaliCatchCalibration {
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);        */
+/*        runMultipleTimesToBuildHistogram("perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN);*/
 
 /*        runMultipleTimesToBuildHistogram("eei",
                                          null,
@@ -251,6 +260,11 @@ public class CaliCatchCalibration {
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
                                          YEARS_PER_RUN);*/
 
+        /*runMultipleTimesToBuildHistogram("truly_perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+                                         YEARS_PER_RUN); */
+
 
 //cpue_map
         //best
@@ -284,15 +298,91 @@ public class CaliCatchCalibration {
 //                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
 //                                         YEARS_PER_RUN);
 
+//        runMultipleTimesToBuildHistogram("truly_perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
 
 
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "cpue_map","best"),
+//                                         YEARS_PER_RUN);
+
+        //best pre to post
+
+
+//                runMultipleTimesToBuildHistogram("default",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+//
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+//
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+
+
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+
+
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
+
+        runMultipleTimesToBuildHistogram("truly_perfect",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "cpue_map",
+                                                   "best", "pretopost"),
+                                         10);
 //uncalibrated
 //        runMultipleTimesToBuildHistogram("clamped",
 //                                         null,
 //                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
 //                                         YEARS_PER_RUN);
 
-//        runMultipleTimesToBuildHistogram("perfect",
+/*        runMultipleTimesToBuildHistogram("perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
+                                         YEARS_PER_RUN);*/
+
+//        runMultipleTimesToBuildHistogram("truly_perfect",
 //                                         null,
 //                                         Paths.get("docs", "20170730 validation", "cpue_map","uncalibrated"),
 //                                         YEARS_PER_RUN);
@@ -353,11 +443,11 @@ public class CaliCatchCalibration {
 //                                                   "uncalibrated", "pre-to-post"),
 //                                         10);
 //
-//        runMultipleTimesToBuildHistogram("perfect",
-//                                         "itq_switch_script",
-//                                         Paths.get("docs", "20170730 validation", "cpue_map",
-//                                                   "uncalibrated", "pre-to-post"),
-//                                         10);
+/*        runMultipleTimesToBuildHistogram("perfect",
+                                         "itq_switch_script",
+                                         Paths.get("docs", "20170730 validation", "cpue_map",
+                                                   "uncalibrated", "pre-to-post"),
+                                         10);*/
 //        runMultipleTimesToBuildHistogram("kernel",
 //                                         "itq_switch_script",
 //                                         Paths.get("docs", "20170730 validation", "cpue_map",
@@ -375,11 +465,17 @@ public class CaliCatchCalibration {
 //                                                   "uncalibrated", "pre-to-post"),
 //                                         10);
 
-        runMultipleTimesToBuildHistogram("bandit",
+/*                runMultipleTimesToBuildHistogram("truly_perfect",
                                          "itq_switch_script",
                                          Paths.get("docs", "20170730 validation", "cpue_map",
                                                    "uncalibrated", "pre-to-post"),
-                                         10);
+                                         10);*/
+
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "uncalibrated", "pre-to-post"),
+//                                         10);
 
     }
 

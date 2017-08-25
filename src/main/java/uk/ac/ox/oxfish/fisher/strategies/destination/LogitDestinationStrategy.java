@@ -117,14 +117,13 @@ public class LogitDestinationStrategy implements DestinationStrategy{
                 effectiveCovariates.toArray(new ObservationExtractor[effectiveCovariates.size()][]),
                 arm -> {
                     List<SeaTile> group = discretization.getGroup(switcher.getGroup(arm));
-                    FishStateUtilities.getValidSeatileFromGroup(random,
-                                                                group,
-                                                                this.automaticallyAvoidMPA,
-                                                                fisher,
-                                                                model,
-                                                                this.automaticallyAvoidWastelands,
-                                                                50);
-                    return group.get(random.nextInt(group.size()));
+                    return FishStateUtilities.getValidSeatileFromGroup(random,
+                                                                       group,
+                                                                       this.automaticallyAvoidMPA,
+                                                                       fisher,
+                                                                       model,
+                                                                       this.automaticallyAvoidWastelands,
+                                                                       50);
                 }
         );
         this.classifier = new LogisticMultiClassifier(
@@ -185,6 +184,9 @@ public class LogitDestinationStrategy implements DestinationStrategy{
      * @param fisher the agent making the choie
      */
     public void adapt(FishState state, MersenneTwisterFast random, Fisher fisher) {
+        if(!fisher.isAllowedAtSea())
+            return;
+
         double[][] input = this.input.getRegressionInput(fisher, state);
         if(log!=null)
             log.recordInput(input);

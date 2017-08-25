@@ -103,8 +103,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         List<SeaTile> mapGroup = discretization.getGroup(groupToFishIn);
         SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(random, mapGroup, respectMPA, fisher, model, ignoreWastelands,
                                                                    100);
-
-        delegate.setFavoriteSpot(tile);
+        if(tile!=null)
+            delegate.setFavoriteSpot(tile);
     }
 
     @Override
