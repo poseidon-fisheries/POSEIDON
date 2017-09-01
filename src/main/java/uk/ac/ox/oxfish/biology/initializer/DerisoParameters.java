@@ -199,17 +199,31 @@ public class DerisoParameters {
                                 .toFile()
                 )
         );
-        //add years 2002 to 2011
+        //add years 2002 to 2007
         yellowEye.getEmpiricalYearlyBiomasses().addAll(
                 Lists.newArrayList(2440588d,2535301d, 2626801d,
-                                   2713269d, 2791586d, 2865974d,
-                                   2925349d, 2989877d, 3052190d, 3109600d)
+                                   2713269d, 2791586d, 2865974d)
         );
         yellowEye.getHistoricalYearlySurvival().clear();
         yellowEye.getHistoricalYearlySurvival().addAll(
                 Lists.newArrayList(0.9515583,
                                    0.9514729)
         );
+        yellowEye.updateLastRecruits();
+        yaml.dump(
+                yellowEye,
+                new FileWriter(
+                        Paths.get("inputs","california",
+                                  "biology","Yelloweye Rockfish","deriso_2007.yaml")
+                                .toFile()
+                )
+        );
+
+        //to 2011
+        yellowEye.getEmpiricalYearlyBiomasses().addAll(
+                Lists.newArrayList(
+                        2925349d, 2989877d, 3052190d, 3109600d));
+
         yellowEye.updateLastRecruits();
         yaml.dump(
                 yellowEye,
@@ -256,11 +270,8 @@ public class DerisoParameters {
                                    366614309d,
                                    368991925d,
                                    370826873d,
-                                   372606667d,
-                                   375295416d,
-                                   377220074d,
-                                   377528382d,
-                                   378249946d)
+                                   372606667d
+                )
         );
         sablefish.getHistoricalYearlySurvival().clear();
         sablefish.getHistoricalYearlySurvival().addAll(
@@ -272,12 +283,29 @@ public class DerisoParameters {
                 sablefish,
                 new FileWriter(
                         Paths.get("inputs","california",
-                                  "biology","Sablefish","deriso_2011.yaml")
+                                  "biology","Sablefish","deriso_2007.yaml")
                                 .toFile()
                 )
         );
 
 
+        sablefish.getEmpiricalYearlyBiomasses().addAll(
+                Lists.newArrayList(
+                        375295416d,
+                        377220074d,
+                        377528382d,
+                        378249946d
+                )
+        );
+        sablefish.updateLastRecruits();
+        yaml.dump(
+                sablefish,
+                new FileWriter(
+                        Paths.get("inputs","california",
+                                  "biology","Sablefish","deriso_2011.yaml")
+                                .toFile()
+                )
+        );
 
         //longspine
 
@@ -325,11 +353,7 @@ public class DerisoParameters {
                                    56966962.450067d,
                                    58093119.984295d,
                                    59633108.6541825d,
-                                   60447252.8924193d,
-                                   61142013.4012949d,
-                                   61704712.854162d,
-                                   62150218.0834741d,
-                                   62499241.7096534)
+                                   60447252.8924193d)
         );
         longspineThornyheads.getHistoricalYearlySurvival().clear();
         longspineThornyheads.getHistoricalYearlySurvival().addAll(
@@ -341,13 +365,29 @@ public class DerisoParameters {
                 longspineThornyheads,
                 new FileWriter(
                         Paths.get("inputs","california",
-                                  "biology","Longspine Thornyhead","deriso_2011.yaml")
+                                  "biology","Longspine Thornyhead","deriso_2007.yaml")
                                 .toFile()
                 )
         );
 
 
 
+
+        longspineThornyheads.getEmpiricalYearlyBiomasses().addAll(
+                Lists.newArrayList(        61142013.4012949d,
+                                           61704712.854162d,
+                                           62150218.0834741d,
+                                           62499241.7096534)
+        );
+        longspineThornyheads.updateLastRecruits();
+        yaml.dump(
+                longspineThornyheads,
+                new FileWriter(
+                        Paths.get("inputs","california",
+                                  "biology","Longspine Thornyhead","deriso_2011.yaml")
+                                .toFile()
+                )
+        );
 
         //shortspine
         DerisoParameters shortspineThornyheads =
@@ -394,13 +434,26 @@ public class DerisoParameters {
         );
         shortspineThornyheads.getEmpiricalYearlyBiomasses().addAll(
                 Lists.newArrayList(222673008d,220666342d,218577444d,216511889d,
-                                   214521270d,212445888d,210071132d,207213527d,204209583d,201358815d)
+                                   214521270d,212445888d)
         );
         shortspineThornyheads.getHistoricalYearlySurvival().clear();
         shortspineThornyheads.getHistoricalYearlySurvival().addAll(
                 Lists.newArrayList(0.9468694,
                                    0.9482032)
         );
+        shortspineThornyheads.updateLastRecruits();
+        yaml.dump(
+                shortspineThornyheads,
+                new FileWriter(
+                        Paths.get("inputs","california",
+                                  "biology","Shortspine Thornyhead","deriso_2007.yaml")
+                                .toFile()
+                )
+        );
+        shortspineThornyheads.getEmpiricalYearlyBiomasses().addAll(
+                Lists.newArrayList(210071132d,207213527d,204209583d,201358815d)
+        );
+
         shortspineThornyheads.updateLastRecruits();
         yaml.dump(
                 shortspineThornyheads,
@@ -476,11 +529,26 @@ public class DerisoParameters {
         );
 
         sole.getEmpiricalYearlyBiomasses().addAll(
-                Lists.newArrayList(611987564.490835,618389739.387254,
-                                   625499225.7513,628763214.913018,
-                                   629818739.798475,630217272.103795)
+                Lists.newArrayList(611987564.490835,618389739.387254 )
         );
 
+        sole.updateLastRecruits();
+        yaml.dump(
+                sole,
+                new FileWriter(
+                        Paths.get("inputs","california",
+                                  "biology","Dover Sole","deriso_2007.yaml")
+                                .toFile()
+                )
+        );
+
+
+        sole.getEmpiricalYearlyBiomasses().addAll(
+                Lists.newArrayList(625499225.7513,628763214.913018,
+                                   629818739.798475,630217272.103795 )
+        );
+
+        sole.updateLastRecruits();
         yaml.dump(
                 sole,
                 new FileWriter(
@@ -489,8 +557,6 @@ public class DerisoParameters {
                                 .toFile()
                 )
         );
-
-
 
     }
 

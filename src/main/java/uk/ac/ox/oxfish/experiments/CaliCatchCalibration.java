@@ -4,6 +4,7 @@ import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.scenario.CaliforniaAbstractScenario;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -177,10 +178,15 @@ public class CaliCatchCalibration {
                                          //YEARS_PER_RUN);
                                          10);*/
 
-/*        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
-                                         "itq_switch_script_nocosting",
-                                         Paths.get("docs", "20170730 validation", "policies"),
-                                         10);*/
+//        runMultipleTimesToBuildHistogram("mpaed150_kernel_log_200_preitq",
+//                                         "itq_switch_script_nocosting",
+//                                         Paths.get("docs", "20170730 validation", "policies"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("kernel_moving",
+//                                         "itq_switch_script_nocosting",
+//                                         Paths.get("docs", "20170730 validation", "policies"),
+//                                         10);
 /*
         runMultipleTimesToBuildHistogram("nompa_noitq_eei",
                                          null,
@@ -210,10 +216,10 @@ public class CaliCatchCalibration {
 
 //best of
 
-/*        runMultipleTimesToBuildHistogram("clamped",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
-                                         YEARS_PER_RUN);        */
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
+//                                         YEARS_PER_RUN);
 /*        runMultipleTimesToBuildHistogram("perfect",
                                          null,
                                          Paths.get("docs", "20170730 validation", "best","20170822_dryrun"),
@@ -366,11 +372,11 @@ public class CaliCatchCalibration {
 //                                                   "best", "pretopost"),
 //                                         10);
 
-        runMultipleTimesToBuildHistogram("truly_perfect",
-                                         "itq_switch_script",
-                                         Paths.get("docs", "20170730 validation", "cpue_map",
-                                                   "best", "pretopost"),
-                                         10);
+//        runMultipleTimesToBuildHistogram("truly_perfect",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation", "cpue_map",
+//                                                   "best", "pretopost"),
+//                                         10);
 //uncalibrated
 //        runMultipleTimesToBuildHistogram("clamped",
 //                                         null,
@@ -477,6 +483,153 @@ public class CaliCatchCalibration {
 //                                                   "uncalibrated", "pre-to-post"),
 //                                         10);
 
+
+        //ant
+
+        /*
+        runMultipleTimesToBuildHistogram("ant",
+                                         null,
+                                         Paths.get("docs", "20170730 validation","best",
+                                                   "20170822_dryrun", "ant"),
+                                         YEARS_PER_RUN);
+        */
+//        runMultipleTimesToBuildHistogram("eei_simple_ant",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","best",
+//                                                   "20170822_dryrun", "ant"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("eei_ant",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","best",
+//                                                   "20170822_dryrun", "ant"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("kernel-ant",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","best",
+//                                                   "20170822_dryrun", "ant"),
+//                                         YEARS_PER_RUN);
+
+
+
+        //deriso-partial (catchabilities calibrated but not the behaviours)
+
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("default",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+//        runMultipleTimesToBuildHistogram("random",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2"),
+//                                         YEARS_PER_RUN);
+
+
+        //deriso pretopost
+
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("default",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("random",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
+
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         "itq_switch_script",
+//                                         Paths.get("docs", "20170730 validation","deriso",
+//                                                   "partial2","pretopost"),
+//                                         10);
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -499,8 +652,8 @@ public class CaliCatchCalibration {
         for (int run = 0; run < RUNS; run++) {
 
             FishYAML yaml = new FishYAML();
-            CaliforniaAbundanceScenario scenario = yaml.loadAs(new FileReader(mainDirectory.resolve(input + ".yaml").toFile()),
-                                                               CaliforniaAbundanceScenario.class);
+            CaliforniaAbstractScenario scenario = yaml.loadAs(new FileReader(mainDirectory.resolve(input + ".yaml").toFile()),
+                                                              CaliforniaAbstractScenario.class);
             scenario.setLogbook(new NoLogbookFactory());
 
             FishState state = new FishState(run);

@@ -131,6 +131,14 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-only/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/itq_only_calibration_noprofits/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/twostep/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/cpue_map/calibration/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/kernel-inference/ant/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/cpue_map/eei"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/cpue_map/bandit"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/cpue_map/kernel"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-only/ant/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/ant/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/deriso/calibration/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 
