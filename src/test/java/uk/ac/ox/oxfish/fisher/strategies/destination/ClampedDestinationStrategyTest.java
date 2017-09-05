@@ -55,7 +55,9 @@ public class ClampedDestinationStrategyTest {
                     delegate,
                     discretization,
                     100,
-                    new double[]{1, 2, 100000}
+                    new double[]{1, 2, 100000},
+                    false,
+                    false
             );
             destinationStrategy.start(state, fisher);
 

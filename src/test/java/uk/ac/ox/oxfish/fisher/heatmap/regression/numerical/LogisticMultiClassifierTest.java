@@ -24,35 +24,31 @@ public class LogisticMultiClassifierTest {
         beta[0][1] = 0;
         beta[1][0] = 0;
         beta[1][1] = 0;
-        //all intercept
-        ObservationExtractor[][] extractor = new ObservationExtractor[2][2];
-        extractor[0][0] =new InterceptExtractor();
-        extractor[1][0] = extractor[0][0];
-        extractor[1][1] = extractor[0][0];
-        extractor[0][1] = extractor[0][0];
+
 
 
         LogisticMultiClassifier logit = new LogisticMultiClassifier(beta);
-        LogisticInputMaker input = new LogisticInputMaker(extractor);
 
 
-        assertEquals(0.731058,logit.getProbability(0,
-                                                   input.getRegressionInput(mock(Fisher.class),mock(FishState.class))),.001);
-        assertEquals(1d-0.731058,logit.getProbability(
-                1,input.getRegressionInput(mock(Fisher.class),mock(FishState.class))),.001);
+        double[][] input = {new double[]{1, 1}, new double[]{1, 1}};
+
+        assertEquals(0.731058, logit.getProbability(0,
+                                                    input), .001);
+        assertEquals(1d-0.731058, logit.getProbability(
+                1, input), .001);
 
 
         beta[1][0] = 1;
         assertEquals(0.5,logit.getProbability(
-                0,input.getRegressionInput(mock(Fisher.class),mock(FishState.class))),.001);
+                0,input),.001);
         assertEquals(0.5,logit.getProbability(
-                1,input.getRegressionInput(mock(Fisher.class),mock(FishState.class))),.001);
+                1,input),.001);
 
         MersenneTwisterFast random = new MersenneTwisterFast();
         int chosen1 = 0;
         for(int i=0; i<1000; i++) {
             if(logit.choose(
-                    input.getRegressionInput(mock(Fisher.class),mock(FishState.class)), random)==1)
+                    input, random)==1)
                 chosen1++;
         }
 

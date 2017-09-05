@@ -6,12 +6,17 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.junit.After;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.DerisoCaliforniaScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -66,7 +71,7 @@ public class SerializeTest {
         assertEquals(800,state2.getFishers().get(5).getDailyData().numberOfObservations());
 
         assertEquals(state.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
-                      state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                     state2.getFishers().get(5).getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_COLUMN),
                      .001);
 
         assertEquals(state.getFishers().get(5).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
@@ -81,6 +86,182 @@ public class SerializeTest {
         c.setVisible(true);
         Thread.sleep(50000);
         */
+    }
+
+
+    @Test
+    public void randomSeedWorks1() throws Exception {
+
+        long seed = System.currentTimeMillis();
+
+        FishState state = new FishState(seed);
+        FishState state2 = new FishState(seed);
+        PrototypeScenario scenario1 = new PrototypeScenario();
+        state.setScenario(scenario1);
+        PrototypeScenario scenario2 = new PrototypeScenario();
+        state2.setScenario(scenario2);
+        scenario1.setFishers(2);
+        scenario2.setFishers(2);
+
+        state.start();
+        state2.start();
+
+
+        for(int x=0; x<state.getMap().getWidth(); x++)
+            for(int y=0; y<state.getMap().getHeight(); y++)
+            {
+                assertEquals(
+                        state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        .0001
+                );
+            }
+
+        for(int day=0; day<600; day++)
+        {
+            System.out.println("day " + day);
+            state.schedule.step(state);
+            state2.schedule.step(state2);
+
+            for(int id=0; id<state.getFishers().size(); id++)
+            {
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             .001);
+            }
+
+            for (int x = 0; x < state.getMap().getWidth(); x++)
+                for (int y = 0; y < state.getMap().getHeight(); y++) {
+                    assertEquals(
+                            state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            .0001
+                    );
+                }
+
+        }
+    }
+
+    /*
+    Need to fix this because biology reset has some issues
+    @Test
+    public void randomSeedWorksCalifornia() throws Exception {
+
+        long seed = System.currentTimeMillis();
+
+        FishState state = new FishState(seed);
+        FishState state2 = new FishState(seed);
+        DerisoCaliforniaScenario scenario1 = new DerisoCaliforniaScenario();
+        state.setScenario(scenario1);
+        DerisoCaliforniaScenario scenario2 = new DerisoCaliforniaScenario();
+        state2.setScenario(scenario2);
+        scenario1.setMainDirectory(Paths.get("inputs","california"));
+        scenario1.setPortFileName("no_ports.csv");
+        scenario2.setMainDirectory(Paths.get("inputs","california"));
+        scenario2.setPortFileName("no_ports.csv");
+
+        state.start();
+        state2.start();
+
+
+        for(int x=0; x<state.getMap().getWidth(); x++)
+            for(int y=0; y<state.getMap().getHeight(); y++)
+            {
+                assertEquals(
+                        state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        .0001
+                );
+            }
+
+        for(int day=0; day<600; day++)
+        {
+            System.out.println("day " + day);
+            state.schedule.step(state);
+            state2.schedule.step(state2);
+
+            for(int id=0; id<state.getFishers().size(); id++)
+            {
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             .001);
+            }
+
+            for (int x = 0; x < state.getMap().getWidth(); x++)
+                for (int y = 0; y < state.getMap().getHeight(); y++) {
+                    assertEquals(
+                            state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            .0001
+                    );
+                }
+
+        }
+    }
+    */
+
+
+    @Test
+    public void randomSeedWorksYaml() throws Exception {
+
+        long seed = System.currentTimeMillis();
+
+        FishYAML yaml = new FishYAML();
+
+        FishState state = new FishState(seed);
+        FishState state2 = new FishState(seed);
+        FileReader io = new FileReader(Paths.get("inputs", "YAML Samples", "scenario", "Abstract.yaml").toFile());
+        PrototypeScenario scenario1 = yaml.loadAs(
+                io,
+                PrototypeScenario.class);
+        state.setScenario(scenario1);
+        io = new FileReader(Paths.get("inputs", "YAML Samples", "scenario", "Abstract.yaml").toFile());
+        PrototypeScenario scenario2 = yaml.loadAs(
+                io,
+                PrototypeScenario.class);
+        state2.setScenario(scenario2);
+        scenario1.setFishers(2);
+        scenario2.setFishers(2);
+
+        state.start();
+        state2.start();
+
+
+        for(int x=0; x<state.getMap().getWidth(); x++)
+            for(int y=0; y<state.getMap().getHeight(); y++)
+            {
+                assertEquals(
+                        state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                        .0001
+                );
+                System.out.println(state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)));
+                System.out.println(state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)));
+            }
+
+        for(int day=0; day<600; day++)
+        {
+            System.out.println("day " + day);
+            state.schedule.step(state);
+            state2.schedule.step(state2);
+
+            for(int id=0; id<state.getFishers().size(); id++)
+            {
+                assertEquals(state.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             state2.getFishers().get(id).getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_COLUMN),
+                             .001);
+            }
+
+            for (int x = 0; x < state.getMap().getWidth(); x++)
+                for (int y = 0; y < state.getMap().getHeight(); y++) {
+                    assertEquals(
+                            state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
+                            .0001
+                    );
+                }
+
+        }
     }
 
 
@@ -198,12 +379,12 @@ public class SerializeTest {
         }
 
         for(int i=0; i<20; i++) {
-     //       Log.setLogger(new FishStateLogger(state,Paths.get("log1.log")));
-     //       Log.set(Log.LEVEL_TRACE);
+            //       Log.setLogger(new FishStateLogger(state,Paths.get("log1.log")));
+            //       Log.set(Log.LEVEL_TRACE);
             state.schedule.step(state);
-      //      Log.trace("-----------------------------------------");
-     //       Log.setLogger(new FishStateLogger(state2,Paths.get("log2.log")));
-     //       Log.set(Log.LEVEL_TRACE);
+            //      Log.trace("-----------------------------------------");
+            //       Log.setLogger(new FishStateLogger(state2,Paths.get("log2.log")));
+            //       Log.set(Log.LEVEL_TRACE);
             state2.schedule.step(state2);
             //the randomizers are linked!
 

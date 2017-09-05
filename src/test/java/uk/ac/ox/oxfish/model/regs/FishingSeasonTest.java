@@ -31,7 +31,8 @@ public class FishingSeasonTest {
         //off season ===> can't fish
         when(model.getDayOfTheYear()).thenReturn(150);
         when(tile.isProtected()).thenReturn(false);
-        assertFalse(season.canFishHere(fisher, tile, model));
+        assertTrue(season.canFishHere(fisher, tile, model));// not an MPA problem
+        assertFalse(season.allowedAtSea(fisher,model));
 
         //on season, protected ===> can't fish
         when(model.getDayOfTheYear()).thenReturn(50);

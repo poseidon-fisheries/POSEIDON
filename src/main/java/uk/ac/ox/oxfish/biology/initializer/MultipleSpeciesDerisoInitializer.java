@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
@@ -233,12 +234,13 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                 currentBiomass = scaledEmpiricalBiomasses.get(scaledEmpiricalBiomasses.size()-1);
 
                 //hopefully biomass sums up in the end!
-                assert localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
+
+                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
                     @Override
                     public double applyAsDouble(BiomassLocalBiology value) {
                         return value.getCarryingCapacity(species);
                     }
-                }).sum() == virginBiomass;
+                }).sum() -virginBiomass) < FishStateUtilities.EPSILON;
                 assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
                     @Override
                     public double applyAsDouble(BiomassLocalBiology value) {
@@ -331,12 +333,13 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
         double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
                 parameter.getEmpiricalYearlyBiomasses().size()-1);
         for (Map.Entry<BiomassLocalBiology, Double> bio : weights.entrySet()) {
-            assert bio.getKey().getCarryingCapacity(species) == 0;
-            assert bio.getKey().getBiomass(species) == 0;
+           // these asserts are only true the first time you call this method
+            // assert bio.getKey().getCarryingCapacity(species) == 0;
+           // assert bio.getKey().getBiomass(species) == 0;
             bio.getKey().setCarryingCapacity(species,
                                              weights.get(bio.getKey()) *
                                                      virginBiomass);
-            assert bio.getKey().getBiomass(species) == 0;
+           // assert bio.getKey().getBiomass(species) == 0;
             bio.getKey().setCurrentBiomass(species, weights.get(bio.getKey()) * currentBiomass);
         }
     }

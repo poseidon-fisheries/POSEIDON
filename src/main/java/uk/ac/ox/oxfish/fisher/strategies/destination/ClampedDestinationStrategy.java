@@ -36,19 +36,32 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
 
     private FishState state;
 
+    private final boolean respectMPA;
+
+    private final boolean avoidWastelands;
+
 
     public ClampedDestinationStrategy(
             FavoriteDestinationStrategy delegate,
             MapDiscretization discretization, double distanceMaximum, double[] propensities
     ) {
+        this(delegate,discretization,distanceMaximum,propensities,true,true);
+    }
+
+    public ClampedDestinationStrategy(
+            FavoriteDestinationStrategy delegate,
+            MapDiscretization discretization, double distanceMaximum, double[] propensities,
+            boolean respectMPA,
+            boolean avoidWastelands
+    ){
         Preconditions.checkArgument(propensities.length==discretization.getNumberOfGroups());
         this.discretization = discretization;
         this.distanceMaximum = distanceMaximum;
         this.propensities = propensities;
         this.delegate = delegate;
+        this.avoidWastelands = avoidWastelands;
+        this.respectMPA = respectMPA;
     }
-
-
 
 
     /**
@@ -104,10 +117,10 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
                 candidates[group] = getValidSeatileFromGroup(
                         random,
                         tileGroup,
-                        true,
+                        respectMPA,
                         fisher,
                         state,
-                        true,
+                        avoidWastelands,
                         100
                 );
         }

@@ -52,7 +52,6 @@ Simple California:
       equalOutDegree: true
   portFileName: policy_ports.csv
   priceMap: Sablefish:3.35102639,Yelloweye Rockfish:0,Others:0
-  regulation: Anarchy
-  resetBiologyAtYear: -1
+  resetBiologyAtYear1: false
   usePremadeInput: false
   weatherStrategy: Ignore Weather

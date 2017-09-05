@@ -1,6 +1,9 @@
 package uk.ac.ox.oxfish.experiments;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
@@ -15,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 /**
  * Created by carrknight on 3/31/17.
@@ -22,7 +26,7 @@ import java.nio.file.Paths;
 public class CaliCatchCalibration {
 
 
-    public static final int RUNS = 15;
+    public static final int RUNS = 100;
     //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170322 cali_catch", "results");
     //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170606 cali_catchability_2", "results");
     public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170730 validation", "best");
@@ -213,6 +217,26 @@ public class CaliCatchCalibration {
                                          null,
                                          Paths.get("docs", "20170730 validation", "policies"),
                                          25);*/
+
+//        runMultipleTimesToBuildHistogram("eei_toscale",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "policies"),
+//                                         YEARS_PER_RUN,
+//                                         new Consumer<FishState>() {
+//                                             @Override
+//                                             public void accept(FishState fishState)
+//                                             {
+//                                                 for(Fisher fisher : fishState.getFishers())
+//                                                 {
+//                                                     if(fisher.getHomePort().getName().equals("Astoria") ||
+//                                                             fisher.getHomePort().getName().equals("Newport"))
+//                                                     {
+//                                                         fisher.getAdditionalTripCosts().clear();
+//                                                         fisher.getAdditionalTripCosts().add(new HourlyCost(80d));
+//                                                     }
+//                                                 }
+//                                             }
+//                                         });
 
 //best of
 
@@ -630,6 +654,64 @@ public class CaliCatchCalibration {
 //                                         Paths.get("docs", "20170730 validation","deriso",
 //                                                   "partial2","pretopost"),
 //                                         10);
+
+
+
+        //rerun
+        runMultipleTimesToBuildHistogram("default",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+
+        runMultipleTimesToBuildHistogram("bandit",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("kernel",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("clamped",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("random",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+
+//        runMultipleTimesToBuildHistogram("truly_perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+
+
+
+
+        runMultipleTimesToBuildHistogram("intercepts",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("annealing",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         YEARS_PER_RUN + 1);
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
@@ -637,8 +719,26 @@ public class CaliCatchCalibration {
         runMultipleTimesToBuildHistogram(input,null,MAIN_DIRECTORY,YEARS_PER_RUN);
     }
 
+
     private static void runMultipleTimesToBuildHistogram(
             final String input, String policyFile, final Path mainDirectory, final int yearsPerRun) throws IOException {
+
+        //does nothing consumer
+        runMultipleTimesToBuildHistogram(input, policyFile, mainDirectory, yearsPerRun,
+                                         new Consumer<FishState>() {
+                                             @Override
+                                             public void accept(FishState fishState) {
+
+                                             }
+                                         });
+
+    }
+
+
+
+    private static void runMultipleTimesToBuildHistogram(
+            final String input, String policyFile, final Path mainDirectory, final int yearsPerRun,
+            Consumer<FishState> dayOneTransformation) throws IOException {
 
 
         boolean header = true;
@@ -670,6 +770,7 @@ public class CaliCatchCalibration {
                 state.registerStartable(scripts);
             }
 
+            dayOneTransformation.accept(state);
 
             state.schedule.step(state);
             state.schedule.step(state);
@@ -679,7 +780,7 @@ public class CaliCatchCalibration {
             {
                 writer.write(
                         "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish" +
-                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits,actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings" );
+                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits,actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings,median_profit,actual_median_profit" );
 
                 for(Port port : state.getPorts())
                     writer.write(","+port.getName()+"_trips,"+port.getName()+"_fishers,"+port.getName()+"_profits,"+port.getName()+"_distance");
@@ -717,7 +818,9 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Weighted Average Distance From Port") + "," +
                                          state.getLatestYearlyObservation("Number Of Active Fishers")+ "," +
                                          state.getLatestYearlyObservation("Total Variable Costs")+ "," +
-                                         state.getLatestYearlyObservation("Total Earnings")
+                                         state.getLatestYearlyObservation("Total Earnings") + "," +
+                                         state.getLatestYearlyObservation("Median Cash-Flow")+ "," +
+                                         state.getLatestYearlyObservation("Actual Median Cash-Flow")
 
 
                     );

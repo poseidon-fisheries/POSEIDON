@@ -34,9 +34,9 @@ public class NaturalMortalityProcessTest {
         assertEquals(male[1],9048);
         assertEquals(male[2],9048);
 
-        assertEquals(female[0], 4094);
-        assertEquals(female[1],3275);
-        assertEquals(female[2],2456);
+        assertEquals(female[0], 4093,1);
+        assertEquals(female[1],3275,1);
+        assertEquals(female[2],2456,1);
 
 
     }
@@ -61,7 +61,7 @@ public class NaturalMortalityProcessTest {
         process.cull(male,female,species.getMeristics());
 
         for(int i=0; i<male.length; i++)
-            assertEquals(male[i],9371);
+            assertEquals(male[i],9370); //always round down now
         System.out.println(Arrays.toString(male));
 
     }

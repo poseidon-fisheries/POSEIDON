@@ -20,8 +20,10 @@ public class ExitDepartingDecoratorTest {
     public void exitDecorated() throws Exception {
 
         Fisher fisher = mock(Fisher.class,RETURNS_DEEP_STUBS);
-        DataColumn profits = new DataColumn(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-        when(fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).thenReturn(profits);
+        DataColumn earningsData =  new DataColumn(FisherYearlyTimeSeries.EARNINGS);
+        DataColumn costData = new DataColumn(FisherYearlyTimeSeries.VARIABLE_COSTS);
+        when(fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.EARNINGS)).thenReturn(earningsData);
+        when(fisher.getYearlyData().getColumn(FisherYearlyTimeSeries.VARIABLE_COSTS)).thenReturn(costData);
 
 
         DepartingStrategy strategy = mock(DepartingStrategy.class);
@@ -36,38 +38,40 @@ public class ExitDepartingDecoratorTest {
 
 
         //check with fisher who had one bad year: not enough to quit!
-        profits.add(-1d);
+        earningsData.add(0d);
+        costData.add(1d);
         decorator.checkIfQuit(fisher);
         assertTrue(decorator.shouldFisherLeavePort(fisher,
                                                    mock(FishState.class),
                                                    new MersenneTwisterFast()));
 
         //have a good year, still not quitting
-        profits.add(1d);
+        earningsData.add(3d);
+        costData.add(1d);
         decorator.checkIfQuit(fisher);
         assertTrue(decorator.shouldFisherLeavePort(fisher,
                                                    mock(FishState.class),
                                                    new MersenneTwisterFast()));
 
         //have two bad years but non consecutively: shouldn't quit
-        profits.add(-1d);
+        earningsData.add(0d);
+        costData.add(1d);
         decorator.checkIfQuit(fisher);
         assertTrue(decorator.shouldFisherLeavePort(fisher,
                                                    mock(FishState.class),
                                                    new MersenneTwisterFast()));
 
         //two bad years in a row: now quit!
-        profits.add(-1d);
+        earningsData.add(0d);
+        costData.add(1d);
         decorator.checkIfQuit(fisher);
         assertFalse(decorator.shouldFisherLeavePort(fisher,
                                                    mock(FishState.class),
                                                    new MersenneTwisterFast()));
 
         //does not matter what happens next
-        profits.add(1d);
-        profits.add(1d);
-        profits.add(1d);
-        profits.add(1d);
+        earningsData.add(300d);
+        costData.add(1d);
         assertFalse(decorator.shouldFisherLeavePort(fisher,
                                                     mock(FishState.class),
                                                     new MersenneTwisterFast()));
