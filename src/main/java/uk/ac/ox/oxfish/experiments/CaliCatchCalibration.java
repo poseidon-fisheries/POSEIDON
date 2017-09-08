@@ -658,41 +658,41 @@ public class CaliCatchCalibration {
 
 
         //rerun
-        runMultipleTimesToBuildHistogram("default",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-        runMultipleTimesToBuildHistogram("eei",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-
-        runMultipleTimesToBuildHistogram("bandit",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-        runMultipleTimesToBuildHistogram("kernel",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-        runMultipleTimesToBuildHistogram("clamped",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-        runMultipleTimesToBuildHistogram("perfect",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
-
-        runMultipleTimesToBuildHistogram("random",
-                                         null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
-                                         YEARS_PER_RUN + 1);
+//        runMultipleTimesToBuildHistogram("default",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("eei",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//
+//        runMultipleTimesToBuildHistogram("bandit",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("kernel",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("clamped",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("perfect",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("random",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
 
 
 //        runMultipleTimesToBuildHistogram("truly_perfect",
@@ -700,17 +700,77 @@ public class CaliCatchCalibration {
 //                                         Paths.get("docs", "20170730 validation", "rerun"),
 //                                         YEARS_PER_RUN + 1);
 
+//
+//
+//
+//        runMultipleTimesToBuildHistogram("intercepts",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+//
+//        runMultipleTimesToBuildHistogram("annealing",
+//                                         null,
+//                                         Paths.get("docs", "20170730 validation", "rerun"),
+//                                         YEARS_PER_RUN + 1);
+
+
+
+        //north_quota
+        runMultipleTimesToBuildHistogram("clamped",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("default",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("eei",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+
+        runMultipleTimesToBuildHistogram("bandit",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+        runMultipleTimesToBuildHistogram("kernel",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+
+
+        runMultipleTimesToBuildHistogram("random",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
+
+        runMultipleTimesToBuildHistogram("truly_perfect",
+                                         null,
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
+                                         YEARS_PER_RUN + 1);
+
 
 
 
         runMultipleTimesToBuildHistogram("intercepts",
                                          null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
                                          YEARS_PER_RUN + 1);
 
         runMultipleTimesToBuildHistogram("annealing",
                                          null,
-                                         Paths.get("docs", "20170730 validation", "rerun"),
+                                         Paths.get("docs", "20170730 validation", "north_quota"),
                                          YEARS_PER_RUN + 1);
     }
 
