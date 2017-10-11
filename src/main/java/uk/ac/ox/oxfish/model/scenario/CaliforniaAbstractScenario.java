@@ -138,6 +138,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             new AnarchyFactory();
 
 
+    private String californiaBathymetryFile = "california.csv";
+
 
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
             new NoLogbookFactory();
@@ -271,7 +273,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
     private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
-    private boolean usePremadeInput = true;
+    private boolean usePremadeInput = false;
     /**
      * anything from crew to ice to insurance to maintenance. Paid as a lump-sum cost at the end of each trip
      */
@@ -372,7 +374,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
             }
             else
-                sampledMap = new SampledMap(mainDirectory.resolve("california.csv"),
+                sampledMap = new SampledMap(mainDirectory.resolve(californiaBathymetryFile),
                                             gridWidth,
                                             spatialFiles);
 
@@ -494,7 +496,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
                         }
                     }
-                }, StepOrder.DAWN, 364);
+                }, StepOrder.DAWN, 366);
                 model.scheduleOnceAtTheBeginningOfYear(
                         new Steppable() {
                             @Override
@@ -1193,5 +1195,24 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     public void setSpatialFileName(String spatialFileName) {
         this.spatialFileName = spatialFileName;
+    }
+
+
+    /**
+     * Getter for property 'californiaBathymetryFile'.
+     *
+     * @return Value for property 'californiaBathymetryFile'.
+     */
+    public String getCaliforniaBathymetryFile() {
+        return californiaBathymetryFile;
+    }
+
+    /**
+     * Setter for property 'californiaBathymetryFile'.
+     *
+     * @param californiaBathymetryFile Value to set for property 'californiaBathymetryFile'.
+     */
+    public void setCaliforniaBathymetryFile(String californiaBathymetryFile) {
+        this.californiaBathymetryFile = californiaBathymetryFile;
     }
 }

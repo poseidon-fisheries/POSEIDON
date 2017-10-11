@@ -12,6 +12,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
@@ -67,7 +68,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         this.diffuser = diffuser;
     }
 
-    private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new HashMap<>();
+    private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new LinkedHashMap<>();
 
     /**
      * schedules itself every year
@@ -132,11 +133,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
         //allocate stuff before mortality hits!
         //either allocate recruits with given allocator or proportional to where biomass is
-        HashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
+        LinkedHashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
         if(recruitsAllocator != null) {
 
             double sum = 0;
-            biomassWeight = new HashMap<>();
+            biomassWeight = new LinkedHashMap<>();
             for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : biologies.entrySet()) {
                 double weight = recruitsAllocator.allocate(entry.getKey(),
                                                            model.getMap(),
@@ -155,7 +156,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
         }
         else {
-            biomassWeight = new HashMap<>();
+            biomassWeight = new LinkedHashMap<>();
             //map for each biology its total weight
             double totalBiomass = biologies.values().stream().mapToDouble(
                     value -> {
@@ -178,7 +179,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     |_|  |_\___/_|  \__\__,_|_|_|\__|\_, |
          *                                      |__/
          */
-        biologies.values().parallelStream().forEach(
+        biologies.values().forEach(
                 abundanceBasedLocalBiology -> mortalityProcess.cull(abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species),
                                                                     abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species),
                                                                     species.getMeristics()));
@@ -192,7 +193,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     /_/ \_\__, |_|_||_\__, |
          *           |___/       |___/
          */
-        biologies.values().parallelStream().forEach(new Consumer<AbundanceBasedLocalBiology>() {
+        biologies.values().forEach(new Consumer<AbundanceBasedLocalBiology>() {
             @Override
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
                 agingProcess.ageLocally(abundanceBasedLocalBiology,species,model);

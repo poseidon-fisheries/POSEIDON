@@ -32,7 +32,7 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
     private MultipleSpeciesDerisoInitializer initializer;
 
 
-    private String derisoFileNames = "deriso.yaml";
+    private String derisoFileNames = "deriso_2007.yaml";
 
     private HashMap<String,String> movement = new HashMap<>();
     {
@@ -56,7 +56,7 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
         GlobalBiology biology = initializer.generateGlobal(model.getRandom(),
                                              model);
 
-        HashMap<Species,Double>  recast = new HashMap<>();
+        LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
         for (Map.Entry<String, String> exogenous : movement.entrySet()) {
             recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
         }

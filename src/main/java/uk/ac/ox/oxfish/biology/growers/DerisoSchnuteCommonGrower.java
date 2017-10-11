@@ -57,7 +57,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     /**
      * list of local biologies we manage. We will at all times
      */
-    private Set<BiomassLocalBiology> biologies = new HashSet<>();
+    private LinkedHashSet<BiomassLocalBiology> biologies = new LinkedHashSet<>();
     /**
      * receipt to stop the grower when needed
      */
@@ -177,39 +177,44 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         );
         double newBiomass =  bioStep.getBiomass();
         lastStepRecruits = bioStep.getRecruits();
+
         //reallocate uniformly. Do not allocate above carrying capacity
-        List<BiomassLocalBiology> biologies = new ArrayList<>(this.biologies);
-        // Collections.shuffle(biologies);
+
+        List<BiomassLocalBiology> biologyList = new ArrayList<>(this.biologies);
+
         double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative
 
         if( Math.abs(toReallocate) < FishStateUtilities.EPSILON ) //if there is nothing to allocate, ignore
             return;
 
         if(toReallocate > 0) //if we are adding biomass, keep only not-full biologies
-            biologies = biologies.stream().filter(new Predicate<BiomassLocalBiology>() {
+            biologyList = biologyList.stream().filter(new Predicate<BiomassLocalBiology>() {
                 @Override
                 public boolean test(BiomassLocalBiology loco) {
                     return loco.getCurrentBiomass()[speciesIndex]< loco.getCarryingCapacity(speciesIndex);
                 }
             }).collect(Collectors.toList());
-        if(toReallocate < 0) //if we are removing biomass, keep only not-empty biologies
-            biologies = biologies.stream().filter(new Predicate<BiomassLocalBiology>() {
+        else {
+            assert toReallocate < 0;
+            //if we are removing biomass, keep only not-empty biologies
+            biologyList = biologyList.stream().filter(new Predicate<BiomassLocalBiology>() {
                 @Override
                 public boolean test(BiomassLocalBiology loco) {
                     return loco.getCurrentBiomass()[speciesIndex] > 0;
                 }
             }).collect(Collectors.toList());
-
+        }
 
 
         //while there is still reallocation to be done
         MersenneTwisterFast random = ((FishState) simState).getRandom();
-        while(Math.abs(toReallocate) > FishStateUtilities.EPSILON && !biologies.isEmpty())
+
+        while(Math.abs(toReallocate) > FishStateUtilities.EPSILON && !biologyList.isEmpty())
         {
             //pick a biology at random
-            BiomassLocalBiology local = biologies.get(random.nextInt(biologies.size()));
+            BiomassLocalBiology local = biologyList.get(random.nextInt(biologyList.size()));
             //give or take some biomass out
-            double delta = toReallocate / (double) biologies.size();
+            double delta = toReallocate / (double) biologyList.size();
             local.getCurrentBiomass()[speciesIndex] += delta;
             //if you gave some biomass
             if(delta > 0)
@@ -221,7 +226,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
                 if(excess > FishStateUtilities.EPSILON) {
                     toReallocate += excess;
                     local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
-                    biologies.remove(local); //this biology is not going to accept any more
+                    biologyList.remove(local); //this biology is not going to accept any more
                 }
             }
             //if you took biomass back
@@ -233,7 +238,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
                 if(local.getCurrentBiomass()[speciesIndex] < 0 ) {
                     toReallocate -= local.getCurrentBiomass()[speciesIndex];
                     local.getCurrentBiomass()[speciesIndex] = 0d;
-                    biologies.remove(local); //this biology is not going to accept any more
+                    biologyList.remove(local); //this biology is not going to accept any more
                 }
             }
 

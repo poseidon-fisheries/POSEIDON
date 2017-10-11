@@ -60,6 +60,7 @@ public class SimpleCaliforniaScenarioTest {
                 Paths.get("inputs","tests","deriso_comparison.yaml").toFile()),
                 DerisoCaliforniaScenario.class
         ) ;
+        scenario.setDerisoFileNames("deriso.yaml");;
         HashMap<String, String> exogenousCatches = new HashMap<>();
         exogenousCatches.put("Sablefish","8000000");
         scenario.setExogenousCatches(exogenousCatches);

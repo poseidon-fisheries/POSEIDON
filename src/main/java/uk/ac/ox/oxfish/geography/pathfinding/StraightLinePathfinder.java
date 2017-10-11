@@ -31,6 +31,9 @@ public class StraightLinePathfinder implements Pathfinder {
 
 
 
+        assert start != null;
+        assert  end != null;
+
         int x = start.getGridX(); int endX = end.getGridX();
         int y = start.getGridY(); int endY =end.getGridY();
 

@@ -58,32 +58,32 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * defines the proportion of fish going to any sea-tile. No checks are made that the
      * proportions sum up to one so be careful!
      */
-    private final HashMap<Species,
-            Function<SeaTile, Double>> allocators = new HashMap<>();
+    private final LinkedHashMap<Species,
+            Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
 
 
-    private final Map<SeaTile,BiomassLocalBiology> localBiologies = new HashMap<>();
+    private final LinkedHashMap<SeaTile,BiomassLocalBiology> localBiologies = new LinkedHashMap<>();
 
     /**
      * contains all the mortality+recruitment processes of each species
      */
-    private final HashMap<Species,DerisoSchnuteCommonGrower>
-            naturalProcesses = new HashMap<>();
+    private final LinkedHashMap<Species,DerisoSchnuteCommonGrower>
+            naturalProcesses = new LinkedHashMap<>();
 
     /**
      * the deriso parameters for all the species
      */
-    private final HashMap<Species, DerisoParameters> parameters = new HashMap<>();
+    private final LinkedHashMap<Species, DerisoParameters> parameters = new LinkedHashMap<>();
 
 
     /**
      * stored and used during reset only!
      */
-    private HashMap<Species,HashMap<BiomassLocalBiology,Double>> originalWeights = new HashMap<>();
+    private LinkedHashMap<Species,LinkedHashMap<BiomassLocalBiology,Double>> originalWeights = new LinkedHashMap<>();
 
 
 
-    private HashMap<Species,Double> movementRate = new HashMap<>();
+    private LinkedHashMap<Species,Double> movementRate = new LinkedHashMap<>();
 
     /**
      * read up a folder that contains deriso.yaml and turn it into a species
@@ -201,8 +201,8 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
                 //we have a mapping tile---> weight
                 //we want a mapping biology-->weight
-                HashMap<BiomassLocalBiology, Double> weights =
-                        new HashMap<>(localBiologies.size());
+                LinkedHashMap<BiomassLocalBiology, Double> weights =
+                        new LinkedHashMap<>(localBiologies.size());
 
 
                 Function<SeaTile, Double> allocator = allocators.get(species);
@@ -265,10 +265,12 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                         parameter.getLastRecruits()
                 );
                 //register all valid biologies to be grown
-                for(BiomassLocalBiology bio : localBiologies.values()) {
-                    if(bio.getCarryingCapacity(species)>0)
-                        grower.getBiologies().add(bio);
+                for (Map.Entry<SeaTile, BiomassLocalBiology> bio : localBiologies.entrySet()) {
+                    if(bio.getValue().getCarryingCapacity(species)>0)
+                        grower.getBiologies().add(bio.getValue());
                 }
+
+
                 model.registerStartable(grower);
                 naturalProcesses.put(species,grower);
 
@@ -325,7 +327,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @param species
      * @param weights
      */
-    private void resetLocalBiology(Species species, HashMap<BiomassLocalBiology, Double> weights) {
+    private void resetLocalBiology(Species species, LinkedHashMap<BiomassLocalBiology, Double> weights) {
         if(species.isImaginary())
             return;
         DerisoParameters parameter = parameters.get(species);
@@ -375,7 +377,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      *
      * @param movementRate Value to set for property 'movementRate'.
      */
-    public void setMovementRate(HashMap<Species, Double> movementRate) {
+    public void setMovementRate(LinkedHashMap<Species, Double> movementRate) {
         this.movementRate = movementRate;
     }
 

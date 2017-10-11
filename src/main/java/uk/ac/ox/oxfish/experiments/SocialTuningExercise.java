@@ -62,7 +62,7 @@ public class SocialTuningExercise {
 
 
 
-/*
+
         fine();
 
 
@@ -71,7 +71,7 @@ public class SocialTuningExercise {
         chaser();
 
         reversal();
-*/
+
       parameterSweep("fine.yaml",YEARS_TO_RUN,0l,1);
 
     }

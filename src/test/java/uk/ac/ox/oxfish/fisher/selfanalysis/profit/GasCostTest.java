@@ -42,18 +42,21 @@ public class GasCostTest {
                         System.out.println("day : " + state.getDay());
                         assertEquals(cost.cost(fisher, state, record, 0d, fisher.getHoursAtSea()),
                                      record.getTotalCosts(), .001d);
-                        TripRecord simulated = simulator.simulateRecord(fisher, record.getMostFishedTileInTrip(),
-                                                                        state, 24 * 5,
-                                                                        new double[]{record.getSoldCatch()[0] / record.getEffort()}
-                        );
-                        assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
-                        assertEquals(
-                                record.getEffort() + record.getDistanceTravelled() / fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),
-                                0, .1d);
-                        assertEquals(simulated.getEffort(), record.getEffort(), .001d);
-                        assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(), .001d);
-                        assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
-
+                        if(record.getEffort() > 0) {
+                            TripRecord simulated = simulator.simulateRecord(fisher,
+                                                                            record.getMostFishedTileInTrip(),
+                                                                            state, 24 * 5,
+                                                                            new double[]{record.getSoldCatch()[0] / record.getEffort()}
+                            );
+                            assertEquals(simulated.getDistanceTravelled(), record.getDistanceTravelled(), .001d);
+                            assertEquals(
+                                    record.getEffort() + record.getDistanceTravelled() / fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),
+                                    0, .1d);
+                            assertEquals(simulated.getEffort(), record.getEffort(), .001d);
+                            assertEquals(simulated.getLitersOfGasConsumed(), record.getLitersOfGasConsumed(),
+                                         .001d);
+                            assertEquals(simulated.getDurationInHours(), record.getDurationInHours(), .1);
+                        }
                     }
                 }
         );

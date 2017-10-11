@@ -108,6 +108,8 @@ public class CaliforniaAbundanceScenarioTest {
         scenario.getExogenousCatches().put("Dover Sole", String.valueOf(12345678d));
 
         scenario.setResetBiologyAtYear1(true);
+        scenario.setRegulationPreReset(new FishingSeasonFactory(15,true));
+        scenario.setRegulationPostReset(new FishingSeasonFactory(0,true));
    //     scenario.setRegulationPreReset(new AnarchyFactory());
    //     scenario.setRegulationPostReset(new AnarchyFactory());
         FishState state = new FishState(System.currentTimeMillis());
@@ -146,7 +148,7 @@ public class CaliforniaAbundanceScenarioTest {
                 );
 
             }
-        }, StepOrder.FISHER_PHASE, 364);
+        }, StepOrder.FISHER_PHASE, 366);
 
 
         for (int i = 0; i < 366; i++)

@@ -99,7 +99,7 @@ dependencies
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test{
-        maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),1)
+        maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
 }
 
 //this just mentions what the gradle version for the "wrapper" gradlew ought to be
@@ -130,12 +130,20 @@ task fatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     }
 }
 
+task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'calicatch.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.CaliCatchCalibration'
+    }
+}
 
 
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
-
 task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
 
     mergeServiceFiles()
