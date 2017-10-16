@@ -221,6 +221,14 @@ task appendix(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+
+
+task algorithms(type:JavaExec){
+    main = 'uk.ac.ox.oxfish.experiments.SocialTuningExercise'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
 task batch(type:JavaExec){
     main = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
     classpath = sourceSets.main.runtimeClasspath

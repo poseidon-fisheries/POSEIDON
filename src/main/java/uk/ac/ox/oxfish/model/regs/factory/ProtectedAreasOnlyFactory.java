@@ -1,7 +1,10 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -9,6 +12,7 @@ import uk.ac.ox.oxfish.utility.Locker;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -47,8 +51,39 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
                 Startable startable = new Startable() {
                     @Override
                     public void start(FishState model) {
-                        for (StartingMPA mpa : startingMPAs)
+                        for (StartingMPA mpa : startingMPAs) {
                             mpa.buildMPA(model.getMap());
+                        }
+
+
+                        model.getDailyDataSet().
+                                registerGatherer(
+                                        "% of Illegal Tows",
+                                        new Gatherer<FishState>() {
+                                            @Override
+                                            public Double apply(FishState state) {
+
+                                                double trawlsSum = 0;
+                                                double illegalSum = 0;
+                                                NauticalMap map = state.getMap();
+                                                for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
+                                                {
+                                                    int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
+                                                                                                 tile.getGridY());
+                                                    trawlsSum += trawlsHere;
+                                                    if(tile.isProtected())
+                                                    {
+                                                        illegalSum +=trawlsHere;
+                                                    }
+                                                }
+                                                if(trawlsSum == 0)
+                                                    return Double.NaN;
+                                                assert trawlsSum>=illegalSum;
+                                                return illegalSum/trawlsSum;
+
+                                            }
+                                        }
+                                        , Double.NaN);
                     }
 
                     @Override

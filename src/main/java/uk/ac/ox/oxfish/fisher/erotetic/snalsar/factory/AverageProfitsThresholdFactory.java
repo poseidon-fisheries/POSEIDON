@@ -15,6 +15,18 @@ public class AverageProfitsThresholdFactory implements AlgorithmFactory<AverageP
 
     private DoubleParameter scale = new FixedDoubleParameter(1d);
 
+
+    public AverageProfitsThresholdFactory() {
+    }
+
+
+    public AverageProfitsThresholdFactory(double multiplier) {
+
+        scale = new FixedDoubleParameter(multiplier);
+    }
+
+
+
     /**
      * Applies this function to the given argument.
      *

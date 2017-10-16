@@ -19,6 +19,13 @@ public class FixedProfitThresholdFactory implements AlgorithmFactory<FixedProfit
     private DoubleParameter  fixedThreshold = new FixedDoubleParameter(0d);
 
 
+    public FixedProfitThresholdFactory() {
+    }
+
+    public FixedProfitThresholdFactory(double threshold) {
+        fixedThreshold = new FixedDoubleParameter(threshold);
+    }
+
     /**
      * Applies this function to the given argument.
      *

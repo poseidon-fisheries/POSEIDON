@@ -138,7 +138,8 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/cpue_map/kernel"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-only/ant/"
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/imitation/ant/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/deriso/calibration/"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/deriso/calibration/"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20170730 validation/attainment-north/"
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
 

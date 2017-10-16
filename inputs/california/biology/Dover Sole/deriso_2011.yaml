@@ -104,11 +104,11 @@ empiricalYearlyBiomasses:
 historicalYearlySurvival:
 - 0.885791668526681
 - 0.888626296064829
-lastRecruits: 118258.72060314906
+lastRecruits: 1.078922625708437E8
 naturalSurvivalRate: 0.914
 recruitmentLag: 8
 recruitmentSteepness: 0.8
 rho: 0.965
-virginBiomass: 853954.0
+virginBiomass: 8.53954E8
 weightAtRecruitment: 0.314
 weightAtRecruitmentMinus1: 0.2674

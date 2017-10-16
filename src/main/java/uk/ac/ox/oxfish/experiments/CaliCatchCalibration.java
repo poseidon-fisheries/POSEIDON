@@ -65,25 +65,26 @@ public class CaliCatchCalibration {
 
 
         //deriso runs
-        for(String scenario : scenarios)
-            runMultipleTimesToBuildHistogram(scenario,
-                                             null,
-                                             Paths.get("docs",
-                                                       "20170730 validation",
-                                                       "rerun",
-                                                       "deriso",
-                                                       "partial_rerun"),
-                                             YEARS_PER_RUN+1);
+//        for(String scenario : scenarios)
+//            runMultipleTimesToBuildHistogram(scenario,
+//                                             null,
+//                                             Paths.get("docs",
+//                                                       "20170730 validation",
+//                                                       "rerun",
+//                                                       "deriso",
+//                                                       "partial_rerun"),
+//                                             YEARS_PER_RUN+1);
         //deriso pre-to-post
         for(String scenario : scenarios)
             runMultipleTimesToBuildHistogram(scenario,
-                                             null,
+                                             "itq_switch_script",
                                              Paths.get("docs",
                                                        "20170730 validation",
                                                        "rerun",
                                                        "deriso",
-                                                       "partial_rerun"),
-                                             YEARS_PER_RUN+1);
+                                                       "partial_rerun",
+                                                       "pretopost"),
+                                             10);
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {
