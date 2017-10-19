@@ -4,7 +4,7 @@ runs/*
 runs/dashboards/*
 !runs/dashboards/dashboard.R
 !runs/optimization
-temp_wfs
+temp_wfs/
 
 
 oxfish.iml
