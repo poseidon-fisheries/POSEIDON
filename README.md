@@ -1,3 +1,13 @@
+POSEIDON
+========
+
+This is the code for POSEIDON, a fishery agent-based model; currently under review but open-source under GPL.
+For all intents and purposes please consider this code pre-alpha.   
+
+A good run-down of what it is and does is available here:
+http://carrknight.github.io/poseidon/appendix.html
+
+
 How to run
 ==============================
 
