@@ -36,7 +36,13 @@ public class FixedProportionFilter implements AbundanceFilter
 
     final private double proportion;
 
-    public FixedProportionFilter(double proportion) {
+    /**
+     * should we round numbers so that the catches are always integers?
+     */
+    final private boolean rounding;
+
+    public FixedProportionFilter(double proportion, boolean rounding) {
+        this.rounding = rounding;
         Preconditions.checkArgument(proportion>=0, "Proportion filter cannot be negative");
         Preconditions.checkArgument(proportion<=1, "Proportion filter cannot be above 1");
         this.proportion = proportion;
@@ -51,13 +57,19 @@ public class FixedProportionFilter implements AbundanceFilter
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public int[][] filter(int[] male, int[] female, Species species)
+    public double[][] filter(double[] male, double[] female, Species species)
     {
-        int[][] filtered = new int[2][species.getMaxAge()+1];
+        double[][] filtered = new double[2][species.getMaxAge()+1];
         for(int age =0; age<species.getMaxAge()+1; age++)
         {
-            filtered[FishStateUtilities.FEMALE][age] = (int)(female[age] * proportion + 0.5d);
-            filtered[FishStateUtilities.MALE][age] = (int)(male[age] * proportion + 0.5d);
+            filtered[FishStateUtilities.FEMALE][age] = (female[age] * proportion);
+            filtered[FishStateUtilities.MALE][age] = (male[age] * proportion );
+
+            if(rounding)
+            {
+                filtered[FishStateUtilities.FEMALE][age] = (int)(filtered[FishStateUtilities.FEMALE][age] + 0.5d);
+                filtered[FishStateUtilities.MALE][age] = (int)(filtered[FishStateUtilities.MALE][age] + 0.5d);
+            }
         }
 
         return filtered;

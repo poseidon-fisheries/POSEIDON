@@ -58,24 +58,24 @@ public class EmptyLocalBiology implements LocalBiology
      * Empty array
      */
     @Override
-    public int[] getNumberOfMaleFishPerAge(Species species) {
-        return new int[0];
+    public double[] getNumberOfMaleFishPerAge(Species species) {
+        return new double[0];
     }
 
     /**
      * Empty array
      */
     @Override
-    public int[] getNumberOfFemaleFishPerAge(Species species) {
-        return new int[0];
+    public double[] getNumberOfFemaleFishPerAge(Species species) {
+        return new double[0];
     }
 
     /**
      * Empty array
      */
     @Override
-    public int[] getNumberOfFishPerAge(Species species) {
-        return new int[0];
+    public double[] getNumberOfFishPerAge(Species species) {
+        return new double[0];
     }
 
 

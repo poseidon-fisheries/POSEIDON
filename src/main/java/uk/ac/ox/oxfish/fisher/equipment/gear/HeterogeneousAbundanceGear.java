@@ -84,7 +84,7 @@ public class HeterogeneousAbundanceGear implements Gear
             if(species.isImaginary() || !gears.containsKey(species) || where.getBiology().getBiomass(species)<=0)
             {
                 //if it's imaginary or not set or there is no fish, just return empty
-                int[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
+                double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
                 caught[species.getIndex()] = new StructuredAbundance(abundance[MALE],abundance[FEMALE]);
 
             }

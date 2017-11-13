@@ -46,12 +46,12 @@ public class HomogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
-                                                                     new FixedProportionFilter(.5),
-                                                                     new FixedProportionFilter(.5));
+                                                                     new FixedProportionFilter(.5, true),
+                                                                     new FixedProportionFilter(.5, true));
 
         SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
-        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
-        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new double[]{100});
+        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new double[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
         Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
@@ -60,9 +60,9 @@ public class HomogeneousAbundanceGearTest
 
         Catch fish = gear.fish(mock(Fisher.class), tile, 1, biology);
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
-                new int[]{0}, new int[]{25}, species.getMeristics()), .001);
+                new double[]{0}, new double[]{25}, species.getMeristics()), .001);
 
-        assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],25);
+        assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],25,.001);
 
 
     }
@@ -73,12 +73,12 @@ public class HomogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
-                                                                     new FixedProportionFilter(1),
-                                                                     new FixedProportionFilter(.5));
+                                                                     new FixedProportionFilter(1, true),
+                                                                     new FixedProportionFilter(.5, true));
 
         SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
-        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
-        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new double[]{100});
+        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new double[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
         Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
@@ -87,7 +87,7 @@ public class HomogeneousAbundanceGearTest
         Catch fish = gear.fish(mock(Fisher.class), tile,1, biology);
 
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
-                new int[]{0}, new int[]{50}, species.getMeristics()), .001);
+                new double[]{0}, new double[]{50}, species.getMeristics()), .001);
 
 
     }
@@ -99,12 +99,12 @@ public class HomogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
-                                                                     new FixedProportionFilter(1),
-                                                                     new FixedProportionFilter(.5));
+                                                                     new FixedProportionFilter(1, true),
+                                                                     new FixedProportionFilter(.5, true));
 
         SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
-        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
-        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new double[]{100});
+        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new double[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
         Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
@@ -112,8 +112,8 @@ public class HomogeneousAbundanceGearTest
 
         double fish[] = gear.expectedHourlyCatch(mock(Fisher.class), tile,1, biology);
 
-        assertEquals(fish[0], FishStateUtilities.weigh(new int[]{0},
-                                                       new int[]{50},species.getMeristics()),.001);
+        assertEquals(fish[0], FishStateUtilities.weigh(new double[]{0},
+                                                       new double[]{50},species.getMeristics()),.001);
 
 
     }
@@ -123,12 +123,12 @@ public class HomogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear = new HomogeneousAbundanceGear(1,
-                                                                     new FixedProportionFilter(1),
-                                                                     new FixedProportionFilter(.5));
+                                                                     new FixedProportionFilter(1, true),
+                                                                     new FixedProportionFilter(.5, true));
 
         SeaTile tile = mock(SeaTile.class,RETURNS_DEEP_STUBS);
-        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new int[]{100});
-        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new int[]{0});
+        when(tile.getNumberOfFemaleFishPerAge(any())).thenReturn(new double[]{100});
+        when(tile.getNumberOfMaleFishPerAge(any())).thenReturn(new double[]{0});
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
         Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
@@ -138,8 +138,8 @@ public class HomogeneousAbundanceGearTest
 
         //you are going to catch 50 on the first hour and 50 in the other second (this is because seatile is mocked and doesn't kill off biology)
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
-                new int[]{0}, new int[]{50+50}, species.getMeristics()), .001);
-        assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],100);
+                new double[]{0}, new double[]{50+50}, species.getMeristics()), .001);
+        assertEquals(fish.getAbundance(0).getAbundance()[FishStateUtilities.FEMALE][0],100,.0001);
 
 
     }

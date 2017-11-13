@@ -35,21 +35,21 @@ public class FixedBoxcar {
     /**
      * population, split into length bins
      */
-    private final  float[] currentDistribution;
+    private final  double[] currentDistribution;
 
     /**
      * proportion graduating each time step
      */
-    private final float[] proportionGraduating;
+    private final double[] proportionGraduating;
 
     /**
      * what is the MIN length associated with each bin
      */
-    private final float[] lengthPerBin;
+    private final double[] lengthPerBin;
 
-    private FixedBoxcar(float[] currentDistribution,
-                        float[] proportionGraduating,
-                        float[] lengthPerBin) {
+    private FixedBoxcar(double[] currentDistribution,
+                        double[] proportionGraduating,
+                        double[] lengthPerBin) {
         this.currentDistribution = currentDistribution;
         this.proportionGraduating = proportionGraduating;
         this.lengthPerBin = lengthPerBin;
@@ -64,9 +64,9 @@ public class FixedBoxcar {
      * @return a Fixed Boxcar tuned to these parameters
      */
     public static FixedBoxcar buildEquallySpacedVB(
-            float LZero,
-            float LInfinity,
-            float K,
+            double LZero,
+            double LInfinity,
+            double K,
             int daysPerStep,
             int numberOfBins
     )
@@ -77,8 +77,8 @@ public class FixedBoxcar {
         Preconditions.checkArgument(K > 0);
         Preconditions.checkArgument(daysPerStep > 0);
         //set the length per bin (they should be all equal)
-        float increment = (LInfinity - LZero)/numberOfBins;
-        float[] lengths = new float[numberOfBins];
+        double increment = (LInfinity - LZero)/(numberOfBins-1);
+        double[] lengths = new double[numberOfBins];
         lengths[0] = LZero;
         for(int i=1;i<lengths.length; i++)
             lengths[i] = lengths[i-1] + increment;
@@ -101,13 +101,13 @@ public class FixedBoxcar {
      *@param cohortCoefficientVariation @return a Fixed Boxcar tuned to these parameters
      */
     public static FixedBoxcar buildVariableWidthVB(
-            float LZero,
-            float LInfinity,
-            float K,
+            double LZero,
+            double LInfinity,
+            double K,
             int daysPerStep,
             int numberOfBins,
-            float factor1,
-            float cohortCoefficientVariation)
+            double factor1,
+            double cohortCoefficientVariation)
     {
         Preconditions.checkArgument(numberOfBins > 1);
         Preconditions.checkArgument(LZero > 0);
@@ -115,12 +115,12 @@ public class FixedBoxcar {
         Preconditions.checkArgument(K > 0);
         Preconditions.checkArgument(daysPerStep > 0);
         //set the length per bin following's Peter formula
-        float[] increments = new float[numberOfBins];
+        double[] increments = new double[numberOfBins];
         for(int i=0;i<increments.length; i++)
             increments[i] = factor1 * 2 * LZero * cohortCoefficientVariation * cohortCoefficientVariation *
-                    (float) Math.pow(1 + factor1 * 2 * cohortCoefficientVariation * cohortCoefficientVariation,i);
+                    (double) Math.pow(1 + factor1 * 2 * cohortCoefficientVariation * cohortCoefficientVariation,i);
 
-        float[] lengths = new float[numberOfBins];
+        double[] lengths = new double[numberOfBins];
         lengths[0] = increments[0];
         for(int i=1; i<increments.length; i++ )
             lengths[i] = lengths[i-1] + increments[i];
@@ -134,22 +134,22 @@ public class FixedBoxcar {
 
     @NotNull
     private static FixedBoxcar buildBoxcarFromLengthBins(
-            float LInfinity, float K, int daysPerStep, int numberOfBins, float[] lenghts) {
-        float deltaT = daysPerStep/365; //scaling factor to turn yearly VB to daily
+            double LInfinity, double K, int daysPerStep, int numberOfBins, double[] lenghts) {
+        double deltaT = daysPerStep/365f; //scaling factor to turn yearly VB to daily
         //this is just the derivative of VB per time
-        float[] growthPerBin = new float[numberOfBins];
+        double[] growthPerBin = new double[numberOfBins];
         for(int i = 0; i<numberOfBins; i++)
             growthPerBin[i] = K * (LInfinity - lenghts[i]) * deltaT;
         //turn this into graduating proportion
         //which is basically what % of length distance has been covered within deltaT (by growthPerBin)
-        float[] proportionGraduating = new float[numberOfBins];
+        double[] proportionGraduating = new double[numberOfBins];
         for(int i = 0; i<numberOfBins-1; i++)
-            proportionGraduating[i] = growthPerBin[i]/(lenghts[i+1]-lenghts[i]);
-        proportionGraduating[numberOfBins-1] = Float.NaN;
+            proportionGraduating[i] = Math.max(growthPerBin[i]/(lenghts[i+1]-lenghts[i]),0);
+        proportionGraduating[numberOfBins-1] = Double.NaN;
 
 
         return new FixedBoxcar(
-                new float[numberOfBins],
+                new double[numberOfBins],
                 proportionGraduating,
                 lenghts
         );
@@ -164,17 +164,17 @@ public class FixedBoxcar {
      * @param proportionGraduating
      * @return number of graduates (at position i is the number that left bin i and went into bin i+1)
      */
-    public static float[] stepInTime(
-            float[] currentDistribution,
-            float[] proportionGraduating
+    public static double[] stepInTime(
+            double[] currentDistribution,
+            double[] proportionGraduating
     )
     {
         int bins = currentDistribution.length;
-        float[] graduate = new float[bins];
+        double[] graduate = new double[bins];
         Preconditions.checkArgument(bins ==
         proportionGraduating.length);
         Preconditions.checkArgument(bins >2);
-        assert proportionGraduating[bins-1]==0 || Float.isNaN(proportionGraduating[bins-1]);
+        assert proportionGraduating[bins-1]==0 || Double.isNaN(proportionGraduating[bins-1]);
         //going backward
         for(int i=bins-2; i>=0; i--)
         {
@@ -209,6 +209,26 @@ public class FixedBoxcar {
     }
 
 
+    /**
+     * the current population, split in bins; the link is *live* so any change ruin everything
+     */
+    public double[] getCurrentDistribution() {
+        return currentDistribution;
+    }
+
+    /**
+     * the proportion of fish moving from one bin to the next in the given time step; this is no copy, so careful about modifying it
+     */
+    public double[] getProportionGraduating() {
+        return proportionGraduating;
+    }
+
+    /**
+     * the length associated with each bin
+     */
+    public double[] getLengthPerBin() {
+        return lengthPerBin;
+    }
 
 
 }

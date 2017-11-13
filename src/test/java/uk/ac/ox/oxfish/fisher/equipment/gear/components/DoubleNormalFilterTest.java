@@ -43,7 +43,7 @@ public class DoubleNormalFilterTest {
         Species species = new Species("shortspine",shortspine);
 
         DoubleNormalFilter filter = new DoubleNormalFilter(
-                true,23.53,-7,3.77,6.78,0,75,1
+                true, true, 23.53, -7, 3.77, 6.78, 0, 75, 1
         );
 
 
@@ -66,7 +66,7 @@ public class DoubleNormalFilterTest {
         Species species = new Species("sole",sole);
 
         DoubleNormalFilter filter = new DoubleNormalFilter(
-                true,38.953,-1.483,3.967,-0.764,Double.NaN,-2.259,0,50,1
+                true, true, 38.953, -1.483, 3.967, -0.764, Double.NaN, -2.259, 0, 50, 1
         );
 
 
@@ -89,11 +89,11 @@ public class DoubleNormalFilterTest {
         Species species = new Species("canary",canary);
 
         DoubleNormalFilter filter = new DoubleNormalFilter(
-                true,39.8622,-4,3.93569,
+                true, true, 39.8622, -4, 3.93569,
                 1.98913,
                 -9,
                 -0.266314,
-                0,65,1
+                0, 65, 1
         );
 
 

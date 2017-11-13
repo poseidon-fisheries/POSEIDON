@@ -41,8 +41,9 @@ public class RetentionAbundanceFilter extends FormulaAbundanceFilter {
 
 
 
-    public RetentionAbundanceFilter(boolean memoization, double inflection, double slope, double asymptote) {
-        super(memoization);
+    public RetentionAbundanceFilter(
+            boolean memoization, double inflection, double slope, double asymptote, final boolean rounding) {
+        super(memoization, rounding);
         this.inflection = inflection;
         this.slope = slope;
         this.asymptote = asymptote;

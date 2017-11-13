@@ -35,9 +35,9 @@ public class LogisticAbundanceFilterTest {
     @Test
     public void equality() throws Exception {
 
-        AbundanceFilter first = new LogisticAbundanceFilter(20, 10, true);
-        AbundanceFilter second = new LogisticAbundanceFilter(20,  10, true);
-        AbundanceFilter third = new LogisticAbundanceFilter(200,  10, true);
+        AbundanceFilter first = new LogisticAbundanceFilter(20, 10, true, true);
+        AbundanceFilter second = new LogisticAbundanceFilter(20, 10, true, true);
+        AbundanceFilter third = new LogisticAbundanceFilter(200, 10, true, true);
 
         assertFalse(first == second);
         assertFalse(first == third);
@@ -57,7 +57,7 @@ public class LogisticAbundanceFilterTest {
                                                                                          0.111313, 17.826, -1.79, 1,
                                                                                          0, 168434124,
                                                                                          0.6, false));
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
+        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
         double[][] selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][5],0.1720164347,.001);
         assertEquals(selectivity[FishStateUtilities.FEMALE][20],0.5556124037,.001);
@@ -75,15 +75,15 @@ public class LogisticAbundanceFilterTest {
                                                                                          0.111313, 17.826, -1.79, 1,
                                                                                          0, 168434124,
                                                                                          0.6, false));
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
+        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         male[5] = 100;
-        int[][] filtered = filter.filter(male, female, species);
-        assertEquals(filtered[FishStateUtilities.MALE][5],17);
-        assertEquals(filtered[FishStateUtilities.MALE][0],0);
-        assertEquals(filtered[FishStateUtilities.FEMALE][5],0);
+        double[][] filtered = filter.filter(male, female, species);
+        assertEquals(filtered[FishStateUtilities.MALE][5],17,.001);
+        assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
+        assertEquals(filtered[FishStateUtilities.FEMALE][5],0,.001);
 
 
     }
@@ -97,8 +97,8 @@ public class LogisticAbundanceFilterTest {
                                                                                          0, 168434124,
                                                                                          0.6, false));
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         for(int i=0; i<81; i++)
         {
             male[i] = random.nextInt(100000);
@@ -107,14 +107,14 @@ public class LogisticAbundanceFilterTest {
 
 
         long start = System.currentTimeMillis();
-        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053,9.03702,false);
+        LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         long end = System.currentTimeMillis();
         long durationFirst = end-start;
 
         start = System.currentTimeMillis();
-        filter = new LogisticAbundanceFilter(23.5053,9.03702,true);
+        filter = new LogisticAbundanceFilter(23.5053, 9.03702, true, true);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         end = System.currentTimeMillis();

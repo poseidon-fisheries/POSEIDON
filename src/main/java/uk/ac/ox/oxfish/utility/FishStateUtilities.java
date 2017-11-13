@@ -104,6 +104,11 @@ public class FishStateUtilities {
 
 
 
+    public static int quickRounding(double value)
+    {
+        return (int)(value + 0.5d);
+    }
+
 
 
 
@@ -613,7 +618,7 @@ public class FishStateUtilities {
      * @param meristics
      * @return
      */
-    public static double weigh(int[] male, int[] female, Meristics meristics)
+    public static double weigh(double[] male, double[] female, Meristics meristics)
     {
         final ImmutableList<Double> maleWeights = meristics.getWeightMaleInKg();
         final ImmutableList<Double> femaleWeights = meristics.getWeightFemaleInKg();
@@ -682,7 +687,7 @@ public class FishStateUtilities {
      * @param species species object containig the details
      * @return the weight of hte fish
      */
-    private static double weigh(int[] ageStructure, Meristics species)
+    private static double weigh(double[] ageStructure, Meristics species)
     {
         final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
         double totalWeight = 0;

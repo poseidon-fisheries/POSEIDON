@@ -67,7 +67,7 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
 
         return new HomogeneousAbundanceGear(
                 litersOfGasConsumed.apply(state.getRandom()),
-                new FixedProportionFilter(getAverageCatchability().apply(state.getRandom()))
+                new FixedProportionFilter(getAverageCatchability().apply(state.getRandom()), true)
         );
     }
 

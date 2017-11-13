@@ -100,7 +100,7 @@ public class HomogeneousAbundanceGear implements Gear {
      */
     public StructuredAbundance catchesAsAbundanceForThisSpecies(SeaTile where, int hoursSpentFishing, Species species) {
         //prepare empty array
-        int[][] catches = emptyAbundance(species);
+        double[][] catches = emptyAbundance(species);
 
         //if there is no fish, don't bother
         if(where.getBiology().getBiomass(species)>FishStateUtilities.EPSILON) {
@@ -109,7 +109,7 @@ public class HomogeneousAbundanceGear implements Gear {
             int hoursSpentFishingThisSpecies = hoursSpentFishing;
 
             while (hoursSpentFishingThisSpecies > 0) {
-                int[][] hourlyCatches = fishThisSpecies(where, species);
+                double[][] hourlyCatches = fishThisSpecies(where, species);
                 for (int sex = 0; sex < 2; sex++)
                     for (int bin = 0; bin < catches[0].length; bin++)
                         catches[sex][bin] += hourlyCatches[sex][bin];
@@ -120,10 +120,10 @@ public class HomogeneousAbundanceGear implements Gear {
         return new StructuredAbundance(catches[MALE],catches[FEMALE]);
     }
 
-    protected static int[][] emptyAbundance(Species species) {
-        int[][] catches = new int[2][];
-        catches[MALE] = new int[species.getMaxAge()+1];
-        catches[FishStateUtilities.FEMALE] = new int[species.getMaxAge()+1];
+    protected static double[][] emptyAbundance(Species species) {
+        double[][] catches = new double[2][];
+        catches[MALE] = new double[species.getMaxAge()+1];
+        catches[FishStateUtilities.FEMALE] = new double[species.getMaxAge()+1];
         return catches;
     }
 
@@ -147,9 +147,9 @@ public class HomogeneousAbundanceGear implements Gear {
      * @param species the species considered
      * @return
      */
-    protected int[][] fishThisSpecies(
+    protected double[][] fishThisSpecies(
             SeaTile where, Species species) {
-        int[][] fish = new int[2][];
+        double[][] fish = new double[2][];
         fish[MALE] = where.getNumberOfMaleFishPerAge(species);
         fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
         //filter until you get the catch
@@ -167,7 +167,7 @@ public class HomogeneousAbundanceGear implements Gear {
      * @return a matrix of 2 columns and MAX_AGE rows corresponding to what was caught
      */
     @VisibleForTesting
-    public int[][] filter(Species species, int[][] abundance) {
+    public double[][] filter(Species species, double[][] abundance) {
         for (AbundanceFilter filter : filters)
             abundance = filter.filter(abundance[MALE],
                                  abundance[FishStateUtilities.FEMALE],

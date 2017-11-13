@@ -57,21 +57,21 @@ public interface LocalBiology extends Startable
      * @param species the species examined
      * @return the male fish array.
      */
-    int[] getNumberOfMaleFishPerAge(Species species);
+    double[] getNumberOfMaleFishPerAge(Species species);
 
     /**
      * returns the number of female fish in this seatile belonging to this species, split into age cohorts
      * @param species the species examined
      * @return the female fish array.
      */
-    int[] getNumberOfFemaleFishPerAge(Species species);
+    double[] getNumberOfFemaleFishPerAge(Species species);
 
     /**
      * returns the number of fish in this seatile belonging to this species, split into age cohorts
      * @param species the species examined
      * @return the fish array.
      */
-    int[] getNumberOfFishPerAge(Species species);
+    double[] getNumberOfFishPerAge(Species species);
 
 
 

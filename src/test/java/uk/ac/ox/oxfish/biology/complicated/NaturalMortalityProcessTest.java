@@ -41,18 +41,18 @@ public class NaturalMortalityProcessTest {
     public void mortalityTest() throws Exception {
 
 
-        int male[] = new int[]{10000,10000,10000};
-        int female[] = new int[]{5000,4000,3000};
+        double male[] = new double[]{10000,10000,10000};
+        double female[] = new double[]{5000,4000,3000};
         Meristics meristics = mock(StockAssessmentCaliforniaMeristics.class);
         when(meristics.getMortalityParameterMFemale()).thenReturn(.2);
         when(meristics.getMortalityParameterMMale()).thenReturn(.1);
 
         NaturalMortalityProcess mortality = new NaturalMortalityProcess();
-        mortality.cull(male,female,meristics);
+        mortality.cull(male,female,meristics, true);
         //this numbers I obtained in R
-        assertEquals(male[0],9048);
-        assertEquals(male[1],9048);
-        assertEquals(male[2],9048);
+        assertEquals(male[0],9048,.001);
+        assertEquals(male[1],9048,.001);
+        assertEquals(male[2],9048,.001);
 
         assertEquals(female[0], 4093,1);
         assertEquals(female[1],3275,1);
@@ -71,17 +71,17 @@ public class NaturalMortalityProcessTest {
                                                     "biology",
                                                     "Sablefish"),"Sablefish");
 
-        int[] male = new int[60];
-        int[] female = new int[60];
+        double[] male = new double[60];
+        double[] female = new double[60];
         Arrays.fill(male,10000);
 
 
         NaturalMortalityProcess process = new NaturalMortalityProcess();
 
-        process.cull(male,female,species.getMeristics());
+        process.cull(male,female,species.getMeristics(), true);
 
         for(int i=0; i<male.length; i++)
-            assertEquals(male[i],9370); //always round down now
+            assertEquals(male[i],9370, .001); //always round down now
         System.out.println(Arrays.toString(male));
 
     }

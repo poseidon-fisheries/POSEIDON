@@ -79,8 +79,8 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      * @return the number of male and female recruits
      */
     @Override
-    public int recruit(
-            Species species, Meristics meristics, int[] femalePerAge, int[] malePerAge)
+    public double recruit(
+            Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge)
     {
 
         //you need to sum up the spawning biomass of the fish:
@@ -104,7 +104,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
 
         //turn it into recruits.
         return
-                (int) FishStateUtilities.round(
+                FishStateUtilities.round(
                         (1d+noisemaker.get()) * (
                                 (4 * steepness * virginRecruits * spawningBiomass)/
                         ((virginRecruits*cumulativePhi*(1-steepness)) +

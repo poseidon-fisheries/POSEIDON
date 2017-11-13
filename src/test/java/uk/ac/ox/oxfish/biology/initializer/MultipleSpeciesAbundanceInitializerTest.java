@@ -79,14 +79,14 @@ public class MultipleSpeciesAbundanceInitializerTest
         initializer.putAllocator(fakeSpecies,
                                  seaTile -> 1d/16d);
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(250,map.getSeaTile(1,1).getNumberOfMaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(250,map.getSeaTile(2,3).getNumberOfMaleFishPerAge(fakeSpecies)[0]);
-        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1]);
-        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1]);
+        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(250,map.getSeaTile(1,1).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(250,map.getSeaTile(2,3).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
+        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
 
         //force it to put everything in tile 1,1
         initializer.putAllocator(fakeSpecies,
@@ -141,9 +141,9 @@ public class MultipleSpeciesAbundanceInitializerTest
                                  });
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
         assertTrue(map.getSeaTile(0,0).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(1600*2,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0]);
+        assertEquals(1600*2,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
         assertTrue(map.getSeaTile(2,3).getBiology() instanceof EmptyLocalBiology);
-        assertEquals(2000*2,map.getSeaTile(1,1).getNumberOfMaleFishPerAge(fakeSpecies)[0]);
+        assertEquals(2000*2,map.getSeaTile(1,1).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
 
     }
 

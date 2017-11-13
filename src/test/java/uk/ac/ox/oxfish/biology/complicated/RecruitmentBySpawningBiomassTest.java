@@ -42,8 +42,8 @@ public class RecruitmentBySpawningBiomassTest {
                                                     "biology",
                                                     "Sablefish"), "Sablefish");
 
-        int[] male = new int[60];
-        int[] female = new int[60];
+        double[] male = new double[60];
+        double[] female = new double[60];
         Arrays.fill(male, 0);
         Arrays.fill(female, 10000);
 
@@ -59,9 +59,9 @@ public class RecruitmentBySpawningBiomassTest {
         );
 
 
-        int recruits = process.recruit(species,species.getMeristics(),female,male);
+        double recruits = process.recruit(species,species.getMeristics(),female,male);
         System.out.println(recruits);
-        Assert.assertEquals(416140d, (double)recruits, 1d);
+        Assert.assertEquals(416140d, recruits, 1d);
 
     }
 }

@@ -38,11 +38,11 @@ public interface RecruitmentProcess
      * @param malePerAge the number of males that are part of the recruitment, grouped by age cohort
      * @return the number of male + female recruits
      */
-    int recruit(
+    double recruit(
             Species species,
             Meristics meristics,
-            int[] femalePerAge,
-            int[] malePerAge);
+            double[] femalePerAge,
+            double[] malePerAge);
 
 
     /**

@@ -84,8 +84,8 @@ public class ThreePricesMarketTest {
         //you catch 1000kg of species 2
         hold.load(
                 new Catch(
-                        new int[]{0,2,3},
-                        new int[]{5,0,0},
+                        new double[]{0,2,3},
+                        new double[]{5,0,0},
                         firstSpecies,
                         bio
 
@@ -169,8 +169,8 @@ public class ThreePricesMarketTest {
         //but regulations will only allow to sell 500kg
         hold.load(
                 new Catch(
-                        new int[]{0,2,3},
-                        new int[]{5,0,0},
+                        new double[]{0,2,3},
+                        new double[]{5,0,0},
                         firstSpecies,
                         bio
 

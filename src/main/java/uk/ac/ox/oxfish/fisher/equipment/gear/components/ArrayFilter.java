@@ -36,10 +36,16 @@ public class ArrayFilter  implements AbundanceFilter{
 
     private final double femaleFilter[];
 
+    /**
+     * do we round abundances so that only integer number of fish can be caught?
+     */
+    private final boolean round;
 
-    public ArrayFilter(double[] maleFilter, double[] femaleFilter) {
+
+    public ArrayFilter(double[] maleFilter, double[] femaleFilter, boolean round) {
         this.maleFilter = maleFilter;
         this.femaleFilter = femaleFilter;
+        this.round = round;
     }
 
     /**
@@ -51,15 +57,20 @@ public class ArrayFilter  implements AbundanceFilter{
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public int[][] filter(int[] male, int[] female, Species species) {
+    public double[][] filter(double[] male, double[] female, Species species) {
         Preconditions.checkArgument(maleFilter.length == male.length);
         Preconditions.checkArgument(femaleFilter.length == female.length);
         Preconditions.checkArgument(male.length == female.length);
-        int[][] filtered = new int[2][male.length];
+        double[][] filtered = new double[2][male.length];
         for(int age =0; age < male.length; age++)
         {
-            filtered[FishStateUtilities.MALE][age] = (int)(maleFilter[age] * male[age] + 0.5d );
-            filtered[FishStateUtilities.FEMALE][age] = (int)(femaleFilter[age] * female[age] + 0.5d );
+            filtered[FishStateUtilities.MALE][age] = (maleFilter[age] * male[age]);
+            filtered[FishStateUtilities.FEMALE][age] = (femaleFilter[age] * female[age] );
+            if(round) {
+                filtered[FishStateUtilities.FEMALE][age] = (int) (filtered[FishStateUtilities.FEMALE][age] + 0.5d);
+                filtered[FishStateUtilities.MALE][age] = (int)(filtered[FishStateUtilities.MALE][age]  + 0.5d );
+            }
+
         }
 
         return filtered;

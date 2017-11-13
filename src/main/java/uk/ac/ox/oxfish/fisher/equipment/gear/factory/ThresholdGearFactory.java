@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundanceGear>
 {
 
+    private boolean rounding = true;
     private DoubleParameter threshold = new FixedDoubleParameter(10d);
 
     private DoubleParameter litersGasPerHourFished = new FixedDoubleParameter(5);
@@ -55,9 +56,9 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
     public HomogeneousAbundanceGear apply(FishState fishState) {
         MersenneTwisterFast random = fishState.getRandom();
         return  new HomogeneousAbundanceGear(litersGasPerHourFished.apply(random),
-                                             new FixedProportionFilter(catchability.apply(random)),
+                                             new FixedProportionFilter(catchability.apply(random), rounding),
                                              new CutoffAbundanceFilter(threshold.apply(random),
-                                                                       selectAboveThreshold));
+                                                                       selectAboveThreshold, rounding));
     }
 
 
@@ -122,5 +123,24 @@ public class ThresholdGearFactory implements AlgorithmFactory<HomogeneousAbundan
      */
     public void setCatchability(DoubleParameter catchability) {
         this.catchability = catchability;
+    }
+
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

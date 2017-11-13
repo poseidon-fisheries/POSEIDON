@@ -47,7 +47,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      * the hashmap contains for each species a table [age][male-female] corresponding to the number of fish of that
      * age and that sex
      */
-    private final HashMap<Species,int[][]>  abundance = new HashMap<>();
+    private final HashMap<Species,double[][]>  abundance = new HashMap<>();
 
 
 
@@ -65,9 +65,9 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
         //for each species create cohorts
         for(Species species : biology.getSpecies()) {
-            int[] male = new int[species.getMaxAge()+1];
-            int[] female = new int[species.getMaxAge()+1];
-            int[][] fish = new int[][]{male,female};
+            double[] male = new double[species.getMaxAge()+1];
+            double[] female = new double[species.getMaxAge()+1];
+            double[][] fish = new double[][]{male,female};
             abundance.put(species, fish);
         }
         //done!
@@ -143,9 +143,9 @@ public class AbundanceBasedLocalBiology implements LocalBiology
             Preconditions.checkArgument(catches.getSubdivisions()==2, " needs male/female split");
 
 
-            final int[][] abundanceHere = this.abundance.get(species);
-            int[] maleCatches =catches.getAbundance()[FishStateUtilities.MALE];
-            int[] femaleCatches =catches.getAbundance()[FishStateUtilities.FEMALE];
+            final double[][] abundanceHere = this.abundance.get(species);
+            double[] maleCatches =catches.getAbundance()[FishStateUtilities.MALE];
+            double[] femaleCatches =catches.getAbundance()[FishStateUtilities.FEMALE];
             Preconditions.checkArgument(maleCatches.length == abundanceHere[FishStateUtilities.MALE].length);
             for(int age=0; age<maleCatches.length; age++)
             {
@@ -169,7 +169,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      * @return the male fish array.
      */
     @Override
-    public int[] getNumberOfMaleFishPerAge(Species species) {
+    public double[] getNumberOfMaleFishPerAge(Species species) {
 
         Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
         return  abundance.get(species)[FishStateUtilities.MALE];
@@ -182,7 +182,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      * @return the female fish array.
      */
     @Override
-    public int[] getNumberOfFemaleFishPerAge(Species species) {
+    public double[] getNumberOfFemaleFishPerAge(Species species) {
         Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
 
         return  abundance.get(species)[FishStateUtilities.FEMALE];
@@ -195,9 +195,9 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      * @return the fish array.
      */
     @Override
-    public int[] getNumberOfFishPerAge(Species species) {
-        int[][] fish = abundance.get(species);
-        int total[] = new int[fish[0].length];
+    public double[] getNumberOfFishPerAge(Species species) {
+        double[][] fish = abundance.get(species);
+        double total[] = new double[fish[0].length];
         assert fish.length==2;
         for(int i=0; i<total.length; i++)
             total[i] = fish[0][i]+ fish[1][i];

@@ -39,7 +39,7 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
      * @return the male fish array.
      */
     @Override
-    public int[] getNumberOfMaleFishPerAge(Species species) {
+    public double[] getNumberOfMaleFishPerAge(Species species) {
         return turnBiomassIntoFakeNumberArray(getBiomass(species)/2,species);
     }
 
@@ -50,7 +50,7 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
      * @return the female fish array.
      */
     @Override
-    public int[] getNumberOfFemaleFishPerAge(Species species) {
+    public double[] getNumberOfFemaleFishPerAge(Species species) {
 
         return turnBiomassIntoFakeNumberArray(getBiomass(species)/2,species);
 
@@ -63,7 +63,7 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
      * @return the fish array.
      */
     @Override
-    public int[] getNumberOfFishPerAge(Species species) {
+    public double[] getNumberOfFishPerAge(Species species) {
         return turnBiomassIntoFakeNumberArray(getBiomass(species),species);
     }
 
@@ -80,16 +80,16 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
      * @param species link to fish biomass
      * @return an array of fish where all the fish are age 0 and their number is biomass/weight rounded down
      */
-    private int[] turnBiomassIntoFakeNumberArray(double biomass, Species species)
+    private double[] turnBiomassIntoFakeNumberArray(double biomass, Species species)
     {
         warnIfNeeded();
 
-        int[] toReturn = new int[species.getMaxAge()+1];
+        double[] toReturn = new double[species.getMaxAge()+1];
         if(biomass == 0)
             return toReturn;
         double weight = species.getWeightMaleInKg().get(0);
         if(weight>0)
-            toReturn[0] = (int) (biomass/weight);
+            toReturn[0] = (biomass/weight);
         else
             toReturn[0] = 1;
         return toReturn;

@@ -157,8 +157,8 @@ public class HoldTest {
 
         hold.load(
                 new Catch(
-                        new int[]{0,10,0},
-                        new int[]{10,0,0},
+                        new double[]{0,10,0},
+                        new double[]{10,0,0},
                         firstSpecies,
                         bio
 
@@ -178,8 +178,8 @@ public class HoldTest {
         //catch the other species, too
         hold.load(
                 new Catch(
-                        new int[]{0,2},
-                        new int[]{0,0},
+                        new double[]{0,2},
+                        new double[]{0,0},
                         secondSpecies,
                         bio
 
@@ -201,8 +201,8 @@ public class HoldTest {
         //catch the other species, too
         hold.load(
                 new Catch(
-                        new int[]{0,12},
-                        new int[]{0,0},
+                        new double[]{0,12},
+                        new double[]{0,0},
                         secondSpecies,
                         bio
 

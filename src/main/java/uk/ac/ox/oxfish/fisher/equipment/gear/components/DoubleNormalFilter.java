@@ -53,9 +53,10 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
 
     public DoubleNormalFilter(
-            boolean memoization, double peak, double top, double ascWidth, double dscWidth, double initialScaling,
+            boolean memoization, final boolean rounding, double peak, double top, double ascWidth, double dscWidth,
+            double initialScaling,
             double finalScaling, double binMin, double binMax, double binWidth) {
-        super(memoization);
+        super(memoization, rounding);
         this.peak = peak;
         this.top = top;
         this.ascWidth = ascWidth;
@@ -69,10 +70,11 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
 
     public DoubleNormalFilter(
-            boolean memoization, double peak, double top, double ascWidth, double dscWidth, double binMin,
+            boolean memoization, final boolean rounding, double peak, double top, double ascWidth, double dscWidth,
+            double binMin,
             double binMax,
             double binWidth) {
-        this(memoization,peak,top,ascWidth,dscWidth,Double.NaN,Double.NaN,binMin,binMax,binWidth);
+        this(memoization, rounding, peak, top, ascWidth, dscWidth, Double.NaN, Double.NaN, binMin, binMax, binWidth);
 
     }
 

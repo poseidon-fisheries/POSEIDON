@@ -93,11 +93,11 @@ public class AgeLimitedConstantRateDiffuserTest {
 
         diffuser.step(species,tiles,state);
 
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{1000,250,0});
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,5});
+        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{1000,250,0},.001);
+        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new int[]{0,250,0});
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,5});
+        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{0,250,0},.001);
+        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001);
 
     }
 
@@ -150,17 +150,17 @@ public class AgeLimitedConstantRateDiffuserTest {
 
         diffuser.step(species,tiles,state);
 
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{900,450,0});
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,10});
+        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{900,450,0},.001);
+        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,10},.001);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new int[]{100,50,0});
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,0});
+        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{100,50,0},.001);
+        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,0},.001);
         diffuser.step(species,tiles,state);
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new int[]{820,410,0});
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,10});
+        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{820,410,0},.001);
+        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,10},.001);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new int[]{180,90,0});
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new int[]{0,0,0});
+        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{180,90,0},.001);
+        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,0},.001);
     }
 
 }

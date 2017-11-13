@@ -37,6 +37,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
 
 
+
+    private boolean rounding = true;
     /**
      * the selectivity parameter A for the logistic
      */
@@ -112,22 +114,22 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
         MersenneTwisterFast random = fishState.getRandom();
         if(retentionAsymptote != null)
             return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                                new FixedProportionFilter(averageCatchability.apply(random)),
+                                                new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),
-                                                                            true),
+                                                                            true, rounding),
                                                 new RetentionAbundanceFilter(true,
                                                                              retentionInflection.apply(random),
                                                                              retentionSlope.apply(random),
-                                                                             retentionAsymptote.apply(random))
+                                                                             retentionAsymptote.apply(random), rounding)
             );
         else
         {
             return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                                new FixedProportionFilter(averageCatchability.apply(random)),
+                                                new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),
-                                                                            true));
+                                                                            true, rounding));
         }
     }
 
@@ -257,5 +259,24 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      */
     public void setAverageCatchability(DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
+    }
+
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

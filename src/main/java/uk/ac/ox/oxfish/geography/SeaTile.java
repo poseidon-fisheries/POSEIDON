@@ -246,7 +246,7 @@ public class SeaTile implements Startable{
      * @param species the species examined
      * @return the male fish array.
      */
-    public int[] getNumberOfMaleFishPerAge(Species species) {
+    public double[] getNumberOfMaleFishPerAge(Species species) {
         return biology.getNumberOfMaleFishPerAge(species);
     }
 
@@ -255,7 +255,7 @@ public class SeaTile implements Startable{
      * @param species the species examined
      * @return the female fish array.
      */
-    public int[] getNumberOfFemaleFishPerAge(Species species) {
+    public double[] getNumberOfFemaleFishPerAge(Species species) {
         return biology.getNumberOfFemaleFishPerAge(species);
     }
 

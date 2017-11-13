@@ -54,7 +54,7 @@ public class GarbageGearDecoratorTest {
         SeaTile where = new SeaTile(0, 0, -100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second,1.5,new OneSpecieGear(first,.5));
+        Gear gear = new GarbageGearDecorator(second, 1.5, new OneSpecieGear(first,.5), true);
         Catch fishCaught = gear.fish(mock(Fisher.class), where, 1 , biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 0, .001);
@@ -75,7 +75,7 @@ public class GarbageGearDecoratorTest {
         SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second,2,new OneSpecieGear(first,.5));
+        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first,.5), true);
         Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 50, .001);
@@ -99,7 +99,7 @@ public class GarbageGearDecoratorTest {
         SeaTile where = new SeaTile(0,0,-100, new TileHabitat(0d));
         where.setBiology(local);
 
-        Gear gear = new GarbageGearDecorator(second,2,new OneSpecieGear(first,.5));
+        Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first,.5), true);
         double[] fishCaught = gear.expectedHourlyCatch(mock(Fisher.class), where,1 , biology);
 
         assertEquals(fishCaught[0], 50, .001);
@@ -125,7 +125,7 @@ public class GarbageGearDecoratorTest {
 
 
         HomogeneousAbundanceGear gear1 = mock(HomogeneousAbundanceGear.class,RETURNS_DEEP_STUBS);
-        int[][] catches = new int[2][81];
+        double[][] catches = new double[2][81];
         catches[0][5]=1000; //total catch weight = 19.880139
         when(gear1.catchesAsAbundanceForThisSpecies(any(),anyInt(), any())).
                 thenReturn(
@@ -133,10 +133,10 @@ public class GarbageGearDecoratorTest {
                 );
 
 
-        Gear gear = new GarbageGearDecorator(imaginary,.5,
+        Gear gear = new GarbageGearDecorator(imaginary, .5,
                                              new HeterogeneousAbundanceGear(
                                                      new Pair<>(longspine, gear1)
-                                             ));
+                                             ), true);
 
         GlobalBiology biology = new GlobalBiology(longspine,imaginary);
 

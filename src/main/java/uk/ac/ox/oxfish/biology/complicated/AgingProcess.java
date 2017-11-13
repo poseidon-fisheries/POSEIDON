@@ -34,8 +34,10 @@ public interface AgingProcess {
      * as a side-effect ages the local biology according to its rules
      * @param localBiology
      * @param model
+     * @param rounding
      */
-    public void ageLocally(AbundanceBasedLocalBiology localBiology,Species species,
-                      FishState model);
+    public void ageLocally(
+            AbundanceBasedLocalBiology localBiology, Species species,
+            FishState model, boolean rounding);
 
 }

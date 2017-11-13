@@ -41,7 +41,7 @@ public class StructuredAbundance {
     /**
      * abundance, per subdivision per bin
      */
-    private int[][] abundance;
+    private double[][] abundance;
 
 
     /**
@@ -49,20 +49,20 @@ public class StructuredAbundance {
      * length/age bin
      * @param ageStructure
      */
-    public StructuredAbundance(int[] ageStructure)
+    public StructuredAbundance(double[] ageStructure)
     {
         Preconditions.checkArgument(ageStructure.length > 0);
-        abundance = new int[1][];
+        abundance = new double[1][];
         abundance[0] = ageStructure;
     }
 
-    public StructuredAbundance(int[] maleAbundance,
-                               int[] femaleAbundance)
+    public StructuredAbundance(double[] maleAbundance,
+                               double[] femaleAbundance)
     {
 
         Preconditions.checkArgument(maleAbundance.length == femaleAbundance.length);
         Preconditions.checkArgument(maleAbundance.length > 0);
-        abundance = new int[2][];
+        abundance = new double[2][];
         abundance[MALE] = maleAbundance;
         abundance[FEMALE] = femaleAbundance;
     }
@@ -75,13 +75,13 @@ public class StructuredAbundance {
      */
     public StructuredAbundance(int subdivisions,int bins){
         Preconditions.checkArgument(subdivisions<=2, "no more than 2 subdivisions are allowed!");
-        abundance = new int[subdivisions][];
+        abundance = new double[subdivisions][];
         for(int i=0; i<subdivisions; i++)
-            abundance[i] = new int[bins];
+            abundance[i] = new double[bins];
     }
 
     public StructuredAbundance(StructuredAbundance other) {
-        this.abundance = new int[other.getSubdivisions()][other.getBins()];
+        this.abundance = new double[other.getSubdivisions()][other.getBins()];
         for(int i=0; i<abundance.length; i++)
             abundance[i] = Arrays.copyOf(other.abundance[i],other.abundance[i].length);
     }
@@ -99,7 +99,7 @@ public class StructuredAbundance {
      * get the age structured matrix
      * @return
      */
-    public int[][] getAbundance() {
+    public double[][] getAbundance() {
         return abundance;
     }
 

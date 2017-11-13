@@ -38,8 +38,8 @@ public class StandardAgingProcessTest {
 
         Species species = mock(Species.class);
         when(species.getMaxAge()).thenReturn(2);
-        int[] male = {10, 20, 30};
-        int[] female = {100, 200, 300};
+        double[] male = {10, 20, 30};
+        double[] female = {100, 200, 300};
 
         StandardAgingProcess process = new StandardAgingProcess(false);
 
@@ -48,10 +48,10 @@ public class StandardAgingProcessTest {
         when(bio.getNumberOfFemaleFishPerAge(species)).thenReturn(female);
 
 
-        process.ageLocally(bio,species,null);
+        process.ageLocally(bio, species, null, true);
 
-        assertArrayEquals(male,new int[]{0,10,20});
-        assertArrayEquals(female,new int[]{0,100,200});
+        assertArrayEquals(male,new double[]{0,10,20},.0001);
+        assertArrayEquals(female,new double[]{0,100,200},.0001);
 
     }
 
@@ -61,8 +61,8 @@ public class StandardAgingProcessTest {
 
         Species species = mock(Species.class);
         when(species.getMaxAge()).thenReturn(2);
-        int[] male = {10, 20, 30};
-        int[] female = {100, 200, 300};
+        double[] male = {10, 20, 30};
+        double[] female = {100, 200, 300};
 
         StandardAgingProcess process = new StandardAgingProcess(true);
 
@@ -71,10 +71,10 @@ public class StandardAgingProcessTest {
         when(bio.getNumberOfFemaleFishPerAge(species)).thenReturn(female);
 
 
-        process.ageLocally(bio,species,null);
+        process.ageLocally(bio, species, null, true);
 
-        assertArrayEquals(male,new int[]{0,10,50});
-        assertArrayEquals(female,new int[]{0,100,500});
+        assertArrayEquals(male,new double[]{0,10,50},.0001);
+        assertArrayEquals(female,new double[]{0,100,500},.0001);
 
     }
 }

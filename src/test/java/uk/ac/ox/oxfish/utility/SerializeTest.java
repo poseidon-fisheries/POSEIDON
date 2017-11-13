@@ -342,7 +342,8 @@ public class SerializeTest {
                             assertArrayEquals(state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
                                     state.getSpecies().get(species)),
                                               state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                      state2.getSpecies().get(species)));
+                                                      state2.getSpecies().get(species)),
+                                              .0001);
 
 
                         assertEquals(
@@ -391,7 +392,7 @@ public class SerializeTest {
                             assertArrayEquals(state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
                                     state.getSpecies().get(species)),
                                               state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                      state2.getSpecies().get(species)));
+                                                      state2.getSpecies().get(species)),.0001);
 
 
                         assertEquals(

@@ -44,9 +44,11 @@ public class ProfitFunctionTest {
     public void attached() throws Exception {
 
         //if I attach it to a fisher in a real simulation it should compute precisely the profits
+        long seed = System.currentTimeMillis();
+        System.out.println(seed);
         PrototypeScenario scenario = new PrototypeScenario();
         scenario.setFishers(1);
-        FishState state = new FishState(System.currentTimeMillis());
+        FishState state = new FishState(seed);
         state.setScenario(scenario);
         MaximumStepsFactory fishingStrategy = new MaximumStepsFactory();
         scenario.setFishingStrategy(fishingStrategy);

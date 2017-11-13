@@ -36,16 +36,21 @@ public class NaturalMortalityProcess
      * @param male array containing male fish per age
      * @param female array with female fish per age
      * @param species the characteristics of the species
+     * @param rounding
      */
-    public void cull(int[] male,int[] female, Meristics species)
+    public void cull(double[] male, double[] female, Meristics species, boolean rounding)
     {
         double maleMortality = species.getMortalityParameterMMale();
         double femaleMortality = species.getMortalityParameterMFemale();
         Preconditions.checkArgument(male.length==female.length);
         for(int i=0;i<male.length; i++)
         {
-            male[i] = (int) FishStateUtilities.round(male[i] * Math.exp(-maleMortality) );
-            female[i] = (int) FishStateUtilities.round(female[i] * Math.exp(-femaleMortality));
+            male[i] = (male[i] * Math.exp(-maleMortality) );
+            female[i] = (female[i] * Math.exp(-femaleMortality));
+            if(rounding) {
+                male[i] = (int) FishStateUtilities.round(male[i]);
+                female[i] = (int) FishStateUtilities.round(female[i]);
+            }
         }
 
     }

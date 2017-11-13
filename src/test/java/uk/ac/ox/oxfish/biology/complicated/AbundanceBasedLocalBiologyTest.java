@@ -80,16 +80,16 @@ public class AbundanceBasedLocalBiologyTest
         local.getNumberOfMaleFishPerAge(longspine)[5]=200;
         local.getNumberOfMaleFishPerAge(longspine)[6]=100;
 
-        int[] maleCatches = new int[longspine.getMaxAge()+1];
-        int[] femaleCatches = new int[longspine.getMaxAge()+1];
+        double[] maleCatches = new double[longspine.getMaxAge()+1];
+        double[] femaleCatches = new double[longspine.getMaxAge()+1];
         maleCatches[6] = 50;
         local.reactToThisAmountOfBiomassBeingFished(new Catch(maleCatches,femaleCatches,longspine,biology),
                                                     null,biology);
 
-        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[5],100);
-        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[6],0);
-        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[5],200);
-        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[6],50);
+        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[5],100, .001);
+        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[6],0, .001);
+        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[5],200, .001);
+        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[6],50, .001);
 
     }
 

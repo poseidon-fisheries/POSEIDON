@@ -46,31 +46,36 @@ public class ProportionalAgingProcess implements AgingProcess {
 
     /**
      * as a side-effect ages the local biology according to its rules
-     *
-     * @param localBiology
+     *  @param localBiology
      * @param species
      * @param model
+     * @param rounding
      */
     @Override
     public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species, FishState model)
+            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding)
     {
 
 
         //get the age structure (these are not copies!)
-        int[] males = localBiology.getNumberOfMaleFishPerAge(species);
-        int[] females = localBiology.getNumberOfFemaleFishPerAge(species);
+        double[] males = localBiology.getNumberOfMaleFishPerAge(species);
+        double[] females = localBiology.getNumberOfFemaleFishPerAge(species);
 
         //go from oldest to youngest and age them (to avoid double aging)
         for(int bin=species.getMaxAge(); bin>=0; bin--)
         {
             //male
-            int deltaMale = proportionalStep(males[bin],model.getRandom());
+            double deltaMale = proportionalStep(males[bin],model.getRandom());
+            if(rounding)
+                deltaMale = (int) deltaMale;
             males[bin]-=deltaMale;
+            assert males[bin] >=0;
             if(bin<species.getMaxAge()) //if you are at very last bin, you just die
                 males[bin+1]+=deltaMale;
             //female
-            int deltaFemale = proportionalStep(females[bin],model.getRandom());
+            double deltaFemale = proportionalStep(females[bin],model.getRandom());
+            if(rounding)
+                deltaFemale = (int) deltaFemale;
             females[bin]-=deltaFemale;
             if(bin<species.getMaxAge()) //if you are at very last bin, you just die
                 //otherwise you age one class
@@ -87,14 +92,14 @@ public class ProportionalAgingProcess implements AgingProcess {
      * @param binAbundance the number of fish
      * @return fish that move to the next bin
      */
-    private int proportionalStep(int binAbundance, MersenneTwisterFast random)
+    private double proportionalStep(double binAbundance, MersenneTwisterFast random)
     {
 
         Preconditions.checkArgument(binAbundance>=0);
         if(binAbundance == 0)
             return 0;
         double proportion = Math.max(0,Math.min(1,proportionAging.apply(random)));
-        return (int) (proportion * binAbundance);
+        return (proportion * binAbundance);
 
     }
 }

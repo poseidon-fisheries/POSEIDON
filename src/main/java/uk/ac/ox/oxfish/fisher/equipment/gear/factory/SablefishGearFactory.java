@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 /**
  * Logistic retention but customized sablefish selectivity
@@ -88,6 +87,8 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
 
+    private boolean rounding = true;
+
     public SablefishGearFactory() {
     }
 
@@ -116,16 +117,16 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
         MersenneTwisterFast random = state.getRandom();
         return new HomogeneousAbundanceGear(
                 litersOfGasConsumedPerHour.apply(random),
-                new FixedProportionFilter(averageCatchability.apply(random)),
+                new FixedProportionFilter(averageCatchability.apply(random), rounding),
                 selectivity.presentKey(state,
                                        () -> new ArrayFilter(
                                                Arrays.copyOf(MALE,MALE.length),
-                                               Arrays.copyOf(FEMALE,FEMALE.length)
-                                       )),
+                                               Arrays.copyOf(FEMALE,FEMALE.length),
+                                               true)),
                 new RetentionAbundanceFilter(true,
                                              retentionInflection.apply(random),
                                              retentionSlope.apply(random),
-                                             retentionAsymptote.apply(random))
+                                             retentionAsymptote.apply(random), rounding)
 
         );
     }
@@ -214,5 +215,23 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
     @Override
     public void setAverageCatchability(DoubleParameter averageCatchability) {
         this.averageCatchability = averageCatchability;
+    }
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

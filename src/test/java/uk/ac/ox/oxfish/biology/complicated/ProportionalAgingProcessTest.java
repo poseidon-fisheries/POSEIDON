@@ -42,8 +42,8 @@ public class ProportionalAgingProcessTest {
 
         Species species = mock(Species.class);
         when(species.getMaxAge()).thenReturn(2);
-        int[] male = {10, 20, 30};
-        int[] female = {100, 200, 300};
+        double[] male = {10, 20, 30};
+        double[] female = {100, 200, 300};
 
         ProportionalAgingProcess process = new ProportionalAgingProcess(new FixedDoubleParameter(0.5d));
 
@@ -54,10 +54,10 @@ public class ProportionalAgingProcessTest {
 
         FishState model = mock(FishState.class);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        process.ageLocally(bio, species, model);
+        process.ageLocally(bio, species, model, true);
 
-        assertArrayEquals(male,new int[]{5,15,25});
-        assertArrayEquals(female,new int[]{50,150,250});
+        assertArrayEquals(male,new double[]{5,15,25},.001);
+        assertArrayEquals(female,new double[]{50,150,250},.001);
 
     }
 

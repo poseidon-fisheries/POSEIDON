@@ -79,8 +79,8 @@ public class DiscardUnderaged implements DiscardingStrategy {
         for(int i=0 ; i<fishCaught.numberOfSpecies(); i++)
         {
             int bins = fishCaught.getAbundance(i).getAbundance()[FishStateUtilities.MALE].length;
-            int[] maleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).getAbundance()[FishStateUtilities.MALE],bins);
-            int[] femaleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).getAbundance()[FishStateUtilities.FEMALE],bins);
+            double[] maleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).getAbundance()[FishStateUtilities.MALE],bins);
+            double[] femaleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).getAbundance()[FishStateUtilities.FEMALE],bins);
             for(int bin =0; bin<minAge ; bin++) {
                 maleAbundance[bin] = 0;
                 femaleAbundance[bin] = 0;

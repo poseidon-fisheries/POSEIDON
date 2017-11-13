@@ -110,13 +110,13 @@ public class AlwaysDiscardTheseSpeciesTest {
         );
 
         AlwaysDiscardTheseSpecies strategy = new AlwaysDiscardTheseSpecies(1);
-        int maleFirst[] = new int[]{100,100,100};
-        int femaleFirst[] = new int[]{20,20,20};
-        int maleSecond[] = new int[]{20,20};
-        int femaleSecond[] = new int[]{20,20};
+        double maleFirst[] = new double[]{100,100,100};
+        double femaleFirst[] = new double[]{20,20,20};
+        double maleSecond[] = new double[]{20,20};
+        double femaleSecond[] = new double[]{20,20};
         Catch original = new Catch(
-                new int[][]{maleFirst,maleSecond},
-                new int[][]{femaleFirst,femaleSecond},
+                new double[][]{maleFirst,maleSecond},
+                new double[][]{femaleFirst,femaleSecond},
                 bio
         );
         FishState model = mock(FishState.class);
@@ -128,9 +128,9 @@ public class AlwaysDiscardTheseSpeciesTest {
         Assert.assertEquals(end.getWeightCaught(secondSpecies),0,.0001);
         assertTrue(end.getWeightCaught(firstSpecies)>0);
         assertEquals(end.getAbundance(firstSpecies).getAbundance()
-                             [FishStateUtilities.MALE][1],100);
+                             [FishStateUtilities.MALE][1],100,.001);
         assertEquals(end.getAbundance(firstSpecies).getAbundance()
-                             [FishStateUtilities.FEMALE][1],20);
+                             [FishStateUtilities.FEMALE][1],20,.001);
 
 
     }

@@ -156,13 +156,14 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * @param preserveLastAge
      * @param yearDelay
      * @param diffuser
+     * @param rounding
      * @return the already scheduled naturalProcesses object
      */
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
             FishState model, Species species,
             Map<SeaTile, AbundanceBasedLocalBiology> locals,
             final boolean preserveLastAge, final int yearDelay,
-            final NoAbundanceDiffusion diffuser) {
+            final NoAbundanceDiffusion diffuser, final boolean rounding) {
         //schedule recruitment and natural mortality
         AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
@@ -181,7 +182,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                                 species.isAddRelativeFecundityToSpawningBiomass()
                         ),
                 species,
-                agingProcess, diffuser);
+                rounding, agingProcess, diffuser);
 
         for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
             processes.add(entry.getValue(),entry.getKey());
@@ -299,7 +300,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = initializeNaturalProcesses(
-                        model, species, locals, preserveLastAge, 0, new NoAbundanceDiffusion());
+                        model, species, locals, preserveLastAge, 0, new NoAbundanceDiffusion(), true);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(

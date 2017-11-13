@@ -60,14 +60,14 @@ public class HeterogeneousAbundanceGearTest
 
 
         HomogeneousAbundanceGear gear1 = mock(HomogeneousAbundanceGear.class,RETURNS_DEEP_STUBS);
-        int[][] catches = new int[2][81];
+        double[][] catches = new double[2][81];
         catches[0][5]=1000; //total catch weight = 19.880139
         when(gear1.catchesAsAbundanceForThisSpecies(any(),anyInt(), any())).
                 thenReturn(
                 new StructuredAbundance(catches[MALE],catches[FEMALE])
         );
         HomogeneousAbundanceGear gear2 = mock(HomogeneousAbundanceGear.class,RETURNS_DEEP_STUBS);
-        int[][] catches2 = new int[2][81];
+        double[][] catches2 = new double[2][81];
         catches2[0][5]=2000; //total catch weight = 19.880139*2
         when(gear2.catchesAsAbundanceForThisSpecies(any(),anyInt(), any())).thenReturn(
                 new StructuredAbundance(catches2[MALE],catches2[FEMALE])

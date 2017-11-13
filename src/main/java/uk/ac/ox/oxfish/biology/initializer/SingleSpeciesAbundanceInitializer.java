@@ -268,7 +268,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 new NaturalMortalityProcess(),
                 recruitmentProcess,
                 species,
-                aging,
+                true, aging,
                 diffuser
         );
         if(recruitmentAllocator !=null)

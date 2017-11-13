@@ -38,8 +38,8 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
     private final double bParameter;
 
 
-    public LogisticAbundanceFilter(double aParameter, double bParameter, boolean memoization) {
-        super(memoization);
+    public LogisticAbundanceFilter(double aParameter, double bParameter, boolean memoization, final boolean rounding) {
+        super(memoization, rounding);
         this.aParameter = aParameter;
         this.bParameter = bParameter;
     }

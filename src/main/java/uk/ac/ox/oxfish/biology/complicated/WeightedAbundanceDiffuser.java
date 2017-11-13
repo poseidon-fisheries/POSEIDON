@@ -64,16 +64,20 @@ public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
     @Override
     public void move(
             Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere, SeaTile there,
-            AbundanceBasedLocalBiology biologyThere, int delta, int fishHere, int fishThere, int bin, boolean male,
-            MersenneTwisterFast random) {
+            AbundanceBasedLocalBiology biologyThere, double delta, double fishHere, double fishThere, int bin, boolean male,
+            MersenneTwisterFast random,
+            boolean rounding) {
 
 
 
         //reweights
         double weightHere = weights.get(biologyHere);
         double weightThere = weights.get(biologyThere);
-        delta = (int) ((fishHere * weightThere  - fishThere * weightHere)/(weightHere+weightThere));
-        super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random);
+        delta = ((fishHere * weightThere  - fishThere * weightHere)/(weightHere+weightThere));
+        if(rounding)
+            delta=(int) delta;
+
+        super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random,rounding);
 
 
     }

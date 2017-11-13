@@ -39,8 +39,14 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
      */
     private final boolean memoization;
 
-    public FormulaAbundanceFilter(boolean memoization) {
+    /**
+     * do we round number so that catches are always integers?
+     */
+    private final boolean rounding;
+
+    public FormulaAbundanceFilter(boolean memoization, boolean rounding) {
         this.memoization = memoization;
+        this.rounding = rounding;
     }
 
     /**
@@ -58,17 +64,25 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public int[][] filter(int[] male, int[] female, Species species) {
+    public double[][] filter(double[] male, double[] female, Species species) {
 
         double[][] selectivity = getProbabilityMatrix(species);
 
-        int[][] filtered = new int[2][species.getMaxAge()+1];
+        double[][] filtered = new double[2][species.getMaxAge()+1];
         for(int age=0; age<species.getMaxAge()+1;age++)
         {
             filtered[FishStateUtilities.MALE][age] =
-                    (int)(male[age] * selectivity[FishStateUtilities.MALE][age] +0.5d);
+                    male[age] * selectivity[FishStateUtilities.MALE][age];
             filtered[FishStateUtilities.FEMALE][age] =
-                    (int)(female[age] * selectivity[FishStateUtilities.FEMALE][age] +0.5d);
+                    female[age] * selectivity[FishStateUtilities.FEMALE][age];
+
+            if(rounding)
+            {
+                filtered[FishStateUtilities.MALE][age] =
+                        (int)(filtered[FishStateUtilities.MALE][age] +0.5d);
+                filtered[FishStateUtilities.FEMALE][age] =
+                        (int)(filtered[FishStateUtilities.FEMALE][age]+0.5d);
+            }
         }
         return filtered;
     }

@@ -33,7 +33,7 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
 
     private int yearDelay;
 
-    private final Queue<Integer> recruits = new LinkedList<>();
+    private final Queue<Double> recruits = new LinkedList<>();
 
     public RecruitmentBySpawningBiomassDelayed(
             int virginRecruits, double steepness,
@@ -52,10 +52,10 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
      * @return the number of male and female recruits
      */
     @Override
-    public int recruit(Species species, Meristics meristics, int[] femalePerAge, int[] malePerAge)
+    public double recruit(Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge)
     {
 
-        int newRecruit = super.recruit(species, meristics, femalePerAge, malePerAge);
+        double newRecruit = super.recruit(species, meristics, femalePerAge, malePerAge);
         if(recruits.isEmpty())
             initializeQueue(newRecruit);
         assert recruits.size() == yearDelay;
@@ -64,7 +64,7 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
         return recruits.poll();
     }
 
-    public void initializeQueue(int newRecruit) {
+    public void initializeQueue(double newRecruit) {
         while (recruits.size() < yearDelay)
             recruits.add(newRecruit);
     }

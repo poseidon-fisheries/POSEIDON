@@ -36,8 +36,9 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
     private final boolean selectHigherThanCutoff;
 
 
-    public CutoffAbundanceFilter(double cutoffLevel, boolean selectHigherThanCutoff) {
-        super(false);
+    public CutoffAbundanceFilter(double cutoffLevel, boolean selectHigherThanCutoff,
+                                 final boolean rounding) {
+        super(false, rounding);
         this.cutoffLevel = cutoffLevel;
         this.selectHigherThanCutoff = selectHigherThanCutoff;
     }

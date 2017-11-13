@@ -71,12 +71,13 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
             SeaTile here, AbundanceBasedLocalBiology biologyHere,
             SeaTile there,
             AbundanceBasedLocalBiology biologyThere,
-            int delta, int fishHere, int fishThere, int bin, boolean male,
-            MersenneTwisterFast random) {
+            double delta, double fishHere, double fishThere, int bin, boolean male,
+            MersenneTwisterFast random,
+            boolean rounding) {
 
         if(delta<=0)
             return;
         if(bin >= minMovementAge && bin<=maxMovementAge)
-            super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random);
+            super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random,rounding);
     }
 }

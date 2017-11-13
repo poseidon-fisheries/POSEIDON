@@ -42,6 +42,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
      */
     private final int diffusingRange;
 
+    private final boolean rounding;
+
     /**
      * we store here for each tile its neighbors. This way we ask the map only once
      */
@@ -49,8 +51,9 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
 
 
     public AbstractAbundanceDiffuser(
-            int diffusingRange) {
+            int diffusingRange, boolean rounding) {
         this.diffusingRange = diffusingRange;
+        this.rounding = rounding;
     }
 
 
@@ -77,33 +80,45 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             for(SeaTile there : potential) {
                 assert biologies.containsKey(there);
                 AbundanceBasedLocalBiology thereBiology = biologies.get(there);
-                int[] malesHere = here.getValue().getNumberOfMaleFishPerAge(species);
-                int[] malesThere = thereBiology.getNumberOfMaleFishPerAge(species);
+                double[] malesHere = here.getValue().getNumberOfMaleFishPerAge(species);
+                double[] malesThere = thereBiology.getNumberOfMaleFishPerAge(species);
 
-                int[] femaleHere = here.getValue().getNumberOfFemaleFishPerAge(species);
-                int[] femaleThere = thereBiology.getNumberOfFemaleFishPerAge(species);
+                double[] femaleHere = here.getValue().getNumberOfFemaleFishPerAge(species);
+                double[] femaleThere = thereBiology.getNumberOfFemaleFishPerAge(species);
 
 
                 //check for difference in abundance between each bin
                 for (int bin = 0; bin < species.getMaxAge() + 1; bin++)
                 {
                     //move male
-                    int fishHere = malesHere[bin];
-                    int fishThere = malesThere[bin];
-                    int maleDelta = fishHere -
+                    double fishHere = malesHere[bin];
+                    double fishThere = malesThere[bin];
+                    if(rounding)
+                    {
+                        fishHere = (int) fishHere;
+                        fishThere = (int) fishThere;
+                    }
+                    double maleDelta = fishHere -
                             fishThere;
                     //move always get called, regardless of what the delta is!
                     move(species, here.getKey(),
-                         here.getValue(), there, thereBiology, maleDelta,fishHere ,fishThere , bin, true, model.getRandom());
+                         here.getValue(), there, thereBiology, maleDelta, fishHere , fishThere , bin, true, model.getRandom(),
+                         rounding);
 
                     //move female
                     fishHere = femaleHere[bin];
                     fishThere = femaleThere[bin];
-                    int femaleDelta = fishHere -
+                    if(rounding)
+                    {
+                        fishHere = (int) fishHere;
+                        fishThere = (int) fishThere;
+                    }
+                    double femaleDelta = fishHere -
                             fishThere;
                     //move always get called, regardless of what the delta is!
                     move(species, here.getKey(),
-                         here.getValue(), there, thereBiology, femaleDelta,fishHere ,fishThere , bin, false, model.getRandom());
+                         here.getValue(), there, thereBiology, femaleDelta, fishHere , fishThere , bin, false, model.getRandom(),
+                         rounding);
 
 
                 }
@@ -130,6 +145,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
      * @param bin bin/age studied
      * @param male whether it's male or female
      * @param random
+     * @param rounding
      */
     public abstract void move(
             Species species,
@@ -137,10 +153,10 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             AbundanceBasedLocalBiology biologyHere,
             SeaTile there,
             AbundanceBasedLocalBiology biologyThere,
-            int delta,
-            int fishHere, int fishThere, int bin,
+            double delta,
+            double fishHere, double fishThere, int bin,
             boolean male,
-            MersenneTwisterFast random);
+            MersenneTwisterFast random, boolean rounding);
 
 
 

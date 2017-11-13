@@ -127,11 +127,11 @@ public class WeightedAbundanceDiffuserTest {
 
 
         //ought to rearrange so that 2/3 of biomass is in "there"
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species), new int[]{334, 334, 0});
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species), new int[]{0, 0, 33});
+        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species), new double[]{334, 334, 0},.001);
+        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species), new double[]{0, 0, 33},.001);
 
-        assertArrayEquals(bioThere.getNumberOfMaleFishPerAge(species), new int[]{666, 666, 0});
-        assertArrayEquals(bioThere.getNumberOfFemaleFishPerAge(species), new int[]{0, 0, 67});
+        assertArrayEquals(bioThere.getNumberOfMaleFishPerAge(species), new double[]{666, 666, 0},.001);
+        assertArrayEquals(bioThere.getNumberOfFemaleFishPerAge(species), new double[]{0, 0, 67},.001);
 
     }
 

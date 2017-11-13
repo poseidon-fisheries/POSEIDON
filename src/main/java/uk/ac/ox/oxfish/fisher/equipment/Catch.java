@@ -116,7 +116,7 @@ public class Catch {
 
     }
 
-    private double[] abudanceToBiomassVector(GlobalBiology biology) {
+    private double[] abundanceToBiomassVector(GlobalBiology biology) {
         return new double[biology.getSize()];
     }
 
@@ -126,7 +126,7 @@ public class Catch {
      * @param ageStructure binned abundance per species
      * @param biology the biology object containing info about each species
      */
-    public Catch(int[][] ageStructure, GlobalBiology biology )
+    public Catch(double[][] ageStructure, GlobalBiology biology )
     {
         Preconditions.checkArgument(biology.getSize() == ageStructure.length);
         this.abundance = new StructuredAbundance[ageStructure.length];
@@ -146,7 +146,7 @@ public class Catch {
      * @param femaleAbundance female abundance per species per bin
      * @param biology biology
      */
-    public Catch(int[][] maleAbundance, int[][]femaleAbundance, GlobalBiology biology )
+    public Catch(double[][] maleAbundance, double[][]femaleAbundance, GlobalBiology biology )
     {
         Preconditions.checkArgument(biology.getSize() == maleAbundance.length);
         this.abundance = new StructuredAbundance[maleAbundance.length];
@@ -177,7 +177,7 @@ public class Catch {
      * @param correctSpecies
      * @param biology
      */
-    public Catch(int[] maleAbundance, int[]femaleAbundance, Species correctSpecies, GlobalBiology biology )
+    public Catch(double[] maleAbundance, double[]femaleAbundance, Species correctSpecies, GlobalBiology biology )
     {
         this.abundance = new StructuredAbundance[biology.getSize()];
         for(Species index : biology.getSpecies())
@@ -185,8 +185,8 @@ public class Catch {
             if(correctSpecies==index)
                 abundance[index.getIndex()] = new StructuredAbundance(maleAbundance,femaleAbundance);
             else
-                abundance[index.getIndex()] = new StructuredAbundance(new int[index.getMaxAge()+1],
-                                                                      new int[index.getMaxAge()+1]);
+                abundance[index.getIndex()] = new StructuredAbundance(new double[index.getMaxAge()+1],
+                                                                      new double[index.getMaxAge()+1]);
         }
         //weigh them (assuming they are all men!)
         biomassCaught = new double[biology.getSize()];

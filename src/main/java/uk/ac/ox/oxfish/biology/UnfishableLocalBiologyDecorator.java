@@ -79,7 +79,7 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      * @return the male fish array.
      */
     @Override
-    public int[] getNumberOfMaleFishPerAge(Species species) {
+    public double[] getNumberOfMaleFishPerAge(Species species) {
         return decorated.getNumberOfMaleFishPerAge(species);
     }
 
@@ -90,7 +90,7 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      * @return the female fish array.
      */
     @Override
-    public int[] getNumberOfFemaleFishPerAge(Species species) {
+    public double[] getNumberOfFemaleFishPerAge(Species species) {
         return decorated.getNumberOfFemaleFishPerAge(species);
     }
 
@@ -101,7 +101,7 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      * @return the fish array.
      */
     @Override
-    public int[] getNumberOfFishPerAge(Species species) {
+    public double[] getNumberOfFishPerAge(Species species) {
         return decorated.getNumberOfFishPerAge(species);
 
     }

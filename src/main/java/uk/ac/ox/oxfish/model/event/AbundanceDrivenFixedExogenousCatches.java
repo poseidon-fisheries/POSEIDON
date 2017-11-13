@@ -60,7 +60,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
         //simulate the catches as a fixed proportion gear
         HomogeneousAbundanceGear simulatedGear = new HomogeneousAbundanceGear(0,
                                                                               new FixedProportionFilter(
-                                                                                      proportionToCatch));
+                                                                                      proportionToCatch, true));
         //hide it in an heterogeneous abundance gear so that only one species at a time gets aught!
         HeterogeneousAbundanceGear gear = new HeterogeneousAbundanceGear(
                 new Pair<>(target, simulatedGear)

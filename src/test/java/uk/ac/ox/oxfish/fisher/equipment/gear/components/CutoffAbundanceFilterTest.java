@@ -42,11 +42,11 @@ public class CutoffAbundanceFilterTest {
                                                                                           0.111313, 17.826, -1.79, 1,
                                                                                           0, 168434124,
                                                                                           0.6, false));
-        CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10,false);
+        CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10, false, true);
         double[][] selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][3], 1, .001);
         assertEquals(selectivity[FishStateUtilities.FEMALE][20],0,.001);
-        filter = new CutoffAbundanceFilter(10,true);
+        filter = new CutoffAbundanceFilter(10, true, true);
         selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][3], 0, .001);
         assertEquals(selectivity[FishStateUtilities.FEMALE][20],1,.001);
@@ -64,15 +64,15 @@ public class CutoffAbundanceFilterTest {
                                                                                          0.111313, 17.826, -1.79, 1,
                                                                                          0, 168434124,
                                                                                          0.6, false));
-        CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10,true);
+        CutoffAbundanceFilter filter = new CutoffAbundanceFilter(10, true, true);
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         male[5] = 100;
-        int[][] filtered = filter.filter(male, female, species);
-        assertEquals(filtered[FishStateUtilities.MALE][5],100);
-        assertEquals(filtered[FishStateUtilities.MALE][0],0);
-        assertEquals(filtered[FishStateUtilities.FEMALE][5],0);
+        double[][] filtered = filter.filter(male, female, species);
+        assertEquals(filtered[FishStateUtilities.MALE][5],100,.001);
+        assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
+        assertEquals(filtered[FishStateUtilities.FEMALE][5],0,.0001);
 
 
     }

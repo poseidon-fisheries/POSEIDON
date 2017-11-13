@@ -84,7 +84,7 @@ public class DiscardUnderagedTest {
 
 
         Catch haul = new Catch(
-                new int[]{100,10,1}, new int[]{100,0,0},
+                new double[]{100,10,1}, new double[]{100,0,0},
                 firstSpecies,
                 bio
         );
@@ -100,12 +100,12 @@ public class DiscardUnderagedTest {
                 new MersenneTwisterFast()
         );
 
-        assertArrayEquals(new int[]{0,10,1},
-                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.MALE]);
-        assertArrayEquals(new int[]{0,0,0},
-                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.FEMALE]);
-        assertArrayEquals(new int[]{0,0},
-                          newCatch.getAbundance(secondSpecies).getAbundance()[FishStateUtilities.FEMALE]);
+        assertArrayEquals(new double[]{0,10,1},
+                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.MALE],.001);
+        assertArrayEquals(new double[]{0,0,0},
+                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.FEMALE],.001);
+        assertArrayEquals(new double[]{0,0},
+                          newCatch.getAbundance(secondSpecies).getAbundance()[FishStateUtilities.FEMALE],.001);
 
     }
 }

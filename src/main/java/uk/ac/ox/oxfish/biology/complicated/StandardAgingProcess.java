@@ -43,22 +43,23 @@ public class StandardAgingProcess implements AgingProcess {
 
     /**
      * as a side-effect ages the local biology according to its rules
-     *
-     * @param localBiology
+     *  @param localBiology
      * @param model
+     * @param rounding
      */
     @Override
-    public void ageLocally(AbundanceBasedLocalBiology localBiology,Species species,
-                           FishState model)
+    public void ageLocally(
+            AbundanceBasedLocalBiology localBiology, Species species,
+            FishState model, boolean rounding)
     {
 
         //get the age structure (these are not copies!)
-        int[] males = localBiology.getNumberOfMaleFishPerAge(species);
-        int[] females = localBiology.getNumberOfFemaleFishPerAge(species);
+        double[] males = localBiology.getNumberOfMaleFishPerAge(species);
+        double[] females = localBiology.getNumberOfFemaleFishPerAge(species);
 
         //store these in case you need to preserve last age
-        int oldestMale = males[males.length-1];
-        int oldestFemale = females[females.length-1];
+        double oldestMale = males[males.length-1];
+        double oldestFemale = females[females.length-1];
 
         System.arraycopy(males,0,males,1,males.length-1);
         System.arraycopy(females,0,females,1,females.length-1);

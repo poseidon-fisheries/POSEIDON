@@ -41,7 +41,7 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
     public ConstantRateAbundanceDiffuser(
             int diffusingRange,
             double diffusingRate) {
-        super(diffusingRange);
+        super(diffusingRange, true);
         Preconditions.checkArgument(diffusingRate >=0);
         Preconditions.checkArgument(diffusingRate <=1);
         this.diffusingRate = diffusingRate;
@@ -64,15 +64,19 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
     @Override
     public void move(
             Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere,
-            SeaTile there, AbundanceBasedLocalBiology biologyThere, int delta, int fishHere, int fishThere, int bin,
+            SeaTile there, AbundanceBasedLocalBiology biologyThere, double delta, double fishHere, double fishThere, int bin,
             boolean male,
-            MersenneTwisterFast random)
+            MersenneTwisterFast random,
+            boolean rounding)
     {
         if(delta<=0)
             return;
 
-        int movement = FishStateUtilities.randomRounding(delta * diffusingRate,
+        double movement = delta * diffusingRate;
+        if(rounding)
+            movement = FishStateUtilities.randomRounding(delta * diffusingRate,
                                                          random);
+
         //might be too small differential for movement
         if(movement > 0)
         {

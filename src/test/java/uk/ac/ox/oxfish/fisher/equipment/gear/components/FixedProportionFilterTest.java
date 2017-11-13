@@ -42,19 +42,19 @@ public class FixedProportionFilterTest
                                                                                           0.111313, 17.826, -1.79, 1,
                                                                                           0, 168434124,
                                                                                           0.6, false));
-        FixedProportionFilter filter = new FixedProportionFilter(.2);
+        FixedProportionFilter filter = new FixedProportionFilter(.2, true);
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         male[20] = 100;
 
-        int[][] filtered = filter.filter(male, female,species);
-        assertEquals(filtered[FishStateUtilities.MALE][20],20);
-        assertEquals(filtered[FishStateUtilities.MALE][21],0);
+        double[][] filtered = filter.filter(male, female,species);
+        assertEquals(filtered[FishStateUtilities.MALE][20],20,.0001);
+        assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
 
-        filter = new FixedProportionFilter(1);
+        filter = new FixedProportionFilter(1, true);
         filtered = filter.filter(male, female,species);
-        assertEquals(filtered[FishStateUtilities.MALE][20],100);
-        assertEquals(filtered[FishStateUtilities.MALE][21],0);
+        assertEquals(filtered[FishStateUtilities.MALE][20],100,.001);
+        assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
     }
 }

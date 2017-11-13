@@ -54,7 +54,7 @@ public class LogisticRecruitmentProcess implements RecruitmentProcess {
      * @return the number of male + female recruits
      */
     @Override
-    public int recruit(Species species, Meristics meristics, int[] femalePerAge, int[] malePerAge) {
+    public double recruit(Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge) {
 
         //weigh
         double biomass = FishStateUtilities.weigh(malePerAge,femalePerAge,meristics);
@@ -70,7 +70,7 @@ public class LogisticRecruitmentProcess implements RecruitmentProcess {
         assert  recruitmentBiomass >=0;
 
         //turn weight into # of recruits and return it!
-        return recruitmentBiomass > 0 ? (int)(recruitmentBiomass/recruitAverageWeight) :0;
+        return recruitmentBiomass > 0 ? (recruitmentBiomass/recruitAverageWeight) :0;
     }
 
     /**

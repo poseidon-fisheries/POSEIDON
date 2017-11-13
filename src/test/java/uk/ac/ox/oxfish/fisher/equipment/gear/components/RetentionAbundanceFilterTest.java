@@ -37,9 +37,9 @@ public class RetentionAbundanceFilterTest {
     @Test
     public void equality() throws Exception {
 
-        AbundanceFilter first = new RetentionAbundanceFilter(true,10,10,10);
-        AbundanceFilter second = new RetentionAbundanceFilter(true,10,10,10);
-        AbundanceFilter third = new RetentionAbundanceFilter(true,10,10,100);
+        AbundanceFilter first = new RetentionAbundanceFilter(true, 10, 10, 10, true);
+        AbundanceFilter second = new RetentionAbundanceFilter(true, 10, 10, 10, true);
+        AbundanceFilter third = new RetentionAbundanceFilter(true, 10, 10, 100, true);
 
         assertFalse(first == second);
         assertFalse(first == third);
@@ -59,7 +59,7 @@ public class RetentionAbundanceFilterTest {
                                                                                           0.111313, 17.826, -1.79, 1,
                                                                                           0, 168434124,
                                                                                           0.6, false));
-        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
+        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false, 21.8035, 1.7773, 0.992661, true);
         double[][] probability = filter.getProbabilityMatrix(species);
         assertEquals(probability[FishStateUtilities.MALE][5], 0.004970534, .0001);
         assertEquals(probability[FishStateUtilities.FEMALE][20],0.8571669724,.001);
@@ -77,15 +77,15 @@ public class RetentionAbundanceFilterTest {
                                                                                          0.111313, 17.826, -1.79, 1,
                                                                                          0, 168434124,
                                                                                          0.6, false));
-        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
+        RetentionAbundanceFilter filter = new RetentionAbundanceFilter(false, 21.8035, 1.7773, 0.992661, true);
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         male[20] = 100;
-        int[][] filtered = filter.filter(male, female, species);
-        assertEquals(filtered[FishStateUtilities.MALE][20],86);
-        assertEquals(filtered[FishStateUtilities.MALE][0],0);
-        assertEquals(filtered[FishStateUtilities.FEMALE][20],0);
+        double[][] filtered = filter.filter(male, female, species);
+        assertEquals(filtered[FishStateUtilities.MALE][20],86,.001);
+        assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
+        assertEquals(filtered[FishStateUtilities.FEMALE][20],0,.001);
 
 
     }
@@ -99,8 +99,8 @@ public class RetentionAbundanceFilterTest {
                                                                                          0, 168434124,
                                                                                          0.6, false));
 
-        int[] male = new int[81];
-        int[] female = new int[81];
+        double[] male = new double[81];
+        double[] female = new double[81];
         for(int i=0; i<81; i++)
         {
             male[i] = random.nextInt(100000);
@@ -109,14 +109,14 @@ public class RetentionAbundanceFilterTest {
 
 
         long start = System.currentTimeMillis();
-        RetentionAbundanceFilter filter =new RetentionAbundanceFilter(false,21.8035,1.7773,0.992661);
+        RetentionAbundanceFilter filter =new RetentionAbundanceFilter(false, 21.8035, 1.7773, 0.992661, true);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         long end = System.currentTimeMillis();
         long durationFirst = end-start;
 
         start = System.currentTimeMillis();
-        filter =new RetentionAbundanceFilter(true,21.8035,1.7773,0.992661);
+        filter =new RetentionAbundanceFilter(true, 21.8035, 1.7773, 0.992661, true);
         for(int times=0;times<1000; times++)
             filter.filter(male,female,species);
         end = System.currentTimeMillis();

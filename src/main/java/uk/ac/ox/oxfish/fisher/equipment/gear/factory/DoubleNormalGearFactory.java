@@ -36,6 +36,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class DoubleNormalGearFactory implements HomogeneousGearFactory
 {
 
+    private boolean rounding = true;
     /**
      * the peak of the double normal
      */
@@ -119,14 +120,14 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
     public HomogeneousAbundanceGear apply(FishState state) {
         MersenneTwisterFast random = state.getRandom();
         return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
-                                            new FixedProportionFilter(averageCatchability.apply(random)),
+                                            new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                             new DoubleNormalFilter(
                                                     true,
-                                                    peak.apply(random),
+                                                    rounding, peak.apply(random),
                                                     top.apply(random),
                                                     ascWidth.apply(random),
                                                     dscWidth.apply(random),
-                                                    initialScaling,finalScaling,
+                                                    initialScaling, finalScaling,
                                                     binMin.apply(random),
                                                     binMax.apply(random),
                                                     binWidth.apply(random)
@@ -134,7 +135,7 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
                                             new RetentionAbundanceFilter(true,
                                                                          retentionInflection.apply(random),
                                                                          retentionSlope.apply(random),
-                                                                         retentionAsymptote.apply(random))
+                                                                         retentionAsymptote.apply(random), rounding)
         );
     }
 
@@ -382,5 +383,23 @@ public class DoubleNormalGearFactory implements HomogeneousGearFactory
      */
     public void setLitersOfGasConsumedPerHour(DoubleParameter litersOfGasConsumedPerHour) {
         this.litersOfGasConsumedPerHour = litersOfGasConsumedPerHour;
+    }
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

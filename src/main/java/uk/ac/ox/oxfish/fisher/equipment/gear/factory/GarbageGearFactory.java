@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator> {
 
 
+    private boolean rounding = true;
     private String garbageSpeciesName = MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME;
 
     private DoubleParameter proportionSimulatedToGarbage = new FixedDoubleParameter(0.3);
@@ -61,7 +62,8 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
 
         return new GarbageGearDecorator(garbageSpecies,
                                         proportionSimulatedToGarbage.apply(state.getRandom()),
-                                        delegate);
+                                        delegate,
+                                        rounding);
 
 
     }
@@ -119,5 +121,23 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
     public void setDelegate(
             AlgorithmFactory<? extends Gear> delegate) {
         this.delegate = delegate;
+    }
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

@@ -33,7 +33,7 @@ import uk.ac.ox.oxfish.model.FishState;
 public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     public MockNaturalProcess(
             Species species) {
-        super(null, null, species, null, new NoAbundanceDiffusion() );
+        super(null, null, species, true, null, new NoAbundanceDiffusion() );
     }
 
 
@@ -74,7 +74,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     }
 
     @Override
-    public int getLastRecruits() {
+    public double getLastRecruits() {
         return 0;
     }
 

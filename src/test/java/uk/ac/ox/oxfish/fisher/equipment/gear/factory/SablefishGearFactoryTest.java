@@ -54,9 +54,9 @@ public class SablefishGearFactoryTest {
         HomogeneousAbundanceGear gear = factory.apply(st);
 
         //filtered and rounded if there are 10000 males in this cell, all aged 1, only 9 will actually be caught
-        int[][] abundance = new int[2][sablefish.getMaxAge()+1];
+        double[][] abundance = new double[2][sablefish.getMaxAge()+1];
         abundance[FishStateUtilities.MALE][1] = 10000;
-        assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1],9);
+        assertEquals(gear.filter(species, abundance)[FishStateUtilities.MALE][1],9,.001);
 
 
     }

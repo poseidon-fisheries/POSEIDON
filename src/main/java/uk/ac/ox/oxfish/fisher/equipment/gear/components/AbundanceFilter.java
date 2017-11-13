@@ -38,5 +38,5 @@ public interface AbundanceFilter {
      * @param species the species of fish
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
-    int[][] filter(int[] male, int[] female, Species species);
+    double[][] filter(double[] male, double[] female, Species species);
 }

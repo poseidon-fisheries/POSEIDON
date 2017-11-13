@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -59,10 +58,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     /**
      * total recruits last step
      */
-    private int lastRecruits = 0;
+    private double lastRecruits = 0;
 
     private final Species species;
 
+
+    private final boolean rounding;
 
 
     private final AgingProcess agingProcess;
@@ -80,10 +81,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public SingleSpeciesNaturalProcesses(
             NaturalMortalityProcess mortalityProcess,
             RecruitmentProcess recruitment, Species species,
-            AgingProcess agingProcess, AbundanceDiffuser diffuser) {
+            boolean rounding, AgingProcess agingProcess, AbundanceDiffuser diffuser) {
         this.species = species;
         this.mortalityProcess = mortalityProcess;
         this.recruitment = recruitment;
+        this.rounding = rounding;
         this.agingProcess = agingProcess;
         this.diffuser = diffuser;
     }
@@ -135,11 +137,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *
          */
         //we need to sum up all the male/female
-        int totalMale[] = new int[species.getMaxAge()+1];
-        int totalFemale[] = new int[species.getMaxAge()+1];
+        double totalMale[] = new double[species.getMaxAge()+1];
+        double totalFemale[] = new double[species.getMaxAge()+1];
         biologies.values().stream().forEach(abundanceBasedLocalBiology -> {
-            int[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
-            int[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
+            double[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
+            double[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
             for(int age=0; age<totalMale.length; age++)
             {
                 totalFemale[age] += females[age];
@@ -149,6 +151,8 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
                                            totalFemale, totalMale);
+        if(rounding)
+            lastRecruits = (int)(lastRecruits);
 
 
         //allocate stuff before mortality hits!
@@ -202,7 +206,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         biologies.values().forEach(
                 abundanceBasedLocalBiology -> mortalityProcess.cull(abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species),
                                                                     abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species),
-                                                                    species.getMeristics()));
+                                                                    species.getMeristics(),rounding ));
 
 
 
@@ -216,7 +220,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         biologies.values().forEach(new Consumer<AbundanceBasedLocalBiology>() {
             @Override
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-                agingProcess.ageLocally(abundanceBasedLocalBiology,species,model);
+                agingProcess.ageLocally(abundanceBasedLocalBiology, species, model, rounding);
             }
         });
 
@@ -242,17 +246,26 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                                 }
                             }).sum()-1d)<.001d;
             double leftOver = 0;
-                for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
-                    double ratio = biologyBiomass.getValue();
-                    int recruitsHere = (int) ((lastRecruits + leftOver) * ratio);
+            for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+                double ratio = biologyBiomass.getValue();
+                double recruitsHere = ((lastRecruits + leftOver) * ratio);
+                if(rounding) {
+                    recruitsHere = (int) recruitsHere;
                     //add recruits to smallest bin
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2;
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2;
+                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += ((int)recruitsHere) / 2;
+                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += ((int)recruitsHere) / 2;
                     leftOver = ((lastRecruits + leftOver) * ratio) -
                             biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
                             biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
                     ;
                 }
+                else{
+                    //add recruits to smallest bin
+                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2d;
+                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2d;
+                }
+
+            }
 
         }
     }
@@ -268,7 +281,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
 
 
-    public int getLastRecruits() {
+    public double getLastRecruits() {
         return lastRecruits;
     }
 

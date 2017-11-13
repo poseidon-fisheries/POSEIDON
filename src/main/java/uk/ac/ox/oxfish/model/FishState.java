@@ -485,7 +485,7 @@ public class FishState  extends SimState{
         return map.getTotalBiology(species);
     }
 
-    public int getTotalAbundance(Species species,int age)
+    public double getTotalAbundance(Species species,int age)
     {
         return
                 map.getAllSeaTilesExcludingLandAsList().stream().filter(
@@ -496,10 +496,10 @@ public class FishState  extends SimState{
                             }
                         }
                 ).
-        mapToInt(
-                new ToIntFunction<SeaTile>() {
+        mapToDouble(
+                new ToDoubleFunction<SeaTile>() {
                     @Override
-                    public int applyAsInt(SeaTile value) {
+                    public double applyAsDouble(SeaTile value) {
                         return value.getNumberOfFemaleFishPerAge(species)[age] +
                                 value.getNumberOfMaleFishPerAge(species)[age];
                     }

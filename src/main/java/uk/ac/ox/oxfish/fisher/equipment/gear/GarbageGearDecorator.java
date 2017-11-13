@@ -56,11 +56,14 @@ public class GarbageGearDecorator implements Gear {
     private final Gear delegate;
 
 
+    private final boolean rounding;
+
     public GarbageGearDecorator(
-            Species garbageSpecies, double ratioToRestOfCatch, Gear delegate) {
+            Species garbageSpecies, double ratioToRestOfCatch, Gear delegate, boolean rounding) {
         this.garbageSpecies = garbageSpecies;
         this.ratioToRestOfCatch = ratioToRestOfCatch;
         this.delegate = delegate;
+        this.rounding = rounding;
     }
 
     @Override
@@ -86,8 +89,10 @@ public class GarbageGearDecorator implements Gear {
                     newAbundances[i] = nonGarbage.getAbundance(i);
                 else {
                     //todo make this sex structured too if needed
-                    int[] garbageStructured = new int[garbageSpecies.getMaxAge() + 1];
-                    garbageStructured[0]= (int) (garbageWeight/garbageSpecies.getWeightMaleInKg().get(0));
+                    double[] garbageStructured = new double[garbageSpecies.getMaxAge() + 1];
+                    garbageStructured[0]= (garbageWeight/garbageSpecies.getWeightMaleInKg().get(0));
+                    if(rounding)
+                        garbageStructured[0] = (int) garbageStructured[0];
                     newAbundances[i] = new StructuredAbundance(garbageStructured);
                 }
                 //
@@ -142,7 +147,7 @@ public class GarbageGearDecorator implements Gear {
 
         return new GarbageGearDecorator(garbageSpecies,
                                         ratioToRestOfCatch,
-                                        delegate.makeCopy());
+                                        delegate.makeCopy(), rounding);
     }
 
 

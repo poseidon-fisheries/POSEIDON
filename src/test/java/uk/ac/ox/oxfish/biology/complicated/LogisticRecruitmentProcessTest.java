@@ -44,11 +44,11 @@ public class LogisticRecruitmentProcessTest {
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
                 400d,.5
         );
-        int recruit = process.recruit(mock(Species.class), meristics,
-                                      new int[]{0, 0, 0}, new int[]{12, 4, 60});
+        double recruit = process.recruit(mock(Species.class), meristics,
+                                      new double[]{0, 0, 0}, new double[]{12, 4, 60});
 
         //recruits ought to be weighin a total of 50kg, so that there ought to be 50 of them
-        Assert.assertEquals(recruit,50);
+        Assert.assertEquals((int)recruit,50);
 
 
 
@@ -61,11 +61,11 @@ public class LogisticRecruitmentProcessTest {
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
                 201,100
         );
-        int recruit = process.recruit(mock(Species.class), meristics,
-                                      new int[]{0, 0, 0}, new int[]{12, 4, 60});
+        double recruit = process.recruit(mock(Species.class), meristics,
+                                      new double[]{0, 0, 0}, new double[]{12, 4, 60});
 
         //recruits ought to be weighin a total of 1kg, so that there ought to be 1 of them
-        Assert.assertEquals(recruit,1);
+        Assert.assertEquals((int)recruit,1);
 
 
 
@@ -79,10 +79,10 @@ public class LogisticRecruitmentProcessTest {
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
                 400d,.5
         );
-        int recruit = process.recruit(mock(Species.class), meristics,
-                                      new int[]{0, 0, 0}, new int[]{0,0, 0});
+        double recruit = process.recruit(mock(Species.class), meristics,
+                                      new double[]{0, 0, 0}, new double[]{0,0, 0});
 
-        Assert.assertEquals(recruit,0);
+        Assert.assertEquals((int)recruit,0);
 
 
     }
