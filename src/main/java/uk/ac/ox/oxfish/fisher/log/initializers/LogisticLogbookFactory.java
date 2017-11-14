@@ -35,6 +35,7 @@ import java.util.function.Supplier;
 public class LogisticLogbookFactory
         implements AlgorithmFactory<LogisticLogbookInitializer>
 {
+    private final int maxHoursOut = 5 * 24;
 
     //each flag represents a pre-made extractor
 
@@ -57,6 +58,8 @@ public class LogisticLogbookFactory
     private boolean simulatedCost = false;
 
     private boolean simulatedRevenue = false;
+
+    private boolean simulatedProfits = false;
 
     private boolean windSpeed = false;
 
@@ -159,14 +162,19 @@ public class LogisticLogbookFactory
 
         if(simulatedCost)
         {
-            extractors.add(new SimulatedHourlyCostExtractor(5*24));
+            extractors.add(new SimulatedHourlyCostExtractor(maxHoursOut));
             names.add("simulated_cost");
         }
         if(simulatedRevenue)
         {
-            extractors.add(new SimulatedHourlyRevenueExtractor(5*24));
+            extractors.add(new SimulatedHourlyRevenueExtractor(maxHoursOut));
             names.add("simulated_revenue");
         }
+        if(simulatedProfits)
+        {
+            extractors.add(new SimulatedHourlyProfitExtractor(maxHoursOut));
+        }
+
         if(windSpeed)
         {
             extractors.add(new WindSpeedExtractor());
@@ -489,5 +497,32 @@ public class LogisticLogbookFactory
      */
     public void setHistogrammerStartYear(int histogrammerStartYear) {
         this.histogrammerStartYear = histogrammerStartYear;
+    }
+
+    /**
+     * Getter for property 'maxHoursOut'.
+     *
+     * @return Value for property 'maxHoursOut'.
+     */
+    public int getMaxHoursOut() {
+        return maxHoursOut;
+    }
+
+    /**
+     * Getter for property 'simulatedProfits'.
+     *
+     * @return Value for property 'simulatedProfits'.
+     */
+    public boolean isSimulatedProfits() {
+        return simulatedProfits;
+    }
+
+    /**
+     * Setter for property 'simulatedProfits'.
+     *
+     * @param simulatedProfits Value to set for property 'simulatedProfits'.
+     */
+    public void setSimulatedProfits(boolean simulatedProfits) {
+        this.simulatedProfits = simulatedProfits;
     }
 }
