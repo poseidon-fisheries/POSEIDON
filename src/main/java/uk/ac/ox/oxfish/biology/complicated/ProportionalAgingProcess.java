@@ -56,30 +56,24 @@ public class ProportionalAgingProcess implements AgingProcess {
             AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding)
     {
 
+        StructuredAbundance abundance = localBiology.getAbundance(species);
 
-        //get the age structure (these are not copies!)
-        double[] males = localBiology.getNumberOfMaleFishPerAge(species);
-        double[] females = localBiology.getNumberOfFemaleFishPerAge(species);
 
-        //go from oldest to youngest and age them (to avoid double aging)
-        for(int bin=species.getMaxAge(); bin>=0; bin--)
+        for(int subdivision = 0; subdivision <  abundance.getSubdivisions(); subdivision++)
+            //go from oldest to youngest and age them (to avoid double aging)
         {
-            //male
-            double deltaMale = proportionalStep(males[bin],model.getRandom());
-            if(rounding)
-                deltaMale = (int) deltaMale;
-            males[bin]-=deltaMale;
-            assert males[bin] >=0;
-            if(bin<species.getMaxAge()) //if you are at very last bin, you just die
-                males[bin+1]+=deltaMale;
-            //female
-            double deltaFemale = proportionalStep(females[bin],model.getRandom());
-            if(rounding)
-                deltaFemale = (int) deltaFemale;
-            females[bin]-=deltaFemale;
-            if(bin<species.getMaxAge()) //if you are at very last bin, you just die
-                //otherwise you age one class
-                females[bin+1]+=deltaFemale;
+            double[] cohort = abundance.asMatrix()[subdivision];
+            for(int bin = cohort.length-1; bin>=0; bin--)
+            {
+                //male
+                double deltaMale = proportionalStep(cohort[bin],model.getRandom());
+                if(rounding)
+                    deltaMale = (int) deltaMale;
+                cohort[bin]-=deltaMale;
+                assert cohort[bin] >=0;
+                if(bin<cohort.length-1) //if you are at very last bin, you just die
+                    cohort[bin+1]+=deltaMale;
+            }
         }
 
 

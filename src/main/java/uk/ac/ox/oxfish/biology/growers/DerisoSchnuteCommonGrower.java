@@ -132,7 +132,6 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     public void start(FishState model) {
 
 
-
         //populates biomasses from data
         for(int i=0; i<recruitmentLag; i++)
             previousBiomasses.addFirst(empiricalYearlyBiomasses.
@@ -170,8 +169,6 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     }
     @Override
     public void step(SimState simState) {
-
-
 
         //basic current info
         double currentBiomass = 0;

@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.biology.weather.LocalWeather;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
@@ -241,23 +242,12 @@ public class SeaTile implements Startable{
 
     }
 
-    /**
-     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
-     * @param species the species examined
-     * @return the male fish array.
-     */
-    public double[] getNumberOfMaleFishPerAge(Species species) {
-        return biology.getNumberOfMaleFishPerAge(species);
+
+    public StructuredAbundance getAbundance(Species species) {
+        return biology.getAbundance(species);
     }
 
-    /**
-     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
-     * @param species the species examined
-     * @return the female fish array.
-     */
-    public double[] getNumberOfFemaleFishPerAge(Species species) {
-        return biology.getNumberOfFemaleFishPerAge(species);
-    }
+
 
     public Port grabPortHere() {
         return portHere;

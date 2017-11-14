@@ -36,8 +36,12 @@ public class ArrayFilterTest {
     @Test
     public void arrayFilter() throws Exception {
 
-        ArrayFilter filter = new ArrayFilter(new double[]{.5, .3}, new double[]{.1, .2}, true);
-        double[][] filtered = filter.filter(new double[]{100, 100}, new double[]{1000, 1000}, mock(Species.class));
+        ArrayFilter filter = new ArrayFilter(true,new double[]{.5, .3}, new double[]{.1, .2});
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = new double[]{100, 100};
+        abundance[FishStateUtilities.FEMALE] = new double[]{1000, 1000};
+        double[][] filtered = filter.filter(mock(Species.class),
+                                            abundance );
 
 
         assertEquals(filtered[FishStateUtilities.FEMALE][0],100,.001d);

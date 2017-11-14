@@ -645,10 +645,10 @@ public class FishStateUtilities {
     public static double weigh(StructuredAbundance abundance, Meristics meristics)
     {
         if(abundance.getSubdivisions() == 1)
-            return weigh(abundance.getAbundance()[0], meristics);
+            return weigh(abundance.asMatrix()[0], meristics);
         if(abundance.getSubdivisions() == 2)
-            return weigh(abundance.getAbundance()[MALE],
-                         abundance.getAbundance()[FEMALE],
+            return weigh(abundance.asMatrix()[MALE],
+                         abundance.asMatrix()[FEMALE],
                          meristics);
 
         throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
@@ -673,8 +673,8 @@ public class FishStateUtilities {
         if(abundance.getSubdivisions() == 1)
             return meristics.getWeightMaleInKg().get(binIndex) * abundance.getAbundanceInBin(binIndex);
         if(abundance.getSubdivisions() == 2)
-            return abundance.getAbundance()[MALE][binIndex] * meristics.getWeightMaleInKg().get(binIndex) +
-                    abundance.getAbundance()[FEMALE][binIndex] * meristics.getWeightFemaleInKg().get(binIndex);
+            return abundance.asMatrix()[MALE][binIndex] * meristics.getWeightMaleInKg().get(binIndex) +
+                    abundance.asMatrix()[FEMALE][binIndex] * meristics.getWeightFemaleInKg().get(binIndex);
 
         throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
 

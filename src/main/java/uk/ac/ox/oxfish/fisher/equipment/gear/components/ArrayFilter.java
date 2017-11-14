@@ -25,16 +25,14 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
- * Simply provide two arrays (one for male, one for female), each representing the age structure
+ * Simply provide arrays (one for each subdivision), each representing the age structure
  * Useful for things like Sablefish which have no set formula.
  * Created by carrknight on 3/21/17.
  */
 public class ArrayFilter  implements AbundanceFilter{
 
 
-    private final double maleFilter[];
-
-    private final double femaleFilter[];
+    private final double filters[][];
 
     /**
      * do we round abundances so that only integer number of fish can be caught?
@@ -42,37 +40,34 @@ public class ArrayFilter  implements AbundanceFilter{
     private final boolean round;
 
 
-    public ArrayFilter(double[] maleFilter, double[] femaleFilter, boolean round) {
-        this.maleFilter = maleFilter;
-        this.femaleFilter = femaleFilter;
+    public ArrayFilter(boolean round, double[]... filters) {
+        this.filters = new double[filters.length][];
+        for(int i=0; i< filters.length; i++)
+            this.filters[i] = filters[i];
         this.round = round;
     }
 
     /**
-     * returns a int[2][age+1] array with male and female fish that are not filtered out
+     * returns a int[subdivisions][age+1] array with male and female fish that are not filtered out
      *
-     * @param male    the abundance array for male
-     * @param female  the abundance array for female
      * @param species the species of fish
+     * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public double[][] filter(double[] male, double[] female, Species species) {
-        Preconditions.checkArgument(maleFilter.length == male.length);
-        Preconditions.checkArgument(femaleFilter.length == female.length);
-        Preconditions.checkArgument(male.length == female.length);
-        double[][] filtered = new double[2][male.length];
-        for(int age =0; age < male.length; age++)
+    public double[][] filter(Species species, double[][] abundance) {
+
+        double[][] filtered = new double[abundance.length][abundance[0].length];
+        for(int subdivision =0; subdivision < abundance.length; subdivision++)
         {
-            filtered[FishStateUtilities.MALE][age] = (maleFilter[age] * male[age]);
-            filtered[FishStateUtilities.FEMALE][age] = (femaleFilter[age] * female[age] );
-            if(round) {
-                filtered[FishStateUtilities.FEMALE][age] = (int) (filtered[FishStateUtilities.FEMALE][age] + 0.5d);
-                filtered[FishStateUtilities.MALE][age] = (int)(filtered[FishStateUtilities.MALE][age]  + 0.5d );
+            for (int age = 0; age < abundance[subdivision].length; age++) {
+                filtered[subdivision][age] = (filters[subdivision][age] * abundance[subdivision][age]);
+                if (round) {
+                    filtered[subdivision][age] =FishStateUtilities.quickRounding(filtered[subdivision][age]);
+                }
+
             }
-
         }
-
         return filtered;
     }
 }

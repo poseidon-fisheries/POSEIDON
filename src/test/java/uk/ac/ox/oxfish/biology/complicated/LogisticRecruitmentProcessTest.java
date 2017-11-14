@@ -45,7 +45,7 @@ public class LogisticRecruitmentProcessTest {
                 400d,.5
         );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                      new double[]{0, 0, 0}, new double[]{12, 4, 60});
+                                         new StructuredAbundance(new double[]{0, 0, 0}, new double[]{12, 4, 60}));
 
         //recruits ought to be weighin a total of 50kg, so that there ought to be 50 of them
         Assert.assertEquals((int)recruit,50);
@@ -62,7 +62,8 @@ public class LogisticRecruitmentProcessTest {
                 201,100
         );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                      new double[]{0, 0, 0}, new double[]{12, 4, 60});
+                                         new StructuredAbundance(
+                                      new double[]{0, 0, 0}, new double[]{12, 4, 60}));
 
         //recruits ought to be weighin a total of 1kg, so that there ought to be 1 of them
         Assert.assertEquals((int)recruit,1);
@@ -80,7 +81,8 @@ public class LogisticRecruitmentProcessTest {
                 400d,.5
         );
         double recruit = process.recruit(mock(Species.class), meristics,
-                                      new double[]{0, 0, 0}, new double[]{0,0, 0});
+                                         new StructuredAbundance(
+                                      new double[]{0, 0, 0}, new double[]{0,0, 0}));
 
         Assert.assertEquals((int)recruit,0);
 

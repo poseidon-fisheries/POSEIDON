@@ -59,7 +59,7 @@ public class RecruitmentBySpawningBiomassTest {
         );
 
 
-        double recruits = process.recruit(species,species.getMeristics(),female,male);
+        double recruits = process.recruit(species,species.getMeristics(),new StructuredAbundance(male,female));
         System.out.println(recruits);
         Assert.assertEquals(416140d, recruits, 1d);
 

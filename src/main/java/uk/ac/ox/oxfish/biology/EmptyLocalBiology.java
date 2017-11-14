@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -54,28 +55,10 @@ public class EmptyLocalBiology implements LocalBiology
         Preconditions.checkArgument(caught.getTotalWeight() == 0,"It's impossible to take biomass from the empty biology");
     }
 
-    /**
-     * Empty array
-     */
-    @Override
-    public double[] getNumberOfMaleFishPerAge(Species species) {
-        return new double[0];
-    }
 
-    /**
-     * Empty array
-     */
     @Override
-    public double[] getNumberOfFemaleFishPerAge(Species species) {
-        return new double[0];
-    }
-
-    /**
-     * Empty array
-     */
-    @Override
-    public double[] getNumberOfFishPerAge(Species species) {
-        return new double[0];
+    public StructuredAbundance getAbundance(Species species) {
+        return new StructuredAbundance(new double[0]);
     }
 
 

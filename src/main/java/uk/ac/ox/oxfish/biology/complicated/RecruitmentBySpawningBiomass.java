@@ -74,17 +74,20 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      *
      * @param species      the species of fish examined
      * @param meristics    the biological characteristics of the fish
-     * @param femalePerAge the number of females that are part of the recruitment, grouped by age cohort
-     * @param malePerAge   the number of males that are part of the recruitment, grouped by age cohort
+     * @param abundance
      * @return the number of male and female recruits
      */
     @Override
     public double recruit(
-            Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge)
+            Species species, Meristics meristics, StructuredAbundance abundance)
     {
 
         //you need to sum up the spawning biomass of the fish:
         int cohorts = meristics.getMaxAge() + 1;
+
+        Preconditions.checkArgument(abundance.getSubdivisions()==2, "This recruitment function requires a split between male and female");
+        
+        final double[] femalePerAge = abundance.asMatrix()[FishStateUtilities.FEMALE];
         Preconditions.checkArgument(femalePerAge.length == cohorts,
                                     "The number of cohorts is not equal to maxAge + 1");
         double spawningBiomass = 0;

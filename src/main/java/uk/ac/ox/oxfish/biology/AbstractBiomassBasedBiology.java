@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.esotericsoftware.minlog.Log;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 
 /**
  * An abstract local biology class that marks the children as being based on Biomass rather than abudance.
@@ -32,41 +33,14 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
 
     boolean warned = false;
 
-    /**
-     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the male fish array.
-     */
     @Override
-    public double[] getNumberOfMaleFishPerAge(Species species) {
-        return turnBiomassIntoFakeNumberArray(getBiomass(species)/2,species);
+    public StructuredAbundance getAbundance(Species species) {
+
+        return new StructuredAbundance(turnBiomassIntoFakeNumberArray(
+                getBiomass(species),
+                species
+        ));
     }
-
-    /**
-     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the female fish array.
-     */
-    @Override
-    public double[] getNumberOfFemaleFishPerAge(Species species) {
-
-        return turnBiomassIntoFakeNumberArray(getBiomass(species)/2,species);
-
-    }
-
-    /**
-     * returns the number of fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the fish array.
-     */
-    @Override
-    public double[] getNumberOfFishPerAge(Species species) {
-        return turnBiomassIntoFakeNumberArray(getBiomass(species),species);
-    }
-
 
     public void warnIfNeeded() {
         if(Log.WARN && !warned)

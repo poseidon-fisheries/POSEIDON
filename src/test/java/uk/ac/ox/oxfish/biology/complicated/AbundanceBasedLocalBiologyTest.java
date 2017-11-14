@@ -24,6 +24,7 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.assertEquals;
 
@@ -49,9 +50,9 @@ public class AbundanceBasedLocalBiologyTest
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
 
         //can modify directly
-        local.getNumberOfFemaleFishPerAge(longspine)[5]=100;
-        local.getNumberOfMaleFishPerAge(longspine)[5]=200;
-        local.getNumberOfMaleFishPerAge(longspine)[6]=100;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5]=100;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5]=200;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6]=100;
 
         assertEquals(local.getBiomass(longspine),
                      100 * 0.019880139 +
@@ -76,9 +77,9 @@ public class AbundanceBasedLocalBiologyTest
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
 
         //can modify directly
-        local.getNumberOfFemaleFishPerAge(longspine)[5]=100;
-        local.getNumberOfMaleFishPerAge(longspine)[5]=200;
-        local.getNumberOfMaleFishPerAge(longspine)[6]=100;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5]=100;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5]=200;
+        local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6]=100;
 
         double[] maleCatches = new double[longspine.getMaxAge()+1];
         double[] femaleCatches = new double[longspine.getMaxAge()+1];
@@ -86,10 +87,10 @@ public class AbundanceBasedLocalBiologyTest
         local.reactToThisAmountOfBiomassBeingFished(new Catch(maleCatches,femaleCatches,longspine,biology),
                                                     null,biology);
 
-        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[5],100, .001);
-        assertEquals(local.getNumberOfFemaleFishPerAge(longspine)[6],0, .001);
-        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[5],200, .001);
-        assertEquals(local.getNumberOfMaleFishPerAge(longspine)[6],50, .001);
+        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5],100, .001);
+        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][6],0, .001);
+        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5],200, .001);
+        assertEquals(local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6],50, .001);
 
     }
 

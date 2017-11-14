@@ -51,27 +51,24 @@ public class FixedProportionFilter implements AbundanceFilter
     /**
      * returns a int[2][age+1] array with male and female fish that are not filtered out
      *
-     * @param male    the abundance array for male
-     * @param female  the abundance array for female
      * @param species the species of fish
+     * @param abundance
      * @return an int[2][age+1] array for all the stuff that is caught/selected and so on
      */
     @Override
-    public double[][] filter(double[] male, double[] female, Species species)
+    public double[][] filter(Species species, double[][] abundance)
     {
-        double[][] filtered = new double[2][species.getMaxAge()+1];
-        for(int age =0; age<species.getMaxAge()+1; age++)
-        {
-            filtered[FishStateUtilities.FEMALE][age] = (female[age] * proportion);
-            filtered[FishStateUtilities.MALE][age] = (male[age] * proportion );
+        double[][] filtered = new double[abundance.length][abundance[0].length];
+        for(int subdivision=0; subdivision<abundance.length; subdivision++ ) {
+            for (int age = 0; age < abundance[subdivision].length; age++) {
+                filtered[subdivision][age] = (abundance[subdivision][age] * proportion);
 
-            if(rounding)
-            {
-                filtered[FishStateUtilities.FEMALE][age] = (int)(filtered[FishStateUtilities.FEMALE][age] + 0.5d);
-                filtered[FishStateUtilities.MALE][age] = (int)(filtered[FishStateUtilities.MALE][age] + 0.5d);
+                if (rounding) {
+                    filtered[subdivision][age] = FishStateUtilities.quickRounding(filtered[subdivision][age]);
+
+                }
             }
         }
-
         return filtered;
     }
 }

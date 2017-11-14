@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -148,14 +149,14 @@ public class SingleSpeciesAbundanceInitializerTest {
         }
         //by default the abundance initializer splits total count uniformly
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(250,map.getSeaTile(1,1).getNumberOfMaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(250,map.getSeaTile(2,3).getNumberOfMaleFishPerAge(fakeSpecies)[0],.0001);
-        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.0001);
-        assertEquals(325,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.0001);
+        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.0001);
+        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.0001);
+        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.0001);
+        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.0001);
+        assertEquals(250, map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0], .0001);
+        assertEquals(250,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.0001);
+        assertEquals(325,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.0001);
+        assertEquals(325,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.0001);
 
     }
 }

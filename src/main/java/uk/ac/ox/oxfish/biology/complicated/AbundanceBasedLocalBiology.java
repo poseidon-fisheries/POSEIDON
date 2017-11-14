@@ -144,8 +144,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
 
             final double[][] abundanceHere = this.abundance.get(species);
-            double[] maleCatches =catches.getAbundance()[FishStateUtilities.MALE];
-            double[] femaleCatches =catches.getAbundance()[FishStateUtilities.FEMALE];
+            double[] maleCatches =catches.asMatrix()[FishStateUtilities.MALE];
+            double[] femaleCatches =catches.asMatrix()[FishStateUtilities.FEMALE];
             Preconditions.checkArgument(maleCatches.length == abundanceHere[FishStateUtilities.MALE].length);
             for(int age=0; age<maleCatches.length; age++)
             {
@@ -162,46 +162,15 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
     }
 
-    /**
-     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
-     *This is <b>not a reflexive copy </b> and any change to this array will change the number of fish
-     * @param species the species examined
-     * @return the male fish array.
-     */
-    @Override
-    public double[] getNumberOfMaleFishPerAge(Species species) {
 
-        Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
-        return  abundance.get(species)[FishStateUtilities.MALE];
-    }
-
-    /**
-     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
-     * This is <b>not a reflexive copy </b> and any change to this array will change the number of fish
-     * @param species the species examined
-     * @return the female fish array.
-     */
     @Override
-    public double[] getNumberOfFemaleFishPerAge(Species species) {
+    public StructuredAbundance getAbundance(Species species) {
         Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
 
-        return  abundance.get(species)[FishStateUtilities.FEMALE];
-    }
+        return new StructuredAbundance(abundance.get(species)[FishStateUtilities.MALE],
+                                       abundance.get(species)[FishStateUtilities.FEMALE]
+                                       );
 
-    /**
-     * returns the number of fish in this seatile belonging to this species, split into age cohorts
-     * This is a reflexive copy and it is safe to modify as it will not affect anything
-     * @param species the species examined
-     * @return the fish array.
-     */
-    @Override
-    public double[] getNumberOfFishPerAge(Species species) {
-        double[][] fish = abundance.get(species);
-        double total[] = new double[fish[0].length];
-        assert fish.length==2;
-        for(int i=0; i<total.length; i++)
-            total[i] = fish[0][i]+ fish[1][i];
-        return total;
     }
 
 

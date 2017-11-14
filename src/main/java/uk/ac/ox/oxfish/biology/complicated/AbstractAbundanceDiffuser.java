@@ -80,49 +80,32 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             for(SeaTile there : potential) {
                 assert biologies.containsKey(there);
                 AbundanceBasedLocalBiology thereBiology = biologies.get(there);
-                double[] malesHere = here.getValue().getNumberOfMaleFishPerAge(species);
-                double[] malesThere = thereBiology.getNumberOfMaleFishPerAge(species);
-
-                double[] femaleHere = here.getValue().getNumberOfFemaleFishPerAge(species);
-                double[] femaleThere = thereBiology.getNumberOfFemaleFishPerAge(species);
-
-
-                //check for difference in abundance between each bin
-                for (int bin = 0; bin < species.getMaxAge() + 1; bin++)
+                StructuredAbundance abundanceHere = here.getValue().getAbundance(species);
+                StructuredAbundance abundanceThere = thereBiology.getAbundance(species);
+                assert abundanceHere.getSubdivisions() == abundanceThere.getSubdivisions();
+                assert abundanceHere.getBins() == abundanceThere.getBins();
+                for(int subdivision = 0; subdivision<abundanceHere.getSubdivisions(); subdivision++)
                 {
-                    //move male
-                    double fishHere = malesHere[bin];
-                    double fishThere = malesThere[bin];
-                    if(rounding)
-                    {
-                        fishHere = (int) fishHere;
-                        fishThere = (int) fishThere;
+                    //check for difference in abundance between each bin
+                    for (int bin = 0; bin < abundanceHere.getBins(); bin++) {
+                        //move male
+                        double fishHere = abundanceHere.getElement(subdivision,bin);
+                        double fishThere = abundanceThere.getElement(subdivision,bin);
+                        if (rounding) {
+                            fishHere = (int) fishHere;
+                            fishThere = (int) fishThere;
+                        }
+                        double delta = fishHere -
+                                fishThere;
+                        //move always get called, regardless of what the delta is!
+                        move(species, here.getKey(),
+                             abundanceHere, there, abundanceThere, delta, fishHere, fishThere, bin,
+                             model.getRandom(),
+                             rounding, subdivision, here.getValue(), thereBiology);
+
+
                     }
-                    double maleDelta = fishHere -
-                            fishThere;
-                    //move always get called, regardless of what the delta is!
-                    move(species, here.getKey(),
-                         here.getValue(), there, thereBiology, maleDelta, fishHere , fishThere , bin, true, model.getRandom(),
-                         rounding);
-
-                    //move female
-                    fishHere = femaleHere[bin];
-                    fishThere = femaleThere[bin];
-                    if(rounding)
-                    {
-                        fishHere = (int) fishHere;
-                        fishThere = (int) fishThere;
-                    }
-                    double femaleDelta = fishHere -
-                            fishThere;
-                    //move always get called, regardless of what the delta is!
-                    move(species, here.getKey(),
-                         here.getValue(), there, thereBiology, femaleDelta, fishHere , fishThere , bin, false, model.getRandom(),
-                         rounding);
-
-
                 }
-
             }
 
         }
@@ -134,29 +117,32 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
 
     /**
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
-     * @param species species moving
+     *  @param species species moving
      * @param here departing point
-     * @param biologyHere departing local biology
+     * @param abundanceHere departing local biology
      * @param there arriving point
-     * @param biologyThere arriving local biology
+     * @param abundanceThere arriving local biology
      * @param delta number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
      * @param bin bin/age studied
-     * @param male whether it's male or female
      * @param random
      * @param rounding
+     * @param subdivision
+     * @param biologyHere departing local biology
+     * @param biologyThere arriving local biology
      */
     public abstract void move(
             Species species,
             SeaTile here,
-            AbundanceBasedLocalBiology biologyHere,
+            StructuredAbundance abundanceHere,
             SeaTile there,
-            AbundanceBasedLocalBiology biologyThere,
+            StructuredAbundance abundanceThere,
             double delta,
             double fishHere, double fishThere, int bin,
-            boolean male,
-            MersenneTwisterFast random, boolean rounding);
+            MersenneTwisterFast random, boolean rounding, int subdivision,
+            AbundanceBasedLocalBiology biologyHere,
+            AbundanceBasedLocalBiology biologyThere);
 
 
 

@@ -80,7 +80,10 @@ public class LogisticAbundanceFilterTest {
         double[] male = new double[81];
         double[] female = new double[81];
         male[5] = 100;
-        double[][] filtered = filter.filter(male, female, species);
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
+        double[][] filtered = filter.filter(species,abundance );
         assertEquals(filtered[FishStateUtilities.MALE][5],17,.001);
         assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
         assertEquals(filtered[FishStateUtilities.FEMALE][5],0,.001);
@@ -104,19 +107,22 @@ public class LogisticAbundanceFilterTest {
             male[i] = random.nextInt(100000);
             female[i] = random.nextInt(100000);
         }
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
 
 
         long start = System.currentTimeMillis();
         LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
         for(int times=0;times<1000; times++)
-            filter.filter(male,female,species);
+            filter.filter(species, abundance);
         long end = System.currentTimeMillis();
         long durationFirst = end-start;
 
         start = System.currentTimeMillis();
         filter = new LogisticAbundanceFilter(23.5053, 9.03702, true, true);
         for(int times=0;times<1000; times++)
-            filter.filter(male,female,species);
+            filter.filter(species,abundance );
         end = System.currentTimeMillis();
 
         long durationSecond = end-start;

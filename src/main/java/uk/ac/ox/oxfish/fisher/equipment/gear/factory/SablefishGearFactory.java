@@ -120,9 +120,9 @@ public class SablefishGearFactory implements HomogeneousGearFactory {
                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                 selectivity.presentKey(state,
                                        () -> new ArrayFilter(
-                                               Arrays.copyOf(MALE,MALE.length),
-                                               Arrays.copyOf(FEMALE,FEMALE.length),
-                                               true)),
+                                               true, Arrays.copyOf(MALE, MALE.length),
+                                               Arrays.copyOf(FEMALE,FEMALE.length)
+                                       )),
                 new RetentionAbundanceFilter(true,
                                              retentionInflection.apply(random),
                                              retentionSlope.apply(random),

@@ -82,7 +82,10 @@ public class RetentionAbundanceFilterTest {
         double[] male = new double[81];
         double[] female = new double[81];
         male[20] = 100;
-        double[][] filtered = filter.filter(male, female, species);
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
+        double[][] filtered = filter.filter(species, abundance);
         assertEquals(filtered[FishStateUtilities.MALE][20],86,.001);
         assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
         assertEquals(filtered[FishStateUtilities.FEMALE][20],0,.001);
@@ -106,19 +109,21 @@ public class RetentionAbundanceFilterTest {
             male[i] = random.nextInt(100000);
             female[i] = random.nextInt(100000);
         }
-
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
 
         long start = System.currentTimeMillis();
         RetentionAbundanceFilter filter =new RetentionAbundanceFilter(false, 21.8035, 1.7773, 0.992661, true);
         for(int times=0;times<1000; times++)
-            filter.filter(male,female,species);
+            filter.filter(species,abundance );
         long end = System.currentTimeMillis();
         long durationFirst = end-start;
 
         start = System.currentTimeMillis();
         filter =new RetentionAbundanceFilter(true, 21.8035, 1.7773, 0.992661, true);
         for(int times=0;times<1000; times++)
-            filter.filter(male,female,species);
+            filter.filter(species, abundance);
         end = System.currentTimeMillis();
 
         long durationSecond = end-start;

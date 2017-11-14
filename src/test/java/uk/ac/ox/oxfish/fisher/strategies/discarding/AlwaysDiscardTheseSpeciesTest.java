@@ -127,9 +127,9 @@ public class AlwaysDiscardTheseSpeciesTest {
                                                  new MersenneTwisterFast());
         Assert.assertEquals(end.getWeightCaught(secondSpecies),0,.0001);
         assertTrue(end.getWeightCaught(firstSpecies)>0);
-        assertEquals(end.getAbundance(firstSpecies).getAbundance()
+        assertEquals(end.getAbundance(firstSpecies).asMatrix()
                              [FishStateUtilities.MALE][1],100,.001);
-        assertEquals(end.getAbundance(firstSpecies).getAbundance()
+        assertEquals(end.getAbundance(firstSpecies).asMatrix()
                              [FishStateUtilities.FEMALE][1],20,.001);
 
 

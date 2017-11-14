@@ -203,6 +203,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         }
     }
 
+
+
     /**
      * after all the tiles have been instantiated this method gets called once to put anything together or to smooth
      * biomasses or whatever
@@ -246,17 +248,15 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         {
             double ratio = initialWeights.get(local.getValue())/sum;
 
-            for(int i=0; i<=species.getMaxAge(); i++)
-            {
+            StructuredAbundance abundance = local.getValue().getAbundance(species);
+            for(int bin=0; bin<abundance.getBins(); bin++)
 
-                local.getValue().getNumberOfMaleFishPerAge(species)[i] =
-                        FishStateUtilities.randomRounding(
-                                scaling * totalCount[FishStateUtilities.MALE][i] *ratio,
-                                model.getRandom());
-                local.getValue().getNumberOfFemaleFishPerAge(species)[i] =
-                        FishStateUtilities.randomRounding(
-                                scaling * totalCount[FishStateUtilities.FEMALE][i] *ratio,
-                                model.getRandom());            }
+                for(int subdivision =0; subdivision<abundance.getSubdivisions(); subdivision++)
+                {
+                    abundance.asMatrix()[subdivision][bin] =
+                            scaling * totalCount[subdivision][bin] *ratio;
+                }
+
         }
 
 
@@ -282,6 +282,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
     }
 
+
+
     /**
      * creates the global biology object for the model
      *
@@ -297,6 +299,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         return new GlobalBiology(species);
 
     }
+
+
 
 
 

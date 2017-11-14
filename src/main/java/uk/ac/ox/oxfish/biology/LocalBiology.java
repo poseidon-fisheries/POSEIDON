@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology;
 
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.Startable;
 
@@ -52,26 +53,10 @@ public interface LocalBiology extends Startable
     void reactToThisAmountOfBiomassBeingFished(
             Catch caught, Catch notDiscarded, GlobalBiology biology);
 
-    /**
-     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
-     * @param species the species examined
-     * @return the male fish array.
-     */
-    double[] getNumberOfMaleFishPerAge(Species species);
 
-    /**
-     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
-     * @param species the species examined
-     * @return the female fish array.
-     */
-    double[] getNumberOfFemaleFishPerAge(Species species);
 
-    /**
-     * returns the number of fish in this seatile belonging to this species, split into age cohorts
-     * @param species the species examined
-     * @return the fish array.
-     */
-    double[] getNumberOfFishPerAge(Species species);
+    StructuredAbundance getAbundance(Species species);
+
 
 
 

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 
@@ -57,12 +58,12 @@ public class ConstantRateAbundanceDiffuserTest {
         //we will move from full to empty at 50%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
         AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
-        fullBio.getNumberOfMaleFishPerAge(species)[0]=1000;
-        fullBio.getNumberOfMaleFishPerAge(species)[1]=500;
-        fullBio.getNumberOfMaleFishPerAge(species)[2]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[0]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[1]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[2]=10;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2]=10;
         full.setBiology(fullBio);
 
 
@@ -91,11 +92,11 @@ public class ConstantRateAbundanceDiffuserTest {
 
         diffuser.step(species,tiles,state);
 
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{500,250,0},.001d);
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001d);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{500,250,0},.001d);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,5},.001d);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{500,250,0},.001d);
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001d);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{500,250,0},.001d);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,5},.001d);
 
     }
 
@@ -113,12 +114,12 @@ public class ConstantRateAbundanceDiffuserTest {
         //we will move from full to empty at 10%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
         AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
-        fullBio.getNumberOfMaleFishPerAge(species)[0]=1000;
-        fullBio.getNumberOfMaleFishPerAge(species)[1]=500;
-        fullBio.getNumberOfMaleFishPerAge(species)[2]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[0]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[1]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[2]=10;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2]=10;
         full.setBiology(fullBio);
 
 
@@ -147,17 +148,17 @@ public class ConstantRateAbundanceDiffuserTest {
 
         diffuser.step(species,tiles,state);
 
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{900,450,0},.001);
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,9},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{900,450,0},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,9},.001);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{100,50,0},.001);
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,1},.001);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{100,50,0},.001);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,1},.001);
         diffuser.step(species,tiles,state);
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{820,410,0},.001);
-        assertEquals(fullBio.getNumberOfFemaleFishPerAge(species)[2],9,1); //there is some randomness involved
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{820,410,0},.001);
+        assertEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2],9,1); //there is some randomness involved
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{180,90,0},.001);
-        assertEquals(empty.getNumberOfFemaleFishPerAge(species)[2],1,1);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{180,90,0},.001);
+        assertEquals(empty.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2],1,1);
     }
 
 
@@ -174,19 +175,19 @@ public class ConstantRateAbundanceDiffuserTest {
         //we will move from full to empty at 50%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
         AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
-        fullBio.getNumberOfMaleFishPerAge(species)[0]=1000;
-        fullBio.getNumberOfMaleFishPerAge(species)[1]=500;
-        fullBio.getNumberOfMaleFishPerAge(species)[2]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[0]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[1]=0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[2]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1]=0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2]=0;
         full.setBiology(fullBio);
 
 
         SeaTile empty = new SeaTile(0,1,-1,new TileHabitat(0d));
         AbundanceBasedLocalBiology emptyBio = new AbundanceBasedLocalBiology(biology);
         empty.setBiology(emptyBio);
-        emptyBio.getNumberOfFemaleFishPerAge(species)[2]=10;
+        emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2]=10;
 
         HashMap<SeaTile,AbundanceBasedLocalBiology> tiles = new HashMap<>();
         tiles.put(full,fullBio);
@@ -209,11 +210,11 @@ public class ConstantRateAbundanceDiffuserTest {
 
         diffuser.step(species,tiles,state);
 
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species),new double[]{500,250,0},.001);
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{500,250,0},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,5},.001);
 
-        assertArrayEquals(emptyBio.getNumberOfMaleFishPerAge(species),new double[]{500,250,0},.001);
-        assertArrayEquals(emptyBio.getNumberOfFemaleFishPerAge(species),new double[]{0,0,5},.001);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE],new double[]{500,250,0},.001);
+        assertArrayEquals(emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE],new double[]{0,0,5},.001);
 
     }
 }

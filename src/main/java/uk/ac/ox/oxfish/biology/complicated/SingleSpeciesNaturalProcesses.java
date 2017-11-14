@@ -29,9 +29,10 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
@@ -136,23 +137,18 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     |_|_\___\__|_|  \_,_|_|\__|_|_|_\___|_||_\__|
          *
          */
-        //we need to sum up all the male/female
-        double totalMale[] = new double[species.getMaxAge()+1];
-        double totalFemale[] = new double[species.getMaxAge()+1];
-        biologies.values().stream().forEach(abundanceBasedLocalBiology -> {
-            double[] females = abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species);
-            double[] males = abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species);
-            for(int age=0; age<totalMale.length; age++)
-            {
-                totalFemale[age] += females[age];
-                totalMale[age] += males[age];
-            }
-        });
+        //we need to sum up all the abundances
+        List<StructuredAbundance> abundances = new LinkedList<>();
+        for (AbundanceBasedLocalBiology biology : biologies.values()) {
+            abundances.add(biology.getAbundance(species));
+        }
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
-                                           totalFemale, totalMale);
+                                           StructuredAbundance.sum(abundances,abundances.get(0).getBins(),abundances.get(0).getSubdivisions())
+        );
         if(rounding)
             lastRecruits = (int)(lastRecruits);
+        abundances.clear();
 
 
         //allocate stuff before mortality hits!
@@ -204,9 +200,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *                                      |__/
          */
         biologies.values().forEach(
-                abundanceBasedLocalBiology -> mortalityProcess.cull(abundanceBasedLocalBiology.getNumberOfMaleFishPerAge(species),
-                                                                    abundanceBasedLocalBiology.getNumberOfFemaleFishPerAge(species),
-                                                                    species.getMeristics(),rounding ));
+                abundanceBasedLocalBiology -> mortalityProcess.cull(
+                        species.getMeristics(),rounding,
+                        abundanceBasedLocalBiology.getAbundance(species)));
 
 
 
@@ -249,20 +245,25 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
             for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
                 double ratio = biologyBiomass.getValue();
                 double recruitsHere = ((lastRecruits + leftOver) * ratio);
-                if(rounding) {
+                StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
+
+                if(rounding)
+                {
                     recruitsHere = (int) recruitsHere;
-                    //add recruits to smallest bin
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += ((int)recruitsHere) / 2;
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += ((int)recruitsHere) / 2;
-                    leftOver = ((lastRecruits + leftOver) * ratio) -
-                            biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] -
-                            biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0]
-                    ;
+                    int totalAllocated = 0;
+                    for(int subdivision = 0; subdivision <abundance.getSubdivisions(); subdivision++) {
+                        abundance.asMatrix()[subdivision][0] += ((int) recruitsHere) / (abundance.getSubdivisions());
+                        totalAllocated+= ((int) recruitsHere) / (abundance.getSubdivisions());
+                    }
+                    leftOver = ((lastRecruits + leftOver) * ratio) -totalAllocated;
+
+
                 }
-                else{
-                    //add recruits to smallest bin
-                    biologyBiomass.getKey().getNumberOfFemaleFishPerAge(species)[0] += recruitsHere / 2d;
-                    biologyBiomass.getKey().getNumberOfMaleFishPerAge(species)[0] += recruitsHere / 2d;
+                else {
+                    for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
+                        abundance.asMatrix()[subdivision][0] += (recruitsHere) / ((double)abundance.getSubdivisions());
+
+                    }
                 }
 
             }

@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,29 +80,29 @@ public class SingleSpeciesNaturalProcessesTest {
         processes.add(cell2,mock(SeaTile.class) );
         for(int i=0; i<=species.getMaxAge(); i++)
         {
-            cell1.getNumberOfFemaleFishPerAge(species)[i] = 5000;
-            cell2.getNumberOfFemaleFishPerAge(species)[i] = 5000;
+            cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][i] = 5000;
+            cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][i] = 5000;
         }
 
         FishState model = mock(FishState.class);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         processes.step(model);
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],9231,2);
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0] +
-                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,416140,4);
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0],208070,2);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][3]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][3],9231,2);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0] +
+                                    cell1.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] ,416140,4);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0],208070,2);
 
         processes.step(model);
-        System.out.println(Arrays.toString(cell1.getNumberOfFemaleFishPerAge(species)));
-        System.out.println(Arrays.toString(cell2.getNumberOfFemaleFishPerAge(species)));
-        System.out.println(Arrays.toString(cell2.getNumberOfMaleFishPerAge(species)));
-        System.out.println(Arrays.toString(cell2.getNumberOfMaleFishPerAge(species)));
+        System.out.println(Arrays.toString(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE]));
+        System.out.println(Arrays.toString(cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE]));
+        System.out.println(Arrays.toString(cell2.getAbundance(species).asMatrix()[FishStateUtilities.MALE]));
+        System.out.println(Arrays.toString(cell2.getAbundance(species).asMatrix()[FishStateUtilities.MALE]));
 
 
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[3]+cell2.getNumberOfFemaleFishPerAge(species)[3],8521,1);
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[0]+cell2.getNumberOfFemaleFishPerAge(species)[0] +
-                                    cell1.getNumberOfMaleFishPerAge(species)[0]+cell2.getNumberOfMaleFishPerAge(species)[0] ,384422,50);
-        Assert.assertEquals(cell1.getNumberOfFemaleFishPerAge(species)[1]+cell2.getNumberOfFemaleFishPerAge(species)[1] ,192073,2);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][3]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][3],8521,1);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0] +
+                                    cell1.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] ,384422,50);
+        Assert.assertEquals(cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1]+cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1] ,192073,2);
 
     }
 
@@ -123,11 +124,11 @@ public class SingleSpeciesNaturalProcessesTest {
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
-        when(recruiter.recruit(any(),any(),any(),any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any(), any())).thenReturn(3200d);
         //nothing dies
         NaturalMortalityProcess culler = mock(NaturalMortalityProcess.class);
 
-        when(recruiter.recruit(any(),any(),any(),any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any(),  any())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 culler,
                 recruiter,
@@ -146,21 +147,21 @@ public class SingleSpeciesNaturalProcessesTest {
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
 
         //because the count is uniform I should see recruits distributed uniformly as well
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
         processes.step(model);
         //3200, half are female: 1600, that means 100 for each area
-        assertEquals(100,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(100,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(100,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(100,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(100,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(100,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(100,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(100,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
         //the others have aged
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[1],.001);
+        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][1],.001);
 
 
 
@@ -185,11 +186,11 @@ public class SingleSpeciesNaturalProcessesTest {
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
-        when(recruiter.recruit(any(),any(),any(),any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
         //nothing dies
         NaturalMortalityProcess culler = mock(NaturalMortalityProcess.class);
 
-        when(recruiter.recruit(any(),any(),any(),any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 culler,
                 recruiter,
@@ -221,21 +222,21 @@ public class SingleSpeciesNaturalProcessesTest {
                 }
         );
         //because the count is uniform I should see recruits distributed uniformly as well
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
         processes.step(model);
         //3200, half are female: 1600
-        assertEquals(0,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(1600,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(0,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[0],.001);
-        assertEquals(0,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[0],.001);
+        assertEquals(0,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(1600,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(0,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][0],.001);
+        assertEquals(0,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][0],.001);
         //the others have aged
-        assertEquals(200,map.getSeaTile(0,0).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(200,map.getSeaTile(1,1).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(200,map.getSeaTile(2,3).getNumberOfFemaleFishPerAge(fakeSpecies)[1],.001);
-        assertEquals(250,map.getSeaTile(0,0).getNumberOfMaleFishPerAge(fakeSpecies)[1],.001);
+        assertEquals(200,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(200,map.getSeaTile(1,1).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(200,map.getSeaTile(2,3).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.FEMALE][1],.001);
+        assertEquals(250,map.getSeaTile(0,0).getAbundance(fakeSpecies).asMatrix()[FishStateUtilities.MALE][1],.001);
 
 
 
@@ -249,7 +250,7 @@ public class SingleSpeciesNaturalProcessesTest {
 
         Log.info("if you set preserve old age to false, the last class has mortality of 100%");
         RecruitmentProcess recruitment = mock(RecruitmentProcess.class);
-        when(recruitment.recruit(any(),any(),any(),any())).thenReturn(1000d); //always create a 1000 new fish
+        when(recruitment.recruit(any(), any() , any())).thenReturn(1000d); //always create a 1000 new fish
 
         //grab a fake species
         Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
@@ -266,24 +267,24 @@ public class SingleSpeciesNaturalProcessesTest {
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
         //there are 500 male/female in each category oldest and 0  for second oldest
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=0;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=0;
         processes.add(local, mock(SeaTile.class));
 
         //when false the oldest all die
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         processes.step(model);
-        assertEquals(0,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()],.001);
-        assertEquals(0,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()],.001);
+        assertEquals(0,local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()],.001);
+        assertEquals(0,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
 
 
         //but when I set it to true, they don't all die
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=0;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=0;
         processes = new SingleSpeciesNaturalProcesses(
                 new NaturalMortalityProcess(),
                 recruitment,
@@ -291,18 +292,18 @@ public class SingleSpeciesNaturalProcessesTest {
                 true, new StandardAgingProcess(true), new NoAbundanceDiffusion() );
         processes.add(local,mock(SeaTile.class) );
         processes.step(model);
-        assertEquals(447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()],.001);
-        assertEquals(447,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()],.001);
+        assertEquals(447,local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()],.001);
+        assertEquals(447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
 
 
         //in fact they mingle with the new oldest fish
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()]=500;
-        local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()-1]=500;
-        local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()-1]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()-1]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=500;
         processes.step(model);
-        assertEquals(447+447,local.getNumberOfFemaleFishPerAge(species)[species.getMaxAge()],.001);
-        assertEquals(447+447,local.getNumberOfMaleFishPerAge(species)[species.getMaxAge()],.001);
+        assertEquals(447+447,local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()],.001);
+        assertEquals(447+447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
 
 
     }

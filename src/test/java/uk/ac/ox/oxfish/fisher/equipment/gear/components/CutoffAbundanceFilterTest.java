@@ -69,7 +69,10 @@ public class CutoffAbundanceFilterTest {
         double[] male = new double[81];
         double[] female = new double[81];
         male[5] = 100;
-        double[][] filtered = filter.filter(male, female, species);
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
+        double[][] filtered = filter.filter(species,abundance );
         assertEquals(filtered[FishStateUtilities.MALE][5],100,.001);
         assertEquals(filtered[FishStateUtilities.MALE][0],0,.001);
         assertEquals(filtered[FishStateUtilities.FEMALE][5],0,.0001);

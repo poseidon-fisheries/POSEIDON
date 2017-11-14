@@ -49,15 +49,15 @@ public class LogisticRecruitmentProcess implements RecruitmentProcess {
      *
      * @param species      the species of fish examined
      * @param meristics    the biological characteristics of the fish
-     * @param femalePerAge the number of females that are part of the recruitment, grouped by age cohort
-     * @param malePerAge   the number of males that are part of the recruitment, grouped by age cohort
+     * @param abundance
      * @return the number of male + female recruits
      */
     @Override
-    public double recruit(Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge) {
+    public double recruit(
+            Species species, Meristics meristics, StructuredAbundance abundance) {
 
         //weigh
-        double biomass = FishStateUtilities.weigh(malePerAge,femalePerAge,meristics);
+        double biomass = FishStateUtilities.weigh(abundance,meristics);
 
         double nextBiomass = IndependentLogisticBiomassGrower.logisticStep(
                 biomass + noise.get(),carryingCapacity,malthusianParameter

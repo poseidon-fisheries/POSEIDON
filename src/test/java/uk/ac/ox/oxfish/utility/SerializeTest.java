@@ -171,6 +171,7 @@ public class SerializeTest {
 
         long seed = System.currentTimeMillis();
 
+        System.out.println("seed " + seed);
         FishState state = new FishState(seed);
         FishState state2 = new FishState(seed);
         DerisoCaliforniaScenario scenario1 = new DerisoCaliforniaScenario();
@@ -339,20 +340,20 @@ public class SerializeTest {
                 for (int x = 0; x < state.getMap().getWidth(); x++)
                     for (int y = 0; y < state.getMap().getHeight(); y++) {
                         if(state.getMap().getSeaTile(x, y).isFishingEvenPossibleHere() && !state.getSpecies().get(species).isImaginary())
-                            assertArrayEquals(state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                    state.getSpecies().get(species)),
-                                              state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                      state2.getSpecies().get(species)),
+                            assertArrayEquals(state.getMap().getSeaTile(x, y).getAbundance(
+                                    state.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE],
+                                              state2.getMap().getSeaTile(x, y).getAbundance(
+                                                      state2.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE],
                                               .0001);
 
 
                         assertEquals(
                                 "first: " + Arrays.toString(
-                                        state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                state.getSpecies().get(species))) +"\n" +
+                                        state.getMap().getSeaTile(x, y).getAbundance(
+                                                state.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE]) +"\n" +
                                         "second: " + Arrays.toString(
-                                        state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                state2.getSpecies().get(species))) +"\n"
+                                        state2.getMap().getSeaTile(x, y).getAbundance(
+                                                state2.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE]) +"\n"
                                 ,
                                 state.getMap().getSeaTile(x, y).getBiomass(state.getSpecies().get(species)),
                                 state2.getMap().getSeaTile(x, y).getBiomass(state2.getSpecies().get(species)),
@@ -389,19 +390,20 @@ public class SerializeTest {
                 for (int x = 0; x < state.getMap().getWidth(); x++)
                     for (int y = 0; y < state.getMap().getHeight(); y++) {
                         if(state.getMap().getSeaTile(x, y).isFishingEvenPossibleHere() && !state.getSpecies().get(species).isImaginary())
-                            assertArrayEquals(state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                    state.getSpecies().get(species)),
-                                              state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                      state2.getSpecies().get(species)),.0001);
+                            assertArrayEquals(state.getMap().getSeaTile(x, y).getAbundance(
+                                    state.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE],
+                                              state2.getMap().getSeaTile(x, y).getAbundance(
+                                                      state2.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE],
+                                              .0001);
 
 
                         assertEquals(
                                 "first: " + Arrays.toString(
-                                        state.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                state.getSpecies().get(species))) +"\n" +
+                                        state.getMap().getSeaTile(x, y).getAbundance(
+                                                state.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE]) +"\n" +
                                         "second: " + Arrays.toString(
-                                        state2.getMap().getSeaTile(x, y).getNumberOfMaleFishPerAge(
-                                                state2.getSpecies().get(species))) +"\n"
+                                        state2.getMap().getSeaTile(x, y).getAbundance(
+                                                state2.getSpecies().get(species)).asMatrix()[FishStateUtilities.MALE]) +"\n"
                                 ,
                                 state.getMap().getSeaTile(x, y).getBiomass(state.getSpecies().get(species)),
                                 state2.getMap().getSeaTile(x, y).getBiomass(state2.getSpecies().get(species)),

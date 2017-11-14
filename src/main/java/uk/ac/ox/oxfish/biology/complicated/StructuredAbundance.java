@@ -33,6 +33,9 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
  * A container for an abundance metric where we expect
  * the # of fish to be classified by length/age (anyway bins) and
  * possibly also by subcategories (like male/female)
+ *
+ *
+ * None of these arrays are copies, these are all live pointers
  * Created by carrknight on 5/2/17.
  */
 public class StructuredAbundance {
@@ -51,7 +54,7 @@ public class StructuredAbundance {
      */
     public StructuredAbundance(double[] ageStructure)
     {
-        Preconditions.checkArgument(ageStructure.length > 0);
+        //Preconditions.checkArgument(ageStructure.length > 0); not true anymore since it could be an emptybiology forced to return an empty structure
         abundance = new double[1][];
         abundance[0] = ageStructure;
     }
@@ -74,7 +77,6 @@ public class StructuredAbundance {
      * @param bins
      */
     public StructuredAbundance(int subdivisions,int bins){
-        Preconditions.checkArgument(subdivisions<=2, "no more than 2 subdivisions are allowed!");
         abundance = new double[subdivisions][];
         for(int i=0; i<subdivisions; i++)
             abundance[i] = new double[bins];
@@ -85,6 +87,28 @@ public class StructuredAbundance {
         for(int i=0; i<abundance.length; i++)
             abundance[i] = Arrays.copyOf(other.abundance[i],other.abundance[i].length);
     }
+
+
+
+    public static StructuredAbundance sum(Iterable<StructuredAbundance> abundances,
+                                          int bins, int subdivisions) {
+
+        StructuredAbundance total = new StructuredAbundance(subdivisions,bins);
+        for(StructuredAbundance abundance : abundances)
+        {
+            for(int subdivision =0; subdivision<subdivisions; subdivision++)
+            {
+                for(int bin = 0; bin<bins; bin++)
+                {
+                    total.asMatrix()[subdivision][bin]+=abundance.asMatrix()[subdivision][bin];
+                }
+            }
+        }
+
+
+       return total;
+    }
+
 
     public int getAbundanceInBin(int bin)
     {
@@ -99,8 +123,18 @@ public class StructuredAbundance {
      * get the age structured matrix
      * @return
      */
-    public double[][] getAbundance() {
+    public double[][] asMatrix() {
         return abundance;
+    }
+
+    /**
+     * get one element from the Abundance matrix
+     * @param subdivision the group (usually MALE and FEMALE)
+     * @param bin the age/length bin
+     * @return the abundance number
+     */
+    public double getElement(int subdivision, int bin){
+        return abundance[subdivision][bin];
     }
 
     public int getBins(){

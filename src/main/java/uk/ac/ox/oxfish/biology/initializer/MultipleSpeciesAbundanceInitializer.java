@@ -50,6 +50,9 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 {
 
     public static final String FAKE_SPECIES_NAME = "Others";
+
+
+    private final boolean rounding;
     /**
      * the path to the biology folder, which must contain a count.csv and a meristic.yaml file
      */
@@ -77,12 +80,14 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
     public MultipleSpeciesAbundanceInitializer(
             LinkedHashMap<String, Path> biologicalDirectories, double scaling,
-            boolean fixedRecruitmentDistribution, final boolean mortality100Percent, boolean addOtherSpecies) {
+            boolean fixedRecruitmentDistribution, final boolean mortality100Percent, boolean addOtherSpecies,
+            boolean rounding) {
         this.biologicalDirectories = biologicalDirectories;
         this.scaling = scaling;
         this.fixedRecruitmentDistribution = fixedRecruitmentDistribution;
         this.preserveLastAge = !mortality100Percent;
         this.addOtherSpecies = addOtherSpecies;
+        this.rounding = rounding;
     }
 
     /**
@@ -400,23 +405,30 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
             //get the ratio back
             AbundanceBasedLocalBiology local = ratio.getKey();
-
+            StructuredAbundance abundance = local.getAbundance(speciesToReset);
+            Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for ");
             for(int i=0; i<=speciesToReset.getMaxAge(); i++)
             {
 
 
                 double doubleMale = scaling * newTotalFishCount[FishStateUtilities.MALE][i] * ratio.getValue()  +
                         maleRemainder[i];
-                local.getNumberOfMaleFishPerAge(speciesToReset)[i] =
-                        (int) (doubleMale );
-                maleRemainder[i] =  (doubleMale-local.getNumberOfMaleFishPerAge(speciesToReset)[i]);
 
-
+                abundance.asMatrix()[FishStateUtilities.MALE][i] = doubleMale;
                 double doubleFemale = scaling * newTotalFishCount[FishStateUtilities.FEMALE][i] * ratio.getValue()  +
                         femaleRemainder[i];
-                local.getNumberOfFemaleFishPerAge(speciesToReset)[i] =
-                        (int) (doubleFemale);
-                femaleRemainder[i] =  (doubleFemale-local.getNumberOfFemaleFishPerAge(speciesToReset)[i]);
+                abundance.asMatrix()[FishStateUtilities.FEMALE][i] = doubleFemale;
+
+
+                if(rounding)
+                {
+                    abundance.asMatrix()[FishStateUtilities.MALE][i] = (int) abundance.asMatrix()[FishStateUtilities.MALE][i];
+                    maleRemainder[i] =  (doubleMale-abundance.asMatrix()[FishStateUtilities.MALE][i]);
+                    abundance.asMatrix()[FishStateUtilities.FEMALE][i] = (int) abundance.asMatrix()[FishStateUtilities.FEMALE][i];
+                    femaleRemainder[i] =  (doubleFemale-abundance.asMatrix()[FishStateUtilities.FEMALE][i]);
+
+                }
+
 
 
             }

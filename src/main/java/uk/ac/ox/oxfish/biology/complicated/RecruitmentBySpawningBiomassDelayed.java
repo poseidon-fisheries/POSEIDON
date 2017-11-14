@@ -47,15 +47,15 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
      *
      * @param species      the species of fish examined
      * @param meristics    the biological characteristics of the fish
-     * @param femalePerAge the number of females that are part of the recruitment, grouped by age cohort
-     * @param malePerAge   the number of males that are part of the recruitment, grouped by age cohort
+     * @param abundance
      * @return the number of male and female recruits
      */
     @Override
-    public double recruit(Species species, Meristics meristics, double[] femalePerAge, double[] malePerAge)
+    public double recruit(
+            Species species, Meristics meristics, StructuredAbundance abundance)
     {
 
-        double newRecruit = super.recruit(species, meristics, femalePerAge, malePerAge);
+        double newRecruit = super.recruit(species, meristics, abundance);
         if(recruits.isEmpty())
             initializeQueue(newRecruit);
         assert recruits.size() == yearDelay;

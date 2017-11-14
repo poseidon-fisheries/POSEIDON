@@ -55,29 +55,34 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
      *  @param species
      * @param here         departing point
-     * @param biologyHere  departing local biology
+     * @param abundanceHere  departing local biology
      * @param there        arriving point
-     * @param biologyThere arriving local biology
+     * @param abundanceThere arriving local biology
      * @param delta        number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
      * @param bin          bin/age studied
-     * @param male         whether it's male or female
      * @param random
+     * @param subdivision
+     * @param biologyHere  departing local biology
+     * @param biologyThere arriving local biology
      */
     @Override
     public void move(
             Species species,
-            SeaTile here, AbundanceBasedLocalBiology biologyHere,
+            SeaTile here, StructuredAbundance abundanceHere,
             SeaTile there,
-            AbundanceBasedLocalBiology biologyThere,
-            double delta, double fishHere, double fishThere, int bin, boolean male,
+            StructuredAbundance abundanceThere,
+            double delta, double fishHere, double fishThere, int bin,
             MersenneTwisterFast random,
-            boolean rounding) {
+            boolean rounding, int subdivision,
+            AbundanceBasedLocalBiology biologyHere,
+            AbundanceBasedLocalBiology biologyThere) {
 
         if(delta<=0)
             return;
         if(bin >= minMovementAge && bin<=maxMovementAge)
-            super.move(species, here, biologyHere, there, biologyThere, delta, fishHere, fishThere, bin, male, random,rounding);
+            super.move(species, here, abundanceHere, there, abundanceThere, delta, fishHere, fishThere, bin, random, rounding,
+                       subdivision, biologyHere, biologyThere);
     }
 }

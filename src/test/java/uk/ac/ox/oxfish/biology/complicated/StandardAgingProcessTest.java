@@ -22,6 +22,9 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.mock;
@@ -40,12 +43,11 @@ public class StandardAgingProcessTest {
         when(species.getMaxAge()).thenReturn(2);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
-
+        StructuredAbundance abundance = new StructuredAbundance(male,female);
         StandardAgingProcess process = new StandardAgingProcess(false);
 
         AbundanceBasedLocalBiology bio = mock(AbundanceBasedLocalBiology.class);
-        when(bio.getNumberOfMaleFishPerAge(species)).thenReturn(male);
-        when(bio.getNumberOfFemaleFishPerAge(species)).thenReturn(female);
+        when(bio.getAbundance(species)).thenReturn(abundance);
 
 
         process.ageLocally(bio, species, null, true);
@@ -63,16 +65,18 @@ public class StandardAgingProcessTest {
         when(species.getMaxAge()).thenReturn(2);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
+        StructuredAbundance abundance = new StructuredAbundance(male,female);
 
         StandardAgingProcess process = new StandardAgingProcess(true);
 
         AbundanceBasedLocalBiology bio = mock(AbundanceBasedLocalBiology.class);
-        when(bio.getNumberOfMaleFishPerAge(species)).thenReturn(male);
-        when(bio.getNumberOfFemaleFishPerAge(species)).thenReturn(female);
+        when(bio.getAbundance(species)).thenReturn(abundance);
+
 
 
         process.ageLocally(bio, species, null, true);
 
+        System.out.println(Arrays.toString(male));
         assertArrayEquals(male,new double[]{0,10,50},.0001);
         assertArrayEquals(female,new double[]{0,100,500},.0001);
 

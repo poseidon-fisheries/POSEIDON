@@ -51,23 +51,27 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
      * ask implementation how to move. This gets called iff there is a positive delta (that is, there are more fish here than there)
      *  @param species      species moving!
      * @param here         departing point
-     * @param biologyHere  departing local biology
+     * @param abundanceHere  departing local biology
      * @param there        arriving point
-     * @param biologyThere arriving local biology
+     * @param abundanceThere arriving local biology
      * @param delta        number of fish here - number of fish there (always positive or this isn't called)
      * @param fishHere
      * @param fishThere
      * @param bin          bin/age studied
-     * @param male         whether it's male or female
      * @param random
+     * @param subdivision
+     * @param biologyHere  departing local biology
+     * @param biologyThere arriving local biology
      */
     @Override
     public void move(
-            Species species, SeaTile here, AbundanceBasedLocalBiology biologyHere,
-            SeaTile there, AbundanceBasedLocalBiology biologyThere, double delta, double fishHere, double fishThere, int bin,
-            boolean male,
+            Species species, SeaTile here, StructuredAbundance abundanceHere,
+            SeaTile there, StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere,
+            int bin,
             MersenneTwisterFast random,
-            boolean rounding)
+            boolean rounding, int subdivision,
+            AbundanceBasedLocalBiology biologyHere,
+            AbundanceBasedLocalBiology biologyThere)
     {
         if(delta<=0)
             return;
@@ -82,19 +86,11 @@ public class ConstantRateAbundanceDiffuser extends AbstractAbundanceDiffuser {
         {
 
             //move!
-            if(male) {
-                biologyHere.getNumberOfMaleFishPerAge(species)[bin] -= movement;
-                assert biologyHere.getNumberOfMaleFishPerAge(species)[bin] >= 0;
-                biologyThere.getNumberOfMaleFishPerAge(species)[bin] += movement;
-                assert biologyThere.getNumberOfMaleFishPerAge(species)[bin] >= 0;
-            }
-            else
-            {
-                biologyHere.getNumberOfFemaleFishPerAge(species)[bin] -= movement;
-                assert biologyHere.getNumberOfFemaleFishPerAge(species)[bin] >= 0;
-                biologyThere.getNumberOfFemaleFishPerAge(species)[bin] += movement;
-                assert biologyThere.getNumberOfFemaleFishPerAge(species)[bin] >= 0;
-            }
+            abundanceHere.asMatrix()[subdivision][bin] -= movement;
+            assert abundanceHere.asMatrix()[subdivision][bin] >=0;
+            abundanceThere.asMatrix()[subdivision][bin] += movement;
+            assert abundanceThere.asMatrix()[subdivision][bin] >=0;
+
         }
 
 

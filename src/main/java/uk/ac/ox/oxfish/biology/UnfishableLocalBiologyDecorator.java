@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -72,38 +73,9 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
 
     }
 
-    /**
-     * returns the number of male fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the male fish array.
-     */
     @Override
-    public double[] getNumberOfMaleFishPerAge(Species species) {
-        return decorated.getNumberOfMaleFishPerAge(species);
-    }
-
-    /**
-     * returns the number of female fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the female fish array.
-     */
-    @Override
-    public double[] getNumberOfFemaleFishPerAge(Species species) {
-        return decorated.getNumberOfFemaleFishPerAge(species);
-    }
-
-    /**
-     * returns the number of fish in this seatile belonging to this species, split into age cohorts
-     *
-     * @param species the species examined
-     * @return the fish array.
-     */
-    @Override
-    public double[] getNumberOfFishPerAge(Species species) {
-        return decorated.getNumberOfFishPerAge(species);
-
+    public StructuredAbundance getAbundance(Species species) {
+        return decorated.getAbundance(species);
     }
 
     /**

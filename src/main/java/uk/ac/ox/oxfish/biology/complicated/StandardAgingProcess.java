@@ -54,21 +54,16 @@ public class StandardAgingProcess implements AgingProcess {
     {
 
         //get the age structure (these are not copies!)
-        double[] males = localBiology.getNumberOfMaleFishPerAge(species);
-        double[] females = localBiology.getNumberOfFemaleFishPerAge(species);
-
-        //store these in case you need to preserve last age
-        double oldestMale = males[males.length-1];
-        double oldestFemale = females[females.length-1];
-
-        System.arraycopy(males,0,males,1,males.length-1);
-        System.arraycopy(females,0,females,1,females.length-1);
-        males[0] = 0;
-        females[0] = 0;
-        if(preserveLastAge)
+        StructuredAbundance abundance = localBiology.getAbundance(species);
+        //escalator move everything
+        for(int subdivision=0; subdivision<abundance.getSubdivisions(); subdivision++)
         {
-            males[males.length - 1] += oldestMale;
-            females[females.length - 1] += oldestFemale;
+            double[] segment = abundance.asMatrix()[subdivision];
+            double oldest = segment[segment.length-1];
+            System.arraycopy(segment,0,segment,1,segment.length-1);
+            segment[0] = 0;
+            if(preserveLastAge)
+                segment[segment.length-1]+= oldest;
 
         }
     }

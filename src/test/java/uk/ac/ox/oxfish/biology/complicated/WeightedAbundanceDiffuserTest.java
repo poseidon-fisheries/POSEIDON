@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 
@@ -56,20 +57,20 @@ public class WeightedAbundanceDiffuserTest {
         //movement rate is 50%
         SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
         AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
-        fullBio.getNumberOfMaleFishPerAge(species)[0] = 1000;
-        fullBio.getNumberOfMaleFishPerAge(species)[1] = 500;
-        fullBio.getNumberOfMaleFishPerAge(species)[2] = 0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[0] = 0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[1] = 0;
-        fullBio.getNumberOfFemaleFishPerAge(species)[2] = 0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] = 1000;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2] = 0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][0] = 0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][1] = 0;
+        fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2] = 0;
         full.setBiology(fullBio);
 
 
         SeaTile there = new SeaTile(0, 1, -1, new TileHabitat(0d));
         AbundanceBasedLocalBiology bioThere = new AbundanceBasedLocalBiology(biology);
         there.setBiology(bioThere);
-        bioThere.getNumberOfFemaleFishPerAge(species)[2] = 100;
-        bioThere.getNumberOfMaleFishPerAge(species)[1] = 500; //bio there has the same amount of age 1 male
+        bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2] = 100;
+        bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500; //bio there has the same amount of age 1 male
 
         //however we will make "there" more habitable than here
 
@@ -127,11 +128,11 @@ public class WeightedAbundanceDiffuserTest {
 
 
         //ought to rearrange so that 2/3 of biomass is in "there"
-        assertArrayEquals(fullBio.getNumberOfMaleFishPerAge(species), new double[]{334, 334, 0},.001);
-        assertArrayEquals(fullBio.getNumberOfFemaleFishPerAge(species), new double[]{0, 0, 33},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE], new double[]{334, 334, 0},.001);
+        assertArrayEquals(fullBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE], new double[]{0, 0, 33}, .001);
 
-        assertArrayEquals(bioThere.getNumberOfMaleFishPerAge(species), new double[]{666, 666, 0},.001);
-        assertArrayEquals(bioThere.getNumberOfFemaleFishPerAge(species), new double[]{0, 0, 67},.001);
+        assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE], new double[]{666, 666, 0},.001);
+        assertArrayEquals(bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE], new double[]{0, 0, 67},.001);
 
     }
 

@@ -500,8 +500,7 @@ public class FishState  extends SimState{
                 new ToDoubleFunction<SeaTile>() {
                     @Override
                     public double applyAsDouble(SeaTile value) {
-                        return value.getNumberOfFemaleFishPerAge(species)[age] +
-                                value.getNumberOfMaleFishPerAge(species)[age];
+                        return value.getAbundance(species).getAbundanceInBin(age);
                     }
                 }
         ).sum();

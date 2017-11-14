@@ -33,17 +33,19 @@ public class NaturalMortalityProcess
 
     /**
      * as a side-effect modifies male and female cohorts by killing a % of its population equal to the mortality rate.
-     * @param male array containing male fish per age
-     * @param female array with female fish per age
      * @param species the characteristics of the species
      * @param rounding
+     * @param abundance
      */
-    public void cull(double[] male, double[] female, Meristics species, boolean rounding)
+    public void cull(
+            Meristics species, boolean rounding, StructuredAbundance abundance)
     {
         double maleMortality = species.getMortalityParameterMMale();
         double femaleMortality = species.getMortalityParameterMFemale();
-        Preconditions.checkArgument(male.length==female.length);
-        for(int i=0;i<male.length; i++)
+        Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for male and female; need recode for generalization");
+        double[] male = abundance.asMatrix()[FishStateUtilities.MALE];
+        double[] female = abundance.asMatrix()[FishStateUtilities.FEMALE];
+        for(int i=0;i<abundance.getBins(); i++)
         {
             male[i] = (male[i] * Math.exp(-maleMortality) );
             female[i] = (female[i] * Math.exp(-femaleMortality));

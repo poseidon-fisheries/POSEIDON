@@ -34,15 +34,12 @@ public interface RecruitmentProcess
      * Computes the number of new recruits per sex
      * @param species the species of fish examined
      * @param meristics the biological characteristics of the fish
-     * @param femalePerAge the number of females that are part of the recruitment, grouped by age cohort
-     * @param malePerAge the number of males that are part of the recruitment, grouped by age cohort
+     * @param abundance
      * @return the number of male + female recruits
      */
     double recruit(
             Species species,
-            Meristics meristics,
-            double[] femalePerAge,
-            double[] malePerAge);
+            Meristics meristics, StructuredAbundance abundance);
 
 
     /**

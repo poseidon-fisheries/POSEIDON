@@ -149,9 +149,8 @@ public class HomogeneousAbundanceGear implements Gear {
      */
     protected double[][] fishThisSpecies(
             SeaTile where, Species species) {
-        double[][] fish = new double[2][];
-        fish[MALE] = where.getNumberOfMaleFishPerAge(species);
-        fish[FishStateUtilities.FEMALE] = where.getNumberOfFemaleFishPerAge(species);
+        //get the array of the fish (but perform a safety copy)
+        double[][] fish = new StructuredAbundance(where.getAbundance(species)).asMatrix();
         //filter until you get the catch
         fish = filter(species, fish);
 
@@ -169,9 +168,8 @@ public class HomogeneousAbundanceGear implements Gear {
     @VisibleForTesting
     public double[][] filter(Species species, double[][] abundance) {
         for (AbundanceFilter filter : filters)
-            abundance = filter.filter(abundance[MALE],
-                                 abundance[FishStateUtilities.FEMALE],
-                                 species);
+            abundance = filter.filter(
+                    species,abundance );
         return abundance;
     }
 

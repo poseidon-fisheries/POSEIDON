@@ -20,80 +20,26 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.esotericsoftware.minlog.Log;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.field.geo.GeomGridField;
-import sim.field.geo.GeomVectorField;
-import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.NoiseMaker;
 import uk.ac.ox.oxfish.biology.complicated.WeightedAbundanceDiffuser;
 import uk.ac.ox.oxfish.biology.initializer.AllocatedBiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
-import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Engine;
-import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
-import uk.ac.ox.oxfish.fisher.selfanalysis.MovingAveragePredictor;
-import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
-import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
-import uk.ac.ox.oxfish.geography.CartesianUTMDistance;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
-import uk.ac.ox.oxfish.geography.pathfinding.AStarPathfinder;
-import uk.ac.ox.oxfish.geography.ports.Port;
-import uk.ac.ox.oxfish.geography.sampling.SampledMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.AbundanceDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
-import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
-import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
-import uk.ac.ox.oxfish.model.network.NetworkBuilder;
-import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.MultiQuotaMapFactory;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -207,7 +153,7 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
                                                               biomassScaling,
                                                               fixedRecruitmentDistribution,
                                                               !mortalityAt100PercentForOldestFish,
-                                                              true);
+                                                              true, true);
         initializer.setCountFileName(countFileName);
 
         biology = initializer.generateGlobal(model.getRandom(),

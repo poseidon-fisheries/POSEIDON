@@ -48,12 +48,15 @@ public class FixedProportionFilterTest
         double[] female = new double[81];
         male[20] = 100;
 
-        double[][] filtered = filter.filter(male, female,species);
+        double[][] abundance = new double[2][];
+        abundance[FishStateUtilities.MALE] = male;
+        abundance[FishStateUtilities.FEMALE] = female;
+        double[][] filtered = filter.filter(species,abundance);
         assertEquals(filtered[FishStateUtilities.MALE][20],20,.0001);
         assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
 
         filter = new FixedProportionFilter(1, true);
-        filtered = filter.filter(male, female,species);
+        filtered = filter.filter(species,abundance);
         assertEquals(filtered[FishStateUtilities.MALE][20],100,.001);
         assertEquals(filtered[FishStateUtilities.MALE][21],0,.001);
     }

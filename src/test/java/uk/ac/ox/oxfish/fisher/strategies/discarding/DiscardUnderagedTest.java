@@ -101,11 +101,11 @@ public class DiscardUnderagedTest {
         );
 
         assertArrayEquals(new double[]{0,10,1},
-                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.MALE],.001);
+                          newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.MALE], .001);
         assertArrayEquals(new double[]{0,0,0},
-                          newCatch.getAbundance(firstSpecies).getAbundance()[FishStateUtilities.FEMALE],.001);
+                          newCatch.getAbundance(firstSpecies).asMatrix()[FishStateUtilities.FEMALE], .001);
         assertArrayEquals(new double[]{0,0},
-                          newCatch.getAbundance(secondSpecies).getAbundance()[FishStateUtilities.FEMALE],.001);
+                          newCatch.getAbundance(secondSpecies).asMatrix()[FishStateUtilities.FEMALE], .001);
 
     }
 }

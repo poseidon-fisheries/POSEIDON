@@ -48,7 +48,7 @@ public class NaturalMortalityProcessTest {
         when(meristics.getMortalityParameterMMale()).thenReturn(.1);
 
         NaturalMortalityProcess mortality = new NaturalMortalityProcess();
-        mortality.cull(male,female,meristics, true);
+        mortality.cull(meristics, true,new StructuredAbundance(male,female));
         //this numbers I obtained in R
         assertEquals(male[0],9048,.001);
         assertEquals(male[1],9048,.001);
@@ -78,7 +78,7 @@ public class NaturalMortalityProcessTest {
 
         NaturalMortalityProcess process = new NaturalMortalityProcess();
 
-        process.cull(male,female,species.getMeristics(), true);
+        process.cull(species.getMeristics(), true,new StructuredAbundance(male,female) );
 
         for(int i=0; i<male.length; i++)
             assertEquals(male[i],9370, .001); //always round down now
