@@ -64,8 +64,10 @@ public class LogisticRecruitmentProcess implements RecruitmentProcess {
         );
 
         double recruitmentBiomass = nextBiomass-biomass;
-        double recruitAverageWeight = meristics.getWeightFemaleInKg().get(0) + meristics.getWeightMaleInKg().get(0);
-        recruitAverageWeight/=2;
+        double recruitAverageWeight = 0;
+        for(int i=0; i<abundance.getSubdivisions(); i++)
+            recruitAverageWeight += meristics.getWeight(i,0);
+        recruitAverageWeight/= (double) meristics.getNumberOfSubdivisions();
 
         assert  recruitmentBiomass >=0;
 

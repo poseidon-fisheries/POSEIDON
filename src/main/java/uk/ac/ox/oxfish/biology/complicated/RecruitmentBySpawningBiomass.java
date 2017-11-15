@@ -24,6 +24,8 @@ import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+
 /**
  * Created by carrknight on 3/1/16.
  */
@@ -87,19 +89,19 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
 
         Preconditions.checkArgument(abundance.getSubdivisions()==2, "This recruitment function requires a split between male and female");
         
-        final double[] femalePerAge = abundance.asMatrix()[FishStateUtilities.FEMALE];
+        final double[] femalePerAge = abundance.asMatrix()[FEMALE];
         Preconditions.checkArgument(femalePerAge.length == cohorts,
                                     "The number of cohorts is not equal to maxAge + 1");
         double spawningBiomass = 0;
         //compute the cumulative spawning biomass
         for(int i=0; i< cohorts; i++)
         {
-            if(meristics.getWeightFemaleInKg().get(i) > 0)
+            if(meristics.getWeight(FEMALE,i) > 0)
                 if(!addRelativeFecundityToSpawningBiomass)
-                    spawningBiomass += meristics.getWeightFemaleInKg().get(i) *
+                    spawningBiomass += meristics.getWeight(FEMALE,i) *
                             meristics.getMaturity().get(i) * femalePerAge[i];
                 else
-                    spawningBiomass += meristics.getWeightFemaleInKg().get(i) *
+                    spawningBiomass += meristics.getWeight(FEMALE,i) *
                             meristics.getMaturity().get(i) * femalePerAge[i]
                             *  meristics.getRelativeFecundity().get(i);
 

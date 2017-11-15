@@ -47,18 +47,17 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
     @Override
     protected double[][] computeSelectivity(Species species) {
         double[][] toReturn = new double[2][species.getMaxAge()+1];
-        ImmutableList<Double> maleLength = species.getLengthMaleInCm();
-        ImmutableList<Double> femaleLength = species.getLengthFemaleInCm();
+
 
         double higherThanCutoff = selectHigherThanCutoff ? 1 : 0;
 
         for(int age=0; age<species.getMaxAge()+1; age++)
         {
-            toReturn[FishStateUtilities.MALE][age] = maleLength.get(age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
+            toReturn[FishStateUtilities.MALE][age] = species.getLength(FishStateUtilities.MALE,age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
 
 
             toReturn[FishStateUtilities.FEMALE][age] =
-                    femaleLength.get(age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
+                    species.getLength(FishStateUtilities.FEMALE,age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
 
         }
         return toReturn;

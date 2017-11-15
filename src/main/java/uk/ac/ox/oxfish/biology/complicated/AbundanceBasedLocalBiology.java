@@ -174,13 +174,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     }
 
 
-    private double  getWeightForThisSex(int sex, Species species, int age)
-    {
-        if(sex== FishStateUtilities.FEMALE)
-            return species.getWeightFemaleInKg().get(age);
-        else
-            return species.getWeightMaleInKg().get(age);
-    }
+
 
     @Override
     public String toString() {

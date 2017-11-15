@@ -23,6 +23,8 @@ package uk.ac.ox.oxfish.biology.complicated;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+
 /**
  * A container for species' parameters and computed arrays of weights, lengths, relativeFecundity and so on
  * Created by carrknight on 2/19/16.
@@ -55,8 +57,11 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
                                                    1,
                                                    false);
 
+
+    private final CaliforniaStockAssessmentGrowthBinParameters growth;
+
     /**
-     * the maximum age for a male
+     * the maximum age for both species
      */
     private final int maxAge;
 
@@ -80,10 +85,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      */
     private final double KParameterMale;
 
-    /**
-     * the L-inf parameter for length, computed
-     */
-    private  final double LengthParameterMale;
 
     /**
      * parameter describing the weight of male fish
@@ -120,11 +121,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      */
     private final double KParameterFemale;
 
-    /**
-     * the L-inf parameter for length, computed
-     */
-    private  final double LengthParameterFemale;
-
 
     /**
      * parameter describing the weight of female fish
@@ -160,25 +156,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      * parameter controlling the relativeFecundity slope
      */
     private final double fecunditySlope;
-
-    /**
-     * For each age contains the length of the fish
-     */
-    private final ImmutableList<Double> lengthMaleInCm;
-    /**
-     * For each age contains the length of the fish
-     */
-    private final ImmutableList<Double> lengthFemaleInCm;
-
-
-    /**
-     * For each age contains the weight of the fish
-     */
-    private final ImmutableList<Double> weightMaleInKg;
-    /**
-     * For each age contains the weight of the fish
-     */
-    private final ImmutableList<Double> weightFemaleInKg;
 
       /**
      * For each age contains the maturity percentage
@@ -320,46 +297,22 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         Preconditions.checkArgument(maxAge>=youngAgeFemale);
         Preconditions.checkArgument(maxAge>=youngAgeMale);
 
-        LengthParameterFemale =
-                youngLengthFemale < ageOld
-                        ?
-                youngLengthFemale +((maxLengthFemale- youngLengthFemale)/
-                (1-Math.exp(-KParameterFemale *(ageOld - youngAgeFemale))))
-                        :
-                        maxLengthFemale
-        ;
-        LengthParameterMale =
-                youngLengthMale < ageOld
-                        ?
-                youngLengthMale +((maxLengthMale- youngLengthMale)/
-                (1-Math.exp(-KParameterMale *(ageOld- youngAgeMale))))
-                        :
-                        maxLengthMale
-        ;
-
-        Double[] weightFemaleInKgArray = new Double[this.maxAge +1];
-        Double[] lengthFemaleInCmArray = new Double[this.maxAge +1];
-        for(int age = 0; age< this.maxAge +1; age++)
-        {
-            lengthFemaleInCmArray[age] = LengthParameterFemale + ((youngLengthFemale -LengthParameterFemale))*
-                    Math.exp(-KParameterFemale*(age- youngAgeFemale));
-            //the formulas lead to negative lenghts for very small fish, here we just round it to 0
-            if(lengthFemaleInCmArray[age]<0)
-                lengthFemaleInCmArray[age]=0d;
-            weightFemaleInKgArray[age] = weightParameterAFemale * Math.pow(lengthFemaleInCmArray[age],weightParameterBFemale);
-
-        }
-        Double[]  weightMaleInKgArray = new Double[maxAge+1];
-        Double[] lengthMaleInCmArray = new Double[maxAge+1];
-        for(int age=0; age<maxAge+1; age++)
-        {
-            lengthMaleInCmArray[age] = LengthParameterMale + ((youngLengthMale- LengthParameterMale))*
-                    Math.exp(-KParameterMale*(age- youngAgeMale));
-            if(lengthMaleInCmArray[age]<0)
-                lengthMaleInCmArray[age]=0d;
-            weightMaleInKgArray[age] = weightParameterAMale * Math.pow(lengthMaleInCmArray[age],weightParameterBMale);
-
-        }
+        growth = new CaliforniaStockAssessmentGrowthBinParameters(
+                maxAge,
+                youngLengthMale,
+                maxLengthMale,
+                weightParameterAMale,
+                weightParameterBMale,
+                KParameterMale,
+                youngLengthFemale,
+                maxLengthFemale,
+                weightParameterAFemale,
+                weightParameterBFemale,
+                KParameterFemale,
+                ageOld,
+                youngAgeMale,
+                youngAgeFemale
+        );
 
         Double[] maturityArray = new Double[this.maxAge +1];
         Double[] relativeFecundityArray = new Double[this.maxAge +1];
@@ -369,8 +322,8 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         for(int age = 0; age< this.maxAge +1; age++)
         {
 
-            maturityArray[age] = 1d/(1+Math.exp(maturitySlope*(lengthFemaleInCmArray[age]-maturityInflection)));
-            relativeFecundityArray[age] = weightFemaleInKgArray[age]*(fecundityIntercept + fecunditySlope*weightFemaleInKgArray[age]);
+            maturityArray[age] = 1d/(1+Math.exp(maturitySlope*(growth.getLength(FEMALE,age)-maturityInflection)));
+            relativeFecundityArray[age] = growth.getWeight(FEMALE,age)*(fecundityIntercept + fecunditySlope*growth.getWeight(FEMALE,age));
             cumulativeSurvivalMaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMMale)*cumulativeSurvivalMaleArray[age-1];
             cumulativeSurvivalFemaleArray[age] = age == 0 ? 1 : Math.exp(-mortalityParameterMFemale)*cumulativeSurvivalFemaleArray[age-1];
             double thisPhi = maturityArray[age] * relativeFecundityArray[age] * cumulativeSurvivalFemaleArray[age];
@@ -380,11 +333,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
 
         }
 
-
-        weightFemaleInKg = ImmutableList.copyOf(weightFemaleInKgArray);
-        lengthFemaleInCm = ImmutableList.copyOf(lengthFemaleInCmArray);
-        weightMaleInKg = ImmutableList.copyOf(weightMaleInKgArray);
-        lengthMaleInCm = ImmutableList.copyOf(lengthMaleInCmArray);
 
         maturity = ImmutableList.copyOf(maturityArray);
         relativeFecundity = ImmutableList.copyOf(relativeFecundityArray);
@@ -417,9 +365,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return KParameterMale;
     }
 
-    public double getLengthParameterMale() {
-        return LengthParameterMale;
-    }
 
     public double getWeightParameterAMale() {
         return weightParameterAMale;
@@ -450,9 +395,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return KParameterFemale;
     }
 
-    public double getLengthParameterFemale() {
-        return LengthParameterFemale;
-    }
 
     public double getWeightParameterAFemale() {
         return weightParameterAFemale;
@@ -481,26 +423,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
 
     public double getFecunditySlope() {
         return fecunditySlope;
-    }
-
-    @Override
-    public ImmutableList<Double> getLengthMaleInCm() {
-        return lengthMaleInCm;
-    }
-
-    @Override
-    public ImmutableList<Double> getLengthFemaleInCm() {
-        return lengthFemaleInCm;
-    }
-
-    @Override
-    public ImmutableList<Double> getWeightMaleInKg() {
-        return weightMaleInKg;
-    }
-
-    @Override
-    public ImmutableList<Double> getWeightFemaleInKg() {
-        return weightFemaleInKg;
     }
 
     @Override
@@ -569,5 +491,35 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      */
     public int getAgeOld() {
         return ageOld;
+    }
+
+    @Override
+    public double getLength(int subdivision, int bin) {
+        return growth.getLength(subdivision, bin);
+    }
+
+    @Override
+    public double getWeight(int subdivision, int bin) {
+        return growth.getWeight(subdivision, bin);
+    }
+
+    /**
+     * male-female
+     *
+     * @return
+     */
+    @Override
+    public int getNumberOfSubdivisions() {
+        return growth.getNumberOfSubdivisions();
+    }
+
+    /**
+     * number of bins for each subdivision. these are just age-classes here
+     *
+     * @return
+     */
+    @Override
+    public int getNumberOfBins() {
+        return growth.getNumberOfBins();
     }
 }

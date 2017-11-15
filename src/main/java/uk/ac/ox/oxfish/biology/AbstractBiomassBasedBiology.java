@@ -61,7 +61,7 @@ public abstract class AbstractBiomassBasedBiology implements LocalBiology {
         double[] toReturn = new double[species.getMaxAge()+1];
         if(biomass == 0)
             return toReturn;
-        double weight = species.getWeightMaleInKg().get(0);
+        double weight = species.getWeight(0,0);
         if(weight>0)
             toReturn[0] = (biomass/weight);
         else

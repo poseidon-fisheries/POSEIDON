@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.biology;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,11 +42,11 @@ public class MeristicsTest {
                                                                                               0.44056, true);
 
         //see if age 5 was computed correctly
-        assertEquals(yellowEye.getLengthFemaleInCm().get(5),26.4837518217,.001);
-        assertEquals(yellowEye.getLengthMaleInCm().get(5),26.8991271545,.001);
+        assertEquals(yellowEye.getLength(FishStateUtilities.FEMALE,5),26.4837518217,.001);
+        assertEquals(yellowEye.getLength(FishStateUtilities.MALE,5),26.8991271545,.001);
 
-        assertEquals(yellowEye.getWeightFemaleInKg().get(5),0.3167667645,.001);
-        assertEquals(yellowEye.getWeightMaleInKg().get(5),0.365220907,.001);
+        assertEquals(yellowEye.getWeight(FishStateUtilities.FEMALE,5),0.3167667645,.001);
+        assertEquals(yellowEye.getWeight(FishStateUtilities.MALE, 5), 0.365220907, .001);
 
         assertEquals(yellowEye.getMaturity().get(5),0.0046166415,.0001);
         assertEquals(yellowEye.getRelativeFecundity().get(5),47344.590014727,.001);
@@ -67,11 +68,11 @@ public class MeristicsTest {
                                                                                                0.6, false);
 
         //see if age 5 was computed correctly
-        assertEquals(shortspine.getLengthFemaleInCm().get(5),11.3138255265,.001);
-        assertEquals(shortspine.getLengthMaleInCm().get(5),11.3138255265,.001);
+        assertEquals(shortspine.getLength(FishStateUtilities.FEMALE,5),11.3138255265,.001);
+        assertEquals(shortspine.getLength(FishStateUtilities.MALE,5),11.3138255265,.001);
 
-        assertEquals(shortspine.getWeightFemaleInKg().get(5),0.0130770514,.001);
-        assertEquals(shortspine.getWeightMaleInKg().get(5),0.0130770514,.001);
+        assertEquals(shortspine.getWeight(FishStateUtilities.FEMALE,5),0.0130770514,.001);
+        assertEquals(shortspine.getWeight(FishStateUtilities.MALE,5),0.0130770514,.001);
 
         assertEquals(shortspine.getMaturity().get(10),0.3900004207,.0001);
         assertEquals(shortspine.getRelativeFecundity().get(5), 0.0130770514, .001);
@@ -94,11 +95,11 @@ public class MeristicsTest {
                                                                                               0.6, false);
 
         //see if age 5 was computed correctly
-        assertEquals(longspine.getLengthFemaleInCm().get(5),12.3983090675,.001);
-        assertEquals(longspine.getLengthMaleInCm().get(5),12.3983090675,.001);
+        assertEquals(longspine.getLength(FishStateUtilities.FEMALE,5),12.3983090675,.001);
+        assertEquals(longspine.getLength(FishStateUtilities.MALE,5),12.3983090675,.001);
 
-        assertEquals(longspine.getWeightFemaleInKg().get(5),0.019880139,.001);
-        assertEquals(longspine.getWeightMaleInKg().get(5),0.019880139,.001);
+        assertEquals(longspine.getWeight(FishStateUtilities.FEMALE,5),0.019880139,.001);
+        assertEquals(longspine.getWeight(FishStateUtilities.MALE,5),0.019880139,.001);
 
         assertEquals(longspine.getMaturity().get(5),6.03332555676691E-05,.0001);
         assertEquals(longspine.getRelativeFecundity().get(5), 0.019880139, .001);
@@ -119,11 +120,11 @@ public class MeristicsTest {
                                                                                               0.6, false);
 
         //see if age 5 was computed correctly
-        assertEquals(sablefish.getLengthFemaleInCm().get(5),55.5416341677,.001);
-        assertEquals(sablefish.getLengthMaleInCm().get(5),51.5868143025,.001);
+        assertEquals(sablefish.getLength(FishStateUtilities.FEMALE,5),55.5416341677,.001);
+        assertEquals(sablefish.getLength(FishStateUtilities.MALE,5),51.5868143025,.001);
 
-        assertEquals(sablefish.getWeightFemaleInKg().get(5),1.7258103959,.001);
-        assertEquals(sablefish.getWeightMaleInKg().get(5),1.3559663707,.001);
+        assertEquals(sablefish.getWeight(FishStateUtilities.FEMALE,5),1.7258103959,.001);
+        assertEquals(sablefish.getWeight(FishStateUtilities.MALE,5),1.3559663707,.001);
 
         assertEquals(sablefish.getMaturity().get(5),0.4207762664,.0001);
         assertEquals(sablefish.getRelativeFecundity().get(5), 1.7258103959, .001);
@@ -145,11 +146,11 @@ public class MeristicsTest {
                                                                                          0.8, false);
 
         //see if age 5 was computed correctly
-        assertEquals(sole.getLengthFemaleInCm().get(5),24.5101516433,.001);
-        assertEquals(sole.getLengthMaleInCm().get(5),24.3553122333,.001);
+        assertEquals(sole.getLength(FishStateUtilities.FEMALE,5),24.5101516433,.001);
+        assertEquals(sole.getLength(FishStateUtilities.MALE,5),24.3553122333,.001);
 
-        assertEquals(sole.getWeightFemaleInKg().get(5),0.124536091,.001);
-        assertEquals(sole.getWeightMaleInKg().get(5),0.120103947,.001);
+        assertEquals(sole.getWeight(FishStateUtilities.FEMALE,5),0.124536091,.001);
+        assertEquals(sole.getWeight(FishStateUtilities.MALE,5),0.120103947,.001);
 
         assertEquals(sole.getMaturity().get(5),0.0002945897,.0001);
 
@@ -173,12 +174,12 @@ public class MeristicsTest {
                                                                                            0.511, true);
 
         //see if age 5 was computed correctly
-        assertEquals(canary.getLengthFemaleInCm().get(5),30.7375135093,.001);
-        assertEquals(canary.getWeightFemaleInKg().get(5),0.4988476814,.001);
+        assertEquals(canary.getLength(FishStateUtilities.FEMALE,5),30.7375135093,.001);
+        assertEquals(canary.getWeight(FishStateUtilities.FEMALE,5),0.4988476814,.001);
 
         //todo ask to steve for discrepancy
-        assertEquals(canary.getLengthMaleInCm().get(5),30.1273037904,.001);
-        assertEquals(canary.getWeightMaleInKg().get(5),0.4694413124,.001);
+        assertEquals(canary.getLength(FishStateUtilities.MALE,5),30.1273037904,.001);
+        assertEquals(canary.getWeight(FishStateUtilities.MALE,5),0.4694413124,.001);
 
         assertEquals(canary.getMaturity().get(5),0.0801270824,.0001);
         assertEquals(canary.getRelativeFecundity().get(5), 0.4988476814, .001);
@@ -193,8 +194,8 @@ public class MeristicsTest {
     @Test
     public void placeholder() throws Exception {
         Meristics placeholder = StockAssessmentCaliforniaMeristics.FAKE_MERISTICS;
-        assertEquals(placeholder.getWeightMaleInKg().get(0),1,.001);
-        assertEquals(placeholder.getWeightFemaleInKg().get(0),1,.001);
+        assertEquals(placeholder.getWeight(FishStateUtilities.MALE,0),1,.001);
+        assertEquals(placeholder.getWeight(FishStateUtilities.FEMALE,0),1,.001);
         assertEquals(placeholder.getMaxAge(), 0, .001);
 
 

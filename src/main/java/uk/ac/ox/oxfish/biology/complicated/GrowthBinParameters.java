@@ -23,28 +23,29 @@ package uk.ac.ox.oxfish.biology.complicated;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Created by carrknight on 7/5/17.
+ * this interface keeps track of basically how much a fish in a bin weigh and is long as well as how many bins and
+ * subdivisions there actually are
+ *
  */
-public interface Meristics extends GrowthBinParameters {
-    int getMaxAge();
-
-    double getMortalityParameterMMale();
-
-    double getMortalityParameterMFemale();
+public interface GrowthBinParameters {
 
 
+    double getLength(int subdivision, int bin);
 
-    ImmutableList<Double> getMaturity();
+    double getWeight(int subdivision, int bin);
 
-    ImmutableList<Double> getRelativeFecundity();
+    /**
+     * subdivision are groups like male-female or age cohorts
+     * @return
+     */
+    int getNumberOfSubdivisions();
 
-    double getCumulativePhi();
+    /**
+     * number of bins for each subdivision. All subdivisions are assumed to have these number of bins
+     * and all bins with the same index refer to the same weight and length; <br>
+     *     Bins can be length-bins or age-bins, it depends on the use case
+     * @return
+     */
+    int getNumberOfBins();
 
-    boolean isAddRelativeFecundityToSpawningBiomass();
-
-
-    int getVirginRecruits();
-
-
-    double getSteepness();
 }

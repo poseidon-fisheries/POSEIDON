@@ -96,15 +96,14 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
         double expDsc = Math.exp(dscWidth);
         double expTop = peak + binWidth + (0.99*  (binMax+binWidth/2) -peak - binWidth ) / (1+ Math.exp(-top));
 
-        ImmutableList<Double> maleLength = species.getLengthMaleInCm();
-        ImmutableList<Double> femaleLength = species.getLengthFemaleInCm();
+
         double[][] asc = new double[2][species.getMaxAge() + 1];
         double[][] desc = new double[2][species.getMaxAge() + 1];
         double[][] join1 = new double[2][species.getMaxAge() + 1];
         double[][] join2 = new double[2][species.getMaxAge() + 1];
         for(int age=0;age<species.getMaxAge() + 1;age++)
         {
-            double bin =  binWidth/2 +  (maleLength.get(age) - binMin) / binWidth;
+            double bin =  binWidth/2 +  (species.getLength(FishStateUtilities.MALE,age) - binMin) / binWidth;
             //EXP(-(($B26-$E$7)^2/$E$9))
             asc[FishStateUtilities.MALE][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
             desc[FishStateUtilities.MALE][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
@@ -112,7 +111,7 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
             join1[FishStateUtilities.MALE][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
             //1/(1+EXP(-($I$24*($B26-$E$8)/(1+ABS($B26-$E$8)))))
             join2[FishStateUtilities.MALE][age] = 1d/(1+Math.exp(-(20*(bin-expTop)/(1+Math.abs(bin-expTop)))));
-            bin =  binWidth/2 +  (femaleLength.get(age) - binMin) / binWidth;
+            bin =  binWidth/2 +  (species.getLength(FishStateUtilities.FEMALE,age) - binMin) / binWidth;
             asc[FishStateUtilities.FEMALE][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
             desc[FishStateUtilities.FEMALE][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
             join1[FishStateUtilities.FEMALE][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
@@ -158,7 +157,7 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
         {
 
             if(Double.isNaN(initialScaling) ||
-                    maleLength.get(age)>-1000-initialScaling)
+                    species.getLength(FishStateUtilities.MALE,age)>-1000-initialScaling)
             {
                 //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
                 selex[FishStateUtilities.MALE][age] =
@@ -172,7 +171,7 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
             }
 
             if(Double.isNaN(initialScaling) ||
-                    -1000-initialScaling> femaleLength.get(age))
+                    -1000-initialScaling> species.getLength(FishStateUtilities.FEMALE,age))
             {
                 //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
                 selex[FishStateUtilities.FEMALE][age] =

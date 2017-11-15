@@ -620,14 +620,13 @@ public class FishStateUtilities {
      */
     public static double weigh(double[] male, double[] female, Meristics meristics)
     {
-        final ImmutableList<Double> maleWeights = meristics.getWeightMaleInKg();
-        final ImmutableList<Double> femaleWeights = meristics.getWeightFemaleInKg();
+
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
         for(int age = 0; age< meristics.getMaxAge()+1; age++)
         {
-            totalWeight += maleWeights.get(age) * male[age];
-            totalWeight += femaleWeights.get(age) * female[age];
+            totalWeight += meristics.getWeight(MALE,age) * male[age];
+            totalWeight += meristics.getWeight(FEMALE,age) * female[age];
         }
 
         return totalWeight;
@@ -671,10 +670,10 @@ public class FishStateUtilities {
     {
         //no female-male split
         if(abundance.getSubdivisions() == 1)
-            return meristics.getWeightMaleInKg().get(binIndex) * abundance.getAbundanceInBin(binIndex);
+            return meristics.getWeight(0,binIndex) * abundance.getAbundanceInBin(binIndex);
         if(abundance.getSubdivisions() == 2)
-            return abundance.asMatrix()[MALE][binIndex] * meristics.getWeightMaleInKg().get(binIndex) +
-                    abundance.asMatrix()[FEMALE][binIndex] * meristics.getWeightFemaleInKg().get(binIndex);
+            return abundance.getElement(MALE,binIndex) * meristics.getWeight(MALE,binIndex) +
+                    abundance.getElement(FEMALE,binIndex) * meristics.getWeight(FEMALE,binIndex);
 
         throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
 
@@ -689,12 +688,11 @@ public class FishStateUtilities {
      */
     private static double weigh(double[] ageStructure, Meristics species)
     {
-        final ImmutableList<Double> maleWeights = species.getWeightMaleInKg();
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
         for(int age=0; age<species.getMaxAge()+1; age++)
         {
-            totalWeight += maleWeights.get(age) * ageStructure[age];
+            totalWeight += species.getWeight(0,age) * ageStructure[age];
         }
 
         return totalWeight;

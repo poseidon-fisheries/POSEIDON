@@ -27,8 +27,12 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 
 public class HoldTest {
@@ -129,28 +133,16 @@ public class HoldTest {
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
 
-        when(first.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        10d,20d,30d
-                )
-        );
-        when(first.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        50d,50d,50d
-                )
-        );
+
+        when(first.getWeight(FEMALE,0)).thenReturn(10d);
+        when(first.getWeight(FEMALE,1)).thenReturn(20d);
+        when(first.getWeight(FEMALE,2)).thenReturn(30d);
+        when(first.getWeight(MALE,0)).thenReturn(50d);
+        when(first.getWeight(MALE,1)).thenReturn(50d);
+        when(first.getWeight(MALE,2)).thenReturn(50d);
 
 
-        when(second.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
-        when(second.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
+        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
 
         Hold hold = new Hold(1000d,
                              bio);

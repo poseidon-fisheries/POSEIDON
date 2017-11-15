@@ -30,27 +30,39 @@ import com.google.common.collect.ImmutableList;
 public class FromListMeristics implements Meristics {
 
 
-    private final ImmutableList<Double> weights;
-
-    private final ImmutableList<Double> maturities;
+    private final GrowthBinByList growth;
 
 
     private final double mortalityRate;
 
 
+    private final  ImmutableList<Double> maturities;
+
 
     public FromListMeristics(double mortalityRate,
                              Double[] maturities,
-                             Double... weights) {
+                             double[] weights) {
+        this(mortalityRate,maturities,weights,new double[weights.length]);
+    }
+
+    public FromListMeristics(double mortalityRate,
+                             Double[] maturities,
+                             double[] weights,
+                             double[] lenghts) {
         Preconditions.checkArgument(maturities.length == weights.length, "length mismatch between maturities and weights");
-        this.weights = ImmutableList.copyOf(weights);
+        Preconditions.checkArgument(lenghts.length == weights.length, "length mismatch between lenghts and weights");
+
         this.maturities = ImmutableList.copyOf(maturities);
         this.mortalityRate = mortalityRate;
+
+        this.growth = new GrowthBinByList(2,
+                                          lenghts,
+                                          weights);
     }
 
     @Override
     public int getMaxAge() {
-        return weights.size()-1;
+        return growth.getNumberOfBins()-1;
     }
 
     @Override
@@ -63,25 +75,9 @@ public class FromListMeristics implements Meristics {
         return mortalityRate;
     }
 
-    @Override
-    public ImmutableList<Double> getLengthMaleInCm() {
-        return null;
-    }
 
-    @Override
-    public ImmutableList<Double> getLengthFemaleInCm() {
-        return null;
-    }
 
-    @Override
-    public ImmutableList<Double> getWeightMaleInKg() {
-        return weights;
-    }
 
-    @Override
-    public ImmutableList<Double> getWeightFemaleInKg() {
-        return weights;
-    }
 
     @Override
     public ImmutableList<Double> getMaturity() {
@@ -114,5 +110,42 @@ public class FromListMeristics implements Meristics {
     @Override
     public double getSteepness() {
         return Double.NaN;
+    }
+
+    /**
+     * you can pick as many subdivisions as you want, they will all just spit out the same weight and length
+     * @param subdivision
+     * @param bin
+     */
+    @Override
+    public double getLength(int subdivision, int bin) {
+        return growth.getLength(subdivision, bin);
+    }
+
+    @Override
+    public double getWeight(int subdivision, int bin) {
+        return growth.getWeight(subdivision, bin);
+    }
+
+    /**
+     * subdivision are groups like male-female or age cohorts
+     *
+     * @return
+     */
+    @Override
+    public int getNumberOfSubdivisions() {
+        return growth.getNumberOfSubdivisions();
+    }
+
+    /**
+     * number of bins for each subdivision. All subdivisions are assumed to have these number of bins
+     * and all bins with the same index refer to the same weight and length; <br>
+     * Bins can be length-bins or age-bins, it depends on the use case
+     *
+     * @return
+     */
+    @Override
+    public int getNumberOfBins() {
+        return growth.getNumberOfBins();
     }
 }

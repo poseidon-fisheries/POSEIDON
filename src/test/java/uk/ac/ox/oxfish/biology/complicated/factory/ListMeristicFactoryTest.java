@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.biology.complicated.factory;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +45,7 @@ public class ListMeristicFactoryTest {
         FromListMeristics meristics = factory.apply(mock(FishState.class));
 
         assertEquals(meristics.getMaxAge(),5);
-        assertEquals(meristics.getWeightMaleInKg().get(2),3,.001);
+        assertEquals(meristics.getWeight(FishStateUtilities.MALE, 2), 3, .001);
 
 
 

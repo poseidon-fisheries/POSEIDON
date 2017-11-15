@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import org.junit.Test;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import static org.junit.Assert.assertEquals;
@@ -59,11 +60,11 @@ public class MeristicsInputTest {
                                                     MeristicsInput.class);
 
         StockAssessmentCaliforniaMeristics yellowEye = new StockAssessmentCaliforniaMeristics(meristicsInput);
-        assertEquals(yellowEye.getLengthFemaleInCm().get(5),26.4837518217,.001);
-        assertEquals(yellowEye.getLengthMaleInCm().get(5),26.8991271545,.001);
+        assertEquals(yellowEye.getLength(FishStateUtilities.FEMALE,5),26.4837518217,.001);
+        assertEquals(yellowEye.getLength(FishStateUtilities.MALE,5),26.8991271545,.001);
 
-        assertEquals(yellowEye.getWeightFemaleInKg().get(5),0.3167667645,.001);
-        assertEquals(yellowEye.getWeightMaleInKg().get(5),0.365220907,.001);
+        assertEquals(yellowEye.getWeight(FishStateUtilities.FEMALE,5),0.3167667645,.001);
+        assertEquals(yellowEye.getWeight(FishStateUtilities.MALE,5),0.365220907,.001);
 
         assertEquals(yellowEye.getMaturity().get(5),0.0046166415,.0001);
         assertEquals(yellowEye.getRelativeFecundity().get(5),47344.590014727,.001);

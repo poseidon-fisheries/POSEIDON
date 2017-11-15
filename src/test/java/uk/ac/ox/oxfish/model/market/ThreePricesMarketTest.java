@@ -55,28 +55,11 @@ public class ThreePricesMarketTest {
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
 
-        when(first.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
-        when(first.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
 
 
-        when(second.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
-        when(second.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
+        when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
+        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
+
 
         Hold hold = new Hold(1000d,
                              bio);
@@ -138,29 +121,9 @@ public class ThreePricesMarketTest {
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
 
+        when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
+        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
 
-        when(first.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
-        when(first.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
-
-
-        when(second.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
-        when(second.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
 
         Hold hold = new Hold(1000d,
                              bio);

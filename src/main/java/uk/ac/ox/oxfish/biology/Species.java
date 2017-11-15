@@ -103,14 +103,6 @@ public class Species {
 
 
 
-    public ImmutableList<Double> getWeightMaleInKg() {
-        return meristics.getWeightMaleInKg();
-    }
-
-    public ImmutableList<Double> getLengthMaleInCm() {
-        return meristics.getLengthMaleInCm();
-    }
-
     /**
      * Getter for property 'virginRecruits'.
      *
@@ -130,17 +122,31 @@ public class Species {
     }
 
 
-
-    public ImmutableList<Double> getWeightFemaleInKg() {
-        return meristics.getWeightFemaleInKg();
+    public double getLength(int subdivision, int bin) {
+        return meristics.getLength(subdivision, bin);
     }
 
-
-
-    public ImmutableList<Double> getLengthFemaleInCm() {
-        return meristics.getLengthFemaleInCm();
+    public double getWeight(int subdivision, int bin) {
+        return meristics.getWeight(subdivision, bin);
     }
 
+    /**
+     * subdivision are groups like male-female or age cohorts
+     * @return
+     */
+    public int getNumberOfSubdivisions() {
+        return meristics.getNumberOfSubdivisions();
+    }
+
+    /**
+     * number of bins for each subdivision. All subdivisions are assumed to have these number of bins
+     * and all bins with the same index refer to the same weight and length; <br>
+     *     Bins can be length-bins or age-bins, it depends on the use case
+     * @return
+     */
+    public int getNumberOfBins() {
+        return meristics.getNumberOfBins();
+    }
 
     /**
      * Getter for property 'addRelativeFecundityToSpawningBiomass'.

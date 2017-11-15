@@ -34,6 +34,8 @@ import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,28 +61,8 @@ public class DiscardUnderagedTest {
         when(first.getMaxAge()).thenReturn(2);
         when(second.getMaxAge()).thenReturn(1);
 
-        when(first.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
-        when(first.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d,100d
-                )
-        );
-
-
-        when(second.getWeightFemaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
-        when(second.getWeightMaleInKg()).thenReturn(
-                ImmutableList.of(
-                        100d,100d
-                )
-        );
+        when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
+        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
 
 
         Catch haul = new Catch(
