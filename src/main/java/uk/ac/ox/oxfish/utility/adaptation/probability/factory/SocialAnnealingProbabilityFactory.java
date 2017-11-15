@@ -37,6 +37,14 @@ public class SocialAnnealingProbabilityFactory implements AlgorithmFactory<Thres
 
     private DoubleParameter multiplier = new FixedDoubleParameter(1);
 
+
+    public SocialAnnealingProbabilityFactory() {
+    }
+
+    public SocialAnnealingProbabilityFactory(double multiplier) {
+
+        this.multiplier = new FixedDoubleParameter(multiplier);
+    }
     /**
      * Applies this function to the given argument.
      *

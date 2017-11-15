@@ -20,12 +20,16 @@
 
 package uk.ac.ox.oxfish.experiments;
 
+import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.LogitRPUEDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomThenBackToPortFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
+import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
+import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
@@ -42,12 +46,10 @@ public class IndirectInferencePaper {
             new LinkedHashMap<>();
 
 
+    //fill up the strategies map with pre-made models
     static {
 
-
-
-
-
+        //perfect agents
         LogitRPUEDestinationFactory perfect = new LogitRPUEDestinationFactory();
         SquaresMapDiscretizerFactory discretizer = new SquaresMapDiscretizerFactory();
         discretizer.setHorizontalSplits(new FixedDoubleParameter(2));
@@ -59,12 +61,78 @@ public class IndirectInferencePaper {
         );
 
 
-        //todo add 3 variants of explore-exploit-imitate
-        //todo add a heatmapper
-        //todo add a social annealing
-        //todo add 3 variants of bandits
+        //3 variants of explore-exploit-imitate
+        PerTripImitativeDestinationFactory exploreExploit = new PerTripImitativeDestinationFactory();
+        exploreExploit.setProbability(new FixedProbabilityFactory(.2,1));
+        exploreExploit.setStepSize(new FixedDoubleParameter(5));
+        exploreExploit.setAlwaysCopyBest(true);
+        exploreExploit.setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+        exploreExploit.setAutomaticallyIgnoreMPAs(true);
+        strategies.put("explore20",exploreExploit);
+
+        PerTripImitativeDestinationFactory exploreExploit80 = new PerTripImitativeDestinationFactory();
+        exploreExploit80.setProbability(new FixedProbabilityFactory(.8,1));
+        exploreExploit80.setStepSize(new FixedDoubleParameter(5));
+        exploreExploit80.setAlwaysCopyBest(true);
+        exploreExploit80.setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+        exploreExploit80.setAutomaticallyIgnoreMPAs(true);
+        strategies.put("explore80",exploreExploit80);
+
+        PerTripImitativeDestinationFactory exploreLarge = new PerTripImitativeDestinationFactory();
+        exploreLarge.setProbability(new FixedProbabilityFactory(.2,1));
+        exploreLarge.setStepSize(new FixedDoubleParameter(20));
+        exploreLarge.setAlwaysCopyBest(true);
+        exploreLarge.setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+        exploreLarge.setAutomaticallyIgnoreMPAs(true);
+        strategies.put("exploreLarge",exploreLarge);
+
+        //heatmapper (these are the parameters in the original kernel regression)
+        HeatmapDestinationFactory heatmap = new HeatmapDestinationFactory();
+        ExhaustiveAcquisitionFunctionFactory acquisition = new ExhaustiveAcquisitionFunctionFactory();
+        acquisition.setProportionSearched(new FixedDoubleParameter(.1));
+        heatmap.setAcquisition(acquisition);
+        heatmap.setExplorationStepSize(new FixedDoubleParameter(1));
+        heatmap.setProbability(new FixedProbabilityFactory(.5,1));
+        KernelTransductionFactory regression = new KernelTransductionFactory();
+        regression.setForgettingFactor(new FixedDoubleParameter(0.999989));
+        regression.setSpaceBandwidth(new FixedDoubleParameter(20));
+        heatmap.setRegression(regression);
+        strategies.put("kernel",heatmap);
+
+        //social annealing
+        PerTripImitativeDestinationFactory annealing = new PerTripImitativeDestinationFactory();
+        annealing.setAlwaysCopyBest(true);
+        annealing.setAutomaticallyIgnoreAreasWhereFishNeverGrows(true);
+        annealing.setAutomaticallyIgnoreMPAs(true);
+        annealing.setStepSize(new FixedDoubleParameter(5));
+        annealing.setProbability(new SocialAnnealingProbabilityFactory(.7));
+        strategies.put("annealing",annealing);
 
 
+        //2 softmax bandits (differ in number of splits!)
+        BanditDestinationFactory bandit = new BanditDestinationFactory();
+        SoftmaxBanditFactory softmax = new SoftmaxBanditFactory();
+        bandit.setBandit(softmax);
+        SquaresMapDiscretizerFactory banditDiscretizer = new SquaresMapDiscretizerFactory();
+        banditDiscretizer.setVerticalSplits(new FixedDoubleParameter(2));
+        banditDiscretizer.setHorizontalSplits(new FixedDoubleParameter(2));
+        bandit.setDiscretizer(banditDiscretizer);
+        strategies.put("bandit3by3",bandit);
+
+        BanditDestinationFactory bandit2 = new BanditDestinationFactory();
+        SoftmaxBanditFactory softmax2 = new SoftmaxBanditFactory();
+        bandit2.setBandit(softmax2);
+        SquaresMapDiscretizerFactory banditDiscretizer2 = new SquaresMapDiscretizerFactory();
+        banditDiscretizer2.setVerticalSplits(new FixedDoubleParameter(4));
+        banditDiscretizer2.setHorizontalSplits(new FixedDoubleParameter(4));
+        bandit2.setDiscretizer(banditDiscretizer2);
+        strategies.put("bandit5by5",bandit2);
+
+        //gravitational pull
+        GravitationalSearchDestinationFactory gravitational = new GravitationalSearchDestinationFactory();
+        strategies.put("gravitational",gravitational);
+
+        //randomizer
         strategies.put(
                 "random",
                 new RandomThenBackToPortFactory()
