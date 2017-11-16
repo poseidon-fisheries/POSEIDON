@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,13 +41,13 @@ import java.util.stream.Collectors;
  * Created by carrknight on 5/25/17.
  */
 public abstract class AbstractExogenousCatches implements ExogenousCatches {
-    protected final Map<Species,Double> exogenousYearlyCatchesInKg;
-    private final Map<Species,Double> lastExogenousCatches = new HashMap<>();
+    protected final LinkedHashMap<Species,Double> exogenousYearlyCatchesInKg;
+    private final LinkedHashMap<Species,Double> lastExogenousCatches = new LinkedHashMap<>();
     private final String columnName;
     private Stoppable stoppable;
 
     public AbstractExogenousCatches(
-            Map<Species, Double> exogenousYearlyCatchesInKg, final String dataColumnName) {
+            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, final String dataColumnName) {
         this.exogenousYearlyCatchesInKg = exogenousYearlyCatchesInKg;
         columnName = dataColumnName;
     }

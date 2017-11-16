@@ -20,22 +20,94 @@
 
 package uk.ac.ox.oxfish.experiments;
 
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class IndirectInferencePaper {
+
+
+
+    private final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
+
+
+    /**
+     * list of names and associated "initializers" which are supposed to randomize some scenario parameters
+     */
+    private final static LinkedHashMap<String,
+            ScenarioInitializer> initializers = new LinkedHashMap<>();
+    public static final int TARGET_RUNS = 10;
+
+    static
+    {
+
+        //the baseline scenario: fishing front and all
+        initializers.put(
+                "baseline",
+                new ScenarioInitializer() {
+                    @Override
+                    public void initialize(Scenario scenario, long seed,
+                                           AlgorithmFactory<? extends DestinationStrategy> strategy)
+                    {
+
+                        PrototypeScenario cast = (PrototypeScenario) scenario;
+                        //randomize biomass, speed and port position
+                        MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                        DiffusingLogisticFactory biology = (DiffusingLogisticFactory) cast
+                                .getBiologyInitializer();
+                        biology.setCarryingCapacity(
+                                new FixedDoubleParameter(random.nextDouble()*9000+1000)
+                        );
+                        biology.setDifferentialPercentageToMove(
+                                new FixedDoubleParameter(random.nextDouble()*.003)
+                        );
+                        ((SimpleLogisticGrowerFactory) biology.getGrower()).setSteepness(
+                                new FixedDoubleParameter(random.nextDouble()*.5 + .3)
+                        );
+
+                        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+                        map.setHeight(new FixedDoubleParameter(50));
+                        map.setWidth(new FixedDoubleParameter(50));
+                        map.setCoastalRoughness(new FixedDoubleParameter(0));
+                        map.setMaxLandWidth(new FixedDoubleParameter(10));
+                        cast.setMapInitializer(map);
+                        cast.setPortPositionX(40);
+                        cast.setPortPositionY(random.nextInt(50));
+
+
+                        cast.setDestinationStrategy(strategy);
+
+                    }
+                }
+        );
+
+
+
+    }
 
 
     /**
@@ -44,6 +116,7 @@ public class IndirectInferencePaper {
     private final static LinkedHashMap<String,
             AlgorithmFactory<? extends DestinationStrategy>> strategies =
             new LinkedHashMap<>();
+
 
 
     //fill up the strategies map with pre-made models
@@ -138,12 +211,69 @@ public class IndirectInferencePaper {
                 new RandomThenBackToPortFactory()
         );
 
+    }
 
+
+
+
+    public static void main(String[] args) throws FileNotFoundException {
+
+        FishYAML yamler = new FishYAML();
+        for (Map.Entry<String, ScenarioInitializer> scenario : initializers.entrySet())
+        {
+
+            Path scenarioDirectory = mainDirectory.resolve(scenario.getKey());
+
+            for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy :
+                    strategies.entrySet())
+            {
+
+                for(int run = 0; run< TARGET_RUNS; run++)
+                {
+
+                    Scenario mainScenario = yamler.loadAs(
+                            new FileReader(
+                                    scenarioDirectory.resolve(scenario.getKey() + ".yaml").toFile()
+                            ), Scenario.class
+
+                    );
+                    //first run the target!
+                    scenario.getValue().initialize(mainScenario,run,targetStrategy.getValue());
+
+                    Path output = scenarioDirectory.resolve("output").resolve(targetStrategy.getKey() + "_" + run);
+                    output.toFile().mkdirs();
+
+
+
+
+
+
+                    //at the end I'd like a CSV like this:
+                    // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....
+
+                }
+
+
+            }
+
+
+        }
 
     }
 
 
 
+
+
+
+    private interface ScenarioInitializer
+    {
+
+        void initialize(Scenario scenario, long seed,
+                        AlgorithmFactory<? extends DestinationStrategy> destinationStrategy);
+
+
+    }
 
 
 

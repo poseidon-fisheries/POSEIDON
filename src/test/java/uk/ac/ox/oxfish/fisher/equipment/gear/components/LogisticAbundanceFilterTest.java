@@ -24,7 +24,7 @@ import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.*;
@@ -52,11 +52,12 @@ public class LogisticAbundanceFilterTest {
      */
     @Test
     public void computesCorrectly() throws Exception {
-        Species species = new Species("Longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 17.826, -1.79, 1,
-                                                                                         0, 168434124,
-                                                                                         0.6, false));
+        Species species = new Species("Longspine",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                     0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                     0.111313, 17.826, -1.79, 1,
+                                                                     0, 168434124,
+                                                                     0.6, false)
+        );
         LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
         double[][] selectivity = filter.getProbabilityMatrix(species);
         assertEquals(selectivity[FishStateUtilities.MALE][5],0.1720164347,.001);
@@ -70,11 +71,13 @@ public class LogisticAbundanceFilterTest {
 
     @Test
     public void filtersCorrectly() throws Exception {
-        Species species = new Species("Longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                         0.111313, 17.826, -1.79, 1,
-                                                                                         0, 168434124,
-                                                                                         0.6, false));
+        Species species = new Species("Longspine",
+                                      new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                         0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                         0.111313, 17.826, -1.79, 1,
+                                                         0, 168434124,
+                                                         0.6, false)
+        );
         LogisticAbundanceFilter filter = new LogisticAbundanceFilter(23.5053, 9.03702, false, true);
 
         double[] male = new double[81];
@@ -94,11 +97,12 @@ public class LogisticAbundanceFilterTest {
     public void memoizationIsFaster() throws Exception
     {
         MersenneTwisterFast random = new MersenneTwisterFast();
-        Species species = new Species("Longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+        Species species = new Species("Longspine",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                          0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                          0.111313, 17.826, -1.79, 1,
                                                                                          0, 168434124,
-                                                                                         0.6, false));
+                                                                                         0.6, false)
+        );
 
         double[] male = new double[81];
         double[] female = new double[81];

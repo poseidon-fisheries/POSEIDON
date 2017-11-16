@@ -45,10 +45,7 @@ import java.util.function.ToDoubleFunction;
 public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 {
 
-    /**
-     * kills off fish
-     */
-    private final NaturalMortalityProcess mortalityProcess;
+
 
     /**
      * creates new recruits
@@ -73,6 +70,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private final AbundanceDiffuser diffuser;
 
 
+    private final NaturalMortalityProcess mortality;
+
+
     /**
      * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
      * on where there is more biomass
@@ -80,15 +80,15 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     private BiomassAllocator recruitsAllocator;
 
     public SingleSpeciesNaturalProcesses(
-            NaturalMortalityProcess mortalityProcess,
             RecruitmentProcess recruitment, Species species,
-            boolean rounding, AgingProcess agingProcess, AbundanceDiffuser diffuser) {
+            boolean rounding, AgingProcess agingProcess, AbundanceDiffuser diffuser,
+            NaturalMortalityProcess mortality) {
         this.species = species;
-        this.mortalityProcess = mortalityProcess;
         this.recruitment = recruitment;
         this.rounding = rounding;
         this.agingProcess = agingProcess;
         this.diffuser = diffuser;
+        this.mortality = mortality;
     }
 
     private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new LinkedHashMap<>();
@@ -200,9 +200,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *                                      |__/
          */
         biologies.values().forEach(
-                abundanceBasedLocalBiology -> mortalityProcess.cull(
+                abundanceBasedLocalBiology -> mortality.cull(
                         species.getMeristics(),rounding,
-                        abundanceBasedLocalBiology.getAbundance(species)));
+                        abundanceBasedLocalBiology.getAbundance(species), 365 ));
 
 
 

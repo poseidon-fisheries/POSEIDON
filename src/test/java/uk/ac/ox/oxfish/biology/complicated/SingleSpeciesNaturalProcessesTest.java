@@ -61,24 +61,25 @@ public class SingleSpeciesNaturalProcessesTest {
                                                     "biology",
                                                     "Sablefish"),"Sablefish");
 
+        StockAssessmentCaliforniaMeristics meristics = (StockAssessmentCaliforniaMeristics) species.getMeristics();
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
                 new RecruitmentBySpawningBiomass(
-                        species.getVirginRecruits(),
-                        species.getSteepness(),
-                        species.getCumulativePhi(),
-                        species.isAddRelativeFecundityToSpawningBiomass()
+                        meristics.getVirginRecruits(),
+                        meristics.getSteepness(),
+                        meristics.getCumulativePhi(),
+                        meristics.isAddRelativeFecundityToSpawningBiomass()
                 ),
                 species,
                 true, new StandardAgingProcess(false),
-                new NoAbundanceDiffusion());
+                new NoAbundanceDiffusion(),
+                new ExponentialMortalityProcess(meristics));
 
         GlobalBiology biology = new GlobalBiology(species);
         AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
         AbundanceBasedLocalBiology cell2 = new AbundanceBasedLocalBiology(biology);
         processes.add(cell1, mock(SeaTile.class));
         processes.add(cell2,mock(SeaTile.class) );
-        for(int i=0; i<=species.getMaxAge(); i++)
+        for(int i=0; i<=meristics.getMaxAge(); i++)
         {
             cell1.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][i] = 5000;
             cell2.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][i] = 5000;
@@ -125,15 +126,13 @@ public class SingleSpeciesNaturalProcessesTest {
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
         when(recruiter.recruit(any(), any(), any())).thenReturn(3200d);
-        //nothing dies
-        NaturalMortalityProcess culler = mock(NaturalMortalityProcess.class);
+
 
         when(recruiter.recruit(any(), any(),  any())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
-                culler,
                 recruiter,
                 fakeSpecies,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion());
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality());
 
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
@@ -187,15 +186,13 @@ public class SingleSpeciesNaturalProcessesTest {
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
         when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
-        //nothing dies
-        NaturalMortalityProcess culler = mock(NaturalMortalityProcess.class);
+
 
         when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
-                culler,
                 recruiter,
                 fakeSpecies,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion());
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality());
 
         HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
@@ -259,10 +256,9 @@ public class SingleSpeciesNaturalProcessesTest {
         GlobalBiology biology = initializer.generateGlobal(new MersenneTwisterFast(), mock(FishState.class));
         Species species = biology.getSpecie(0);
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion() );
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), initializer.getMortality());
 
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
@@ -286,10 +282,9 @@ public class SingleSpeciesNaturalProcessesTest {
         local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()-1]=0;
         local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=0;
         processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
                 recruitment,
                 species,
-                true, new StandardAgingProcess(true), new NoAbundanceDiffusion() );
+                true, new StandardAgingProcess(true), new NoAbundanceDiffusion(), initializer.getMortality());
         processes.add(local,mock(SeaTile.class) );
         processes.step(model);
         assertEquals(447,local.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][species.getMaxAge()],.001);

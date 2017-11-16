@@ -44,11 +44,11 @@ public class NaturalMortalityProcessTest {
         double male[] = new double[]{10000,10000,10000};
         double female[] = new double[]{5000,4000,3000};
         Meristics meristics = mock(StockAssessmentCaliforniaMeristics.class);
-        when(meristics.getMortalityParameterMFemale()).thenReturn(.2);
-        when(meristics.getMortalityParameterMMale()).thenReturn(.1);
+        when(meristics.getNumberOfSubdivisions()).thenReturn(2);
 
-        NaturalMortalityProcess mortality = new NaturalMortalityProcess();
-        mortality.cull(meristics, true,new StructuredAbundance(male,female));
+
+        NaturalMortalityProcess mortality = new ExponentialMortalityProcess(.1,.2);
+        mortality.cull(meristics, true,new StructuredAbundance(male,female),365 );
         //this numbers I obtained in R
         assertEquals(male[0],9048,.001);
         assertEquals(male[1],9048,.001);
@@ -76,9 +76,10 @@ public class NaturalMortalityProcessTest {
         Arrays.fill(male,10000);
 
 
-        NaturalMortalityProcess process = new NaturalMortalityProcess();
+        NaturalMortalityProcess process = new ExponentialMortalityProcess(
+                (StockAssessmentCaliforniaMeristics) species.getMeristics());
 
-        process.cull(species.getMeristics(), true,new StructuredAbundance(male,female) );
+        process.cull(species.getMeristics(), true,new StructuredAbundance(male,female),365);
 
         for(int i=0; i<male.length; i++)
             assertEquals(male[i],9370, .001); //always round down now

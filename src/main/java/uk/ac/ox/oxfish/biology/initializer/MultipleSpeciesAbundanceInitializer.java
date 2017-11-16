@@ -148,52 +148,48 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
         FishYAML yaml = new FishYAML();
         String meristicFile = String.join("\n", Files.readAllLines(biologicalDirectory.resolve("meristics.yaml")));
         MeristicsInput input = yaml.loadAs(meristicFile, MeristicsInput.class);
-        StockAssessmentCaliforniaMeristics meristics = new StockAssessmentCaliforniaMeristics(input);
-        return new Species(speciesName, meristics);
+        return new Species(speciesName, input);
     }
 
-    /**
-     * for a specific species create the natural processes object (which will be returned)
-     * and register it as startable in the model
-     * @param model the model
-     * @param species the species you need the natural processes set up
-     * @param locals a map of all the areas where fish can live
-     * @param preserveLastAge
-     * @param yearDelay
-     * @param diffuser
-     * @param rounding
-     * @return the already scheduled naturalProcesses object
-     */
+
+
+
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
+
             FishState model, Species species,
             Map<SeaTile, AbundanceBasedLocalBiology> locals,
-            final boolean preserveLastAge, final int yearDelay,
-            final NoAbundanceDiffusion diffuser, final boolean rounding) {
-        //schedule recruitment and natural mortality
+            StockAssessmentCaliforniaMeristics meristics,
+            boolean preserveLastAge,
+            int yearDelay,
+            boolean rounding
+    ){
+
         AgingProcess agingProcess = new StandardAgingProcess(preserveLastAge);
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
                 yearDelay > 0 ?
                         new RecruitmentBySpawningBiomassDelayed(
-                                species.getVirginRecruits(),
-                                species.getSteepness(),
-                                species.getCumulativePhi(),
-                                species.isAddRelativeFecundityToSpawningBiomass(),
+                                meristics.getVirginRecruits(),
+                                meristics.getSteepness(),
+                                meristics.getCumulativePhi(),
+                                meristics.isAddRelativeFecundityToSpawningBiomass(),
                                 yearDelay) :
                         new RecruitmentBySpawningBiomass(
-                                species.getVirginRecruits(),
-                                species.getSteepness(),
-                                species.getCumulativePhi(),
-                                species.isAddRelativeFecundityToSpawningBiomass()
+                                meristics.getVirginRecruits(),
+                                meristics.getSteepness(),
+                                meristics.getCumulativePhi(),
+                                meristics.isAddRelativeFecundityToSpawningBiomass()
                         ),
                 species,
-                rounding, agingProcess, diffuser);
-
+                rounding, agingProcess,
+                new NoAbundanceDiffusion(),
+                new ExponentialMortalityProcess(meristics)
+                );
         for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
             processes.add(entry.getValue(),entry.getKey());
         }
         model.registerStartable(processes);
         return processes;
+
     }
 
     public int[][] getInitialAbundance (Species species)
@@ -305,7 +301,10 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
                 //start the natural process (use single species abundance since it's easier)
                 SingleSpeciesNaturalProcesses process = initializeNaturalProcesses(
-                        model, species, locals, preserveLastAge, 0, new NoAbundanceDiffusion(), true);
+                        model,species,locals, ((StockAssessmentCaliforniaMeristics) species.getMeristics()),
+                        preserveLastAge,
+                        0,
+                        rounding);
                 //if you want to keep recruits to spawn in the same places this is the time to do it
                 if(fixedRecruitmentDistribution) {
                     process.setRecruitsAllocator(

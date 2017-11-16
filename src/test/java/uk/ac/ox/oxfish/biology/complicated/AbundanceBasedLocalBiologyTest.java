@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 public class AbundanceBasedLocalBiologyTest
 {
 
-    final static private StockAssessmentCaliforniaMeristics meristics=  new StockAssessmentCaliforniaMeristics(80, 40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+    final static private MeristicsInput meristics=  new MeristicsInput(80, 40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                                                0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                                                0.111313, 17.826, -1.79, 1,
                                                                                                                0, 168434124,

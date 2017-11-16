@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class CaliforniaBiomassDynamics {
 
@@ -51,7 +52,7 @@ public class CaliforniaBiomassDynamics {
         scenario.setSablefishDiffusingRate(0);
         scenario.setCountFileName("count_2011.csv");
         scenario.setMortalityAt100PercentForOldestFish(false);
-        scenario.setExogenousCatches(new HashMap<>());
+        scenario.setExogenousCatches(new LinkedHashMap<>());
         scenario.setSablefishDiffusingRate(0);
         scenario.setPortFileName("no_ports.csv");
 

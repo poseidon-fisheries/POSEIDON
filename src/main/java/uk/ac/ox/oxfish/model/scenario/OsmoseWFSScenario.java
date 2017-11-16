@@ -297,7 +297,7 @@ public class OsmoseWFSScenario implements Scenario{
     //2,024,700 kg (2007 to 2010)
 
 
-    private Map<String, String> exogenousCatches = new HashMap<>();
+    private LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
     {
         //recreational mortality
         //RED SNAPPER:
@@ -543,7 +543,7 @@ public class OsmoseWFSScenario implements Scenario{
 
 
             //exogenous mortality
-            HashMap<Species,Double>  recast = new HashMap<>();
+            LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
             for (Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
                 recast.put(global.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
             }
@@ -552,9 +552,9 @@ public class OsmoseWFSScenario implements Scenario{
             model.registerStartable(recreationalMortality);
 
             //shrimp mortality
-            HashMap<Species,Double> mortality = new HashMap<>();
+            LinkedHashMap<Species,Double> mortality = new LinkedHashMap<>();
             mortality.put(global.getSpecie("RedSnapper"),redSnapperMortalityFromShrimpBycatchInKg.apply(model.getRandom()));
-            HashMap<Species,Pair<Integer,Integer>> bounds = new HashMap<>();
+            LinkedHashMap<Species,Pair<Integer,Integer>> bounds = new LinkedHashMap<>();
             bounds.put(global.getSpecie("RedSnapper"),new Pair<>(0,1));
 
             OsmoseBoundedExogenousCatches shrimpMortality =  new OsmoseBoundedExogenousCatches(
@@ -1132,7 +1132,7 @@ public class OsmoseWFSScenario implements Scenario{
      *
      * @param exogenousCatches Value to set for property 'exogenousCatches'.
      */
-    public void setExogenousCatches(Map<String, String> exogenousCatches) {
+    public void setExogenousCatches(LinkedHashMap<String, String> exogenousCatches) {
         this.exogenousCatches = exogenousCatches;
     }
 

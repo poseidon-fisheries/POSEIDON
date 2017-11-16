@@ -18,30 +18,23 @@
  *
  */
 
-package uk.ac.ox.oxfish.biology.complicated;
+package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
-/**
- * Created by carrknight on 7/5/17.
- */
-public interface Meristics extends GrowthBinParameters {
-    int getMaxAge();
+public class DummyMortalityFactory implements AlgorithmFactory<DummyNaturalMortality> {
 
 
-
-
-    ImmutableList<Double> getMaturity();
-
-    ImmutableList<Double> getRelativeFecundity();
-
-    double getCumulativePhi();
-
-    boolean isAddRelativeFecundityToSpawningBiomass();
-
-
-    int getVirginRecruits();
-
-
-    double getSteepness();
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param fishState the function argument
+     * @return the function result
+     */
+    @Override
+    public DummyNaturalMortality apply(FishState fishState) {
+        return new DummyNaturalMortality();
+    }
 }

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
 
 
     public AbundanceDrivenFixedExogenousCatches(
-            Map<Species, Double> exogenousYearlyCatchesInKg) {
+            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg) {
         super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
     }
 

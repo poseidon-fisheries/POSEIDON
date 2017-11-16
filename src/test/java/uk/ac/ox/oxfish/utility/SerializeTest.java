@@ -25,11 +25,14 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.junit.After;
 import org.junit.Test;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
@@ -189,21 +192,14 @@ public class SerializeTest {
         state2.start();
 
 
-        for(int x=0; x<state.getMap().getWidth(); x++)
-            for(int y=0; y<state.getMap().getHeight(); y++)
-            {
-                assertEquals(
-                        state.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
-                        state2.getMap().getSeaTile(x,y).getBiomass(state.getSpecies().get(0)),
-                        .0001
-                );
-            }
+
 
         for(int day=0; day<600; day++)
         {
             System.out.println("day " + day);
             state.schedule.step(state);
             state2.schedule.step(state2);
+
 
             for(int id=0; id<state.getFishers().size(); id++)
             {

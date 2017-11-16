@@ -41,14 +41,14 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
                                                    1,
                                                    1,
                                                    0,
-                                                   1,
+                                                   0,
                                                    0,
                                                    1,
                                                    1,
                                                    1,
                                                    1,
                                                    0,
-                                                   1,
+                                                   0,
                                                    0,
                                                    0,
                                                    0,
@@ -244,14 +244,14 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
              input.getKParameterMale(),
              input.getWeightParameterAMale(),
              input.getWeightParameterBMale(),
-             input.getMortalityParameterMMale(),
+             input.mortalityParameterMMale,
              input.getYoungAgeFemale(),
              input.getYoungLengthFemale(),
              input.getMaxLengthFemale(),
              input.getKParameterFemale(),
              input.getWeightParameterAFemale(),
              input.getWeightParameterBFemale(),
-             input.getMortalityParameterMFemale(),
+             input.mortalityParameterMFemale,
              input.getMaturityInflection(),
              input.getMaturitySlope(),
              input.getFecundityIntercept(),
@@ -374,10 +374,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return weightParameterBMale;
     }
 
-    @Override
-    public double getMortalityParameterMMale() {
-        return mortalityParameterMMale;
-    }
 
     public double getYoungAgeFemale() {
         return youngAgeFemale;
@@ -404,10 +400,7 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return weightParameterBFemale;
     }
 
-    @Override
-    public double getMortalityParameterMFemale() {
-        return mortalityParameterMFemale;
-    }
+
 
     public double getMaturityInflection() {
         return maturityInflection;
@@ -521,5 +514,23 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
     @Override
     public int getNumberOfBins() {
         return growth.getNumberOfBins();
+    }
+
+    /**
+     * Getter for property 'mortalityParameterMMale'.
+     *
+     * @return Value for property 'mortalityParameterMMale'.
+     */
+    public double getMortalityParameterMMale() {
+        return mortalityParameterMMale;
+    }
+
+    /**
+     * Getter for property 'mortalityParameterMFemale'.
+     *
+     * @return Value for property 'mortalityParameterMFemale'.
+     */
+    public double getMortalityParameterMFemale() {
+        return mortalityParameterMFemale;
     }
 }

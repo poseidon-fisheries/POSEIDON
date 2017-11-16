@@ -31,6 +31,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by carrknight on 6/26/17.
@@ -81,7 +82,7 @@ public class SimpleCaliforniaScenarioTest {
                 DerisoCaliforniaScenario.class
         ) ;
         scenario.setDerisoFileNames("deriso.yaml");;
-        HashMap<String, String> exogenousCatches = new HashMap<>();
+        LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
         exogenousCatches.put("Sablefish","8000000");
         scenario.setExogenousCatches(exogenousCatches);
         scenario.setRegulationPreReset(new FishingSeasonFactory(0, true));

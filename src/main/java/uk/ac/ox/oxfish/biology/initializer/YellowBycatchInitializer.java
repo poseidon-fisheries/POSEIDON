@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -442,9 +443,9 @@ public class YellowBycatchInitializer implements BiologyInitializer {
                                                                                          1,
                                                                                          false);
         Species target = new Species(targetSpeciesName,
-                                     fake);
+                                     fake, new DummyNaturalMortality());
         Species bycatch = new Species(bycatchSpeciesName,
-                                      fake);
+                                      fake, new DummyNaturalMortality());
 
         return new GlobalBiology(target,bycatch);
 

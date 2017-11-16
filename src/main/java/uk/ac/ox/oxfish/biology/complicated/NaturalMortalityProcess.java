@@ -20,42 +20,15 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-/**
- * Simply culls a % of fish each year according to their mortality rate
- * Created by carrknight on 3/2/16.
- */
-public class NaturalMortalityProcess
-{
-
+public interface NaturalMortalityProcess {
 
     /**
-     * as a side-effect modifies male and female cohorts by killing a % of its population equal to the mortality rate.
-     * @param species the characteristics of the species
-     * @param rounding
-     * @param abundance
+     * call the mortality process to kill (by side-effect) fish
+     * @param species the fish species to kill
+     * @param rounding whether we want the process to round all abundances to closest int
+     * @param structuredAbundance the current abundance of the fish (and what actually gets modified)
+     * @param daysSimulated how many days are we simulating the mortality for
      */
-    public void cull(
-            Meristics species, boolean rounding, StructuredAbundance abundance)
-    {
-        double maleMortality = species.getMortalityParameterMMale();
-        double femaleMortality = species.getMortalityParameterMFemale();
-        Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for male and female; need recode for generalization");
-        double[] male = abundance.asMatrix()[FishStateUtilities.MALE];
-        double[] female = abundance.asMatrix()[FishStateUtilities.FEMALE];
-        for(int i=0;i<abundance.getBins(); i++)
-        {
-            male[i] = (male[i] * Math.exp(-maleMortality) );
-            female[i] = (female[i] * Math.exp(-femaleMortality));
-            if(rounding) {
-                male[i] = (int) FishStateUtilities.round(male[i]);
-                female[i] = (int) FishStateUtilities.round(female[i]);
-            }
-        }
-
-    }
-
-
+    void cull(
+            Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated);
 }

@@ -20,28 +20,16 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.collect.ImmutableList;
-
 /**
- * Created by carrknight on 7/5/17.
+ * nobody dies ever
  */
-public interface Meristics extends GrowthBinParameters {
-    int getMaxAge();
+public class DummyNaturalMortality implements NaturalMortalityProcess {
+    /**
+     * nobody dies, ever
+     */
+    @Override
+    public void cull(
+            Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated) {
 
-
-
-
-    ImmutableList<Double> getMaturity();
-
-    ImmutableList<Double> getRelativeFecundity();
-
-    double getCumulativePhi();
-
-    boolean isAddRelativeFecundityToSpawningBiomass();
-
-
-    int getVirginRecruits();
-
-
-    double getSteepness();
+    }
 }

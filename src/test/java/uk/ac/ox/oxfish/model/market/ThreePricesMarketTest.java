@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -46,8 +47,8 @@ public class ThreePricesMarketTest {
         //set up copied from the holdsize test
         StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
         StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
-        Species firstSpecies = new Species("first",first);
-        Species secondSpecies = new Species("second",second);
+        Species firstSpecies = new Species("first",first,new DummyNaturalMortality());
+        Species secondSpecies = new Species("second",second,new DummyNaturalMortality());
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
@@ -112,8 +113,8 @@ public class ThreePricesMarketTest {
         //set up copied from the holdsize test
         StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
         StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
-        Species firstSpecies = new Species("first",first);
-        Species secondSpecies = new Species("second",second);
+        Species firstSpecies = new Species("first",first,new DummyNaturalMortality());
+        Species secondSpecies = new Species("second",second,new DummyNaturalMortality());
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);

@@ -33,7 +33,8 @@ import uk.ac.ox.oxfish.model.FishState;
 public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     public MockNaturalProcess(
             Species species) {
-        super(null, null, species, true, null, new NoAbundanceDiffusion() );
+        super(null, species, true, null, new NoAbundanceDiffusion(),
+              new DummyNaturalMortality());
     }
 
 

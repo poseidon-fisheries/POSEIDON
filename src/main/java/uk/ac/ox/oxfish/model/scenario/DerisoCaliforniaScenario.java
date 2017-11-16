@@ -93,7 +93,7 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
     @NotNull
     @Override
     protected ExogenousCatches turnIntoExogenousCatchesObject(
-            HashMap<Species, Double> recast) {
+            LinkedHashMap<Species, Double> recast) {
 
             return new BiomassDrivenFixedExogenousCatches(recast);
 

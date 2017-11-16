@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -45,17 +45,19 @@ public class HeterogeneousAbundanceGearTest
     @Test
     public void catchesCorrectly() throws Exception {
 
-        Species species1 = new Species("longspine1",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                           0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                           0.111313, 17.826, -1.79, 1,
-                                                                                           0, 168434124,
-                                                                                           0.6, false));
+        Species species1 = new Species("longspine1",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                       0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                       0.111313, 17.826, -1.79, 1,
+                                                                       0, 168434124,
+                                                                       0.6, false)
+        );
         species1.resetIndexTo(0);
-        Species species2 = new Species("longspine2",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+        Species species2 = new Species("longspine2",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                            0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
                                                                                            0.111313, 17.826, -1.79, 1,
                                                                                            0, 168434124,
-                                                                                           0.6, false));
+                                                                                           0.6, false)
+        );
         species2.resetIndexTo(1);
 
 

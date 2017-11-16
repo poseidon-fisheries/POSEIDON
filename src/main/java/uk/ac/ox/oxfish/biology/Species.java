@@ -21,9 +21,10 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.google.common.collect.ImmutableList;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
+import uk.ac.ox.oxfish.biology.complicated.*;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 /**
  * A collection of all information regarding a species (for now just a name)
  * Created by carrknight on 4/11/15.
@@ -36,6 +37,8 @@ public class Species {
      * a collection of parameters about the fish including its size and such
      */
     private final Meristics meristics;
+
+
 
     /**
      * the specie index, basically its order in the species array.
@@ -57,7 +60,7 @@ public class Species {
 
     }
 
-    public Species(String name, Meristics meristics) {
+    public Species(String name, Meristics meristics, NaturalMortalityProcess mortality) {
         this(name,meristics,false);
 
     }
@@ -67,6 +70,14 @@ public class Species {
         this.meristics = meristics;
         this.imaginary = imaginary;
     }
+
+    public Species(String name, MeristicsInput input)
+    {
+        this.name = name;
+        this.meristics = new StockAssessmentCaliforniaMeristics(input);
+        this.imaginary = false;
+    }
+
 
     public String getName()
     {
@@ -164,15 +175,6 @@ public class Species {
      */
     public boolean isImaginary() {
         return imaginary;
-    }
-
-
-    public double getMortalityParameterMMale() {
-        return meristics.getMortalityParameterMMale();
-    }
-
-    public double getMortalityParameterMFemale() {
-        return meristics.getMortalityParameterMFemale();
     }
 
     public ImmutableList<Double> getMaturity() {

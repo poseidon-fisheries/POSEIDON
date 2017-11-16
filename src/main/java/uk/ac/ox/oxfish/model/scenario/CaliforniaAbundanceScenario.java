@@ -274,7 +274,7 @@ public class CaliforniaAbundanceScenario extends CaliforniaAbstractScenario {
     @NotNull
     @Override
     protected ExogenousCatches turnIntoExogenousCatchesObject(
-            HashMap<Species, Double> catchesPerSpecies) {
+            LinkedHashMap<Species, Double> catchesPerSpecies) {
         return new AbundanceDrivenFixedExogenousCatches(catchesPerSpecies);
     }
 

@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import fr.ird.osmose.process.mortality.MortalityProcess;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.*;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
@@ -53,6 +54,9 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
     private AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator = new ConstantAllocatorFactory();
 
+    private AlgorithmFactory<? extends NaturalMortalityProcess> mortalityProcess =
+            new ExponentialMortalityFactory();
+
 
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
 
@@ -75,7 +79,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
                 recruitment.apply(state),
                 diffuser.apply(state),
                 recruitAllocator.apply(state),
-                habitabilityAllocator.apply(state));
+                habitabilityAllocator.apply(state),
+                mortalityProcess.apply(state));
 
 
     }

@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -72,8 +71,8 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
         Double[] maturities = Arrays.stream(maturityPerBin.split(",")).map(mapper::applyAsDouble).toArray(Double[]::new);
 
         //create a meristic!
-        return new FromListMeristics(mortalityRate.apply(fishState.getRandom()),
-                                     maturities,
+        return new FromListMeristics(
+                maturities,
                                      weights);
 
 

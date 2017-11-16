@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.geography.osmose.LocalOsmoseWithoutRecruitmentBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public class OsmoseBoundedExogenousCatches extends AbstractExogenousCatches {
     private final Map<Species,Pair<Integer,Integer>> ageBounds;
 
     public OsmoseBoundedExogenousCatches(
-            Map<Species, Double> exogenousYearlyCatchesInKg,
+            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
             Map<Species, Pair<Integer, Integer>> ageBounds, final String dataColumnName
     ) {
         super(exogenousYearlyCatchesInKg, dataColumnName);

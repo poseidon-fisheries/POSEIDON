@@ -33,27 +33,25 @@ public class FromListMeristics implements Meristics {
     private final GrowthBinByList growth;
 
 
-    private final double mortalityRate;
 
 
     private final  ImmutableList<Double> maturities;
 
 
-    public FromListMeristics(double mortalityRate,
-                             Double[] maturities,
-                             double[] weights) {
-        this(mortalityRate,maturities,weights,new double[weights.length]);
+    public FromListMeristics(
+            Double[] maturities,
+            double[] weights) {
+        this(maturities, weights, new double[weights.length]);
     }
 
-    public FromListMeristics(double mortalityRate,
-                             Double[] maturities,
-                             double[] weights,
-                             double[] lenghts) {
+    public FromListMeristics(
+            Double[] maturities,
+            double[] weights,
+            double[] lenghts) {
         Preconditions.checkArgument(maturities.length == weights.length, "length mismatch between maturities and weights");
         Preconditions.checkArgument(lenghts.length == weights.length, "length mismatch between lenghts and weights");
 
         this.maturities = ImmutableList.copyOf(maturities);
-        this.mortalityRate = mortalityRate;
 
         this.growth = new GrowthBinByList(2,
                                           lenghts,
@@ -65,15 +63,6 @@ public class FromListMeristics implements Meristics {
         return growth.getNumberOfBins()-1;
     }
 
-    @Override
-    public double getMortalityParameterMMale() {
-        return mortalityRate;
-    }
-
-    @Override
-    public double getMortalityParameterMFemale() {
-        return mortalityRate;
-    }
 
 
 

@@ -169,7 +169,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      */
     protected AlgorithmFactory<? extends Gear> gear =
             new GarbageGearFactory();
-    protected Map<String, String> exogenousCatches = new HashMap<>();
+    protected LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
 
     {
         //these numbers are just the total catches on the noaa website minus DTS catches from catcher vessel report
@@ -571,7 +571,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
             //add exogenous catches
             //first turn map of strings into map of species
-            HashMap<Species,Double>  recast = new HashMap<>();
+            LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
             for (Map.Entry<String, String> exogenous : exogenousCatches.entrySet()) {
                 recast.put(biology.getSpecie(exogenous.getKey()),Double.parseDouble(exogenous.getValue()));
             }
@@ -595,7 +595,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
     }
 
     @NotNull
-    abstract protected ExogenousCatches turnIntoExogenousCatchesObject(HashMap<Species, Double> recast) ;
+    abstract protected ExogenousCatches turnIntoExogenousCatchesObject(LinkedHashMap<Species, Double> recast) ;
 
     /**
      * build the biology part!
@@ -1089,7 +1089,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @return Value for property 'exogenousCatches'.
      */
-    public Map<String, String> getExogenousCatches() {
+    public LinkedHashMap<String, String> getExogenousCatches() {
         return exogenousCatches;
     }
 
@@ -1098,7 +1098,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
      *
      * @param exogenousCatches Value to set for property 'exogenousCatches'.
      */
-    public void setExogenousCatches(Map<String, String> exogenousCatches) {
+    public void setExogenousCatches(LinkedHashMap<String, String> exogenousCatches) {
         this.exogenousCatches = exogenousCatches;
     }
 

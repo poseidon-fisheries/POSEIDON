@@ -46,6 +46,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.function.Supplier;
 
 import static uk.ac.ox.oxfish.model.scenario.CaliforniaAbstractScenario.LITERS_OF_GAS_CONSUMED_PER_HOUR;
@@ -351,7 +352,7 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
         //add exogenous mortality
         Preconditions.checkArgument(model.getSpecies().get(0).getName().equals("Sablefish"));
-        HashMap<Species, Double> exogenousMortality = new HashMap<>();
+        LinkedHashMap<Species, Double> exogenousMortality = new LinkedHashMap<>();
         exogenousMortality.put(model.getSpecies().get(0),exogenousSablefishCatches);
         exogenousMortality.put(model.getSpecies().get(1),exogenousYelloweyeCatches);
         BiomassDrivenFixedExogenousCatches mortality = new BiomassDrivenFixedExogenousCatches(

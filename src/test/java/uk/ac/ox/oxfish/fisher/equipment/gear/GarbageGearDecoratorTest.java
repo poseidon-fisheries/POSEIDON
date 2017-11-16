@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
+import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -113,13 +115,14 @@ public class GarbageGearDecoratorTest {
     @Test
     public void catchesCorrectly() throws Exception {
 
-        Species longspine = new Species("longspine",new StockAssessmentCaliforniaMeristics(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                           0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
-                                                                                           0.111313, 17.826, -1.79, 1,
-                                                                                           0, 168434124,
-                                                                                           0.6, false));
+        Species longspine = new Species("longspine",new MeristicsInput(80, 40, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                       0.111313, 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
+                                                                       0.111313, 17.826, -1.79, 1,
+                                                                       0, 168434124,
+                                                                       0.6, false));
         longspine.resetIndexTo(0);
-        Species imaginary = new Species("imaginary", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS, true);
+        Species imaginary = new Species("imaginary", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                                        true);
         imaginary.resetIndexTo(1);
 
 

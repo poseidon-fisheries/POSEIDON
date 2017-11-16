@@ -36,7 +36,6 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -63,6 +62,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
 
     final private AgingProcess aging;
+
+    final private NaturalMortalityProcess mortality;
 
 
     /**
@@ -110,7 +111,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             RecruitmentProcess recruitmentProcess,
             AbundanceDiffuser diffuser,
             BiomassAllocator recruitmentAllocator,
-            BiomassAllocator habitabilityAllocator) {
+            BiomassAllocator habitabilityAllocator,
+            NaturalMortalityProcess mortality) {
         this.initialAbundanceFactory = initialAbundanceFactory;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
@@ -121,6 +123,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.diffuser = diffuser;
         this.recruitmentAllocator = recruitmentAllocator;
         this.habitabilityAllocator = habitabilityAllocator;
+        this.mortality = mortality;
     }
 
     /**
@@ -143,20 +146,26 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             Path biologicalDirectory, String speciesName, double scaling, FishState state) {
         initialAbundanceFactory = new InitialAbundanceFromFileFactory(
                 biologicalDirectory.resolve("count.csv"));
-        meristics = new MeristicsFileFactory(
+        StockAssessmentCaliforniaMeristics
+                cali = new MeristicsFileFactory(
                 biologicalDirectory.resolve("meristics.yaml")
         ).apply(state);
+        meristics = cali;
         recruitmentProcess = new RecruitmentBySpawningBiomass(
-                meristics.getVirginRecruits(),
-                meristics.getSteepness(),
-                meristics.getCumulativePhi(),
-                meristics.isAddRelativeFecundityToSpawningBiomass()
+                cali.getVirginRecruits(),
+                cali.getSteepness(),
+                cali.getCumulativePhi(),
+                cali.isAddRelativeFecundityToSpawningBiomass()
         );
         aging = new StandardAgingProcess(false);
+
 
         intialAbundanceAllocator = new ConstantBiomassAllocator();
         this.speciesName = speciesName;
         this.scaling = scaling;
+        this.mortality = new ExponentialMortalityProcess(
+                cali
+        );
         this.diffuser = new NoAbundanceDiffusion();
         this.recruitmentAllocator = null;
         this.habitabilityAllocator = null;
@@ -265,12 +274,11 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
         //create the natural process
         processes = new SingleSpeciesNaturalProcesses(
-                new NaturalMortalityProcess(),
                 recruitmentProcess,
                 species,
                 true, aging,
-                diffuser
-        );
+                diffuser,
+                mortality);
         if(recruitmentAllocator !=null)
             processes.setRecruitsAllocator(recruitmentAllocator);
         //tell it to deal with our biologies
@@ -295,33 +303,20 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     public GlobalBiology generateGlobal(
             MersenneTwisterFast random, FishState modelBeingInitialized) {
 
-        Species species = new Species(speciesName,meristics);
+        Species species = new Species(speciesName,meristics, new DummyNaturalMortality());
         return new GlobalBiology(species);
 
     }
 
 
-
-
-
     /**
-     * Getter for property 'speciesName'.
+     * Getter for property 'mortality'.
      *
-     * @return Value for property 'speciesName'.
+     * @return Value for property 'mortality'.
      */
-    public String getSpeciesName() {
-        return speciesName;
+    public NaturalMortalityProcess getMortality() {
+        return mortality;
     }
-
-    /**
-     * Getter for property 'scaling'.
-     *
-     * @return Value for property 'scaling'.
-     */
-    public double getScaling() {
-        return scaling;
-    }
-
 
     /**
      * Getter for property 'processes'.
