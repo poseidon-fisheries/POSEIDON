@@ -173,6 +173,8 @@ public class LogisticLogbookFactory
         if(simulatedProfits)
         {
             extractors.add(new SimulatedHourlyProfitExtractor(maxHoursOut));
+            names.add("simulated_profits");
+
         }
 
         if(windSpeed)

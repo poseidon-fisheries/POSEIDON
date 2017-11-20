@@ -916,14 +916,14 @@ public class FishStateUtilities {
     }
 
     public static FishState  run(
-            String simulationName, Path inputFolder, final Path outputFolder,
+            String simulationName, Path scenarioYaml, final Path outputFolder,
             final Long seed, final int logLevel, final boolean additionalData,
             final String policyScript, final int yearsToRun,
             final boolean saveOnExit, Integer heatmapGathererYear) throws IOException {
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
-        String fullScenario = String.join("\n", Files.readAllLines(inputFolder));
+        String fullScenario = String.join("\n", Files.readAllLines(scenarioYaml));
 
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);

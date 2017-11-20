@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.experiments;
 
+import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -33,6 +34,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFactory;
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
@@ -41,6 +43,8 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -61,6 +65,9 @@ public class IndirectInferencePaper {
     private final static LinkedHashMap<String,
             ScenarioInitializer> initializers = new LinkedHashMap<>();
     public static final int TARGET_RUNS = 10;
+
+
+    public static final int SIMULATION_YEARS = 5;
 
     static
     {
@@ -216,13 +223,15 @@ public class IndirectInferencePaper {
 
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         FishYAML yamler = new FishYAML();
-        for (Map.Entry<String, ScenarioInitializer> scenario : initializers.entrySet())
+        for (Map.Entry<String, ScenarioInitializer> initializer : initializers.entrySet())
         {
 
-            Path scenarioDirectory = mainDirectory.resolve(scenario.getKey());
+            Path scenarioDirectory = mainDirectory.resolve(initializer.getKey());
+            Path inputDirectory = scenarioDirectory.resolve("inputs");
+
 
             for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy :
                     strategies.entrySet())
@@ -233,23 +242,41 @@ public class IndirectInferencePaper {
 
                     Scenario mainScenario = yamler.loadAs(
                             new FileReader(
-                                    scenarioDirectory.resolve(scenario.getKey() + ".yaml").toFile()
+                                    scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
                             ), Scenario.class
 
                     );
                     //first run the target!
-                    scenario.getValue().initialize(mainScenario,run,targetStrategy.getValue());
-
-                    Path output = scenarioDirectory.resolve("output").resolve(targetStrategy.getKey() + "_" + run);
+                    initializer.getValue().initialize(mainScenario,run,targetStrategy.getValue());
+                    String targetName = targetStrategy.getKey() + "_" + run;
+                    Path output = scenarioDirectory.resolve("output").resolve(targetName);
                     output.toFile().mkdirs();
+                    //write down the scenario to file;
+                    //this is in order to keep a record of everything
+                    inputDirectory.toFile().mkdirs();
+                    yamler.dump(mainScenario,
+                                new FileWriter(
+                                        inputDirectory.resolve(targetName+".yaml").toFile())
+                    );
 
-
-
-
-
+                    Log.info("Starting target run : " + targetName);
+                    FishStateUtilities.run(
+                            targetName,
+                            inputDirectory.resolve(targetName+".yaml"),
+                            output,
+                            (long)run,
+                            Log.LEVEL_INFO,
+                            false,
+                            null,
+                            SIMULATION_YEARS,
+                            false,
+                            -1
+                    );
 
                     //at the end I'd like a CSV like this:
                     // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....
+
+
 
                 }
 
