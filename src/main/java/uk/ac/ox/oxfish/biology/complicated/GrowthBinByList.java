@@ -80,4 +80,17 @@ public class GrowthBinByList implements GrowthBinParameters {
     public int getNumberOfBins() {
         return lenghts.length;
     }
+
+    /**
+     * because bins represent age here, this is just a lookup; we always round down the age
+     *
+     * @param ageInYears  age in terms of years
+     * @param subdivision the subdivision we are study (male/female is different for example)
+     * @return the length of the fish
+     */
+    @Override
+    public double getLengthAtAge(double ageInYears, int subdivision) {
+
+        return getLength(subdivision,ageInYears > (lenghts.length-1) ? (int)ageInYears : lenghts.length-1 );
+    }
 }

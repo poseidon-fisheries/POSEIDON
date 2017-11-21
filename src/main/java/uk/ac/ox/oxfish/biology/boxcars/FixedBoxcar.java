@@ -155,41 +155,6 @@ public class FixedBoxcar {
         );
     }
 
-    /**
-     * very simple helper: given an array of currentDistribution,
-     * graduates a proportion of each to the next bin;
-     * CurrentDistribution is changed as a **side effect**
-     *
-     * @param currentDistribution
-     * @param proportionGraduating
-     * @return number of graduates (at position i is the number that left bin i and went into bin i+1)
-     */
-    public static double[] stepInTime(
-            double[] currentDistribution,
-            double[] proportionGraduating
-    )
-    {
-        int bins = currentDistribution.length;
-        double[] graduate = new double[bins];
-        Preconditions.checkArgument(bins ==
-        proportionGraduating.length);
-        Preconditions.checkArgument(bins >2);
-        assert proportionGraduating[bins-1]==0 || Double.isNaN(proportionGraduating[bins-1]);
-        //going backward
-        for(int i=bins-2; i>=0; i--)
-        {
-            assert currentDistribution[i] >=0;
-            // find graduates
-            graduate[i] = currentDistribution[i]*proportionGraduating[i];
-            currentDistribution[i+1] += graduate[i];
-            currentDistribution[i] -= graduate[i];
-            assert currentDistribution[i] >=0;
-
-        }
-        return graduate;
-
-    }
-
 
     /**
      * just the VB growth function

@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -56,7 +55,7 @@ public class HomogeneousAbundanceGearTest
         when(tile.getAbundance(any())).thenReturn(new StructuredAbundance(new double[]{0},new double[]{100}));
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
 
@@ -83,7 +82,7 @@ public class HomogeneousAbundanceGearTest
 
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         Catch fish = gear.fish(mock(Fisher.class), tile,1, biology);
@@ -109,7 +108,7 @@ public class HomogeneousAbundanceGearTest
 
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         double fish[] = gear.expectedHourlyCatch(mock(Fisher.class), tile,1, biology);
@@ -133,7 +132,7 @@ public class HomogeneousAbundanceGearTest
 
         when(tile.getBiology().getBiomass(any())).thenReturn(1d);
 
-        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species = new Species("test", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
         GlobalBiology biology = new GlobalBiology(species);
 
         Catch fish = gear.fish(mock(Fisher.class), tile, 2, biology);

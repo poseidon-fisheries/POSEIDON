@@ -1,8 +1,8 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import com.google.common.base.Preconditions;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 
 import java.util.Arrays;
 
@@ -35,7 +35,7 @@ public class FixedBoxcarTest {
 
         double[] population = new double[]{100, 100, 100};
         double[] graduationRate = new double[]{.5, .2, 0};
-        double[] graduates = FixedBoxcar.stepInTime(population, graduationRate);
+        double[] graduates = VariableProportionAging.variableAging(population, graduationRate);
         Assert.assertArrayEquals(
                 population,
                 new double[]{50, 130, 120},
@@ -95,8 +95,8 @@ public class FixedBoxcarTest {
         fixedBoxcar.getCurrentDistribution()[0]=10000;
         //step for 100 times
         for(int i=0; i<100; i++)
-            FixedBoxcar.stepInTime(fixedBoxcar.getCurrentDistribution(),
-                                   fixedBoxcar.getProportionGraduating());
+            VariableProportionAging.variableAging(fixedBoxcar.getCurrentDistribution(),
+                                                  fixedBoxcar.getProportionGraduating());
         System.out.println(fixedBoxcar.getCurrentDistribution()[0]);
         //these numbers also come from R
         Assert.assertArrayEquals(fixedBoxcar.getCurrentDistribution(),
@@ -141,8 +141,8 @@ public class FixedBoxcarTest {
         variableWidthBoxcar.getCurrentDistribution()[0]=10000;
         //step for 100 times
         for(int i=0; i<100; i++)
-            FixedBoxcar.stepInTime(variableWidthBoxcar.getCurrentDistribution(),
-                                   variableWidthBoxcar.getProportionGraduating());
+            VariableProportionAging.variableAging(variableWidthBoxcar.getCurrentDistribution(),
+                                                  variableWidthBoxcar.getProportionGraduating());
         System.out.println(variableWidthBoxcar.getCurrentDistribution()[0]);
         //these numbers also come from R
         Assert.assertArrayEquals(variableWidthBoxcar.getCurrentDistribution(),

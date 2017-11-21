@@ -176,10 +176,15 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
 
 
+
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("lastComputedBiomass", lastComputedBiomass)
                 .toString();
     }
+
+
+
 }

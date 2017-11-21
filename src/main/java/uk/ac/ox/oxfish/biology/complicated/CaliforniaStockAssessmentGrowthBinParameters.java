@@ -151,4 +151,17 @@ public class CaliforniaStockAssessmentGrowthBinParameters
     public int getNumberOfBins() {
         return maxAge+1;
     }
+
+    /**
+     * because bins represent age here, this is just a lookup; we always round down the age
+     *
+     * @param ageInYears  age in terms of years
+     * @param subdivision the subdivision we are study (male/female is different for example)
+     * @return the length of the fish
+     */
+    @Override
+    public double getLengthAtAge(double ageInYears, int subdivision) {
+
+        return getLength(subdivision,ageInYears > maxAge ? (int)ageInYears : maxAge );
+    }
 }

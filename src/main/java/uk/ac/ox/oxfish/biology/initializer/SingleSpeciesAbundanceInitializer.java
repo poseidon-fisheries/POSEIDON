@@ -303,7 +303,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     public GlobalBiology generateGlobal(
             MersenneTwisterFast random, FishState modelBeingInitialized) {
 
-        Species species = new Species(speciesName,meristics, new DummyNaturalMortality());
+        Species species = new Species(speciesName,meristics);
         return new GlobalBiology(species);
 
     }

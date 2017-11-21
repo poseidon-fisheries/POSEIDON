@@ -20,8 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * this interface keeps track of basically how much a fish in a bin weigh and is long as well as how many bins and
  * subdivisions there actually are
@@ -47,5 +45,15 @@ public interface GrowthBinParameters {
      * @return
      */
     int getNumberOfBins();
+
+
+    /**
+     * function mapping time to length; the growth function.
+     * It doesn't have to be consistent with the subdivisions but it should
+     * @param ageInYears age in terms of years
+     * @param subdivision the subdivision we are study (male/female is different for example)
+     * @return the length of the fish
+     */
+    double getLengthAtAge(double ageInYears, int subdivision);
 
 }

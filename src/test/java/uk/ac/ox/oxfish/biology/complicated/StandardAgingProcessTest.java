@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 
@@ -50,7 +49,7 @@ public class StandardAgingProcessTest {
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 
-        process.ageLocally(bio, species, null, true);
+        process.ageLocally(bio, species, null, true, 365);
 
         assertArrayEquals(male,new double[]{0,10,20},.0001);
         assertArrayEquals(female,new double[]{0,100,200},.0001);
@@ -74,7 +73,7 @@ public class StandardAgingProcessTest {
 
 
 
-        process.ageLocally(bio, species, null, true);
+        process.ageLocally(bio, species, null, true,365 );
 
         System.out.println(Arrays.toString(male));
         assertArrayEquals(male,new double[]{0,10,50},.0001);

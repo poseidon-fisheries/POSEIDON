@@ -31,13 +31,20 @@ public interface AgingProcess {
 
 
     /**
+     * called after the aging process has been initialized but before it is run.
+     * @param species
+     */
+    public void initialize(Species species);
+
+    /**
      * as a side-effect ages the local biology according to its rules
      * @param localBiology
      * @param model
      * @param rounding
+     * @param daysToSimulate
      */
     public void ageLocally(
             AbundanceBasedLocalBiology localBiology, Species species,
-            FishState model, boolean rounding);
+            FishState model, boolean rounding, int daysToSimulate);
 
 }

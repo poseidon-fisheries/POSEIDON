@@ -137,4 +137,18 @@ public class FromListMeristics implements Meristics {
     public int getNumberOfBins() {
         return growth.getNumberOfBins();
     }
+
+
+    /**
+     * function mapping time to length; the growth function.
+     * It doesn't have to be consistent with the subdivisions but it should
+     *
+     * @param ageInYears  age in terms of years
+     * @param subdivision the subdivision we are study (male/female is different for example)
+     * @return the length of the fish
+     */
+    @Override
+    public double getLengthAtAge(double ageInYears, int subdivision) {
+        return growth.getLengthAtAge(ageInYears,subdivision);
+    }
 }

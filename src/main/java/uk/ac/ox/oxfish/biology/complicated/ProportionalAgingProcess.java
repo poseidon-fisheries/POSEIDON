@@ -34,6 +34,14 @@ public class ProportionalAgingProcess implements AgingProcess {
 
 
     /**
+     * ignored
+     */
+    @Override
+    public void initialize(Species species) {
+        //ignored
+    }
+
+    /**
      * generates a number between 0 and 1 (the method bounds it so otherwise) representing
      * how many fish of class x move between one bin and the next
      */
@@ -46,14 +54,16 @@ public class ProportionalAgingProcess implements AgingProcess {
 
     /**
      * as a side-effect ages the local biology according to its rules
-     *  @param localBiology
+     * @param localBiology
      * @param species
      * @param model
      * @param rounding
+     * @param daysToSimulate
      */
     @Override
     public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding)
+            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding,
+            int daysToSimulate)
     {
 
         StructuredAbundance abundance = localBiology.getAbundance(species);
@@ -66,7 +76,7 @@ public class ProportionalAgingProcess implements AgingProcess {
             for(int bin = cohort.length-1; bin>=0; bin--)
             {
                 //male
-                double deltaMale = proportionalStep(cohort[bin],model.getRandom());
+                double deltaMale = proportionalStep(cohort[bin],model.getRandom(),daysToSimulate/365d );
                 if(rounding)
                     deltaMale = (int) deltaMale;
                 cohort[bin]-=deltaMale;
@@ -84,15 +94,16 @@ public class ProportionalAgingProcess implements AgingProcess {
     /**
      * tells you for these many fish how many age and how many don't
      * @param binAbundance the number of fish
+     * @param scaling
      * @return fish that move to the next bin
      */
-    private double proportionalStep(double binAbundance, MersenneTwisterFast random)
+    private double proportionalStep(double binAbundance, MersenneTwisterFast random, double scaling)
     {
 
         Preconditions.checkArgument(binAbundance>=0);
         if(binAbundance == 0)
             return 0;
-        double proportion = Math.max(0,Math.min(1,proportionAging.apply(random)));
+        double proportion = Math.max(0,Math.min(1,proportionAging.apply(random))) * scaling;
         return (proportion * binAbundance);
 
     }

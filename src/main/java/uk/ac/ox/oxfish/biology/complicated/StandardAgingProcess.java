@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 
@@ -37,22 +38,34 @@ public class StandardAgingProcess implements AgingProcess {
     }
 
     /**
+     * called after the aging process has been initialized but before it is run.
+     *
+     * @param species
+     */
+    @Override
+    public void initialize(Species species) {
+
+    }
+
+    /**
      * if this is false, last year fish dies off. Otherwise it accumulates in the last bin
      */
     final boolean preserveLastAge;
 
     /**
      * as a side-effect ages the local biology according to its rules
-     *  @param localBiology
+     * @param localBiology
      * @param model
      * @param rounding
+     * @param daysToSimulate
      */
     @Override
     public void ageLocally(
             AbundanceBasedLocalBiology localBiology, Species species,
-            FishState model, boolean rounding)
+            FishState model, boolean rounding, int daysToSimulate)
     {
 
+        Preconditions.checkArgument(daysToSimulate==365, "This should be used yearly!");
         //get the age structure (these are not copies!)
         StructuredAbundance abundance = localBiology.getAbundance(species);
         //escalator move everything

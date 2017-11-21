@@ -23,8 +23,6 @@ package uk.ac.ox.oxfish.biology;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.complicated.*;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 /**
  * A collection of all information regarding a species (for now just a name)
  * Created by carrknight on 4/11/15.
@@ -60,7 +58,7 @@ public class Species {
 
     }
 
-    public Species(String name, Meristics meristics, NaturalMortalityProcess mortality) {
+    public Species(String name, Meristics meristics) {
         this(name,meristics,false);
 
     }

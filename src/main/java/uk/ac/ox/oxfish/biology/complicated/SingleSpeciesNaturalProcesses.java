@@ -72,7 +72,6 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
     private final NaturalMortalityProcess mortality;
 
-
     /**
      * if this is given the recruited biomass is distributed according to this table, otherwise it is distributed based
      * on where there is more biomass
@@ -102,6 +101,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public void start(FishState model)
     {
 
+        this.agingProcess.initialize(species);
         model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
 
         model.scheduleEveryDay(new Steppable() {
@@ -216,7 +216,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         biologies.values().forEach(new Consumer<AbundanceBasedLocalBiology>() {
             @Override
             public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-                agingProcess.ageLocally(abundanceBasedLocalBiology, species, model, rounding);
+                agingProcess.ageLocally(abundanceBasedLocalBiology, species, model, rounding, 365);
             }
         });
 

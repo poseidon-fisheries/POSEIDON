@@ -24,7 +24,6 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -55,7 +54,7 @@ public class ProportionalAgingProcessTest {
 
         FishState model = mock(FishState.class);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
-        process.ageLocally(bio, species, model, true);
+        process.ageLocally(bio, species, model, true, 365);
 
         assertArrayEquals(male,new double[]{5,15,25},.001);
         assertArrayEquals(female,new double[]{50,150,250},.001);

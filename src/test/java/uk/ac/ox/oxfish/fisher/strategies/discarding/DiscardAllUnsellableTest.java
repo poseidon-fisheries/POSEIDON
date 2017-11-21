@@ -24,7 +24,6 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -48,8 +47,8 @@ public class DiscardAllUnsellableTest {
     @Test
     public void noDiscarding() throws Exception {
 
-        Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
-        Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
+        Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
 
         GlobalBiology biology = new GlobalBiology(species1, species2);
         when(model.getSpecies()).thenReturn(biology.getSpecies());
@@ -79,8 +78,8 @@ public class DiscardAllUnsellableTest {
     @Test
     public void someDiscarding() throws Exception {
 
-        Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
-        Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,new DummyNaturalMortality());
+        Species species1 = new Species("first", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
+        Species species2 = new Species("second", StockAssessmentCaliforniaMeristics.FAKE_MERISTICS);
 
         GlobalBiology biology = new GlobalBiology(species1, species2);
         when(model.getSpecies()).thenReturn(biology.getSpecies());
