@@ -20,8 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.DoubleArray;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
@@ -30,7 +28,6 @@ import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -89,14 +86,13 @@ public class FixedBoxcarAgingTest
         Species species = new Species(
                 "lame",
                 new FromListMeristics(
-                        ArrayUtils.toObject(lengths),
                         lengths,
                         lengths
                 ),
                 false
         );
 
-        aging.initialize(species);
+        aging.start(species);
 
 
 

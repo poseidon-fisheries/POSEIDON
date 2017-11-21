@@ -24,33 +24,40 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
- * Ages the abundance-based biomass.
- * Created by carrknight on 7/6/17.
+ * abstract class that turns aging process from happening to the entire collection of biologies to happen independently
+ * to each local one
  */
-public interface AgingProcess {
-
-
-
-
-    /**
-     * called after the aging process has been constructed but before it is run.
-     * @param species
-     */
-    public void start(Species species);
+public abstract class LocalAgingProcess implements AgingProcess {
 
 
     /**
      * as a side-effect ages the local biology according to its rules
-     * @param localBiology list of local biologies to age
-     * @param model link to the model
-     * @param rounding whether we expect numbers to be rounded to integers
+     *
+     * @param biologies   list of local biologies to age
+     * @param species
+     * @param model          link to the model
+     * @param rounding       whether we expect numbers to be rounded to integers
      * @param daysToSimulate simulation days
      */
+    @Override
     public void age(
-            Collection<AbundanceBasedLocalBiology> localBiology, Species species,
-            FishState model, boolean rounding, int daysToSimulate);
+            Collection<AbundanceBasedLocalBiology> biologies, Species species, FishState model, boolean rounding,
+            int daysToSimulate) {
+            biologies.forEach(new Consumer<AbundanceBasedLocalBiology>() {
+            @Override
+            public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
+                ageLocally(abundanceBasedLocalBiology, species, model, rounding, daysToSimulate);
+            }
+        });
+    }
+
+
+    abstract public void ageLocally(
+            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding,
+            int daysToSimulate);
 
 
 }

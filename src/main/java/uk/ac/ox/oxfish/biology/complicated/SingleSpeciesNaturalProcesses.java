@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -101,7 +100,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     public void start(FishState model)
     {
 
-        this.agingProcess.initialize(species);
+        this.agingProcess.start(species);
         model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
 
         model.scheduleEveryDay(new Steppable() {
@@ -213,12 +212,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     /_/ \_\__, |_|_||_\__, |
          *           |___/       |___/
          */
-        biologies.values().forEach(new Consumer<AbundanceBasedLocalBiology>() {
-            @Override
-            public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-                agingProcess.ageLocally(abundanceBasedLocalBiology, species, model, rounding, 365);
-            }
-        });
+        agingProcess.age(biologies.values(),
+                         species,
+                         model,
+                         rounding,
+                         365);
 
 
         /***
@@ -342,5 +340,50 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      */
     public void setRandomRounding(boolean randomRounding) {
         this.randomRounding = randomRounding;
+    }
+
+    /**
+     * Getter for property 'recruitment'.
+     *
+     * @return Value for property 'recruitment'.
+     */
+    public RecruitmentProcess getRecruitment() {
+        return recruitment;
+    }
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Getter for property 'agingProcess'.
+     *
+     * @return Value for property 'agingProcess'.
+     */
+    public AgingProcess getAgingProcess() {
+        return agingProcess;
+    }
+
+    /**
+     * Getter for property 'mortality'.
+     *
+     * @return Value for property 'mortality'.
+     */
+    public NaturalMortalityProcess getMortality() {
+        return mortality;
+    }
+
+    /**
+     * Getter for property 'species'.
+     *
+     * @return Value for property 'species'.
+     */
+    public Species getSpecies() {
+        return species;
     }
 }

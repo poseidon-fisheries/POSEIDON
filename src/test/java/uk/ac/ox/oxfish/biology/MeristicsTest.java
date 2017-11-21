@@ -48,8 +48,8 @@ public class MeristicsTest {
         assertEquals(yellowEye.getWeight(FishStateUtilities.FEMALE,5),0.3167667645,.001);
         assertEquals(yellowEye.getWeight(FishStateUtilities.MALE, 5), 0.365220907, .001);
 
-        assertEquals(yellowEye.getMaturity().get(5),0.0046166415,.0001);
-        assertEquals(yellowEye.getRelativeFecundity().get(5),47344.590014727,.001);
+        assertEquals(yellowEye.getMaturity()[5],0.0046166415,.0001);
+        assertEquals(yellowEye.getRelativeFecundity()[5],47344.590014727,.001);
         assertEquals(yellowEye.getPhi().get(5),173.6635925757,.001);
 
         assertEquals(yellowEye.getCumulativeSurvivalFemale().get(5),0.7945336025,.001);
@@ -74,9 +74,9 @@ public class MeristicsTest {
         assertEquals(shortspine.getWeight(FishStateUtilities.FEMALE,5),0.0130770514,.001);
         assertEquals(shortspine.getWeight(FishStateUtilities.MALE,5),0.0130770514,.001);
 
-        assertEquals(shortspine.getMaturity().get(10),0.3900004207,.0001);
-        assertEquals(shortspine.getRelativeFecundity().get(5), 0.0130770514, .001);
-        assertEquals(shortspine.getRelativeFecundity().get(20), 0.3052767163, .001);
+        assertEquals(shortspine.getMaturity()[10],0.3900004207,.0001);
+        assertEquals(shortspine.getRelativeFecundity()[5], 0.0130770514, .001);
+        assertEquals(shortspine.getRelativeFecundity()[20], 0.3052767163, .001);
        assertEquals(shortspine.getCumulativeSurvivalFemale().get(5),0.7768562128,.001);
         assertEquals(shortspine.getCumulativeSurvivalFemale().get(20),0.3642189796,.001);
         assertEquals(shortspine.getPhi().get(20),0.1111875741,.001);
@@ -101,8 +101,8 @@ public class MeristicsTest {
         assertEquals(longspine.getWeight(FishStateUtilities.FEMALE,5),0.019880139,.001);
         assertEquals(longspine.getWeight(FishStateUtilities.MALE,5),0.019880139,.001);
 
-        assertEquals(longspine.getMaturity().get(5),6.03332555676691E-05,.0001);
-        assertEquals(longspine.getRelativeFecundity().get(5), 0.019880139, .001);
+        assertEquals(longspine.getMaturity()[5],6.03332555676691E-05,.0001);
+        assertEquals(longspine.getRelativeFecundity()[5], 0.019880139, .001);
         assertEquals(longspine.getCumulativeSurvivalMale().get(5), 0.5731745408, .001);
         assertEquals(longspine.getPhi().get(5),3.45814860523815E-05,.001);
 
@@ -126,8 +126,8 @@ public class MeristicsTest {
         assertEquals(sablefish.getWeight(FishStateUtilities.FEMALE,5),1.7258103959,.001);
         assertEquals(sablefish.getWeight(FishStateUtilities.MALE,5),1.3559663707,.001);
 
-        assertEquals(sablefish.getMaturity().get(5),0.4207762664,.0001);
-        assertEquals(sablefish.getRelativeFecundity().get(5), 1.7258103959, .001);
+        assertEquals(sablefish.getMaturity()[5],0.4207762664,.0001);
+        assertEquals(sablefish.getRelativeFecundity()[5], 1.7258103959, .001);
         assertEquals(sablefish.getCumulativeSurvivalFemale().get(5),0.670320046,.001);
         assertEquals(sablefish.getPhi().get(5),0.4867730478,.001);
         assertEquals(sablefish.getCumulativePhi(),14.2444066772,.001);
@@ -152,9 +152,9 @@ public class MeristicsTest {
         assertEquals(sole.getWeight(FishStateUtilities.FEMALE,5),0.124536091,.001);
         assertEquals(sole.getWeight(FishStateUtilities.MALE,5),0.120103947,.001);
 
-        assertEquals(sole.getMaturity().get(5),0.0002945897,.0001);
+        assertEquals(sole.getMaturity()[5],0.0002945897,.0001);
 
-        assertEquals(sole.getRelativeFecundity().get(5), 0.124536091, .001);
+        assertEquals(sole.getRelativeFecundity()[5], 0.124536091, .001);
         assertEquals(sole.getCumulativeSurvivalFemale().get(5),0.5585003689, .001);
         assertEquals(sole.getPhi().get(5),2.04897288861722E-05,.001);
 
@@ -181,8 +181,8 @@ public class MeristicsTest {
         assertEquals(canary.getLength(FishStateUtilities.MALE,5),30.1273037904,.001);
         assertEquals(canary.getWeight(FishStateUtilities.MALE,5),0.4694413124,.001);
 
-        assertEquals(canary.getMaturity().get(5),0.0801270824,.0001);
-        assertEquals(canary.getRelativeFecundity().get(5), 0.4988476814, .001);
+        assertEquals(canary.getMaturity()[5],0.0801270824,.0001);
+        assertEquals(canary.getRelativeFecundity()[5], 0.4988476814, .001);
         assertEquals(canary.getCumulativeSurvivalFemale().get(5), 0.7408182207, .001);
 
         assertEquals(canary.getPhi().get(5),0.0296114001         ,.001);

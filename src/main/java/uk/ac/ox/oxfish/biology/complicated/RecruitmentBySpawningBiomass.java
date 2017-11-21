@@ -21,10 +21,11 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+import java.util.Arrays;
 
 /**
  * Created by carrknight on 3/1/16.
@@ -50,6 +51,18 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      */
     private final boolean addRelativeFecundityToSpawningBiomass;
 
+    /**
+     * return the maturity array of female fishers 
+     */
+    private final double[] maturity;
+
+    @Nullable
+    private final double[] relativeFecundity;
+
+    /**
+     * returns the subdivision/cohort/dimension representing female fish
+     */
+    private final int femaleSubdivision;
 
     private NoiseMaker noisemaker = new NoiseMaker() {
         @Override
@@ -62,8 +75,16 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     public RecruitmentBySpawningBiomass(
             int virginRecruits,
             double steepness,
-            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass) {
-        this.cumulativePhi = cumulativePhi;
+            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass, double[] maturity,
+            @Nullable double[] relativeFecundity, int femaleSubdivision) {
+        this.cumulativePhi =cumulativePhi;
+        this.maturity = Arrays.copyOf(maturity,maturity.length);
+        if(addRelativeFecundityToSpawningBiomass)
+            this.relativeFecundity = Arrays.copyOf(relativeFecundity,relativeFecundity.length);
+        else
+            this.relativeFecundity=null;
+        Preconditions.checkArgument(femaleSubdivision>=0);
+        this.femaleSubdivision = femaleSubdivision;
         Preconditions.checkArgument(virginRecruits>0);
         Preconditions.checkArgument(steepness>0);
         this.virginRecruits = virginRecruits;
@@ -87,24 +108,28 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
         //you need to sum up the spawning biomass of the fish:
         int cohorts = meristics.getMaxAge() + 1;
 
-        Preconditions.checkArgument(abundance.getSubdivisions()==2, "This recruitment function requires a split between male and female");
-        
-        final double[] femalePerAge = abundance.asMatrix()[FEMALE];
+        Preconditions.checkArgument(abundance.getSubdivisions()>=
+                                            femaleSubdivision, "This recruitment function is looking for the FEMALE cohort but ran out of bounds");
+
+        final double[] femalePerAge = abundance.asMatrix()[femaleSubdivision];
         Preconditions.checkArgument(femalePerAge.length == cohorts,
                                     "The number of cohorts is not equal to maxAge + 1");
+        Preconditions.checkArgument(femalePerAge.length == maturity.length,
+                                    "Mismatch length between maturity and female per age!");
         double spawningBiomass = 0;
         //compute the cumulative spawning biomass
         for(int i=0; i< cohorts; i++)
         {
-            if(meristics.getWeight(FEMALE,i) > 0)
+            if(meristics.getWeight(femaleSubdivision,i) > 0)
                 if(!addRelativeFecundityToSpawningBiomass)
-                    spawningBiomass += meristics.getWeight(FEMALE,i) *
-                            meristics.getMaturity().get(i) * femalePerAge[i];
-                else
-                    spawningBiomass += meristics.getWeight(FEMALE,i) *
-                            meristics.getMaturity().get(i) * femalePerAge[i]
-                            *  meristics.getRelativeFecundity().get(i);
-
+                    spawningBiomass += meristics.getWeight(femaleSubdivision,i) *
+                            maturity[i] * femalePerAge[i];
+                else {
+                    assert relativeFecundity != null;
+                    spawningBiomass += meristics.getWeight(femaleSubdivision, i) *
+                            maturity[i] * femalePerAge[i]
+                            * relativeFecundity[i];
+                }
         }
 
         //turn it into recruits.
@@ -112,8 +137,8 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
                 FishStateUtilities.round(
                         (1d+noisemaker.get()) * (
                                 (4 * steepness * virginRecruits * spawningBiomass)/
-                        ((virginRecruits*cumulativePhi*(1-steepness)) +
-                                (((5*steepness)-1)*spawningBiomass))
+                                        ((virginRecruits*cumulativePhi*(1-steepness)) +
+                                                (((5*steepness)-1)*spawningBiomass))
                         )
                 );
 
@@ -128,6 +153,71 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      */
     @Override
     public void addNoise(NoiseMaker noiseMaker) {
-            this.noisemaker = noiseMaker;
+        this.noisemaker = noiseMaker;
+    }
+
+
+    /**
+     * Getter for property 'virginRecruits'.
+     *
+     * @return Value for property 'virginRecruits'.
+     */
+    public int getVirginRecruits() {
+        return virginRecruits;
+    }
+
+    /**
+     * Getter for property 'steepness'.
+     *
+     * @return Value for property 'steepness'.
+     */
+    public double getSteepness() {
+        return steepness;
+    }
+
+    /**
+     * Getter for property 'cumulativePhi'.
+     *
+     * @return Value for property 'cumulativePhi'.
+     */
+    public double getCumulativePhi() {
+        return cumulativePhi;
+    }
+
+    /**
+     * Getter for property 'addRelativeFecundityToSpawningBiomass'.
+     *
+     * @return Value for property 'addRelativeFecundityToSpawningBiomass'.
+     */
+    public boolean isAddRelativeFecundityToSpawningBiomass() {
+        return addRelativeFecundityToSpawningBiomass;
+    }
+
+    /**
+     * Getter for property 'maturity'.
+     *
+     * @return Value for property 'maturity'.
+     */
+    public double[] getMaturity() {
+        return maturity;
+    }
+
+    /**
+     * Getter for property 'relativeFecundity'.
+     *
+     * @return Value for property 'relativeFecundity'.
+     */
+    @Nullable
+    public double[] getRelativeFecundity() {
+        return relativeFecundity;
+    }
+
+    /**
+     * Getter for property 'femaleSubdivision'.
+     *
+     * @return Value for property 'femaleSubdivision'.
+     */
+    public int getFemaleSubdivision() {
+        return femaleSubdivision;
     }
 }

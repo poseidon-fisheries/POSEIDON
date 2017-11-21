@@ -72,8 +72,7 @@ public class ListMeristicFactory implements AlgorithmFactory<FromListMeristics>{
 
         //create a meristic!
         return new FromListMeristics(
-                maturities,
-                                     weights);
+                weights);
 
 
 

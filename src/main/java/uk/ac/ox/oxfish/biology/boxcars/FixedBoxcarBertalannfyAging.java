@@ -26,15 +26,13 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FixedBoxcarAgingEqualLengthFactory implements AlgorithmFactory<FixedBoxcarAging>{
+public class FixedBoxcarBertalannfyAging implements AlgorithmFactory<FixedBoxcarAging>{
 
 
 
     private DoubleParameter LInfinity= new FixedDoubleParameter(113);
 
     private DoubleParameter K = new FixedDoubleParameter(.364);
-
-    private int numberOfBins = 100;
 
 
     /**
@@ -91,21 +89,4 @@ public class FixedBoxcarAgingEqualLengthFactory implements AlgorithmFactory<Fixe
         K = k;
     }
 
-    /**
-     * Getter for property 'numberOfBins'.
-     *
-     * @return Value for property 'numberOfBins'.
-     */
-    public int getNumberOfBins() {
-        return numberOfBins;
-    }
-
-    /**
-     * Setter for property 'numberOfBins'.
-     *
-     * @param numberOfBins Value to set for property 'numberOfBins'.
-     */
-    public void setNumberOfBins(int numberOfBins) {
-        this.numberOfBins = numberOfBins;
-    }
 }

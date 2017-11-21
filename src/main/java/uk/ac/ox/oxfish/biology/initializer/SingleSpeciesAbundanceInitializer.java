@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+
 /**
  * A biology initializer that creates a one species model with abundance biology splitting the population equally
  * among all the seatiles
@@ -155,8 +157,10 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 cali.getVirginRecruits(),
                 cali.getSteepness(),
                 cali.getCumulativePhi(),
-                cali.isAddRelativeFecundityToSpawningBiomass()
-        );
+                cali.isAddRelativeFecundityToSpawningBiomass(),
+                cali.getMaturity(),
+                cali.getRelativeFecundity(),
+                FEMALE);
         aging = new StandardAgingProcess(false);
 
 

@@ -30,14 +30,14 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
  * A fixed proportion of fish moves from one bin to the next each step
  * Created by carrknight on 7/6/17.
  */
-public class ProportionalAgingProcess implements AgingProcess {
+public class ProportionalAgingProcess extends LocalAgingProcess {
 
 
     /**
      * ignored
      */
     @Override
-    public void initialize(Species species) {
+    public void start(Species species) {
         //ignored
     }
 

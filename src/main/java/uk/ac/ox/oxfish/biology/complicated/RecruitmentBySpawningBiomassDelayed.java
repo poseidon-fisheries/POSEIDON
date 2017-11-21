@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 
 import java.util.LinkedList;
@@ -35,10 +36,14 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
 
     private final Queue<Double> recruits = new LinkedList<>();
 
+
     public RecruitmentBySpawningBiomassDelayed(
-            int virginRecruits, double steepness,
-            double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass, int yearDelay) {
-        super(virginRecruits, steepness, cumulativePhi, addRelativeFecundityToSpawningBiomass);
+            int virginRecruits, double steepness, double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass,
+            double[] maturity, @Nullable double[] relativeFecundity, int femaleSubdivision,
+            int yearDelay) {
+        super(virginRecruits, steepness, cumulativePhi, addRelativeFecundityToSpawningBiomass, maturity,
+              relativeFecundity,
+              femaleSubdivision);
         this.yearDelay = yearDelay;
     }
 

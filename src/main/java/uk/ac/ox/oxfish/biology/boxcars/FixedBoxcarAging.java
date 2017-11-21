@@ -23,11 +23,11 @@ package uk.ac.ox.oxfish.biology.boxcars;
 import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
-import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
+import uk.ac.ox.oxfish.biology.complicated.LocalAgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 import uk.ac.ox.oxfish.model.FishState;
 
-public class FixedBoxcarAging  implements AgingProcess{
+public class FixedBoxcarAging  extends LocalAgingProcess {
 
 
 
@@ -50,7 +50,7 @@ public class FixedBoxcarAging  implements AgingProcess{
      * @param species
      */
     @Override
-    public void initialize(Species species) {
+    public void start(Species species) {
 
         int numberOfBins = species.getMeristics().getNumberOfBins();
         double[][] graduatingRates = new double[species.getNumberOfSubdivisions()][numberOfBins];

@@ -112,25 +112,6 @@ public class Species {
 
 
 
-    /**
-     * Getter for property 'virginRecruits'.
-     *
-     * @return Value for property 'virginRecruits'.
-     */
-    public int getVirginRecruits() {
-        return meristics.getVirginRecruits();
-    }
-
-    /**
-     * Getter for property 'steepness'.
-     *
-     * @return Value for property 'steepness'.
-     */
-    public double getSteepness() {
-        return meristics.getSteepness();
-    }
-
-
     public double getLength(int subdivision, int bin) {
         return meristics.getLength(subdivision, bin);
     }
@@ -157,14 +138,6 @@ public class Species {
         return meristics.getNumberOfBins();
     }
 
-    /**
-     * Getter for property 'addRelativeFecundityToSpawningBiomass'.
-     *
-     * @return Value for property 'addRelativeFecundityToSpawningBiomass'.
-     */
-    public boolean isAddRelativeFecundityToSpawningBiomass() {
-        return meristics.isAddRelativeFecundityToSpawningBiomass();
-    }
 
     /**
      * Getter for property 'imaginary'.
@@ -175,15 +148,4 @@ public class Species {
         return imaginary;
     }
 
-    public ImmutableList<Double> getMaturity() {
-        return meristics.getMaturity();
-    }
-
-    public ImmutableList<Double> getRelativeFecundity() {
-        return meristics.getRelativeFecundity();
-    }
-
-    public double getCumulativePhi() {
-        return meristics.getCumulativePhi();
-    }
 }

@@ -160,12 +160,12 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
       /**
      * For each age contains the maturity percentage
      */
-    private final ImmutableList<Double> maturity;
+    private final double[] maturity;
 
     /**
      * for each age contains the relative relativeFecundity (eggs/weight) of the species
      */
-    private final ImmutableList<Double> relativeFecundity;
+    private final double[] relativeFecundity;
 
     /**
      * The cumulative survival of the male fish
@@ -314,8 +314,8 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
                 youngAgeFemale
         );
 
-        Double[] maturityArray = new Double[this.maxAge +1];
-        Double[] relativeFecundityArray = new Double[this.maxAge +1];
+        double[] maturityArray = new double[this.maxAge +1];
+        double[] relativeFecundityArray = new double[this.maxAge +1];
         Double[] cumulativeSurvivalMaleArray = new Double[this.maxAge +1];
         Double[] cumulativeSurvivalFemaleArray = new Double[this.maxAge + 1];
         Double[] phiArray = new Double[this.maxAge +1];
@@ -334,8 +334,8 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         }
 
 
-        maturity = ImmutableList.copyOf(maturityArray);
-        relativeFecundity = ImmutableList.copyOf(relativeFecundityArray);
+        this.maturity = maturityArray;
+        this.relativeFecundity = relativeFecundityArray;
         cumulativeSurvivalMale = ImmutableList.copyOf(cumulativeSurvivalMaleArray);
         cumulativeSurvivalFemale = ImmutableList.copyOf(cumulativeSurvivalFemaleArray);
         phi = ImmutableList.copyOf(phiArray);
@@ -418,15 +418,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return fecunditySlope;
     }
 
-    @Override
-    public ImmutableList<Double> getMaturity() {
-        return maturity;
-    }
-
-    @Override
-    public ImmutableList<Double> getRelativeFecundity() {
-        return relativeFecundity;
-    }
 
     public ImmutableList<Double> getCumulativeSurvivalMale() {
         return cumulativeSurvivalMale;
@@ -440,7 +431,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
         return phi;
     }
 
-    @Override
     public double getCumulativePhi() {
         return cumulativePhi;
     }
@@ -472,7 +462,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      *
      * @return Value for property 'addRelativeFecundityToSpawningBiomass'.
      */
-    @Override
     public boolean isAddRelativeFecundityToSpawningBiomass() {
         return addRelativeFecundityToSpawningBiomass;
     }
@@ -545,5 +534,23 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
     @Override
     public double getLengthAtAge(double ageInYears, int subdivision) {
         return growth.getLengthAtAge(ageInYears, subdivision);
+    }
+
+    /**
+     * Getter for property 'maturity'.
+     *
+     * @return Value for property 'maturity'.
+     */
+    public double[] getMaturity() {
+        return maturity;
+    }
+
+    /**
+     * Getter for property 'relativeFecundity'.
+     *
+     * @return Value for property 'relativeFecundity'.
+     */
+    public double[] getRelativeFecundity() {
+        return relativeFecundity;
     }
 }

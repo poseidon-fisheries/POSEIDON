@@ -30,10 +30,11 @@ public interface Meristics extends GrowthBinParameters {
 
 
 
-
+/*
     ImmutableList<Double> getMaturity();
 
     ImmutableList<Double> getRelativeFecundity();
+
 
     double getCumulativePhi();
 
@@ -44,4 +45,5 @@ public interface Meristics extends GrowthBinParameters {
 
 
     double getSteepness();
+    */
 }

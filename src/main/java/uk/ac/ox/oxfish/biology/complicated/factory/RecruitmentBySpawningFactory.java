@@ -28,6 +28,8 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
+
 /**
  * Created by carrknight on 7/8/17.
  */
@@ -59,6 +61,13 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
     private DoubleParameter yearlyDelay = new FixedDoubleParameter(0);
 
 
+    private double[] maturity = new double[2];
+
+
+    private double[] relativeFecundity = null;
+
+    private int femaleSubdivisionIndex = FEMALE;
+
     /**
      * Applies this function to the given argument.
      *
@@ -73,15 +82,15 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
                     virginRecruits.apply(state.getRandom()).intValue(),
                     steepness.apply(state.getRandom()),
                     cumulativePhi.apply(state.getRandom()),
-                    addRelativeFecundityToSpawningBiomass
-            );
+                    addRelativeFecundityToSpawningBiomass,
+                    maturity, relativeFecundity, femaleSubdivisionIndex);
         else
             return new RecruitmentBySpawningBiomassDelayed(
                     virginRecruits.apply(state.getRandom()).intValue(),
                     steepness.apply(state.getRandom()),
                     cumulativePhi.apply(state.getRandom()),
-
                     addRelativeFecundityToSpawningBiomass,
+                    maturity, relativeFecundity, femaleSubdivisionIndex,
                     delay);
     }
 
@@ -173,5 +182,60 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
      */
     public void setYearlyDelay(DoubleParameter yearlyDelay) {
         this.yearlyDelay = yearlyDelay;
+    }
+
+
+    /**
+     * Getter for property 'maturity'.
+     *
+     * @return Value for property 'maturity'.
+     */
+    public double[] getMaturity() {
+        return maturity;
+    }
+
+    /**
+     * Setter for property 'maturity'.
+     *
+     * @param maturity Value to set for property 'maturity'.
+     */
+    public void setMaturity(double[] maturity) {
+        this.maturity = maturity;
+    }
+
+    /**
+     * Getter for property 'relativeFecundity'.
+     *
+     * @return Value for property 'relativeFecundity'.
+     */
+    public double[] getRelativeFecundity() {
+        return relativeFecundity;
+    }
+
+    /**
+     * Setter for property 'relativeFecundity'.
+     *
+     * @param relativeFecundity Value to set for property 'relativeFecundity'.
+     */
+    public void setRelativeFecundity(double[] relativeFecundity) {
+        this.relativeFecundity = relativeFecundity;
+    }
+
+    /**
+     * Getter for property 'femaleSubdivisionIndex'.
+     *
+     * @return Value for property 'femaleSubdivisionIndex'.
+     */
+    public int getFemaleSubdivisionIndex() {
+        return femaleSubdivisionIndex;
+    }
+
+    /**
+     * Setter for property 'femaleSubdivisionIndex'.
+     *
+     * @param femaleSubdivisionIndex Value to set for property 'femaleSubdivisionIndex'.
+     */
+    public void setFemaleSubdivisionIndex(int femaleSubdivisionIndex) {
+        this.femaleSubdivisionIndex = femaleSubdivisionIndex;
     }
 }

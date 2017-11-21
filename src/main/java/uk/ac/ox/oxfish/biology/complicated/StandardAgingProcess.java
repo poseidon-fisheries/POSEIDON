@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.model.FishState;
  * other forms of bins
  * Created by carrknight on 7/6/17.
  */
-public class StandardAgingProcess implements AgingProcess {
+public class StandardAgingProcess extends LocalAgingProcess {
 
 
     public StandardAgingProcess(boolean preserveLastAge) {
@@ -43,7 +43,7 @@ public class StandardAgingProcess implements AgingProcess {
      * @param species
      */
     @Override
-    public void initialize(Species species) {
+    public void start(Species species) {
 
     }
 

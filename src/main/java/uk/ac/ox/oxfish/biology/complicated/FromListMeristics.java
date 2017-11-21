@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 /**
  * A plug while waiting for a proper meristic reform. This simply c
@@ -33,25 +32,16 @@ public class FromListMeristics implements Meristics {
     private final GrowthBinByList growth;
 
 
-
-
-    private final  ImmutableList<Double> maturities;
-
-
     public FromListMeristics(
-            Double[] maturities,
             double[] weights) {
-        this(maturities, weights, new double[weights.length]);
+        this(weights, new double[weights.length]);
     }
 
     public FromListMeristics(
-            Double[] maturities,
             double[] weights,
             double[] lenghts) {
-        Preconditions.checkArgument(maturities.length == weights.length, "length mismatch between maturities and weights");
         Preconditions.checkArgument(lenghts.length == weights.length, "length mismatch between lenghts and weights");
 
-        this.maturities = ImmutableList.copyOf(maturities);
 
         this.growth = new GrowthBinByList(2,
                                           lenghts,
@@ -66,40 +56,6 @@ public class FromListMeristics implements Meristics {
 
 
 
-
-
-    @Override
-    public ImmutableList<Double> getMaturity() {
-        return maturities;
-    }
-
-    @Override
-    public ImmutableList<Double> getRelativeFecundity() {
-
-        return null;
-    }
-
-    @Override
-    public double getCumulativePhi() {
-
-       return Double.NaN;
-    }
-
-    @Override
-    public boolean isAddRelativeFecundityToSpawningBiomass() {
-        return false;
-    }
-
-
-    @Override
-    public int getVirginRecruits() {
-        return  - 1;
-    }
-
-    @Override
-    public double getSteepness() {
-        return Double.NaN;
-    }
 
     /**
      * you can pick as many subdivisions as you want, they will all just spit out the same weight and length

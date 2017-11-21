@@ -161,7 +161,7 @@ public class TripRecord {
      * @return profits/days
      * @param includingOpportunityCosts
      */
-    public Double getProfitPerHour(boolean includingOpportunityCosts)
+    public double getProfitPerHour(boolean includingOpportunityCosts)
     {
 
         double totalEarnings = getEarnings();

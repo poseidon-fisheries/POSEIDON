@@ -23,10 +23,15 @@ package uk.ac.ox.oxfish.biology.complicated;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.factory.MeristicsFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by carrknight on 6/26/17.
@@ -36,30 +41,43 @@ public class RecruitmentBySpawningBiomassTest {
     @Test
     public void recruitment() throws Exception {
 
-        Species species = MultipleSpeciesAbundanceInitializer.
-                generateSpeciesFromFolder(Paths.get("inputs",
-                                                    "california",
-                                                    "biology",
-                                                    "Sablefish"), "Sablefish");
+        MeristicsFileFactory factory = new MeristicsFileFactory(Paths.get("inputs",
+                                                                          "california",
+                                                                          "biology",
+                                                                          "Sablefish","meristics.yaml"));
+
+        StockAssessmentCaliforniaMeristics meristics = factory.apply(mock(FishState.class));
+        SingleSpeciesNaturalProcesses process = MultipleSpeciesAbundanceInitializer.initializeNaturalProcesses(
+                mock(FishState.class),
+                MultipleSpeciesAbundanceInitializer.
+                        generateSpeciesFromFolder(Paths.get("inputs",
+                                                            "california",
+                                                            "biology",
+                                                            "Sablefish"), "Sablefish"),
+                new HashMap<>(),
+                meristics,
+                true,
+                0,
+                false
+
+        );
+
+
 
         double[] male = new double[60];
         double[] female = new double[60];
         Arrays.fill(male, 0);
         Arrays.fill(female, 10000);
 
-        System.out.println(species.getVirginRecruits());
-        System.out.println(species.getSteepness());
-        System.out.println(species.isAddRelativeFecundityToSpawningBiomass());
-
-        RecruitmentBySpawningBiomass process = new RecruitmentBySpawningBiomass(
-                species.getVirginRecruits(),
-                species.getSteepness(),
-                species.getCumulativePhi(),
-                species.isAddRelativeFecundityToSpawningBiomass()
-        );
+        RecruitmentBySpawningBiomass recruitment = (RecruitmentBySpawningBiomass) process.getRecruitment();
+        System.out.println(recruitment.getVirginRecruits());
+        System.out.println(recruitment.getSteepness());
+        System.out.println(recruitment.isAddRelativeFecundityToSpawningBiomass());
 
 
-        double recruits = process.recruit(species,species.getMeristics(),new StructuredAbundance(male,female));
+
+        double recruits = recruitment.recruit(process.getSpecies(),meristics,
+                                              new StructuredAbundance(male,female));
         System.out.println(recruits);
         Assert.assertEquals(416140d, recruits, 1d);
 

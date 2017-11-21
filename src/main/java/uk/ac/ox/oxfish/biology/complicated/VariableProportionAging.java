@@ -23,13 +23,12 @@ package uk.ac.ox.oxfish.biology.complicated;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.model.FishState;
 
 /**
  * aging as simulated by a fixed boxcar process
  */
-public class VariableProportionAging implements AgingProcess {
+public class VariableProportionAging extends LocalAgingProcess {
 
 
     /**
@@ -50,7 +49,7 @@ public class VariableProportionAging implements AgingProcess {
      * @param species
      */
     @Override
-    public void initialize(Species species) {
+    public void start(Species species) {
 
     }
 
