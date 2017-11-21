@@ -105,10 +105,6 @@ public class Species {
     }
 
 
-    public int getMaxAge() {
-        return meristics.getMaxAge();
-    }
-
 
 
 

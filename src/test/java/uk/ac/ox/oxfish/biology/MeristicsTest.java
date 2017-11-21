@@ -196,7 +196,7 @@ public class MeristicsTest {
         Meristics placeholder = StockAssessmentCaliforniaMeristics.FAKE_MERISTICS;
         assertEquals(placeholder.getWeight(FishStateUtilities.MALE,0),1,.001);
         assertEquals(placeholder.getWeight(FishStateUtilities.FEMALE,0),1,.001);
-        assertEquals(placeholder.getMaxAge(), 0, .001);
+        assertEquals(placeholder.getNumberOfBins(), 1, .001);
 
 
     }

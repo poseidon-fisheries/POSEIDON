@@ -344,7 +344,6 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
     }
 
 
-    @Override
     public int getMaxAge() {
         return maxAge;
     }

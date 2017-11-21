@@ -69,7 +69,7 @@ public class CaliforniaBiomassDynamics {
         state.schedule.step(state);
         StringBuilder demography = new StringBuilder();
         demography.append("year,age,abundance").append("\n");
-        for(int age=0; age<sablefish.getMaxAge(); age++)
+        for(int age=0; age<sablefish.getNumberOfBins(); age++)
         {
             demography.append(state.getYear()).append(",").append(age).append(",").append(
                     state.getTotalAbundance(sablefish,age)
@@ -120,7 +120,7 @@ public class CaliforniaBiomassDynamics {
 
         writer.close();
         demography.append("year,age,abundance").append("\n");
-        for(int age=0; age<sablefish.getMaxAge(); age++)
+        for(int age=0; age<sablefish.getNumberOfBins(); age++)
         {
             demography.append(state.getYear()).append(",").append(age).append(",").append(
                     state.getTotalAbundance(sablefish,age)

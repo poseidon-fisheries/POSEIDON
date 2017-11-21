@@ -400,8 +400,8 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
         Preconditions.checkArgument(ratiosLocalCopy.keySet().containsAll(locals.values()),
                                     "Some local biologies in the masterlist are not present in the proportion map");
 
-        double maleRemainder[] = new double[speciesToReset.getMaxAge()+1];
-        double femaleRemainder[] = new double[speciesToReset.getMaxAge()+1];
+        double maleRemainder[] = new double[speciesToReset.getNumberOfBins()];
+        double femaleRemainder[] = new double[speciesToReset.getNumberOfBins()];
         for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
         {
 
@@ -409,7 +409,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
             AbundanceBasedLocalBiology local = ratio.getKey();
             StructuredAbundance abundance = local.getAbundance(speciesToReset);
             Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for ");
-            for(int i=0; i<=speciesToReset.getMaxAge(); i++)
+            for(int i=0; i<speciesToReset.getNumberOfBins(); i++)
             {
 
 

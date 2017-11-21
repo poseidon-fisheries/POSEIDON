@@ -239,7 +239,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         //read in the total number of fish
         int[][] totalCount = initialAbundanceFactory.apply(model).getAbundance();
         assert totalCount.length == 2;
-        Preconditions.checkArgument(totalCount[0].length == species.getMaxAge()+1,
+        Preconditions.checkArgument(totalCount[0].length == species.getNumberOfBins(),
                                     "mismatch between size of initial abundance and maxAge of species");
 
 

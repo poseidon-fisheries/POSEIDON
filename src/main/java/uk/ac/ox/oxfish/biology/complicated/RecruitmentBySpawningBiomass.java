@@ -106,7 +106,7 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
     {
 
         //you need to sum up the spawning biomass of the fish:
-        int cohorts = meristics.getMaxAge() + 1;
+        int cohorts = meristics.getNumberOfBins();
 
         Preconditions.checkArgument(abundance.getSubdivisions()>=
                                             femaleSubdivision, "This recruitment function is looking for the FEMALE cohort but ran out of bounds");

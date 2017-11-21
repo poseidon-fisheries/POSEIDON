@@ -65,7 +65,7 @@ public class MultipleSpeciesDerisoInitializerTest {
         assertEquals(1,biology.getSpecies().size());
         Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(0, fakeSpecies.getMaxAge());
+        assertEquals(0, fakeSpecies.getNumberOfBins()-1);
 
 
         //create a 4x4 map of the world.
@@ -127,7 +127,7 @@ public class MultipleSpeciesDerisoInitializerTest {
         assertEquals(1,biology.getSpecies().size());
         Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(0, fakeSpecies.getMaxAge());
+        assertEquals(0, fakeSpecies.getNumberOfBins()-1);
 
 
         //create a 4x4 map of the world.

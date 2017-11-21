@@ -39,7 +39,7 @@ public class StandardAgingProcessTest {
     public void oldFishDies() throws Exception {
 
         Species species = mock(Species.class);
-        when(species.getMaxAge()).thenReturn(2);
+        when(species.getNumberOfBins()).thenReturn(3);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
         StructuredAbundance abundance = new StructuredAbundance(male,female);
@@ -61,7 +61,7 @@ public class StandardAgingProcessTest {
     public void oldFishStays() throws Exception {
 
         Species species = mock(Species.class);
-        when(species.getMaxAge()).thenReturn(2);
+        when(species.getNumberOfBins()).thenReturn(3);
         double[] male = {10, 20, 30};
         double[] female = {100, 200, 300};
         StructuredAbundance abundance = new StructuredAbundance(male,female);

@@ -57,8 +57,8 @@ public class DiscardUnderagedTest {
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
-        when(first.getMaxAge()).thenReturn(2);
-        when(second.getMaxAge()).thenReturn(1);
+        when(first.getMaxAge()).thenReturn(3);
+        when(second.getMaxAge()).thenReturn(2);
 
         when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
         when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);

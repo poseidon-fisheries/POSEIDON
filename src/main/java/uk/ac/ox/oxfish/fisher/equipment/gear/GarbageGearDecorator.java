@@ -89,7 +89,7 @@ public class GarbageGearDecorator implements Gear {
                     newAbundances[i] = nonGarbage.getAbundance(i);
                 else {
                     //todo make this sex structured too if needed
-                    double[] garbageStructured = new double[garbageSpecies.getMaxAge() + 1];
+                    double[] garbageStructured = new double[garbageSpecies.getNumberOfBins()];
                     garbageStructured[0]= (garbageWeight/garbageSpecies.getWeight(0,0));
                     if(rounding)
                         garbageStructured[0] = (int) garbageStructured[0];

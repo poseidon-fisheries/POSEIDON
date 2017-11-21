@@ -65,8 +65,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
         //for each species create cohorts
         for(Species species : biology.getSpecies()) {
-            double[] male = new double[species.getMaxAge()+1];
-            double[] female = new double[species.getMaxAge()+1];
+            double[] male = new double[species.getNumberOfBins()];
+            double[] female = new double[species.getNumberOfBins()];
             double[][] fish = new double[][]{male,female};
             abundance.put(species, fish);
         }

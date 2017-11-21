@@ -84,8 +84,8 @@ public class AlwaysDiscardTheseSpeciesTest {
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
-        when(first.getMaxAge()).thenReturn(2);
-        when(second.getMaxAge()).thenReturn(1);
+        when(first.getNumberOfBins()).thenReturn(3);
+        when(second.getNumberOfBins()).thenReturn(2);
 
         when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
         when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);

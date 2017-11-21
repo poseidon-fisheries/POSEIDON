@@ -236,8 +236,8 @@ public class FishState  extends SimState{
         biology = initialization.getBiology();
         //add counters for catches if there is any need (aggregate catches are counted by fishers, here we want abundance based)
         for(Species species : biology.getSpecies())
-            if(species.getMaxAge()>0)
-                for(int age=0; age<species.getMaxAge()+1; age++)
+            if(species.getNumberOfBins()>0)
+                for(int age=0; age<species.getNumberOfBins(); age++)
                 {
                     String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age;
                     dailyCounter.addColumn(

@@ -46,12 +46,12 @@ public class CutoffAbundanceFilter extends FormulaAbundanceFilter {
     /** {@inheritDoc} */
     @Override
     protected double[][] computeSelectivity(Species species) {
-        double[][] toReturn = new double[2][species.getMaxAge()+1];
+        double[][] toReturn = new double[2][species.getNumberOfBins()];
 
 
         double higherThanCutoff = selectHigherThanCutoff ? 1 : 0;
 
-        for(int age=0; age<species.getMaxAge()+1; age++)
+        for(int age=0; age<species.getNumberOfBins(); age++)
         {
             toReturn[FishStateUtilities.MALE][age] = species.getLength(FishStateUtilities.MALE,age)>=cutoffLevel ? higherThanCutoff : 1-higherThanCutoff;
 

@@ -122,8 +122,8 @@ public class HomogeneousAbundanceGear implements Gear {
 
     protected static double[][] emptyAbundance(Species species) {
         double[][] catches = new double[2][];
-        catches[MALE] = new double[species.getMaxAge()+1];
-        catches[FishStateUtilities.FEMALE] = new double[species.getMaxAge()+1];
+        catches[MALE] = new double[species.getNumberOfBins()];
+        catches[FishStateUtilities.FEMALE] = new double[species.getNumberOfBins()];
         return catches;
     }
 

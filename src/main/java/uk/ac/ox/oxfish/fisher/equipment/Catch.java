@@ -185,8 +185,8 @@ public class Catch {
             if(correctSpecies==index)
                 abundance[index.getIndex()] = new StructuredAbundance(maleAbundance,femaleAbundance);
             else
-                abundance[index.getIndex()] = new StructuredAbundance(new double[index.getMaxAge()+1],
-                                                                      new double[index.getMaxAge()+1]);
+                abundance[index.getIndex()] = new StructuredAbundance(new double[index.getNumberOfBins()],
+                                                                      new double[index.getNumberOfBins()]);
         }
         //weigh them (assuming they are all men!)
         biomassCaught = new double[biology.getSize()];

@@ -48,7 +48,6 @@ public class FromListMeristics implements Meristics {
                                           weights);
     }
 
-    @Override
     public int getMaxAge() {
         return growth.getNumberOfBins()-1;
     }

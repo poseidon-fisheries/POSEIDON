@@ -135,7 +135,7 @@ public class SingleSpeciesAbundanceInitializerTest {
         assertEquals(1,biology.getSpecies().size());
         Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getMaxAge());
+        assertEquals(3, fakeSpecies.getNumberOfBins()-1);
 
 
         //put biology in there

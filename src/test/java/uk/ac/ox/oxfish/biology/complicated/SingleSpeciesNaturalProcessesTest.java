@@ -266,42 +266,42 @@ public class SingleSpeciesNaturalProcessesTest {
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
         //there are 500 male/female in each category oldest and 0  for second oldest
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()-1]=0;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-2]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-2]=0;
         processes.add(local, mock(SeaTile.class));
 
         //when false the oldest all die
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
         processes.step(model);
-        assertEquals(0, local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()], .001);
-        assertEquals(0,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
+        assertEquals(0, local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1], .001);
+        assertEquals(0,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1],.001);
 
 
         //but when I set it to true, they don't all die
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()-1]=0;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=0;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-2]=0;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-2]=0;
         processes = new SingleSpeciesNaturalProcesses(
                 recruitment,
                 species,
                 true, new StandardAgingProcess(true), new NoAbundanceDiffusion(), initializer.getMortality());
         processes.add(local,mock(SeaTile.class) );
         processes.step(model);
-        assertEquals(447, local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()], .001);
-        assertEquals(447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
+        assertEquals(447, local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1], .001);
+        assertEquals(447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1],.001);
 
 
         //in fact they mingle with the new oldest fish
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()]=500;
-        local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()-1]=500;
-        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()-1]=500;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1]=500;
+        local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-2]=500;
+        local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-2]=500;
         processes.step(model);
-        assertEquals(447+447, local.getAbundance(species).asMatrix()[FEMALE][species.getMaxAge()], .001);
-        assertEquals(447+447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getMaxAge()],.001);
+        assertEquals(447+447, local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1], .001);
+        assertEquals(447+447,local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1],.001);
 
 
     }

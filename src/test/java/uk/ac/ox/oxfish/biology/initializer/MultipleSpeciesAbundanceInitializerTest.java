@@ -63,7 +63,7 @@ public class MultipleSpeciesAbundanceInitializerTest
         assertEquals(1,biology.getSpecies().size());
         Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getMaxAge());
+        assertEquals(3, fakeSpecies.getNumberOfBins()-1);
 
 
         //create a 4x4 map of the world.
@@ -119,7 +119,7 @@ public class MultipleSpeciesAbundanceInitializerTest
         assertEquals(1,biology.getSpecies().size());
         Species fakeSpecies = biology.getSpecie(0);
         assertEquals("fake", fakeSpecies.getName());
-        assertEquals(3, fakeSpecies.getMaxAge());
+        assertEquals(3, fakeSpecies.getNumberOfBins()-1);
 
 
         //create a 4x4 map of the world.

@@ -129,8 +129,8 @@ public class HoldTest {
 
 
 
-        when(first.getMaxAge()).thenReturn(2);
-        when(second.getMaxAge()).thenReturn(1);
+        when(first.getNumberOfBins()).thenReturn(3);
+        when(second.getNumberOfBins()).thenReturn(2);
 
 
         when(first.getWeight(FEMALE,0)).thenReturn(10d);

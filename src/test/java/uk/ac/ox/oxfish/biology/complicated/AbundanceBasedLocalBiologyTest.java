@@ -81,8 +81,8 @@ public class AbundanceBasedLocalBiologyTest
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][5]=200;
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.MALE][6]=100;
 
-        double[] maleCatches = new double[longspine.getMaxAge()+1];
-        double[] femaleCatches = new double[longspine.getMaxAge()+1];
+        double[] maleCatches = new double[longspine.getNumberOfBins()];
+        double[] femaleCatches = new double[longspine.getNumberOfBins()];
         maleCatches[6] = 50;
         local.reactToThisAmountOfBiomassBeingFished(new Catch(maleCatches,femaleCatches,longspine,biology),
                                                     null,biology);

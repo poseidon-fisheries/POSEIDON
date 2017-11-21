@@ -97,11 +97,11 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
         double expTop = peak + binWidth + (0.99*  (binMax+binWidth/2) -peak - binWidth ) / (1+ Math.exp(-top));
 
 
-        double[][] asc = new double[2][species.getMaxAge() + 1];
-        double[][] desc = new double[2][species.getMaxAge() + 1];
-        double[][] join1 = new double[2][species.getMaxAge() + 1];
-        double[][] join2 = new double[2][species.getMaxAge() + 1];
-        for(int age=0;age<species.getMaxAge() + 1;age++)
+        double[][] asc = new double[2][species.getNumberOfBins()];
+        double[][] desc = new double[2][species.getNumberOfBins()];
+        double[][] join1 = new double[2][species.getNumberOfBins()];
+        double[][] join2 = new double[2][species.getNumberOfBins()];
+        for(int age=0;age<species.getNumberOfBins();age++)
         {
             double bin =  binWidth/2 +  (species.getLength(FishStateUtilities.MALE,age) - binMin) / binWidth;
             //EXP(-(($B26-$E$7)^2/$E$9))
@@ -124,7 +124,7 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
             double scaling = 1d/(1+Math.exp(-initialScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
             double minScaling = Math.exp(-(Math.pow(binMin + binWidth/2d-peak,2)/expWidth));
-            for(int age=0;age<species.getMaxAge();age++)
+            for(int age=0;age<species.getNumberOfBins()-1;age++)
             {
                 //($E$11+(1-$E$11)*(C26-$C$20)/($C$21-$C$20))
                 asc[0][age] = scaling+(1-scaling)*(asc[0][age]-minScaling)/( 1- minScaling);
@@ -140,7 +140,7 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
             double scaling = 1d/(1+Math.exp(-finalScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
             double maxScaling = Math.exp(-(Math.pow(binMax + binWidth/2d-expTop,2)/expDsc));
-            for(int age=0;age<species.getMaxAge();age++)
+            for(int age=0;age<species.getNumberOfBins()-1;age++)
             {
                 //((1+($E$12-1)*(E26-$C$22)/($C$23-$C$22)),E26)
                 desc[0][age] = 1 + (scaling-1)*(desc[0][age]-1)/(maxScaling-1);
@@ -152,8 +152,8 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
 
         //now turn it into selectivity thank god
-        double[][] selex = new double[2][species.getMaxAge() + 1];
-        for(int age=0;age<species.getMaxAge() + 1;age++)
+        double[][] selex = new double[2][species.getNumberOfBins()];
+        for(int age=0;age<species.getNumberOfBins();age++)
         {
 
             if(Double.isNaN(initialScaling) ||

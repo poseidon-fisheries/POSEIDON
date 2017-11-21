@@ -74,7 +74,7 @@ public class ThreePricesMarket extends AbstractMarket {
         super.start(state);
 
 
-        for(int age =0; age<getSpecies().getMaxAge()+1;age++) {
+        for(int age =0; age<getSpecies().getNumberOfBins();age++) {
             String columnName = LANDINGS_COLUMN_NAME + AGE_BIN_PREFIX + age;
             getDailyCounter().addColumn(columnName);
             String finalColumnName1 = columnName;
@@ -140,7 +140,7 @@ public class ThreePricesMarket extends AbstractMarket {
         double price =priceBelowThreshold;
         double earnings = 0;
         double sold = 0;
-        for(int age =0; age<species.getMaxAge()+1;age++)
+        for(int age =0; age<species.getNumberOfBins();age++)
         {
             if(age>highAgeThreshold)
                 price= priceAboveThresholds;

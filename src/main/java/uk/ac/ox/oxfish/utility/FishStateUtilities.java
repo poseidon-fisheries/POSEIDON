@@ -623,7 +623,7 @@ public class FishStateUtilities {
 
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
-        for(int age = 0; age< meristics.getMaxAge()+1; age++)
+        for(int age = 0; age< meristics.getNumberOfBins(); age++)
         {
             totalWeight += meristics.getWeight(MALE,age) * male[age];
             totalWeight += meristics.getWeight(FEMALE,age) * female[age];
@@ -690,7 +690,7 @@ public class FishStateUtilities {
     {
         double totalWeight = 0;
         //go through all the fish and sum up their weight at given age
-        for(int age=0; age<species.getMaxAge()+1; age++)
+        for(int age=0; age<species.getNumberOfBins(); age++)
         {
             totalWeight += species.getWeight(0,age) * ageStructure[age];
         }

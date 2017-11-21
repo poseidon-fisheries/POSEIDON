@@ -26,24 +26,7 @@ import com.google.common.collect.ImmutableList;
  * Created by carrknight on 7/5/17.
  */
 public interface Meristics extends GrowthBinParameters {
-    int getMaxAge();
 
 
 
-/*
-    ImmutableList<Double> getMaturity();
-
-    ImmutableList<Double> getRelativeFecundity();
-
-
-    double getCumulativePhi();
-
-    boolean isAddRelativeFecundityToSpawningBiomass();
-
-
-    int getVirginRecruits();
-
-
-    double getSteepness();
-    */
 }

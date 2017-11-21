@@ -49,9 +49,9 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
 
     protected double[][] computeSelectivity(Species species)
     {
-        double[][] toReturn = new double[2][species.getMaxAge()+1];
+        double[][] toReturn = new double[2][species.getNumberOfBins()];
 
-        for(int age=0; age<species.getMaxAge()+1; age++)
+        for(int age=0; age<species.getNumberOfBins(); age++)
         {
             toReturn[FishStateUtilities.MALE][age] =
                     1d/(1+Math.exp(-Math.log10(19)*( species.getLength(FishStateUtilities.MALE,age)-aParameter)/bParameter));
