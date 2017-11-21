@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 
+import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -53,6 +54,12 @@ public class MeristicFactories {
         CONSTRUCTORS.put("Stock Assessment Meristics From File",
                          MeristicsFileFactory::new);
         NAMES.put(MeristicsFileFactory.class,"Stock Assessment Meristics From File");
+
+
+        CONSTRUCTORS.put("Equally Spaced Von bertalanffy",
+                         EquallySpacedBertalanffyFactory::new);
+        NAMES.put(EquallySpacedBertalanffyFactory.class,"Equally Spaced Von bertalanffy");
+
 
     }
 

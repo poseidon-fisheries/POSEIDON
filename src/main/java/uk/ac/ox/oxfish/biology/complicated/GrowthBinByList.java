@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 /**
  * computes nothing, is given a list of weights and lengths and just spit them out
  */
-public class GrowthBinByList implements GrowthBinParameters {
+public class GrowthBinByList implements Meristics {
 
 
     private final double[] lenghts;

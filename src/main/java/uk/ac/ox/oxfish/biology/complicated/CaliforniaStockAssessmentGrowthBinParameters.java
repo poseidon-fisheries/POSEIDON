@@ -27,8 +27,7 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
  * follows the california stock assessment formulas where bins are age classes, and the subdivision is MALE-FEMALE
  * 
  */
-public class CaliforniaStockAssessmentGrowthBinParameters 
-        implements GrowthBinParameters {
+public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
     
     
     private final int maxAge;

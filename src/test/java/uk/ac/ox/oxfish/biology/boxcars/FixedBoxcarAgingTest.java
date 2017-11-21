@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 
@@ -44,10 +45,11 @@ public class FixedBoxcarAgingTest
 
 
 
-        FixedBoxcarAging aging = new FixedBoxcarAging(
-                0.364,
-                113
-        );
+        FixedBoxcarBertalannfyAging factory = new FixedBoxcarBertalannfyAging();
+        factory.setK(new FixedDoubleParameter(0.364));
+        factory.setLInfinity(new FixedDoubleParameter(113));
+
+        FixedBoxcarAging aging = factory.apply(mock(FishState.class));
 
 
         double[] lengths = new double[]{10, 11.040404040404, 12.0808080808081, 13.1212121212121, 14.1616161616162, 15.2020202020202,

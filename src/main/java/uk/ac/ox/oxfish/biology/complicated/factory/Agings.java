@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
+import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarAging;
+import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarBertalannfyAging;
 import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -53,6 +55,11 @@ public class Agings {
         CONSTRUCTORS.put("Proportional Aging",
                          ProportionalAgingFactory::new);
         NAMES.put(ProportionalAgingFactory.class,"Proportional Aging");
+
+
+        CONSTRUCTORS.put("Fixed Boxcar VB Aging",
+                         FixedBoxcarBertalannfyAging::new);
+        NAMES.put(FixedBoxcarBertalannfyAging.class,"Fixed Boxcar VB Aging");
 
     }
 
