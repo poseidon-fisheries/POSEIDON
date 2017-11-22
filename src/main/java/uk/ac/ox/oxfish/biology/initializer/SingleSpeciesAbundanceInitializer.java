@@ -55,7 +55,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
 
 
-    final private AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory;
+    final private InitialAbundance initialAbundance;
 
     /**
      * object allocating biomass around when simulation starts
@@ -103,9 +103,12 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     private final BiomassAllocator recruitmentAllocator;
     private SingleSpeciesNaturalProcesses processes;
 
+
+    private final boolean daily;
+
     public SingleSpeciesAbundanceInitializer(
             String speciesName,
-            AlgorithmFactory<? extends InitialAbundance> initialAbundanceFactory,
+            InitialAbundance initialAbundance,
             BiomassAllocator intialAbundanceAllocator,
             AgingProcess aging,
             Meristics meristics,
@@ -114,8 +117,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             AbundanceDiffuser diffuser,
             BiomassAllocator recruitmentAllocator,
             BiomassAllocator habitabilityAllocator,
-            NaturalMortalityProcess mortality) {
-        this.initialAbundanceFactory = initialAbundanceFactory;
+            NaturalMortalityProcess mortality, boolean daily) {
+        this.initialAbundance = initialAbundance;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
         this.meristics = meristics;
@@ -126,6 +129,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.recruitmentAllocator = recruitmentAllocator;
         this.habitabilityAllocator = habitabilityAllocator;
         this.mortality = mortality;
+        this.daily = daily;
     }
 
     /**
@@ -134,7 +138,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     private HashMap<SeaTile,AbundanceBasedLocalBiology> locals = new HashMap<>();
 
     //allocate weights to each
-    Map<AbundanceBasedLocalBiology, Double> initialWeights = new HashMap<>();
+    private Map<AbundanceBasedLocalBiology, Double> initialWeights = new HashMap<>();
 
 
     /**
@@ -146,8 +150,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     public SingleSpeciesAbundanceInitializer(
             Path biologicalDirectory, String speciesName, double scaling, FishState state) {
-        initialAbundanceFactory = new InitialAbundanceFromFileFactory(
-                biologicalDirectory.resolve("count.csv"));
+        initialAbundance = new InitialAbundanceFromFileFactory(
+                biologicalDirectory.resolve("count.csv")).apply(state);
         StockAssessmentCaliforniaMeristics
                 cali = new MeristicsFileFactory(
                 biologicalDirectory.resolve("meristics.yaml")
@@ -163,7 +167,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 FEMALE);
         aging = new StandardAgingProcess(false);
 
-
+        this.daily = false;
         intialAbundanceAllocator = new ConstantBiomassAllocator();
         this.speciesName = speciesName;
         this.scaling = scaling;
@@ -237,7 +241,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         Species species = biology.getSpecie(0);
 
         //read in the total number of fish
-        int[][] totalCount = initialAbundanceFactory.apply(model).getAbundance();
+        initialAbundance.initialize(species);
+        double[][] totalCount = initialAbundance.getInitialAbundance();
         assert totalCount.length == 2;
         Preconditions.checkArgument(totalCount[0].length == species.getNumberOfBins(),
                                     "mismatch between size of initial abundance and maxAge of species");
@@ -282,7 +287,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 species,
                 true, aging,
                 diffuser,
-                mortality);
+                mortality, daily);
         if(recruitmentAllocator !=null)
             processes.setRecruitsAllocator(recruitmentAllocator);
         //tell it to deal with our biologies

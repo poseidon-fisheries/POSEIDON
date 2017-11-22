@@ -20,34 +20,37 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
 /**
- * A process to decide how many new fish of each sex are generated this year
- * Created by carrknight on 3/1/16.
+ * recruitment that happens only once a year
  */
-public interface RecruitmentProcess
-{
-
-
+public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
     /**
      * Computes the number of new recruits per sex
-     * @param species the species of fish examined
-     * @param meristics the biological characteristics of the fish
+     *
+     * @param species       the species of fish examined
+     * @param meristics     the biological characteristics of the fish
      * @param abundance
      * @param dayOfTheYear
-     *@param daysSimulated @return the number of male + female recruits
+     * @param daysSimulated @return the number of male + female recruits
      */
-    double recruit(
-            Species species,
-            Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated);
+    @Override
+    public double recruit(
+            Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated) {
 
+        Preconditions.checkArgument(daysSimulated==365 || daysSimulated == 1,
+                                    "expect this to be called daily or yearly");
+        //recruits yearly only
+        if(daysSimulated == 1 && dayOfTheYear !=1)
+            return 0d;
+        else
+            return recruitYearly(species, meristics, abundance);
 
-    /**
-     * give a function to generate noise as % of recruits this year
-     * @param noiseMaker the function that generates percentage changes. 1 means no noise.
-     */
-    void addNoise(NoiseMaker noiseMaker);
+    }
+
+    protected abstract double recruitYearly(Species species, Meristics meristics, StructuredAbundance abundance);
 
 
 

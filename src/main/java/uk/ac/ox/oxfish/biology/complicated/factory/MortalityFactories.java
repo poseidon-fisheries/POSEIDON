@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
 import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 

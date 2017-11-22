@@ -20,23 +20,23 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
-import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
+import fr.ird.osmose.process.mortality.MortalityProcess;
+import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-/**
- * Created by carrknight on 7/8/17.
- */
-public class InitialAbundances {
+public class Mortalities {
+
 
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends InitialAbundance>>> CONSTRUCTORS =
+    public static final Map<String,Supplier<AlgorithmFactory<? extends NaturalMortalityProcess>>> CONSTRUCTORS =
             new LinkedHashMap<>();
     /**
      * a link to go from class back to the name of the constructor
@@ -45,17 +45,19 @@ public class InitialAbundances {
             new LinkedHashMap<>();
 
     static{
-        CONSTRUCTORS.put("Abundance From File",
-                         InitialAbundanceFromFileFactory::new);
-        NAMES.put(InitialAbundanceFromFileFactory.class,"Abundance From File");
+        CONSTRUCTORS.put("Proportional Mortality",
+                         ProportionalMortalityFactory::new);
+        NAMES.put(ProportionalMortalityFactory.class,"Proportional Mortality");
 
-        CONSTRUCTORS.put("Abundance From String",
-                         InitialAbundanceFromStringFactory::new);
-        NAMES.put(InitialAbundanceFromStringFactory.class,"Abundance From String");
+        CONSTRUCTORS.put("Exponential Mortality",
+                         ExponentialMortalityFactory::new);
+        NAMES.put(ExponentialMortalityFactory.class,"Exponential Mortality");
 
-        CONSTRUCTORS.put("Abundance From List",
-                         InitialAbundanceFromListFactory::new);
-        NAMES.put(InitialAbundanceFromListFactory.class,"Abundance From List");
+
+
+
     }
+
+    private Mortalities() {}
 
 }

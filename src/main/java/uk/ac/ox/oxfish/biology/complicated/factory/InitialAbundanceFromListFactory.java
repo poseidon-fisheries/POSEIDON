@@ -21,7 +21,8 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import com.beust.jcommander.internal.Lists;
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.RepeatingInitialAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -32,12 +33,12 @@ import java.util.List;
  * so that, for example. 100,200,300 implies 100 male and 100 female of age[0] in the world
  * Created by carrknight on 7/8/17.
  */
-public class InitialAbundanceFromListFactory implements AlgorithmFactory<InitialAbundance>
+public class InitialAbundanceFromListFactory implements AlgorithmFactory<RepeatingInitialAbundance>
 {
 
 
 
-    private List<Integer> fishPerBinPerSex = Lists.newArrayList(10000000, 1000000, 10000);
+    private List<Double> fishPerBinPerSex = Lists.newArrayList(10000000d, 1000000d, 10000d);
 
 
     /**
@@ -47,29 +48,30 @@ public class InitialAbundanceFromListFactory implements AlgorithmFactory<Initial
      * @return the function result
      */
     @Override
-    public InitialAbundance apply(FishState state) {
+    public RepeatingInitialAbundance apply(FishState state) {
 
         //set up initial abundance array
-        int[][] abundance = new int[2][];
-        abundance[0]=new int[fishPerBinPerSex.size()];
-        abundance[1]=new int[fishPerBinPerSex.size()];
+        double[] abundance = new double[fishPerBinPerSex.size()];
+
+
+
         //fill it up
         for(int bin=0; bin<fishPerBinPerSex.size(); bin++)
         {
-            abundance[0][bin] = fishPerBinPerSex.get(bin);
-            abundance[1][bin] = fishPerBinPerSex.get(bin);
+            abundance[bin] = fishPerBinPerSex.get(bin);
         }
         //return it
-        return new InitialAbundance(abundance);
+        return new RepeatingInitialAbundance(abundance);
 
     }
+
 
     /**
      * Getter for property 'fishPerBinPerSex'.
      *
      * @return Value for property 'fishPerBinPerSex'.
      */
-    public List<Integer> getFishPerBinPerSex() {
+    public List<Double> getFishPerBinPerSex() {
         return fishPerBinPerSex;
     }
 
@@ -78,7 +80,7 @@ public class InitialAbundanceFromListFactory implements AlgorithmFactory<Initial
      *
      * @param fishPerBinPerSex Value to set for property 'fishPerBinPerSex'.
      */
-    public void setFishPerBinPerSex(List<Integer> fishPerBinPerSex) {
+    public void setFishPerBinPerSex(List<Double> fishPerBinPerSex) {
         this.fishPerBinPerSex = fishPerBinPerSex;
     }
 }

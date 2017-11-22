@@ -20,24 +20,48 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
-/**
- * any object that sets up the raw numbers of fish in the simulation (before being allocated!)
- */
-public interface InitialAbundance {
+import java.util.Arrays;
 
+/**
+ * another simple initial abundance, in this case it is supplied an array and will copy it
+ * for each subdivision
+ */
+public class RepeatingInitialAbundance  implements InitialAbundance{
+
+
+    private final double[] cohort;
+
+
+    private double[][] abundance;
+
+    public RepeatingInitialAbundance(double[] cohort) {
+        this.cohort = cohort;
+    }
 
     /**
      * called before being asked for initial abundance
+     *
      * @param species
      */
-    public void initialize(Species species);
+    @Override
+    public void initialize(Species species) {
+        abundance= new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        Preconditions.checkArgument(species.getNumberOfBins()==cohort.length);
+
+        for(int i=0; i<species.getNumberOfSubdivisions(); i++)
+            abundance[i] = Arrays.copyOf(cohort,cohort.length);
+    }
 
     /**
      * returns the abundance matrix; call after initialize()
+     *
      * @return
      */
-    public double[][] getInitialAbundance();
-
+    @Override
+    public double[][] getInitialAbundance() {
+        return abundance;
+    }
 }

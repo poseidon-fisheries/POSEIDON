@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
-import fr.ird.osmose.process.mortality.MortalityProcess;
 import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.biology.complicated.factory.*;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
@@ -59,6 +58,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
 
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
+    private final boolean daily = false;
 
     /**
      * Applies this function to the given argument.
@@ -71,7 +71,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
         return new SingleSpeciesAbundanceInitializer(
                 speciesName,
-                initialAbundanceFactory,
+                initialAbundanceFactory.apply(state),
                 initialAbundanceAllocator.apply(state),
                 aging.apply(state),
                 meristics.apply(state),
@@ -80,7 +80,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
                 diffuser.apply(state),
                 recruitAllocator.apply(state),
                 habitabilityAllocator.apply(state),
-                mortalityProcess.apply(state));
+                mortalityProcess.apply(state), daily);
 
 
     }
@@ -273,5 +273,33 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
     public void setHabitabilityAllocator(
             AlgorithmFactory<? extends BiomassAllocator> habitabilityAllocator) {
         this.habitabilityAllocator = habitabilityAllocator;
+    }
+
+    /**
+     * Getter for property 'mortalityProcess'.
+     *
+     * @return Value for property 'mortalityProcess'.
+     */
+    public AlgorithmFactory<? extends NaturalMortalityProcess> getMortalityProcess() {
+        return mortalityProcess;
+    }
+
+    /**
+     * Setter for property 'mortalityProcess'.
+     *
+     * @param mortalityProcess Value to set for property 'mortalityProcess'.
+     */
+    public void setMortalityProcess(
+            AlgorithmFactory<? extends NaturalMortalityProcess> mortalityProcess) {
+        this.mortalityProcess = mortalityProcess;
+    }
+
+    /**
+     * Getter for property 'daily'.
+     *
+     * @return Value for property 'daily'.
+     */
+    public boolean isDaily() {
+        return daily;
     }
 }

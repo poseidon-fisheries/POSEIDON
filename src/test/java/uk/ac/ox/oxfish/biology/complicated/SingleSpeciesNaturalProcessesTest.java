@@ -44,6 +44,7 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
@@ -75,7 +76,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 species,
                 true, new StandardAgingProcess(false),
                 new NoAbundanceDiffusion(),
-                new ExponentialMortalityProcess(meristics));
+                new ExponentialMortalityProcess(meristics), false);
 
         GlobalBiology biology = new GlobalBiology(species);
         AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
@@ -128,14 +129,14 @@ public class SingleSpeciesNaturalProcessesTest {
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
-        when(recruiter.recruit(any(), any(), any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any(), any(), anyInt(),anyInt() )).thenReturn(3200d);
 
 
-        when(recruiter.recruit(any(), any(),  any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any(),  any(), anyInt(),anyInt())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 recruiter,
                 fakeSpecies,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality());
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality(), false);
 
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
@@ -188,14 +189,14 @@ public class SingleSpeciesNaturalProcessesTest {
         NauticalMap map = model.getMap();
         RecruitmentProcess recruiter = mock(RecruitmentProcess.class);
         //recruit 3200 fish this year
-        when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any() , any(),anyInt(),anyInt())).thenReturn(3200d);
 
 
-        when(recruiter.recruit(any(), any() , any())).thenReturn(3200d);
+        when(recruiter.recruit(any(), any() , any(),anyInt(),anyInt())).thenReturn(3200d);
         SingleSpeciesNaturalProcesses processes =  new SingleSpeciesNaturalProcesses(
                 recruiter,
                 fakeSpecies,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality());
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality(), false);
 
         HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
@@ -250,7 +251,7 @@ public class SingleSpeciesNaturalProcessesTest {
 
         Log.info("if you set preserve old age to false, the last class has mortality of 100%");
         RecruitmentProcess recruitment = mock(RecruitmentProcess.class);
-        when(recruitment.recruit(any(), any() , any())).thenReturn(1000d); //always create a 1000 new fish
+        when(recruitment.recruit(any(), any() , any(),anyInt(),anyInt() )).thenReturn(1000d); //always create a 1000 new fish
 
         //grab a fake species
         Path testInput = Paths.get("inputs", "tests", "abundance", "fake");
@@ -261,7 +262,7 @@ public class SingleSpeciesNaturalProcessesTest {
         SingleSpeciesNaturalProcesses processes = new SingleSpeciesNaturalProcesses(
                 recruitment,
                 species,
-                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), initializer.getMortality());
+                true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), initializer.getMortality(), false);
 
 
         AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
@@ -287,7 +288,7 @@ public class SingleSpeciesNaturalProcessesTest {
         processes = new SingleSpeciesNaturalProcesses(
                 recruitment,
                 species,
-                true, new StandardAgingProcess(true), new NoAbundanceDiffusion(), initializer.getMortality());
+                true, new StandardAgingProcess(true), new NoAbundanceDiffusion(), initializer.getMortality(), false);
         processes.add(local,mock(SeaTile.class) );
         processes.step(model);
         assertEquals(447, local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1], .001);

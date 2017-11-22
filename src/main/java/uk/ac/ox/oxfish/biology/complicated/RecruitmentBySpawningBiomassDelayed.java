@@ -53,14 +53,15 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
      * @param species      the species of fish examined
      * @param meristics    the biological characteristics of the fish
      * @param abundance
-     * @return the number of male and female recruits
+     * @param dayOfTheYear
+     *@param daysSimulated @return the number of male and female recruits
      */
     @Override
     public double recruit(
-            Species species, Meristics meristics, StructuredAbundance abundance)
+            Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated)
     {
 
-        double newRecruit = super.recruit(species, meristics, abundance);
+        double newRecruit = super.recruit(species, meristics, abundance, dayOfTheYear, daysSimulated);
         if(recruits.isEmpty())
             initializeQueue(newRecruit);
         assert recruits.size() == yearDelay;

@@ -34,7 +34,7 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     public MockNaturalProcess(
             Species species) {
         super(null, species, true, null, new NoAbundanceDiffusion(),
-              new DummyNaturalMortality());
+              new DummyNaturalMortality(), false);
     }
 
 

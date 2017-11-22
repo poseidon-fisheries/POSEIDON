@@ -77,16 +77,20 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
      */
     private BiomassAllocator recruitsAllocator;
 
+    final private boolean daily;
+
+
     public SingleSpeciesNaturalProcesses(
             RecruitmentProcess recruitment, Species species,
             boolean rounding, AgingProcess agingProcess, AbundanceDiffuser diffuser,
-            NaturalMortalityProcess mortality) {
+            NaturalMortalityProcess mortality, boolean daily) {
         this.species = species;
         this.recruitment = recruitment;
         this.rounding = rounding;
         this.agingProcess = agingProcess;
         this.diffuser = diffuser;
         this.mortality = mortality;
+        this.daily = daily;
     }
 
     private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new LinkedHashMap<>();
@@ -101,15 +105,26 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     {
 
         this.agingProcess.start(species);
-        model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
-
-        model.scheduleEveryDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                diffuser.step(species,biologies,model);
-            }
-        }, StepOrder.BIOLOGY_PHASE);
-
+        if(!daily) {
+            model.scheduleEveryYear(this, StepOrder.BIOLOGY_PHASE);
+            model.scheduleEveryDay(new Steppable() {
+                @Override
+                public void step(SimState simState) {
+                    diffuser.step(species, biologies, model);
+                }
+            }, StepOrder.BIOLOGY_PHASE);
+        }
+        else
+        //will have to make sure diffuser and natural processes happen in sync;
+        // in this case it means that the diffuser will act BEFORE the natural process, always
+        {
+            model.scheduleEveryDay(new Steppable() {
+                @Override
+                public void step(SimState simState) {
+                    diffuser.step(species, biologies, model);
+                    this.step(simState);
+                }
+            }, StepOrder.BIOLOGY_PHASE);        }
     }
 
     /**
@@ -143,8 +158,9 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         }
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
-                                           StructuredAbundance.sum(abundances,abundances.get(0).getBins(),abundances.get(0).getSubdivisions())
-        );
+                                           StructuredAbundance.sum(abundances,abundances.get(0).getBins(),abundances.get(0).getSubdivisions()),
+                                           model.getDayOfTheYear(),
+                                           daysSimulated());
         if(rounding)
             lastRecruits = (int)(lastRecruits);
         abundances.clear();
@@ -200,8 +216,8 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          */
         biologies.values().forEach(
                 abundanceBasedLocalBiology -> mortality.cull(
-                        species.getMeristics(),rounding,
-                        abundanceBasedLocalBiology.getAbundance(species), 365 ));
+                        species.getMeristics(), rounding,
+                        abundanceBasedLocalBiology.getAbundance(species), daysSimulated()));
 
 
 
@@ -216,7 +232,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                          species,
                          model,
                          rounding,
-                         365);
+                         daysSimulated());
 
 
         /***
@@ -267,6 +283,10 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
             }
 
         }
+    }
+
+    private int daysSimulated() {
+        return daily ? 1 : 365;
     }
 
     /**

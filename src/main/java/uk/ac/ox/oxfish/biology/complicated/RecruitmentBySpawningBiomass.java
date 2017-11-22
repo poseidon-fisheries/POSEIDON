@@ -30,7 +30,7 @@ import java.util.Arrays;
 /**
  * Created by carrknight on 3/1/16.
  */
-public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
+public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
 
 
     /**
@@ -98,10 +98,10 @@ public class RecruitmentBySpawningBiomass implements RecruitmentProcess {
      * @param species      the species of fish examined
      * @param meristics    the biological characteristics of the fish
      * @param abundance
-     * @return the number of male and female recruits
+     *@return the number of male and female recruits
      */
     @Override
-    public double recruit(
+    public double recruitYearly(
             Species species, Meristics meristics, StructuredAbundance abundance)
     {
 

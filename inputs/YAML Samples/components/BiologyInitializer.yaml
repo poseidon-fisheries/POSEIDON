@@ -137,7 +137,7 @@ Single Species Abundance:
   diffuser: No Diffusion
   habitabilityAllocator: Equal Allocation
   initialAbundanceAllocator: Equal Allocation
-  initialAbundanceFactory:
+  initialAbundance:
     Abundance From List:
       fishPerBinPerSex:
       - 10000000

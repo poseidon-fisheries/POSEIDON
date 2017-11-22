@@ -20,19 +20,18 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import com.beust.jcommander.internal.Lists;
-import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.RepeatingInitialAbundance;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 /**
  * Created by carrknight on 7/11/17.
  */
-public class InitialAbundanceFromStringFactory implements AlgorithmFactory<InitialAbundance> {
+public class InitialAbundanceFromStringFactory implements AlgorithmFactory<RepeatingInitialAbundance> {
 
 
     private String fishPerBinPerSex ="10000000,1000000,10000";
@@ -45,7 +44,7 @@ public class InitialAbundanceFromStringFactory implements AlgorithmFactory<Initi
      * @return the function result
      */
     @Override
-    public InitialAbundance apply(FishState state)
+    public RepeatingInitialAbundance apply(FishState state)
     {
 
         //turn into weights array
@@ -61,17 +60,14 @@ public class InitialAbundanceFromStringFactory implements AlgorithmFactory<Initi
 
 
         //set up initial abundance array
-        int[][] abundance = new int[2][];
-        abundance[0]=new int[fish.length];
-        abundance[1]=new int[fish.length];
+        double[] abundance =new double[fish.length];
         //fill it up
         for(int bin=0; bin<fish.length; bin++)
         {
-            abundance[0][bin] = fish[bin];
-            abundance[1][bin] = fish[bin];
+            abundance[bin] = fish[bin];
         }
         //return it
-        return new InitialAbundance(abundance);
+        return new RepeatingInitialAbundance(abundance);
 
     }
 

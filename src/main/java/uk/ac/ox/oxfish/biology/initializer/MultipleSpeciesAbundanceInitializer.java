@@ -114,7 +114,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     /**
      * holds the "total count" of fish as initially read from data
      */
-    private final LinkedHashMap<Species, int[][]> initialAbundance = new LinkedHashMap<>();
+    private final LinkedHashMap<Species, double[][]> initialAbundance = new LinkedHashMap<>();
 
     /**
      * the generate local made static so the MultipleSpeciesInitializer can use it too
@@ -185,8 +185,8 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 species,
                 rounding, agingProcess,
                 new NoAbundanceDiffusion(),
-                new ExponentialMortalityProcess(meristics)
-                );
+                new ExponentialMortalityProcess(meristics),
+                false);
         for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
             processes.add(entry.getValue(),entry.getKey());
         }
@@ -195,7 +195,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
     }
 
-    public int[][] getInitialAbundance (Species species)
+    public double[][] getInitialAbundance (Species species)
     {
         return initialAbundance.get(species);
     }
@@ -286,7 +286,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                         new InitialAbundanceFromFileFactory(
                                 biologicalDirectories.get(species.getName()).resolve(countFileName)
                         );
-                int[][] totalCount = factory.apply(model).getAbundance();
+                double[][] totalCount = factory.apply(model).getInitialAbundance();
                 initialAbundance.put(species,totalCount);
 
                 //prepare the map biology-->ratio of fish to put there
@@ -376,7 +376,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     }
 
     public void resetAllLocalBiologies(
-            Species speciesToReset, int[][] newTotalFishCount,
+            Species speciesToReset, double[][] newTotalFishCount,
             HashMap<AbundanceBasedLocalBiology, Double> biologyToProportionOfFishThere)
     {
         if(speciesToReset.getName().equals(FAKE_SPECIES_NAME))

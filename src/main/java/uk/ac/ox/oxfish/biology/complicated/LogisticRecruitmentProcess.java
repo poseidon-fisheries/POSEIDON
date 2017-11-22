@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -28,7 +29,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
  * Logistic recruitment: weight all the biomass, take a logisitc step and transform it back into abundance
  * Created by carrknight on 7/5/17.
  */
-public class LogisticRecruitmentProcess implements RecruitmentProcess {
+public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
 
 
     final private double carryingCapacity;
@@ -53,7 +54,7 @@ public class LogisticRecruitmentProcess implements RecruitmentProcess {
      * @return the number of male + female recruits
      */
     @Override
-    public double recruit(
+    public double recruitYearly(
             Species species, Meristics meristics, StructuredAbundance abundance) {
 
         //weigh

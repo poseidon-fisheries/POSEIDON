@@ -20,24 +20,43 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
 /**
- * any object that sets up the raw numbers of fish in the simulation (before being allocated!)
+ * Just a renaming of a matrix[2][maxAge+1] representing
+ * the initial abundance of fish
+ * Created by carrknight on 7/8/17.
  */
-public interface InitialAbundance {
+public class PremadeInitialAbundance implements InitialAbundance {
+
+
+    private final double[][] abundance;
+
+
+    public PremadeInitialAbundance(double[][] abundance) {
+        this.abundance = abundance;
+        Preconditions.checkArgument(abundance.length == 2); //male and female!
+    }
 
 
     /**
      * called before being asked for initial abundance
+     *
      * @param species
      */
-    public void initialize(Species species);
+    @Override
+    public void initialize(Species species) {
+        Preconditions.checkArgument(species.getNumberOfSubdivisions()==abundance.length, "wrong initial abundance!");
+        Preconditions.checkArgument(species.getNumberOfBins()==abundance[0].length, "wrong initial abundance!");
+    }
 
     /**
-     * returns the abundance matrix; call after initialize()
-     * @return
+     * Getter for property 'abundance'.
+     *
+     * @return Value for property 'abundance'.
      */
-    public double[][] getInitialAbundance();
-
+    public double[][] getInitialAbundance() {
+        return abundance;
+    }
 }

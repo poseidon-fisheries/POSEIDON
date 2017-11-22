@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.factory.MeristicsFileFactory;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.model.FishState;
@@ -77,7 +76,7 @@ public class RecruitmentBySpawningBiomassTest {
 
 
         double recruits = recruitment.recruit(process.getSpecies(),meristics,
-                                              new StructuredAbundance(male,female));
+                                              new StructuredAbundance(male,female),0 ,365 );
         System.out.println(recruits);
         Assert.assertEquals(416140d, recruits, 1d);
 
