@@ -47,6 +47,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -58,6 +59,8 @@ public class IndirectInferencePaper {
 
     private final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
 
+    private final static Path mlogitScript = mainDirectory.resolve("mlogit_fit.R");
+
 
     /**
      * list of names and associated "initializers" which are supposed to randomize some scenario parameters
@@ -67,7 +70,8 @@ public class IndirectInferencePaper {
     public static final int TARGET_RUNS = 10;
 
 
-    public static final int SIMULATION_YEARS = 5;
+
+    public static final int SIMULATION_YEARS = 10;
 
     static
     {
@@ -105,6 +109,7 @@ public class IndirectInferencePaper {
                         cast.setPortPositionX(40);
                         cast.setPortPositionY(random.nextInt(50));
 
+                        cast.setMapMakerDedicatedRandomSeed(seed);
 
                         cast.setDestinationStrategy(strategy);
 
@@ -223,9 +228,14 @@ public class IndirectInferencePaper {
 
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
+
+        //reader and randomizer
         FishYAML yamler = new FishYAML();
+        MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
+
+
         for (Map.Entry<String, ScenarioInitializer> initializer : initializers.entrySet())
         {
 
@@ -276,6 +286,44 @@ public class IndirectInferencePaper {
                     //at the end I'd like a CSV like this:
                     // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....
 
+                    /*
+                    Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R   ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2 baseline 2 perfect3by3 perfect3by3 TRUE
+                     */
+                    String pathToRScript  = mlogitScript.toAbsolutePath().toString();
+                    String pathToLogbook = output.resolve("logistic_long.csv").toAbsolutePath().toString();
+                    String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
+                    String runArgument = Integer.toString(run);
+                    String scenario = initializer.getKey();
+                    String seedArgument = runArgument;
+                    String targetStrategyArgument = targetStrategy.getKey();
+                    String currentStrategyArgument = targetStrategyArgument;
+                    String isTargetRun = "TRUE";
+
+                    String[] arguments =
+                            new String[]{
+                            "Rscript",
+                            pathToRScript,
+                                    pathToLogbook,
+                                    pathToCSV,
+                                    runArgument,
+                                    scenario,
+                                    seedArgument,
+                                    targetStrategyArgument,
+                                    currentStrategyArgument,
+                                    isTargetRun
+                            };
+                    Log.info(Arrays.toString(arguments));
+                    Process exec = Runtime.getRuntime().exec(arguments);
+                    int code = exec.waitFor();
+                    switch (code) {
+                        case 0:
+                            //normal termination, everything is fine
+                            break;
+                        case 1:
+                            //Read the error stream then
+                            String message =convertStreamToString(exec.getErrorStream());
+                            throw new RuntimeException(message);
+                    }
 
 
                 }
@@ -289,7 +337,10 @@ public class IndirectInferencePaper {
     }
 
 
-
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
 
 
 

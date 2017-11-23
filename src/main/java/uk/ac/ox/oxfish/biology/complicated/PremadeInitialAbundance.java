@@ -47,8 +47,10 @@ public class PremadeInitialAbundance implements InitialAbundance {
      */
     @Override
     public void initialize(Species species) {
-        Preconditions.checkArgument(species.getNumberOfSubdivisions()==abundance.length, "wrong initial abundance!");
-        Preconditions.checkArgument(species.getNumberOfBins()==abundance[0].length, "wrong initial abundance!");
+        Preconditions.checkArgument(species.getNumberOfSubdivisions()==abundance.length,
+                                    "wrong initial abundance!");
+        Preconditions.checkArgument(species.getNumberOfBins()==abundance[0].length,
+                                    "wrong initial abundance!");
     }
 
     /**
