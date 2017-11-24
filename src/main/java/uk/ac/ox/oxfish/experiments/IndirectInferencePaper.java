@@ -24,6 +24,7 @@ import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.OneSpeciesSchoolFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
@@ -31,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.scenario.DerisoCaliforniaScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -67,11 +69,12 @@ public class IndirectInferencePaper {
      */
     private final static LinkedHashMap<String,
             ScenarioInitializer> initializers = new LinkedHashMap<>();
-    public static final int TARGET_RUNS = 10;
+    public static final int TARGET_RUNS = 100;
 
 
 
     public static final int SIMULATION_YEARS = 10;
+    private static final int CANDIDATE_RUNS = 1;
 
     static
     {
@@ -117,7 +120,72 @@ public class IndirectInferencePaper {
                 }
         );
 
+        initializers.put("chaser",
+                         new ScenarioInitializer() {
+                             @Override
+                             public void initialize(
+                                     Scenario scenario, long seed,
+                                     AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
 
+                                 PrototypeScenario cast = (PrototypeScenario) scenario;
+                                 MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                                 cast.setHoldSize(
+                                         new FixedDoubleParameter(
+                                                 random.nextDouble()*100+50
+                                         )
+                                 );
+                                 OneSpeciesSchoolFactory biologyInitializer = (OneSpeciesSchoolFactory) cast
+                                         .getBiologyInitializer();
+                                 biologyInitializer.setDiameter(
+                                         new FixedDoubleParameter(
+                                                 random.nextInt(8)+1
+                                         )
+                                 );
+                                 biologyInitializer.setSpeedInDays(
+                                         new FixedDoubleParameter(
+                                                 random.nextInt(10)+1
+                                         )
+                                 );
+                                 biologyInitializer.setNumberOfSchools(
+                                         new FixedDoubleParameter(
+                                                 random.nextInt(3)+1
+                                         )
+                                 );
+
+
+                                 cast.setDestinationStrategy(destinationStrategy);
+
+                             }
+                         }
+
+        );
+
+        initializers.put("deriso",
+                         new ScenarioInitializer() {
+                             @Override
+                             public void initialize(
+                                     Scenario scenario, long seed,
+                                     AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+
+                                 DerisoCaliforniaScenario cast = (DerisoCaliforniaScenario) scenario;
+                                 MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                                 cast.setHoldSizePerBoat(
+                                         new FixedDoubleParameter(
+                                                 random.nextDouble()*10000+5000
+                                         )
+                                 );
+                                 LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
+                                 exogenousCatches.put("Dover Sole", Double.toString(random.nextDouble()* 500000 + 300000));
+                                 exogenousCatches.put("Sablefish", Double.toString(random.nextDouble()* 5000000 + 3000000));
+                                 cast.setExogenousCatches(exogenousCatches
+                                 );
+
+                                 cast.setDestinationStrategy(destinationStrategy);
+
+                             }
+                         }
+
+        );
 
     }
 
@@ -242,6 +310,7 @@ public class IndirectInferencePaper {
             Path scenarioDirectory = mainDirectory.resolve(initializer.getKey());
             Path inputDirectory = scenarioDirectory.resolve("inputs");
 
+            String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
 
             for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy :
                     strategies.entrySet())
@@ -269,62 +338,55 @@ public class IndirectInferencePaper {
                                         inputDirectory.resolve(targetName+".yaml").toFile())
                     );
 
-                    Log.info("Starting target run : " + targetName);
-                    FishStateUtilities.run(
-                            targetName,
-                            inputDirectory.resolve(targetName+".yaml"),
-                            output,
-                            (long)run,
-                            Log.LEVEL_INFO,
-                            false,
-                            null,
-                            SIMULATION_YEARS,
-                            false,
-                            -1
-                    );
-
-                    //at the end I'd like a CSV like this:
-                    // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....
-
-                    /*
+                                        /*
                     Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R   ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2 baseline 2 perfect3by3 perfect3by3 TRUE
                      */
-                    String pathToRScript  = mlogitScript.toAbsolutePath().toString();
-                    String pathToLogbook = output.resolve("logistic_long.csv").toAbsolutePath().toString();
-                    String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
                     String runArgument = Integer.toString(run);
                     String scenario = initializer.getKey();
                     String seedArgument = runArgument;
                     String targetStrategyArgument = targetStrategy.getKey();
                     String currentStrategyArgument = targetStrategyArgument;
                     String isTargetRun = "TRUE";
+                    Log.info("Starting target run : " + targetName);
 
-                    String[] arguments =
-                            new String[]{
-                            "Rscript",
-                            pathToRScript,
-                                    pathToLogbook,
-                                    pathToCSV,
-                                    runArgument,
-                                    scenario,
-                                    seedArgument,
-                                    targetStrategyArgument,
-                                    currentStrategyArgument,
-                                    isTargetRun
-                            };
-                    Log.info(Arrays.toString(arguments));
-                    Process exec = Runtime.getRuntime().exec(arguments);
-                    int code = exec.waitFor();
-                    switch (code) {
-                        case 0:
-                            //normal termination, everything is fine
-                            break;
-                        case 1:
-                            //Read the error stream then
-                            String message =convertStreamToString(exec.getErrorStream());
-                            throw new RuntimeException(message);
+                    runOneSimulation(inputDirectory, run, targetName, output, pathToCSV, runArgument, scenario,
+                                     seedArgument,
+                                     targetStrategyArgument, currentStrategyArgument, isTargetRun);
+
+
+                    //now do variations
+                    for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> candidateStrategy :
+                            strategies.entrySet())
+                    {
+                        for(int candidate_run=0; candidate_run<CANDIDATE_RUNS; candidate_run++)
+                        {
+                            //re-read and re-initialize
+                            Scenario candidateScenario = yamler.loadAs(
+                                    new FileReader(
+                                            scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
+                                    ), Scenario.class
+
+                            );
+                            initializer.getValue().initialize(candidateScenario,run,candidateStrategy.getValue());
+                            String candidateName = candidateStrategy.getKey() + "_" + candidate_run;
+                            output = scenarioDirectory.resolve("output").resolve(targetName).resolve(candidateName);
+                            output.toFile().mkdirs();
+                            inputDirectory.toFile().mkdirs();
+                            yamler.dump(mainScenario,
+                                        new FileWriter(
+                                                inputDirectory.resolve(targetName+ "_" + candidateName +".yaml").toFile())
+                            );
+
+                            long seed = random.nextLong();
+                            currentStrategyArgument = candidateStrategy.getKey();
+                            isTargetRun = "FALSE";
+                            Log.info("Starting target run : " + targetName + "   ---- candidate: " + candidateName);
+
+                            runOneSimulation(inputDirectory, seed, targetName, output, pathToCSV, runArgument, scenario,
+                                             Long.toString(seed),
+                                             targetStrategyArgument, currentStrategyArgument, isTargetRun);
+                        }
                     }
-
 
                 }
 
@@ -334,6 +396,63 @@ public class IndirectInferencePaper {
 
         }
 
+    }
+
+    private static void runOneSimulation(
+            Path inputDirectory,
+            long seed,
+            String targetName,
+            Path output,
+            String pathToCSV,
+            String runArgument,
+            String scenario,
+            String seedArgument,
+            String targetStrategyArgument,
+            String currentStrategyArgument,
+            String isTargetRun) throws IOException, InterruptedException {
+        FishStateUtilities.run(
+                targetName,
+                inputDirectory.resolve(targetName+".yaml"),
+                output,
+                seed,
+                Log.LEVEL_INFO,
+                false,
+                null,
+                SIMULATION_YEARS,
+                false,
+                -1
+        );
+
+        //at the end I'd like a CSV like this:
+        // run, scenario, seed, target-strategy,current-strategy,isTargetRun,beta_0,beta_0_sd,beta_1,beta_1_sd,....
+        String pathToRScript  = mlogitScript.toAbsolutePath().toString();
+        String pathToLogbook = output.resolve("logistic_long.csv").toAbsolutePath().toString();
+
+        String[] arguments =
+                new String[]{
+                "Rscript",
+                pathToRScript,
+                        pathToLogbook,
+                        pathToCSV,
+                        runArgument,
+                        scenario,
+                        seedArgument,
+                        targetStrategyArgument,
+                        currentStrategyArgument,
+                        isTargetRun
+                };
+        Log.info(Arrays.toString(arguments));
+        Process exec = Runtime.getRuntime().exec(arguments);
+        int code = exec.waitFor();
+        switch (code) {
+            case 0:
+                //normal termination, everything is fine
+                break;
+            case 1:
+                //Read the error stream then
+                String message =convertStreamToString(exec.getErrorStream());
+                throw new RuntimeException(message);
+        }
     }
 
 
