@@ -34,9 +34,6 @@ import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
-
 /**
  * A map species ---> homogeneousAbudanceGear so that each species has a different selectivity and such.
  * Throws an exception if it catches a species for which it has no gear
@@ -85,7 +82,7 @@ public class HeterogeneousAbundanceGear implements Gear
             {
                 //if it's imaginary or not set or there is no fish, just return empty
                 double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
-                caught[species.getIndex()] = new StructuredAbundance(abundance[MALE],abundance[FEMALE]);
+                caught[species.getIndex()] = new StructuredAbundance(abundance);
 
             }
             else {

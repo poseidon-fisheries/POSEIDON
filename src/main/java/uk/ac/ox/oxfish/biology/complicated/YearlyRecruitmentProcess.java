@@ -27,6 +27,9 @@ import uk.ac.ox.oxfish.biology.Species;
  * recruitment that happens only once a year
  */
 public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
+
+    public static final int SPAWNING_DAY = 364;
+
     /**
      * Computes the number of new recruits per sex
      *
@@ -43,7 +46,7 @@ public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
         Preconditions.checkArgument(daysSimulated==365 || daysSimulated == 1,
                                     "expect this to be called daily or yearly");
         //recruits yearly only
-        if(daysSimulated == 1 && dayOfTheYear !=1)
+        if(daysSimulated == 1 && dayOfTheYear != SPAWNING_DAY)
             return 0d;
         else
             return recruitYearly(species, meristics, abundance);

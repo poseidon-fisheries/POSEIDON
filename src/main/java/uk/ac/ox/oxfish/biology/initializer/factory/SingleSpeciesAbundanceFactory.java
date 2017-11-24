@@ -58,7 +58,11 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
 
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
-    private final boolean daily = false;
+
+
+    private boolean daily = false;
+
+    private boolean rounding = true;
 
     /**
      * Applies this function to the given argument.
@@ -80,7 +84,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
                 diffuser.apply(state),
                 recruitAllocator.apply(state),
                 habitabilityAllocator.apply(state),
-                mortalityProcess.apply(state), daily);
+                mortalityProcess.apply(state), daily, rounding);
 
 
     }
@@ -301,5 +305,32 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      */
     public boolean isDaily() {
         return daily;
+    }
+
+    /**
+     * Setter for property 'daily'.
+     *
+     * @param daily Value to set for property 'daily'.
+     */
+    public void setDaily(boolean daily) {
+        this.daily = daily;
+    }
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

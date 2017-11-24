@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFactory {
 
 
+    private boolean rounding = true;
     private DoubleParameter catchability = new FixedDoubleParameter(.0001);
 
     private DoubleParameter litersOfGasConsumed = new FixedDoubleParameter(0d);
@@ -67,7 +68,7 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
 
         return new HomogeneousAbundanceGear(
                 litersOfGasConsumed.apply(state.getRandom()),
-                new FixedProportionFilter(getAverageCatchability().apply(state.getRandom()), true)
+                new FixedProportionFilter(getAverageCatchability().apply(state.getRandom()), rounding)
         );
     }
 
@@ -88,5 +89,24 @@ public class FixedProportionHomogeneousGearFactory implements HomogeneousGearFac
      */
     public void setLitersOfGasConsumed(DoubleParameter litersOfGasConsumed) {
         this.litersOfGasConsumed = litersOfGasConsumed;
+    }
+
+
+    /**
+     * Getter for property 'rounding'.
+     *
+     * @return Value for property 'rounding'.
+     */
+    public boolean isRounding() {
+        return rounding;
+    }
+
+    /**
+     * Setter for property 'rounding'.
+     *
+     * @param rounding Value to set for property 'rounding'.
+     */
+    public void setRounding(boolean rounding) {
+        this.rounding = rounding;
     }
 }

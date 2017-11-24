@@ -59,6 +59,11 @@ public class StructuredAbundance {
         abundance[0] = ageStructure;
     }
 
+    public StructuredAbundance(double[][] abundance)
+    {
+        this.abundance = abundance;
+    }
+
     public StructuredAbundance(double[] maleAbundance,
                                double[] femaleAbundance)
     {

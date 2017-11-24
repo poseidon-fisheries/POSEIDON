@@ -60,6 +60,10 @@ public class Recruitments {
                          RecruitmentBySpawningFactory::new);
         NAMES.put(RecruitmentBySpawningFactory.class,"Beverton-Holt");
 
+        CONSTRUCTORS.put("Fixed Recruitment",
+                         FixedRecruitmentFactory::new);
+        NAMES.put(FixedRecruitmentFactory.class,"Fixed Recruitment");
+
     }
 
 

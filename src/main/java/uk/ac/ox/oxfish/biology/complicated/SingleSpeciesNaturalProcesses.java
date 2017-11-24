@@ -122,7 +122,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                 @Override
                 public void step(SimState simState) {
                     diffuser.step(species, biologies, model);
-                    this.step(simState);
+                    SingleSpeciesNaturalProcesses.this.step(simState);
                 }
             }, StepOrder.BIOLOGY_PHASE);        }
     }

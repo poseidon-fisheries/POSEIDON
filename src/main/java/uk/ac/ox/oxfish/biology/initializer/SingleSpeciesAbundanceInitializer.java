@@ -35,7 +35,6 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -105,6 +104,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
 
 
     private final boolean daily;
+    private final boolean rounding;
 
     public SingleSpeciesAbundanceInitializer(
             String speciesName,
@@ -117,7 +117,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             AbundanceDiffuser diffuser,
             BiomassAllocator recruitmentAllocator,
             BiomassAllocator habitabilityAllocator,
-            NaturalMortalityProcess mortality, boolean daily) {
+            NaturalMortalityProcess mortality, boolean daily, boolean rounding) {
         this.initialAbundance = initialAbundance;
         this.intialAbundanceAllocator = intialAbundanceAllocator;
         this.aging = aging;
@@ -130,6 +130,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.habitabilityAllocator = habitabilityAllocator;
         this.mortality = mortality;
         this.daily = daily;
+        this.rounding = rounding;
     }
 
     /**
@@ -177,6 +178,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         this.diffuser = new NoAbundanceDiffusion();
         this.recruitmentAllocator = null;
         this.habitabilityAllocator = null;
+        this.rounding = true;
     }
 
 
@@ -243,7 +245,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         //read in the total number of fish
         initialAbundance.initialize(species);
         double[][] totalCount = initialAbundance.getInitialAbundance();
-        assert totalCount.length == 2;
+        assert totalCount.length == species.getNumberOfSubdivisions();
         Preconditions.checkArgument(totalCount[0].length == species.getNumberOfBins(),
                                     "mismatch between size of initial abundance and maxAge of species");
 
@@ -285,7 +287,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         processes = new SingleSpeciesNaturalProcesses(
                 recruitmentProcess,
                 species,
-                true, aging,
+                rounding, aging,
                 diffuser,
                 mortality, daily);
         if(recruitmentAllocator !=null)

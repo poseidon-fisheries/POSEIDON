@@ -54,7 +54,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     /**
      * biomass gets computed somewhat lazily (but this number gets reset under any interaction with the object, no matter how trivial)
      */
-    double lastComputedBiomass[];
+    private double lastComputedBiomass[];
 
     /**
      * creates an abundance based local biology that starts off as entirely empty
@@ -65,9 +65,9 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
         //for each species create cohorts
         for(Species species : biology.getSpecies()) {
-            double[] male = new double[species.getNumberOfBins()];
-            double[] female = new double[species.getNumberOfBins()];
-            double[][] fish = new double[][]{male,female};
+            double[][] fish = new double[species.getNumberOfSubdivisions()][];
+            for(int i=0; i<fish.length; i++)
+                fish[i] = new double[species.getNumberOfBins()];
             abundance.put(species, fish);
         }
         //done!
@@ -87,8 +87,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
 
         if(Double.isNaN(lastComputedBiomass[species.getIndex()] )) {
             lastComputedBiomass[species.getIndex()] = FishStateUtilities.weigh(
-                    abundance.get(species)[FishStateUtilities.MALE],
-                    abundance.get(species)[FishStateUtilities.FEMALE],
+                    getAbundance(species),
                     species.getMeristics()
             );
             assert !Double.isNaN(lastComputedBiomass[species.getIndex()] );
@@ -132,7 +131,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     public void reactToThisAmountOfBiomassBeingFished(
             Catch caught, Catch notDiscarded, GlobalBiology biology)
     {
-        Preconditions.checkArgument(caught.hasAbundanceInformation(), "This biology requires a gear that catches per age bins rather than biomass directly!");
+        Preconditions.checkArgument(caught.hasAbundanceInformation(), "This biology requires a gear that catches per bins rather than biomass directly!");
 
         for(int index = 0; index < caught.numberOfSpecies(); index++) {
             Species species = biology.getSpecie(index);
@@ -140,21 +139,22 @@ public class AbundanceBasedLocalBiology implements LocalBiology
                 continue;
 
             StructuredAbundance catches = caught.getAbundance(species);
-            Preconditions.checkArgument(catches.getSubdivisions()==2, " needs male/female split");
+            Preconditions.checkArgument(catches.getSubdivisions()==species.getNumberOfSubdivisions(), "wrong number of cohorts/subdivisions");
 
 
             final double[][] abundanceHere = this.abundance.get(species);
-            double[] maleCatches =catches.asMatrix()[FishStateUtilities.MALE];
-            double[] femaleCatches =catches.asMatrix()[FishStateUtilities.FEMALE];
-            Preconditions.checkArgument(maleCatches.length == abundanceHere[FishStateUtilities.MALE].length);
-            for(int age=0; age<maleCatches.length; age++)
-            {
-                abundanceHere[FishStateUtilities.MALE][age]-=maleCatches[age];
-                Preconditions.checkArgument(abundanceHere[FishStateUtilities.MALE][age] >=0,
-                                            "There is now a negative amount of male fish left at age " + age);
-                abundanceHere[FishStateUtilities.FEMALE][age]-=femaleCatches[age];
-                Preconditions.checkArgument(abundanceHere[FishStateUtilities.FEMALE][age] >=0,
-                                            "There is now a negative amount of female fish left at age " + age);
+
+
+            double[][] catchesMatrix = catches.asMatrix();
+            Preconditions.checkArgument(catchesMatrix.length == abundanceHere.length);
+            Preconditions.checkArgument(catchesMatrix[0].length == abundanceHere[0].length);
+            for(int subdivision =0;subdivision<catches.getSubdivisions(); subdivision++ ) {
+                for (int bin = 0; bin < catches.getBins(); bin++) {
+                    abundanceHere[subdivision][bin] -= catchesMatrix[subdivision][bin];
+                    Preconditions.checkArgument(abundanceHere[FishStateUtilities.MALE][bin] >= 0,
+                                                "There is now a negative amount of male fish left at bin " + bin);
+
+                }
             }
             lastComputedBiomass[species.getIndex()]=Double.NaN;
         }
@@ -167,9 +167,8 @@ public class AbundanceBasedLocalBiology implements LocalBiology
     public StructuredAbundance getAbundance(Species species) {
         Arrays.fill(lastComputedBiomass,Double.NaN); //force a recount after calling this
 
-        return new StructuredAbundance(abundance.get(species)[FishStateUtilities.MALE],
-                                       abundance.get(species)[FishStateUtilities.FEMALE]
-                                       );
+        return new StructuredAbundance(abundance.get(species)
+        );
 
     }
 

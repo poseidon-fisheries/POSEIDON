@@ -35,8 +35,6 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Objects;
 
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.MALE;
 
 /**
  * A gear that works on abundance and applies the same series of filters to all species equally
@@ -110,20 +108,18 @@ public class HomogeneousAbundanceGear implements Gear {
 
             while (hoursSpentFishingThisSpecies > 0) {
                 double[][] hourlyCatches = fishThisSpecies(where, species);
-                for (int sex = 0; sex < 2; sex++)
+                for (int cohort = 0; cohort < catches.length; cohort++)
                     for (int bin = 0; bin < catches[0].length; bin++)
-                        catches[sex][bin] += hourlyCatches[sex][bin];
+                        catches[cohort][bin] += hourlyCatches[cohort][bin];
 
                 hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies - 1;
             }
         }
-        return new StructuredAbundance(catches[MALE],catches[FEMALE]);
+        return new StructuredAbundance(catches);
     }
 
     protected static double[][] emptyAbundance(Species species) {
-        double[][] catches = new double[2][];
-        catches[MALE] = new double[species.getNumberOfBins()];
-        catches[FishStateUtilities.FEMALE] = new double[species.getNumberOfBins()];
+        double[][] catches = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         return catches;
     }
 
@@ -162,7 +158,7 @@ public class HomogeneousAbundanceGear implements Gear {
      * this is just the loop that calls all filters in order used by the gear when fishing.
      * It's visible so one can test that the numbers are right
      * @param species the species being fished
-     * @param abundance a matrix of 2 columns and MAX_AGE rows
+     * @param abundance a matrix Pof # of subdivisions} columns and MAX_AGE rows
      * @return a matrix of 2 columns and MAX_AGE rows corresponding to what was caught
      */
     @VisibleForTesting

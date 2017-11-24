@@ -56,6 +56,10 @@ public class InitialAbundances {
         CONSTRUCTORS.put("Abundance From List",
                          InitialAbundanceFromListFactory::new);
         NAMES.put(InitialAbundanceFromListFactory.class,"Abundance From List");
+
+        CONSTRUCTORS.put("Abundance in one bin",
+                         OneBinAbundanceFactory::new);
+        NAMES.put(OneBinAbundanceFactory.class,"Abundance in one bin");
     }
 
 }
