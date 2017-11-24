@@ -33,17 +33,18 @@ public class FromListMeristics implements Meristics {
 
 
     public FromListMeristics(
-            double[] weights) {
-        this(weights, new double[weights.length]);
+            double[] weights, final int subdivisions) {
+        this(weights, new double[weights.length], subdivisions);
     }
 
     public FromListMeristics(
             double[] weights,
-            double[] lenghts) {
+            double[] lenghts,
+            final int subdivisions) {
         Preconditions.checkArgument(lenghts.length == weights.length, "length mismatch between lenghts and weights");
 
 
-        this.growth = new GrowthBinByList(2,
+        this.growth = new GrowthBinByList(subdivisions,
                                           lenghts,
                                           weights);
     }

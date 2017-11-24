@@ -643,16 +643,14 @@ public class FishStateUtilities {
      */
     public static double weigh(StructuredAbundance abundance, Meristics meristics)
     {
-        if(abundance.getSubdivisions() == 1)
-            return weigh(abundance.asMatrix()[0], meristics);
-        if(abundance.getSubdivisions() == 2)
-            return weigh(abundance.asMatrix()[MALE],
-                         abundance.asMatrix()[FEMALE],
-                         meristics);
+        //no female-male split
+        double totalWeight = 0;
+        //go through all the fish and sum up their weight at given age
+        for(int subdivision =0; subdivision< meristics.getNumberOfSubdivisions(); subdivision++)
+            for(int bin=0; bin<meristics.getNumberOfBins(); bin++)
+                totalWeight += abundance.getElement(subdivision, bin) * meristics.getWeight(subdivision, bin);
 
-        throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
-
-
+        return totalWeight;
 
 
     }
@@ -669,13 +667,14 @@ public class FishStateUtilities {
                                Meristics meristics, int binIndex)
     {
         //no female-male split
-        if(abundance.getSubdivisions() == 1)
-            return meristics.getWeight(0,binIndex) * abundance.getAbundanceInBin(binIndex);
-        if(abundance.getSubdivisions() == 2)
-            return abundance.getElement(MALE,binIndex) * meristics.getWeight(MALE,binIndex) +
-                    abundance.getElement(FEMALE,binIndex) * meristics.getWeight(FEMALE,binIndex);
+        double totalWeight = 0;
+        //go through all the fish and sum up their weight at given age
+        for(int subdivision =0; subdivision< meristics.getNumberOfSubdivisions(); subdivision++)
+            {
+                totalWeight += abundance.getElement(subdivision,binIndex) * meristics.getWeight(subdivision,binIndex);
+            }
 
-        throw new RuntimeException("I don't know how to weigh abundance when split into more than two groups");
+        return totalWeight;
 
 
     }
@@ -1128,9 +1127,9 @@ public class FishStateUtilities {
 
         }while (
                 (respectMPA && !fisher.isAllowedToFishHere(tile, model))  ||
-                (ignoreWastelands && !tile.isFishingEvenPossibleHere()));
+                        (ignoreWastelands && !tile.isFishingEvenPossibleHere()));
         if(attempts > maxAttempts) {
-           return null;
+            return null;
         }
         assert !respectMPA || fisher.isAllowedToFishHere(tile, model);
         assert !ignoreWastelands || tile.isFishingEvenPossibleHere();

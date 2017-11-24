@@ -76,17 +76,24 @@ public class DiscardUnderaged implements DiscardingStrategy {
             return fishCaught;
 
         StructuredAbundance[] abundances = new StructuredAbundance[fishCaught.numberOfSpecies()];
-        for(int i=0 ; i<fishCaught.numberOfSpecies(); i++)
+        for(int species=0 ; species<fishCaught.numberOfSpecies(); species++)
         {
-            int bins = fishCaught.getAbundance(i).asMatrix()[FishStateUtilities.MALE].length;
-            double[] maleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).asMatrix()[FishStateUtilities.MALE], bins);
-            double[] femaleAbundance = Arrays.copyOf(fishCaught.getAbundance(i).asMatrix()[FishStateUtilities.FEMALE], bins);
-            for(int bin =0; bin<minAge ; bin++) {
-                maleAbundance[bin] = 0;
-                femaleAbundance[bin] = 0;
+            StructuredAbundance thisSpeciesAbundance = fishCaught.getAbundance(species);
+            int bins = thisSpeciesAbundance.getBins();
+            double[][] filtered = new double[thisSpeciesAbundance.getSubdivisions()][];
+            for(int subdivision=0; subdivision<filtered.length; subdivision++ ) {
+                filtered[subdivision] = new double[thisSpeciesAbundance.getBins()];
+                for (int bin = 0; bin < thisSpeciesAbundance.getBins(); bin++)
+                {
+                    if(bin<minAge)
+                        filtered[subdivision][bin] = 0;
+                    else
+                        filtered[subdivision][bin] = thisSpeciesAbundance.asMatrix()[subdivision][bin];
+
+                }
             }
-            abundances[i] = new StructuredAbundance(
-                    maleAbundance,femaleAbundance
+            abundances[species] = new StructuredAbundance(
+                    filtered
             );
         }
         return new Catch(abundances,model.getBiology());

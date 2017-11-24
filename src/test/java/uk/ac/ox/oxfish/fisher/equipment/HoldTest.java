@@ -23,6 +23,8 @@ package uk.ac.ox.oxfish.fisher.equipment;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 
 import static org.junit.Assert.assertEquals;
@@ -118,8 +120,8 @@ public class HoldTest {
     public void throwsOverboardAbundance() throws Exception {
 
         //set up copied from the holdsize test
-        StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
-        StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
+        Meristics first = mock(Meristics.class);
+        Meristics second = new FromListMeristics(new double[]{100,100},2);
         Species firstSpecies = new Species("first",first);
         Species secondSpecies = new Species("second",second);
 
@@ -130,7 +132,7 @@ public class HoldTest {
 
 
         when(first.getNumberOfBins()).thenReturn(3);
-        when(second.getNumberOfBins()).thenReturn(2);
+        when(first.getNumberOfSubdivisions()).thenReturn(2);
 
 
         when(first.getWeight(FEMALE,0)).thenReturn(10d);
@@ -141,7 +143,6 @@ public class HoldTest {
         when(first.getWeight(MALE,2)).thenReturn(50d);
 
 
-        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
 
         Hold hold = new Hold(1000d,
                              bio);

@@ -52,18 +52,16 @@ public class RetentionAbundanceFilter extends FormulaAbundanceFilter {
     @Override
     protected double[][] computeSelectivity(Species species)
     {
-        double[][] toReturn = new double[2][species.getNumberOfBins()];
+        double[][] toReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+
+        for(int subdivision = 0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
+            for(int age=0; age<species.getNumberOfBins(); age++)
+            {
+                toReturn[subdivision][age] =
+                        asymptote/(1+Math.exp(-( species.getLength(subdivision,age)-inflection)/slope));
 
 
-        for(int age=0; age<species.getNumberOfBins(); age++)
-        {
-            toReturn[FishStateUtilities.MALE][age] =
-                    asymptote/(1+Math.exp(-( species.getLength(FishStateUtilities.MALE,age)-inflection)/slope));
-
-            toReturn[FishStateUtilities.FEMALE][age] =
-                    asymptote/(1+Math.exp(-( species.getLength(FishStateUtilities.FEMALE,age)-inflection)/slope));
-
-        }
+            }
         return toReturn;
 
     }

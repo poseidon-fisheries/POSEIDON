@@ -97,39 +97,35 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
         double expTop = peak + binWidth + (0.99*  (binMax+binWidth/2) -peak - binWidth ) / (1+ Math.exp(-top));
 
 
-        double[][] asc = new double[2][species.getNumberOfBins()];
-        double[][] desc = new double[2][species.getNumberOfBins()];
-        double[][] join1 = new double[2][species.getNumberOfBins()];
-        double[][] join2 = new double[2][species.getNumberOfBins()];
-        for(int age=0;age<species.getNumberOfBins();age++)
-        {
-            double bin =  binWidth/2 +  (species.getLength(FishStateUtilities.MALE,age) - binMin) / binWidth;
-            //EXP(-(($B26-$E$7)^2/$E$9))
-            asc[FishStateUtilities.MALE][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
-            desc[FishStateUtilities.MALE][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
-            //1/(1+EXP(-($H$24*($B26-$E$7)/(1+ABS($B26-$E$7)))))
-            join1[FishStateUtilities.MALE][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
-            //1/(1+EXP(-($I$24*($B26-$E$8)/(1+ABS($B26-$E$8)))))
-            join2[FishStateUtilities.MALE][age] = 1d/(1+Math.exp(-(20*(bin-expTop)/(1+Math.abs(bin-expTop)))));
-            bin =  binWidth/2 +  (species.getLength(FishStateUtilities.FEMALE,age) - binMin) / binWidth;
-            asc[FishStateUtilities.FEMALE][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
-            desc[FishStateUtilities.FEMALE][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
-            join1[FishStateUtilities.FEMALE][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
-            join2[FishStateUtilities.FEMALE][age] = 1d/(1+Math.exp(-(20*(bin-expTop)/(1+Math.abs(bin-expTop)))));
+        double[][] asc = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        double[][] desc = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        double[][] join1 = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        double[][] join2 = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
+            for(int age=0;age<species.getNumberOfBins();age++)
+            {
+                double bin =  binWidth/2 +  (species.getLength(subdivision,age) - binMin) / binWidth;
+                //EXP(-(($B26-$E$7)^2/$E$9))
+                asc[subdivision][age] = Math.exp(-(Math.pow(bin-peak,2)/expWidth));
+                desc[subdivision][age] = Math.exp(-(Math.pow(bin-expTop,2)/expDsc));
+                //1/(1+EXP(-($H$24*($B26-$E$7)/(1+ABS($B26-$E$7)))))
+                join1[subdivision][age] = 1d/(1+Math.exp(-(20*(bin-peak)/(1+Math.abs(bin-peak)))));
+                //1/(1+EXP(-($I$24*($B26-$E$8)/(1+ABS($B26-$E$8)))))
+                join2[subdivision][age] = 1d/(1+Math.exp(-(20*(bin-expTop)/(1+Math.abs(bin-expTop)))));
 
-        }
+            }
         //if necessary scale the asc vector
         if(Double.isFinite(initialScaling))
         {
             double scaling = 1d/(1+Math.exp(-initialScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
             double minScaling = Math.exp(-(Math.pow(binMin + binWidth/2d-peak,2)/expWidth));
-            for(int age=0;age<species.getNumberOfBins()-1;age++)
-            {
-                //($E$11+(1-$E$11)*(C26-$C$20)/($C$21-$C$20))
-                asc[0][age] = scaling+(1-scaling)*(asc[0][age]-minScaling)/( 1- minScaling);
-                asc[1][age] = scaling+(1-scaling)*(asc[1][age]-minScaling)/( 1- minScaling);
-            }
+            for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
+                for(int age=0;age<species.getNumberOfBins()-1;age++)
+                {
+                    //($E$11+(1-$E$11)*(C26-$C$20)/($C$21-$C$20))
+                    asc[subdivision][age] = scaling+(1-scaling)*(asc[subdivision][age]-minScaling)/( 1- minScaling);
+                }
 
         }
 
@@ -140,12 +136,13 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
             double scaling = 1d/(1+Math.exp(-finalScaling));
             //EXP(-(($B20-$E$7)^2/$E$9))
             double maxScaling = Math.exp(-(Math.pow(binMax + binWidth/2d-expTop,2)/expDsc));
-            for(int age=0;age<species.getNumberOfBins()-1;age++)
-            {
-                //((1+($E$12-1)*(E26-$C$22)/($C$23-$C$22)),E26)
-                desc[0][age] = 1 + (scaling-1)*(desc[0][age]-1)/(maxScaling-1);
-                desc[1][age] = 1 + (scaling-1)*(desc[1][age]-1)/(maxScaling-1);
-            }
+            for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
+
+                for(int age=0;age<species.getNumberOfBins()-1;age++)
+                {
+                    //((1+($E$12-1)*(E26-$C$22)/($C$23-$C$22)),E26)
+                    desc[subdivision][age] = 1 + (scaling-1)*(desc[subdivision][age]-1)/(maxScaling-1);
+                }
 
         }
 
@@ -153,41 +150,27 @@ public class DoubleNormalFilter extends FormulaAbundanceFilter{
 
         //now turn it into selectivity thank god
         double[][] selex = new double[2][species.getNumberOfBins()];
-        for(int age=0;age<species.getNumberOfBins();age++)
-        {
+        for(int subdivision =0; subdivision< species.getNumberOfSubdivisions(); subdivision++)
+            for(int age=0;age<species.getNumberOfBins();age++)
+            {
 
-            if(Double.isNaN(initialScaling) ||
-                    species.getLength(FishStateUtilities.MALE,age)>-1000-initialScaling)
-            {
-                //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
-                selex[FishStateUtilities.MALE][age] =
-                        asc[0][age]*(1-join1[FishStateUtilities.MALE][age])+
-                                join1[FishStateUtilities.MALE][age]*((1-join2[FishStateUtilities.MALE][age])+
-                                        desc[FishStateUtilities.MALE][age]*join2[0][age]);
-            }
-            else
-            {
-                selex[FishStateUtilities.MALE][age] = 0;
-            }
-
-            if(Double.isNaN(initialScaling) ||
-                    -1000-initialScaling> species.getLength(FishStateUtilities.FEMALE,age))
-            {
-                //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
-                selex[FishStateUtilities.FEMALE][age] =
-                        asc[FishStateUtilities.FEMALE][age]*(1-join1[FishStateUtilities.FEMALE][age])+
-                                join1[FishStateUtilities.FEMALE][age]*
-                                        ((1-join2[FishStateUtilities.FEMALE][age])+
-                                                desc[FishStateUtilities.FEMALE][age]*
-                                                        join2[FishStateUtilities.FEMALE][age]);
-            }
-            else
-            {
-                selex[FishStateUtilities.FEMALE][age] = 0;
-            }
+                if(Double.isNaN(initialScaling) ||
+                        species.getLength(subdivision,age)>-1000-initialScaling)
+                {
+                    //(D26*(1-G26)+G26*(1*(1-H26)+F26*H26))
+                    selex[subdivision][age] =
+                            asc[subdivision][age]*(1-join1[subdivision][age])+
+                                    join1[subdivision][age]*((1-join2[subdivision][age])+
+                                            desc[subdivision][age]*join2[subdivision][age]);
+                }
+                else
+                {
+                    selex[subdivision][age] = 0;
+                }
 
 
-        }
+
+            }
         return selex;
 
 

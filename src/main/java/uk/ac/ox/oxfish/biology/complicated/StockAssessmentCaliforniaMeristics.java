@@ -32,30 +32,8 @@ import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 public class StockAssessmentCaliforniaMeristics implements Meristics {
 
 
-    public static final StockAssessmentCaliforniaMeristics FAKE_MERISTICS =
-            new StockAssessmentCaliforniaMeristics(0,
-                                                   0 ,
-                                                   0,
-                                                   1,
-                                                   1,
-                                                   1,
-                                                   1,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   1,
-                                                   1,
-                                                   1,
-                                                   1,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   1,
-                                                   1,
-                                                   false);
+    public static final Meristics FAKE_MERISTICS =
+            new FromListMeristics(new double[]{1}, new double[]{1}, 1);
 
 
     private final CaliforniaStockAssessmentGrowthBinParameters growth;

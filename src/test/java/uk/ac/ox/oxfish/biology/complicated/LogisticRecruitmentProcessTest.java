@@ -35,7 +35,7 @@ public class LogisticRecruitmentProcessTest {
 
 
     private final static Meristics meristics = new FromListMeristics(
-            new double[]{1d, 2d, 3d});
+            new double[]{1d, 2d, 3d}, 2);
 
 
     @Test

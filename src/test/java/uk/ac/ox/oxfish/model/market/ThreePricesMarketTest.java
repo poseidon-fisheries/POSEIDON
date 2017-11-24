@@ -23,6 +23,8 @@ package uk.ac.ox.oxfish.model.market;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -43,27 +45,19 @@ public class ThreePricesMarketTest {
     public void sellsAndNotifiesCorrectly() throws Exception {
 
         //set up copied from the holdsize test
-        StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
-        StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
+        Meristics first = new FromListMeristics(new double[]{100,100,100},2);
+        Meristics second = new FromListMeristics(new double[]{100,100},2);
         Species firstSpecies = new Species("first",first);
         Species secondSpecies = new Species("second",second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
-        when(first.getNumberOfBins()).thenReturn(3);
-        when(second.getNumberOfBins()).thenReturn(2);
-
-
-
-        when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
-        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
-
 
         Hold hold = new Hold(1000d,
                              bio);
 
-        //you catch 1000kg of species 2
+        //you catch 1000kg of species 1
         hold.load(
                 new Catch(
                         new double[]{0,2,3},
@@ -109,25 +103,21 @@ public class ThreePricesMarketTest {
     public void regulationHalves() throws Exception {
 
         //set up copied from the holdsize test
-        StockAssessmentCaliforniaMeristics first = mock(StockAssessmentCaliforniaMeristics.class);
-        StockAssessmentCaliforniaMeristics second = mock(StockAssessmentCaliforniaMeristics.class);
+        Meristics first = new FromListMeristics(new double[]{100,100,100},2);
+        Meristics second = new FromListMeristics(new double[]{100,100},2);
         Species firstSpecies = new Species("first",first);
         Species secondSpecies = new Species("second",second);
 
 
         GlobalBiology bio = new GlobalBiology(firstSpecies, secondSpecies);
 
-        when(first.getNumberOfBins()).thenReturn(3);
-        when(second.getNumberOfBins()).thenReturn(2);
 
-        when(first.getWeight(anyInt(),anyInt())).thenReturn(100d);
-        when(second.getWeight(anyInt(),anyInt())).thenReturn(100d);
 
 
         Hold hold = new Hold(1000d,
                              bio);
 
-        //you catch 1000kg of species 2
+        //you catch 1000kg of species 1
         //but regulations will only allow to sell 500kg
         hold.load(
                 new Catch(

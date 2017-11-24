@@ -50,7 +50,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //there is only one species of fish, with 3 age structures
         Meristics meristics = new FromListMeristics(
-                new double[]{10d,20d,30d});
+                new double[]{10d,20d,30d}, 2);
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -106,7 +106,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //there is only one species of fish, with 3 age structures
         Meristics meristics = new FromListMeristics(
-                new double[]{10d,20d,30d});
+                new double[]{10d,20d,30d}, 2);
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 
@@ -167,7 +167,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //there is only one species of fish, with 3 age structures
         Meristics meristics = new FromListMeristics(
-                new double[]{10d,20d,30d});
+                new double[]{10d,20d,30d}, 2);
         Species species = new Species("only",meristics);
         GlobalBiology biology = new GlobalBiology(species);
 

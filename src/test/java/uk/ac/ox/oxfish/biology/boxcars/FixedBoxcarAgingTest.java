@@ -89,7 +89,7 @@ public class FixedBoxcarAgingTest
                 "lame",
                 new FromListMeristics(
                         lengths,
-                        lengths
+                        lengths, 2
                 ),
                 false
         );
