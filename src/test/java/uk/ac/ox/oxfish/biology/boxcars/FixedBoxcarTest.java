@@ -1,11 +1,23 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
+import uk.ac.ox.oxfish.biology.complicated.factory.FixedRecruitmentFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.NoDiffuserFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.OneBinAbundanceFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.ProportionalMortalityFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
 
 
 //refer to fixedboxcar.R in the inputs/test folder for why the numbers targeted are the ones we are targeting!
@@ -24,7 +36,7 @@ public class FixedBoxcarTest {
                                                          113,
                                                          10
         );
-        Assert.assertEquals(length,
+        assertEquals(length,
                             88.98379,
                             .0001);
     }
@@ -87,7 +99,7 @@ public class FixedBoxcarTest {
 
         //should start empty!
         for(int i=0; i<100; i++)
-            Assert.assertEquals(0,
+            assertEquals(0,
                                 fixedBoxcar.getCurrentDistribution()[i],
                                 .001f);
 
@@ -133,7 +145,7 @@ public class FixedBoxcarTest {
 
         //should start empty!
         for(int i=0; i<100; i++)
-            Assert.assertEquals(0,
+            assertEquals(0,
                                 variableWidthBoxcar.getCurrentDistribution()[i],
                                 .001f);
 
@@ -150,5 +162,96 @@ public class FixedBoxcarTest {
                                  .001);
     }
 
+
+
+    @NotNull
+    private static PrototypeScenario oneCellBlockFixedBoxcar() {
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(0);
+        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+        map.setCoastalRoughness(new FixedDoubleParameter(0));
+        map.setHeight(new FixedDoubleParameter(1));
+        map.setWidth(new FixedDoubleParameter(2.0));
+        map.setMaxLandWidth(new FixedDoubleParameter(1.0));
+        scenario.setMapInitializer(map);
+
+        SingleSpeciesAbundanceFactory biology = new SingleSpeciesAbundanceFactory();
+        //no movement
+        biology.setDiffuser(new NoDiffuserFactory());
+        //10% yearly mortality
+        ProportionalMortalityFactory mortalityProcess = new ProportionalMortalityFactory();
+        biology.setMortalityProcess(mortalityProcess);
+        mortalityProcess.setYearlyMortality(new FixedDoubleParameter(.1));
+        //Aphaerus rutilans numbers
+        EquallySpacedBertalanffyFactory meristics = new EquallySpacedBertalanffyFactory();
+        meristics.setNumberOfBins(100);
+        meristics.setRecruitLengthInCm(new FixedDoubleParameter(10));
+        meristics.setMaxLengthInCm(new FixedDoubleParameter(113));
+        meristics.setkYearlyParameter(new FixedDoubleParameter(0.364));
+        meristics.setAllometricAlpha(new FixedDoubleParameter(0.015));
+        meristics.setAllometricBeta(new FixedDoubleParameter(2.961));
+        biology.setMeristics(meristics);
+        //VB Aging
+        FixedBoxcarBertalannfyAging aging = new FixedBoxcarBertalannfyAging();
+        aging.setLInfinity(new FixedDoubleParameter(113));
+        aging.setK(new FixedDoubleParameter(0.364));
+        biology.setAging(aging);
+        //initial abundance
+        OneBinAbundanceFactory initial = new OneBinAbundanceFactory();
+        initial.setInitialBin(0);
+        initial.setInitialSubdivision(-1);
+        initial.setInitialBinPopulation(new FixedDoubleParameter(10000));
+        biology.setInitialAbundanceFactory(initial);
+        //no recruitment
+        FixedRecruitmentFactory recruitment = new FixedRecruitmentFactory();
+        recruitment.setYearlyRecruits(new FixedDoubleParameter(0));
+        biology.setRecruitment(recruitment);
+        //add!
+        biology.setRounding(false);
+        biology.setDaily(true);
+        scenario.setBiologyInitializer(biology);
+        return scenario;
+    }
+
+
+    @Test
+    public void allIntegratedFixedBoxcarPlusDailyRecruits() throws Exception {
+
+        //no fisher, one single box!
+        PrototypeScenario scenario = oneCellBlockFixedBoxcar();
+
+        FixedRecruitmentFactory recruitment = new FixedRecruitmentFactory();
+        recruitment.setYearlyRecruits(new FixedDoubleParameter(10*365));
+        ((SingleSpeciesAbundanceFactory) scenario.getBiologyInitializer()).setRecruitment(recruitment);
+
+
+        FishState state =new FishState(System.currentTimeMillis());
+        state.setScenario(scenario);
+        state.start();
+        // there are 10,000 fish initially, all of length 10 which means weight 13.7117g
+        // this means 137.117 kg worth of fish in the sea
+        Species species = state.getSpecies().get(0);
+        assertEquals(137.117, state.getTotalBiomass(species), .0001);
+
+
+        //step it for 1000 steps
+        for(int i=0; i<1000; i++)
+            state.schedule.step(state);
+
+        //numbers computed from R
+        double[] expectedAbundance = new double[]{101.034909929416,101.78047704758,102.539267035032,103.311654184481,104.098027423304,104.898791047056,105.714365498008,106.545188191984,107.391714397065,108.254418168019,109.133793340657,110.030354590674,110.94463856196,111.877205069776,112.828638384715,113.799548603886,114.790573116368,115.802378170641,116.835660552429,117.891149382211,118.969608042536,120.071836246325,121.198672258394,122.350995283734,123.529728037434,124.735839512708,125.970347965218,127.234324133935,128.52889472129,129.855246159263,131.214628696253,132.608360862291,134.03783444032,135.504520289107,137.009976014625,138.55585833585,140.143947943836,141.776207131113,143.454919947307,145.183029712579,146.964922310019,148.808156895987,150.727083961376,152.749970396733,154.932160952591,157.378761321399,160.280835567458,163.968256516969,168.978851829886,176.136092186272,186.615884513884,201.968760872037,224.051752094466,254.822542517962,295.966280652427,348.368459566736,411.512166733892,482.947888456209,558.029872623696,630.102708191018,691.235847173384,733.451177404509,750.212703057669,737.814641552592,696.278150555617,629.475674211492,544.418957740629,449.896329117122,354.833063278635,266.805886977535,191.054773315146,130.147290670075,84.2428594691442,51.7525544081309,30.1354450032376,16.6102441960796,8.65334528915145,4.25404639896348,1.96999822327511,0.857698635898846,0.350333439364466,0.133930082609909,0.0477945391610409,0.0158744170483338,0.00489090266880036,0.00139254504121545,0.000364821378542261,8.75056571832177e-05,1.91053061234377e-05,3.77104019861888e-06,6.67430891682503e-07,1.04876096001684e-07,1.44519922994949e-08,1.71937476871579e-09,1.73021184053611e-10,1.43194941515714e-11,9.35781162067081e-13,4.52748341054907e-14,1.44167857183e-15,2.27584975496875e-17};
+        int numberOfBins = species.getNumberOfBins();
+        for(int i = 0; i< numberOfBins; i++)
+            assertEquals(
+                    expectedAbundance[i],
+                    state.getTotalAbundance(species,i),
+                    .0001
+            );
+
+
+
+
+
+    }
 
 }

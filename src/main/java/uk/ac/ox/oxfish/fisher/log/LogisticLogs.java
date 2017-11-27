@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
 
 import java.util.LinkedList;
@@ -32,6 +33,11 @@ public class LogisticLogs extends LinkedList<LogisticLog> implements OutputPlugi
 
 
     private String filename = "logistic_long.csv";
+
+    @Override
+    public void reactToEndOfSimulation(FishState state) {
+        //ignored
+    }
 
     @Override
     public String getFileName() {

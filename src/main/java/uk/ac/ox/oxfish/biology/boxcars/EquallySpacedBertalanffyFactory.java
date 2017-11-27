@@ -31,14 +31,16 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
 
 
     /**
-     * the allometric alpha converting length length to weight
+     * the allometric alpha converting length length cm to weight grams
      */
-    private DoubleParameter allometricAlpha = new FixedDoubleParameter(0.0000034487);
+    private DoubleParameter allometricAlpha =
+            new FixedDoubleParameter(0.015);
 
     /**
-     * the allometric beta converting length length to weight
+     * the allometric beta converting length length cm to weight grams
      */
-    private DoubleParameter allometricBeta = new FixedDoubleParameter(3.26681);
+    private DoubleParameter allometricBeta =
+            new FixedDoubleParameter(2.961);
 
     /**
      * the L_zero of the VB formula
@@ -77,12 +79,13 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         double alpha = allometricAlpha.apply(fishState.getRandom());
         double beta = allometricBeta.apply(fishState.getRandom());
         lengths[0] =  LZero;
-        weights[0] = alpha * Math.pow(lengths[0],beta);
+        weights[0] = alpha * Math.pow(lengths[0],beta)/1000d;
 
         for(int i=1; i<lengths.length; i++)
         {
             lengths[i] = lengths[i-1] + increment;
-            weights[i] = alpha * Math.pow(lengths[i],beta);
+            //the allometric function turns it into grams, we want kg!
+            weights[i] = alpha * Math.pow(lengths[i],beta)/1000d;
 
         }
 

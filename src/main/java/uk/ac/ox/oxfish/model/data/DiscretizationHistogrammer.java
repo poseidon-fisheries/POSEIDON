@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.Map;
 
@@ -49,6 +50,11 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
 
 
     private String fileName = "location_histogram.csv";
+
+    @Override
+    public void reactToEndOfSimulation(FishState state) {
+
+    }
 
     public DiscretizationHistogrammer(MapDiscretization discretization, boolean effortCounter) {
         this.discretization = discretization;

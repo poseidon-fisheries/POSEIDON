@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.model.data;
 
+import uk.ac.ox.oxfish.model.FishState;
+
 /**
  * Any object that wants to write a file out at the end of the simulation can register as a OutputPlugin with the state
  * and the YamlMain will output it before closing the simulation
@@ -27,6 +29,8 @@ package uk.ac.ox.oxfish.model.data;
  */
 public interface OutputPlugin {
 
+
+    public void reactToEndOfSimulation(FishState state);
 
     public String getFileName();
 

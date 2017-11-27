@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
+import org.jfree.io.FileUtilities;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.OneSpeciesSchoolFactory;
@@ -43,10 +44,7 @@ import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -339,7 +337,10 @@ public class IndirectInferencePaper {
                     );
 
                                         /*
-                    Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R   ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2 baseline 2 perfect3by3 perfect3by3 TRUE
+                    Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R
+                    ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv
+                    ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2
+                    baseline 2 perfect3by3 perfect3by3 TRUE
                      */
                     String runArgument = Integer.toString(run);
                     String scenario = initializer.getKey();
@@ -385,6 +386,8 @@ public class IndirectInferencePaper {
                             runOneSimulation(inputDirectory, seed, targetName, output, pathToCSV, runArgument, scenario,
                                              Long.toString(seed),
                                              targetStrategyArgument, currentStrategyArgument, isTargetRun);
+
+
                         }
                     }
 
@@ -446,6 +449,7 @@ public class IndirectInferencePaper {
         int code = exec.waitFor();
         switch (code) {
             case 0:
+                deleteFolder(output.toFile());
                 //normal termination, everything is fine
                 break;
             case 1:
@@ -473,5 +477,22 @@ public class IndirectInferencePaper {
     }
 
 
+    /**
+     * grabbed from
+     * https://stackoverflow.com/questions/7768071/how-to-delete-directory-content-in-java
+     */
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
 
 }

@@ -298,6 +298,45 @@ public class  FishGUI extends GUIState{
             }
         });
 
+        policyButtons.add(new PolicyButton() {
+            @Override
+            public JComponent buildJComponent(FishGUI gui) {
+
+                JButton button = new JButton("Print additional outputs to file");
+           //     button
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        JFileChooser chooser = new JFileChooser(Paths.get(".").toFile());
+                        chooser.setDialogTitle("Choose directory where to output new files");
+                        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                        chooser.setAcceptAllFileFilterUsed(false);
+                        try {
+                            if (chooser.showOpenDialog(gui.displayFrame) == JFileChooser.APPROVE_OPTION) {
+
+                                System.out.println("getCurrentDirectory(): "
+                                                           + chooser.getSelectedFile());
+                                FishStateUtilities.writeAdditionalOutputsToFolder(
+                                        chooser.getSelectedFile().toPath(),
+                                        (FishState) gui.state
+                                );
+                            } else {
+                                System.out.println("No Selection ");
+                            }
+                        }
+                        catch (IOException io)
+                        {
+                            System.err.println("Failed to write additional outputs!");
+                        }
+                    }
+                });
+
+                return button;
+            }
+        });
+
+
 
         //mpa drawer
         transformer = new CoordinateTransformer(display2D, state.getMap());

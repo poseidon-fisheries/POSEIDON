@@ -26,6 +26,7 @@ import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.CatchesHistogrammer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -64,6 +65,8 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
 
     private boolean rounding = true;
 
+    private boolean histogrammerOutput = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -72,6 +75,9 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      */
     @Override
     public SingleSpeciesAbundanceInitializer apply(FishState state) {
+
+        if(histogrammerOutput)
+            state.getOutputPlugins().add(new CatchesHistogrammer());
 
         return new SingleSpeciesAbundanceInitializer(
                 speciesName,
@@ -332,5 +338,24 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
      */
     public void setRounding(boolean rounding) {
         this.rounding = rounding;
+    }
+
+
+    /**
+     * Getter for property 'histogrammerOutput'.
+     *
+     * @return Value for property 'histogrammerOutput'.
+     */
+    public boolean isHistogrammerOutput() {
+        return histogrammerOutput;
+    }
+
+    /**
+     * Setter for property 'histogrammerOutput'.
+     *
+     * @param histogrammerOutput Value to set for property 'histogrammerOutput'.
+     */
+    public void setHistogrammerOutput(boolean histogrammerOutput) {
+        this.histogrammerOutput = histogrammerOutput;
     }
 }

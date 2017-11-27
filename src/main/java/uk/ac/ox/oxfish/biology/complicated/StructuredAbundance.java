@@ -115,9 +115,9 @@ public class StructuredAbundance {
     }
 
 
-    public int getAbundanceInBin(int bin)
+    public double getAbundanceInBin(int bin)
     {
-        int fish = 0;
+        double fish = 0;
         for(int group = 0; group < getSubdivisions(); group++)
             fish += abundance[group][bin];
         return fish;

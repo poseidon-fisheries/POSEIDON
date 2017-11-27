@@ -984,15 +984,8 @@ public class FishStateUtilities {
             writer.close();
 
         }
+        writeAdditionalOutputsToFolder(outputFolder, model);
 
-        //add additional outputs
-        for(OutputPlugin plugin : model.getOutputPlugins())
-        {
-            writer = new FileWriter(outputFolder.resolve(plugin.getFileName()).toFile());
-            writer.write(plugin.composeFileContents());
-            writer.close();
-
-        }
 
         if(saveOnExit)
             writeModelToFile(
@@ -1000,6 +993,18 @@ public class FishStateUtilities {
                     model);
 
         return model;
+    }
+
+    public static void writeAdditionalOutputsToFolder(Path outputFolder, FishState model) throws IOException {
+        FileWriter writer;//add additional outputs
+        for(OutputPlugin plugin : model.getOutputPlugins())
+        {
+            plugin.reactToEndOfSimulation(model);
+            writer = new FileWriter(outputFolder.resolve(plugin.getFileName()).toFile());
+            writer.write(plugin.composeFileContents());
+            writer.close();
+
+        }
     }
 
 
