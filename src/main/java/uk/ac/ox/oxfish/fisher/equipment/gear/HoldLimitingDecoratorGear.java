@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -39,7 +40,6 @@ public class HoldLimitingDecoratorGear implements Gear {
 
     private final Gear delegate;
 
-    private static boolean warned = false;
 
     public HoldLimitingDecoratorGear(Gear delegate) {
         this.delegate = delegate;
@@ -49,21 +49,41 @@ public class HoldLimitingDecoratorGear implements Gear {
     public Catch fish(
             Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         Catch original = delegate.fish(fisher, where, hoursSpentFishing, modelBiology);
-        if(original.hasAbundanceInformation() && !warned)
-        {
-            Log.warn("this decorator will lose abundance based information!");
-            warned = true;
-        }
+
         double[] biomassArray = original.getBiomassArray();
         double spaceLeft = fisher.getMaximumHold() - fisher.getTotalWeightOfCatchInHold();
         assert  spaceLeft>=0;
-        if(spaceLeft > 0) {
+        if (spaceLeft == 0) {
+            return original.hasAbundanceInformation() ?
+                    new Catch(new StructuredAbundance[original.numberOfSpecies()],modelBiology) :
+                    new Catch(new double[biomassArray.length]);
+        } else {
+
             //biomassArray gets changed as a side effect!
-            Hold.throwOverboard(biomassArray, spaceLeft);
-            return new Catch(biomassArray);
+            double proportionKept = Hold.throwOverboard(biomassArray, spaceLeft);
+            //if there isn't abundance information you are already done
+            if(!original.hasAbundanceInformation())
+                return new Catch(biomassArray);
+            else
+            {
+                //otherwise reweigh
+                if(proportionKept >=1)
+                    return original;
+
+                StructuredAbundance[] abundances = new StructuredAbundance[biomassArray.length];
+                for(int i=0; i<modelBiology.getSpecies().size(); i++)
+                {
+                    //multiply every item by the proportion kept
+                    abundances[i] = new StructuredAbundance(original.getAbundance(i));
+                    double[][] structuredAbundance = abundances[i].asMatrix();
+                    for(int j=0; j<structuredAbundance.length; j++)
+                        for(int k=0; k<structuredAbundance[j].length; k++)
+                            structuredAbundance[j][k] *= proportionKept;
+                    //next species
+                }
+                return new Catch(abundances,modelBiology);
+            }
         }
-        else
-            return new Catch(new double[biomassArray.length]);
     }
 
     /**

@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.components.RetentionAbundanceFilter
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
 /**
  * This is a gear that applies the same Logistic selectivity and Logistic Retention to every species.
@@ -112,7 +113,13 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
     @Override
     public HomogeneousAbundanceGear apply(FishState fishState) {
         MersenneTwisterFast random = fishState.getRandom();
-        if(retentionAsymptote != null)
+        if(retentionAsymptote != null &&
+                !(retentionAsymptote instanceof NullParameter) &&
+                retentionSlope != null &&
+                !(retentionSlope instanceof NullParameter) &&
+                retentionInflection != null &&
+                !(retentionInflection instanceof NullParameter)
+                )
             return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
                                                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
