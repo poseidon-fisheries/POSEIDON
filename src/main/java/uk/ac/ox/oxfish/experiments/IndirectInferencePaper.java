@@ -28,6 +28,8 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.OneSpeciesSchoolFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
@@ -244,11 +246,11 @@ public class IndirectInferencePaper {
         heatmap.setAcquisition(acquisition);
         heatmap.setExplorationStepSize(new FixedDoubleParameter(1));
         heatmap.setProbability(new FixedProbabilityFactory(.5,1));
-        KernelTransductionFactory regression = new KernelTransductionFactory();
-        regression.setForgettingFactor(new FixedDoubleParameter(0.999989));
-        regression.setSpaceBandwidth(new FixedDoubleParameter(20));
+        NearestNeighborTransductionFactory regression = new NearestNeighborTransductionFactory();
+       // regression.setTimeBandwidth(new FixedDoubleParameter(0.999989));
+        regression.setSpaceBandwidth(new FixedDoubleParameter(5));
         heatmap.setRegression(regression);
-        strategies.put("kernel",heatmap);
+        strategies.put("nn",heatmap);
 
         //social annealing
         PerTripImitativeDestinationFactory annealing = new PerTripImitativeDestinationFactory();
@@ -373,7 +375,7 @@ public class IndirectInferencePaper {
                             output = scenarioDirectory.resolve("output").resolve(targetName).resolve(candidateName);
                             output.toFile().mkdirs();
                             inputDirectory.toFile().mkdirs();
-                            yamler.dump(mainScenario,
+                            yamler.dump(candidateScenario,
                                         new FileWriter(
                                                 inputDirectory.resolve(targetName+ "_" + candidateName +".yaml").toFile())
                             );
@@ -383,7 +385,7 @@ public class IndirectInferencePaper {
                             isTargetRun = "FALSE";
                             Log.info("Starting target run : " + targetName + "   ---- candidate: " + candidateName);
 
-                            runOneSimulation(inputDirectory, seed, targetName, output, pathToCSV, runArgument, scenario,
+                            runOneSimulation(inputDirectory, seed, targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
                                              Long.toString(seed),
                                              targetStrategyArgument, currentStrategyArgument, isTargetRun);
 
