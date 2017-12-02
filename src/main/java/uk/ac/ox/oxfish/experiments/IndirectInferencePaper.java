@@ -61,7 +61,7 @@ public class IndirectInferencePaper {
 
     private final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
 
-    private final static Path mlogitScript = mainDirectory.resolve("mlogit_fit.R");
+    private final static Path mlogitScript = mainDirectory.resolve("mlogit_fit_full.R");
 
 
     /**
@@ -80,6 +80,7 @@ public class IndirectInferencePaper {
     {
 
         //the baseline scenario: fishing front and all
+
         initializers.put(
                 "baseline",
                 new ScenarioInitializer() {
@@ -120,6 +121,8 @@ public class IndirectInferencePaper {
                 }
         );
 
+
+        /*
         initializers.put("chaser",
                          new ScenarioInitializer() {
                              @Override
@@ -152,14 +155,24 @@ public class IndirectInferencePaper {
                                          )
                                  );
 
+                                                         SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+                        map.setHeight(new FixedDoubleParameter(50));
+                        map.setWidth(new FixedDoubleParameter(50));
+                        map.setCoastalRoughness(new FixedDoubleParameter(0));
+                        map.setMaxLandWidth(new FixedDoubleParameter(10));
+                        cast.setMapInitializer(map);
+                        cast.setPortPositionX(40);
+                        cast.setPortPositionY(random.nextInt(50));
+
+                                 cast.setMapMakerDedicatedRandomSeed(seed);
 
                                  cast.setDestinationStrategy(destinationStrategy);
 
                              }
                          }
 
-        );
-
+        );*/
+/*
         initializers.put("deriso",
                          new ScenarioInitializer() {
                              @Override
@@ -186,7 +199,7 @@ public class IndirectInferencePaper {
                          }
 
         );
-
+*/
     }
 
 

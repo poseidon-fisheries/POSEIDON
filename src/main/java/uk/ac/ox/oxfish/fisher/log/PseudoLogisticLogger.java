@@ -142,7 +142,7 @@ public class PseudoLogisticLogger implements TripListener {
 
         }
         assert !log.waitingForChoice();
-        log.recordInput(inputter.getRegressionInput(fisher,state));
+            log.recordInput(inputter.getRegressionInput(fisher,state));
 
 
 

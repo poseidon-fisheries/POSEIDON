@@ -72,6 +72,8 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
                 double[] cpue = lastFinishedTrip.getTotalCatch();
                 for(int i=0; i<cpue.length; i++)
                     cpue[i] = cpue[i]/ (double)lastFinishedTrip.getEffort();
+                if(lastFinishedTrip.getMostFishedTileInTrip()==null)
+                    return Double.NaN;
                 //use it to simulate a trip
                 TripRecord simulatedTrip = LameTripSimulator.simulateRecord(
                         observer,
