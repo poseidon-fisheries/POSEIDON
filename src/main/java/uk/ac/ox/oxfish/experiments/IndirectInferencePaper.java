@@ -122,7 +122,7 @@ public class IndirectInferencePaper {
         );
 
 
-        /*
+
         initializers.put("chaser",
                          new ScenarioInitializer() {
                              @Override
@@ -171,8 +171,8 @@ public class IndirectInferencePaper {
                              }
                          }
 
-        );*/
-/*
+        );
+
         initializers.put("deriso",
                          new ScenarioInitializer() {
                              @Override
@@ -199,7 +199,7 @@ public class IndirectInferencePaper {
                          }
 
         );
-*/
+
     }
 
 
@@ -316,6 +316,10 @@ public class IndirectInferencePaper {
         FishYAML yamler = new FishYAML();
         MersenneTwisterFast random = new MersenneTwisterFast(System.currentTimeMillis());
 
+        String onlyScenario = args[0];
+        ScenarioInitializer selected = initializers.get(onlyScenario);
+        initializers.clear();
+        initializers.put(args[0],selected);
 
         for (Map.Entry<String, ScenarioInitializer> initializer : initializers.entrySet())
         {
@@ -470,7 +474,9 @@ public class IndirectInferencePaper {
             case 1:
                 //Read the error stream then
                 String message =convertStreamToString(exec.getErrorStream());
-                throw new RuntimeException(message);
+                Log.info("Swish!");
+                Log.info(message);
+                //throw new RuntimeException(message);
         }
     }
 
