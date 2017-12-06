@@ -140,7 +140,15 @@ task calicatchFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     }
 }
 
-
+task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'indirectInference.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.CaliCatchCalibration'
+    }
+}
 
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
@@ -228,7 +236,7 @@ task algorithms(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
-
+scenario = "tofill"
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task indirectinference(type: JavaExec){
     classpath = sourceSets.main.runtimeClasspath
