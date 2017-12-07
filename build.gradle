@@ -146,7 +146,7 @@ task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     from sourceSets.main.output //tells the task to include the project code
     configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
     manifest {
-        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.CaliCatchCalibration'
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
     }
 }
 
@@ -236,13 +236,13 @@ task algorithms(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
-scenario = "tofill"
-//this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
-task indirectinference(type: JavaExec){
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
-    args = ["$scenario"]
-}
+//scenario = "tofill"
+////this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
+//task indirectinference(type: JavaExec){
+//    classpath = sourceSets.main.runtimeClasspath
+//    main = 'uk.ac.ox.oxfish.experiments.IndirectInferencePaper'
+//    args = ["$scenario"]
+//}
 
 task batch(type:JavaExec){
     main = 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
