@@ -22,15 +22,11 @@ package uk.ac.ox.oxfish.experiments;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
-import org.jfree.io.FileUtilities;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.OneSpeciesSchoolFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.KernelTransductionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.NearestNeighborTransduction;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
@@ -49,11 +45,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.*;
 
 public class IndirectInferencePaper {
 
@@ -321,6 +313,29 @@ public class IndirectInferencePaper {
         initializers.clear();
         initializers.put(args[0],selected);
 
+        //strategies that make up
+        LinkedHashSet<Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>>> mainStrategiesLeft =
+                new LinkedHashSet<>(strategies.entrySet());
+
+        int firstRun = 0;
+        if(args.length > 1) //if we are resuming a previous run
+        {
+            firstRun = Integer.parseInt(args[1]);
+            //find the main strategy you are going to start with
+            String startingMainStrategy = args[2];
+            do{
+                Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> nextMainStrategy = mainStrategiesLeft.iterator().next();
+                if(nextMainStrategy.getKey().equalsIgnoreCase(startingMainStrategy))
+                    break;
+                else
+                    mainStrategiesLeft.remove(nextMainStrategy);
+            }
+            while(true);
+
+        }
+
+
+
         for (Map.Entry<String, ScenarioInitializer> initializer : initializers.entrySet())
         {
 
@@ -330,87 +345,17 @@ public class IndirectInferencePaper {
             String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
 
             for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy :
-                    strategies.entrySet())
+                    mainStrategiesLeft)
             {
 
-                for(int run = 0; run< TARGET_RUNS; run++)
-                {
-
-                    Scenario mainScenario = yamler.loadAs(
-                            new FileReader(
-                                    scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
-                            ), Scenario.class
-
-                    );
-                    //first run the target!
-                    initializer.getValue().initialize(mainScenario,run,targetStrategy.getValue());
-                    String targetName = targetStrategy.getKey() + "_" + run;
-                    Path output = scenarioDirectory.resolve("output").resolve(targetName);
-                    output.toFile().mkdirs();
-                    //write down the scenario to file;
-                    //this is in order to keep a record of everything
-                    inputDirectory.toFile().mkdirs();
-                    yamler.dump(mainScenario,
-                                new FileWriter(
-                                        inputDirectory.resolve(targetName+".yaml").toFile())
-                    );
-
-                                        /*
-                    Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R
-                    ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv
-                    ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2
-                    baseline 2 perfect3by3 perfect3by3 TRUE
-                     */
-                    String runArgument = Integer.toString(run);
-                    String scenario = initializer.getKey();
-                    String seedArgument = runArgument;
-                    String targetStrategyArgument = targetStrategy.getKey();
-                    String currentStrategyArgument = targetStrategyArgument;
-                    String isTargetRun = "TRUE";
-                    Log.info("Starting target run : " + targetName);
-
-                    runOneSimulation(inputDirectory, run, targetName, output, pathToCSV, runArgument, scenario,
-                                     seedArgument,
-                                     targetStrategyArgument, currentStrategyArgument, isTargetRun);
-
-
-                    //now do variations
-                    for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> candidateStrategy :
-                            strategies.entrySet())
-                    {
-                        for(int candidate_run=0; candidate_run<CANDIDATE_RUNS; candidate_run++)
-                        {
-                            //re-read and re-initialize
-                            Scenario candidateScenario = yamler.loadAs(
-                                    new FileReader(
-                                            scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
-                                    ), Scenario.class
-
-                            );
-                            initializer.getValue().initialize(candidateScenario,run,candidateStrategy.getValue());
-                            String candidateName = candidateStrategy.getKey() + "_" + candidate_run;
-                            output = scenarioDirectory.resolve("output").resolve(targetName).resolve(candidateName);
-                            output.toFile().mkdirs();
-                            inputDirectory.toFile().mkdirs();
-                            yamler.dump(candidateScenario,
-                                        new FileWriter(
-                                                inputDirectory.resolve(targetName+ "_" + candidateName +".yaml").toFile())
-                            );
-
-                            long seed = random.nextLong();
-                            currentStrategyArgument = candidateStrategy.getKey();
-                            isTargetRun = "FALSE";
-                            Log.info("Starting target run : " + targetName + "   ---- candidate: " + candidateName);
-
-                            runOneSimulation(inputDirectory, seed, targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
-                                             Long.toString(seed),
-                                             targetStrategyArgument, currentStrategyArgument, isTargetRun);
-
-
-                        }
-                    }
-
-                }
+                fullStrategyLoop(yamler,
+                        random,
+                        initializer,
+                        scenarioDirectory,
+                        inputDirectory,
+                        pathToCSV,
+                        targetStrategy,
+                        firstRun);
 
 
             }
@@ -418,6 +363,92 @@ public class IndirectInferencePaper {
 
         }
 
+    }
+
+    private static void fullStrategyLoop(FishYAML yamler, MersenneTwisterFast random,
+                                         Map.Entry<String, ScenarioInitializer> initializer,
+                                         Path scenarioDirectory, Path inputDirectory,
+                                         String pathToCSV,
+                                         Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy,
+                                         int initialRun) throws IOException, InterruptedException {
+        for(int run = initialRun; run< TARGET_RUNS; run++)
+        {
+
+            Scenario mainScenario = yamler.loadAs(
+                    new FileReader(
+                            scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
+                    ), Scenario.class
+
+            );
+            //first run the target!
+            initializer.getValue().initialize(mainScenario,run,targetStrategy.getValue());
+            String targetName = targetStrategy.getKey() + "_" + run;
+            Path output = scenarioDirectory.resolve("output").resolve(targetName);
+            output.toFile().mkdirs();
+            //write down the scenario to file;
+            //this is in order to keep a record of everything
+            inputDirectory.toFile().mkdirs();
+            yamler.dump(mainScenario,
+                        new FileWriter(
+                                inputDirectory.resolve(targetName+".yaml").toFile())
+            );
+
+                                /*
+            Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R
+            ~/code/oxfish/docs/indirect_inference/simulation/baseline/output/perfect3by3_1/logistic_long.csv
+            ~/code/oxfish/docs/indirect_inference/simulation/baseline/baseline.csv 2
+            baseline 2 perfect3by3 perfect3by3 TRUE
+             */
+            String runArgument = Integer.toString(run);
+            String scenario = initializer.getKey();
+            String seedArgument = runArgument;
+            String targetStrategyArgument = targetStrategy.getKey();
+            String currentStrategyArgument = targetStrategyArgument;
+            String isTargetRun = "TRUE";
+            Log.info("Starting target run : " + targetName);
+
+            runOneSimulation(inputDirectory, run, targetName, output, pathToCSV, runArgument, scenario,
+                             seedArgument,
+                             targetStrategyArgument, currentStrategyArgument, isTargetRun);
+
+
+            //now do variations
+            for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> candidateStrategy :
+                    strategies.entrySet())
+            {
+                for(int candidate_run=0; candidate_run<CANDIDATE_RUNS; candidate_run++)
+                {
+                    //re-read and re-initialize
+                    Scenario candidateScenario = yamler.loadAs(
+                            new FileReader(
+                                    scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
+                            ), Scenario.class
+
+                    );
+                    initializer.getValue().initialize(candidateScenario,run,candidateStrategy.getValue());
+                    String candidateName = candidateStrategy.getKey() + "_" + candidate_run;
+                    output = scenarioDirectory.resolve("output").resolve(targetName).resolve(candidateName);
+                    output.toFile().mkdirs();
+                    inputDirectory.toFile().mkdirs();
+                    yamler.dump(candidateScenario,
+                                new FileWriter(
+                                        inputDirectory.resolve(targetName+ "_" + candidateName +".yaml").toFile())
+                    );
+
+                    long seed = random.nextLong();
+                    currentStrategyArgument = candidateStrategy.getKey();
+                    isTargetRun = "FALSE";
+                    Log.info("Starting target run : " + targetName + "   ---- candidate: " + candidateName);
+
+                    runOneSimulation(inputDirectory, seed, targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
+                                     Long.toString(seed),
+                                     targetStrategyArgument, currentStrategyArgument, isTargetRun);
+
+
+                }
+            }
+
+        }
     }
 
     private static void runOneSimulation(

@@ -2,6 +2,7 @@ California Map Scenario:
   biomassScaling: 1.0
   boatLength: '22.573488'
   boatWidth: '7.0'
+  californiaBathymetryFile: california.csv
   californiaScaling: 1.0
   countFileName: count.csv
   cruiseSpeedInKph: '16.0661'
@@ -10,6 +11,8 @@ California Map Scenario:
       hoursBetweenEachDeparture: '12.0'
   destinationStrategy:
     Continuous Bare Bones:
+      automaticallyAvoidMPA: true
+      automaticallyAvoidWastelands: true
       discretizer:
         Centroid File Discretization:
           automaticallyIgnoreWastelands: true
@@ -21,8 +24,8 @@ California Map Scenario:
       habitPeriodInDays: '365.0'
   discardingStrategy: No Discarding
   exogenousCatches:
-    Sablefish: '4438200.0'
     Dover Sole: '676900.0'
+    Sablefish: '4438200.0'
   fishingStrategy:
     Until Full With Day Limit:
       daysAtSea: '5.0'
@@ -57,6 +60,7 @@ California Map Scenario:
                 retentionAsymptote: '1.0'
                 retentionInflection: '23.74'
                 retentionSlope: '2.42'
+                rounding: true
                 top: '-0.3'
             Yelloweye Rockfish:
               Logistic Selectivity Gear:
@@ -65,6 +69,7 @@ California Map Scenario:
                 retentionAsymptote: null
                 retentionInflection: null
                 retentionSlope: null
+                rounding: true
                 selectivityAParameter: '36.364'
                 selectivityBParameter: '14.009'
             Sablefish:
@@ -74,6 +79,7 @@ California Map Scenario:
                 retentionAsymptote: '0.910947'
                 retentionInflection: '45.5128'
                 retentionSlope: '3.12457'
+                rounding: true
             Dover Sole:
               Double Normal Selectivity Gear:
                 ascWidth: '3.967'
@@ -89,6 +95,7 @@ California Map Scenario:
                 retentionAsymptote: '0.869'
                 retentionInflection: '26.962'
                 retentionSlope: '1.065'
+                rounding: true
                 top: '-1.483'
             Longspine Thornyhead:
               Logistic Selectivity Gear:
@@ -97,10 +104,12 @@ California Map Scenario:
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
                 retentionSlope: '1.7773'
+                rounding: true
                 selectivityAParameter: '23.5035'
                 selectivityBParameter: '9.03702'
       garbageSpeciesName: Others
       proportionSimulatedToGarbage: '0.3221743'
+      rounding: true
   gearStrategy: Never Change Gear
   gridWidth: 50
   holdSizePerBoat: '8000.0'
@@ -133,8 +142,10 @@ California Map Scenario:
         Yelloweye rockfish: 6.0
         Longspine Thornyhead: 500.0
       quotaType: ITQ
+      respectMPA: true
   regulationPreReset: Anarchy
   resetBiologyAtYear1: true
   sablefishDiffusingRate: 0.0
-  usePremadeInput: true
+  spatialFileName: spatial.csv
+  usePremadeInput: false
   weatherStrategy: Ignore Weather

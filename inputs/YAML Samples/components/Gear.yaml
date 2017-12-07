@@ -27,6 +27,7 @@ Habitat Aware Gear:
 Threshold Gear Factory:
   catchability: '0.01'
   litersGasPerHourFished: '5.0'
+  rounding: true
   selectAboveThreshold: true
   threshold: '10.0'
 -------
@@ -36,6 +37,7 @@ Logistic Selectivity Gear:
   retentionAsymptote: '0.992661'
   retentionInflection: '21.8035'
   retentionSlope: '1.7773'
+  rounding: true
   selectivityAParameter: '23.5035'
   selectivityBParameter: '9.03702'
 -------
@@ -53,6 +55,7 @@ Double Normal Selectivity Gear:
   retentionAsymptote: '1.0'
   retentionInflection: '28.11'
   retentionSlope: '3.43'
+  rounding: true
   top: '-7.0'
 -------
 Sablefish Trawl Selectivity Gear:
@@ -61,6 +64,7 @@ Sablefish Trawl Selectivity Gear:
   retentionAsymptote: '0.910947'
   retentionInflection: '45.5128'
   retentionSlope: '3.12457'
+  rounding: true
 -------
 Heterogeneous Selectivity Gear:
   gears: {
@@ -69,6 +73,7 @@ Heterogeneous Selectivity Gear:
 Abundance Fixed Proportion Gear:
   averageCatchability: '1.0E-4'
   litersOfGasConsumed: '0.0'
+  rounding: true
 -------
 Garbage Gear:
   delegate:
@@ -76,6 +81,7 @@ Garbage Gear:
       catchabilityPerHour: '0.01'
   garbageSpeciesName: Others
   proportionSimulatedToGarbage: '0.3'
+  rounding: true
 -------
 Hold Upper Limit:
   delegate:

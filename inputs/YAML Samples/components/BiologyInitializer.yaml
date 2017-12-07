@@ -134,25 +134,33 @@ Single Species Abundance:
   aging:
     Proportional Aging:
       proportionAging: '0.2'
+  daily: false
   diffuser: No Diffusion
   habitabilityAllocator: Equal Allocation
+  histogrammerOutput: false
   initialAbundanceAllocator: Equal Allocation
-  initialAbundance:
+  initialAbundanceFactory:
     Abundance From List:
       fishPerBinPerSex:
-      - 10000000
-      - 1000000
-      - 10000
+      - 1.0E7
+      - 1000000.0
+      - 10000.0
   meristics:
     Weight List Meristics:
       maturityPerBin: 0,0.5,1
       mortalityRate: '0.08'
       weightsPerBin: .1,1,5
+  mortalityProcess:
+    Exponential Mortality:
+      mortalityPerSubdivision:
+      - 0.1
+      - 0.1
   recruitAllocator: Equal Allocation
   recruitment:
     Logistic Recruitment:
       carryingCapacity: '1.0E8'
       malthusianParameter: '0.6'
+  rounding: true
   scaling: '1.0'
   speciesName: Red Fish
 -------

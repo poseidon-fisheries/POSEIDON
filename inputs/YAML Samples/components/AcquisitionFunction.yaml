@@ -1,4 +1,6 @@
 Exhaustive Search:
+  ignoreProtectedAreas: true
+  ignoreWastelands: true
   proportionSearched: '1.0'
 -------
 Hill-Climber Acquisition:

@@ -58,12 +58,14 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Socially Acceptable Everywhere
+  safety: Safe Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
   acquisition:
     Exhaustive Search:
+      ignoreProtectedAreas: true
+      ignoreWastelands: true
       proportionSearched: '1.0'
   explorationStepSize: uniform 1.0 10.0
   ignoreFailedTrips: false
@@ -80,6 +82,8 @@ Heatmap Based:
 Heatmap Planning:
   acquisition:
     Exhaustive Search:
+      ignoreProtectedAreas: true
+      ignoreWastelands: true
       proportionSearched: '1.0'
   almostPerfectKnowledge: false
   explorationStepSize: uniform 1.0 10.0
@@ -106,6 +110,8 @@ Unified Amateurish Dynamic Programming:
   noiseRate: '0.02'
 -------
 Discretized Bandit:
+  automaticallyIgnoreMPAs: true
+  automaticallyIgnoreWastelands: true
   average:
     Exponential Moving Average:
       alpha: '0.2'
@@ -118,11 +124,15 @@ Discretized Bandit:
       verticalSplits: '2.0'
 -------
 Florida Longliner:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
   centroidFile: temp_wfs/areas.txt
   coefficientsFile: temp_wfs/longline.csv
   coefficientsStandardDeviationFile: temp_wfs/longline_dummy.csv
 -------
 Boolean Bare Bones:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
   discretizer:
     Centroid File Discretization:
       automaticallyIgnoreWastelands: false
@@ -134,6 +144,8 @@ Boolean Bare Bones:
   habitPeriodInDays: '90.0'
 -------
 Continuous Bare Bones:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
   discretizer:
     Centroid File Discretization:
       automaticallyIgnoreWastelands: false
@@ -145,6 +157,8 @@ Continuous Bare Bones:
   habitPeriodInDays: '90.0'
 -------
 Continuous Bare Bones With Intercepts:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
   discretizer:
     Centroid File Discretization:
       automaticallyIgnoreWastelands: false
@@ -231,6 +245,8 @@ Clamped to Data:
   - 0.0175895765472313
 -------
 Perfect RPUE Logit:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
   discretizer: Identity Discretization
   profitBeta: '1.0'
 -------
@@ -238,6 +254,8 @@ Replicator:
   inertia: '0.8'
   options:
   - Discretized Bandit:
+      automaticallyIgnoreMPAs: true
+      automaticallyIgnoreWastelands: true
       average:
         Exponential Moving Average:
           alpha: '0.2'
