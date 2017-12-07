@@ -374,6 +374,7 @@ public class IndirectInferencePaper {
         for(int run = initialRun; run< TARGET_RUNS; run++)
         {
 
+            initialRun = 0; //it's not 0 only for the first run when we are resuming!
             Scenario mainScenario = yamler.loadAs(
                     new FileReader(
                             scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
