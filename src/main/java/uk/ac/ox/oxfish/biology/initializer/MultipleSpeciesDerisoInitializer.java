@@ -117,9 +117,11 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                                               String speciesName)
             throws IOException {
         FishYAML yaml = new FishYAML();
+        FileReader io = new FileReader(biologicalDirectory.resolve(derisoYamlFileName).toFile());
         DerisoParameters parameter = yaml.loadAs(
-                new FileReader(biologicalDirectory.resolve(derisoYamlFileName).toFile()),
+                io,
                 DerisoParameters.class);
+        io.close();
         parameter.updateLastRecruits();
         Species species = new Species(speciesName);
         parameters.put(species,parameter);

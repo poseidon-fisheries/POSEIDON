@@ -356,6 +356,7 @@ public class IndirectInferencePaper {
                         pathToCSV,
                         targetStrategy,
                         firstRun);
+                firstRun = 0; //it's not 0 only for the first run when we are resuming!
 
 
             }
@@ -374,13 +375,14 @@ public class IndirectInferencePaper {
         for(int run = initialRun; run< TARGET_RUNS; run++)
         {
 
-            initialRun = 0; //it's not 0 only for the first run when we are resuming!
+            FileReader reader = new FileReader(
+                    scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
+            );
             Scenario mainScenario = yamler.loadAs(
-                    new FileReader(
-                            scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
-                    ), Scenario.class
+                    reader, Scenario.class
 
             );
+            reader.close();
             //first run the target!
             initializer.getValue().initialize(mainScenario,run,targetStrategy.getValue());
             String targetName = targetStrategy.getKey() + "_" + run;
@@ -389,10 +391,12 @@ public class IndirectInferencePaper {
             //write down the scenario to file;
             //this is in order to keep a record of everything
             inputDirectory.toFile().mkdirs();
+            FileWriter writer = new FileWriter(
+                    inputDirectory.resolve(targetName + ".yaml").toFile());
             yamler.dump(mainScenario,
-                        new FileWriter(
-                                inputDirectory.resolve(targetName+".yaml").toFile())
+                    writer
             );
+            writer.close();
 
                                 /*
             Rscript ~/code/oxfish/docs/indirect_inference/simulation/baseline/mlogit_fit.R
@@ -420,21 +424,25 @@ public class IndirectInferencePaper {
                 for(int candidate_run=0; candidate_run<CANDIDATE_RUNS; candidate_run++)
                 {
                     //re-read and re-initialize
+                    FileReader io = new FileReader(
+                            scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
+                    );
                     Scenario candidateScenario = yamler.loadAs(
-                            new FileReader(
-                                    scenarioDirectory.resolve(initializer.getKey() + ".yaml").toFile()
-                            ), Scenario.class
+                            io, Scenario.class
 
                     );
+                    io.close();
                     initializer.getValue().initialize(candidateScenario,run,candidateStrategy.getValue());
                     String candidateName = candidateStrategy.getKey() + "_" + candidate_run;
                     output = scenarioDirectory.resolve("output").resolve(targetName).resolve(candidateName);
                     output.toFile().mkdirs();
                     inputDirectory.toFile().mkdirs();
+                    writer = new FileWriter(
+                            inputDirectory.resolve(targetName + "_" + candidateName + ".yaml").toFile());
                     yamler.dump(candidateScenario,
-                                new FileWriter(
-                                        inputDirectory.resolve(targetName+ "_" + candidateName +".yaml").toFile())
+                            writer
                     );
+                    writer.close();
 
                     long seed = random.nextLong();
                     currentStrategyArgument = candidateStrategy.getKey();
