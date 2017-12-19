@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -66,12 +67,14 @@ public class MeristicsFileFactory
 
         FishYAML yaml = new FishYAML();
         try {
-            MeristicsInput input = yaml.loadAs(new FileReader(
+            FileReader io = new FileReader(
                     pathToMeristicFile.toFile()
-            ), MeristicsInput.class);
+            );
+            MeristicsInput input = yaml.loadAs(io, MeristicsInput.class);
+            io.close();
             return new StockAssessmentCaliforniaMeristics(input);
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("can't find the meristics file");
         }

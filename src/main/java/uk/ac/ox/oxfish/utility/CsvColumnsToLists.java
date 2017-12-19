@@ -69,7 +69,9 @@ public class CsvColumnsToLists
 
         //turn the csv column into a list of doubles
         try {
-            CSVReader reader = new CSVReader(new FileReader(pathToCSV), separator);
+            FileReader io = new FileReader(pathToCSV);
+            CSVReader reader = new CSVReader(io, separator);
+            io.close();
 
 
             Iterator<String[]> iterator = reader.iterator();
