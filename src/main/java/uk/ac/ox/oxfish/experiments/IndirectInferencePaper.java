@@ -51,22 +51,22 @@ public class IndirectInferencePaper {
 
 
 
-    private final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
+    public final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
 
-    private final static Path mlogitScript = mainDirectory.resolve("mlogit_fit_full.R");
+    public final static Path mlogitScript = mainDirectory.resolve("mlogit_fit_full.R");
 
 
     /**
      * list of names and associated "initializers" which are supposed to randomize some scenario parameters
      */
-    private final static LinkedHashMap<String,
+    public final static LinkedHashMap<String,
             ScenarioInitializer> initializers = new LinkedHashMap<>();
     public static final int TARGET_RUNS = 100;
 
 
 
-    public static final int SIMULATION_YEARS = 10;
-    private static final int CANDIDATE_RUNS = 1;
+    public static final int SIMULATION_YEARS = 1;
+    public static final int CANDIDATE_RUNS = 1;
 
     static
     {
@@ -198,7 +198,7 @@ public class IndirectInferencePaper {
     /**
      * store list of names of the algorithms to use and their factory; this is used for the model-selection bit
      */
-    private final static LinkedHashMap<String,
+    public final static LinkedHashMap<String,
             AlgorithmFactory<? extends DestinationStrategy>> strategies =
             new LinkedHashMap<>();
 
@@ -355,7 +355,7 @@ public class IndirectInferencePaper {
                         inputDirectory,
                         pathToCSV,
                         targetStrategy,
-                        firstRun);
+                        firstRun, CANDIDATE_RUNS);
                 firstRun = 0; //it's not 0 only for the first run when we are resuming!
 
 
@@ -366,12 +366,12 @@ public class IndirectInferencePaper {
 
     }
 
-    private static void fullStrategyLoop(FishYAML yamler, MersenneTwisterFast random,
+    public static void fullStrategyLoop(FishYAML yamler, MersenneTwisterFast random,
                                          Map.Entry<String, ScenarioInitializer> initializer,
                                          Path scenarioDirectory, Path inputDirectory,
                                          String pathToCSV,
                                          Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy,
-                                         int initialRun) throws IOException, InterruptedException {
+                                         int initialRun, int maxCandidateRuns) throws IOException, InterruptedException {
         for(int run = initialRun; run< TARGET_RUNS; run++)
         {
 
@@ -421,7 +421,7 @@ public class IndirectInferencePaper {
             for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> candidateStrategy :
                     strategies.entrySet())
             {
-                for(int candidate_run=0; candidate_run<CANDIDATE_RUNS; candidate_run++)
+                for(int candidate_run = 0; candidate_run< maxCandidateRuns; candidate_run++)
                 {
                     //re-read and re-initialize
                     FileReader io = new FileReader(
@@ -528,7 +528,7 @@ public class IndirectInferencePaper {
 
 
 
-    private interface ScenarioInitializer
+    public interface ScenarioInitializer
     {
 
         void initialize(Scenario scenario, long seed,
