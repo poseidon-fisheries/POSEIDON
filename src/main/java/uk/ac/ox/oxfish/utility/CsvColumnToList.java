@@ -82,6 +82,7 @@ public class CsvColumnToList {
             while(iterator.hasNext())
                 column.add(transformer.apply(Double.parseDouble(iterator.next()[columnNumber])));
 
+            reader.close();
             return column;
         } catch (IOException e) {
             throw new RuntimeException("failed to read or parse " + pathToCSV  + " with exception " + e);
