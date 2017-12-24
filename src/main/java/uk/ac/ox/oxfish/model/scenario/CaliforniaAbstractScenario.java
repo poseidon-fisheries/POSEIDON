@@ -341,7 +341,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
             folders.forEach(sortedFolders::add);
             Collections.sort(sortedFolders, (o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getFileName().toString(),
                                                                                               o2.getFileName().toString()));
-
+            folders.close();
 
             //each folder is supposedly a species
             for(Path folder : sortedFolders)
@@ -380,9 +380,8 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
 
             SampledMap sampledMap = null;
             if(usePremadeInput) {
-                ObjectInputStream stream = new ObjectInputStream(
-                        new FileInputStream(mainDirectory.resolve("premade.data").toFile())
-                );
+                FileInputStream in = new FileInputStream(mainDirectory.resolve("premade.data").toFile());
+                ObjectInputStream stream = new ObjectInputStream(in);
                 try {
                     sampledMap = (SampledMap) stream.readObject();
                 }
@@ -390,6 +389,10 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     Log.error("Failed to read the premade california scenario.");
                     Log.error(e.toString());
                     System.exit(-1);
+                }
+                finally {
+                    stream.close();
+                    in.close();
                 }
 
             }

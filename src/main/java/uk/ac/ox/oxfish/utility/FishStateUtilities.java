@@ -926,7 +926,9 @@ public class FishStateUtilities {
 
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
-        yaml.dump(scenario,new FileWriter(outputFolder.resolve("scenario.yaml").toFile()));
+        FileWriter io = new FileWriter(outputFolder.resolve("scenario.yaml").toFile());
+        yaml.dump(scenario, io);
+        io.close();
 
         FishState model = new FishState(seed);
         Log.setLogger(new FishStateLogger(model,
