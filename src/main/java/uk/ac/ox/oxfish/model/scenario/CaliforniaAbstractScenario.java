@@ -390,10 +390,9 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                     Log.error(e.toString());
                     System.exit(-1);
                 }
-                finally {
-                    stream.close();
-                    in.close();
-                }
+
+                stream.close();
+                in.close();
 
             }
             else
