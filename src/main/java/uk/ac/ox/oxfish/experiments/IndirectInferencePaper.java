@@ -40,6 +40,7 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.factory.FixedProbabilityFa
 import uk.ac.ox.oxfish.utility.adaptation.probability.factory.SocialAnnealingProbabilityFactory;
 import uk.ac.ox.oxfish.utility.bandit.factory.SoftmaxBanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.*;
@@ -190,6 +191,46 @@ public class IndirectInferencePaper {
                              }
                          }
 
+        );
+
+
+        initializers.put(
+                "threeport",
+                new ScenarioInitializer() {
+                    @Override
+                    public void initialize(Scenario scenario, long seed,
+                                           AlgorithmFactory<? extends DestinationStrategy> strategy)
+                    {
+
+                        PrototypeScenario cast = (PrototypeScenario) scenario;
+                        //randomize biomass, speed and port position
+                        MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                        DiffusingLogisticFactory biology = (DiffusingLogisticFactory) cast
+                                .getBiologyInitializer();
+                        biology.setCarryingCapacity(
+                                new FixedDoubleParameter(random.nextDouble()*9000+1000)
+                        );
+                        biology.setDifferentialPercentageToMove(
+                                new FixedDoubleParameter(random.nextDouble()*.003)
+                        );
+                        ((SimpleLogisticGrowerFactory) biology.getGrower()).setSteepness(
+                                new FixedDoubleParameter(random.nextDouble()*.5 + .3)
+                        );
+
+                        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+                        map.setHeight(new FixedDoubleParameter(50));
+                        map.setWidth(new FixedDoubleParameter(50));
+                        map.setCoastalRoughness(new UniformDoubleParameter(0,4));
+                        map.setMaxLandWidth(new UniformDoubleParameter(1,10));
+                        cast.setMapInitializer(map);
+
+                        cast.setMapMakerDedicatedRandomSeed(seed);
+                        //functional friendship only!
+                        cast.getNetworkBuilder().addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
+                        cast.setDestinationStrategy(strategy);
+
+                    }
+                }
         );
 
     }
