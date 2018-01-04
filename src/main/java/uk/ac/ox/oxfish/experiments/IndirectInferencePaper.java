@@ -24,6 +24,7 @@ import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.LinearGetterBiologyFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.OneSpeciesSchoolFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborTransductionFactory;
@@ -52,9 +53,9 @@ public class IndirectInferencePaper {
 
 
 
-    public final static Path mainDirectory = Paths.get("docs","indirect_inference", "simulation");
+    private final static Path MAIN_DIRECTORY = Paths.get("docs","indirect_inference", "simulation_short");
 
-    public final static Path mlogitScript = mainDirectory.resolve("mlogit_fit_full.R");
+    private final static Path MLOGIT_SCRIPT = MAIN_DIRECTORY.resolve("mlogit_fit_full.R");
 
 
     /**
@@ -117,38 +118,38 @@ public class IndirectInferencePaper {
 
 
         initializers.put("chaser",
-                         new ScenarioInitializer() {
-                             @Override
-                             public void initialize(
-                                     Scenario scenario, long seed,
-                                     AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+                new ScenarioInitializer() {
+                    @Override
+                    public void initialize(
+                            Scenario scenario, long seed,
+                            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
 
-                                 PrototypeScenario cast = (PrototypeScenario) scenario;
-                                 MersenneTwisterFast random = new MersenneTwisterFast(seed);
-                                 cast.setHoldSize(
-                                         new FixedDoubleParameter(
-                                                 random.nextDouble()*100+50
-                                         )
-                                 );
-                                 OneSpeciesSchoolFactory biologyInitializer = (OneSpeciesSchoolFactory) cast
-                                         .getBiologyInitializer();
-                                 biologyInitializer.setDiameter(
-                                         new FixedDoubleParameter(
-                                                 random.nextInt(8)+1
-                                         )
-                                 );
-                                 biologyInitializer.setSpeedInDays(
-                                         new FixedDoubleParameter(
-                                                 random.nextInt(10)+1
-                                         )
-                                 );
-                                 biologyInitializer.setNumberOfSchools(
-                                         new FixedDoubleParameter(
-                                                 random.nextInt(3)+1
-                                         )
-                                 );
+                        PrototypeScenario cast = (PrototypeScenario) scenario;
+                        MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                        cast.setHoldSize(
+                                new FixedDoubleParameter(
+                                        random.nextDouble()*100+50
+                                )
+                        );
+                        OneSpeciesSchoolFactory biologyInitializer = (OneSpeciesSchoolFactory) cast
+                                .getBiologyInitializer();
+                        biologyInitializer.setDiameter(
+                                new FixedDoubleParameter(
+                                        random.nextInt(8)+1
+                                )
+                        );
+                        biologyInitializer.setSpeedInDays(
+                                new FixedDoubleParameter(
+                                        random.nextInt(10)+1
+                                )
+                        );
+                        biologyInitializer.setNumberOfSchools(
+                                new FixedDoubleParameter(
+                                        random.nextInt(3)+1
+                                )
+                        );
 
-                                                         SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+                        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
                         map.setHeight(new FixedDoubleParameter(50));
                         map.setWidth(new FixedDoubleParameter(50));
                         map.setCoastalRoughness(new FixedDoubleParameter(0));
@@ -157,39 +158,39 @@ public class IndirectInferencePaper {
                         cast.setPortPositionX(40);
                         cast.setPortPositionY(random.nextInt(50));
 
-                                 cast.setMapMakerDedicatedRandomSeed(seed);
+                        cast.setMapMakerDedicatedRandomSeed(seed);
 
-                                 cast.setDestinationStrategy(destinationStrategy);
+                        cast.setDestinationStrategy(destinationStrategy);
 
-                             }
-                         }
+                    }
+                }
 
         );
 
         initializers.put("deriso",
-                         new ScenarioInitializer() {
-                             @Override
-                             public void initialize(
-                                     Scenario scenario, long seed,
-                                     AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
+                new ScenarioInitializer() {
+                    @Override
+                    public void initialize(
+                            Scenario scenario, long seed,
+                            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
 
-                                 DerisoCaliforniaScenario cast = (DerisoCaliforniaScenario) scenario;
-                                 MersenneTwisterFast random = new MersenneTwisterFast(seed);
-                                 cast.setHoldSizePerBoat(
-                                         new FixedDoubleParameter(
-                                                 random.nextDouble()*10000+5000
-                                         )
-                                 );
-                                 LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
-                                 exogenousCatches.put("Dover Sole", Double.toString(random.nextDouble()* 500000 + 300000));
-                                 exogenousCatches.put("Sablefish", Double.toString(random.nextDouble()* 5000000 + 3000000));
-                                 cast.setExogenousCatches(exogenousCatches
-                                 );
+                        DerisoCaliforniaScenario cast = (DerisoCaliforniaScenario) scenario;
+                        MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                        cast.setHoldSizePerBoat(
+                                new FixedDoubleParameter(
+                                        random.nextDouble()*10000+5000
+                                )
+                        );
+                        LinkedHashMap<String, String> exogenousCatches = new LinkedHashMap<>();
+                        exogenousCatches.put("Dover Sole", Double.toString(random.nextDouble()* 500000 + 300000));
+                        exogenousCatches.put("Sablefish", Double.toString(random.nextDouble()* 5000000 + 3000000));
+                        cast.setExogenousCatches(exogenousCatches
+                        );
 
-                                 cast.setDestinationStrategy(destinationStrategy);
+                        cast.setDestinationStrategy(destinationStrategy);
 
-                             }
-                         }
+                    }
+                }
 
         );
 
@@ -227,6 +228,37 @@ public class IndirectInferencePaper {
                         cast.setMapMakerDedicatedRandomSeed(seed);
                         //functional friendship only!
                         cast.getNetworkBuilder().addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
+                        cast.setDestinationStrategy(strategy);
+
+                    }
+                }
+        );
+
+
+        initializers.put(
+                "moving",
+                new ScenarioInitializer() {
+                    @Override
+                    public void initialize(Scenario scenario, long seed,
+                                           AlgorithmFactory<? extends DestinationStrategy> strategy)
+                    {
+
+                        PrototypeScenario cast = (PrototypeScenario) scenario;
+                        //randomize biomass, speed and port position
+                        MersenneTwisterFast random = new MersenneTwisterFast(seed);
+                        LinearGetterBiologyFactory biology = (LinearGetterBiologyFactory) cast
+                                .getBiologyInitializer();
+                        biology.setxDay(new UniformDoubleParameter(-3,-1));
+                        biology.setyDay(new UniformDoubleParameter(1,3));
+                        biology.setX(new UniformDoubleParameter(0,200));
+                        biology.setY(new UniformDoubleParameter(-200,0));
+
+                        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+                        cast.setMapInitializer(map);
+
+                        cast.setMapMakerDedicatedRandomSeed(seed);
+                        //functional friendship only!
+                        //      cast.getNetworkBuilder().addPredicate((from, to) -> from.getHomePort().equals(to.getHomePort()));
                         cast.setDestinationStrategy(strategy);
 
                     }
@@ -293,7 +325,7 @@ public class IndirectInferencePaper {
         heatmap.setExplorationStepSize(new FixedDoubleParameter(1));
         heatmap.setProbability(new FixedProbabilityFactory(.5,1));
         NearestNeighborTransductionFactory regression = new NearestNeighborTransductionFactory();
-       // regression.setTimeBandwidth(new FixedDoubleParameter(0.999989));
+        // regression.setTimeBandwidth(new FixedDoubleParameter(0.999989));
         regression.setSpaceBandwidth(new FixedDoubleParameter(5));
         heatmap.setRegression(regression);
         strategies.put("nn",heatmap);
@@ -380,7 +412,7 @@ public class IndirectInferencePaper {
         for (Map.Entry<String, ScenarioInitializer> initializer : initializers.entrySet())
         {
 
-            Path scenarioDirectory = mainDirectory.resolve(initializer.getKey());
+            Path scenarioDirectory = MAIN_DIRECTORY.resolve(initializer.getKey());
             Path inputDirectory = scenarioDirectory.resolve("inputs");
 
             String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
@@ -408,11 +440,11 @@ public class IndirectInferencePaper {
     }
 
     public static void fullStrategyLoop(FishYAML yamler, MersenneTwisterFast random,
-                                         Map.Entry<String, ScenarioInitializer> initializer,
-                                         Path scenarioDirectory, Path inputDirectory,
-                                         String pathToCSV,
-                                         Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy,
-                                         int initialRun, int maxCandidateRuns) throws IOException, InterruptedException {
+                                        Map.Entry<String, ScenarioInitializer> initializer,
+                                        Path scenarioDirectory, Path inputDirectory,
+                                        String pathToCSV,
+                                        Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy,
+                                        int initialRun, int maxCandidateRuns) throws IOException, InterruptedException {
         for(int run = initialRun; run< TARGET_RUNS; run++)
         {
 
@@ -454,8 +486,8 @@ public class IndirectInferencePaper {
             Log.info("Starting target run : " + targetName);
 
             runOneSimulation(inputDirectory, run, targetName, output, pathToCSV, runArgument, scenario,
-                             seedArgument,
-                             targetStrategyArgument, currentStrategyArgument, isTargetRun);
+                    seedArgument,
+                    targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS);
 
 
             //now do variations
@@ -490,9 +522,11 @@ public class IndirectInferencePaper {
                     isTargetRun = "FALSE";
                     Log.info("Starting target run : " + targetName + "   ---- candidate: " + candidateName);
 
-                    runOneSimulation(inputDirectory, seed, targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
-                                     Long.toString(seed),
-                                     targetStrategyArgument, currentStrategyArgument, isTargetRun);
+                    runOneSimulation(inputDirectory,
+                            seed,
+                            targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
+                            Long.toString(seed),
+                            targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS);
 
 
                 }
@@ -501,7 +535,7 @@ public class IndirectInferencePaper {
         }
     }
 
-    private static void runOneSimulation(
+    public static void runOneSimulation(
             Path inputDirectory,
             long seed,
             String targetName,
@@ -512,7 +546,9 @@ public class IndirectInferencePaper {
             String seedArgument,
             String targetStrategyArgument,
             String currentStrategyArgument,
-            String isTargetRun) throws IOException, InterruptedException {
+            String isTargetRun,
+            Path mlogitScript,
+            int simulationYears) throws IOException, InterruptedException {
         FishStateUtilities.run(
                 targetName,
                 inputDirectory.resolve(targetName+".yaml"),
@@ -521,7 +557,7 @@ public class IndirectInferencePaper {
                 Log.LEVEL_INFO,
                 false,
                 null,
-                SIMULATION_YEARS,
+                simulationYears,
                 false,
                 -1
         );
@@ -533,8 +569,8 @@ public class IndirectInferencePaper {
 
         String[] arguments =
                 new String[]{
-                "Rscript",
-                pathToRScript,
+                        "Rscript",
+                        pathToRScript,
                         pathToLogbook,
                         pathToCSV,
                         runArgument,
@@ -557,6 +593,7 @@ public class IndirectInferencePaper {
                 String message =convertStreamToString(exec.getErrorStream());
                 Log.info("Swish!");
                 Log.info(message);
+                deleteFolder(output.toFile());
                 //throw new RuntimeException(message);
         }
     }

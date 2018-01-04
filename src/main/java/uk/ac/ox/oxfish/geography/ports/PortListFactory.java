@@ -33,7 +33,11 @@ import java.util.LinkedHashMap;
 public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
 
     private LinkedHashMap<String,Coordinate> ports = new LinkedHashMap<>();
-
+    {
+        ports.put("Top Port", new Coordinate(40,0));
+        ports.put("Middle Port", new Coordinate(40,24));
+        ports.put("Bottom Port", new Coordinate(40,49));
+    }
 
     /**
      * Applies this function to the given argument.
