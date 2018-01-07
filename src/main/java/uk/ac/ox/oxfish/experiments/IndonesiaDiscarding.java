@@ -117,7 +117,7 @@ public class IndonesiaDiscarding {
                     state.schedule.step(state);
 
 
-                dumpObservation(writer, fine, state, 10d);
+                dumpObservation(writer, run,fine, state, 10d);
 
             }
 
@@ -128,10 +128,10 @@ public class IndonesiaDiscarding {
     }
 
     @NotNull
-    private static FileWriter prepWriter(File outputFile) throws IOException {
+    public static FileWriter prepWriter(File outputFile) throws IOException {
         FileWriter writer = new FileWriter(outputFile);
         //writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
-        writer.write("price_low,price_high,landings,earnings,cash-flow,");
+        writer.write("run,price_low,price_high,landings,earnings,cash-flow,");
         for(int i=0; i<EXPECTED_NUMBER_OF_BINS; i++)
         {
             writer.write("landings_" + i);
@@ -194,7 +194,7 @@ public class IndonesiaDiscarding {
                     state.schedule.step(state);
 
 
-                dumpObservation(writer, fine, state, 10d);
+                dumpObservation(writer,run, fine, state, 10d);
 
             }
 
@@ -204,8 +204,9 @@ public class IndonesiaDiscarding {
 
     }
 
-    private static void dumpObservation(FileWriter writer, double fine, FishState state, double subsidy) throws IOException {
+    public   static void dumpObservation(FileWriter writer,int run, double fine, FishState state, double subsidy) throws IOException {
         StringBuffer observation = new StringBuffer();
+        observation.append(Integer.toString(run)).append(",");
         observation.append(fine).append(",");
         observation.append(subsidy).append(",");
         observation.append(state.getLatestYearlyObservation("Red Fish Landings")).append(",");
@@ -274,7 +275,7 @@ public class IndonesiaDiscarding {
                     state.schedule.step(state);
 
 
-                dumpObservation(writer, 10d,state,subsidy);
+                dumpObservation(writer, run,10d,state,subsidy);
 
 
             }

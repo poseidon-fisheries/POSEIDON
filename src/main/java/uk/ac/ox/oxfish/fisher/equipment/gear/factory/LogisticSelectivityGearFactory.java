@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.SelectivityAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticAbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.RetentionAbundanceFilter;
@@ -120,7 +121,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
                 retentionInflection != null &&
                 !(retentionInflection instanceof NullParameter)
                 )
-            return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
+            return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
                                                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),
@@ -132,7 +133,7 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
             );
         else
         {
-            return new HomogeneousAbundanceGear(litersOfGasConsumedPerHour.apply(random),
+            return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
                                                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),

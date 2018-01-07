@@ -71,4 +71,8 @@ public class FixedProportionFilter implements AbundanceFilter
         }
         return filtered;
     }
+
+    public double getProportion() {
+        return proportion;
+    }
 }

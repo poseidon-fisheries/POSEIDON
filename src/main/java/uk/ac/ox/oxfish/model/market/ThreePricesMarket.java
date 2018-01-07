@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.market;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -58,6 +59,7 @@ public class ThreePricesMarket extends AbstractMarket {
             double priceAboveThresholds) {
         this.lowAgeThreshold = lowAgeThreshold;
         this.highAgeThreshold = highAgeThreshold;
+        Preconditions.checkArgument(highAgeThreshold>lowAgeThreshold);
         this.priceBelowThreshold = priceBelowThreshold;
         this.priceBetweenThresholds = priceBetweenThresholds;
         this.priceAboveThresholds = priceAboveThresholds;

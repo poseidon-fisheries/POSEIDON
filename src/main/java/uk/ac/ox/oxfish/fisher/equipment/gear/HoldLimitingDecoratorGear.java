@@ -35,10 +35,10 @@ import java.util.Objects;
  * Blocks agents from ever fishing more than their hold
  * Created by carrknight on 6/1/17.
  */
-public class HoldLimitingDecoratorGear implements Gear {
+public class HoldLimitingDecoratorGear implements GearDecorator {
 
 
-    private final Gear delegate;
+    private Gear delegate;
 
 
     public HoldLimitingDecoratorGear(Gear delegate) {
@@ -124,4 +124,12 @@ public class HoldLimitingDecoratorGear implements Gear {
     }
 
 
+    public Gear getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public void setDelegate(Gear delegate) {
+        this.delegate = delegate;
+    }
 }

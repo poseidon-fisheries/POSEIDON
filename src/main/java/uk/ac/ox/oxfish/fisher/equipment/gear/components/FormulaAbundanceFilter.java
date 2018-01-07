@@ -117,4 +117,8 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
     public boolean isMemoization() {
         return memoization;
     }
+
+    public boolean isRounding() {
+        return rounding;
+    }
 }

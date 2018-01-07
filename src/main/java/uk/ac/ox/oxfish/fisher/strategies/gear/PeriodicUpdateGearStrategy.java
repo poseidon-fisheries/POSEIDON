@@ -24,7 +24,9 @@ import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.equipment.gear.DecoratorGearPair;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.GearDecorator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.DiscreteRandomAlgorithm;
 import uk.ac.ox.oxfish.model.FishState;
@@ -85,6 +87,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                 new Actuator<Fisher,Gear>() {
                     @Override
                     public void apply(Fisher fisher, Gear change, FishState model) {
+
                         toReturn = change.makeCopy();
                     }
                 },
@@ -126,7 +129,9 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
                 new DiscreteRandomAlgorithm<>(options),
                 new Actuator<Fisher,Gear>() {
                     @Override
-                    public void apply(Fisher fisher, Gear change, FishState model) {
+                    public void apply(Fisher fisher,
+                                      Gear change,
+                                      FishState model) {
                         toReturn = change.makeCopy();
                     }
                 },
@@ -161,14 +166,35 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
      */
     @Override
     public void updateGear(
-            Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
+            Fisher fisher,
+            MersenneTwisterFast random,
+            FishState model,
+            Action currentAction) {
         if(toReturn != null)
         {
             if(Log.TRACE)
                 Log.trace(fisher + " changing gear from " + fisher.getGear() +
                                   " to " + toReturn);
             fisher.resetDailyCatchesPredictors();
-            fisher.setGear(toReturn);
+
+            //if it's a decorator, I am going to assume you want to replace it, as is
+            if(toReturn instanceof GearDecorator) {
+                assert !(((GearDecorator) toReturn).getDelegate() instanceof  GearDecorator);
+                //this assert might be wrong at some point but for now let's just assume
+                // that if you swap a gear decorator out for another one you are
+                // just targeting one level
+                fisher.setGear(toReturn);
+            }
+            else {
+                DecoratorGearPair pair = DecoratorGearPair.getActualGear(fisher.getGear());
+                //i am assuming you are swapping gears of the same type; if that's not true at some point
+                //then delete this assert
+                assert pair.getDecorated().getClass().equals(toReturn.getClass());
+                if(pair.getDeepestDecorator()==null)
+                    fisher.setGear(toReturn);
+                else
+                    pair.getDeepestDecorator().setDelegate(toReturn);
+            }
             toReturn=null;
         }
     }
@@ -179,7 +205,7 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
      */
     private Fisher fisher;
 
-    final ExploreImitateAdaptation<? extends Gear> gearAdaptation;
+    final private ExploreImitateAdaptation<? extends Gear> gearAdaptation;
 
     @Override
     public void start(FishState model, Fisher fisher)
@@ -202,5 +228,9 @@ public class PeriodicUpdateGearStrategy implements GearStrategy
             else
                 this.fisher.removeBiMonthlyAdaptation(gearAdaptation);
         }
+    }
+
+    public ExploreImitateAdaptation<? extends Gear> getGearAdaptation() {
+        return gearAdaptation;
     }
 }

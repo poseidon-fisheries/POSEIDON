@@ -199,5 +199,7 @@ public class HomogeneousAbundanceGear implements Gear {
                 Objects.equals(filters, that.filters);
     }
 
-
+    public double getLitersOfGasConsumedEachHourFishing() {
+        return litersOfGasConsumedEachHourFishing;
+    }
 }

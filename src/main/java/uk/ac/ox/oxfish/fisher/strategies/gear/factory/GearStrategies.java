@@ -59,6 +59,11 @@ public class GearStrategies {
 
 
 
+        CONSTRUCTORS.put("Periodic Gear Update Selectivity", PeriodicUpdateSelectivityFactory::new);
+        NAMES.put(PeriodicUpdateSelectivityFactory.class,"Periodic Gear Update Selectivity");
+
+
+
 
 
     }

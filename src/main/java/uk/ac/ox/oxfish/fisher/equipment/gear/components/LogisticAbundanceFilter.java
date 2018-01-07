@@ -81,5 +81,16 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
     public int hashCode() {
         return Objects.hash(aParameter,bParameter);
     }
+
+
+    public double getaParameter() {
+        return aParameter;
+    }
+
+    public double getbParameter() {
+        return bParameter;
+    }
+
+
 }
 

@@ -93,7 +93,8 @@ public class PeriodicUpdateMileageFactory implements AlgorithmFactory<PeriodicUp
                 new RandomStep<Gear>() {
                     @Override
                     public Gear randomStep(
-                            FishState state, MersenneTwisterFast random, Fisher fisher,
+                            FishState state,
+                            MersenneTwisterFast random, Fisher fisher,
                             Gear current1) {
                         Preconditions.checkArgument(current1.getClass().equals(RandomCatchabilityTrawl.class),
                                                     "PeriodicUpdateMileageFactory works only with RandomCatchabilityTrawl gear");

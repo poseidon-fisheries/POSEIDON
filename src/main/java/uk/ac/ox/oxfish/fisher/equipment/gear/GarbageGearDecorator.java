@@ -38,7 +38,7 @@ import java.util.Objects;
  *
  * Created by carrknight on 3/22/17.
  */
-public class GarbageGearDecorator implements Gear {
+public class GarbageGearDecorator implements GearDecorator {
 
     /**
      * which species is the garbage one?
@@ -53,7 +53,7 @@ public class GarbageGearDecorator implements Gear {
     /**
      * a delegate gear that catches non garbage stuff
      */
-    private final Gear delegate;
+    private Gear delegate;
 
 
     private final boolean rounding;
@@ -180,4 +180,12 @@ public class GarbageGearDecorator implements Gear {
                 Objects.equals(delegate, that.delegate);
     }
 
+    @Override
+    public Gear getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(Gear delegate) {
+        this.delegate = delegate;
+    }
 }
