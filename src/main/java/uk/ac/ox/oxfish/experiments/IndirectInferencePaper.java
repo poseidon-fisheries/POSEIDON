@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.DerisoCaliforniaScenario;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -53,7 +54,7 @@ public class IndirectInferencePaper {
 
 
 
-    private final static Path MAIN_DIRECTORY = Paths.get("docs","indirect_inference", "simulation_short");
+    private final static Path MAIN_DIRECTORY = Paths.get("docs","indirect_inference", "simulation_short_validation");
 
     private final static Path MLOGIT_SCRIPT = MAIN_DIRECTORY.resolve("mlogit_fit_full.R");
 
@@ -63,7 +64,7 @@ public class IndirectInferencePaper {
      */
     public final static LinkedHashMap<String,
             ScenarioInitializer> initializers = new LinkedHashMap<>();
-    public static final int TARGET_RUNS = 100;
+    public static final int TARGET_RUNS = 200;
 
 
 
@@ -416,7 +417,22 @@ public class IndirectInferencePaper {
             Path inputDirectory = scenarioDirectory.resolve("inputs");
 
             String pathToCSV = scenarioDirectory.resolve(initializer.getKey() + ".csv").toAbsolutePath().toString();
+            Path pathToAggregates = scenarioDirectory.resolve(initializer.getKey() + "_aggregates.csv");
+            //Species 0 Landings
+            //Total Effort
+            //Average Distance From Port
+            //Average Number of Trips
+            //Average Hours Out
+            //Average Cash-Flow
+            if(args.length == 1) {
+                try (FileWriter writer =
+                             new FileWriter(pathToAggregates.toFile(),true)) {
+                    writer.append("landings,effort,distance,trips,hours,profits,run,target_strategy,current_strategy,scenario,isTargetRun,seed");
+                    writer.append("\n");
+                    writer.close();
+                }
 
+            }
             for (Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy :
                     mainStrategiesLeft)
             {
@@ -428,7 +444,7 @@ public class IndirectInferencePaper {
                         inputDirectory,
                         pathToCSV,
                         targetStrategy,
-                        firstRun, CANDIDATE_RUNS);
+                        firstRun, CANDIDATE_RUNS, pathToAggregates);
                 firstRun = 0; //it's not 0 only for the first run when we are resuming!
 
 
@@ -444,8 +460,9 @@ public class IndirectInferencePaper {
                                         Path scenarioDirectory, Path inputDirectory,
                                         String pathToCSV,
                                         Map.Entry<String, AlgorithmFactory<? extends DestinationStrategy>> targetStrategy,
-                                        int initialRun, int maxCandidateRuns) throws IOException, InterruptedException {
-        for(int run = initialRun; run< TARGET_RUNS; run++)
+                                        int initialRun, int maxCandidateRuns,
+                                        Path pathToAggregates) throws IOException, InterruptedException {
+        for(int run = 100; run< TARGET_RUNS; run++)
         {
 
             FileReader reader = new FileReader(
@@ -487,7 +504,8 @@ public class IndirectInferencePaper {
 
             runOneSimulation(inputDirectory, run, targetName, output, pathToCSV, runArgument, scenario,
                     seedArgument,
-                    targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS);
+                    targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS,
+                    pathToAggregates);
 
 
             //now do variations
@@ -526,7 +544,8 @@ public class IndirectInferencePaper {
                             seed,
                             targetName+ "_" + candidateName, output, pathToCSV, runArgument, scenario,
                             Long.toString(seed),
-                            targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS);
+                            targetStrategyArgument, currentStrategyArgument, isTargetRun, MLOGIT_SCRIPT, SIMULATION_YEARS,
+                            pathToAggregates);
 
 
                 }
@@ -548,10 +567,11 @@ public class IndirectInferencePaper {
             String currentStrategyArgument,
             String isTargetRun,
             Path mlogitScript,
-            int simulationYears) throws IOException, InterruptedException {
-        FishStateUtilities.run(
+            int simulationYears,
+            Path pathToAggregatesCSV) throws IOException, InterruptedException {
+        FishState state = FishStateUtilities.run(
                 targetName,
-                inputDirectory.resolve(targetName+".yaml"),
+                inputDirectory.resolve(targetName + ".yaml"),
                 output,
                 seed,
                 Log.LEVEL_INFO,
@@ -583,10 +603,75 @@ public class IndirectInferencePaper {
         Log.info(Arrays.toString(arguments));
         Process exec = Runtime.getRuntime().exec(arguments);
         int code = exec.waitFor();
+        FileWriter fileWriter = new FileWriter(pathToAggregatesCSV.toFile(), true);
+        if(state.getYearlyDataSet().getColumn("Species 0 Landings")!=null) {
+            fileWriter.append(
+                    Double.toString(
+                            state.getAverageYearlyObservation("Species 0 Landings"))
+            );
+        }
+        else
+        {
+            fileWriter.append(
+                    Double.toString(
+                            state.getAverageYearlyObservation("Dover Sole Landings"))
+            );
+        }
+        fileWriter.append(",");
+
+
+        fileWriter.append(
+                Double.toString(
+                        state.getAverageYearlyObservation("Total Effort"))
+        );
+        fileWriter.append(",");
+
+        fileWriter.append(
+                Double.toString(
+                        state.getAverageYearlyObservation("Average Distance From Port"))
+        );
+        fileWriter.append(",");
+
+        fileWriter.append(
+                Double.toString(
+                        state.getAverageYearlyObservation("Average Number of Trips"))
+        );
+        fileWriter.append(",");
+
+        fileWriter.append(
+                Double.toString(
+                        state.getAverageYearlyObservation("Average Hours Out"))
+        );
+        fileWriter.append(",");
+
+        fileWriter.append(
+                Double.toString(
+                        state.getAverageYearlyObservation("Average Cash-Flow"))
+        );
+        fileWriter.append(",");
+
+        //"landings,effort,distance,trips,hours,profits,run,target_strategy,current_strategy,scenario,isTargetRun,seed"
+        fileWriter.append(runArgument);
+        fileWriter.append(",");
+        fileWriter.append(targetStrategyArgument);
+        fileWriter.append(",");
+        fileWriter.append(currentStrategyArgument);
+        fileWriter.append(",");
+        fileWriter.append(scenario);
+        fileWriter.append(",");
+        fileWriter.append(isTargetRun);
+        fileWriter.append(",");
+        fileWriter.append(seedArgument);
+
+        fileWriter.append("\n");
+        fileWriter.flush();
+        fileWriter.close();
+
         switch (code) {
             case 0:
                 deleteFolder(output.toFile());
-                //normal termination, everything is fine
+                inputDirectory.resolve(targetName + ".yaml").toFile().delete();
+
                 break;
             case 1:
                 //Read the error stream then
@@ -595,7 +680,14 @@ public class IndirectInferencePaper {
                 Log.info(message);
                 deleteFolder(output.toFile());
                 //throw new RuntimeException(message);
+
+
+
+
         }
+        //normal termination, everything is fine
+
+
     }
 
 

@@ -602,6 +602,16 @@ public class FishState  extends SimState{
         return getYearlyDataSet().getColumn(columnName).getLatest();
     }
 
+
+    public Double getAverageYearlyObservation(String columnName)
+    {
+
+        DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+        for(Double observation : getYearlyDataSet().getColumn(columnName))
+            statistics.accept(observation.doubleValue());
+
+        return statistics.getAverage();
+    }
     /**
      *
      * @return true if the model has a fisher factory it can use to create more fishers

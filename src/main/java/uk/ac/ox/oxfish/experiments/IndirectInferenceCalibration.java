@@ -53,6 +53,7 @@ public class IndirectInferenceCalibration {
         Path scenarioDirectory = MAIN_DIRECTORY.resolve(onlyScenario);
         // here we keep the mlogit results
         String mlogitCSV = scenarioDirectory.resolve(onlyScenario + ".csv").toAbsolutePath().toString();
+        Path aggregatesCSV = scenarioDirectory.resolve(onlyScenario + "_aggregates.csv");
         // here we keep the parameters that originated them
         File eeiParameterCSV = scenarioDirectory.resolve(onlyScenario + "_parameters.csv").toFile();
         FileWriter writer = new FileWriter(eeiParameterCSV);
@@ -103,7 +104,9 @@ public class IndirectInferenceCalibration {
                     "explore20",
                     "TRUE",
                     MLOGIT_SCRIPT,
-                    1
+                    1,
+                    aggregatesCSV
+
             );
             //  writer.write("run,seed,exploration,imitation,step_size\n");
 
@@ -150,7 +153,8 @@ public class IndirectInferenceCalibration {
                     "explore20",
                     "explore20",
                     "FALSE",
-                    MLOGIT_SCRIPT, IndirectInferencePaper.SIMULATION_YEARS
+                    MLOGIT_SCRIPT, IndirectInferencePaper.SIMULATION_YEARS,
+                    aggregatesCSV
             );
 
             writer.write(Integer.toString(run));
