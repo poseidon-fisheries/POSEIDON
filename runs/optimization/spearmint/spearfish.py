@@ -217,8 +217,8 @@ def main():
 
     ##now run spearmint
     os.chdir(SPEARMINT_DIRECTORY)
-    console = open(EXPERIMENT_DIRECTORY + '/console_' + experiment_name + '.txt', "w")
-    subprocess.call(["python2", "main.py", EXPERIMENT_DIRECTORY ], stdout = console, stderr = console )
+    with open(EXPERIMENT_DIRECTORY + '/console_' + experiment_name + '.txt', "w") as console:
+        subprocess.call(["python2", "main.py", EXPERIMENT_DIRECTORY ], stdout = console, stderr = console )
 
     #now plot
     #output_to_r.plot()

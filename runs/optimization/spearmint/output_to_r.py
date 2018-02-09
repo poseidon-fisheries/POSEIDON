@@ -149,7 +149,7 @@ def returnBest(config_directory):
     print "best", lp, x
     bestp = task_group.paramify(task_group.from_unit(x))
     print "expected best position", bestp
-    db.client.close()
+
 
     return bestp
 
