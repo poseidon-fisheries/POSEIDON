@@ -50,12 +50,13 @@ public class TacMixedKitchenSinkComparison {
                                 "20170511 optimisation_remake",
                                 "kitchensink","mixed","best",
                                 "best-tac-mixed.yaml")
-                      );
+                      )*/
         scenarios.put("kitchensink",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
                                 "kitchensink","mixed","best",
                                 "kitchensink-best.yaml"));
+        /*
         scenarios.put("itq",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
@@ -70,12 +71,14 @@ public class TacMixedKitchenSinkComparison {
                                 "season.yaml")
         );
 */
-        scenarios.put("mpaonly",
+      /*  scenarios.put("mpa-temp",
                       Paths.get("docs",
                                 "20170511 optimisation_remake",
                                 "kitchensink","mixed","best",
-                                "mpa_only.yaml")
+                                "temporary_mpa.yaml")
+
         );
+        */
     }
 
 

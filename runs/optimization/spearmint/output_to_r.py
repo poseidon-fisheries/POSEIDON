@@ -9,7 +9,7 @@ import spearmint
 import yaml
 from spearmint.main import parse_resources_from_config, load_jobs, remove_broken_jobs
 
-SPACING = 500
+SPACING = 10000
 
 
 def print_dict(d, level=1):
@@ -113,6 +113,45 @@ def get_options(expt_dir, config_file="config.json"):
         sys.exit(-1)
 
     return options
+
+
+def returnBest(config_directory):
+    os.chdir("/home/carrknight/code/oxfish/runs/optimization/spearmint")
+    options = get_options(config_directory,
+                          config_file="config.json")
+    experiment_name = str(options['experiment-name'])
+    db = MongoDB()
+    resources = parse_resources_from_config(options)
+    resource = resources.itervalues().next()
+
+    # load hyper parameters
+    chooser_module = importlib.import_module('spearmint.choosers.' + options['chooser'])
+    chooser = chooser_module.init(options)
+    print "chooser", chooser
+
+    hypers = db.load(experiment_name, "hypers")
+    print "loaded hypers", hypers  # from GP.to_dict()
+
+    jobs = load_jobs(db, experiment_name)
+    remove_broken_jobs(db, jobs, experiment_name, resources)
+    task_options = {task: options["tasks"][task] for task in resource.tasks}
+    task_group = spearmint.main.load_task_group(db, options, resource.tasks)
+
+    hypers = spearmint.main.load_hypers(db, experiment_name)
+    print "loaded hypers", hypers  # from GP.to_dict()
+
+    hypers = chooser.fit(task_group, hypers, task_options)
+    print "\nfitted hypers:"
+    print(hypers)
+
+    lp, x = chooser.best()
+    x = x.flatten()
+    print "best", lp, x
+    bestp = task_group.paramify(task_group.from_unit(x))
+    print "expected best position", bestp
+    db.client.close()
+
+    return bestp
 
 
 def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearmint"):
@@ -240,6 +279,10 @@ def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearm
         # plot(experiment_name="congested_departure")
 
 
+#print returnBest(config_directory="/home/carrknight/code/oxfish/docs/indirect_inference/bayes/feb2018/calibration")["epsilon"]["values"][0]
+
+
+#plot(config_directory="/home/carrknight/code/oxfish/docs/indirect_inference/bayes/feb2018/calibration")
 # plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/subsidy")
 # plot(config_directory="/home/carrknight/code/oxfish/docs/20161004 adaptive_tax/")
 # plot(config_directory="/home/carrknight/code/oxfish/docs/20170103 shodan_test")
@@ -261,4 +304,8 @@ def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearm
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/tac_half/")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/itq_half/")
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170606 cali_catchability_2/attainment_single_profits")
-plot(config_directory="/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170730 validation/eei-inference/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20171127 selex_test/lutjanus/")
+#plot(config_directory="/home/carrknight/code/oxfish/docs/indirect_inference/bayes/calibrator")
+
+#plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/mpa_alone/")

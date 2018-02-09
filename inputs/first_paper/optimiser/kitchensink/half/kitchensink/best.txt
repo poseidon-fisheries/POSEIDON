@@ -1,0 +1,71 @@
+HALF:
+
+KITCHEN-SINK:
+
+Minimum expected objective value under model is -12056115.90948 (+/- 6407.08065), at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                start_day     int        0
+                second        float      1228868.644884
+                height        int        40
+                width         int        40
+                length        int        118
+                y             int        24
+                x             int        0
+                mpa_duration  int        365
+                first         float      1121503.410077
+
+Minimum of observed values is -12437428.789205, at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                start_day     int        0
+                second        float      1409089.302236
+                height        int        40
+                width         int        40
+                length        int        118
+                y             int        24
+                x             int        0
+                mpa_duration  int        365
+                first         float      1035338.851721
+
+
+
+
+MPA ALONE:
+
+Minimum expected objective value under model is -10943790.08532 (+/- 61471.52149), at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                y             int        10
+                width         int        40
+                mpa_duration  int        265
+                x             int        1
+                height        int        40
+
+Minimum of observed values is -11324522.729990, at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                y             int        9
+                width         int        40
+                mpa_duration  int        267
+                x             int        2
+                height        int        40
+
+
+SEASON ALONE:
+
+Minimum expected objective value under model is -7163219.14877 (+/- 30409.45883), at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                length        int        132
+
+Minimum of observed values is -7544618.823586, at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                length        int        128
+
+Suggestion:     NAME          TYPE       VALUE
+                ----          ----       -----
+                length        int        66
+Submitted job 100 with local scheduler (process id: 6603).
+Status: 1 pending, 99 complete.

@@ -1,0 +1,31 @@
+Kitchen sink:
+
+
+
+Minimum expected objective value under model is -19430116.16887 (+/- 10084.49770), at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                start_day     int        0
+                second        float      1997840.649281
+                height        int        40
+                width         int        40
+                length        int        366
+                y             int        5
+                x             int        16
+                mpa_duration  int        283
+                first         float      1221258.631924
+
+Minimum of observed values is -19672407.859025, at location:
+                NAME          TYPE       VALUE
+                ----          ----       -----
+                start_day     int        0
+                second        float      1999448.183797
+                height        int        40
+                width         int        37
+                length        int        366
+                y             int        4
+                x             int        16
+                mpa_duration  int        283
+                first         float      1259787.834123
+
+
