@@ -85,7 +85,7 @@ public class PortBasedWaitTimesDecorator implements Regulation {
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model) {
 
-        if(fisher.isAtPort() && fisher.getHoursAtPort() < hoursToWaitPerPort.get(fisher.getHomePort().getName()) )
+        if(fisher.isAtPortAndDocked() && fisher.getHoursAtPort() < hoursToWaitPerPort.get(fisher.getHomePort().getName()) )
             return false;
 
         return decorated.allowedAtSea(fisher,model);

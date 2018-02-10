@@ -56,10 +56,10 @@ public class PortBasedWaitTimesDecoratorTest {
         );
 
 
-        when(fisher.isAtPort()).thenReturn(false); //never stop somebody who is already out!
+        when(fisher.isAtPortAndDocked()).thenReturn(false); //never stop somebody who is already out!
         assertTrue(decorator.allowedAtSea(fisher,mock(FishState.class)));
 
-        when(fisher.isAtPort()).thenReturn(true); //allow somebody who has waited for a long time
+        when(fisher.isAtPortAndDocked()).thenReturn(true); //allow somebody who has waited for a long time
         when(fisher.getHomePort()).thenReturn(port);
         when(fisher.getHoursAtPort()).thenReturn(200d);
         assertTrue(decorator.allowedAtSea(fisher,mock(FishState.class)));

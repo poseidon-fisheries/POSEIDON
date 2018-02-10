@@ -122,6 +122,9 @@ public class Regulations
         CONSTRUCTORS.put("Weak Multi-TAC by List", WeakMultiTACStringFactory::new);
         NAMES.put(WeakMultiTACStringFactory.class,"Weak Multi-TAC by List");
 
+        CONSTRUCTORS.put("Port Based Wait Times", PortBasedWaitTimesFactory::new);
+        NAMES.put(PortBasedWaitTimesFactory.class,"Port Based Wait Times");
+
 
     }
 

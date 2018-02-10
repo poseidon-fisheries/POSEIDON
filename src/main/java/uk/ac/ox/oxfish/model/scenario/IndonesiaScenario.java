@@ -72,6 +72,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
+import uk.ac.ox.oxfish.utility.adaptation.SimplePortAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
@@ -204,9 +205,11 @@ public class IndonesiaScenario implements Scenario {
      */
     private Long mapMakerDedicatedRandomSeed =  null;
 
-
     private AlgorithmFactory<? extends LogbookInitializer> logbook =
             new NoLogbookFactory();
+
+
+    private boolean portSwitching = false;
 
 
     public IndonesiaScenario() {
@@ -348,6 +351,19 @@ public class IndonesiaScenario implements Scenario {
                 log.add(fisher,model);
             }
         });
+
+        if(portSwitching)
+        {
+            fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
+                @Override
+                public void accept(Fisher fisher) {
+
+                    fisher.addYearlyAdaptation(new SimplePortAdaptation());
+
+                }
+            });
+        }
+
 
         //add snalsar info which should be moved elsewhere at some point
         fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
@@ -653,5 +669,13 @@ public class IndonesiaScenario implements Scenario {
     public void setDiscardingStrategy(
             AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
         this.discardingStrategy = discardingStrategy;
+    }
+
+    public boolean isPortSwitching() {
+        return portSwitching;
+    }
+
+    public void setPortSwitching(boolean portSwitching) {
+        this.portSwitching = portSwitching;
     }
 }

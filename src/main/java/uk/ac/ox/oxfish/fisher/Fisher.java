@@ -470,6 +470,10 @@ public class Fisher implements Steppable, Startable{
     }
 
 
+    public boolean isAtPortAndDocked(){
+        return isAtPort() && getHomePort().isDocked(this);
+    }
+
     private LinkedList<DockingListener> dockingListeners = new LinkedList<>();
     public void addDockingListener(DockingListener listener){
         dockingListeners.add(listener);
