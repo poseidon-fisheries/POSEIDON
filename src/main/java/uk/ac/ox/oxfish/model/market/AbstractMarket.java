@@ -166,4 +166,9 @@ public abstract class AbstractMarket implements Market {
     protected Counter getDailyCounter() {
         return dailyCounter;
     }
+
+    @Override
+    public boolean isStarted() {
+        return started;
+    }
 }

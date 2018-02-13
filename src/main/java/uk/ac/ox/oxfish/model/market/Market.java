@@ -117,6 +117,8 @@ public interface Market extends Startable {
 
     public void setSpecies(Species species);
 
+    public boolean isStarted();
+
 
 
 }

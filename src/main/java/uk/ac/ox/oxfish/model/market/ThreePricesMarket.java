@@ -39,15 +39,15 @@ public class ThreePricesMarket extends AbstractMarket {
 
 
     public static final String AGE_BIN_PREFIX = " - age bin ";
-    private final int lowAgeThreshold;
+    private int lowAgeThreshold;
 
-    private final int highAgeThreshold;
+    private int highAgeThreshold;
 
-    private final double priceBelowThreshold;
+    private double priceBelowThreshold;
 
-    private final double priceBetweenThresholds;
+    private double priceBetweenThresholds;
 
-    private final double priceAboveThresholds;
+    private double priceAboveThresholds;
 
 
 
@@ -168,5 +168,45 @@ public class ThreePricesMarket extends AbstractMarket {
 
         //return data!
         return new TradeInfo(sold,species,earnings);
+    }
+
+    public int getLowAgeThreshold() {
+        return lowAgeThreshold;
+    }
+
+    public void setLowAgeThreshold(int lowAgeThreshold) {
+        this.lowAgeThreshold = lowAgeThreshold;
+    }
+
+    public int getHighAgeThreshold() {
+        return highAgeThreshold;
+    }
+
+    public void setHighAgeThreshold(int highAgeThreshold) {
+        this.highAgeThreshold = highAgeThreshold;
+    }
+
+    public double getPriceBelowThreshold() {
+        return priceBelowThreshold;
+    }
+
+    public void setPriceBelowThreshold(double priceBelowThreshold) {
+        this.priceBelowThreshold = priceBelowThreshold;
+    }
+
+    public double getPriceBetweenThresholds() {
+        return priceBetweenThresholds;
+    }
+
+    public void setPriceBetweenThresholds(double priceBetweenThresholds) {
+        this.priceBetweenThresholds = priceBetweenThresholds;
+    }
+
+    public double getPriceAboveThresholds() {
+        return priceAboveThresholds;
+    }
+
+    public void setPriceAboveThresholds(double priceAboveThresholds) {
+        this.priceAboveThresholds = priceAboveThresholds;
     }
 }

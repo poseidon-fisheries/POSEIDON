@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 public class SimplePortAdaptation extends AbstractAdaptation<Port> {
 
 
+    public static final double DEFAULT_INERTIA = .25;
     private final double  inertia;
 
     public SimplePortAdaptation(double inertia) {
@@ -49,6 +50,8 @@ public class SimplePortAdaptation extends AbstractAdaptation<Port> {
                             subject.setHomePort(policy);
                             subject.teleport(policy.getLocation());
                             policy.dock(subject);
+                            subject.getSocialNetwork().removeFisher(subject,model);
+                            subject.getSocialNetwork().addFisher(subject,model);
                         }
 
                     }
@@ -66,7 +69,7 @@ public class SimplePortAdaptation extends AbstractAdaptation<Port> {
     }
 
     public SimplePortAdaptation() {
-        this(.25);
+        this(DEFAULT_INERTIA);
     }
 
     @Override
@@ -88,7 +91,9 @@ public class SimplePortAdaptation extends AbstractAdaptation<Port> {
                 new Function<Integer, Double>() {
                     @Override
                     public Double apply(Integer integer) {
-                        return state.getYearlyDataSet().getLatestObservation("Average Cash-Flow at " + ports.get(integer).getName());
+                        return (state.getYearlyDataSet().
+                                getLatestObservation("Average Cash-Flow at " + ports.get(integer).getName()))/(365d)
+                                ;
                     }
                 }
 

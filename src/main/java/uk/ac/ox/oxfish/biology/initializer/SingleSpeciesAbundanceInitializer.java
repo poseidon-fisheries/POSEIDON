@@ -38,6 +38,8 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
@@ -134,12 +136,9 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
     }
 
     /**
-     * list of all the abundance based local biologies
+     * weights to each location
      */
-    private HashMap<SeaTile,AbundanceBasedLocalBiology> locals = new HashMap<>();
-
-    //allocate weights to each
-    private Map<AbundanceBasedLocalBiology, Double> initialWeights = new HashMap<>();
+    private Map<SeaTile, Double> initialWeights = new HashMap<>();
 
 
     /**
@@ -216,8 +215,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             return  new EmptyLocalBiology();
         else {
             AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
-            locals.put(seaTile,local);
-            initialWeights.put(local, weight);
+            initialWeights.put(seaTile, weight);
             return local;
         }
     }
@@ -235,12 +233,14 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
      */
     @Override
     public void processMap(
-            GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
+            GlobalBiology biology,
+            NauticalMap map,
+            MersenneTwisterFast random,
+            FishState model)
     {
 
-        Preconditions.checkArgument(biology.getSize() == 1, "Single Species Abudance Initializer" +
-                "used for multiple species");
-        Species species = biology.getSpecie(0);
+
+        Species species = biology.getSpecie(speciesName);
 
         //read in the total number of fish
         initialAbundance.initialize(species);
@@ -263,12 +263,30 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         ).sum();
 
 
+        //create the natural process
+        processes = new SingleSpeciesNaturalProcesses(
+                recruitmentProcess,
+                species,
+                rounding, aging,
+                diffuser,
+                mortality, daily);
+        if(recruitmentAllocator !=null)
+            processes.setRecruitsAllocator(recruitmentAllocator);
 
-        for(Map.Entry<SeaTile,AbundanceBasedLocalBiology> local : locals.entrySet())
+        /**
+         * this used to be collected when generating, but with other initializers it might not
+         * be the case that what you generated was used; to be super-safe then we generate this year
+         */
+        for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
         {
-            double ratio = initialWeights.get(local.getValue())/sum;
+            if(!initialWeights.containsKey(tile))
+                continue;
+            double ratio = initialWeights.get(tile)/sum;
 
-            StructuredAbundance abundance = local.getValue().getAbundance(species);
+            //cast is justified because we put it in ourselves!
+            assert tile.getBiology() instanceof AbundanceBasedLocalBiology;
+            processes.add((AbundanceBasedLocalBiology) tile.getBiology(),tile);
+            StructuredAbundance abundance = tile.getBiology().getAbundance(species);
             for(int bin=0; bin<abundance.getBins(); bin++)
 
                 for(int subdivision =0; subdivision<abundance.getSubdivisions(); subdivision++)
@@ -280,22 +298,6 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         }
 
 
-
-//        initializeNaturalProcesses(model, species, locals, false, 2);
-
-        //create the natural process
-        processes = new SingleSpeciesNaturalProcesses(
-                recruitmentProcess,
-                species,
-                rounding, aging,
-                diffuser,
-                mortality, daily);
-        if(recruitmentAllocator !=null)
-            processes.setRecruitsAllocator(recruitmentAllocator);
-        //tell it to deal with our biologies
-        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
-            processes.add(entry.getValue(), entry.getKey());
-        }
         //start it!
         model.registerStartable(processes);
 

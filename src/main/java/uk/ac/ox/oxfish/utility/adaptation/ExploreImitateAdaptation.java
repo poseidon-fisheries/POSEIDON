@@ -156,7 +156,7 @@ public class ExploreImitateAdaptation<T> extends AbstractAdaptation<T> {
             // reject failed attempts up to a limit of 20
             int attempts = 0;
 
-            while(attempts < 20) {
+            while(attempts < 100) {
                 T future = algorithm.randomize(random, toAdapt, fitness, current);
                 if(explorationCheck.test(future)) {
                     explorationStart = new Pair<>(current, fitness);

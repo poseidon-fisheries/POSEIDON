@@ -142,14 +142,14 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
                                                     BeamHillClimbing.DEFAULT_DYNAMIC_NETWORK,
                                                     stepSize.apply(
                                                             random).intValue(),
-                                                    10, backtracksOnBadExploration);
+                                                    100, backtracksOnBadExploration);
         }
         else {
             algorithm = DefaultBeamHillClimbing.BeamHillClimbingWithUnfriending(alwaysCopyBest,
                                                                                 probabilityUnfriending,
                                                                                 stepSize.apply(
                                                                                         random).intValue(),
-                                                                                10);
+                                                                                100);
         }
 
         //never start from an invalid spot!
