@@ -45,7 +45,7 @@ public class FromLeftToRightInitializerTest {
         SeaTile left = new SeaTile(0,0,-1, new TileHabitat(0d));
         SeaTile middle = new SeaTile(50,0,-1, new TileHabitat(0d));
         SeaTile right = new SeaTile(100,0,-1, new TileHabitat(0d));
-        FromLeftToRightInitializer initializer = new FromLeftToRightInitializer(5000,1);
+        FromLeftToRightInitializer initializer = new FromLeftToRightInitializer(5000, 1, 2);
         final Species species = new Species("Specie0");
         GlobalBiology biology = new GlobalBiology(species);
 

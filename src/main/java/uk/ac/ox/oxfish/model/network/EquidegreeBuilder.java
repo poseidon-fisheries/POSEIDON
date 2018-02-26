@@ -178,13 +178,14 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
         currentNetwork.addVertex(fisher);
         ObservableList<Fisher> fishers = state.getFishers();
-        int populationSize = fishers.size();
 
         int degree = computeDegree(state.getRandom());
         Set<Fisher> friends = new HashSet<>(degree);
-        while(friends.size() < Math.min(degree,populationSize))
+        ArrayList<Fisher> candidates = new ArrayList<>(fishers);
+        candidates.remove(fisher); //ignore yourself!
+        while(friends.size() < degree && candidates.size() > 0)
         {
-            final Fisher candidate = fishers.get(state.getRandom().nextInt(populationSize));
+            final Fisher candidate = candidates.get(state.getRandom().nextInt(candidates.size()));
             if(candidate != fisher)
             {
                 boolean allowed = true;
@@ -193,6 +194,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
                 if(allowed)
                     friends.add(candidate);
             }
+            candidates.remove(candidate);
         }
         //now make them your friends!
         addSetOfFriends(currentNetwork, fisher, friends);

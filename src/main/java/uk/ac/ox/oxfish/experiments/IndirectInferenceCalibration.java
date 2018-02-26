@@ -221,7 +221,7 @@ public class IndirectInferenceCalibration {
     public static void baselineScenarioTargets() throws IOException, InterruptedException {
 
 
-        Path scenarioDirectory =  Paths.get("docs","indirect_inference", "bayes","target");
+        Path scenarioDirectory =  Paths.get("docs","indirect_inference", "bayes","fishery");
         // here we keep the mlogit results
         String mlogitCSV = scenarioDirectory.resolve("baseline.csv").toAbsolutePath().toString();
         Path aggregatesCSV = scenarioDirectory.resolve("baseline_aggregates.csv");
@@ -259,63 +259,64 @@ public class IndirectInferenceCalibration {
 
 
         for(double explorationRate=0; explorationRate<=1; explorationRate= FishStateUtilities.round(explorationRate + .1)) {
+            for(int run=0; run<100; run++) {
 
-            //set up the scenario
-            FileReader reader = new FileReader(
-                    scenarioDirectory.resolve("baseline.yaml").toFile()
-            );
-            probability.setExplorationProbability(new FixedDoubleParameter(explorationRate));
-
-
-
-            PrototypeScenario mainScenario = yamler.loadAs(reader, PrototypeScenario.class);
-            mainScenario.setDestinationStrategy(exploreExploit);
-
-            seed = (int)(explorationRate * 100);
-            String targetName = "run_" + explorationRate + "_" + seed;
-            Path output = scenarioDirectory.resolve("output").resolve(targetName);
-            //run "target"
-            Path inputDirectory = scenarioDirectory.resolve("inputs");
-            inputDirectory.toFile().mkdirs();
-            FileWriter yamlWriter = new FileWriter(
-                    inputDirectory.resolve(targetName + ".yaml").toFile());
-            yamler.dump(mainScenario,
-                        yamlWriter
-            );
-            yamlWriter.close();
+                //set up the scenario
+                FileReader reader = new FileReader(
+                        scenarioDirectory.resolve("baseline.yaml").toFile()
+                );
+                probability.setExplorationProbability(new FixedDoubleParameter(explorationRate));
 
 
-            IndirectInferencePaper.runOneSimulation(
-                    inputDirectory,
-                    seed,
-                    targetName,
-                    output,
-                    mlogitCSV,
-                    Long.toString(seed),
-                    "baseline",
-                    Long.toString(seed),
-                    "explore20",
-                    "explore20",
-                    "TRUE",
-                    MLOGIT_SCRIPT,
-                    IndirectInferencePaper.SIMULATION_YEARS,
-                    aggregatesCSV
+                PrototypeScenario mainScenario = yamler.loadAs(reader, PrototypeScenario.class);
+                mainScenario.setDestinationStrategy(exploreExploit);
 
-            );
-            writer.write(Long.toString(seed));
-            writer.write(",");
-            writer.write(Long.toString(seed));
-            writer.write(",");
-            writer.write(Double.toString(((FixedDoubleParameter)
-                    ((FixedProbabilityFactory) exploreExploit.getProbability()).getExplorationProbability()).getFixedValue()));
-            writer.write(",");
-            writer.write(Double.toString(((FixedDoubleParameter)
-                    ((FixedProbabilityFactory) exploreExploit.getProbability()).getImitationProbability()).getFixedValue()));
-            writer.write(",");
-            writer.write(Double.toString(((FixedDoubleParameter) exploreExploit.getStepSize()).getFixedValue()));
-            writer.write("\n");
-            writer.flush();
+                seed = run;
+                String targetName = "run_" + explorationRate + "_" + seed;
+                Path output = scenarioDirectory.resolve("output").resolve(targetName);
+                //run "target"
+                Path inputDirectory = scenarioDirectory.resolve("inputs");
+                inputDirectory.toFile().mkdirs();
+                FileWriter yamlWriter = new FileWriter(
+                        inputDirectory.resolve(targetName + ".yaml").toFile());
+                yamler.dump(mainScenario,
+                            yamlWriter
+                );
+                yamlWriter.close();
 
+
+                IndirectInferencePaper.runOneSimulation(
+                        inputDirectory,
+                        seed,
+                        targetName,
+                        output,
+                        mlogitCSV,
+                        Long.toString(seed),
+                        "baseline",
+                        Long.toString(seed),
+                        "explore20",
+                        "explore20",
+                        "TRUE",
+                        MLOGIT_SCRIPT,
+                        IndirectInferencePaper.SIMULATION_YEARS,
+                        aggregatesCSV
+
+                );
+                writer.write(Long.toString(seed));
+                writer.write(",");
+                writer.write(Long.toString(seed));
+                writer.write(",");
+                writer.write(Double.toString(((FixedDoubleParameter)
+                        ((FixedProbabilityFactory) exploreExploit.getProbability()).getExplorationProbability()).getFixedValue()));
+
+                writer.write(",");
+                writer.write(Double.toString(((FixedDoubleParameter)
+                        ((FixedProbabilityFactory) exploreExploit.getProbability()).getImitationProbability()).getFixedValue()));
+                writer.write(",");
+                writer.write(Double.toString(((FixedDoubleParameter) exploreExploit.getStepSize()).getFixedValue()));
+                writer.write("\n");
+                writer.flush();
+            }
         }
 
     }

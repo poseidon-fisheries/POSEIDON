@@ -69,8 +69,7 @@ public class HoldLimitingDecoratorGearTest {
         assertEquals(haul.getWeightCaught(0),35d,.001);
         assertEquals(haul.getWeightCaught(1),15d,.001);
 
-        assertTrue(haul.hasAbundanceInformation());
-        assertEquals(haul.getAbundance(0).getElement(0,0),.4,.001);
+        assertFalse(haul.hasAbundanceInformation());
 
     }
 
@@ -106,6 +105,7 @@ public class HoldLimitingDecoratorGearTest {
 
         HoldLimitingDecoratorGear gear = new HoldLimitingDecoratorGear(delegate);
         Catch haul = gear.fish(fisher, mock(SeaTile.class), 100, bio);
+        assertTrue(haul.hasAbundanceInformation());
         assertEquals(haul.getTotalWeight(),200d,.001);
         assertEquals(haul.getWeightCaught(0),120d,.001);
         assertEquals(haul.getWeightCaught(1),80d,.001);

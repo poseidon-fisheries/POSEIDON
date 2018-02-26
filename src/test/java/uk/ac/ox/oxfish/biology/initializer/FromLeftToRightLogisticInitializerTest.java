@@ -46,7 +46,7 @@ public class FromLeftToRightLogisticInitializerTest {
         GlobalBiology biology = new GlobalBiology(species);
         DiffusingLogisticInitializer delegate = mock(DiffusingLogisticInitializer.class);
 
-        FromLeftToRightLogisticInitializer initializer = new FromLeftToRightLogisticInitializer(delegate,.1);
+        FromLeftToRightLogisticInitializer initializer = new FromLeftToRightLogisticInitializer(delegate, .1, 1);
 
         //the leftmost cell shouldn't be bothered
         SeaTile tile = mock(SeaTile.class);

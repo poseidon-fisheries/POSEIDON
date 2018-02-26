@@ -38,6 +38,7 @@ public class PortListFactoryTest {
     public void yamlOut() throws Exception {
 
         PortListFactory factory = new PortListFactory();
+        factory.getPorts().clear();
 
         factory.getPorts().put("Washington",new Coordinate(0,0));
         factory.getPorts().put("Italy",new Coordinate(5,2));

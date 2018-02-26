@@ -45,6 +45,9 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
     private DoubleParameter biologySmoothingIndex = new FixedDoubleParameter(1000000);
 
 
+    private DoubleParameter exponent = new FixedDoubleParameter(2);
+
+
 
     /**
      * Applies this function to the given argument.
@@ -55,7 +58,7 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
     @Override
     public BiologyInitializer apply(FishState state) {
         return new FromLeftToRightInitializer(maximumBiomass.apply(state.random),
-                                              biologySmoothingIndex.apply(state.random).intValue());
+                                              biologySmoothingIndex.apply(state.random).intValue(), exponent.apply(state.getRandom()));
     }
 
 
@@ -73,5 +76,23 @@ public class FromLeftToRightFactory implements AlgorithmFactory<BiologyInitializ
 
     public void setBiologySmoothingIndex(DoubleParameter biologySmoothingIndex) {
         this.biologySmoothingIndex = biologySmoothingIndex;
+    }
+
+    /**
+     * Getter for property 'exponent'.
+     *
+     * @return Value for property 'exponent'.
+     */
+    public DoubleParameter getExponent() {
+        return exponent;
+    }
+
+    /**
+     * Setter for property 'exponent'.
+     *
+     * @param exponent Value to set for property 'exponent'.
+     */
+    public void setExponent(DoubleParameter exponent) {
+        this.exponent = exponent;
     }
 }

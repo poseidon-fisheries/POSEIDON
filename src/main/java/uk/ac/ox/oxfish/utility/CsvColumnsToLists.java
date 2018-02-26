@@ -71,7 +71,6 @@ public class CsvColumnsToLists
         try {
             FileReader io = new FileReader(pathToCSV);
             CSVReader reader = new CSVReader(io, separator);
-            io.close();
 
 
             Iterator<String[]> iterator = reader.iterator();

@@ -103,18 +103,18 @@ public class SimplePortSwitchingExperiment {
                 FishState state = new FishState(System.currentTimeMillis());
                 FishYAML yaml = new FishYAML();
                 IndonesiaScenario scenario = yaml.loadAs(new FileReader(DIRECTORY.resolve("2species.yaml").toFile()),
-                        IndonesiaScenario.class);
+                                                         IndonesiaScenario.class);
                 if(hourDelay<0) {
                     ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Kupang",
-                            Math.abs(hourDelay));
-                    ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Benoa", 0);
+                                                                                                  Integer.toString(Math.abs(hourDelay)));
+                    ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Benoa", "0");
                 }
                 else
                 {
                     ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Kupang",
-                            0);
+                                                                                                  "0");
                     ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Benoa",
-                            hourDelay);
+                                                                                                  Integer.toString(hourDelay));
                 }
                 state.setScenario(scenario);
 
@@ -152,9 +152,9 @@ public class SimplePortSwitchingExperiment {
 
             FishYAML yaml = new FishYAML();
             IndonesiaScenario scenario = yaml.loadAs(new FileReader(DIRECTORY.resolve("port_switching.yaml").toFile()),
-                    IndonesiaScenario.class);
-            ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Kupang",hourDelay);
-            ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Benoa",0);
+                                                     IndonesiaScenario.class);
+            ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Kupang",Integer.toString(hourDelay));
+            ((PortBasedWaitTimesFactory) scenario.getRegulation()).getPortWaitTimes().put("Benoa","0");
 
             FishState fishState = new FishState(0);
             fishState.setScenario(scenario);

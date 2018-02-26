@@ -41,6 +41,8 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
 
     DoubleParameter minCapacityRatio = new FixedDoubleParameter(.2);
 
+    DoubleParameter exponent = new FixedDoubleParameter(1);
+
     /**
      * Applies this function to the given argument.
      *
@@ -50,7 +52,8 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
     @Override
     public FromLeftToRightLogisticInitializer apply(FishState fishState) {
         return new FromLeftToRightLogisticInitializer(delegate.apply(fishState),
-                                                      minCapacityRatio.apply(fishState.getRandom()));
+                                                      minCapacityRatio.apply(fishState.getRandom()),
+                                                      exponent.apply(fishState.getRandom()));
     }
 
     public DoubleParameter getPercentageLimitOnDailyMovement() {
@@ -155,5 +158,23 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
      */
     public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
         delegate.setMinInitialCapacity(minInitialCapacity);
+    }
+
+    /**
+     * Getter for property 'exponent'.
+     *
+     * @return Value for property 'exponent'.
+     */
+    public DoubleParameter getExponent() {
+        return exponent;
+    }
+
+    /**
+     * Setter for property 'exponent'.
+     *
+     * @param exponent Value to set for property 'exponent'.
+     */
+    public void setExponent(DoubleParameter exponent) {
+        this.exponent = exponent;
     }
 }

@@ -40,6 +40,7 @@ import java.util.function.Consumer;
 public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
 
 
+    private final double exponent;
     /**
      * leftmost biomass
      */
@@ -51,9 +52,10 @@ public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
     private int biologySmoothingIndex;
 
 
-    public FromLeftToRightInitializer(double maximumBiomass, int biologySmoothingIndex) {
+    public FromLeftToRightInitializer(double maximumBiomass, int biologySmoothingIndex, final double exponent) {
         this.maximumBiomass = maximumBiomass;
         this.biologySmoothingIndex = biologySmoothingIndex;
+        this.exponent = exponent;
     }
 
     /**
@@ -75,7 +77,7 @@ public class FromLeftToRightInitializer extends AbstractBiologyInitializer{
         else
             return new ConstantLocalBiology(maximumBiomass*
                                                     Math.pow((1-seaTile.getGridX()/(double)mapWidthInCells)
-                                                            ,2));
+                                                            , exponent));
     }
 
     /**

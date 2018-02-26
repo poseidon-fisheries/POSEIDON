@@ -45,10 +45,14 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
      */
     private double minCapacityRatio;
 
-    public FromLeftToRightLogisticInitializer(DiffusingLogisticInitializer delegate,
-                                              double minCapacityRatio) {
+    private final double exponent;
+
+    public FromLeftToRightLogisticInitializer(
+            DiffusingLogisticInitializer delegate,
+            double minCapacityRatio, double exponent) {
         this.delegate = delegate;
         this.minCapacityRatio = minCapacityRatio;
+        this.exponent = exponent;
         Preconditions.checkArgument(minCapacityRatio>=0);
         Preconditions.checkArgument(minCapacityRatio<=1);
     }
@@ -106,9 +110,15 @@ public class FromLeftToRightLogisticInitializer implements BiologyInitializer{
         if(seaTile.getAltitude()>0)
             return generated;
         BiomassLocalBiology local = (BiomassLocalBiology) generated;
-        double correctRatio = Math.max((mapWidthInCells-seaTile.getGridX())
-                                               /
-                                               (float)mapWidthInCells,minCapacityRatio);
+        double correctRatio = Math.max(
+                Math.pow(
+                        (mapWidthInCells-seaTile.getGridX())
+                                /
+                                (float)mapWidthInCells,
+                        exponent),
+
+
+                minCapacityRatio);
         assert correctRatio>=0;
         assert correctRatio<=1;
         for(Species species : biology.getSpecies()) {
