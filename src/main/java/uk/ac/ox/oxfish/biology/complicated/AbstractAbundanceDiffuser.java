@@ -89,8 +89,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
                     //check for difference in abundance between each bin
                     for (int bin = 0; bin < abundanceHere.getBins(); bin++) {
                         //move male
-                        double fishHere = abundanceHere.getElement(subdivision,bin);
-                        double fishThere = abundanceThere.getElement(subdivision,bin);
+                        double fishHere = abundanceHere.getAbundance(subdivision, bin);
+                        double fishThere = abundanceThere.getAbundance(subdivision, bin);
                         if (rounding) {
                             fishHere = (int) fishHere;
                             fishThere = (int) fishThere;

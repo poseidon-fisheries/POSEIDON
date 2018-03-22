@@ -509,7 +509,7 @@ public class StockAssessmentCaliforniaMeristics implements Meristics {
      * @return the length of the fish
      */
     @Override
-    public double getLengthAtAge(double ageInYears, int subdivision) {
+    public double getLengthAtAge(int ageInYears, int subdivision) {
         return growth.getLengthAtAge(ageInYears, subdivision);
     }
 

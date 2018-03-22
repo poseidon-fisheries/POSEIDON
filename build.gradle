@@ -50,6 +50,7 @@ dependencies
 
     //guava. Useful for PreConditions and sometimes specialized collections
     compile "com.google.guava:guava:19.0"
+    compile "com.google.code.findbugs:jsr305:3.0.2"
     //metawidget + apache binders. Useful for the gui
     compile "org.metawidget.modules:metawidget-all:4.1"
     compile "commons-beanutils:commons-beanutils:1.8.3"

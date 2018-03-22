@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.utility;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
@@ -648,7 +647,7 @@ public class FishStateUtilities {
         //go through all the fish and sum up their weight at given age
         for(int subdivision =0; subdivision< meristics.getNumberOfSubdivisions(); subdivision++)
             for(int bin=0; bin<meristics.getNumberOfBins(); bin++)
-                totalWeight += abundance.getElement(subdivision, bin) * meristics.getWeight(subdivision, bin);
+                totalWeight += abundance.getAbundance(subdivision, bin) * meristics.getWeight(subdivision, bin);
 
         return totalWeight;
 
@@ -671,7 +670,7 @@ public class FishStateUtilities {
         //go through all the fish and sum up their weight at given age
         for(int subdivision =0; subdivision< meristics.getNumberOfSubdivisions(); subdivision++)
             {
-                totalWeight += abundance.getElement(subdivision,binIndex) * meristics.getWeight(subdivision,binIndex);
+                totalWeight += abundance.getAbundance(subdivision, binIndex) * meristics.getWeight(subdivision, binIndex);
             }
 
         return totalWeight;

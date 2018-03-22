@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthBinByList> {
 
 
+    public static final int MAXIMUM_AGE_TRACKED = 100;
     /**
      * the allometric alpha converting length length cm to weight grams
      */
@@ -90,9 +91,22 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         }
 
 
+        //sometimes we need to know what is the length at specific age, we can compute that here!
+        double[] lengthAtAge = new double[100];
+        double k = kYearlyParameter.apply(fishState.getRandom());
+        lengthAtAge[0] = LZero;
+        for(int i = 1; i< MAXIMUM_AGE_TRACKED; i++)
+        {
+            lengthAtAge[i] = LInfinity + ((LZero- LInfinity))*
+                    Math.exp(-k*i);
+        }
+
+
+
         return new GrowthBinByList(1,
                                    lengths,
-                                   weights);
+                                   weights,
+                                   lengthAtAge);
 
 
     }

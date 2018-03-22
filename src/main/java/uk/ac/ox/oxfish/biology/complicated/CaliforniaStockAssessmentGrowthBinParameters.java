@@ -159,7 +159,7 @@ public class CaliforniaStockAssessmentGrowthBinParameters implements Meristics{
      * @return the length of the fish
      */
     @Override
-    public double getLengthAtAge(double ageInYears, int subdivision) {
+    public double getLengthAtAge(int ageInYears, int subdivision) {
 
         return getLength(subdivision,ageInYears > maxAge ? (int)ageInYears : maxAge );
     }

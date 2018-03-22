@@ -82,6 +82,7 @@ public class StructuredAbundance {
      * @param bins
      */
     public StructuredAbundance(int subdivisions,int bins){
+        Preconditions.checkArgument(subdivisions>0);
         abundance = new double[subdivisions][];
         for(int i=0; i<subdivisions; i++)
             abundance[i] = new double[bins];
@@ -138,7 +139,7 @@ public class StructuredAbundance {
      * @param bin the age/length bin
      * @return the abundance number
      */
-    public double getElement(int subdivision, int bin){
+    public double getAbundance(int subdivision, int bin){
         return abundance[subdivision][bin];
     }
 

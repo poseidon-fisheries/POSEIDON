@@ -20,10 +20,11 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.base.Preconditions;
+import javax.annotation.Nullable;
 
 /**
- * computes nothing, is given a list of weights and lengths and just spit them out
+ * computes nothing, is given a list of weights and lengths and just spit them out.
+ * It assumes that each bin is one year apart unless a lengthAtAge array is provided
  */
 public class GrowthBinByList implements Meristics {
 
@@ -34,13 +35,33 @@ public class GrowthBinByList implements Meristics {
 
     private final int subdivisions;
 
+    /**
+     * If this is not provided we assume that each bin represents 1 year
+     */
+    @Nullable
+    private final double[] lengthAtAge;
+
 
     public GrowthBinByList(int subdivisions, double[] lenghts, double[] weights) {
+
+        this(subdivisions, lenghts, weights, null);
+    }
+
+
+    /**
+     *  @param subdivisions
+     * @param lenghts
+     * @param weights
+     * @param lengthAtAge an array with [age]---> length at all subdivisions <br> NULL if each bin described in lengths is also one year apart
+     */
+    public GrowthBinByList(
+            int subdivisions, double[] lenghts, double[] weights,
+            @Nullable
+                    double[] lengthAtAge) {
         this.lenghts = lenghts;
         this.weights = weights;
         this.subdivisions = subdivisions;
-        Preconditions.checkArgument(lenghts.length >0);
-        Preconditions.checkArgument(lenghts.length  == weights.length);
+        this.lengthAtAge = lengthAtAge;
     }
 
     /**
@@ -82,15 +103,19 @@ public class GrowthBinByList implements Meristics {
     }
 
     /**
-     * because bins represent age here, this is just a lookup; we always round down the age
+     * if no lengthAtBin was provided then bins represent age here and this is just a lookup; we always round down the age
      *
+     * Otherwise just lookup the table provided! (if asked for an age that doesn't exit, return max age instead)
      * @param ageInYears  age in terms of years
      * @param subdivision the subdivision we are study (male/female is different for example)
      * @return the length of the fish
      */
     @Override
-    public double getLengthAtAge(double ageInYears, int subdivision) {
+    public double getLengthAtAge(int ageInYears, int subdivision) {
 
-        return getLength(subdivision,ageInYears > (lenghts.length-1) ? (int)ageInYears : lenghts.length-1 );
+        if(lengthAtAge == null)
+            return getLength(subdivision,ageInYears <= (lenghts.length-1) ? (int)ageInYears : lenghts.length-1 );
+        else
+            return lengthAtAge[ageInYears <= (lengthAtAge.length-1) ? (int)ageInYears : lengthAtAge.length-1 ];
     }
 }

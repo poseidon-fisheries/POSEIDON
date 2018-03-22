@@ -140,8 +140,21 @@ public class Species {
      *
      * @return Value for property 'imaginary'.
      */
+
+
     public boolean isImaginary() {
         return imaginary;
     }
 
+
+    /**
+     * function mapping time to length; the growth function.
+     * It doesn't have to be consistent with the subdivisions but it should
+     * @param ageInYears age in terms of years
+     * @param subdivision the subdivision we are study (male/female is different for example)
+     * @return the length of the fish
+     */
+    public double getLengthAtAge(int ageInYears, int subdivision) {
+        return meristics.getLengthAtAge(ageInYears, subdivision);
+    }
 }
