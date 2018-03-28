@@ -46,8 +46,8 @@ import java.util.function.ToDoubleFunction;
 import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 
 /**
- * A biology initializer that creates a one species model with abundance biology splitting the population equally
- * among all the seatiles
+ * A biology initializer that creates a one species model with abundance biology splitting the population
+ * according to biomassAllocator
  * Created by carrknight on 3/11/16.
  */
 public class SingleSpeciesAbundanceInitializer implements BiologyInitializer

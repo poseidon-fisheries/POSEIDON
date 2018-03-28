@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
@@ -127,9 +128,14 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
     @Override
     public void processMap(
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
-        BiomassDiffuser diffuser = new BiomassDiffuser(map,random,biology,
-                                                       differentialPercentageToMove,
-                                                       percentageLimitOnDailyMovement);
+
+
+
+
+
+        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
+                                                                         differentialPercentageToMove,
+                                                                         percentageLimitOnDailyMovement);
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
 
         grower.initializeGrower(biologies,model,random);

@@ -20,13 +20,22 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
+import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightLogisticFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -42,42 +51,69 @@ public class FromLeftToRightLogisticInitializerTest {
     public void leftToRightInitializer() throws Exception {
 
 
-        Species species = new Species("test");
-        GlobalBiology biology = new GlobalBiology(species);
-        DiffusingLogisticInitializer delegate = mock(DiffusingLogisticInitializer.class);
 
-        FromLeftToRightLogisticInitializer initializer = new FromLeftToRightLogisticInitializer(delegate, .1, 1);
+        FromLeftToRightLogisticFactory factory = new FromLeftToRightLogisticFactory();
+        factory.setCarryingCapacity(new FixedDoubleParameter(100d));
+        factory.setExponent(new FixedDoubleParameter(1d));
+        factory.setMinCapacityRatio(new FixedDoubleParameter(.1d));
+        factory.setGrower(new AlgorithmFactory<LogisticGrowerInitializer>() {
+            @Override
+            public LogisticGrowerInitializer apply(FishState state) {
+                return mock(LogisticGrowerInitializer.class,RETURNS_DEEP_STUBS);
+            }
+        });
+
+
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        when(model.getRandom()).thenReturn(new MersenneTwisterFast());
+        SingleSpeciesBiomassInitializer initializer = factory.apply(model);
+
+        NauticalMap map = mock(NauticalMap.class);
+        when(map.getWidth()).thenReturn(100);
+        SeaTile leftmost = mock(SeaTile.class); when(leftmost.getGridX()).thenReturn(0);
+        SeaTile middle = mock(SeaTile.class); when(middle.getGridX()).thenReturn(50);
+        SeaTile rightmost = mock(SeaTile.class); when(rightmost.getGridX()).thenReturn(99);
+        when(leftmost.getAltitude()).thenReturn(-100d);
+        when(middle.getAltitude()).thenReturn(-100d);
+        when(rightmost.getAltitude()).thenReturn(-100d);
+        List<SeaTile> cells = Lists.newArrayList(
+                leftmost,
+                middle,
+                rightmost
+        );
+        when(map.getAllSeaTilesExcludingLandAsList()).thenReturn(
+                cells
+        );
+        when(map.getAllSeaTilesAsList()).thenReturn(cells);
+
+        GlobalBiology globalBiology = initializer.generateGlobal(model.getRandom(),
+                                                                 model);
+        for(SeaTile cell : cells)
+            initializer.generateLocal(globalBiology,
+                                      cell,
+                                      model.getRandom(),
+                                      0,
+                                      3,
+                                      map);
+
 
         //the leftmost cell shouldn't be bothered
-        SeaTile tile = mock(SeaTile.class);
-        when(tile.getGridX()).thenReturn(0);
         BiomassLocalBiology local = mock(BiomassLocalBiology.class);
-        when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(),any() )).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100,                                           mock(NauticalMap.class)
-        );
-        verify(local).setCarryingCapacity(species,100d);
+        when(leftmost.getBiology()).thenReturn(local);
+        when(middle.getBiology()).thenReturn(local);
+        when(rightmost.getBiology()).thenReturn(local);
+        initializer.processMap(
+                globalBiology,
+                map,
+                model.getRandom(),
+                model
 
-        //in the middle you lose 50%
-        tile = mock(SeaTile.class);
-        when(tile.getGridX()).thenReturn(50);
-        local = mock(BiomassLocalBiology.class);
-        when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(),any() )).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100,                                           mock(NauticalMap.class)
         );
-        verify(local).setCarryingCapacity(species,50d);
 
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),100d);
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),50d);
+        verify(local).setCarryingCapacity(globalBiology.getSpecie(0),10d);
 
-        //rightmost you lose 10% (bound)
-        tile = mock(SeaTile.class);
-        when(tile.getGridX()).thenReturn(99);
-        local = mock(BiomassLocalBiology.class);
-        when(local.getCarryingCapacity(species)).thenReturn(100d);
-        when(delegate.generateLocal(any(),any(),any(),anyInt(),anyInt(),any() )).thenReturn(local);
-        initializer.generateLocal(biology, tile,new MersenneTwisterFast(),100,100,                                          mock(NauticalMap.class)
-        );
-        verify(local).setCarryingCapacity(species,10d);
 
     }
 }

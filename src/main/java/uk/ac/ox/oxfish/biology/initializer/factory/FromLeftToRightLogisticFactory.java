@@ -20,23 +20,44 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.SmoothMovementRule;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
-import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightLogisticInitializer;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.function.Function;
-
 /**
  * Create biomass slope but with diffusion
  * Created by carrknight on 2/12/16.
  */
-public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeftToRightLogisticInitializer> {
+public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSpeciesBiomassInitializer> {
 
 
-    DiffusingLogisticFactory delegate = new DiffusingLogisticFactory();
+    private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
+
+    private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
+
+
+    /**
+     * fixes a limit on how much biomass can leave the sea-tile
+     */
+    private DoubleParameter percentageLimitOnDailyMovement = new FixedDoubleParameter(0.01);
+
+    /**
+     * how much of the differential between two seatile's biomass should be solved by movement in a single day
+     */
+    private DoubleParameter differentialPercentageToMove = new FixedDoubleParameter(0.001);
+
+    private DoubleParameter maxInitialCapacity = new FixedDoubleParameter(1.0);
+
+    private DoubleParameter minInitialCapacity = new FixedDoubleParameter(0.0);
 
 
     DoubleParameter minCapacityRatio = new FixedDoubleParameter(.2);
@@ -46,64 +67,66 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
     /**
      * Applies this function to the given argument.
      *
-     * @param fishState the function argument
+     * @param state the function argument
      * @return the function result
      */
     @Override
-    public FromLeftToRightLogisticInitializer apply(FishState fishState) {
-        return new FromLeftToRightLogisticInitializer(delegate.apply(fishState),
-                                                      minCapacityRatio.apply(fishState.getRandom()),
-                                                      exponent.apply(fishState.getRandom()));
+    public SingleSpeciesBiomassInitializer apply(FishState state) {
+
+        double exponent = getExponent().apply(state.getRandom());
+        double minCapacityRatio = getMinCapacityRatio().apply(state.getRandom());
+        double maxCapacity = getCarryingCapacity().apply(state.getRandom());
+        BiomassAllocator leftToRightAllocator =
+                new BiomassAllocator() {
+                    @Override
+                    public double allocate(
+                            SeaTile tile, NauticalMap map, MersenneTwisterFast random)
+                    {
+
+                        double correctRatio = Math.max(
+                                Math.pow(
+                                        (map.getWidth()-tile.getGridX())
+                                                /
+                                                (float)map.getWidth(),
+                                        exponent),
+                                minCapacityRatio);
+                        return correctRatio * maxCapacity;
+                    }
+                };
+
+
+        return new SingleSpeciesBiomassInitializer(
+                leftToRightAllocator,
+                leftToRightAllocator,
+                new SmoothMovementRule(
+
+                        percentageLimitOnDailyMovement.apply(state.getRandom()),
+                        differentialPercentageToMove.apply(state.getRandom())
+                ),
+                "Species 0",
+                getGrower().apply(state)
+
+        );
     }
 
-    public DoubleParameter getPercentageLimitOnDailyMovement() {
-        return delegate.getPercentageLimitOnDailyMovement();
-    }
 
-    public DoubleParameter getDifferentialPercentageToMove() {
-        return delegate.getDifferentialPercentageToMove();
-    }
-
-    public void setDifferentialPercentageToMove(
-            DoubleParameter differentialPercentageToMove) {
-        delegate.setDifferentialPercentageToMove(differentialPercentageToMove);
-    }
-
-
-    public void setCarryingCapacity(DoubleParameter carryingCapacity) {
-        delegate.setCarryingCapacity(carryingCapacity);
-    }
-
-
-
-
+    /**
+     * Getter for property 'carryingCapacity'.
+     *
+     * @return Value for property 'carryingCapacity'.
+     */
     public DoubleParameter getCarryingCapacity() {
-        return delegate.getCarryingCapacity();
+        return carryingCapacity;
     }
 
     /**
-     * Returns a function that always returns its input argument.
+     * Setter for property 'carryingCapacity'.
      *
-     * @return a function that always returns its input argument
+     * @param carryingCapacity Value to set for property 'carryingCapacity'.
      */
-    public static <T> Function<T, T> identity() {
-        return Function.identity();
+    public void setCarryingCapacity(DoubleParameter carryingCapacity) {
+        this.carryingCapacity = carryingCapacity;
     }
-
-    public void setPercentageLimitOnDailyMovement(
-            DoubleParameter percentageLimitOnDailyMovement) {
-        delegate.setPercentageLimitOnDailyMovement(percentageLimitOnDailyMovement);
-    }
-
-
-    public DoubleParameter getMinCapacityRatio() {
-        return minCapacityRatio;
-    }
-
-    public void setMinCapacityRatio(DoubleParameter minCapacityRatio) {
-        this.minCapacityRatio = minCapacityRatio;
-    }
-
 
     /**
      * Getter for property 'grower'.
@@ -111,7 +134,7 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
      * @return Value for property 'grower'.
      */
     public AlgorithmFactory<? extends LogisticGrowerInitializer> getGrower() {
-        return delegate.getGrower();
+        return grower;
     }
 
     /**
@@ -121,43 +144,62 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
      */
     public void setGrower(
             AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
-        delegate.setGrower(grower);
+        this.grower = grower;
     }
 
     /**
-     * Getter for property 'maxInitialCapacity'.
+     * Getter for property 'percentageLimitOnDailyMovement'.
      *
-     * @return Value for property 'maxInitialCapacity'.
+     * @return Value for property 'percentageLimitOnDailyMovement'.
      */
-    public DoubleParameter getMaxInitialCapacity() {
-        return delegate.getMaxInitialCapacity();
+    public DoubleParameter getPercentageLimitOnDailyMovement() {
+        return percentageLimitOnDailyMovement;
     }
 
     /**
-     * Setter for property 'maxInitialCapacity'.
+     * Setter for property 'percentageLimitOnDailyMovement'.
      *
-     * @param maxInitialCapacity Value to set for property 'maxInitialCapacity'.
+     * @param percentageLimitOnDailyMovement Value to set for property 'percentageLimitOnDailyMovement'.
      */
-    public void setMaxInitialCapacity(DoubleParameter maxInitialCapacity) {
-        delegate.setMaxInitialCapacity(maxInitialCapacity);
+    public void setPercentageLimitOnDailyMovement(
+            DoubleParameter percentageLimitOnDailyMovement) {
+        this.percentageLimitOnDailyMovement = percentageLimitOnDailyMovement;
     }
 
     /**
-     * Getter for property 'minInitialCapacity'.
+     * Getter for property 'differentialPercentageToMove'.
      *
-     * @return Value for property 'minInitialCapacity'.
+     * @return Value for property 'differentialPercentageToMove'.
      */
-    public DoubleParameter getMinInitialCapacity() {
-        return delegate.getMinInitialCapacity();
+    public DoubleParameter getDifferentialPercentageToMove() {
+        return differentialPercentageToMove;
     }
 
     /**
-     * Setter for property 'minInitialCapacity'.
+     * Setter for property 'differentialPercentageToMove'.
      *
-     * @param minInitialCapacity Value to set for property 'minInitialCapacity'.
+     * @param differentialPercentageToMove Value to set for property 'differentialPercentageToMove'.
      */
-    public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
-        delegate.setMinInitialCapacity(minInitialCapacity);
+    public void setDifferentialPercentageToMove(DoubleParameter differentialPercentageToMove) {
+        this.differentialPercentageToMove = differentialPercentageToMove;
+    }
+
+    /**
+     * Getter for property 'minCapacityRatio'.
+     *
+     * @return Value for property 'minCapacityRatio'.
+     */
+    public DoubleParameter getMinCapacityRatio() {
+        return minCapacityRatio;
+    }
+
+    /**
+     * Setter for property 'minCapacityRatio'.
+     *
+     * @param minCapacityRatio Value to set for property 'minCapacityRatio'.
+     */
+    public void setMinCapacityRatio(DoubleParameter minCapacityRatio) {
+        this.minCapacityRatio = minCapacityRatio;
     }
 
     /**
@@ -176,5 +218,41 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<FromLeft
      */
     public void setExponent(DoubleParameter exponent) {
         this.exponent = exponent;
+    }
+
+    /**
+     * Getter for property 'maxInitialCapacity'.
+     *
+     * @return Value for property 'maxInitialCapacity'.
+     */
+    public DoubleParameter getMaxInitialCapacity() {
+        return maxInitialCapacity;
+    }
+
+    /**
+     * Setter for property 'maxInitialCapacity'.
+     *
+     * @param maxInitialCapacity Value to set for property 'maxInitialCapacity'.
+     */
+    public void setMaxInitialCapacity(DoubleParameter maxInitialCapacity) {
+        this.maxInitialCapacity = maxInitialCapacity;
+    }
+
+    /**
+     * Getter for property 'minInitialCapacity'.
+     *
+     * @return Value for property 'minInitialCapacity'.
+     */
+    public DoubleParameter getMinInitialCapacity() {
+        return minInitialCapacity;
+    }
+
+    /**
+     * Setter for property 'minInitialCapacity'.
+     *
+     * @param minInitialCapacity Value to set for property 'minInitialCapacity'.
+     */
+    public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
+        this.minInitialCapacity = minInitialCapacity;
     }
 }

@@ -1,6 +1,6 @@
 /*
  *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ *     Copyright (C) 2018  CoHESyS Lab cohesys.lab@gmail.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,29 +20,28 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-/**
- * easiest allocator, always returns the same weight
- * Created by carrknight on 6/30/17.
- */
-public class ConstantBiomassAllocator implements BiomassAllocator {
+public class RandomAllocator implements BiomassAllocator {
 
 
-    private final double constant;
+    private final double maxAllocation;
 
-    public ConstantBiomassAllocator() {
-        constant=1;
-    }
+    private final double minAllocation;
 
-    public ConstantBiomassAllocator(double constant) {
-        this.constant = constant;
+
+    public RandomAllocator(double maxAllocation, double minAllocation) {
+        this.maxAllocation = maxAllocation;
+        this.minAllocation = minAllocation;
+        Preconditions.checkArgument(maxAllocation>minAllocation);
     }
 
     /**
-     * Always returns 1 if the depth is below 0
+     * Returns a positive number representing the weight in terms of either
+     * biomass or carrying capacity (or whatever else the allocator is used for)
      *
      * @param tile   tile to allocate a weight to
      * @param map    general map information
@@ -51,9 +50,7 @@ public class ConstantBiomassAllocator implements BiomassAllocator {
      */
     @Override
     public double allocate(
-            SeaTile tile,
-            NauticalMap map,
-            MersenneTwisterFast random) {
-        return constant;
+            SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
+        return random.nextDouble() * (maxAllocation-minAllocation) + minAllocation;
     }
 }

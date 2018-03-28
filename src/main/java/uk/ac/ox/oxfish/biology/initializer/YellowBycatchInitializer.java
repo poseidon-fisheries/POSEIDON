@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.*;
 import java.util.function.Function;
@@ -311,11 +312,15 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         targetGrower.getBiologies().addAll(southBiologies);
         model.registerStartable(targetGrower);
 
-        BiomassDiffuser diffuser = new BiomassDiffuser(map,model.getRandom(),
-                                                       biology,
-                                                       targetDiffusionRate,
-                                                       .1,
-                                                       0); //only sablefish moves!
+        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, model.getRandom(),
+                                                                         biology,
+                                                                         new Pair<>(
+                                                                                 biology.getSpecie(0),
+                                                                                 new SmoothMovementRule(
+                                                                                         targetDiffusionRate,
+                                                                                         .1
+                                                                                 )
+                                                                         )); //only sablefish moves!
         model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
         assert Math.abs(bycatchBios.values().stream().mapToDouble(value -> value.getCurrentBiomass()[1]).sum() -

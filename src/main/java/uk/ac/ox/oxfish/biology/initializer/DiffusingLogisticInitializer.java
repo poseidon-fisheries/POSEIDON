@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.biology.BiomassDiffuser;
+import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -71,9 +71,9 @@ public class DiffusingLogisticInitializer extends IndependentLogisticInitializer
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
         super.processMap(biology, map, random, model);
 
-        BiomassDiffuser diffuser = new BiomassDiffuser(map,random,biology,
-                                                       differentialPercentageToMove,
-                                                       percentageLimitOnDailyMovement);
+        BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
+                                                                         differentialPercentageToMove,
+                                                                         percentageLimitOnDailyMovement);
         model.scheduleEveryDay(diffuser,StepOrder.BIOLOGY_PHASE);
 
 

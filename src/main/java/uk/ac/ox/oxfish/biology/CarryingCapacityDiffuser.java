@@ -21,11 +21,9 @@
 package uk.ac.ox.oxfish.biology;
 
 import com.google.common.base.Preconditions;
-import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -104,8 +102,8 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
 
 
             //grab neighbors
-            neighbors.putIfAbsent(here, BiomassDiffuser.getUsefulNeighbors(here,
-                                                                           model.getMap()));
+            neighbors.putIfAbsent(here, BiomassDiffuserContainer.getUsefulNeighbors(here,
+                                                                                    model.getMap()));
             List<SeaTile> neighborList = neighbors.get(here);
             //for each neighbour
             for (SeaTile neighbour : neighborList) {

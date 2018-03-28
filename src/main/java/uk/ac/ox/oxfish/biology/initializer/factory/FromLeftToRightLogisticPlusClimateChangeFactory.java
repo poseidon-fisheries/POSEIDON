@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
 import uk.ac.ox.oxfish.biology.CarryingCapacityDiffuser;
-import uk.ac.ox.oxfish.biology.initializer.FromLeftToRightLogisticInitializer;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -47,8 +47,8 @@ public class FromLeftToRightLogisticPlusClimateChangeFactory extends FromLeftToR
      * @return the function result
      */
     @Override
-    public FromLeftToRightLogisticInitializer apply(FishState model) {
-        FromLeftToRightLogisticInitializer apply = super.apply(model);
+    public SingleSpeciesBiomassInitializer apply(FishState model) {
+        SingleSpeciesBiomassInitializer apply = super.apply(model);
         //add climate change
         model.registerStartable(new CarryingCapacityDiffuser(
                 climateChangePercentageMovement.apply(model.getRandom()),

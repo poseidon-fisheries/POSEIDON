@@ -54,6 +54,10 @@ public class AllocatorManager {
     final private List<BiomassAllocator> allocators;
 
 
+    private boolean started = false;
+
+
+
     public AllocatorManager(
             boolean normalize,
             List<BiomassAllocator> allocators,
@@ -73,6 +77,9 @@ public class AllocatorManager {
 
     public void start(NauticalMap map, MersenneTwisterFast random)
     {
+
+        Preconditions.checkArgument(!started);
+        started = true;
         //there ought to be a lot of maps in here, one for each species
         Preconditions.checkArgument(!weightMaps.isEmpty());
 
@@ -161,4 +168,12 @@ public class AllocatorManager {
         }
     }
 
+    /**
+     * Getter for property 'started'.
+     *
+     * @return Value for property 'started'.
+     */
+    public boolean isStarted() {
+        return started;
+    }
 }

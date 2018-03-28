@@ -20,9 +20,12 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.SmoothMovementRule;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
-import uk.ac.ox.oxfish.biology.initializer.DiffusingLogisticInitializer;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.RandomAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -32,7 +35,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  * Creates a DiffusingLogisticInitializer
  * Created by carrknight on 6/22/15.
  */
-public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogisticInitializer>
+public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesBiomassInitializer>
 {
 
 
@@ -62,13 +65,25 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<DiffusingLogis
      * @return the function result
      */
     @Override
-    public DiffusingLogisticInitializer apply(FishState state) {
-        return new DiffusingLogisticInitializer(carryingCapacity,
-                                                minInitialCapacity,
-                                                maxInitialCapacity,
-                                                percentageLimitOnDailyMovement.apply(state.random),
-                                                differentialPercentageToMove.apply(state.random),
-                                                grower.apply(state));
+    public SingleSpeciesBiomassInitializer apply(FishState state) {
+        double carryingCapacity = getCarryingCapacity().apply(state.getRandom());
+        SingleSpeciesBiomassInitializer initializer = new SingleSpeciesBiomassInitializer(
+                new RandomAllocator(
+                        carryingCapacity * maxInitialCapacity.apply(state.getRandom()),
+                        carryingCapacity * minInitialCapacity.apply(state.getRandom())
+                ),
+                new ConstantBiomassAllocator(carryingCapacity),
+                new SmoothMovementRule(
+
+                        percentageLimitOnDailyMovement.apply(state.getRandom()),
+                        differentialPercentageToMove.apply(state.getRandom())
+                ),
+                "Species 0",
+                grower.apply(state));
+
+
+
+        return initializer;
     }
 
     public DoubleParameter getCarryingCapacity() {

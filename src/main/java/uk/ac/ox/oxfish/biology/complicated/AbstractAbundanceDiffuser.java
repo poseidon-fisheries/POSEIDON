@@ -70,8 +70,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
 
         for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> here : locals) {
             neighbors.putIfAbsent(here.getKey(),
-                                  getUsefulNeighbors(here.getKey(), model.getMap(),
-                                                     biologies));
+                                  getNeighborsWithAbundanceBasedLocalBiology(here.getKey(), model.getMap(),
+                                                                             biologies));
             List<SeaTile> potential = neighbors.get(here.getKey());
             if(potential.size()==0)
                 continue;
@@ -153,7 +153,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
      * @param biologies
      * @return a bag with all the neighbors
      */
-    private List<SeaTile> getUsefulNeighbors(
+    private List<SeaTile> getNeighborsWithAbundanceBasedLocalBiology(
             SeaTile tile,
             NauticalMap map,
             Map<SeaTile, AbundanceBasedLocalBiology> biologies)

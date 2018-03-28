@@ -25,7 +25,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
-import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -316,13 +315,20 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
 
             //movement rates
+            BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map,
+                                                                             random,
+                                                                             biology);
+
             for (Map.Entry<Species, Double> movement : movementRate.entrySet()) {
                 assert movement.getValue()>0;
-                BiomassDiffuser diffuser = new BiomassDiffuser(map, random, biology, movement.getValue(), .001d,
-                                                               movement.getKey().getIndex());
+                diffuser.getMovementRules().put(movement.getKey(),
+                                                new SmoothMovementRule(
+                                                        movement.getValue(),
+                                                        .001d
+                                                ));
 
-                model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
             }
+            model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
 
             //done!
             biologicalDirectories.clear();

@@ -61,6 +61,7 @@ public class SingleSpeciesAbundanceFactory implements AlgorithmFactory<SingleSpe
     private DoubleParameter scaling = new FixedDoubleParameter(1.0);
 
 
+
     private boolean daily = false;
 
     private boolean rounding = true;

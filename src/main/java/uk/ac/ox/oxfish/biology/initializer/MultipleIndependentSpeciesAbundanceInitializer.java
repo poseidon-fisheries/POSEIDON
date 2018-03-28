@@ -20,7 +20,8 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
     private final List<SingleSpeciesAbundanceInitializer> individualInitializers;
 
 
-    public MultipleIndependentSpeciesAbundanceInitializer(List<SingleSpeciesAbundanceInitializer> individualInitializers)
+    public MultipleIndependentSpeciesAbundanceInitializer(
+            List<SingleSpeciesAbundanceInitializer> individualInitializers)
     {
         this.individualInitializers = individualInitializers;
     }
@@ -32,7 +33,12 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
         //depending on its abundance algorithm
         LocalBiology toReturn = null;
         for(SingleSpeciesAbundanceInitializer initializer : individualInitializers) {
-            LocalBiology lastgen = initializer.generateLocal(biology, seaTile, random, mapHeightInCells, mapWidthInCells, map);
+            LocalBiology lastgen = initializer.generateLocal(biology,
+                                                             seaTile,
+                                                             random,
+                                                             mapHeightInCells,
+                                                             mapWidthInCells,
+                                                             map);
             if(toReturn == null ||
                     (toReturn instanceof EmptyLocalBiology && lastgen instanceof AbundanceBasedLocalBiology))
                 toReturn = lastgen;
