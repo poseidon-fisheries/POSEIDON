@@ -34,7 +34,7 @@ public class OneBinInitialAbundanceTest {
         OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1,100,0);
 
         //let's do longline
-        Species longspine = new Species("Longspine", AbundanceBasedLocalBiologyTest.longspineTestInput);
+        Species longspine = new Species("Longspine", AbundanceLocalBiologyTest.longspineTestInput);
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();
@@ -53,7 +53,7 @@ public class OneBinInitialAbundanceTest {
         OneBinInitialAbundance initialAbundance = new OneBinInitialAbundance(1,100,-1);
 
         //let's do longline
-        Species longspine = new Species("Longspine", AbundanceBasedLocalBiologyTest.longspineTestInput);
+        Species longspine = new Species("Longspine", AbundanceLocalBiologyTest.longspineTestInput);
         initialAbundance.initialize(longspine);
 
         double[][] abundance = initialAbundance.getInitialAbundance();

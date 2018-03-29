@@ -51,7 +51,7 @@ public class AllocatorManager {
     /**
      * list of allocators, one for each species
      */
-    final private List<BiomassAllocator> allocators;
+    final private Map<Species,BiomassAllocator> allocators;
 
 
     private boolean started = false;
@@ -60,10 +60,31 @@ public class AllocatorManager {
 
     public AllocatorManager(
             boolean normalize,
-            List<BiomassAllocator> allocators,
+            Map<Species,BiomassAllocator> allocators,
             GlobalBiology biology) {
         this.normalize = normalize;
         this.allocators = allocators;
+        Preconditions.checkArgument(biology.getSize()==allocators.size(),
+                                    "size mismatch between # of species and # of allocators");
+
+        weightMaps = new HashMap<>(biology.getSpecies().size());
+        //prepare the maps
+        for(Species species : biology.getSpecies())
+            weightMaps.put(species,new HashMap<>());
+
+    }
+
+    public AllocatorManager(
+            boolean normalize,
+            Species singleSpecies,
+            BiomassAllocator allocator,
+            GlobalBiology biology) {
+        this.normalize = normalize;
+
+
+
+        this.allocators = new HashMap<>(1);
+        allocators.put(singleSpecies,allocator);
         Preconditions.checkArgument(biology.getSize()==allocators.size(),
                                     "size mismatch between # of species and # of allocators");
 
@@ -137,7 +158,7 @@ public class AllocatorManager {
                     tile.getAltitude() >= 0 ?
                             0 :
                             //otherwise allocate according to the right allocator
-                            allocators.get(species.getIndex()).allocate(
+                            allocators.get(species).allocate(
                                     tile,
                                     map,
                                     random

@@ -24,6 +24,8 @@ import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedAllocatorDecorator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -32,16 +34,18 @@ import static org.mockito.Mockito.when;
 /**
  * Created by carrknight on 7/11/17.
  */
-public class DepthAllocatorTest {
+public class DepthAllocatorDecoratorTest {
 
 
     @Test
     public void depthAllocator() throws Exception {
 
 
-        DepthAllocator allocator = new DepthAllocator(
-                0,0,5,10,
-                105,300
+        DepthAllocatorDecorator allocator = new DepthAllocatorDecorator(
+             
+                105,300,
+                new BoundedAllocatorDecorator(0,0,5,10,true,
+                    new ConstantBiomassAllocator())
         );
 
 

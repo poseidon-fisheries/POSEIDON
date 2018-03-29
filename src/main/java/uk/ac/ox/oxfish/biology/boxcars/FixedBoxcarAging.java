@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.google.common.annotations.VisibleForTesting;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.LocalAgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.VariableProportionAging;
 import uk.ac.ox.oxfish.model.FishState;
@@ -90,7 +90,7 @@ public class FixedBoxcarAging  extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding,
+            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
             int daysToSimulate) {
         delegate.ageLocally(localBiology, species, model, rounding, daysToSimulate);
     }

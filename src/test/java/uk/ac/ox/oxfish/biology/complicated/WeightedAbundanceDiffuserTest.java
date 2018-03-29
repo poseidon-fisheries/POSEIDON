@@ -56,7 +56,7 @@ public class WeightedAbundanceDiffuserTest {
 
         //movement rate is 50%
         SeaTile full = new SeaTile(0, 0, -1, new TileHabitat(0d));
-        AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0] = 1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2] = 0;
@@ -67,7 +67,7 @@ public class WeightedAbundanceDiffuserTest {
 
 
         SeaTile there = new SeaTile(0, 1, -1, new TileHabitat(0d));
-        AbundanceBasedLocalBiology bioThere = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology bioThere = new AbundanceLocalBiology(biology);
         there.setBiology(bioThere);
         bioThere.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2] = 100;
         bioThere.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1] = 500; //bio there has the same amount of age 1 male
@@ -75,11 +75,11 @@ public class WeightedAbundanceDiffuserTest {
         //however we will make "there" more habitable than here
 
 
-        HashMap<SeaTile, AbundanceBasedLocalBiology> tiles = new HashMap<>();
+        HashMap<SeaTile, AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full, fullBio);
         tiles.put(there, bioThere);
 
-        HashMap<AbundanceBasedLocalBiology, Double> habitability = new HashMap<>();
+        HashMap<AbundanceLocalBiology, Double> habitability = new HashMap<>();
         habitability.put(fullBio, 1d);
         habitability.put(bioThere, 2d);
 

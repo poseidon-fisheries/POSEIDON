@@ -68,7 +68,7 @@ public class VariableProportionAging extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding,
+            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
             int daysToSimulate)
     {
 

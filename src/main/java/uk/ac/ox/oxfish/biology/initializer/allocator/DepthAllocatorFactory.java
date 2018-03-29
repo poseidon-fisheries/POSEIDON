@@ -28,19 +28,17 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/11/17.
  */
-public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocator> {
+public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocatorDecorator> {
 
 
 
-
-    private DoubleParameter lowestX = new FixedDoubleParameter(62);
-    private DoubleParameter lowestY = new FixedDoubleParameter(27);
-    private DoubleParameter highestX = new FixedDoubleParameter(95);
-    private DoubleParameter highestY = new FixedDoubleParameter(34);
 
     private DoubleParameter minDepth = new FixedDoubleParameter(800);
     private DoubleParameter maxDepth = new FixedDoubleParameter(1500);
 
+
+    private AlgorithmFactory<? extends BiomassAllocator> delegate =
+            new BoundedAllocatorFactory(62,27,95,34,true);
 
 
     /**
@@ -50,89 +48,15 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocator> {
      * @return the function result
      */
     @Override
-    public DepthAllocator apply(FishState state) {
-        return new DepthAllocator(
-                lowestX.apply(state.getRandom()),
-                lowestY.apply(state.getRandom()),
-                highestX.apply(state.getRandom()),
-                highestY.apply(state.getRandom()),
+    public DepthAllocatorDecorator apply(FishState state) {
+        return new DepthAllocatorDecorator(
                 minDepth.apply(state.getRandom()),
-                maxDepth.apply(state.getRandom())
+                maxDepth.apply(state.getRandom()),
+                delegate.apply(state)
 
         );
     }
 
-    /**
-     * Getter for property 'lowestX'.
-     *
-     * @return Value for property 'lowestX'.
-     */
-    public DoubleParameter getLowestX() {
-        return lowestX;
-    }
-
-    /**
-     * Setter for property 'lowestX'.
-     *
-     * @param lowestX Value to set for property 'lowestX'.
-     */
-    public void setLowestX(DoubleParameter lowestX) {
-        this.lowestX = lowestX;
-    }
-
-    /**
-     * Getter for property 'lowestY'.
-     *
-     * @return Value for property 'lowestY'.
-     */
-    public DoubleParameter getLowestY() {
-        return lowestY;
-    }
-
-    /**
-     * Setter for property 'lowestY'.
-     *
-     * @param lowestY Value to set for property 'lowestY'.
-     */
-    public void setLowestY(DoubleParameter lowestY) {
-        this.lowestY = lowestY;
-    }
-
-    /**
-     * Getter for property 'highestX'.
-     *
-     * @return Value for property 'highestX'.
-     */
-    public DoubleParameter getHighestX() {
-        return highestX;
-    }
-
-    /**
-     * Setter for property 'highestX'.
-     *
-     * @param highestX Value to set for property 'highestX'.
-     */
-    public void setHighestX(DoubleParameter highestX) {
-        this.highestX = highestX;
-    }
-
-    /**
-     * Getter for property 'highestY'.
-     *
-     * @return Value for property 'highestY'.
-     */
-    public DoubleParameter getHighestY() {
-        return highestY;
-    }
-
-    /**
-     * Setter for property 'highestY'.
-     *
-     * @param highestY Value to set for property 'highestY'.
-     */
-    public void setHighestY(DoubleParameter highestY) {
-        this.highestY = highestY;
-    }
 
     /**
      * Getter for property 'minDepth'.
@@ -168,5 +92,24 @@ public class DepthAllocatorFactory implements AlgorithmFactory<DepthAllocator> {
      */
     public void setMaxDepth(DoubleParameter maxDepth) {
         this.maxDepth = maxDepth;
+    }
+
+    /**
+     * Getter for property 'delegate'.
+     *
+     * @return Value for property 'delegate'.
+     */
+    public AlgorithmFactory<? extends BiomassAllocator> getDelegate() {
+        return delegate;
+    }
+
+    /**
+     * Setter for property 'delegate'.
+     *
+     * @param delegate Value to set for property 'delegate'.
+     */
+    public void setDelegate(
+            AlgorithmFactory<? extends BiomassAllocator> delegate) {
+        this.delegate = delegate;
     }
 }

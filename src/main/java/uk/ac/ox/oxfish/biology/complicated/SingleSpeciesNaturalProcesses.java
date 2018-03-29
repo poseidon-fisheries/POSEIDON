@@ -93,7 +93,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         this.daily = daily;
     }
 
-    private final Map<SeaTile,AbundanceBasedLocalBiology> biologies = new LinkedHashMap<>();
+    private final Map<SeaTile,AbundanceLocalBiology> biologies = new LinkedHashMap<>();
 
     /**
      * schedules itself every year
@@ -153,7 +153,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          */
         //we need to sum up all the abundances
         List<StructuredAbundance> abundances = new LinkedList<>();
-        for (AbundanceBasedLocalBiology biology : biologies.values()) {
+        for (AbundanceLocalBiology biology : biologies.values()) {
             abundances.add(biology.getAbundance(species));
         }
         //now create the total number of recruits
@@ -168,12 +168,12 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
         //allocate stuff before mortality hits!
         //either allocate recruits with given allocator or proportional to where biomass is
-        LinkedHashMap<AbundanceBasedLocalBiology,Double> biomassWeight;
+        LinkedHashMap<AbundanceLocalBiology,Double> biomassWeight;
         if(recruitsAllocator != null) {
 
             double sum = 0;
             biomassWeight = new LinkedHashMap<>();
-            for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : biologies.entrySet()) {
+            for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : biologies.entrySet()) {
                 double weight = recruitsAllocator.allocate(entry.getKey(),
                                                            model.getMap(),
                                                            model.getRandom());
@@ -182,7 +182,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
             }
             Preconditions.checkArgument(sum > 0,"No area valid for recruits!");
-            for (AbundanceBasedLocalBiology biology : biologies.values()) {
+            for (AbundanceLocalBiology biology : biologies.values()) {
                 biomassWeight.replace(biology,biomassWeight.get(biology)/sum);
                 Preconditions.checkArgument(Double.isFinite(biomassWeight.get(biology)),
                                             "some weights are not finite");
@@ -200,7 +200,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                         return biomass;
                     }).sum();
             //reweight so they add up to 1
-            for(AbundanceBasedLocalBiology bio : biomassWeight.keySet())
+            for(AbundanceLocalBiology bio : biomassWeight.keySet())
                 biomassWeight.put(bio,biomassWeight.get(bio)/totalBiomass);
 
 
@@ -256,7 +256,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
                                 }
                             }).sum()-1d)<.001d;
             double leftOver = 0;
-            for (Map.Entry<AbundanceBasedLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+            for (Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
                 double ratio = biologyBiomass.getValue();
                 double recruitsHere = ((lastRecruits + leftOver) * ratio);
                 StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
@@ -292,7 +292,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
     /**
      * register this biology so that it can be accessed by recruits and so on
      */
-    public void add(AbundanceBasedLocalBiology localBiology, SeaTile tile) {
+    public void add(AbundanceLocalBiology localBiology, SeaTile tile) {
         Preconditions.checkArgument(!biologies.containsKey(tile));
         Preconditions.checkArgument(!biologies.containsKey(localBiology));
         biologies.put(tile, localBiology);

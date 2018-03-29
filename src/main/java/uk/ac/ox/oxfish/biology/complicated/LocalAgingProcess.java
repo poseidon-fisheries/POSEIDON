@@ -44,19 +44,19 @@ public abstract class LocalAgingProcess implements AgingProcess {
      */
     @Override
     public void age(
-            Collection<AbundanceBasedLocalBiology> biologies, Species species, FishState model, boolean rounding,
+            Collection<AbundanceLocalBiology> biologies, Species species, FishState model, boolean rounding,
             int daysToSimulate) {
-            biologies.forEach(new Consumer<AbundanceBasedLocalBiology>() {
+            biologies.forEach(new Consumer<AbundanceLocalBiology>() {
             @Override
-            public void accept(AbundanceBasedLocalBiology abundanceBasedLocalBiology) {
-                ageLocally(abundanceBasedLocalBiology, species, model, rounding, daysToSimulate);
+            public void accept(AbundanceLocalBiology abundanceLocalBiology) {
+                ageLocally(abundanceLocalBiology, species, model, rounding, daysToSimulate);
             }
         });
     }
 
 
     abstract public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species, FishState model, boolean rounding,
+            AbundanceLocalBiology localBiology, Species species, FishState model, boolean rounding,
             int daysToSimulate);
 
 

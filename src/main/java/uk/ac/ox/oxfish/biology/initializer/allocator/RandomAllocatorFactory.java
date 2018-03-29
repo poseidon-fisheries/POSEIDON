@@ -1,6 +1,6 @@
 /*
  *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2017  CoHESyS Lab cohesys.lab@gmail.com
+ *     Copyright (C) 2018  CoHESyS Lab cohesys.lab@gmail.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,26 +20,26 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-/**
- * Created by carrknight on 7/11/17.
- */
-public class ConstantAllocatorFactory implements AlgorithmFactory<ConstantBiomassAllocator> {
+public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator> {
 
 
-    private DoubleParameter constantValue = new FixedDoubleParameter(1d);
+    private DoubleParameter minimum = new FixedDoubleParameter(0);
+
+    private DoubleParameter maximum = new FixedDoubleParameter(1);
 
 
-    public ConstantAllocatorFactory() {
+    public RandomAllocatorFactory() {
     }
 
-    public ConstantAllocatorFactory(double constantValue) {
-        this.constantValue = new FixedDoubleParameter(constantValue);
+    public RandomAllocatorFactory(double minimum,
+                                  double maximum) {
+        this.minimum = new FixedDoubleParameter(minimum);
+        this.maximum = new FixedDoubleParameter(maximum);
     }
 
     /**
@@ -49,27 +49,10 @@ public class ConstantAllocatorFactory implements AlgorithmFactory<ConstantBiomas
      * @return the function result
      */
     @Override
-    public ConstantBiomassAllocator apply(FishState state) {
-
-        return new ConstantBiomassAllocator(constantValue.apply(state.getRandom()));
-    }
-
-
-    /**
-     * Getter for property 'constantValue'.
-     *
-     * @return Value for property 'constantValue'.
-     */
-    public DoubleParameter getConstantValue() {
-        return constantValue;
-    }
-
-    /**
-     * Setter for property 'constantValue'.
-     *
-     * @param constantValue Value to set for property 'constantValue'.
-     */
-    public void setConstantValue(DoubleParameter constantValue) {
-        this.constantValue = constantValue;
+    public RandomAllocator apply(FishState state) {
+        return  new RandomAllocator(
+                maximum.apply(state.getRandom()),
+                minimum.apply(state.getRandom())
+        );
     }
 }

@@ -61,7 +61,7 @@ public class StandardAgingProcess extends LocalAgingProcess {
      */
     @Override
     public void ageLocally(
-            AbundanceBasedLocalBiology localBiology, Species species,
+            AbundanceLocalBiology localBiology, Species species,
             FishState model, boolean rounding, int daysToSimulate)
     {
 

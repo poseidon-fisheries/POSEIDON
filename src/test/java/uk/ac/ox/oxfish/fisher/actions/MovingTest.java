@@ -309,7 +309,7 @@ public class MovingTest
         //great
         NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
                                           new EquirectangularDistance(0.0,1), new StraightLinePathfinder());
-        FishState model = mock(FishState.class);
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(model.getMap()).thenReturn(map);
         when(model.getStepsPerDay()).thenReturn(1);
         when(model.getHoursPerStep()).thenReturn(24d);

@@ -20,12 +20,7 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
-import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-
-import java.util.Map;
 
 /**
  * Marker for all diffuser objects that deal with biomass

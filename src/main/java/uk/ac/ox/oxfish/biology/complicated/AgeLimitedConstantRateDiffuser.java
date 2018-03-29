@@ -76,8 +76,8 @@ public class AgeLimitedConstantRateDiffuser extends ConstantRateAbundanceDiffuse
             double delta, double fishHere, double fishThere, int bin,
             MersenneTwisterFast random,
             boolean rounding, int subdivision,
-            AbundanceBasedLocalBiology biologyHere,
-            AbundanceBasedLocalBiology biologyThere) {
+            AbundanceLocalBiology biologyHere,
+            AbundanceLocalBiology biologyThere) {
 
         if(delta<=0)
             return;

@@ -25,6 +25,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -52,12 +53,17 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
     /**
      * the uninpeded growth rate of each species
      */
-    private final Double[] malthusianParameter;
+    private final double malthusianParameter;
     private Stoppable receipt;
 
+    private final Species species;
 
-    public IndependentLogisticBiomassGrower(Double[] malthusianParameter) {
+
+    public IndependentLogisticBiomassGrower(
+            double malthusianParameter,
+            Species species) {
         this.malthusianParameter = malthusianParameter;
+        this.species = species;
     }
 
     @Override
@@ -75,29 +81,29 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
             //grow fish
 
             Double[] currentBiomasses = biology.getCurrentBiomass();
-            assert (currentBiomasses.length==malthusianParameter.length);
 
-            for(int i=0; i<currentBiomasses.length; i++)
-            {
-                assert currentBiomasses[i] >=0;
-                //grows logistically
 
-                Double carryingCapacity = biology.getCarryingCapacity(i);
-                if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[i]) {
-                    double oldBiomass = currentBiomasses[i];
-                    currentBiomasses[i] = logisticStep(currentBiomasses[i],
-                                                       carryingCapacity,
-                                                       malthusianParameter[i]);
-                    //store recruitment number, counter should have been initialized by factory!
-                    double recruitment = currentBiomasses[i]-oldBiomass;
-                    if(recruitment>FishStateUtilities.EPSILON)
-                        model.getYearlyCounter().count(model.getSpecies().get(i) +
-                                                               " Recruitment",
-                                                       recruitment);
 
-                }
-                assert currentBiomasses[i] >=0;
+            int speciesIndex = species.getIndex();
+            assert currentBiomasses[speciesIndex] >=0;
+            //grows logistically
+
+            Double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
+            if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[speciesIndex]) {
+                double oldBiomass = currentBiomasses[speciesIndex];
+                currentBiomasses[speciesIndex] = logisticStep(currentBiomasses[speciesIndex],
+                                                   carryingCapacity,
+                                                   malthusianParameter);
+                //store recruitment number, counter should have been initialized by factory!
+                double recruitment = currentBiomasses[speciesIndex]-oldBiomass;
+                if(recruitment>FishStateUtilities.EPSILON)
+                    model.getYearlyCounter().count(model.getSpecies().get(speciesIndex) +
+                                                           " Recruitment",
+                                                   recruitment);
+
             }
+            assert currentBiomasses[speciesIndex] >=0;
+
         }
 
 
@@ -143,12 +149,13 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
         return biologies;
     }
 
+
     /**
      * Getter for property 'malthusianParameter'.
      *
      * @return Value for property 'malthusianParameter'.
      */
-    public Double[] getMalthusianParameter() {
+    public double getMalthusianParameter() {
         return malthusianParameter;
     }
 }

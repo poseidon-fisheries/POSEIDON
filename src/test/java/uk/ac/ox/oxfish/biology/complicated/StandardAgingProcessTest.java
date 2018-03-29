@@ -45,7 +45,7 @@ public class StandardAgingProcessTest {
         StructuredAbundance abundance = new StructuredAbundance(male,female);
         StandardAgingProcess process = new StandardAgingProcess(false);
 
-        AbundanceBasedLocalBiology bio = mock(AbundanceBasedLocalBiology.class);
+        AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 
@@ -68,7 +68,7 @@ public class StandardAgingProcessTest {
 
         StandardAgingProcess process = new StandardAgingProcess(true);
 
-        AbundanceBasedLocalBiology bio = mock(AbundanceBasedLocalBiology.class);
+        AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 

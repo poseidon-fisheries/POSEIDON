@@ -25,7 +25,8 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.GenericBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedConstantAllocator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedAllocatorDecorator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -91,8 +92,10 @@ public class TwoSpeciesBoxFactory implements AlgorithmFactory<GenericBiomassInit
                 differentialPercentageToMove.apply(fishState.getRandom()),
                 grower.apply(fishState),
                 Lists.newArrayList(
-                        new BoundedConstantAllocator(x, y, x+width-1, y+height-1, false),
-                        new BoundedConstantAllocator(x, y, x+width-1, y+height-1,true)
+                        new BoundedAllocatorDecorator(x, y, x+width-1, y+height-1, false,
+                                                      new ConstantBiomassAllocator(1)),
+                        new BoundedAllocatorDecorator(x, y, x+width-1, y+height-1, true,
+                                                      new ConstantBiomassAllocator(1))
                 )
 
 

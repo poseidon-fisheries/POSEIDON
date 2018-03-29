@@ -57,7 +57,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //we will move from full to empty at 50%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
@@ -68,10 +68,10 @@ public class ConstantRateAbundanceDiffuserTest {
 
 
         SeaTile empty = new SeaTile(0,1,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology emptyBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
         empty.setBiology(emptyBio);
 
-        HashMap<SeaTile,AbundanceBasedLocalBiology> tiles = new HashMap<>();
+        HashMap<SeaTile,AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full,fullBio);
         tiles.put(empty,emptyBio);
 
@@ -113,7 +113,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //we will move from full to empty at 10%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
@@ -124,10 +124,10 @@ public class ConstantRateAbundanceDiffuserTest {
 
 
         SeaTile empty = new SeaTile(0,1,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology emptyBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
         empty.setBiology(emptyBio);
 
-        HashMap<SeaTile,AbundanceBasedLocalBiology> tiles = new HashMap<>();
+        HashMap<SeaTile,AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full,fullBio);
         tiles.put(empty,emptyBio);
 
@@ -174,7 +174,7 @@ public class ConstantRateAbundanceDiffuserTest {
 
         //we will move from full to empty at 50%
         SeaTile full = new SeaTile(0,0,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology fullBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology fullBio = new AbundanceLocalBiology(biology);
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][0]=1000;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][1]=500;
         fullBio.getAbundance(species).asMatrix()[FishStateUtilities.MALE][2]=0;
@@ -185,11 +185,11 @@ public class ConstantRateAbundanceDiffuserTest {
 
 
         SeaTile empty = new SeaTile(0,1,-1,new TileHabitat(0d));
-        AbundanceBasedLocalBiology emptyBio = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology emptyBio = new AbundanceLocalBiology(biology);
         empty.setBiology(emptyBio);
         emptyBio.getAbundance(species).asMatrix()[FishStateUtilities.FEMALE][2]=10;
 
-        HashMap<SeaTile,AbundanceBasedLocalBiology> tiles = new HashMap<>();
+        HashMap<SeaTile,AbundanceLocalBiology> tiles = new HashMap<>();
         tiles.put(full,fullBio);
         tiles.put(empty,emptyBio);
 

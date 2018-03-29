@@ -29,20 +29,28 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 
-public class BiomassLocalBiologyTest
+public class LogisticGrowthTest
 {
     @Test
     public void logisticGrowthWorks() throws Exception {
 
         BiomassLocalBiology bio = new BiomassLocalBiology(
-                new Double[]{100d,200d}, new Double[]{100d,400d}
+                new Double[]{100d,200d,0d}, new Double[]{100d,400d,0d}
         );
-        IndependentLogisticBiomassGrower grower =
-                new IndependentLogisticBiomassGrower(new Double[]{.5,.5});
-        grower.getBiologies().add(bio);
         Species species0 = new Species("0"); species0.resetIndexTo(0);
         Species species1 = new Species("1"); species1.resetIndexTo(1);
         Species species2 = new Species("2"); species2.resetIndexTo(2);
+
+
+        IndependentLogisticBiomassGrower grower0 =
+                new IndependentLogisticBiomassGrower(.5,species0);
+        grower0.getBiologies().add(bio);
+        IndependentLogisticBiomassGrower grower1 =
+                new IndependentLogisticBiomassGrower(.5,species1);
+        grower1.getBiologies().add(bio);
+        IndependentLogisticBiomassGrower grower2 =
+                new IndependentLogisticBiomassGrower(.5,species2);
+        grower2.getBiologies().add(bio);
 
         assertEquals(100, bio.getBiomass(species0), .1);
         assertEquals(200, bio.getBiomass(species1), .1);
@@ -51,7 +59,9 @@ public class BiomassLocalBiologyTest
         //grow it
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(model.getSpecies()).thenReturn(Lists.newArrayList(species0,species1,species2));
-        grower.step(model);
+        grower0.step(model);
+        grower1.step(model);
+        grower2.step(model);
 
         assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
         assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
@@ -59,11 +69,49 @@ public class BiomassLocalBiologyTest
 
         bio.setCurrentBiomass(species1, 399.88);
         //grow it again
-        grower.step(model);
+        grower0.step(model);
+        grower1.step(model);
+        grower2.step(model);
         assertEquals(100, bio.getBiomass(species0), .1); //didn't grow because it is at capacity
         assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
         assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
     }
 
+
+    @Test
+    public void logisticGrowthWorksOneSpecies() throws Exception {
+
+        BiomassLocalBiology bio = new BiomassLocalBiology(
+                new Double[]{80d,200d,0d}, new Double[]{100d,400d,0d}
+        );
+        Species species0 = new Species("0"); species0.resetIndexTo(0);
+        Species species1 = new Species("1"); species1.resetIndexTo(1);
+        Species species2 = new Species("2"); species2.resetIndexTo(2);
+
+
+        IndependentLogisticBiomassGrower grower =
+                new IndependentLogisticBiomassGrower(.5,species1);
+        grower.getBiologies().add(bio);
+
+        assertEquals(80d, bio.getBiomass(species0), .1);
+        assertEquals(200, bio.getBiomass(species1), .1);
+        assertEquals(0, bio.getBiomass(species2), .1);
+
+        //grow it
+        FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
+        when(model.getSpecies()).thenReturn(Lists.newArrayList(species0,species1,species2));
+        grower.step(model);
+
+        assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
+        assertEquals(250, bio.getBiomass(species1), .1); //grew by 50%
+        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+
+        bio.setCurrentBiomass(species1, 399.88);
+        //grow it again
+        grower.step(model);
+        assertEquals(80, bio.getBiomass(species0), .1); //didn't grow because the grower focuses on species1
+        assertEquals(400, bio.getBiomass(species1), .1); //grew until capacity
+        assertEquals(0, bio.getBiomass(species2), .1);  //0 doesn't grow
+    }
 
 }

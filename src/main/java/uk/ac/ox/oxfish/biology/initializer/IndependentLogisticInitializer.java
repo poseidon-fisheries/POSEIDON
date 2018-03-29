@@ -110,7 +110,7 @@ public class IndependentLogisticInitializer extends AbstractBiologyInitializer {
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model)
     {
 
-        grower.initializeGrower(biologies, model, random);
+        grower.initializeGrower(biologies, model, random,biology.getSpecie(0));
 
 
 

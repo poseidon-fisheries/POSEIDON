@@ -200,7 +200,8 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
 
 
 
-        grower.initializeGrower(biologies,model,random);
+        for(Species species : biology.getSpecies())
+            grower.initializeGrower(biologies,model,random,species);
 
         BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology, differentialPercentageToMove, percentageLimitOnDailyMovement);
 

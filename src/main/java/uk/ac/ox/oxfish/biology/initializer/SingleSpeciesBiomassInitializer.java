@@ -266,7 +266,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
 
 
         //initialize the grower
-        grower.initializeGrower(habitableAreas, model, random);
+        grower.initializeGrower(habitableAreas, model, random,species);
         //initialize the diffuser
         if(!forceMovementOff) {
             BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
@@ -299,12 +299,14 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         //create maps of where the fish is
         initialDistribution = new AllocatorManager(
                 normalizeAllocators,
-                Lists.newArrayList(initialAllocator),
+                species,
+                initialAllocator,
                 independentGlobalBiology
         );
         habitabilityDistribution = new AllocatorManager(
                 normalizeAllocators,
-                Lists.newArrayList(carryingCapacityAllocator),
+                species,
+                carryingCapacityAllocator,
                 independentGlobalBiology
         );
 
@@ -409,4 +411,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     public void setForceMovementOff(boolean forceMovementOff) {
         this.forceMovementOff = forceMovementOff;
     }
+
+
 }

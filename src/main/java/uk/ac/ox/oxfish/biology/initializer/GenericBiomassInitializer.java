@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,8 +122,13 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
         //if there is no manager, we need to create and start it now
         if(manager == null)
         {
+            //assume order of allocators is the same as order of species
+            Map<Species,BiomassAllocator> allocatorMap = new LinkedHashMap<>();
+            for(Species species : biology.getSpecies())
+                allocatorMap.put(species,allocators.get(species.getIndex()));
+
             manager = new AllocatorManager(false,
-                                           allocators,
+                                           allocatorMap,
                                            biology);
             manager.start(map,random);
         }
@@ -162,7 +168,8 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
     public void processMap(
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
 
-        grower.initializeGrower(biologies, model, random);
+        for(Species species : biology.getSpecies())
+            grower.initializeGrower(biologies, model, random,species);
 
 
         BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,

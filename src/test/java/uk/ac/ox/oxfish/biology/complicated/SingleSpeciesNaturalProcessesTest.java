@@ -79,8 +79,8 @@ public class SingleSpeciesNaturalProcessesTest {
                 new ExponentialMortalityProcess(meristics), false);
 
         GlobalBiology biology = new GlobalBiology(species);
-        AbundanceBasedLocalBiology cell1 = new AbundanceBasedLocalBiology(biology);
-        AbundanceBasedLocalBiology cell2 = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology cell1 = new AbundanceLocalBiology(biology);
+        AbundanceLocalBiology cell2 = new AbundanceLocalBiology(biology);
         processes.add(cell1, mock(SeaTile.class));
         processes.add(cell2,mock(SeaTile.class) );
         for(int i=0; i<=meristics.getMaxAge(); i++)
@@ -144,7 +144,7 @@ public class SingleSpeciesNaturalProcessesTest {
                                                               element, new MersenneTwisterFast(), 4, 4,                                          mock(NauticalMap.class)
             );
             element.setBiology(localBiology); //put new biology in
-            processes.add((AbundanceBasedLocalBiology) localBiology,element );
+            processes.add((AbundanceLocalBiology) localBiology, element );
         }
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         initializer.processMap(biology, map, new MersenneTwisterFast(), model);
@@ -198,18 +198,18 @@ public class SingleSpeciesNaturalProcessesTest {
                 fakeSpecies,
                 true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), new DummyNaturalMortality(), false);
 
-        HashMap<AbundanceBasedLocalBiology,Double> allocator = new HashMap<>();
+        HashMap<AbundanceLocalBiology,Double> allocator = new HashMap<>();
         for(SeaTile element : map.getAllSeaTilesAsList())
         {
             LocalBiology localBiology = initializer.generateLocal(biology,
                                                                   element, random, 4, 4, mock(NauticalMap.class)
             );
             element.setBiology(localBiology); //put new biology in
-            processes.add((AbundanceBasedLocalBiology) localBiology, element);
+            processes.add((AbundanceLocalBiology) localBiology, element);
             if(element.getGridX()==1 && element.getGridY()==1)
-                allocator.put((AbundanceBasedLocalBiology) localBiology, 1d);
+                allocator.put((AbundanceLocalBiology) localBiology, 1d);
             else
-                allocator.put((AbundanceBasedLocalBiology) localBiology, 0d);
+                allocator.put((AbundanceLocalBiology) localBiology, 0d);
         }
         when(model.getRandom()).thenReturn(random);
 
@@ -218,7 +218,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 new BiomassAllocator() {
                     @Override
                     public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-                        return allocator.get(((AbundanceBasedLocalBiology) tile.getBiology()));
+                        return allocator.get(((AbundanceLocalBiology) tile.getBiology()));
                     }
                 }
         );
@@ -265,7 +265,7 @@ public class SingleSpeciesNaturalProcessesTest {
                 true, new StandardAgingProcess(false), new NoAbundanceDiffusion(), initializer.getMortality(), false);
 
 
-        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(new GlobalBiology(species));
+        AbundanceLocalBiology local = new AbundanceLocalBiology(new GlobalBiology(species));
         //there are 500 male/female in each category oldest and 0  for second oldest
         local.getAbundance(species).asMatrix()[FEMALE][species.getNumberOfBins()-1]=500;
         local.getAbundance(species).asMatrix()[FishStateUtilities.MALE][species.getNumberOfBins()-1]=500;

@@ -5,13 +5,12 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyInitializer {
@@ -40,7 +39,7 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
                                                              mapWidthInCells,
                                                              map);
             if(toReturn == null ||
-                    (toReturn instanceof EmptyLocalBiology && lastgen instanceof AbundanceBasedLocalBiology))
+                    (toReturn instanceof EmptyLocalBiology && lastgen instanceof AbundanceLocalBiology))
                 toReturn = lastgen;
         }
         //return one, it doesn't matter which

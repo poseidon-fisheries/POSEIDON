@@ -35,7 +35,7 @@ public interface AbundanceDiffuser {
 
 
     public void step(Species species,
-                     Map<SeaTile, AbundanceBasedLocalBiology> biologies,
+                     Map<SeaTile, AbundanceLocalBiology> biologies,
                      FishState state);
 
 

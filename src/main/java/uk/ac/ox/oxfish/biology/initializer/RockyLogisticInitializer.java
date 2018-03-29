@@ -138,7 +138,8 @@ public class RockyLogisticInitializer extends AbstractBiologyInitializer
                                                                          percentageLimitOnDailyMovement);
         model.scheduleEveryDay(diffuser, StepOrder.DAWN);
 
-        grower.initializeGrower(biologies,model,random);
+        for(Species species : biology.getSpecies())
+            grower.initializeGrower(biologies,model,random,species);
     }
 
 

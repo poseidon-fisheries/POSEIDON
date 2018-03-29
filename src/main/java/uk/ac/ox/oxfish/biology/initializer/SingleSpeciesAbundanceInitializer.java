@@ -38,8 +38,6 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
@@ -214,7 +212,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
         )  <= 0))
             return  new EmptyLocalBiology();
         else {
-            AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
+            AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
             initialWeights.put(seaTile, weight);
             return local;
         }
@@ -284,8 +282,8 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             double ratio = initialWeights.get(tile)/sum;
 
             //cast is justified because we put it in ourselves!
-            assert tile.getBiology() instanceof AbundanceBasedLocalBiology;
-            processes.add((AbundanceBasedLocalBiology) tile.getBiology(),tile);
+            assert tile.getBiology() instanceof AbundanceLocalBiology;
+            processes.add((AbundanceLocalBiology) tile.getBiology(), tile);
             StructuredAbundance abundance = tile.getBiology().getAbundance(species);
             for(int bin=0; bin<abundance.getBins(); bin++)
 

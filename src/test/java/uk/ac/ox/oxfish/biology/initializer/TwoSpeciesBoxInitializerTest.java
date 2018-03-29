@@ -27,7 +27,9 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedConstantAllocator;
+import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedAllocatorDecorator;
+import 
+uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.factory.TwoSpeciesBoxFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -56,8 +58,10 @@ public class TwoSpeciesBoxInitializerTest
                 0d,0d,
                 new SimpleLogisticGrowerInitializer(new FixedDoubleParameter(1d)),
                 Lists.newArrayList(
-                        new BoundedConstantAllocator(0,0,9,9,false),
-                        new BoundedConstantAllocator(0,0,9,9,true)
+                        new BoundedAllocatorDecorator(0, 0, 9, 9, false, 
+new ConstantBiomassAllocator() ),
+                        new BoundedAllocatorDecorator(0, 0, 9, 9, true, 
+new ConstantBiomassAllocator() )
                 )
         );
 

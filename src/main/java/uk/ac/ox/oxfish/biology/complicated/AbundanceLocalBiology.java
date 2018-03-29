@@ -39,7 +39,7 @@ import java.util.HashMap;
  * abundance data whenever a process takes place
  * Created by carrknight on 3/4/16.
  */
-public class AbundanceBasedLocalBiology implements LocalBiology
+public class AbundanceLocalBiology implements LocalBiology
 {
 
 
@@ -60,7 +60,7 @@ public class AbundanceBasedLocalBiology implements LocalBiology
      * creates an abundance based local biology that starts off as entirely empty
      * @param biology a list of species
      */
-    public AbundanceBasedLocalBiology(GlobalBiology biology)
+    public AbundanceLocalBiology(GlobalBiology biology)
     {
 
         //for each species create cohorts

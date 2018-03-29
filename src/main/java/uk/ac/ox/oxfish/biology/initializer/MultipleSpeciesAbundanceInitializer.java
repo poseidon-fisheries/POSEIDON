@@ -102,7 +102,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     /**
      * list of all the abundance based local biologies
      */
-    private final LinkedHashMap<SeaTile,AbundanceBasedLocalBiology> locals = new LinkedHashMap<>();
+    private final LinkedHashMap<SeaTile,AbundanceLocalBiology> locals = new LinkedHashMap<>();
 
 
     /**
@@ -125,14 +125,14 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      * @return empty biology on land, abundance biology in water
      */
     public static LocalBiology generateAbundanceBiologyExceptOnLand(
-            GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceBasedLocalBiology> locals) {
+            GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceLocalBiology> locals) {
         if(seaTile.getAltitude() >= 0)
             return new EmptyLocalBiology();
 
 
 
 
-        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
         locals.put(seaTile,local);
         return local;
     }
@@ -157,7 +157,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     public static SingleSpeciesNaturalProcesses initializeNaturalProcesses(
 
             FishState model, Species species,
-            Map<SeaTile, AbundanceBasedLocalBiology> locals,
+            Map<SeaTile, AbundanceLocalBiology> locals,
             StockAssessmentCaliforniaMeristics meristics,
             boolean preserveLastAge,
             int yearDelay,
@@ -187,7 +187,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 new NoAbundanceDiffusion(),
                 new ExponentialMortalityProcess(meristics),
                 false);
-        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> entry : locals.entrySet()) {
+        for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : locals.entrySet()) {
             processes.add(entry.getValue(),entry.getKey());
         }
         model.registerStartable(processes);
@@ -290,7 +290,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                 initialAbundance.put(species,totalCount);
 
                 //prepare the map biology-->ratio of fish to put there
-                LinkedHashMap<AbundanceBasedLocalBiology, Double> currentWeightMap = new LinkedHashMap<>(locals.size());
+                LinkedHashMap<AbundanceLocalBiology, Double> currentWeightMap = new LinkedHashMap<>(locals.size());
                 initialWeights.put(species, currentWeightMap);
                 //we start with location--->ratio of fish so we need to go location--->biology through the allocator
                 turnLocationRatioMaptoBiologyRatioMap(species, currentWeightMap);
@@ -347,11 +347,11 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     }
 
     private void turnLocationRatioMaptoBiologyRatioMap(
-            Species species, HashMap<AbundanceBasedLocalBiology, Double> currentWeightMap) {
+            Species species, HashMap<AbundanceLocalBiology, Double> currentWeightMap) {
         Function<SeaTile, Double> allocator = allocators.get(species);
         Preconditions.checkArgument(allocator != null);
         //fill in the location
-        for(Map.Entry<SeaTile,AbundanceBasedLocalBiology> local : locals.entrySet())
+        for(Map.Entry<SeaTile,AbundanceLocalBiology> local : locals.entrySet())
         {
 
             //find the ratio by allocator
@@ -377,13 +377,13 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
     public void resetAllLocalBiologies(
             Species speciesToReset, double[][] newTotalFishCount,
-            HashMap<AbundanceBasedLocalBiology, Double> biologyToProportionOfFishThere)
+            HashMap<AbundanceLocalBiology, Double> biologyToProportionOfFishThere)
     {
         if(speciesToReset.getName().equals(FAKE_SPECIES_NAME))
             return;
 
-        LinkedHashMap<AbundanceBasedLocalBiology,Double> ratiosLocalCopy = new LinkedHashMap<>(biologyToProportionOfFishThere);
-        for (Map.Entry<AbundanceBasedLocalBiology, Double> ratio : biologyToProportionOfFishThere.entrySet()) {
+        LinkedHashMap<AbundanceLocalBiology,Double> ratiosLocalCopy = new LinkedHashMap<>(biologyToProportionOfFishThere);
+        for (Map.Entry<AbundanceLocalBiology, Double> ratio : biologyToProportionOfFishThere.entrySet()) {
             //if this is not present in the local list
             if(!locals.values().contains(ratio.getKey()))
             {
@@ -402,11 +402,11 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
 
         double maleRemainder[] = new double[speciesToReset.getNumberOfBins()];
         double femaleRemainder[] = new double[speciesToReset.getNumberOfBins()];
-        for(Map.Entry<AbundanceBasedLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
+        for(Map.Entry<AbundanceLocalBiology,Double> ratio : ratiosLocalCopy.entrySet())
         {
 
             //get the ratio back
-            AbundanceBasedLocalBiology local = ratio.getKey();
+            AbundanceLocalBiology local = ratio.getKey();
             StructuredAbundance abundance = local.getAbundance(speciesToReset);
             Preconditions.checkArgument(abundance.getSubdivisions()==2, "coded for ");
             for(int i=0; i<speciesToReset.getNumberOfBins(); i++)
@@ -443,7 +443,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     /**
      * holds the weight given to each biology object when first created
      */
-    private final LinkedHashMap<Species,HashMap<AbundanceBasedLocalBiology,Double>> initialWeights = new LinkedHashMap<>();
+    private final LinkedHashMap<Species,HashMap<AbundanceLocalBiology,Double>> initialWeights = new LinkedHashMap<>();
 
 
 
@@ -465,7 +465,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
     /**
 
      */
-    public HashMap<AbundanceBasedLocalBiology,Double> getInitialWeights(Species species) {
+    public HashMap<AbundanceLocalBiology,Double> getInitialWeights(Species species) {
         return initialWeights.get(species);
     }
 
@@ -474,7 +474,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      *
      * @return Value for property 'locals'.
      */
-    public HashMap<SeaTile, AbundanceBasedLocalBiology> getLocals() {
+    public HashMap<SeaTile, AbundanceLocalBiology> getLocals() {
         return locals;
     }
 

@@ -48,7 +48,7 @@ public class ProportionalAgingProcessTest {
 
         ProportionalAgingProcess process = new ProportionalAgingProcess(new FixedDoubleParameter(0.5d));
 
-        AbundanceBasedLocalBiology bio = mock(AbundanceBasedLocalBiology.class);
+        AbundanceLocalBiology bio = mock(AbundanceLocalBiology.class);
         when(bio.getAbundance(species)).thenReturn(abundance);
 
 

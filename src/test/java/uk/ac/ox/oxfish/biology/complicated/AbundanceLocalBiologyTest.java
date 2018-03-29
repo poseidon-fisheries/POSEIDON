@@ -29,7 +29,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import static org.junit.Assert.assertEquals;
 
 
-public class AbundanceBasedLocalBiologyTest
+public class AbundanceLocalBiologyTest
 {
 
     final static public MeristicsInput longspineTestInput =  new MeristicsInput(80, 40 , 3, 8.573, 27.8282, 0.108505, 4.30E-06, 3.352,
@@ -47,7 +47,7 @@ public class AbundanceBasedLocalBiologyTest
         Species longspine = new Species("Longspine", longspineTestInput);
         GlobalBiology biology = new GlobalBiology(longspine);
 
-        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
 
         //can modify directly
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5]=100;
@@ -74,7 +74,7 @@ public class AbundanceBasedLocalBiologyTest
         Species longspine = new Species("Longspine", longspineTestInput);
         GlobalBiology biology = new GlobalBiology(longspine);
 
-        AbundanceBasedLocalBiology local = new AbundanceBasedLocalBiology(biology);
+        AbundanceLocalBiology local = new AbundanceLocalBiology(biology);
 
         //can modify directly
         local.getAbundance(longspine).asMatrix()[FishStateUtilities.FEMALE][5]=100;

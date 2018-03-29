@@ -57,6 +57,7 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesB
     private DoubleParameter maxInitialCapacity = new FixedDoubleParameter(1d);
 
     private DoubleParameter minInitialCapacity = new FixedDoubleParameter(0d);
+    private String speciesName = "Species 0";
 
     /**
      * Applies this function to the given argument.
@@ -67,18 +68,25 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesB
     @Override
     public SingleSpeciesBiomassInitializer apply(FishState state) {
         double carryingCapacity = getCarryingCapacity().apply(state.getRandom());
+        double actualMaxCapacity = maxInitialCapacity.apply(state.getRandom());
+        double actualMinCapacity = minInitialCapacity.apply(state.getRandom());
         SingleSpeciesBiomassInitializer initializer = new SingleSpeciesBiomassInitializer(
-                new RandomAllocator(
-                        carryingCapacity * maxInitialCapacity.apply(state.getRandom()),
-                        carryingCapacity * minInitialCapacity.apply(state.getRandom())
-                ),
+                //if initial capacities are the same, just always return the same thing
+                actualMaxCapacity == actualMinCapacity ?
+                        new ConstantBiomassAllocator(
+                                actualMaxCapacity * carryingCapacity
+                        ) :
+                        new RandomAllocator(
+                                carryingCapacity * actualMaxCapacity,
+                                carryingCapacity * actualMinCapacity
+                        ),
                 new ConstantBiomassAllocator(carryingCapacity),
                 new SmoothMovementRule(
 
                         percentageLimitOnDailyMovement.apply(state.getRandom()),
                         differentialPercentageToMove.apply(state.getRandom())
                 ),
-                "Species 0",
+                speciesName,
                 grower.apply(state));
 
 
@@ -168,5 +176,24 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesB
      */
     public void setMinInitialCapacity(DoubleParameter minInitialCapacity) {
         this.minInitialCapacity = minInitialCapacity;
+    }
+
+
+    /**
+     * Getter for property 'speciesName'.
+     *
+     * @return Value for property 'speciesName'.
+     */
+    public String getSpeciesName() {
+        return speciesName;
+    }
+
+    /**
+     * Setter for property 'speciesName'.
+     *
+     * @param speciesName Value to set for property 'speciesName'.
+     */
+    public void setSpeciesName(String speciesName) {
+        this.speciesName = speciesName;
     }
 }

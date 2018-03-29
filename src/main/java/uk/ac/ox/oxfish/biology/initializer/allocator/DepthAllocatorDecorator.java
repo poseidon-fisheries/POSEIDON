@@ -26,33 +26,31 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 /**
- * Returns 1 within the box (bounds included)
- * Created by carrknight on 6/30/17.
+ * Allocates only within a bound and within depth
+ * Created by carrknight on 7/11/17.
  */
-public class BoundedConstantAllocator implements BiomassAllocator {
+public class DepthAllocatorDecorator implements BiomassAllocator{
 
 
-    private final double lowestX;
 
-    private final double lowestY;
 
-    private final double highestX;
+    private final double minDepth;
 
-    private final double highestY;
+    private final double maxDepth;
 
-    private final boolean insideTheBox;
+    private final BiomassAllocator delegate;
 
-    public BoundedConstantAllocator(
-            double lowestX, double lowestY,
-            double highestX, double highestY, boolean insideTheBox) {
-        this.insideTheBox = insideTheBox;
-        Preconditions.checkArgument(lowestX<=highestX, "allocator bound badly defined");
-        Preconditions.checkArgument(lowestY<=highestY,"allocator bound badly defined");
-        this.lowestX = lowestX;
-        this.lowestY = lowestY;
-        this.highestX = highestX;
-        this.highestY = highestY;
+
+    public DepthAllocatorDecorator(
+            double minDepth,
+            double maxDepth,
+            BiomassAllocator delegate) {
+        this.minDepth = minDepth;
+        this.maxDepth = maxDepth;
+        this.delegate = delegate;
+        Preconditions.checkArgument(minDepth<=maxDepth, "allocator depth bound badly defined");
     }
+
 
     /**
      * Returns a positive number representing the weight in terms of either
@@ -66,15 +64,31 @@ public class BoundedConstantAllocator implements BiomassAllocator {
     @Override
     public double allocate(
             SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
-
-        if(tile.getGridY()>=lowestY && tile.getGridY()<=highestY &&
-                tile.getGridX()>=lowestX && tile.getGridX()<=highestX)
-            return insideTheBox ? 1d : 0d;
+        if(
+                tile.getAltitude()<=0 &&
+                -tile.getAltitude()>=minDepth && -tile.getAltitude()<=maxDepth
+                )
+            return delegate.allocate(tile, map, random);
         else
-            return insideTheBox ? 0d : 1d;
+            return 0d;
 
+    }
 
+    /**
+     * Getter for property 'minDepth'.
+     *
+     * @return Value for property 'minDepth'.
+     */
+    public double getMinDepth() {
+        return minDepth;
+    }
 
-
+    /**
+     * Getter for property 'maxDepth'.
+     *
+     * @return Value for property 'maxDepth'.
+     */
+    public double getMaxDepth() {
+        return maxDepth;
     }
 }

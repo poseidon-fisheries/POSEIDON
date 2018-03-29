@@ -35,12 +35,12 @@ public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
 
 
 
-    private final HashMap<AbundanceBasedLocalBiology,Double> weights;
+    private final HashMap<AbundanceLocalBiology,Double> weights;
 
 
     public WeightedAbundanceDiffuser(
             int diffusingRange, double diffusingRate,
-            HashMap<AbundanceBasedLocalBiology, Double> weights) {
+            HashMap<AbundanceLocalBiology, Double> weights) {
         super(diffusingRange, diffusingRate);
         this.weights = weights;
     }
@@ -69,8 +69,8 @@ public class WeightedAbundanceDiffuser extends ConstantRateAbundanceDiffuser{
             StructuredAbundance abundanceThere, double delta, double fishHere, double fishThere, int bin,
             MersenneTwisterFast random,
             boolean rounding, int subdivision,
-            AbundanceBasedLocalBiology biologyHere,
-            AbundanceBasedLocalBiology biologyThere) {
+            AbundanceLocalBiology biologyHere,
+            AbundanceLocalBiology biologyThere) {
 
 
 

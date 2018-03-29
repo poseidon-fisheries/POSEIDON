@@ -67,11 +67,11 @@ public class MockNaturalProcess extends SingleSpeciesNaturalProcesses {
     /**
      * register this biology so that it can be accessed by recruits and so on
      *
-     * @param abundanceBasedLocalBiology
+     * @param abundanceLocalBiology
      * @param tile
      */
     @Override
-    public void add(AbundanceBasedLocalBiology abundanceBasedLocalBiology, SeaTile tile) {
+    public void add(AbundanceLocalBiology abundanceLocalBiology, SeaTile tile) {
     }
 
     @Override

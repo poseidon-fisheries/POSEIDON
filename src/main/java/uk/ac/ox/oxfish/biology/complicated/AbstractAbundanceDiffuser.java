@@ -60,15 +60,15 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
     @Override
     public void step(
             Species species,
-            Map<SeaTile, AbundanceBasedLocalBiology> biologies,
+            Map<SeaTile, AbundanceLocalBiology> biologies,
             FishState model) {
 
         //turn it into a list and shuffle it
-        List<Map.Entry<SeaTile, AbundanceBasedLocalBiology>> locals = Lists.newArrayList(biologies.entrySet());
+        List<Map.Entry<SeaTile, AbundanceLocalBiology>> locals = Lists.newArrayList(biologies.entrySet());
         Collections.shuffle(locals, new Random(model.getRandom().nextLong()));
 
 
-        for (Map.Entry<SeaTile, AbundanceBasedLocalBiology> here : locals) {
+        for (Map.Entry<SeaTile, AbundanceLocalBiology> here : locals) {
             neighbors.putIfAbsent(here.getKey(),
                                   getNeighborsWithAbundanceBasedLocalBiology(here.getKey(), model.getMap(),
                                                                              biologies));
@@ -79,7 +79,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             Collections.shuffle(potential);
             for(SeaTile there : potential) {
                 assert biologies.containsKey(there);
-                AbundanceBasedLocalBiology thereBiology = biologies.get(there);
+                AbundanceLocalBiology thereBiology = biologies.get(there);
                 StructuredAbundance abundanceHere = here.getValue().getAbundance(species);
                 StructuredAbundance abundanceThere = thereBiology.getAbundance(species);
                 assert abundanceHere.getSubdivisions() == abundanceThere.getSubdivisions();
@@ -141,8 +141,8 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             double delta,
             double fishHere, double fishThere, int bin,
             MersenneTwisterFast random, boolean rounding, int subdivision,
-            AbundanceBasedLocalBiology biologyHere,
-            AbundanceBasedLocalBiology biologyThere);
+            AbundanceLocalBiology biologyHere,
+            AbundanceLocalBiology biologyThere);
 
 
 
@@ -156,7 +156,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
     private List<SeaTile> getNeighborsWithAbundanceBasedLocalBiology(
             SeaTile tile,
             NauticalMap map,
-            Map<SeaTile, AbundanceBasedLocalBiology> biologies)
+            Map<SeaTile, AbundanceLocalBiology> biologies)
     {
         final Bag mooreNeighbors = map.getMooreNeighbors(tile, diffusingRange);
         List<SeaTile> toKeep = new LinkedList<>();
@@ -166,7 +166,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             if (biologies.containsKey(newTile))
             {
                 assert newTile.getAltitude() <= 0;
-                assert newTile.getBiology() instanceof AbundanceBasedLocalBiology;
+                assert newTile.getBiology() instanceof AbundanceLocalBiology;
                 toKeep.add(newTile);
             }
         }

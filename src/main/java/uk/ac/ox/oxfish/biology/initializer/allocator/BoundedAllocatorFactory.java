@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import uk.ac.ox.oxfish.biology.initializer.allocator.BoundedConstantAllocator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -29,7 +28,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 /**
  * Created by carrknight on 7/11/17.
  */
-public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedConstantAllocator> {
+public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedAllocatorDecorator> {
 
 
     private DoubleParameter lowestX = new FixedDoubleParameter(-100);
@@ -41,6 +40,21 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedConstant
      */
     private boolean insideTheBox = true;
 
+    private AlgorithmFactory<? extends BiomassAllocator> delegate = new ConstantAllocatorFactory();
+
+
+    public BoundedAllocatorFactory() {
+    }
+
+    public BoundedAllocatorFactory(
+            double lowestX, double lowestY, double highestX,
+            double highestY, boolean insideTheBox) {
+        this.lowestX = new FixedDoubleParameter(lowestX);
+        this.lowestY = new FixedDoubleParameter(lowestY);
+        this.highestX = new FixedDoubleParameter(highestX);
+        this.highestY = new FixedDoubleParameter(highestY);
+        this.insideTheBox = insideTheBox;
+    }
 
     /**
      * Applies this function to the given argument.
@@ -49,13 +63,14 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedConstant
      * @return the function result
      */
     @Override
-    public BoundedConstantAllocator apply(FishState state) {
-        return new BoundedConstantAllocator(
+    public BoundedAllocatorDecorator apply(FishState state) {
+        return new BoundedAllocatorDecorator(
                 lowestX.apply(state.getRandom()),
                 lowestY.apply(state.getRandom()),
                 highestX.apply(state.getRandom()),
                 highestY.apply(state.getRandom()),
-                insideTheBox
+                insideTheBox,
+                delegate.apply(state)
 
         );
     }
@@ -148,5 +163,24 @@ public class BoundedAllocatorFactory implements AlgorithmFactory<BoundedConstant
      */
     public void setInsideTheBox(boolean insideTheBox) {
         this.insideTheBox = insideTheBox;
+    }
+
+    /**
+     * Getter for property 'delegate'.
+     *
+     * @return Value for property 'delegate'.
+     */
+    public AlgorithmFactory<? extends BiomassAllocator> getDelegate() {
+        return delegate;
+    }
+
+    /**
+     * Setter for property 'delegate'.
+     *
+     * @param delegate Value to set for property 'delegate'.
+     */
+    public void setDelegate(
+            AlgorithmFactory<? extends BiomassAllocator> delegate) {
+        this.delegate = delegate;
     }
 }

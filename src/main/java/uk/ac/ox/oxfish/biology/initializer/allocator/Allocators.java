@@ -67,6 +67,10 @@ public class Allocators {
                          DepthAllocatorFactory::new);
         NAMES.put(DepthAllocatorFactory.class,"Depth Allocator");
 
+        CONSTRUCTORS.put("Random Allocator",
+                         RandomAllocatorFactory::new);
+        NAMES.put(RandomAllocatorFactory.class,"Random Allocator");
+
 
     }
 

@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.boxcars;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.AbundanceBasedLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.model.FishState;
@@ -112,7 +112,7 @@ public class FixedBoxcarAgingTest
         );
 
 
-        AbundanceBasedLocalBiology biology = mock(AbundanceBasedLocalBiology.class);
+        AbundanceLocalBiology biology = mock(AbundanceLocalBiology.class);
         StructuredAbundance abundance = new StructuredAbundance(
                 1,100
         );

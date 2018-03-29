@@ -49,7 +49,7 @@ public interface AgingProcess {
      * @param daysToSimulate simulation days
      */
     public void age(
-            Collection<AbundanceBasedLocalBiology> localBiology, Species species,
+            Collection<AbundanceLocalBiology> localBiology, Species species,
             FishState model, boolean rounding, int daysToSimulate);
 
 
