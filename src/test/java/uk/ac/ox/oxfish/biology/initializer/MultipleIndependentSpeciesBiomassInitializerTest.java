@@ -40,7 +40,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class MultipleIndependentSpeciesBiologyInitializerTest {
+public class MultipleIndependentSpeciesBiomassInitializerTest {
 
 
     @Test
@@ -59,8 +59,8 @@ public class MultipleIndependentSpeciesBiologyInitializerTest {
         species1.setMinInitialCapacity(new FixedDoubleParameter(.8d));
         species1.setMaxInitialCapacity(new FixedDoubleParameter(.8d));
 
-        MultipleIndependentSpeciesBiologyInitializer toTest = new
-                MultipleIndependentSpeciesBiologyInitializer(
+        MultipleIndependentSpeciesBiomassInitializer toTest = new
+                MultipleIndependentSpeciesBiomassInitializer(
                 Lists.newArrayList(
                         species0.apply(model),
                         species1.apply(model)

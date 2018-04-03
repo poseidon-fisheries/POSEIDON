@@ -31,13 +31,13 @@ import uk.ac.ox.oxfish.utility.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultipleIndependentSpeciesBiologyInitializer implements BiologyInitializer
+public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInitializer
 {
 
 
     private final List<SingleSpeciesBiomassInitializer> initializers ;
 
-    public MultipleIndependentSpeciesBiologyInitializer(
+    public MultipleIndependentSpeciesBiomassInitializer(
             List<SingleSpeciesBiomassInitializer> initializers) {
         this.initializers = initializers;
     }

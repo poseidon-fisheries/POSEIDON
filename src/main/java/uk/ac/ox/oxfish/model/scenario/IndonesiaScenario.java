@@ -678,4 +678,14 @@ public class IndonesiaScenario implements Scenario {
     public void setPortSwitching(boolean portSwitching) {
         this.portSwitching = portSwitching;
     }
+
+
+    /**
+     * Setter for property 'mapInitializer'.
+     *
+     * @param mapInitializer Value to set for property 'mapInitializer'.
+     */
+    public void setMapInitializer(FromFileMapInitializerFactory mapInitializer) {
+        this.mapInitializer = mapInitializer;
+    }
 }

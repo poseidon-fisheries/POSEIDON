@@ -55,4 +55,41 @@ public class RandomAllocatorFactory implements AlgorithmFactory<RandomAllocator>
                 minimum.apply(state.getRandom())
         );
     }
+
+
+    /**
+     * Getter for property 'minimum'.
+     *
+     * @return Value for property 'minimum'.
+     */
+    public DoubleParameter getMinimum() {
+        return minimum;
+    }
+
+    /**
+     * Setter for property 'minimum'.
+     *
+     * @param minimum Value to set for property 'minimum'.
+     */
+    public void setMinimum(DoubleParameter minimum) {
+        this.minimum = minimum;
+    }
+
+    /**
+     * Getter for property 'maximum'.
+     *
+     * @return Value for property 'maximum'.
+     */
+    public DoubleParameter getMaximum() {
+        return maximum;
+    }
+
+    /**
+     * Setter for property 'maximum'.
+     *
+     * @param maximum Value to set for property 'maximum'.
+     */
+    public void setMaximum(DoubleParameter maximum) {
+        this.maximum = maximum;
+    }
 }

@@ -130,4 +130,7 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public void setLatLong(boolean latLong) {
         this.latLong = latLong;
     }
+
+
+
 }

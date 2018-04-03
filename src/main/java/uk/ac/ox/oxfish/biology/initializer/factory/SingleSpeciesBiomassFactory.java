@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.initializer.factory;
 
+import uk.ac.ox.oxfish.biology.NoMovement;
 import uk.ac.ox.oxfish.biology.SmoothMovementRule;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
@@ -69,14 +70,19 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
     public SingleSpeciesBiomassInitializer apply(FishState state) {
 
 
+        double  movementRate = differentialPercentageToMove.apply(state.getRandom());
+        double  movementLimit = percentageLimitOnDailyMovement.apply(state.getRandom());
+
         return new SingleSpeciesBiomassInitializer(
                 initialBiomassAllocator.apply(state),
                 initialCapacityAllocator.apply(state),
-                new SmoothMovementRule(
+                movementRate > 0 & movementLimit > 0 ?
+                        new SmoothMovementRule(
 
-                        percentageLimitOnDailyMovement.apply(state.getRandom()),
-                        differentialPercentageToMove.apply(state.getRandom())
-                ),
+                                percentageLimitOnDailyMovement.apply(state.getRandom()),
+                                differentialPercentageToMove.apply(state.getRandom())
+                        ) :
+                        new NoMovement(),
                 speciesName,
                 grower.apply(state)
 

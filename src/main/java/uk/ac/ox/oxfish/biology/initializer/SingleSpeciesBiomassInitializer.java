@@ -24,6 +24,7 @@ import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.AllocatorManager;
@@ -84,6 +85,8 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      */
     private boolean forceMovementOff = false;
 
+
+    private boolean hasAlreadyWarned = false;
 
 
     public SingleSpeciesBiomassInitializer(
@@ -246,6 +249,15 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
                                                   map,
                                                   random);
 
+            //if inconsistent, carrying capacity limits initial biomass!
+            if(startingBiomass > carryingCapacity) {
+                startingBiomass = carryingCapacity;
+                if(!hasAlreadyWarned)
+                {
+                    Log.warn("Initialized a cell with more initial biomass than carrying capacity; reduced initial biomass to current capacity");
+                    hasAlreadyWarned = true;
+                }
+            }
             BiomassLocalBiology local = (BiomassLocalBiology) seaTile.getBiology();
             local.setCarryingCapacity(
                     species,

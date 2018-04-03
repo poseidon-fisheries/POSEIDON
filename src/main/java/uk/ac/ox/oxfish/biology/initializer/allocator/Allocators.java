@@ -71,6 +71,10 @@ public class Allocators {
                          RandomAllocatorFactory::new);
         NAMES.put(RandomAllocatorFactory.class,"Random Allocator");
 
+        CONSTRUCTORS.put("Random Smoothed Allocator",
+                         RandomSmoothedFactory::new);
+        NAMES.put(RandomSmoothedFactory.class,"Random Smoothed Allocator");
+
 
     }
 
