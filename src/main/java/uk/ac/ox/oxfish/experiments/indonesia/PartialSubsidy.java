@@ -112,7 +112,7 @@ public class PartialSubsidy {
                         ), IndonesiaScenario.class
                 );
                 state.setScenario(scenario);
-                scenario.setRegulation(new FishingSeasonFactory(season,false));
+                scenario.getFisherDefinition().setRegulation(new FishingSeasonFactory(season,false));
                 state.start();
 
 

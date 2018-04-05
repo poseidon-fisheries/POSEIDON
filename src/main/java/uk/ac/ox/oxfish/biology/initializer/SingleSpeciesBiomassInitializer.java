@@ -211,7 +211,6 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
             GlobalBiology biology, NauticalMap map, MersenneTwisterFast random, FishState model) {
         //we are going to work on a single species!
         Species species = biology.getSpecie(speciesName);
-        int index = species.getIndex();
 
 
         //generate correct numbers of starting biomass!

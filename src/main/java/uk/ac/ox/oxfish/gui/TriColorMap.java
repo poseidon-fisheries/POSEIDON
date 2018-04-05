@@ -30,7 +30,7 @@ import sim.util.gui.SimpleColorMap;
  * This is actually modified from the original TriColorMap made by the very good Joey Harrison
  * who originally coded it for the RiftLand project. Thank you Joey. All I added was a second constructor.
  *
- * TriColorMap is a gradient between three colors. It works the same as
+ * TriColorMap is a gradient between three BOAT_COLORS. It works the same as
  * SimpleColorMap, and indeed, makes use of that class.
  * For example:
  * -1 : red

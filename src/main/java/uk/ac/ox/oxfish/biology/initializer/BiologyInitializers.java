@@ -108,6 +108,10 @@ public class BiologyInitializers {
                          SingleSpeciesBiomassFactory::new);
         NAMES.put(SingleSpeciesBiomassFactory.class, "Single Species Biomass");
 
+        CONSTRUCTORS.put("Single Species Biomass Normalized",
+                         SingleSpeciesBiomassNormalizedFactory::new);
+        NAMES.put(SingleSpeciesBiomassNormalizedFactory.class, "Single Species Biomass Normalized");
+
         CONSTRUCTORS.put("Single Species Abundance From Directory",
                          SingleSpeciesAbundanceFromDirectoryFactory::new);
         NAMES.put(SingleSpeciesAbundanceFromDirectoryFactory.class, "Single Species Abundance From Directory");

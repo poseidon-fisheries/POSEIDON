@@ -36,7 +36,7 @@ public class MultipleIndependentSpeciesBiomassFactory implements
 
 
 
-    private List<SingleSpeciesBiomassFactory> factories = new LinkedList<>();
+    private List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories = new LinkedList<>();
     {
         SingleSpeciesBiomassFactory first = new SingleSpeciesBiomassFactory();
         first.setSpeciesName("Red Fish");
@@ -72,7 +72,7 @@ public class MultipleIndependentSpeciesBiomassFactory implements
      *
      * @return Value for property 'factories'.
      */
-    public List<SingleSpeciesBiomassFactory> getFactories() {
+    public List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> getFactories() {
         return factories;
     }
 
@@ -81,7 +81,8 @@ public class MultipleIndependentSpeciesBiomassFactory implements
      *
      * @param factories Value to set for property 'factories'.
      */
-    public void setFactories(List<SingleSpeciesBiomassFactory> factories) {
+    public void setFactories(
+            List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories) {
         this.factories = factories;
     }
 }

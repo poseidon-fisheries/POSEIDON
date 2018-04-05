@@ -33,6 +33,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -51,17 +52,18 @@ public class BoatPortrayalFactory
 
     private final FishGUI gui;
 
-    private final static HashMap<String,Color> colors = new HashMap<>();
+    public final static HashMap<String,Color> BOAT_COLORS = new LinkedHashMap<>();
     static
     {
-        colors.put("red",Color.red);
-        colors.put("blue",Color.blue);
-        colors.put("yellow",Color.yellow);
-        colors.put("green",Color.green);
-        colors.put("grey",Color.gray);
-        colors.put("gray",Color.gray);
-        colors.put("pink",Color.pink);
-        colors.put("orange",Color.orange);
+        BOAT_COLORS.put("black", Color.black);
+        BOAT_COLORS.put("red", Color.red);
+        BOAT_COLORS.put("blue", Color.blue);
+        BOAT_COLORS.put("yellow", Color.yellow);
+        BOAT_COLORS.put("green", Color.green);
+        BOAT_COLORS.put("grey", Color.gray);
+        BOAT_COLORS.put("gray", Color.gray);
+        BOAT_COLORS.put("pink", Color.pink);
+        BOAT_COLORS.put("orange", Color.orange);
 
 
     }
@@ -88,7 +90,7 @@ public class BoatPortrayalFactory
         else
             correctImage = shipIcon;
 
-        for (Map.Entry<String, Color> color : colors.entrySet()) {
+        for (Map.Entry<String, Color> color : BOAT_COLORS.entrySet()) {
             if (fisher.getTags().contains(color.getKey()))
                 return new BoatPortrayal(colorImage(correctImage, color.getValue()), gui);
         }

@@ -60,6 +60,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.ports.FromFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
+import uk.ac.ox.oxfish.gui.drawing.BoatPortrayalFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -72,6 +73,7 @@ import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.SimplePortAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -79,9 +81,7 @@ import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -115,7 +115,7 @@ public class IndonesiaScenario implements Scenario {
 
 
     private final FromFilePortInitializer portInitializer =
-            new FromFilePortInitializer(Paths.get("inputs","indonesia","mwm_ports.csv"));
+            new FromFilePortInitializer(Paths.get("inputs","indonesia","712713_ports.csv"));
     private boolean cheaters = false;
 
     /**
@@ -136,57 +136,14 @@ public class IndonesiaScenario implements Scenario {
         portInitializer.setFilePath(filePath);
     }
 
-    /**
-     * boat speed
-     */
-    private DoubleParameter speedInKmh = new FixedDoubleParameter(5);
-
-    /**
-     * hold size
-     */
-    private DoubleParameter holdSize = new FixedDoubleParameter(100);
-
-    /**
-     * efficiency
-     */
-    private AlgorithmFactory<? extends Gear> gear = new RandomCatchabilityTrawlFactory();
-
-
-    private DoubleParameter enginePower = new NormalDoubleParameter(5000, 100);
-
-    private DoubleParameter fuelTankSize = new FixedDoubleParameter(100000);
-
-
-    private DoubleParameter literPerKilometer = new FixedDoubleParameter(10);
-
-
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DepartingStrategy> departingStrategy =
-            new FixedRestTimeDepartingFactory();
 
-    /**
-     * factory to produce departing strategy
-     */
-    private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy =
-            new PerTripImitativeDestinationFactory();
-    /**
-     * factory to produce fishing strategy
-     */
-    private AlgorithmFactory<? extends FishingStrategy> fishingStrategy =
-            new MaximumStepsFactory();
 
-    private AlgorithmFactory<? extends GearStrategy> gearStrategy =
-            new FixedGearStrategyFactory();
-
-    private AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy = new NoDiscardingFactory();
-
-    private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
-            new IgnoreWeatherFactory();
-
-    private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
+    private FisherDefinition fisherDefinition = new FisherDefinition();
+    {
+        fisherDefinition.getInitialFishersPerPort().put("Galesong",15);
+        fisherDefinition.getInitialFishersPerPort().put("Probolinggo",3);
+    }
 
 
     private NetworkBuilder networkBuilder =
@@ -210,6 +167,10 @@ public class IndonesiaScenario implements Scenario {
 
 
     private boolean portSwitching = false;
+
+
+
+    final private HashMap<Port,String> portColorTags = new HashMap<>();
 
 
     public IndonesiaScenario() {
@@ -258,25 +219,27 @@ public class IndonesiaScenario implements Scenario {
                                          global, model);
 
 
-
-
-
-        portInitializer.buildPorts(map,
-                                   mapMakerRandom,
-                                   new Function<SeaTile, MarketMap>() {
-                                       @Override
-                                       public MarketMap apply(SeaTile seaTile) {
-                                           //create fixed price market
-                                           MarketMap marketMap = new MarketMap(global);
-                                           //set market for each species
-                                           for(Species species : global.getSpecies())
-                                               marketMap.addMarket(species, market.apply(model));
-                                           return marketMap;
-                                       }
-                                       },
-                                   model,
-                                   new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom))
+        List<Port> ports = portInitializer.buildPorts(map,
+                                                      mapMakerRandom,
+                                                      new Function<SeaTile, MarketMap>() {
+                                                          @Override
+                                                          public MarketMap apply(SeaTile seaTile) {
+                                                              //create fixed price market
+                                                              MarketMap marketMap = new MarketMap(global);
+                                                              //set market for each species
+                                                              for (Species species : global.getSpecies())
+                                                                  marketMap.addMarket(species, market.apply(model));
+                                                              return marketMap;
+                                                          }
+                                                      },
+                                                      model,
+                                                      new FixedGasPrice(gasPricePerLiter.apply(mapMakerRandom))
         );
+        Iterator<String> colorIterator = BoatPortrayalFactory.BOAT_COLORS.keySet().iterator();
+        for(Port port : ports) {
+            portColorTags.put(port,
+                              colorIterator.next());
+        }
 
         //substitute back the original randomizer
         model.random = originalRandom;
@@ -297,7 +260,6 @@ public class IndonesiaScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
-        LinkedList<Fisher> fisherList = new LinkedList<>();
         final NauticalMap map = model.getMap();
         final GlobalBiology biology = model.getBiology();
         final MersenneTwisterFast random = model.random;
@@ -310,109 +272,66 @@ public class IndonesiaScenario implements Scenario {
             }
         });
 
-        Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
-
-        //create logbook initializer
-        LogbookInitializer log = logbook.apply(model);
-        log.start(model);
-
-
         //adds predictors to the fisher if the usepredictors flag is up.
         //without predictors agents do not participate in ITQs
         Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
-        //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
-        //while the model is running
-        Supplier<Boat> boatSupplier = () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                        literPerKilometer.apply(random),
-                                                                        speedInKmh.apply(random)),
-                                                     new FuelTank(fuelTankSize.apply(random)));
-        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random),  biology);
+        Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
 
-        FisherFactory fisherFactory = new FisherFactory(
-                () -> ports[random.nextInt(ports.length)],
-                regulation,
-                departingStrategy,
-                destinationStrategy,
-                fishingStrategy,
-                discardingStrategy,
-                gearStrategy,
-                weatherStrategy,
-                boatSupplier,
-                holdSupplier,
-                gear,
 
-                0);
-        //add predictor setup to the factory
-        fisherFactory.getAdditionalSetups().add(predictorSetup);
-        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(Fisher fisher) {
-                log.add(fisher,model);
-            }
-        });
+        Pair<FisherFactory, List<Fisher>> fishers = fisherDefinition.instantiateFishers(
+                model,
+                map.getPorts(),
+                0,
+                predictorSetup,
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        fisher.setCheater(cheaters);
+                        //todo move this somewhere else
+                        fisher.addFeatureExtractor(
+                                SNALSARutilities.PROFIT_FEATURE,
+                                new RememberedProfitsExtractor(true)
+                        );
+                        fisher.addFeatureExtractor(
+                                FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                                new FeatureExtractor<SeaTile>() {
+                                    @Override
+                                    public HashMap<SeaTile, Double> extractFeature(
+                                            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+                                        double averageProfits = model.getLatestDailyObservation(
+                                                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+                                        return new FixedMap<>(averageProfits,
+                                                              toRepresent);
+                                    }
+                                }
+                        );
+                    }
+                },
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        fisher.getTags().add(
+                                portColorTags.get(fisher.getHomePort())
+                        );
+                    }
+                },
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        if (portSwitching)
+                            fisher.addYearlyAdaptation(new SimplePortAdaptation());
 
-        if(portSwitching)
-        {
-            fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-                @Override
-                public void accept(Fisher fisher) {
-
-                    fisher.addYearlyAdaptation(new SimplePortAdaptation());
-
+                    }
                 }
-            });
-        }
+
+        );
 
 
-        //add snalsar info which should be moved elsewhere at some point
-        fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
-            @Override
-            public void accept(Fisher fisher) {
-                fisher.setCheater(cheaters);
-                //todo move this somewhere else
-                fisher.addFeatureExtractor(
-                        SNALSARutilities.PROFIT_FEATURE,
-                        new RememberedProfitsExtractor(true)
-                );
-                fisher.addFeatureExtractor(
-                        FeatureExtractor.AVERAGE_PROFIT_FEATURE,
-                        new FeatureExtractor<SeaTile>() {
-                            @Override
-                            public HashMap<SeaTile, Double> extractFeature(
-                                    Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
-                                double averageProfits = model.getLatestDailyObservation(
-                                        FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                                return new FixedMap<>(averageProfits,
-                                                      toRepresent) ;
-                            }
-                        }
-                );
-            }
-        });
-
-
-
-        //call the factory to keep creating fishers
-        for(Port port : ports)
-        {
-            Integer fishersHere = portInitializer.getFishersPerPort(port);
-            for(int i = 0; i< fishersHere; i++) {
-                //create fisher
-                Fisher newFisher = fisherFactory.buildFisher(model);
-                //teleport it to the right port
-                newFisher.getHomePort().depart(newFisher);
-                newFisher.setHomePort(port);
-                newFisher.teleport(port.getLocation());
-                port.dock(newFisher);
-                fisherList.add(newFisher);
-            }
-        }
-
-        if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), fisherFactory );
+        if(fishers.getSecond().size() <=1)
+            return new ScenarioPopulation(fishers.getSecond(), new SocialNetwork(new EmptyNetworkBuilder()), fishers.getFirst() );
         else {
-            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+            return new ScenarioPopulation(fishers.getSecond(), new SocialNetwork(networkBuilder), fishers.getFirst());
         }
     }
 
@@ -420,60 +339,9 @@ public class IndonesiaScenario implements Scenario {
 
 
 
-    public DoubleParameter getSpeedInKmh() {
-        return speedInKmh;
-    }
-
-    public void setSpeedInKmh(DoubleParameter speedInKmh) {
-        this.speedInKmh = speedInKmh;
-    }
 
 
-    public AlgorithmFactory<? extends Regulation> getRegulation() {
-        return regulation;
-    }
 
-    public void setRegulation(
-            AlgorithmFactory<? extends Regulation> regulation) {
-        this.regulation = regulation;
-    }
-
-
-    public AlgorithmFactory<? extends DepartingStrategy> getDepartingStrategy() {
-        return departingStrategy;
-    }
-
-    public void setDepartingStrategy(
-            AlgorithmFactory<? extends DepartingStrategy> departingStrategy) {
-        this.departingStrategy = departingStrategy;
-    }
-
-    public AlgorithmFactory<? extends FishingStrategy> getFishingStrategy() {
-        return fishingStrategy;
-    }
-
-    public void setFishingStrategy(
-            AlgorithmFactory<? extends FishingStrategy> fishingStrategy) {
-        this.fishingStrategy = fishingStrategy;
-    }
-
-
-    public DoubleParameter getHoldSize() {
-        return holdSize;
-    }
-
-    public void setHoldSize(DoubleParameter holdSize) {
-        this.holdSize = holdSize;
-    }
-
-    public AlgorithmFactory<? extends DestinationStrategy> getDestinationStrategy() {
-        return destinationStrategy;
-    }
-
-    public void setDestinationStrategy(
-            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy) {
-        this.destinationStrategy = destinationStrategy;
-    }
 
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
         return biologyInitializer;
@@ -494,39 +362,7 @@ public class IndonesiaScenario implements Scenario {
         this.networkBuilder = networkBuilder;
     }
 
-    public DoubleParameter getEnginePower() {
-        return enginePower;
-    }
 
-    public void setEnginePower(DoubleParameter enginePower) {
-        this.enginePower = enginePower;
-    }
-
-    public DoubleParameter getFuelTankSize() {
-        return fuelTankSize;
-    }
-
-    public void setFuelTankSize(DoubleParameter fuelTankSize) {
-        this.fuelTankSize = fuelTankSize;
-    }
-
-    public DoubleParameter getLiterPerKilometer() {
-        return literPerKilometer;
-    }
-
-    public void setLiterPerKilometer(DoubleParameter literPerKilometer) {
-        this.literPerKilometer = literPerKilometer;
-    }
-
-
-    public AlgorithmFactory<? extends Gear> getGear() {
-        return gear;
-    }
-
-    public void setGear(
-            AlgorithmFactory<? extends Gear> gear) {
-        this.gear = gear;
-    }
 
     public DoubleParameter getGasPricePerLiter() {
         return gasPricePerLiter;
@@ -563,15 +399,6 @@ public class IndonesiaScenario implements Scenario {
     }
 
 
-    public AlgorithmFactory<? extends WeatherEmergencyStrategy> getWeatherStrategy() {
-        return weatherStrategy;
-    }
-
-    public void setWeatherStrategy(
-            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy) {
-        this.weatherStrategy = weatherStrategy;
-    }
-
     public Long getMapMakerDedicatedRandomSeed() {
         return mapMakerDedicatedRandomSeed;
     }
@@ -594,26 +421,6 @@ public class IndonesiaScenario implements Scenario {
     }
 
 
-
-
-    /**
-     * Getter for property 'gearStrategy'.
-     *
-     * @return Value for property 'gearStrategy'.
-     */
-    public AlgorithmFactory<? extends GearStrategy> getGearStrategy() {
-        return gearStrategy;
-    }
-
-    /**
-     * Setter for property 'gearStrategy'.
-     *
-     * @param gearStrategy Value to set for property 'gearStrategy'.
-     */
-    public void setGearStrategy(
-            AlgorithmFactory<? extends GearStrategy> gearStrategy) {
-        this.gearStrategy = gearStrategy;
-    }
 
     /**
      * Getter for property 'cheaters'.
@@ -652,24 +459,6 @@ public class IndonesiaScenario implements Scenario {
         this.logbook = logbook;
     }
 
-    /**
-     * Getter for property 'discardingStrategy'.
-     *
-     * @return Value for property 'discardingStrategy'.
-     */
-    public AlgorithmFactory<? extends DiscardingStrategy> getDiscardingStrategy() {
-        return discardingStrategy;
-    }
-
-    /**
-     * Setter for property 'discardingStrategy'.
-     *
-     * @param discardingStrategy Value to set for property 'discardingStrategy'.
-     */
-    public void setDiscardingStrategy(
-            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
-        this.discardingStrategy = discardingStrategy;
-    }
 
     public boolean isPortSwitching() {
         return portSwitching;
@@ -687,5 +476,23 @@ public class IndonesiaScenario implements Scenario {
      */
     public void setMapInitializer(FromFileMapInitializerFactory mapInitializer) {
         this.mapInitializer = mapInitializer;
+    }
+
+    /**
+     * Getter for property 'fisherDefinition'.
+     *
+     * @return Value for property 'fisherDefinition'.
+     */
+    public FisherDefinition getFisherDefinition() {
+        return fisherDefinition;
+    }
+
+    /**
+     * Setter for property 'fisherDefinition'.
+     *
+     * @param fisherDefinition Value to set for property 'fisherDefinition'.
+     */
+    public void setFisherDefinition(FisherDefinition fisherDefinition) {
+        this.fisherDefinition = fisherDefinition;
     }
 }

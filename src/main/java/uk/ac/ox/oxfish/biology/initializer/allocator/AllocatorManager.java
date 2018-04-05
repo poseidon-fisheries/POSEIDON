@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class AllocatorManager {
     /**
      * created weight maps from seatile to weight for each species
      */
-    final private Map<Species,Map<SeaTile,Double>> weightMaps;
+    final private LinkedHashMap<Species,Map<SeaTile,Double>> weightMaps;
 
     /**
      * list of allocators, one for each species
@@ -67,7 +68,7 @@ public class AllocatorManager {
         Preconditions.checkArgument(biology.getSize()==allocators.size(),
                                     "size mismatch between # of species and # of allocators");
 
-        weightMaps = new HashMap<>(biology.getSpecies().size());
+        weightMaps = new LinkedHashMap<>(biology.getSpecies().size());
         //prepare the maps
         for(Species species : biology.getSpecies())
             weightMaps.put(species,new HashMap<>());
@@ -88,7 +89,7 @@ public class AllocatorManager {
         Preconditions.checkArgument(biology.getSize()==allocators.size(),
                                     "size mismatch between # of species and # of allocators");
 
-        weightMaps = new HashMap<>(biology.getSpecies().size());
+        weightMaps = new LinkedHashMap<>(biology.getSpecies().size());
         //prepare the maps
         for(Species species : biology.getSpecies())
             weightMaps.put(species,new HashMap<>());
@@ -112,22 +113,23 @@ public class AllocatorManager {
             //for each tile
             for (SeaTile tile : map.getAllSeaTilesAsList()) {
                 //for each species
+                int index = 0;
                 for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet()) {
                     //what's the weight here?
-                    int speciesIndex = speciesMap.getKey().getIndex();
                     double weightHere =
                             //weight is always 0 above ground
                             tile.getAltitude() >= 0 ?
                                     0 :
                                     //otherwise allocate according to the right allocator
-                                    allocators.get(speciesIndex).allocate(
+                                    allocators.get(speciesMap.getKey()).allocate(
                                             tile,
                                             map,
                                             random
                                     );
-                    sums[speciesIndex] += weightHere;
+                    sums[index] += weightHere;
                     //add to map
                     speciesMap.getValue().put(tile, weightHere);
+                    index++;
 
                 }
             }
@@ -170,21 +172,22 @@ public class AllocatorManager {
     {
         List<SeaTile> tiles = map.getAllSeaTilesAsList();
 
+        int index = 0;
         //go through every item and divide it
         for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet())
         {
-            //what's the weight here?
-            int speciesIndex = speciesMap.getKey().getIndex();
+
 
             for(SeaTile tile : tiles)
             {
 
                 //normalize
                 Map<SeaTile, Double> currentMapping = speciesMap.getValue();
-                currentMapping.put(tile, currentMapping.get(tile)/sums[speciesIndex]);
+                currentMapping.put(tile, currentMapping.get(tile)/sums[index]);
 
             }
 
+            index++;
 
         }
     }
