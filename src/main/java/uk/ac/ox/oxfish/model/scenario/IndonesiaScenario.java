@@ -107,11 +107,7 @@ public class IndonesiaScenario implements Scenario {
             new FromFileMapInitializerFactory();
 
 
-    /**
-     * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
-     * for ITQs to work
-     */
-    private boolean usePredictors = true;
+
 
 
     private final FromFilePortInitializer portInitializer =
@@ -139,10 +135,22 @@ public class IndonesiaScenario implements Scenario {
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
 
 
-    private FisherDefinition fisherDefinition = new FisherDefinition();
+    private List<FisherDefinition> fisherDefinitions = new LinkedList<>();
     {
-        fisherDefinition.getInitialFishersPerPort().put("Galesong",15);
-        fisherDefinition.getInitialFishersPerPort().put("Probolinggo",3);
+        FisherDefinition fisherDefinition = new FisherDefinition();
+        fisherDefinition.getInitialFishersPerPort().put("Brondong",10);
+        fisherDefinition.getInitialFishersPerPort().put("Probolinggo",12);
+        fisherDefinition.setTags("small,canoe");
+        fisherDefinitions.add(fisherDefinition);
+
+
+        FisherDefinition largeBoats = new FisherDefinition();
+        largeBoats.getInitialFishersPerPort().put("Galesong",15);
+        largeBoats.setHoldSize(new FixedDoubleParameter(1000d));
+        largeBoats.setTags("large,boat");
+        fisherDefinitions.add(largeBoats);
+
+
     }
 
 
@@ -161,9 +169,6 @@ public class IndonesiaScenario implements Scenario {
      * in the biology/fishery
      */
     private Long mapMakerDedicatedRandomSeed =  null;
-
-    private AlgorithmFactory<? extends LogbookInitializer> logbook =
-            new NoLogbookFactory();
 
 
     private boolean portSwitching = false;
@@ -261,8 +266,7 @@ public class IndonesiaScenario implements Scenario {
     public ScenarioPopulation populateModel(FishState model) {
 
         final NauticalMap map = model.getMap();
-        final GlobalBiology biology = model.getBiology();
-        final MersenneTwisterFast random = model.random;
+
 
         //no friends from separate ports
         networkBuilder.addPredicate(new NetworkPredicate() {
@@ -272,66 +276,70 @@ public class IndonesiaScenario implements Scenario {
             }
         });
 
-        //adds predictors to the fisher if the usepredictors flag is up.
-        //without predictors agents do not participate in ITQs
-        Consumer<Fisher> predictorSetup = FishStateUtilities.predictorSetup(usePredictors, biology);
 
         Port[] ports =map.getPorts().toArray(new Port[map.getPorts().size()]);
 
-
-        Pair<FisherFactory, List<Fisher>> fishers = fisherDefinition.instantiateFishers(
-                model,
-                map.getPorts(),
-                0,
-                predictorSetup,
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        fisher.setCheater(cheaters);
-                        //todo move this somewhere else
-                        fisher.addFeatureExtractor(
-                                SNALSARutilities.PROFIT_FEATURE,
-                                new RememberedProfitsExtractor(true)
-                        );
-                        fisher.addFeatureExtractor(
-                                FeatureExtractor.AVERAGE_PROFIT_FEATURE,
-                                new FeatureExtractor<SeaTile>() {
-                                    @Override
-                                    public HashMap<SeaTile, Double> extractFeature(
-                                            Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
-                                        double averageProfits = model.getLatestDailyObservation(
-                                                FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
-                                        return new FixedMap<>(averageProfits,
-                                                              toRepresent);
+        List<Fisher> fishers = new LinkedList<>();
+        //arbitrary fisher factory
+        FisherFactory lastFactory = null;
+        int definitionIndex = 0;
+        for (FisherDefinition fisherDefinition : fisherDefinitions) {
+            Pair<FisherFactory, List<Fisher>> generated = fisherDefinition.instantiateFishers(
+                    model,
+                    map.getPorts(),
+                    definitionIndex * 10000,
+                    new Consumer<Fisher>() {
+                        @Override
+                        public void accept(Fisher fisher) {
+                            fisher.setCheater(cheaters);
+                            //todo move this somewhere else
+                            fisher.addFeatureExtractor(
+                                    SNALSARutilities.PROFIT_FEATURE,
+                                    new RememberedProfitsExtractor(true)
+                            );
+                            fisher.addFeatureExtractor(
+                                    FeatureExtractor.AVERAGE_PROFIT_FEATURE,
+                                    new FeatureExtractor<SeaTile>() {
+                                        @Override
+                                        public HashMap<SeaTile, Double> extractFeature(
+                                                Collection<SeaTile> toRepresent, FishState model, Fisher fisher) {
+                                            double averageProfits = model.getLatestDailyObservation(
+                                                    FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
+                                            return new FixedMap<>(averageProfits,
+                                                                  toRepresent);
+                                        }
                                     }
-                                }
-                        );
-                    }
-                },
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        fisher.getTags().add(
-                                portColorTags.get(fisher.getHomePort())
-                        );
-                    }
-                },
-                new Consumer<Fisher>() {
-                    @Override
-                    public void accept(Fisher fisher) {
-                        if (portSwitching)
-                            fisher.addYearlyAdaptation(new SimplePortAdaptation());
+                            );
+                        }
+                    },
+                    new Consumer<Fisher>() {
+                        @Override
+                        public void accept(Fisher fisher) {
+                            fisher.getTags().add(
+                                    portColorTags.get(fisher.getHomePort())
+                            );
+                        }
+                    },
+                    new Consumer<Fisher>() {
+                        @Override
+                        public void accept(Fisher fisher) {
+                            if (portSwitching)
+                                fisher.addYearlyAdaptation(new SimplePortAdaptation());
 
-                    }
-                }
-
-        );
+                        }
+                    });
 
 
-        if(fishers.getSecond().size() <=1)
-            return new ScenarioPopulation(fishers.getSecond(), new SocialNetwork(new EmptyNetworkBuilder()), fishers.getFirst() );
+            lastFactory = generated.getFirst();
+            fishers.addAll(generated.getSecond());
+            definitionIndex++;
+        }
+
+
+        if(fishers.size() <=1)
+            return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
         else {
-            return new ScenarioPopulation(fishers.getSecond(), new SocialNetwork(networkBuilder), fishers.getFirst());
+            return new ScenarioPopulation(fishers, new SocialNetwork(networkBuilder), lastFactory);
         }
     }
 
@@ -381,13 +389,6 @@ public class IndonesiaScenario implements Scenario {
         this.market = market;
     }
 
-    public boolean isUsePredictors() {
-        return usePredictors;
-    }
-
-    public void setUsePredictors(boolean usePredictors) {
-        this.usePredictors = usePredictors;
-    }
 
     public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
         return weatherInitializer;
@@ -440,25 +441,6 @@ public class IndonesiaScenario implements Scenario {
         this.cheaters = cheaters;
     }
 
-    /**
-     * Getter for property 'logbook'.
-     *
-     * @return Value for property 'logbook'.
-     */
-    public AlgorithmFactory<? extends LogbookInitializer> getLogbook() {
-        return logbook;
-    }
-
-    /**
-     * Setter for property 'logbook'.
-     *
-     * @param logbook Value to set for property 'logbook'.
-     */
-    public void setLogbook(
-            AlgorithmFactory<? extends LogbookInitializer> logbook) {
-        this.logbook = logbook;
-    }
-
 
     public boolean isPortSwitching() {
         return portSwitching;
@@ -479,20 +461,20 @@ public class IndonesiaScenario implements Scenario {
     }
 
     /**
-     * Getter for property 'fisherDefinition'.
+     * Getter for property 'fisherDefinitions'.
      *
-     * @return Value for property 'fisherDefinition'.
+     * @return Value for property 'fisherDefinitions'.
      */
-    public FisherDefinition getFisherDefinition() {
-        return fisherDefinition;
+    public List<FisherDefinition> getFisherDefinitions() {
+        return fisherDefinitions;
     }
 
     /**
-     * Setter for property 'fisherDefinition'.
+     * Setter for property 'fisherDefinitions'.
      *
-     * @param fisherDefinition Value to set for property 'fisherDefinition'.
+     * @param fisherDefinitions Value to set for property 'fisherDefinitions'.
      */
-    public void setFisherDefinition(FisherDefinition fisherDefinition) {
-        this.fisherDefinition = fisherDefinition;
+    public void setFisherDefinitions(List<FisherDefinition> fisherDefinitions) {
+        this.fisherDefinitions = fisherDefinitions;
     }
 }

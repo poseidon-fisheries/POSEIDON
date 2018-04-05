@@ -76,34 +76,35 @@ public class ProtectedAreasOnlyFactory implements AlgorithmFactory<ProtectedArea
                         }
 
 
-                        model.getDailyDataSet().
-                                registerGatherer(
-                                        "% of Illegal Tows",
-                                        new Gatherer<FishState>() {
-                                            @Override
-                                            public Double apply(FishState state) {
+                        if(model.getDailyDataSet().getColumn("% of Illegal Tows") == null)
+                            model.getDailyDataSet().
+                                    registerGatherer(
+                                            "% of Illegal Tows",
+                                            new Gatherer<FishState>() {
+                                                @Override
+                                                public Double apply(FishState state) {
 
-                                                double trawlsSum = 0;
-                                                double illegalSum = 0;
-                                                NauticalMap map = state.getMap();
-                                                for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
-                                                {
-                                                    int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
-                                                                                                 tile.getGridY());
-                                                    trawlsSum += trawlsHere;
-                                                    if(tile.isProtected())
+                                                    double trawlsSum = 0;
+                                                    double illegalSum = 0;
+                                                    NauticalMap map = state.getMap();
+                                                    for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
                                                     {
-                                                        illegalSum +=trawlsHere;
+                                                        int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
+                                                                                                     tile.getGridY());
+                                                        trawlsSum += trawlsHere;
+                                                        if(tile.isProtected())
+                                                        {
+                                                            illegalSum +=trawlsHere;
+                                                        }
                                                     }
-                                                }
-                                                if(trawlsSum == 0)
-                                                    return Double.NaN;
-                                                assert trawlsSum>=illegalSum;
-                                                return illegalSum/trawlsSum;
+                                                    if(trawlsSum == 0)
+                                                        return Double.NaN;
+                                                    assert trawlsSum>=illegalSum;
+                                                    return illegalSum/trawlsSum;
 
+                                                }
                                             }
-                                        }
-                                        , Double.NaN);
+                                            , Double.NaN);
                     }
 
                     @Override

@@ -48,8 +48,10 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -93,7 +95,7 @@ public class FisherDefinition {
     private AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy =
             new IgnoreWeatherFactory();
 
-    private AlgorithmFactory<? extends Regulation> regulation =  new ProtectedAreasOnlyFactory();
+    private AlgorithmFactory<? extends Regulation> regulation =  new AnarchyFactory();
 
     private DoubleParameter fuelTankSize = new FixedDoubleParameter(100000);
 
@@ -126,6 +128,15 @@ public class FisherDefinition {
 
 
     /**
+     * tags to add to each fisher created
+     */
+    //the format would be something like "boat,black"
+    private String tags = "";
+
+
+    private boolean usePredictors = false;
+
+    /**
      * here we store an array with port names. If we need to create 3 fishers, 2 in portA and 1 in port B this will look:
      * [portA portA portB]
      */
@@ -151,7 +162,10 @@ public class FisherDefinition {
     }
 
 
-    int fishCreationIndex =0;
+    //keeps track of how many fish have been built so far
+    //so that we can match each to a specific port
+    //when we have built enough, fishCreation resets to 0
+    private int fishCreationIndex =0;
     public Port getNextFisher(List<Port> ports)
     {
         assert fishCreationIndex <flatPortArray.length;
@@ -181,7 +195,7 @@ public class FisherDefinition {
         final MersenneTwisterFast random = model.random;
 
         updateNumberOfInitialFishers();
-     //   Preconditions.checkState(flatPortArray.length>0,"No fisher can be built because no port was provided!");
+        //   Preconditions.checkState(flatPortArray.length>0,"No fisher can be built because no port was provided!");
 
 
 
@@ -225,6 +239,33 @@ public class FisherDefinition {
                 log.add(fisher,model);
             }
         });
+
+        //adds predictors to the fisher if the usepredictors flag is up.
+        //without predictors agents do not participate in ITQs
+
+        fisherFactory.getAdditionalSetups().add(
+                FishStateUtilities.predictorSetup(
+                        usePredictors,
+                        model.getBiology()
+                )
+        );
+
+        //add tags to fisher definition
+        final String[] tags = this.tags.split(",");
+        if(tags.length>0)
+            fisherFactory.getAdditionalSetups().add(
+                    new Consumer<Fisher>() {
+                        @Override
+                        public void accept(Fisher fisher) {
+                            for(String tag : tags)
+                                fisher.getTags().add(tag.trim());
+                        }
+                    }
+            );
+
+
+
+
 
         return fisherFactory;
     }
@@ -485,5 +526,42 @@ public class FisherDefinition {
      */
     public void setInitialFishersPerPort(LinkedHashMap<String, Integer> initialFishersPerPort) {
         this.initialFishersPerPort = initialFishersPerPort;
+    }
+
+
+    /**
+     * Getter for property 'usePredictors'.
+     *
+     * @return Value for property 'usePredictors'.
+     */
+    public boolean isUsePredictors() {
+        return usePredictors;
+    }
+
+    /**
+     * Setter for property 'usePredictors'.
+     *
+     * @param usePredictors Value to set for property 'usePredictors'.
+     */
+    public void setUsePredictors(boolean usePredictors) {
+        this.usePredictors = usePredictors;
+    }
+
+    /**
+     * Getter for property 'tags'.
+     *
+     * @return Value for property 'tags'.
+     */
+    public String getTags() {
+        return tags;
+    }
+
+    /**
+     * Setter for property 'tags'.
+     *
+     * @param tags Value to set for property 'tags'.
+     */
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }
