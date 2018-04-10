@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.biology.initializer;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.*;
+import uk.ac.ox.oxfish.biology.complicated.CaliforniaStockAssessmentGrowthBinParameters;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -37,11 +39,15 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
     private final List<SingleSpeciesBiomassInitializer> initializers ;
 
-    public MultipleIndependentSpeciesBiomassInitializer(
-            List<SingleSpeciesBiomassInitializer> initializers) {
-        this.initializers = initializers;
-    }
 
+    private final boolean addImaginarySpecies;
+
+
+    public MultipleIndependentSpeciesBiomassInitializer(
+            List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies) {
+        this.initializers = initializers;
+        this.addImaginarySpecies = addImaginarySpecies;
+    }
 
     /**
      * if at least one species can live here, return a localBiomassBiology; else return a empty biology
@@ -121,6 +127,11 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
             assert individualBiology.getSize()==1;
             species.add(individualBiology.getSpecie(0));
         }
+        if(addImaginarySpecies)
+            species.add(new Species("Others",
+                                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                                    true));
+
         return new GlobalBiology(species.toArray(new Species[species.size()]));
 
     }

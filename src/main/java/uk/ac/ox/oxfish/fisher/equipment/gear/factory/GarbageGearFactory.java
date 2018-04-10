@@ -39,6 +39,7 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
 
 
     private boolean rounding = true;
+
     private String garbageSpeciesName = MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME;
 
     private DoubleParameter proportionSimulatedToGarbage = new FixedDoubleParameter(0.3);
@@ -140,4 +141,6 @@ public class GarbageGearFactory implements AlgorithmFactory<GarbageGearDecorator
     public void setRounding(boolean rounding) {
         this.rounding = rounding;
     }
+
+
 }

@@ -48,6 +48,8 @@ public class MultipleIndependentSpeciesBiomassFactory implements
     }
 
 
+    private boolean addImaginarySpecies = true;
+
     /**
      * Applies this function to the given argument.
      *
@@ -61,7 +63,8 @@ public class MultipleIndependentSpeciesBiomassFactory implements
         List<SingleSpeciesBiomassInitializer> initializers = factories.stream().map(
                 factory -> factory.apply(state)).collect(Collectors.toList());
 
-        return new MultipleIndependentSpeciesBiomassInitializer(initializers
+        return new MultipleIndependentSpeciesBiomassInitializer(initializers,
+                                                                true
         );
 
     }
@@ -84,5 +87,24 @@ public class MultipleIndependentSpeciesBiomassFactory implements
     public void setFactories(
             List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories) {
         this.factories = factories;
+    }
+
+
+    /**
+     * Getter for property 'addImaginarySpecies'.
+     *
+     * @return Value for property 'addImaginarySpecies'.
+     */
+    public boolean isAddImaginarySpecies() {
+        return addImaginarySpecies;
+    }
+
+    /**
+     * Setter for property 'addImaginarySpecies'.
+     *
+     * @param addImaginarySpecies Value to set for property 'addImaginarySpecies'.
+     */
+    public void setAddImaginarySpecies(boolean addImaginarySpecies) {
+        this.addImaginarySpecies = addImaginarySpecies;
     }
 }
