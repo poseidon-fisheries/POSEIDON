@@ -564,4 +564,24 @@ public class FisherDefinition {
     public void setTags(String tags) {
         this.tags = tags;
     }
+
+
+    /**
+     * Getter for property 'logbook'.
+     *
+     * @return Value for property 'logbook'.
+     */
+    public AlgorithmFactory<? extends LogbookInitializer> getLogbook() {
+        return logbook;
+    }
+
+    /**
+     * Setter for property 'logbook'.
+     *
+     * @param logbook Value to set for property 'logbook'.
+     */
+    public void setLogbook(
+            AlgorithmFactory<? extends LogbookInitializer> logbook) {
+        this.logbook = logbook;
+    }
 }

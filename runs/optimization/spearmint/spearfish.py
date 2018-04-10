@@ -147,7 +147,10 @@ import os
 
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/indirect_inference/bayes/calibrator/"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/indirect_inference/bayes/feb2018/calibration"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/indirect_inference/bayes/feb2018/calibration"
+
+
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180404 biomass_indonesia/calibration"
 
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"

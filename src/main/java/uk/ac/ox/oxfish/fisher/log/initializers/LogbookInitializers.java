@@ -60,6 +60,12 @@ public class LogbookInitializers {
         NAMES.put(LogisticLogbookFactory.class, "Logit-like Logbook");
 
 
+        CONSTRUCTORS.put("Histogrammer",
+                         DiscretizationHeatmapperFactory::new
+        );
+        NAMES.put(DiscretizationHeatmapperFactory.class, "Histogrammer");
+
+
 
 
     }

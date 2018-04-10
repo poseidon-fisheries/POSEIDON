@@ -309,3 +309,4 @@ def plot(config_directory="/home/carrknight/code/oxfish/runs/optimization/spearm
 #plot(config_directory="/home/carrknight/code/oxfish/docs/indirect_inference/bayes/calibrator")
 
 #plot(config_directory="/home/carrknight/code/oxfish/docs/20170511 optimisation_remake/kitchensink/mixed/mpa_alone/")
+
