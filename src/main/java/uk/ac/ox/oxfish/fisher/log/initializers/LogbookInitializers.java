@@ -20,10 +20,6 @@
 
 package uk.ac.ox.oxfish.fisher.log.initializers;
 
-import uk.ac.ox.oxfish.geography.discretization.CentroidMapFileFactory;
-import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
-import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -60,10 +56,10 @@ public class LogbookInitializers {
         NAMES.put(LogisticLogbookFactory.class, "Logit-like Logbook");
 
 
-        CONSTRUCTORS.put("Histogrammer",
-                         DiscretizationHeatmapperFactory::new
+        CONSTRUCTORS.put("Tows and Altitude",
+                         TowAndAltitudeFactory::new
         );
-        NAMES.put(DiscretizationHeatmapperFactory.class, "Histogrammer");
+        NAMES.put(TowAndAltitudeFactory.class, "Tows and Altitude");
 
 
 

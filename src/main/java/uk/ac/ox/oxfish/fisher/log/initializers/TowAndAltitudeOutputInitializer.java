@@ -26,18 +26,16 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.AltitudeHistogrammer;
+import uk.ac.ox.oxfish.model.data.AltitudeOutput;
 import uk.ac.ox.oxfish.model.data.DiscretizationHistogrammer;
+import uk.ac.ox.oxfish.model.data.TowOutput;
 
 /**
  * generates exclusively the histogram initializer
  */
-public class DiscretizationHistogrammerInitializer implements LogbookInitializer {
+public class TowAndAltitudeOutputInitializer implements LogbookInitializer {
 
 
-    private final MapDiscretization discretization;
-
-    private DiscretizationHistogrammer histogrammer;
 
     private final int histogrammerStartYear;
 
@@ -47,16 +45,16 @@ public class DiscretizationHistogrammerInitializer implements LogbookInitializer
      */
     private final String identifier;
 
+    private TowOutput tows;
 
-    private final boolean countEffort;
+    private AltitudeOutput altitude;
 
 
-    public DiscretizationHistogrammerInitializer(
-            MapDiscretization discretization, int histogrammerStartYear, String identifier, boolean countEffort) {
-        this.discretization = discretization;
+
+    public TowAndAltitudeOutputInitializer(
+            int histogrammerStartYear, String identifier) {
         this.histogrammerStartYear = histogrammerStartYear;
         this.identifier = identifier;
-        this.countEffort = countEffort;
 
 
     }
@@ -68,12 +66,12 @@ public class DiscretizationHistogrammerInitializer implements LogbookInitializer
         //add histogrammer now or when it is time!
         if(histogrammerStartYear>=0) { //don't do anything if the start year is negative!
             if (state.getYear() >= histogrammerStartYear)
-                fisher.addTripListener(histogrammer);
+                fisher.addTripListener(tows);
             else
                 state.scheduleOnceAtTheBeginningOfYear(new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        fisher.addTripListener(histogrammer);
+                        fisher.addTripListener(tows);
                     }
                 }, StepOrder.DAWN, histogrammerStartYear);
         }
@@ -91,13 +89,12 @@ public class DiscretizationHistogrammerInitializer implements LogbookInitializer
     public void start(FishState model) {
 
         //let it build, we won't start it until it's time though
-        histogrammer = new DiscretizationHistogrammer(
-                discretization,countEffort);
-        histogrammer.setFileName( identifier + histogrammer.getFileName());
-        model.getOutputPlugins().add(histogrammer);
+        tows = new TowOutput(model.getMap());
+        tows.setFileName(identifier +"_" + tows.getFileName());
+        model.getOutputPlugins().add(tows);
 
 
-        AltitudeHistogrammer altitude = new AltitudeHistogrammer(discretization);
+        AltitudeOutput altitude = new AltitudeOutput(model.getMap());
         altitude.setFileName( identifier + altitude.getFileName());
         model.getOutputPlugins().add(altitude);
 

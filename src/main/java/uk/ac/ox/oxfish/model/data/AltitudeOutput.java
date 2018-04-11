@@ -22,32 +22,32 @@ package uk.ac.ox.oxfish.model.data;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
+import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.DoubleSummaryStatistics;
+import java.util.Map;
 
-public class AltitudeHistogrammer implements OutputPlugin{
-
-
-
-
-    private String fileName = "altitude_histogram.csv";
-
-    final private Integer[] altitude;
+public class AltitudeOutput implements OutputPlugin{
 
 
-    public AltitudeHistogrammer(MapDiscretization discretization) {
-        altitude = new Integer[discretization.getNumberOfGroups()];
-        for(int i=0; i<altitude.length; i++) {
-            DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
-            for (SeaTile seaTile : discretization.getGroup(i)) {
-                statistics.accept(seaTile.getAltitude());
-            }
-            altitude[i] = (int)statistics.getAverage();
+
+
+    private String fileName = "altitude_map.csv";
+
+    final private DoubleGrid2D altitude;
+
+
+    public AltitudeOutput(NauticalMap map) {
+        altitude = new DoubleGrid2D(map.getWidth(),map.getHeight());
+        for (SeaTile seaTile : map.getAllSeaTilesAsList()) {
+            altitude.set(seaTile.getGridX(),seaTile.getGridY(),seaTile.getAltitude());
         }
+
     }
 
 
@@ -68,8 +68,14 @@ public class AltitudeHistogrammer implements OutputPlugin{
 
     @Override
     public String toString() {
-        Joiner joiner = Joiner.on(",").skipNulls();
-        return joiner.join(altitude);
+        StringBuilder builder = new StringBuilder(2000);
+        builder.append("x,y,z").append("\n");
+        for(int x =0; x< altitude.getWidth(); x++)
+            for(int y=0; y< altitude.getHeight(); y++)
+                builder.append(x).append(",").append(y).append(",").append(altitude.get(x,y)).append("\n");
+
+        return builder.toString();
+
     }
 
     /**
