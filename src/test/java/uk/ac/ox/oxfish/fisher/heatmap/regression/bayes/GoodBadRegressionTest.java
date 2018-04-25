@@ -93,4 +93,45 @@ public class GoodBadRegressionTest {
         assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),mock(FishState.class)  ),
                      .5*10+(1-.5)*5,.001);
     }
+
+    @Test
+    public void goodBadRegressionTest2() throws Exception {
+
+        FishState state = MovingTest.generateSimple50x50Map();
+        //std= 2
+        //avg good = 10, bad = 5
+
+        //force initial prior to be 50-50
+        MersenneTwisterFast random = mock(MersenneTwisterFast.class);
+        when(random.nextDouble()).thenReturn(.5);
+
+        GoodBadRegression regression = new GoodBadRegression(
+                state.getMap(),
+                new ManhattanDistance(),
+                random,
+                5,10,2,
+                1,
+                0.1
+        );
+
+
+        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class), null), 7.5, .001);
+        //observe a 9
+        regression.addObservation(
+                new GeographicalObservation<>(state.getMap().getSeaTile(25,25),0,9d),
+                mock(Fisher.class),mock(FishState.class)
+        );
+
+        //that suggests that this is a good spot!
+        //according to R the new probability ought to be .8670358
+        assertEquals(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),null ),
+                     .8670358*10+(1-.8670358)*5,.001);
+
+        regression.addObservation(
+                new GeographicalObservation<>(state.getMap().getSeaTile(25,25),0,9d),
+                mock(Fisher.class),mock(FishState.class)
+        );
+        assertTrue(regression.predict(state.getMap().getSeaTile(25,25),0,mock(Fisher.class),null ) >.8670358*10+(1-.8670358)*5
+        );
+    }
 }

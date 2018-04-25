@@ -75,6 +75,10 @@ public class Allocators {
                          RandomSmoothedFactory::new);
         NAMES.put(RandomSmoothedFactory.class,"Random Smoothed Allocator");
 
+        CONSTRUCTORS.put("Random Kernel Allocator",
+                         KernelizedRandomFactory::new);
+        NAMES.put(KernelizedRandomFactory.class,"Random Kernel Allocator");
+
 
     }
 

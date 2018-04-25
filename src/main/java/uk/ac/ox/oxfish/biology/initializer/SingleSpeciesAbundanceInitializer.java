@@ -205,7 +205,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                                                           map,
                                                           random);
         //weights of 0 or below are wastelands
-        if(weight <= 0 && (habitabilityAllocator == null || habitabilityAllocator.allocate(
+        if((!Double.isFinite(weight) || weight <= 0) && (habitabilityAllocator == null || habitabilityAllocator.allocate(
                 seaTile,
                 map,
                 random

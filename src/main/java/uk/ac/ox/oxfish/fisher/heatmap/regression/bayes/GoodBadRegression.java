@@ -173,7 +173,7 @@ public class GoodBadRegression implements GeographicalRegression<Double>, Steppa
                 assert  goodPosterior >=0;
 
 
-                double badPrior = probability.getValue();
+                double badPrior = 1d-probability.getValue();
                 double badLikelihood = FishStateUtilities.normalPDF(
                         badAverage,standardDeviation*evidenceStrength).apply(observation.getValue());
                 double badPosterior = badPrior*badLikelihood;

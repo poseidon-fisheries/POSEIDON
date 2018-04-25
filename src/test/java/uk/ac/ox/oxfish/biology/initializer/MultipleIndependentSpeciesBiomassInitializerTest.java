@@ -65,6 +65,8 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
                         species0.apply(model),
                         species1.apply(model)
                 )
+                ,
+                false
         );
 
 

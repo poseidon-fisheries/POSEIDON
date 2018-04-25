@@ -178,7 +178,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
 
 
         //we return an empty biology object. We will fill it in the processing phase
-        if(habitability <=0)
+        if(habitability <=0 || !Double.isFinite(habitability))
             return new EmptyLocalBiology();
         else{
             numberOfHabitableCells++;
@@ -236,7 +236,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
                                                                      random);
 
             //don't bother if you can't live there
-            if(habitability<=0)
+            if(habitability<=0 || Double.isNaN(habitability))
                 continue;
 
 
