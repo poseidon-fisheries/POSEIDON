@@ -79,6 +79,10 @@ public class Allocators {
                          KernelizedRandomFactory::new);
         NAMES.put(KernelizedRandomFactory.class,"Random Kernel Allocator");
 
+        CONSTRUCTORS.put("Simplex Allocator",
+                         SimplexFactory::new);
+        NAMES.put(SimplexFactory.class,"Simplex Allocator");
+
 
     }
 
