@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MultipleIndependentSpeciesBiomassFactory implements
@@ -50,6 +49,10 @@ public class MultipleIndependentSpeciesBiomassFactory implements
 
     private boolean addImaginarySpecies = true;
 
+
+
+    private boolean constantBiomass = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -64,8 +67,8 @@ public class MultipleIndependentSpeciesBiomassFactory implements
                 factory -> factory.apply(state)).collect(Collectors.toList());
 
         return new MultipleIndependentSpeciesBiomassInitializer(initializers,
-                                                                true
-        );
+                addImaginarySpecies,
+                constantBiomass);
 
     }
 
@@ -106,5 +109,13 @@ public class MultipleIndependentSpeciesBiomassFactory implements
      */
     public void setAddImaginarySpecies(boolean addImaginarySpecies) {
         this.addImaginarySpecies = addImaginarySpecies;
+    }
+
+    public boolean isConstantBiomass() {
+        return constantBiomass;
+    }
+
+    public void setConstantBiomass(boolean constantBiomass) {
+        this.constantBiomass = constantBiomass;
     }
 }

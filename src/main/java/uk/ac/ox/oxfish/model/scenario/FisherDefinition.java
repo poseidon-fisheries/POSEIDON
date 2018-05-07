@@ -173,12 +173,15 @@ public class FisherDefinition {
         String portName = flatPortArray[fishCreationIndex];
 
 
+
         Port toReturn = ports.stream().filter(new Predicate<Port>() {
             @Override
             public boolean test(Port port) {
-                return port.getName().equals(portName);
+                return port.getName().trim().equalsIgnoreCase(portName.trim());
             }
-        }).findFirst().get();
+        }).findFirst().orElseGet(() -> {
+            throw new RuntimeException(portName + " not found!");
+        });
 
         fishCreationIndex++;
         if(fishCreationIndex >=flatPortArray.length)

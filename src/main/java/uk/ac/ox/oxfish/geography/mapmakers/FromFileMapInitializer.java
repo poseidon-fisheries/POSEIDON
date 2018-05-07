@@ -177,6 +177,8 @@ public class FromFileMapInitializer implements MapInitializer {
         //cell distance:
         System.out.println("coordinates for 0,0 are: " + nauticalMap.getCoordinates(0,0) );
         System.out.println("coordinates for 1,1 are: " + nauticalMap.getCoordinates(1,1) );
+        System.out.println("coordinates for max,max are: " + nauticalMap.getCoordinates(
+                nauticalMap.getWidth()-1,nauticalMap.getHeight()-1) );
         System.out.println("the distance between 0,0 and 1,1 is: " +
                                    distance.distance(nauticalMap.getSeaTile(0,0),
                                                      nauticalMap.getSeaTile(1,1),

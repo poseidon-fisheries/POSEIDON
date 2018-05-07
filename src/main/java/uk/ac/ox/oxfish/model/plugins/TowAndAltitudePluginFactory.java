@@ -1,41 +1,21 @@
-/*
- *     POSEIDON, an agent-based model of fisheries
- *     Copyright (C) 2018  CoHESyS Lab cohesys.lab@gmail.com
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- */
+package uk.ac.ox.oxfish.model.plugins;
 
-package uk.ac.ox.oxfish.fisher.log.initializers;
-
-import uk.ac.ox.oxfish.geography.discretization.IdentityDiscretizerFactory;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.Locker;
 
-import java.util.function.Supplier;
+public class TowAndAltitudePluginFactory implements AlgorithmFactory<TowAndAltitudePlugin> {
 
-public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOutputInitializer> {
 
     /**
      * useful (in fact, needed) if you have multiple logbooks running at once!
      */
     private String identifier = "";
 
+
+    /**
+     * if you only want to study some fishers
+     */
+    private String tagSusbset = "";
 
 
     /**
@@ -51,14 +31,21 @@ public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOut
      * @return the function result
      */
     @Override
-    public TowAndAltitudeOutputInitializer apply(FishState fishState) {
+    public TowAndAltitudePlugin apply(FishState fishState) {
 
 
-        return new TowAndAltitudeOutputInitializer(
-                histogrammerStartYear,
-                identifier
-        );
-
+        if(tagSusbset == null || tagSusbset.trim().length()<=0)
+            return new TowAndAltitudePlugin(
+                    histogrammerStartYear,
+                    identifier,
+                    null
+            );
+        else
+            return new TowAndAltitudePlugin(
+                    histogrammerStartYear,
+                    identifier,
+                    tagSusbset
+            );
 
 
 
@@ -100,4 +87,11 @@ public class TowAndAltitudeFactory implements AlgorithmFactory<TowAndAltitudeOut
         this.histogrammerStartYear = histogrammerStartYear;
     }
 
+    public String getTagSusbset() {
+        return tagSusbset;
+    }
+
+    public void setTagSusbset(String tagSusbset) {
+        this.tagSusbset = tagSusbset;
+    }
 }

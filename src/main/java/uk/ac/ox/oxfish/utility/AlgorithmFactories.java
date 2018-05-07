@@ -63,6 +63,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.MapInitializers;
 import uk.ac.ox.oxfish.geography.ports.PortInitializer;
 import uk.ac.ox.oxfish.geography.ports.PortInitializers;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.factory.Averages;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -70,6 +71,7 @@ import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMakers;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
+import uk.ac.ox.oxfish.model.plugins.AdditionalStartables;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
@@ -169,10 +171,11 @@ public class AlgorithmFactories {
         NAMES_MAP.put(BiomassAllocator.class, Allocators.NAMES);
         CONSTRUCTOR_MAP.put(NaturalMortalityProcess.class, Mortalities.CONSTRUCTORS);
         NAMES_MAP.put(NaturalMortalityProcess.class, Mortalities.NAMES);
-
-
         CONSTRUCTOR_MAP.put(GasPriceMaker.class, GasPriceMakers.CONSTRUCTORS);
         NAMES_MAP.put(GasPriceMaker.class, GasPriceMakers.NAMES);
+
+        CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
+        NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
     }
 
 

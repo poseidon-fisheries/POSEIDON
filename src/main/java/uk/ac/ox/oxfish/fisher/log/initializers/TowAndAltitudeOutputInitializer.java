@@ -24,6 +24,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.AltitudeOutput;
@@ -33,7 +34,7 @@ import uk.ac.ox.oxfish.model.data.TowOutput;
 /**
  * generates exclusively the histogram initializer
  */
-public class TowAndAltitudeOutputInitializer implements LogbookInitializer {
+public class TowAndAltitudeOutputInitializer implements AdditionalStartable, LogbookInitializer {
 
 
 
@@ -47,17 +48,15 @@ public class TowAndAltitudeOutputInitializer implements LogbookInitializer {
 
     private TowOutput tows;
 
-    private AltitudeOutput altitude;
 
 
 
-    public TowAndAltitudeOutputInitializer(
-            int histogrammerStartYear, String identifier) {
+    public TowAndAltitudeOutputInitializer(int histogrammerStartYear, String identifier) {
         this.histogrammerStartYear = histogrammerStartYear;
         this.identifier = identifier;
-
-
     }
+
+
 
     @Override
     public void add(Fisher fisher, FishState state) {
@@ -75,6 +74,7 @@ public class TowAndAltitudeOutputInitializer implements LogbookInitializer {
                     }
                 }, StepOrder.DAWN, histogrammerStartYear);
         }
+
 
 
     }

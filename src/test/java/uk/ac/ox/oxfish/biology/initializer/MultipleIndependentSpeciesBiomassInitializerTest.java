@@ -66,8 +66,8 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
                         species1.apply(model)
                 )
                 ,
-                false
-        );
+                false,
+                false);
 
 
         GlobalBiology globalBiology = toTest.generateGlobal(model.getRandom(), model);

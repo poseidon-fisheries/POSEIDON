@@ -28,29 +28,10 @@ import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.Boat;
-import uk.ac.ox.oxfish.fisher.equipment.Engine;
-import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
-import uk.ac.ox.oxfish.fisher.equipment.Hold;
-import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
-import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
-import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.DiscardingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.NoDiscardingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.FishingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
-import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.gear.factory.FixedGearStrategyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.weather.factory.IgnoreWeatherFactory;
+import uk.ac.ox.oxfish.model.plugins.TowAndAltitudePluginFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -61,6 +42,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.ports.FromFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.gui.drawing.BoatPortrayalFactory;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -68,23 +50,18 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.*;
-import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.FixedMap;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.SimplePortAdaptation;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Very ugly repeat of prototype scenario because I need a proper refactor of port
@@ -177,6 +154,32 @@ public class IndonesiaScenario implements Scenario {
 
     final private HashMap<Port,String> portColorTags = new HashMap<>();
 
+
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins =
+            new LinkedList<>();
+    {
+        TowAndAltitudePluginFactory tow = new TowAndAltitudePluginFactory();
+        tow.setIdentifier("cluster1_");
+        tow.setHistogrammerStartYear(4);
+        tow.setTagSusbset("cluster1");
+        plugins.add(
+                tow
+        );
+        tow = new TowAndAltitudePluginFactory();
+        tow.setIdentifier("cluster2_");
+        tow.setHistogrammerStartYear(4);
+        tow.setTagSusbset("cluster2");
+        plugins.add(
+                tow
+        );
+        tow = new TowAndAltitudePluginFactory();
+        tow.setIdentifier("cluster3_");
+        tow.setHistogrammerStartYear(4);
+        tow.setTagSusbset("cluster3");
+        plugins.add(
+                tow
+        );
+    }
 
     public IndonesiaScenario() {
     }
@@ -336,6 +339,14 @@ public class IndonesiaScenario implements Scenario {
         }
 
 
+        //start additional elements
+        for (AlgorithmFactory<? extends AdditionalStartable> additionalElement : plugins) {
+            model.registerStartable(
+                    additionalElement.apply(model)
+            );
+
+        }
+
         if(fishers.size() <=1)
             return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
         else {
@@ -476,5 +487,14 @@ public class IndonesiaScenario implements Scenario {
      */
     public void setFisherDefinitions(List<FisherDefinition> fisherDefinitions) {
         this.fisherDefinitions = fisherDefinitions;
+    }
+
+
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() {
+        return plugins;
+    }
+
+    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) {
+        this.plugins = plugins;
     }
 }

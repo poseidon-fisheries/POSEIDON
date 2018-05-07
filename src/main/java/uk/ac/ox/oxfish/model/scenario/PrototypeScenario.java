@@ -61,6 +61,7 @@ import uk.ac.ox.oxfish.geography.mapmakers.MapInitializer;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.geography.ports.RandomPortInitializer;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.market.Market;
@@ -232,6 +233,9 @@ public class PrototypeScenario implements Scenario {
             new NoLogbookFactory();
 
 
+    private List<AlgorithmFactory<? extends AdditionalStartable>> plugins =
+            new LinkedList<>();
+
     public PrototypeScenario() {
     }
 
@@ -274,8 +278,8 @@ public class PrototypeScenario implements Scenario {
 
         //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(map, mapMakerRandom, biology,
-                                         weather,
-                                         global, model);
+                weather,
+                global, model);
 
 
         //create fixed price market
@@ -292,13 +296,13 @@ public class PrototypeScenario implements Scenario {
         //create random ports, all sharing the same market
         if(portPositionX == null || portPositionX < 0)
             RandomPortInitializer.addRandomPortsToMap(map, ports, seaTile -> marketMap, mapMakerRandom,
-                                                      new FixedGasPrice(
-                                                              gasPricePerLiter.apply(mapMakerRandom)),
-                                                      model);
+                    new FixedGasPrice(
+                            gasPricePerLiter.apply(mapMakerRandom)),
+                    model);
         else
         {
             Port port = new Port("Port 0", map.getSeaTile(portPositionX, portPositionY),
-                                 marketMap, 0);
+                    marketMap, 0);
             map.addPort(port);
         }
 
@@ -364,9 +368,9 @@ public class PrototypeScenario implements Scenario {
                 gearStrategy,
                 weatherStrategy,
                 (Supplier<Boat>) () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                   literPerKilometer.apply(random),
-                                                                   speedInKmh.apply(random)),
-                                                new FuelTank(fuelTankSize.apply(random))),
+                        literPerKilometer.apply(random),
+                        speedInKmh.apply(random)),
+                        new FuelTank(fuelTankSize.apply(random))),
                 (Supplier<Hold>) () -> new Hold(holdSize.apply(random),biology),
                 gear,
 
@@ -399,7 +403,7 @@ public class PrototypeScenario implements Scenario {
                                 double averageProfits = model.getLatestDailyObservation(
                                         FishStateDailyTimeSeries.AVERAGE_LAST_TRIP_HOURLY_PROFITS);
                                 return new FixedMap<>(averageProfits,
-                                                      toRepresent) ;
+                                        toRepresent) ;
                             }
                         }
                 );
@@ -417,6 +421,16 @@ public class PrototypeScenario implements Scenario {
 
         assert fisherList.size()==fishers;
         assert fisherFactory.getNextID()==fishers;
+
+
+        //start additional elements
+        for (AlgorithmFactory<? extends AdditionalStartable> additionalElement : plugins) {
+            model.registerStartable(
+                    additionalElement.apply(model)
+            );
+
+        }
+
 
         if(fisherList.size() <=1)
             return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
@@ -719,5 +733,13 @@ public class PrototypeScenario implements Scenario {
     public void setDiscardingStrategy(
             AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy) {
         this.discardingStrategy = discardingStrategy;
+    }
+
+    public List<AlgorithmFactory<? extends AdditionalStartable>> getPlugins() {
+        return plugins;
+    }
+
+    public void setPlugins(List<AlgorithmFactory<? extends AdditionalStartable>> plugins) {
+        this.plugins = plugins;
     }
 }
