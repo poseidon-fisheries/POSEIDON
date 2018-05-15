@@ -82,7 +82,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             Function<SeaTile, Double>> allocators = new LinkedHashMap<>();
 
 
-    private final LinkedHashMap<SeaTile,BiomassLocalBiology> localBiologies = new LinkedHashMap<>();
+    private final LinkedHashMap<SeaTile,VariableBiomassBasedBiology> localBiologies = new LinkedHashMap<>();
 
     /**
      * contains all the mortality+recruitment processes of each species
@@ -99,7 +99,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
     /**
      * stored and used during reset only!
      */
-    private LinkedHashMap<Species,LinkedHashMap<BiomassLocalBiology,Double>> originalWeights = new LinkedHashMap<>();
+    private LinkedHashMap<Species,LinkedHashMap<VariableBiomassBasedBiology,Double>> originalWeights = new LinkedHashMap<>();
 
 
 
@@ -188,7 +188,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
         else
         {
 
-            BiomassLocalBiology local = new BiomassLocalBiology(0,biology.getSize(),random);
+            BiomassLocalBiology local = new BiomassLocalBiology(0, biology.getSize(), random);
             localBiologies.put(seaTile,local);
             return local;
 
@@ -223,14 +223,14 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
                 //we have a mapping tile---> weight
                 //we want a mapping biology-->weight
-                LinkedHashMap<BiomassLocalBiology, Double> weights =
+                LinkedHashMap<VariableBiomassBasedBiology, Double> weights =
                         new LinkedHashMap<>(localBiologies.size());
 
 
                 Function<SeaTile, Double> allocator = allocators.get(species);
                 Preconditions.checkArgument(allocator != null);
                 //for every biology allocate it its weight (for this species)
-                for (Map.Entry<SeaTile, BiomassLocalBiology> local : localBiologies.entrySet()) {
+                for (Map.Entry<SeaTile, VariableBiomassBasedBiology> local : localBiologies.entrySet()) {
                     double ratio = allocator.apply(local.getKey());
                     weights.put(local.getValue(), ratio);
                 }
@@ -257,15 +257,16 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
 
                 //hopefully biomass sums up in the end!
 
-                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
+                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
+
                     @Override
-                    public double applyAsDouble(BiomassLocalBiology value) {
+                    public double applyAsDouble(VariableBiomassBasedBiology value) {
                         return value.getCarryingCapacity(species);
                     }
                 }).sum() -virginBiomass) < FishStateUtilities.EPSILON;
-                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<BiomassLocalBiology>() {
+                assert Math.abs(localBiologies.values().stream().mapToDouble(new ToDoubleFunction<VariableBiomassBasedBiology>() {
                     @Override
-                    public double applyAsDouble(BiomassLocalBiology value) {
+                    public double applyAsDouble(VariableBiomassBasedBiology value) {
                         return value.getBiomass(species);
                     }
                 }).sum() - currentBiomass)<.01;
@@ -287,7 +288,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
                         parameter.getLastRecruits()
                 );
                 //register all valid biologies to be grown
-                for (Map.Entry<SeaTile, BiomassLocalBiology> bio : localBiologies.entrySet()) {
+                for (Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet()) {
                     if(bio.getValue().getCarryingCapacity(species)>0)
                         grower.getBiologies().add(bio.getValue());
                 }
@@ -299,7 +300,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             }
             //clear out all empty biologies
             List<SeaTile> toClear = new LinkedList<>();
-            for (Map.Entry<SeaTile, BiomassLocalBiology> bio : localBiologies.entrySet())
+            for (Map.Entry<SeaTile, VariableBiomassBasedBiology> bio : localBiologies.entrySet())
             {
                 double sum = 0;
                 for(int i=0; i<biology.getSize(); i++)
@@ -356,14 +357,14 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
      * @param species
      * @param weights
      */
-    private void resetLocalBiology(Species species, LinkedHashMap<BiomassLocalBiology, Double> weights) {
+    private void resetLocalBiology(Species species, LinkedHashMap<VariableBiomassBasedBiology, Double> weights) {
         if(species.isImaginary())
             return;
         DerisoParameters parameter = parameters.get(species);
         double virginBiomass = parameter.getVirginBiomass();
         double currentBiomass = parameter.getEmpiricalYearlyBiomasses().get(
                 parameter.getEmpiricalYearlyBiomasses().size()-1);
-        for (Map.Entry<BiomassLocalBiology, Double> bio : weights.entrySet()) {
+        for (Map.Entry<VariableBiomassBasedBiology, Double> bio : weights.entrySet()) {
            // these asserts are only true the first time you call this method
             // assert bio.getKey().getCarryingCapacity(species) == 0;
            // assert bio.getKey().getBiomass(species) == 0;

@@ -25,14 +25,9 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.junit.After;
 import org.junit.Test;
-import sim.engine.SimState;
-import sim.engine.Steppable;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
@@ -41,7 +36,6 @@ import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -213,11 +207,11 @@ public class SerializeTest {
                     for (int y = 0; y < state.getMap().getHeight(); y++) {
                         if (state.getMap().getSeaTile(x, y).isFishingEvenPossibleHere()) {
                             assertEquals(
-                                    ((BiomassLocalBiology) state.getMap().getSeaTile(x,
-                                                                                     y).getBiology()).getCarryingCapacity(
+                                    ((VariableBiomassBasedBiology) state.getMap().getSeaTile(x,
+                                                                                             y).getBiology()).getCarryingCapacity(
                                             species),
-                                    ((BiomassLocalBiology) state2.getMap().getSeaTile(x,
-                                                                                      y).getBiology()).getCarryingCapacity(
+                                    ((VariableBiomassBasedBiology) state2.getMap().getSeaTile(x,
+                                                                                              y).getBiology()).getCarryingCapacity(
                                             species),
                                     .0001
                             );

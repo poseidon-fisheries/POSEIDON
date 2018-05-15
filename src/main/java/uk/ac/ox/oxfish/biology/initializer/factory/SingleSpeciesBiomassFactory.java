@@ -60,6 +60,8 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
     private AlgorithmFactory<? extends LogisticGrowerInitializer> grower = new SimpleLogisticGrowerFactory(0.6, 0.8);
 
 
+    private boolean unfishable = false;
+
     /**Si
      * Applies this function to the given argument.
      *
@@ -84,10 +86,10 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
                         ) :
                         new NoMovement(),
                 speciesName,
-                grower.apply(state)
+                grower.apply(state),
 
 
-        );
+                unfishable);
 
 
 
@@ -204,5 +206,23 @@ public class SingleSpeciesBiomassFactory implements AlgorithmFactory<SingleSpeci
     public void setGrower(
             AlgorithmFactory<? extends LogisticGrowerInitializer> grower) {
         this.grower = grower;
+    }
+
+    /**
+     * Getter for property 'unfishable'.
+     *
+     * @return Value for property 'unfishable'.
+     */
+    public boolean isUnfishable() {
+        return unfishable;
+    }
+
+    /**
+     * Setter for property 'unfishable'.
+     *
+     * @param unfishable Value to set for property 'unfishable'.
+     */
+    public void setUnfishable(boolean unfishable) {
+        this.unfishable = unfishable;
     }
 }

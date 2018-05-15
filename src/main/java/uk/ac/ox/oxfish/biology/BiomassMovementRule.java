@@ -40,8 +40,8 @@ public interface BiomassMovementRule {
                      double carryingCapacityHere,
                      double carryingCapacityThere,
 
-                     BiomassLocalBiology biologyHere,
-                     BiomassLocalBiology biologyThere
+                     VariableBiomassBasedBiology biologyHere,
+                     VariableBiomassBasedBiology biologyThere
     );
 
 

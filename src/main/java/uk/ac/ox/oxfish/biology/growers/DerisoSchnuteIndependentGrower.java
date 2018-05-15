@@ -25,6 +25,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -70,17 +71,17 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
     /**
      * map containing previous end of the year biomasses, last is the latest/newest
      */
-    private Map<BiomassLocalBiology,LinkedList<Double>> previousBiomasses =
+    private Map<VariableBiomassBasedBiology,LinkedList<Double>> previousBiomasses =
             new HashMap<>();
 
     /**
      * map containing survival rates after fishing has occurred, last is the latest/newest
      */
-    private Map<BiomassLocalBiology,LinkedList<Double>> actualSurvivalRates =
+    private Map<VariableBiomassBasedBiology,LinkedList<Double>> actualSurvivalRates =
             new HashMap<>();
 
 
-    private Map<BiomassLocalBiology,Double> previousRecruits = new HashMap<>();
+    private Map<VariableBiomassBasedBiology,Double> previousRecruits = new HashMap<>();
 
     /**
      * set up when starting
@@ -103,7 +104,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
 
         double numberOfCells = biologies.size();
 
-        for(BiomassLocalBiology biology : biologies)
+        for(VariableBiomassBasedBiology biology : biologies)
         {
             //populates biomasses from data
             LinkedList<Double> biomasses = new LinkedList<>();
@@ -163,7 +164,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
      * the operation is in progress.  (Note that this will occur if the
      * specified collection is this list, and it's nonempty.)
      */
-    public boolean addAll(Collection<? extends BiomassLocalBiology> c) {
+    public boolean addAll(Collection<BiomassLocalBiology> c) {
         return biologies.addAll(c);
     }
 
@@ -186,7 +187,7 @@ public class DerisoSchnuteIndependentGrower implements Startable, Steppable{
                 logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for(BiomassLocalBiology biology : biologies)
+        for(VariableBiomassBasedBiology biology : biologies)
         {
 
             //basic current info

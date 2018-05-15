@@ -1,5 +1,9 @@
 package uk.ac.ox.oxfish.model.plugins;
 
+import uk.ac.ox.oxfish.biology.BiomassLocationResetter;
+import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
+import uk.ac.ox.oxfish.biology.BiomassTotalResetter;
+import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -24,6 +28,19 @@ public class AdditionalStartables {
         NAMES.put(TowAndAltitudePluginFactory.class,
                 "Tow Heatmapper");
 
+
+        CONSTRUCTORS.put("Biomass Location Resetter",
+                         BiomassResetterFactory::new
+        );
+        NAMES.put(BiomassResetterFactory.class,
+                  "Biomass Location Resetter");
+
+
+        CONSTRUCTORS.put("Biomass Total Resetter",
+                         BiomassTotalResetterFactory::new
+        );
+        NAMES.put(BiomassTotalResetterFactory.class,
+                  "Biomass Total Resetter");
 
 
     }

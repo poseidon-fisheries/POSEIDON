@@ -9,3 +9,6 @@ Equal Out Degree:
   degree: '2.0'
   equalOutDegree: true
 -------
+Same Size Clubs:
+  maxClubSize: 2
+-------

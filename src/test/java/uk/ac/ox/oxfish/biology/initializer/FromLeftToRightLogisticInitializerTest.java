@@ -24,10 +24,9 @@ import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
-import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightLogisticFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -38,7 +37,6 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
 /**
@@ -98,7 +96,7 @@ public class FromLeftToRightLogisticInitializerTest {
 
 
         //the leftmost cell shouldn't be bothered
-        BiomassLocalBiology local = mock(BiomassLocalBiology.class);
+        VariableBiomassBasedBiology local = mock(BiomassLocalBiology.class);
         when(leftmost.getBiology()).thenReturn(local);
         when(middle.getBiology()).thenReturn(local);
         when(rightmost.getBiology()).thenReturn(local);

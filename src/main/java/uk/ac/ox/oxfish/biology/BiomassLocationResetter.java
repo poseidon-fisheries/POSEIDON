@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * calls biomass allocator at the end of each year to reset the location of biomass left.
@@ -19,10 +20,11 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
 
     private final Species species;
 
-    private final BiomassAllocator biomassAllocator;
+    //a supplier because I want a "new" biomass allocator each time step
+    private final Supplier<BiomassAllocator> biomassAllocator;
 
 
-    public BiomassLocationResetter(Species species, BiomassAllocator biomassAllocator) {
+    public BiomassLocationResetter(Species species, Supplier<BiomassAllocator> biomassAllocator) {
         this.species = species;
         this.biomassAllocator = biomassAllocator;
     }
@@ -42,43 +44,49 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
 
         FishState state = (FishState) simState;
 
+        BiomassAllocator thisYearAllocator = this.biomassAllocator.get();
         Double totalAllocation = 0d;
-        double totalBiomass = 0d;
+        double totalBiomass = computeBiomassNextYear((FishState) simState);
         HashMap<SeaTile,Double> hashMap = new HashMap<>();
+        //for all the areas of the seas that are livable
         for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList()) {
             //skip if it's unlivable
-            if(tile.getBiology() instanceof BiomassLocalBiology)
-            {
-                if(((BiomassLocalBiology) tile.getBiology()).getCarryingCapacity(species)<=0)
-                    continue;
-                else
-                    totalBiomass+=
-                            tile.getBiology().getBiomass(species);
-            }
-            else
-                assert tile.getBiology() instanceof EmptyLocalBiology;
 
-            double allocated = biomassAllocator.allocate(
+            if(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(species)<=0)
+                continue;
+
+
+            //allocate new biomass weight
+            double allocated = thisYearAllocator.allocate(
                     tile,
                     state.getMap(),
                     state.getRandom()
             );
+
+            if(!Double.isFinite(allocated))
+                allocated=0;
             hashMap.put(tile,
-                    allocated);
-            totalAllocation+=allocated;
+                        allocated);
+            totalAllocation += allocated;
 
 
         }
+        assert Double.isFinite(totalAllocation);
+        assert  totalAllocation>=0;
+
         //now loop again and place it!
         for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
         {
-            if(tile.getBiology() instanceof BiomassLocalBiology)
+            if(tile.getBiology() instanceof VariableBiomassBasedBiology)
             {
-                if (((BiomassLocalBiology) tile.getBiology()).getCarryingCapacity(species) <= 0)
+                VariableBiomassBasedBiology biology = (VariableBiomassBasedBiology) tile.getBiology();
+                if (biology.getCarryingCapacity(species) > 0)
                 {
-                    ((BiomassLocalBiology) tile.getBiology()).setCurrentBiomass(species,
-                            totalBiomass*hashMap.get(tile)/totalAllocation
-                            );
+                    biology.setCurrentBiomass(species,
+                                              Math.min(
+                                                      totalBiomass*hashMap.get(tile)/totalAllocation,
+                                                      biology.getCarryingCapacity(species))
+                    );
                 }
 
             }
@@ -86,5 +94,9 @@ public class BiomassLocationResetter implements AdditionalStartable, Steppable
 
 
         }
+    }
+
+    protected double computeBiomassNextYear(FishState simState) {
+        return simState.getTotalBiomass(species);
     }
 }

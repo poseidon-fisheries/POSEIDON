@@ -24,8 +24,8 @@ import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.BiomassDiffuserContainer;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -90,8 +90,8 @@ public class MultipleIndependentSpeciesBiomassInitializerTest {
             assertEquals(tile.getBiomass(globalBiology.getSpecie(0)),100d,.0001);
             assertEquals(tile.getBiomass(globalBiology.getSpecie(1)),160d,.0001);
 
-            assertEquals(((BiomassLocalBiology) tile.getBiology()).getCarryingCapacity(0),100d,.0001);
-            assertEquals(((BiomassLocalBiology) tile.getBiology()).getCarryingCapacity(1),200d,.0001);
+            assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(0), 100d, .0001);
+            assertEquals(((VariableBiomassBasedBiology) tile.getBiology()).getCarryingCapacity(1), 200d, .0001);
         }
         //only one movement should have started!
         verify(model,times(1)).scheduleEveryDay(

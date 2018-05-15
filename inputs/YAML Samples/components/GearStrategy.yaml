@@ -29,3 +29,12 @@ Periodic Gear Update Catchability:
   shockSize: '0.05'
   yearly: true
 -------
+Periodic Gear Update Selectivity:
+  maxPercentageChangeA: 0.1
+  maxPercentageChangeB: 0.1
+  probability:
+    Fixed Probability:
+      explorationProbability: '0.2'
+      imitationProbability: '0.6'
+  yearly: false
+-------

@@ -56,8 +56,8 @@ public class SimplexAllocator implements BiomassAllocator {
             SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
 
 
-        return noise.eval(tile.getGridX()/bandwidth,
-                          tile.getGridY()/bandwidth)*(maxAllocation-minAllocation)+minAllocation;
+        return Math.max(noise.eval(tile.getGridX()/bandwidth,
+                          tile.getGridY()/bandwidth)*(maxAllocation-minAllocation)+minAllocation,0);
 
     }
 }

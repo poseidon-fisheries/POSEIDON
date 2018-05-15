@@ -49,7 +49,7 @@ public class SmoothMovementRule implements BiomassMovementRule {
     public void move(
             Species species, SeaTile here, double biomassHere, SeaTile there, double biomassThere, double delta,
             double carryingCapacityHere, double carryingCapacityThere,
-            BiomassLocalBiology biologyHere, BiomassLocalBiology biologyThere)
+            VariableBiomassBasedBiology biologyHere, VariableBiomassBasedBiology biologyThere)
     {
         //shouldn't call this uselessly
         assert carryingCapacityHere >FishStateUtilities.EPSILON;

@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerInitializer;
@@ -82,7 +82,7 @@ new ConstantBiomassAllocator() )
 
         GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
         //at 0,0 there is no species 0
-        BiomassLocalBiology zerozero = (BiomassLocalBiology)
+        VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(0, 0, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
@@ -95,7 +95,7 @@ new ConstantBiomassAllocator() )
         assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
 
         //at 5,5 also no species 0
-        BiomassLocalBiology fivefive = (BiomassLocalBiology)
+        VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(5,5, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
@@ -109,7 +109,7 @@ new ConstantBiomassAllocator() )
 
 
         //at 10,10 there is no species 1
-        BiomassLocalBiology tenten = (BiomassLocalBiology)
+        VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(10,10, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
@@ -154,7 +154,7 @@ new ConstantBiomassAllocator() )
 
         GlobalBiology biology = new GlobalBiology(new Species("A"), new Species("B"));
         //at 0,0 there is no species 0
-        BiomassLocalBiology zerozero = (BiomassLocalBiology)
+        VariableBiomassBasedBiology zerozero = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(0, 0, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
@@ -167,7 +167,7 @@ new ConstantBiomassAllocator() )
         assertEquals(zerozero.getCarryingCapacity(biology.getSpecie(1)),100,.0001 );
 
         //at 5,5 also no species 0
-        BiomassLocalBiology fivefive = (BiomassLocalBiology)
+        VariableBiomassBasedBiology fivefive = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(5,5, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),
@@ -181,7 +181,7 @@ new ConstantBiomassAllocator() )
 
 
         //at 10,10 there is no species 1
-        BiomassLocalBiology tenten = (BiomassLocalBiology)
+        VariableBiomassBasedBiology tenten = (VariableBiomassBasedBiology)
                 initializer.generateLocal(biology,
                                           new SeaTile(10,10, -100, mock(TileHabitat.class)),
                                           new MersenneTwisterFast(),

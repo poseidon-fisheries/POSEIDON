@@ -25,6 +25,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -76,7 +77,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
                 logisticLocalBiology -> !logisticLocalBiology.isStopped()).collect(Collectors.toList());
 
         //for each place
-        for(BiomassLocalBiology biology : biologies)
+        for(VariableBiomassBasedBiology biology : biologies)
         {
             //grow fish
 

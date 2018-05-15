@@ -11,6 +11,7 @@ Abstract 2 Populations:
       maxInitialCapacity: '1.0'
       minInitialCapacity: '0.0'
       percentageLimitOnDailyMovement: '0.01'
+      speciesName: Species 0
   departingStrategyLarge:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'

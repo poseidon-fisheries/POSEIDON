@@ -24,7 +24,7 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -77,7 +77,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
     /**
      * list of local biologies we manage. We will at all times
      */
-    private LinkedHashSet<BiomassLocalBiology> biologies = new LinkedHashSet<>();
+    private LinkedHashSet<VariableBiomassBasedBiology> biologies = new LinkedHashSet<>();
     /**
      * receipt to stop the grower when needed
      */
@@ -173,7 +173,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         //basic current info
         double currentBiomass = 0;
         double virginBiomass = 0;
-        for(BiomassLocalBiology biology : biologies)
+        for(VariableBiomassBasedBiology biology : biologies)
         {
             currentBiomass+= biology.getCurrentBiomass()[speciesIndex];
             virginBiomass+= biology.getCarryingCapacity(speciesIndex);
@@ -197,7 +197,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
         //reallocate uniformly. Do not allocate above carrying capacity
 
-        List<BiomassLocalBiology> biologyList = new ArrayList<>(this.biologies);
+        List<VariableBiomassBasedBiology> biologyList = new ArrayList<>(this.biologies);
 
         double toReallocate = newBiomass  - currentBiomass; // I suppose this could be negative
 
@@ -205,18 +205,18 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
             return;
 
         if(toReallocate > 0) //if we are adding biomass, keep only not-full biologies
-            biologyList = biologyList.stream().filter(new Predicate<BiomassLocalBiology>() {
+            biologyList = biologyList.stream().filter(new Predicate<VariableBiomassBasedBiology>() {
                 @Override
-                public boolean test(BiomassLocalBiology loco) {
+                public boolean test(VariableBiomassBasedBiology loco) {
                     return loco.getCurrentBiomass()[speciesIndex]< loco.getCarryingCapacity(speciesIndex);
                 }
             }).collect(Collectors.toList());
         else {
             assert toReallocate < 0;
             //if we are removing biomass, keep only not-empty biologies
-            biologyList = biologyList.stream().filter(new Predicate<BiomassLocalBiology>() {
+            biologyList = biologyList.stream().filter(new Predicate<VariableBiomassBasedBiology>() {
                 @Override
-                public boolean test(BiomassLocalBiology loco) {
+                public boolean test(VariableBiomassBasedBiology loco) {
                     return loco.getCurrentBiomass()[speciesIndex] > 0;
                 }
             }).collect(Collectors.toList());
@@ -229,7 +229,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         while(Math.abs(toReallocate) > FishStateUtilities.EPSILON && !biologyList.isEmpty())
         {
             //pick a biology at random
-            BiomassLocalBiology local = biologyList.get(random.nextInt(biologyList.size()));
+            VariableBiomassBasedBiology local = biologyList.get(random.nextInt(biologyList.size()));
             //give or take some biomass out
             double delta = toReallocate / (double) biologyList.size();
             local.getCurrentBiomass()[speciesIndex] += delta;
@@ -266,7 +266,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
     }
 
-    public boolean addAll(Collection<? extends BiomassLocalBiology> c) {
+    public boolean addAll(Collection<? extends VariableBiomassBasedBiology> c) {
         return biologies.addAll(c);
     }
 
@@ -366,7 +366,7 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
      *
      * @return Value for property 'biologies'.
      */
-    public Set<BiomassLocalBiology> getBiologies() {
+    public Set<VariableBiomassBasedBiology> getBiologies() {
         return biologies;
     }
 }

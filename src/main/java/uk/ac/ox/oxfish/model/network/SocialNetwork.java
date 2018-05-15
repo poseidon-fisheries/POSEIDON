@@ -97,6 +97,16 @@ public class SocialNetwork
 
 
     /**
+     * these are all other fishers connected to this agent
+     * @param agent
+     * @return
+     */
+    public Collection<Fisher> getPredecessors(Fisher agent)
+    {
+        return network.getPredecessors(agent);
+    }
+
+    /**
      * replace connection with a random new one
      * @param agent agent who will be connected to a new friend
      * @param friendBeingReplaced old friend whose connection will be removed

@@ -32,7 +32,8 @@ import java.util.Arrays;
  * A simple local biology that has carrying capacity and actual biomass.
  * Created by carrknight on 5/8/15.
  */
-public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements Startable {
+public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements Startable,
+        VariableBiomassBasedBiology {
 
     /**
      * the current amount of biomass in this spot
@@ -114,6 +115,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param species the species
      * @return the carrying capacity for this species at this location
      */
+    @Override
     public Double getCarryingCapacity(Species species)
     {
         final int index = species.getIndex();
@@ -128,6 +130,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param index the species
      * @return the carrying capacity for this species at this location
      */
+    @Override
     public Double getCarryingCapacity(int index)
     {
         if(index>=this.carryingCapacity.length)
@@ -182,6 +185,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param s the specie
      * @param newCarryingCapacity the new carrying capacity
      */
+    @Override
     public void setCarryingCapacity(Species s, double newCarryingCapacity)
     {
         Preconditions.checkArgument(newCarryingCapacity >= 0, "new carrying capacity must be positive");
@@ -201,6 +205,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param s the specie
      * @param newCurrentBiomass the new biomass in lbs
      */
+    @Override
     public void setCurrentBiomass(Species s, double newCurrentBiomass)
     {
 
@@ -278,6 +283,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     }
 
 
+    @Override
     public Double[] getCurrentBiomass() {
         return currentBiomass;
     }

@@ -9,6 +9,7 @@ Abstract:
       maxInitialCapacity: '1.0'
       minInitialCapacity: '0.0'
       percentageLimitOnDailyMovement: '0.01'
+      speciesName: Species 0
   cheaters: false
   departingStrategy:
     Fixed Rest:
@@ -69,6 +70,15 @@ Abstract:
       allowMutualFriendships: true
       degree: '2.0'
       equalOutDegree: true
+  plugins:
+  - Biomass Location Resetter:
+      algorithmFactory:
+        Random Kernel Allocator:
+          bandwidth: '5.0'
+          fixedPoints: '10.0'
+          maximum: '1.0'
+          minimum: '0.0'
+      speciesName: Species 0
   portPositionX: -1
   portPositionY: -1
   ports: 1

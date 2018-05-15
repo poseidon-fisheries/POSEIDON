@@ -111,7 +111,7 @@ public class CarryingCapacityDiffuser implements Steppable,Startable{
                 for(Direction direction : Direction.getDirection(here,neighbour))
                 {
                     //if your carrying capacity is 0 do not diffuse
-                    if(((BiomassLocalBiology) here.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON )
+                    if(((VariableBiomassBasedBiology) here.getBiology()).getCarryingCapacity(species)<= FishStateUtilities.EPSILON )
                         continue tileloop;
 
                     if(direction.getBiasNorth() == biasNorth)

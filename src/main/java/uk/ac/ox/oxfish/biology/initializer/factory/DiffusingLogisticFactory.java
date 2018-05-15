@@ -87,7 +87,7 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesB
                         differentialPercentageToMove.apply(state.getRandom())
                 ),
                 speciesName,
-                grower.apply(state));
+                grower.apply(state), false);
 
 
 

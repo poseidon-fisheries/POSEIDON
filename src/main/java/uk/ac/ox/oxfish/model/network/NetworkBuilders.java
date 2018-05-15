@@ -54,6 +54,10 @@ public class NetworkBuilders
                          EquidegreeBuilder::new
         );
         NAMES.put(EquidegreeBuilder.class,"Equal Out Degree");
+        CONSTRUCTORS.put("Same Size Clubs",
+                         ClubNetworkBuilder::new
+        );
+        NAMES.put(ClubNetworkBuilder.class,"Same Size Clubs");
 
     }
 

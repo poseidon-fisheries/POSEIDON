@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -235,6 +236,11 @@ public class PrototypeScenario implements Scenario {
 
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins =
             new LinkedList<>();
+    {
+        plugins.add(
+                new BiomassResetterFactory()
+        );
+    }
 
     public PrototypeScenario() {
     }

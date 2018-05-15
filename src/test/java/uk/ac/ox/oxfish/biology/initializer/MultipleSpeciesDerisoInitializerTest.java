@@ -23,10 +23,7 @@ package uk.ac.ox.oxfish.biology.initializer;
 import ec.util.MersenneTwisterFast;
 import org.jfree.util.Log;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
-import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
-import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.*;
 import uk.ac.ox.oxfish.biology.growers.DerisoSchnuteCommonGrower;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -98,7 +95,7 @@ public class MultipleSpeciesDerisoInitializerTest {
         double virginBiomass = map.getAllSeaTilesAsList().stream().mapToDouble(new ToDoubleFunction<SeaTile>() {
             @Override
             public double applyAsDouble(SeaTile value) {
-                return ((BiomassLocalBiology) value.getBiology()).getCarryingCapacity(fakeSpecies);
+                return ((VariableBiomassBasedBiology) value.getBiology()).getCarryingCapacity(fakeSpecies);
             }
         }).sum();
 

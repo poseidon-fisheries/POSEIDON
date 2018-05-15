@@ -77,6 +77,8 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
     private String speciesName = "Species 0";
 
 
+    private boolean unfishable = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -109,8 +111,9 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
                         ) :
                         new NoMovement(),
                 speciesName,
-                grower.apply(state)
-        );
+                grower.apply(state),
+                true,
+                unfishable);
 
 
     }
@@ -283,5 +286,23 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
      */
     public void setBiomassSuppliedPerCell(boolean biomassSuppliedPerCell) {
         this.biomassSuppliedPerCell = biomassSuppliedPerCell;
+    }
+
+    /**
+     * Getter for property 'unfishable'.
+     *
+     * @return Value for property 'unfishable'.
+     */
+    public boolean isUnfishable() {
+        return unfishable;
+    }
+
+    /**
+     * Setter for property 'unfishable'.
+     *
+     * @param unfishable Value to set for property 'unfishable'.
+     */
+    public void setUnfishable(boolean unfishable) {
+        this.unfishable = unfishable;
     }
 }

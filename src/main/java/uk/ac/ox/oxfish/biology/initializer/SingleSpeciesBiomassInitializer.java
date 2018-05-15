@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.initializer;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
@@ -80,6 +79,8 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     final private boolean normalizeAllocators;
 
 
+
+
     /**
      * you can set this true and biomass diffuser won't be generated when processing the map
      */
@@ -89,21 +90,17 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     private boolean hasAlreadyWarned = false;
 
 
-    public SingleSpeciesBiomassInitializer(
-            InitialBiomass initialTotalBiomass,
-            BiomassAllocator initialAllocator, InitialBiomass totalCapacity,
-            BiomassAllocator carryingCapacityAllocator, BiomassMovementRule movementRule, String speciesName,
-            @NotNull LogisticGrowerInitializer grower) {
-        this(initialTotalBiomass, initialAllocator, totalCapacity, carryingCapacityAllocator, movementRule,
-             speciesName, grower, true);
-    }
+
+    private boolean unfishable;
+
 
     public SingleSpeciesBiomassInitializer(
             InitialBiomass initialTotalBiomass,
             BiomassAllocator initialAllocator, InitialBiomass totalCapacity,
             BiomassAllocator carryingCapacityAllocator, BiomassMovementRule movementRule,
             String speciesName,
-            @NotNull LogisticGrowerInitializer grower, boolean normalizeAllocators) {
+            @NotNull LogisticGrowerInitializer grower,
+            boolean normalizeAllocators, boolean unfishable) {
         this.initialTotalBiomass = initialTotalBiomass;
         this.initialAllocator = initialAllocator;
         this.totalCapacity = totalCapacity;
@@ -113,6 +110,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         this.speciesName = speciesName;
         this.grower = grower;
         this.normalizeAllocators = normalizeAllocators;
+        this.unfishable = unfishable;
     }
 
 
@@ -123,13 +121,15 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
      * @param carryingCapacityAllocator
      * @param speciesName
      * @param grower
+     * @param unfishable
      */
     public SingleSpeciesBiomassInitializer(
             BiomassAllocator initialAllocator,
             BiomassAllocator carryingCapacityAllocator,
             BiomassMovementRule movementRule,
             String speciesName,
-            @NotNull LogisticGrowerInitializer grower) {
+            @NotNull LogisticGrowerInitializer grower, boolean unfishable) {
+        this.unfishable = unfishable;
         this.initialTotalBiomass = new ConstantInitialBiomass(1);
         this.totalCapacity = new ConstantInitialBiomass(1);
 
@@ -270,6 +270,9 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
 
             Preconditions.checkArgument(startingBiomass<=carryingCapacity,
                                         "carrying capacity allocated less than initial biomass allocated! ");
+
+            if(unfishable)
+                seaTile.setBiology(new ConstantBiomassDecorator(local));
 
         }
         Preconditions.checkArgument(habitableAreas.size()==numberOfHabitableCells,
@@ -423,5 +426,21 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         this.forceMovementOff = forceMovementOff;
     }
 
+    /**
+     * Getter for property 'unfishable'.
+     *
+     * @return Value for property 'unfishable'.
+     */
+    public boolean isUnfishable() {
+        return unfishable;
+    }
 
+    /**
+     * Setter for property 'unfishable'.
+     *
+     * @param unfishable Value to set for property 'unfishable'.
+     */
+    public void setUnfishable(boolean unfishable) {
+        this.unfishable = unfishable;
+    }
 }

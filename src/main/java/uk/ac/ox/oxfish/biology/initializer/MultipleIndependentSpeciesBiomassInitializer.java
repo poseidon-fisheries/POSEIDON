@@ -42,13 +42,13 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
     private final boolean addImaginarySpecies;
 
 
-    private final boolean keepBiomassConstant;
+    private final boolean unfishable;
 
     public MultipleIndependentSpeciesBiomassInitializer(
-            List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies, boolean keepBiomassConstant) {
+            List<SingleSpeciesBiomassInitializer> initializers, boolean addImaginarySpecies, boolean unfishable) {
         this.initializers = initializers;
         this.addImaginarySpecies = addImaginarySpecies;
-        this.keepBiomassConstant = keepBiomassConstant;
+        this.unfishable = unfishable;
     }
 
     /**
@@ -94,11 +94,12 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
 
 
 
-        //do not let them create their own movement!
         ArrayList<Pair<Species,BiomassMovementRule>> movements = new ArrayList<>(initializers.size());
         for (SingleSpeciesBiomassInitializer initializer : initializers)
         {
+            //do not let them create their own movement!
             initializer.setForceMovementOff(true);
+
             initializer.processMap(biology, map, random, model);
             movements.add(
                     new Pair<>(
@@ -108,11 +109,11 @@ public class MultipleIndependentSpeciesBiomassInitializer implements BiologyInit
         }
 
 
-        if(keepBiomassConstant)
+        if(unfishable)
         {
             for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
                 if(!(seaTile.getBiology() instanceof EmptyLocalBiology))
-                    seaTile.setBiology(new ConstantBiomassDecorator(seaTile.getBiology()));
+                    seaTile.setBiology(new ConstantBiomassDecorator((BiomassLocalBiology)seaTile.getBiology()));
             }
         }
 

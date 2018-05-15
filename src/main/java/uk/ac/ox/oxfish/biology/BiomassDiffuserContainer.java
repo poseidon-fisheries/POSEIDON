@@ -56,8 +56,6 @@ public class BiomassDiffuserContainer implements Steppable {
      * @param map
      * @param random
      * @param biology
-     * @param differentialPercentageToMove
-     * @param percentageLimitOnDailyMovement
      */
     public BiomassDiffuserContainer(
             NauticalMap map, MersenneTwisterFast random,
@@ -146,7 +144,7 @@ public class BiomassDiffuserContainer implements Steppable {
                     //if here there are more than there
                     final Species species = movementRuleEntry.getKey();
                     BiomassLocalBiology biologyHere = (BiomassLocalBiology) tile.getBiology();
-                    BiomassLocalBiology biologyThere = (BiomassLocalBiology) neighbor.getBiology();
+                    VariableBiomassBasedBiology biologyThere = (VariableBiomassBasedBiology) neighbor.getBiology();
 
                     //if your carrying capacity is 0 do not diffuse
                     double biomassHere = tile.getBiomass(species);

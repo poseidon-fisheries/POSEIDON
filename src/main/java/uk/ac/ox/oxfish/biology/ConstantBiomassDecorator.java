@@ -7,12 +7,12 @@ import uk.ac.ox.oxfish.model.FishState;
 /**
  * intercepts and doesn't pass along "reactTo" calls
  */
-public class ConstantBiomassDecorator implements LocalBiology {
+public class ConstantBiomassDecorator implements VariableBiomassBasedBiology {
 
 
-    private final LocalBiology delegate;
+    private final VariableBiomassBasedBiology delegate;
 
-    public ConstantBiomassDecorator(LocalBiology delegate) {
+    public ConstantBiomassDecorator(VariableBiomassBasedBiology delegate) {
         this.delegate = delegate;
     }
 
@@ -40,5 +40,31 @@ public class ConstantBiomassDecorator implements LocalBiology {
     @Override
     public void turnOff() {
         delegate.turnOff();
+    }
+
+
+    @Override
+    public Double getCarryingCapacity(Species species) {
+        return delegate.getCarryingCapacity(species);
+    }
+
+    @Override
+    public Double getCarryingCapacity(int index) {
+        return delegate.getCarryingCapacity(index);
+    }
+
+    @Override
+    public void setCarryingCapacity(Species s, double newCarryingCapacity) {
+        delegate.setCarryingCapacity(s, newCarryingCapacity);
+    }
+
+    @Override
+    public void setCurrentBiomass(Species s, double newCurrentBiomass) {
+        delegate.setCurrentBiomass(s, newCurrentBiomass);
+    }
+
+    @Override
+    public Double[] getCurrentBiomass() {
+        return delegate.getCurrentBiomass();
     }
 }

@@ -83,6 +83,10 @@ public class Allocators {
                          SimplexFactory::new);
         NAMES.put(SimplexFactory.class,"Simplex Allocator");
 
+        CONSTRUCTORS.put("Pyramids Allocator",
+                         PyramidsAllocatorFactory::new);
+        NAMES.put(PyramidsAllocatorFactory.class,"Pyramids Allocator");
+
 
     }
 

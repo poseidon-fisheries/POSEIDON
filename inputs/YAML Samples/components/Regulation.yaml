@@ -114,3 +114,9 @@ Multiple Regulations:
 Weak Multi-TAC by List:
   yearlyQuotaMaps: 0:500000
 -------
+Port Based Wait Times:
+  delegate: Anarchy
+  portWaitTimes:
+    Port 2: '10'
+    Port 1: '0'
+-------

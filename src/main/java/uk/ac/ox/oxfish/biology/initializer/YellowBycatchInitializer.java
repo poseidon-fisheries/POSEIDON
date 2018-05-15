@@ -90,16 +90,16 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     /**
      * bycatch tiles
      */
-    private Map<SeaTile,BiomassLocalBiology> bycatchBios = new HashMap<>();
+    private Map<SeaTile,VariableBiomassBasedBiology> bycatchBios = new HashMap<>();
 
     /**
      * northern tiles
      */
-    private List<BiomassLocalBiology> northBiologies = new LinkedList<>();
+    private List<VariableBiomassBasedBiology> northBiologies = new LinkedList<>();
     /**
      * southern tiles
      */
-    private List<BiomassLocalBiology> southBiologies = new LinkedList<>();
+    private List<VariableBiomassBasedBiology> southBiologies = new LinkedList<>();
 
 
     /**
@@ -128,7 +128,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     /**
      * the original biomass assigned for each local biology. Makes resetting quick
      */
-    private HashMap<BiomassLocalBiology,Double[]> originalBiomass = new HashMap<>();
+    private HashMap<VariableBiomassBasedBiology,Double[]> originalBiomass = new HashMap<>();
 
 
     private final double targetDiffusionRate;
@@ -210,7 +210,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         //prepare an empty biology
         //we will change carrying capacities and the like at the end after we have a good count of how many biologies
         //there actually are!
-        BiomassLocalBiology bio = new BiomassLocalBiology(0d,2,random);
+        BiomassLocalBiology bio = new BiomassLocalBiology(0d, 2, random);
 
         //will it contain the bycatch?
         if(seaTile.getGridX()>= habitatSeparator) {
@@ -242,7 +242,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
 
         assert  Collections.disjoint(northBiologies,southBiologies); //something is either in tile 1 or tile 2!
 
-        List<BiomassLocalBiology> allBiologies = new LinkedList<>();
+        List<VariableBiomassBasedBiology> allBiologies = new LinkedList<>();
         allBiologies.addAll(northBiologies);
         allBiologies.addAll(southBiologies);
 
@@ -260,15 +260,15 @@ public class YellowBycatchInitializer implements BiologyInitializer {
 
 
         //assign weights!
-        Map<BiomassLocalBiology,Double> weights = new HashMap<>();
+        Map<VariableBiomassBasedBiology,Double> weights = new HashMap<>();
         double weightSum = 0;
-        for (Map.Entry<SeaTile, BiomassLocalBiology> bycatchBio : bycatchBios.entrySet()) {
+        for (Map.Entry<SeaTile, VariableBiomassBasedBiology> bycatchBio : bycatchBios.entrySet()) {
             double weight = allocator.apply(bycatchBio.getKey());
             weights.put(bycatchBio.getValue(),weight);
             weightSum+=weight;
         }
 
-        for(BiomassLocalBiology bio : allBiologies)
+        for(VariableBiomassBasedBiology bio : allBiologies)
         {
             bio.setCarryingCapacity(biology.getSpecie(0),carryingCapacityTarget);
             bio.setCurrentBiomass(biology.getSpecie(0),targetBiomass);
@@ -349,9 +349,9 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         else
         {
 
-            List<BiomassLocalBiology> southBycatch = new LinkedList<>(bycatchBios.values());
+            List<VariableBiomassBasedBiology> southBycatch = new LinkedList<>(bycatchBios.values());
             southBycatch.removeAll(northBiologies);
-            List<BiomassLocalBiology> northBycatch = new LinkedList<>(bycatchBios.values());
+            List<VariableBiomassBasedBiology> northBycatch = new LinkedList<>(bycatchBios.values());
             northBycatch.removeAll(southBiologies);
 
 
@@ -536,15 +536,15 @@ public class YellowBycatchInitializer implements BiologyInitializer {
         return habitatSeparator;
     }
 
-    public Collection<BiomassLocalBiology> getBycatchBios() {
+    public Collection<VariableBiomassBasedBiology> getBycatchBios() {
         return bycatchBios.values();
     }
 
-    public List<BiomassLocalBiology> getNorthBiologies() {
+    public List<VariableBiomassBasedBiology> getNorthBiologies() {
         return northBiologies;
     }
 
-    public List<BiomassLocalBiology> getSouthBiologies() {
+    public List<VariableBiomassBasedBiology> getSouthBiologies() {
         return southBiologies;
     }
 
@@ -638,7 +638,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     public void resetLocalBiology(Species species){
 
         //reset!
-        for (Map.Entry<BiomassLocalBiology, Double[]> local : originalBiomass.entrySet()) {
+        for (Map.Entry<VariableBiomassBasedBiology, Double[]> local : originalBiomass.entrySet()) {
             local.getKey().setCurrentBiomass(species,local.getValue()[species.getIndex()]);
 
         }

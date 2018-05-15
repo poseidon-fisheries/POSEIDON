@@ -104,9 +104,9 @@ public class FromLeftToRightLogisticFactory implements AlgorithmFactory<SingleSp
                         differentialPercentageToMove.apply(state.getRandom())
                 ),
                 "Species 0",
-                getGrower().apply(state)
+                getGrower().apply(state),
 
-        );
+                false);
     }
 
 
