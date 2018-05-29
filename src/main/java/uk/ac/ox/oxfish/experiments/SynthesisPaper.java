@@ -52,13 +52,16 @@ import java.util.function.Supplier;
 public class SynthesisPaper {
 
 
+    public static final int FIGURE_2_RUNS = 10;
+
     public static void main(String[] args) throws IOException {
+        //shows some console info
         Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
 
-        avoidTheLine(100,
-                     Paths.get("inputs","paper_synthesis"),
-                     Paths.get("runs","paper_synthesis"));
-/*
+//        avoidTheLine(FIGURE_2_RUNS,
+//                Paths.get("inputs","paper_synthesis"),
+//                Paths.get("runs","paper_synthesis"));
+
         thresholdSweeps(25,
                         Paths.get("inputs","paper_synthesis"),
                         Paths.get("runs","paper_synthesis")
@@ -75,7 +78,7 @@ public class SynthesisPaper {
                                    Paths.get("inputs","paper_synthesis"),
                                    Paths.get("runs","paper_synthesis")
         );
-        */
+
 
     }
 
@@ -147,40 +150,40 @@ public class SynthesisPaper {
             //add tows on the line counter (the neighborhood is size 2 because that's the size of the border where
             //blue fish live and is not protected)
             DataColumn borders = state.getDailyDataSet().registerGatherer("Tows on the Line",
-                                                                          (Gatherer<FishState>) state1 -> {
+                    (Gatherer<FishState>) state1 -> {
 
-                                                                              double lineSum = 0;
-                                                                              NauticalMap map = state1.getMap();
-                                                                              for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                                                                  int trawlsHere = map.getDailyTrawlsMap().get(
-                                                                                          tile.getGridX(),
-                                                                                          tile.getGridY());
-                                                                                  if (!tile.isProtected() &&
-                                                                                          map.getMooreNeighbors(tile,
-                                                                                                                2).stream().anyMatch(
-                                                                                                  o -> ((SeaTile) o).isProtected())) {
-                                                                                      lineSum += trawlsHere;
-                                                                                  }
-                                                                              }
+                        double lineSum = 0;
+                        NauticalMap map = state1.getMap();
+                        for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                            int trawlsHere = map.getDailyTrawlsMap().get(
+                                    tile.getGridX(),
+                                    tile.getGridY());
+                            if (!tile.isProtected() &&
+                                    map.getMooreNeighbors(tile,
+                                            2).stream().anyMatch(
+                                            o -> ((SeaTile) o).isProtected())) {
+                                lineSum += trawlsHere;
+                            }
+                        }
 
-                                                                              return lineSum;
+                        return lineSum;
 
-                                                                          }
+                    }
                     , Double.NaN);
             //now just count all tows
             DataColumn totals = state.getDailyDataSet().registerGatherer("Tows",
-                                                                       (Gatherer<FishState>) state1 -> {
+                    (Gatherer<FishState>) state1 -> {
 
-                                                                           double lineSum = 0;
-                                                                           NauticalMap map = state1.getMap();
-                                                                           for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                                                               int trawlsHere = map.getDailyTrawlsMap().get(
-                                                                                       tile.getGridX(),
-                                                                                       tile.getGridY());
-                                                                               lineSum += trawlsHere;
-                                                                           }
-                                                                           return lineSum;
-                                                                       }
+                        double lineSum = 0;
+                        NauticalMap map = state1.getMap();
+                        for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                            int trawlsHere = map.getDailyTrawlsMap().get(
+                                    tile.getGridX(),
+                                    tile.getGridY());
+                            lineSum += trawlsHere;
+                        }
+                        return lineSum;
+                    }
                     , Double.NaN);
 
 
@@ -204,10 +207,18 @@ public class SynthesisPaper {
                 Files.write(outputFolder.resolve("grid" + name + ".csv"), grid.getBytes());
             }
 
-            FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name+"_"+run+".csv").toFile(),
-                                                     totals,
-                                                     borders);
+            if(!name.equals("itq"))
+                FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name+"_"+run+".csv").toFile(),
+                        totals,
+                        borders);
 
+            else
+                FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name+"_"+run+".csv").toFile(),
+                        totals,
+                        borders,
+                        state.getDailyDataSet().getColumn("ITQ Trades Of Species 1"),
+                        state.getDailyDataSet().getColumn("ITQ Prices Of Species 1")
+                );
 
         }
     }
