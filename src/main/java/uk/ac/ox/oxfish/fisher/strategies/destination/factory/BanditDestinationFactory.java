@@ -55,6 +55,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
     private boolean automaticallyIgnoreWastelands = true;
 
+    private boolean imitate = false;
+
 
     /**
      * Applies this function to the given argument.
@@ -78,7 +80,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
                 );
 
 
-        return new BanditDestinationStrategy(
+        BanditDestinationStrategy banditDestinationStrategy = new BanditDestinationStrategy(
                 arms -> new BanditAverage(
                         arms,
                         average,
@@ -88,6 +90,8 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
                 map,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
                 automaticallyIgnoreMPAs, automaticallyIgnoreWastelands);
+        banditDestinationStrategy.setImitate(imitate);
+        return banditDestinationStrategy;
     }
 
 
@@ -182,5 +186,23 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      */
     public void setAutomaticallyIgnoreWastelands(boolean automaticallyIgnoreWastelands) {
         this.automaticallyIgnoreWastelands = automaticallyIgnoreWastelands;
+    }
+
+    /**
+     * Getter for property 'imitate'.
+     *
+     * @return Value for property 'imitate'.
+     */
+    public boolean isImitate() {
+        return imitate;
+    }
+
+    /**
+     * Setter for property 'imitate'.
+     *
+     * @param imitate Value to set for property 'imitate'.
+     */
+    public void setImitate(boolean imitate) {
+        this.imitate = imitate;
     }
 }

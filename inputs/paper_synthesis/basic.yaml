@@ -5,7 +5,7 @@ Abstract:
       differentialPercentageToMove: '0.001'
       grower:
         Independent Logistic Grower:
-          steepness: uniform 0.6 0.8
+          steepness: 0.7
       maxInitialCapacity: '1.0'
       minInitialCapacity: '0.0'
       percentageLimitOnDailyMovement: '0.01'
@@ -56,7 +56,7 @@ Abstract:
   mapInitializer:
     Simple Map:
       cellSizeInKilometers: '10.0'
-      coastalRoughness: '4.0'
+      coastalRoughness: '0'
       depthSmoothing: '1000000.0'
       height: '50.0'
       maxLandWidth: '10.0'
@@ -70,10 +70,9 @@ Abstract:
       allowMutualFriendships: true
       degree: '2.0'
       equalOutDegree: true
-  plugins: [
-    ]
-  portPositionX: -1
-  portPositionY: -1
+  plugins: []
+  portPositionX: 40
+  portPositionY: 25
   ports: 1
   regulation:
     MPA Only:

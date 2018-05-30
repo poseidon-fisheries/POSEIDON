@@ -55,27 +55,20 @@ public class SynthesisPaper {
     public static void main(String[] args) throws IOException {
         Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
 
+        //figure 2
         avoidTheLine(100,
                      Paths.get("inputs","paper_synthesis"),
                      Paths.get("runs","paper_synthesis"));
-/*
-        thresholdSweeps(25,
+
+        //figure 3
+        socialAnnealing(100,
                         Paths.get("inputs","paper_synthesis"),
                         Paths.get("runs","paper_synthesis")
-                        );
-
-        thresholdProbabilitySweeps(25,
-                        Paths.get("inputs","paper_synthesis"),
-                        Paths.get("runs","paper_synthesis")
-                        );
-
-
-
-        socialAnnealing(25,
-                                   Paths.get("inputs","paper_synthesis"),
-                                   Paths.get("runs","paper_synthesis")
         );
-        */
+
+
+        //figure 4
+        SynthesisPaperDemo3.clubs();
 
     }
 
@@ -169,18 +162,18 @@ public class SynthesisPaper {
                     , Double.NaN);
             //now just count all tows
             DataColumn totals = state.getDailyDataSet().registerGatherer("Tows",
-                                                                       (Gatherer<FishState>) state1 -> {
+                                                                         (Gatherer<FishState>) state1 -> {
 
-                                                                           double lineSum = 0;
-                                                                           NauticalMap map = state1.getMap();
-                                                                           for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
-                                                                               int trawlsHere = map.getDailyTrawlsMap().get(
-                                                                                       tile.getGridX(),
-                                                                                       tile.getGridY());
-                                                                               lineSum += trawlsHere;
-                                                                           }
-                                                                           return lineSum;
-                                                                       }
+                                                                             double lineSum = 0;
+                                                                             NauticalMap map = state1.getMap();
+                                                                             for (SeaTile tile : map.getAllSeaTilesExcludingLandAsList()) {
+                                                                                 int trawlsHere = map.getDailyTrawlsMap().get(
+                                                                                         tile.getGridX(),
+                                                                                         tile.getGridY());
+                                                                                 lineSum += trawlsHere;
+                                                                             }
+                                                                             return lineSum;
+                                                                         }
                     , Double.NaN);
 
 
@@ -204,9 +197,13 @@ public class SynthesisPaper {
                 Files.write(outputFolder.resolve("grid" + name + ".csv"), grid.getBytes());
             }
 
-            FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name+"_"+run+".csv").toFile(),
-                                                     totals,
-                                                     borders);
+            DataColumn[] dataColumns = name != "itq" ? new DataColumn[]{totals,
+                    borders} : new DataColumn[]{totals,borders,
+                    state.getDailyDataSet().getColumn("ITQ Trades Of Species 1"),
+                    state.getDailyDataSet().getColumn("ITQ Prices Of Species 1")
+            };
+            FishStateUtilities.printCSVColumnsToFile(outputFolder.resolve(name + "_" + run + ".csv").toFile(),
+                                                     dataColumns);
 
 
         }
@@ -251,7 +248,7 @@ public class SynthesisPaper {
 
     public static void socialAnnealing(int runsPerScenario, Path inputFolder, Path outputFolder) throws IOException {
 
-        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("fronts.yaml")));
+        String readScenario = String.join("\n", Files.readAllLines(inputFolder.resolve("basic.yaml")));
 
         FileWriter writer = new FileWriter(outputFolder.resolve("demo2_annealing.csv").toFile());
         writer.write("multiplier,run,final_biomass\n");

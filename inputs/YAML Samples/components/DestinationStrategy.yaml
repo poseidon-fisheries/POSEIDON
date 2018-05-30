@@ -122,6 +122,7 @@ Discretized Bandit:
     Squared Discretization:
       horizontalSplits: '2.0'
       verticalSplits: '2.0'
+  imitate: false
 -------
 Florida Longliner:
   automaticallyAvoidMPA: true
@@ -266,6 +267,7 @@ Replicator:
         Squared Discretization:
           horizontalSplits: '2.0'
           verticalSplits: '2.0'
+      imitate: false
   - GSA:
       explorationSize: '20.0'
       gravitationalConstant: '100.0'

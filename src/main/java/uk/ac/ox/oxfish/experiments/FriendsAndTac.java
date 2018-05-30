@@ -27,16 +27,11 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.network.ClubNetworkBuilder;
-import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.EquidegreeBuilder;
+import uk.ac.ox.oxfish.model.network.FixedNumberOfEdges;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
-import uk.ac.ox.oxfish.model.regs.factory.IQMonoFactory;
-import uk.ac.ox.oxfish.model.regs.factory.ITQMonoFactory;
-import uk.ac.ox.oxfish.model.regs.factory.TACMonoFactory;
-import uk.ac.ox.oxfish.model.scenario.IndonesiaScenario;
+import uk.ac.ox.oxfish.model.regs.factory.*;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactories;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
@@ -46,10 +41,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -58,30 +51,36 @@ public class FriendsAndTac {
 
 
     private static final Path DIRECTORY = Paths.get("docs", "20180510 matt");
-    private static final Path OUTPUT_DIRECTORY = Paths.get("docs", "20180510 matt","unfishable_pyramid_100_truly");
-    private static final String SCENARIO_NAME = "unfishable_pyramid_truly.yaml";
-    public static final int NUMBER_OF_RUNS = 500;
-    public static final int NUMBER_OF_FISHERS = 100;
+    private static final Path OUTPUT_DIRECTORY = Paths.get("docs", "20180510 matt","basic");
+    private static final String SCENARIO_NAME = "basic.yaml";
+    public static final int NUMBER_OF_RUNS = 100;
+    public static final int NUMBER_OF_FISHERS = 20;
     public static final int NUMBER_OF_YEARS_NOT_RECORDED = 1;
     public static final int NUMBER_OF_YEARS_FISHING = 5; //20;
     public static final int MIN_NUMBER_OF_FRIENDS = 0;
-    public static final int MAX_NUMBER_OF_FRIENDS = 10;
+    public static final int MAX_NUMBER_OF_FRIENDS = 20;
 
 
     private static final LinkedHashMap<String, AlgorithmFactory<? extends Regulation>> regulations =
             new LinkedHashMap<>();
+    public static final String COMMON_HEADINGS = "regulation,run,year";
+
     static {
+
+
         regulations.put(
                 "anarchy",
                 new AnarchyFactory()
         );
 
+
         TACMonoFactory tac = new TACMonoFactory();
-        tac.setQuota(new FixedDoubleParameter(5000d*NUMBER_OF_FISHERS));
+        tac.setQuota(new FixedDoubleParameter(10000d*NUMBER_OF_FISHERS));
         regulations.put(
                 "high_tac",
                 tac
         );
+
 /*
         tac = new TACMonoFactory();
         tac.setQuota(new FixedDoubleParameter(500d*NUMBER_OF_FISHERS));
@@ -91,8 +90,10 @@ public class FriendsAndTac {
         );
 */
 
-        ITQMonoFactory itq = new ITQMonoFactory();
-        itq.setIndividualQuota(new FixedDoubleParameter(5000d));
+        MultiITQFactory itq = new MultiITQFactory();
+        itq.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
+        itq.setAllowMultipleTrades(true);
+        //itq.setIndividualQuota(new FixedDoubleParameter(5000d));
         regulations.put(
                 "high_itq",
                 itq
@@ -107,7 +108,7 @@ public class FriendsAndTac {
 */
 
         IQMonoFactory iq = new IQMonoFactory();
-        iq.setIndividualQuota(new FixedDoubleParameter(5000d));
+        iq.setIndividualQuota(new FixedDoubleParameter(10000d));
         regulations.put(
                 "high_iq",
                 iq
@@ -176,9 +177,10 @@ public class FriendsAndTac {
     }
 
     public static void main(String[] args) throws IOException {
-        spreadOut();
-        //spreadOutClub();
+        //spreadOut();
+        spreadOutClub();
         //allEqual(null);
+        //allEqualRaw(null);
         //allEqualClubs();
     }
 
@@ -190,7 +192,7 @@ public class FriendsAndTac {
         if(!OUTPUT_DIRECTORY.toFile().exists())
             OUTPUT_DIRECTORY.toFile().mkdir();
         File outputFile = OUTPUT_DIRECTORY.resolve("clubs2.csv").toFile();
-        FileWriter fileWriter = writeHeading(outputFile);
+        FileWriter fileWriter = writeHeading(outputFile, COMMON_HEADINGS);
 
         for (Map.Entry<String, AlgorithmFactory<? extends Regulation>> regulation : regulations
                 .entrySet()) {
@@ -251,8 +253,8 @@ public class FriendsAndTac {
         Path scenarioFile = DIRECTORY.resolve(SCENARIO_NAME);
         if(!OUTPUT_DIRECTORY.toFile().exists())
             OUTPUT_DIRECTORY.toFile().mkdir();
-        File outputFile = OUTPUT_DIRECTORY.resolve("spread_clubs.csv").toFile();
-        FileWriter fileWriter = writeHeading(outputFile);
+        File outputFile = OUTPUT_DIRECTORY.resolve("spread_clubs_2.csv").toFile();
+        FileWriter fileWriter = writeHeading(outputFile, COMMON_HEADINGS);
 
         for (Map.Entry<String, AlgorithmFactory<? extends Regulation>> regulation : regulations
                 .entrySet()) {
@@ -310,7 +312,7 @@ public class FriendsAndTac {
         if(!OUTPUT_DIRECTORY.toFile().exists())
             OUTPUT_DIRECTORY.toFile().mkdir();
         File outputFile = OUTPUT_DIRECTORY.resolve("spread.csv").toFile();
-        FileWriter fileWriter = writeHeading(outputFile);
+        FileWriter fileWriter = writeHeading(outputFile, COMMON_HEADINGS);
 
         for (Map.Entry<String, AlgorithmFactory<? extends Regulation>> regulation : regulations
                 .entrySet()) {
@@ -331,9 +333,10 @@ public class FriendsAndTac {
                 scenario.setRegulation(regulation.getValue());
 
                 //these runs have all the same number of friends
-                EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
-                networkBuilder.setDegree(new UniformDoubleParameter(MIN_NUMBER_OF_FRIENDS,
-                                                                    MAX_NUMBER_OF_FRIENDS));
+                FixedNumberOfEdges networkBuilder = new FixedNumberOfEdges();
+                networkBuilder.setEdges(new FixedDoubleParameter(MAX_NUMBER_OF_FRIENDS));
+                //set some runs for
+
                 scenario.setNetworkBuilder(networkBuilder);
 
 
@@ -368,7 +371,11 @@ public class FriendsAndTac {
         if(!OUTPUT_DIRECTORY.toFile().exists())
             OUTPUT_DIRECTORY.toFile().mkdir();
         File outputFile = OUTPUT_DIRECTORY.resolve("all_equal.csv").toFile();
-        FileWriter fileWriter = writeHeading(outputFile);
+        FileWriter fileWriter = writeHeading(outputFile, COMMON_HEADINGS);
+
+        Files.copy(scenarioFile,
+                   OUTPUT_DIRECTORY.resolve("scenario.yaml"),
+                   StandardCopyOption.REPLACE_EXISTING);
 
         for (Map.Entry<String, AlgorithmFactory<? extends Regulation>> regulation : regulations
                 .entrySet()) {
@@ -422,11 +429,74 @@ public class FriendsAndTac {
     }
 
 
+    public static void allEqualRaw(String[] args) throws IOException {
+
+        Path scenarioFile = DIRECTORY.resolve(SCENARIO_NAME);
+        if(!OUTPUT_DIRECTORY.toFile().exists())
+            OUTPUT_DIRECTORY.toFile().mkdir();
+        File outputFile = OUTPUT_DIRECTORY.resolve("all_equal_raw.csv").toFile();
+        FileWriter fileWriter = writeHeading(outputFile, COMMON_HEADINGS +",edges");
+
+        Files.copy(scenarioFile,
+                   OUTPUT_DIRECTORY.resolve("scenario.yaml"),
+                   StandardCopyOption.REPLACE_EXISTING);
+
+        for (Map.Entry<String, AlgorithmFactory<? extends Regulation>> regulation : regulations
+                .entrySet()) {
+
+            for (int friends = MIN_NUMBER_OF_FRIENDS; friends <= MAX_NUMBER_OF_FRIENDS*10; friends++)
+            {
+                for (int run = 0; run < NUMBER_OF_RUNS; run++) {
+
+                    Log.info("STARTING WITH SCENARIO " + regulation.getKey() + " - RUN " + run);
+                    FishState state = new FishState(run);
+                    FishYAML yaml = new FishYAML();
+                    PrototypeScenario scenario = yaml.loadAs(
+                            new FileReader(
+                                    scenarioFile.toFile()
+                            ), PrototypeScenario.class
+                    );
+                    state.setScenario(scenario);
+                    scenario.setFishers(NUMBER_OF_FISHERS);
+
+                    //these runs have all the same number of friends
+                    FixedNumberOfEdges networkBuilder = new FixedNumberOfEdges();
+                    networkBuilder.setEdges(new FixedDoubleParameter(friends));
+                    scenario.setNetworkBuilder(networkBuilder);
+
+                    scenario.setRegulation(regulation.getValue());
+
+
+                    state.start();
+                    while (state.getYear() <= NUMBER_OF_YEARS_NOT_RECORDED)
+                        state.schedule.step(state);
+                    state.schedule.step(state);
+
+                    while (state.getYear() <= NUMBER_OF_YEARS_FISHING) {
+                        state.schedule.step(state);
+                        //first day of the year!
+                        if(state.getDayOfTheYear()==1)
+                        {
+                            String commonRows = regulation.getKey() + "," + run +"," + state.getYear() +"," + friends;
+                            for (Fisher fisher : state.getFishers()) {
+                                writeLine(fisher,fileWriter,commonRows);
+                            }
+                        }
+                    }
+                }
+
+
+            }
+        }
+        fileWriter.close();
+
+    }
+
     @NotNull
-    private static FileWriter writeHeading(File outputFile) throws IOException {
+    private static FileWriter writeHeading(File outputFile, final String commonRows) throws IOException {
         FileWriter writer = new FileWriter(outputFile);
         //writer.write("price_low,price_high,landings,earnings,cash-flow,landings_0,landings_1,landings_2,discarding_agents,catches_0");
-        writer.write("regulation,run,year");
+        writer.write(commonRows);
         for (Map.Entry<String, Function<Fisher, String>> column : columns.entrySet()) {
             writer.write(",");
             writer.write(column.getKey());
