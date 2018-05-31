@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.Arrays;
@@ -41,14 +42,14 @@ import java.util.function.Function;
 public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegulation>{
 
     /**
-     * an array of order books for each "model" run
+     * an array of order books for each "model" lspiRun
      */
-    private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
+    private final Locker<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
 
     /**
-     * an array of order book makers for each model run
+     * an array of order book makers for each model lspiRun
      */
-    private final Map<FishState,ITQMarketBuilder[]> orderBooksBuilder = new HashMap<>(1);
+    private final Locker<FishState,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
 
     /**
      * The string we are going to turn into rule, "0:100 ,2:uniform 1 100" means that EACH FISHER gets 100 quotas a year
@@ -137,13 +138,25 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
          *
          */
 
-        MultiITQFactory.buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
+        //grab the markets and its builders
+        HashMap<Integer,ITQOrderBook> markets =
+                orderBooks.presentKey(state,
+                                      HashMap::new
+                );
+
+
+        ITQMarketBuilder[] builders = orderBooksBuilder.
+                presentKey(state,
+                           () -> new ITQMarketBuilder[numberOfSpecies]);
+
+
+        MultiITQFactory.buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, markets, builders,
                                                 allowMultipleTrades, volumePerMatch);
 
 
         MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
-                                                                                      orderBooks.get(state));
-        for(ITQMarketBuilder builder : orderBooksBuilder.get(state))
+                                                                                      markets);
+        for(ITQMarketBuilder builder : builders)
             if(builder!=null)
                 builder.addTrader(multiQuotaITQRegulation);
 
@@ -199,12 +212,13 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         this.minimumQuotaTraded = minimumQuotaTraded;
     }
 
+
     /**
      * Getter for property 'orderBooksBuilder'.
      *
      * @return Value for property 'orderBooksBuilder'.
      */
-    public Map<FishState, ITQMarketBuilder[]> getOrderBooksBuilder() {
+    public Locker<FishState, ITQMarketBuilder[]> getOrderBooksBuilder() {
         return orderBooksBuilder;
     }
 }

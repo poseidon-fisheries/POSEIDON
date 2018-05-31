@@ -84,6 +84,12 @@ public class SynthesisPaperDemo3 {
                 tac
         );
 
+        IQMonoFactory iq = new IQMonoFactory();
+        iq.setIndividualQuota(new FixedDoubleParameter(10000d));
+        regulations.put(
+                "high_iq",
+                iq
+        );
 
 
         MultiITQFactory itq = new MultiITQFactory();
@@ -95,14 +101,14 @@ public class SynthesisPaperDemo3 {
         );
 
 
-        IQMonoFactory iq = new IQMonoFactory();
-        iq.setIndividualQuota(new FixedDoubleParameter(10000d));
+        MultiITQFactory inefficient = new MultiITQFactory();
+        inefficient.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
+        inefficient.setMinimumQuotaTraded(5);
+        inefficient.setAllowMultipleTrades(false);
         regulations.put(
-                "high_iq",
-                iq
+                "inefficient_itq",
+                inefficient
         );
-
-
     }
 
 

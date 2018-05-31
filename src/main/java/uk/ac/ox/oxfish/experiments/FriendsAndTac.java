@@ -53,7 +53,7 @@ public class FriendsAndTac {
     private static final Path DIRECTORY = Paths.get("docs", "20180510 matt");
     private static final Path OUTPUT_DIRECTORY = Paths.get("docs", "20180510 matt","basic");
     private static final String SCENARIO_NAME = "basic.yaml";
-    public static final int NUMBER_OF_RUNS = 100;
+    public static final int NUMBER_OF_RUNS = 1000;
     public static final int NUMBER_OF_FISHERS = 20;
     public static final int NUMBER_OF_YEARS_NOT_RECORDED = 1;
     public static final int NUMBER_OF_YEARS_FISHING = 5; //20;
@@ -68,27 +68,27 @@ public class FriendsAndTac {
     static {
 
 
-        regulations.put(
-                "anarchy",
-                new AnarchyFactory()
-        );
+//        regulations.put(
+//                "anarchy",
+//                new AnarchyFactory()
+//        );
+//
+//
+//        TACMonoFactory tac = new TACMonoFactory();
+//        tac.setQuota(new FixedDoubleParameter(10000d*NUMBER_OF_FISHERS));
+//        regulations.put(
+//                "high_tac",
+//                tac
+//        );
 
 
-        TACMonoFactory tac = new TACMonoFactory();
-        tac.setQuota(new FixedDoubleParameter(10000d*NUMBER_OF_FISHERS));
+        IQMonoFactory iq = new IQMonoFactory();
+        iq.setIndividualQuota(new FixedDoubleParameter(10000d));
         regulations.put(
-                "high_tac",
-                tac
+                "high_iq",
+                iq
         );
 
-/*
-        tac = new TACMonoFactory();
-        tac.setQuota(new FixedDoubleParameter(500d*NUMBER_OF_FISHERS));
-        regulations.put(
-                "low_tac",
-                tac
-        );
-*/
 
         MultiITQFactory itq = new MultiITQFactory();
         itq.setQuotaFirstSpecie(new FixedDoubleParameter(10000d));
@@ -98,29 +98,8 @@ public class FriendsAndTac {
                 "high_itq",
                 itq
         );
-/*
-        itq = new ITQMonoFactory();
-        itq.setIndividualQuota(new FixedDoubleParameter(500d));
-        regulations.put(
-                "low_itq",
-                itq
-        );
-*/
 
-        IQMonoFactory iq = new IQMonoFactory();
-        iq.setIndividualQuota(new FixedDoubleParameter(10000d));
-        regulations.put(
-                "high_iq",
-                iq
-        );
-/*
-        iq = new IQMonoFactory();
-        iq.setIndividualQuota(new FixedDoubleParameter(500d));
-        regulations.put(
-                "low_iq",
-                iq
-        );
-*/
+
 
     }
 
