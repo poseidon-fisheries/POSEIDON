@@ -56,11 +56,11 @@ public class SynthesisPaper {
         Log.set(com.esotericsoftware.minlog.Log.LEVEL_INFO);
 
         //figure 2
-        /*
+
         avoidTheLine(100,
                      Paths.get("inputs","paper_synthesis"),
                      Paths.get("runs","paper_synthesis"));
-*/
+
         //figure 3
         socialAnnealing(100,
                         Paths.get("inputs","paper_synthesis"),
@@ -69,9 +69,9 @@ public class SynthesisPaper {
 
 
         //figure 4
-        /*
+
         SynthesisPaperDemo3.clubs();
-*/
+
     }
 
     /**

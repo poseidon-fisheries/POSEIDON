@@ -26,6 +26,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
 
 /**
@@ -54,31 +55,18 @@ public class StartingMPA {
 
     public MasonGeometry buildMPA(NauticalMap map){
 
-        //create the coordinate transformer (null the gui, no need)
-        CoordinateTransformer transformer = new CoordinateTransformer(null,map);
 
-        int lowerLeftX = topLeftX;
-        int height = Math.min(this.height,map.getHeight()-1-topLeftY);
-        int lowerLeftY = topLeftY + height;
+        MasonGeometry geometry = new MasonGeometry();
 
-        Point lowerLeft = transformer.gridToJTSPoint(lowerLeftX, lowerLeftY);
-      //  Point topRight = transformer.gridToJTSPoint(topRightX, topRightY);
-        //correct (JTS transformer gets you the centroid, you want the lower corner)
-        double correctedX= lowerLeft.getX()-transformer.getCellWidthInJTS()/2;
-        double correctedY= lowerLeft.getY()-transformer.getCellHeightInJTS()/2;
-        //setup the factory
-        GeometricShapeFactory geometryFactory = new GeometricShapeFactory();
-        geometryFactory.setBase(new Coordinate(correctedX,
-                                               correctedY));
-        geometryFactory.setHeight(transformer.getCellHeightInJTS() * height + transformer.getCellHeightInJTS());
-        geometryFactory.setWidth(transformer.getCellWidthInJTS() * width + transformer.getCellWidthInJTS() );
-        //build it
-        final Polygon rectangle = geometryFactory.createRectangle();
-        //add to map
-        MasonGeometry mpaGeometry = new MasonGeometry(rectangle);
-        map.getMpaVectorField().addGeometry(mpaGeometry);
-        map.recomputeTilesMPA();
-        return mpaGeometry;
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+            if(seaTile.getGridX()>= topLeftX &&
+                    seaTile.getGridX()<topLeftX+width &&
+                    seaTile.getGridY()>=topLeftY &&
+                    seaTile.getGridY()<topLeftY+height)
+                seaTile.assignMpa(geometry);
+        }
+
+        return geometry;
     }
 
     public int getTopLeftX() {
