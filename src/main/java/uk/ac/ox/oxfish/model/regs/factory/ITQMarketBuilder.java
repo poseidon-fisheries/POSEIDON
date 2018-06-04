@@ -117,6 +117,7 @@ public class ITQMarketBuilder  implements Startable
                                                                  public Double apply(FishState state1) {
                                                                      return market.getDailyAveragePrice();
                                                                  }
+
                                                              },
                                                              Double.NaN);
             model.getYearlyDataSet().registerGatherer("ITQ Prices Of " + speciesName,

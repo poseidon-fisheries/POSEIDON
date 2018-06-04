@@ -32,7 +32,7 @@ public class CaliCatchExperiments {
     public static void main(String[] args) throws IOException {
 
 
-            runMultipleTimesToBuildHistogram("eei_best_mult",
+            runMultipleTimesToBuildHistogram("guess_different_gas_price",
                                              null,
                                              Paths.get("docs",
                                                        "paper3_dts",
