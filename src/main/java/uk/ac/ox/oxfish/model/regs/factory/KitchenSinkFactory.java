@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * A factory for the kitchen sink regulation, it is itself just a collection of factories
@@ -73,12 +74,16 @@ public class KitchenSinkFactory implements AlgorithmFactory<KitchenSinkRegulatio
             subcomponent3 = tacFactory.apply(fishState);
 
         KitchenSinkRegulation reg = new KitchenSinkRegulation(subcomponent1,
-                                                                                subcomponent2,
-                                                                                subcomponent3);
+                                                              subcomponent2,
+                                                              subcomponent3);
 
         if(individualTradeableQuotas) {
-            subcomponent3 = itqFactory.apply(fishState);
-            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().get(fishState))
+            //initializes
+            itqFactory.apply(fishState);
+            for(ITQMarketBuilder builder : itqFactory.getOrderBooksBuilder().presentKey(fishState,
+                                                                                        () -> {
+                                                                                            throw new RuntimeException("Should be initialized already!!!");
+                                                                                        }))
                 if(builder!=null)
                     builder.addTrader(reg);
         }

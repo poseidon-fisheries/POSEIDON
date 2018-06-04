@@ -113,7 +113,7 @@ public class CaliCatchCalibration {
     }
 
 
-    private static void runMultipleTimesToBuildHistogram(
+    public static void runMultipleTimesToBuildHistogram(
             final String input, String policyFile, final Path mainDirectory, final int yearsPerRun) throws IOException {
 
         //does nothing consumer

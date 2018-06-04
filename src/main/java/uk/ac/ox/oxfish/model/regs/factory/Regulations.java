@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
-import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -69,6 +68,8 @@ public class Regulations
 
         CONSTRUCTORS.put("MPA by depth", DepthMPAFactory::new);
         NAMES.put(DepthMPAFactory.class,"MPA by depth");
+
+
 
         CONSTRUCTORS.put("Mono-TAC", () -> TAC_MONO_FACTORY);
         NAMES.put(TACMonoFactory.class,"Mono-TAC");

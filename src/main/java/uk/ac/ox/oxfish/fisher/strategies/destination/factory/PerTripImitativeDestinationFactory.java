@@ -95,6 +95,12 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
     private boolean ignoreFailedTrips = false;
 
 
+    /**
+     * if this is a positive number then the very first "random" option cannot be more distant from port than
+     */
+    private double maxInitialDistance = -1;
+
+
 
     /**
      * Applies this function to the given argument.
@@ -125,15 +131,14 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
                 };
 
         if(automaticallyIgnoreAreasWhereFishNeverGrows) {
-            final Predicate<SeaTile> previosValidator = explorationValidator;
-            explorationValidator = new Predicate<SeaTile>() {
-                @Override
-                public boolean test(SeaTile seaTile) {
-                    return
-                            previosValidator.test(seaTile) &&
-                                    seaTile.isFishingEvenPossibleHere();
-                }
-            };
+            explorationValidator =
+                    explorationValidator.and(new Predicate<SeaTile>() {
+                        @Override
+                        public boolean test(SeaTile seaTile) {
+                            return
+                                            seaTile.isFishingEvenPossibleHere();
+                        }
+                    });
         }
         if(probabilityUnfriending <= 0)
         { //no unfriending
@@ -173,7 +178,7 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
                 new FavoriteDestinationStrategy(initialFavoriteSpot), algorithm,
                 probability.apply(state),
                 objectiveFunction.apply(state), explorationValidator,
-                ignoreFailedTrips);
+                ignoreFailedTrips, maxInitialDistance);
 
 
     }
@@ -333,5 +338,24 @@ public class PerTripImitativeDestinationFactory implements AlgorithmFactory<Expl
      */
     public void setIgnoreFailedTrips(boolean ignoreFailedTrips) {
         this.ignoreFailedTrips = ignoreFailedTrips;
+    }
+
+
+    /**
+     * Getter for property 'maxInitialDistance'.
+     *
+     * @return Value for property 'maxInitialDistance'.
+     */
+    public double getMaxInitialDistance() {
+        return maxInitialDistance;
+    }
+
+    /**
+     * Setter for property 'maxInitialDistance'.
+     *
+     * @param maxInitialDistance Value to set for property 'maxInitialDistance'.
+     */
+    public void setMaxInitialDistance(double maxInitialDistance) {
+        this.maxInitialDistance = maxInitialDistance;
     }
 }

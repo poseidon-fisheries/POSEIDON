@@ -237,9 +237,9 @@ public class PrototypeScenario implements Scenario {
     private List<AlgorithmFactory<? extends AdditionalStartable>> plugins =
             new LinkedList<>();
     {
-        plugins.add(
-                new BiomassResetterFactory()
-        );
+//        plugins.add(
+//                new BiomassResetterFactory()
+//        );
     }
 
     public PrototypeScenario() {

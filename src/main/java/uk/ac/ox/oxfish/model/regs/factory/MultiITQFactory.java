@@ -34,6 +34,7 @@ import uk.ac.ox.oxfish.model.market.itq.ProportionalQuotaPriceGenerator;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.model.regs.QuotaPerSpecieRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
@@ -56,12 +57,12 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
     /**
      * an array of order books for each "model" lspiRun
      */
-    private final Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new HashMap<>(1);
+    private final Locker<FishState,HashMap<Integer,ITQOrderBook>> orderBooks = new Locker<>();
 
     /**
      * an array of order book makers for each model lspiRun
      */
-    private final Map<FishState,ITQMarketBuilder[]> orderBooksBuilder = new HashMap<>(1);
+    private final Locker<FishState,ITQMarketBuilder[]> orderBooksBuilder = new Locker<>();
 
     /**
      * The ITQ yearly quota to give the fisher to fish the first species
@@ -102,6 +103,17 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
             quotas[i] = quotaOtherSpecies.apply(state.getRandom());
 
 
+        //grab the markets and its builders
+        HashMap<Integer,ITQOrderBook> markets =
+                orderBooks.presentKey(state,
+                                      HashMap::new
+                );
+
+
+        ITQMarketBuilder[] builders = orderBooksBuilder.
+                presentKey(state,
+                           () -> new ITQMarketBuilder[numberOfSpecies]);
+
 
         /***
          *      __  __   _   ___ _  _____ _____   ___ _   _ ___ _    ___  ___ ___  ___
@@ -110,13 +122,13 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
          *     |_|  |_/_/ \_\_|_\_|\_\___| |_|   |___/\___/|___|____|___/|___|_|_\|___/
          *
          */
-        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, orderBooks, orderBooksBuilder,
+        buildITQMarketsIfNeeded(state, numberOfSpecies, quotas, markets, builders,
                                 allowMultipleTrades, integer -> minimumQuotaTraded);
 
         MultiQuotaITQRegulation multiQuotaITQRegulation = new MultiQuotaITQRegulation(quotas, state,
-                                                                                      orderBooks.get(state));
+                                                                                      markets);
 
-        for(ITQMarketBuilder builder : orderBooksBuilder.get(state))
+        for(ITQMarketBuilder builder : builders)
             if(builder!=null)
                 builder.addTrader(multiQuotaITQRegulation);
         return multiQuotaITQRegulation;
@@ -128,29 +140,21 @@ public class MultiITQFactory implements AlgorithmFactory<MultiQuotaITQRegulation
      * @param state the model
      * @param numberOfSpecies the number of species
      * @param quotas yealy quotas of this fisher
-     * @param orderBooks a map model---> ITQ markets
-     * @param orderBooksBuilder a map: model---> ITQ builders
+     * @param markets ITQ markets
+     * @param builders ITQ builders
      * @param allowMultipleTradesPerFisher whether a fisher can make multiple trades within the same step
      * @param unitsTradedPerMatch the size of quotas exchanged at each trade (in kg) as a function index of species ---> size of quota
      */
     public static void buildITQMarketsIfNeeded(
             FishState state, int numberOfSpecies, double[] quotas,
-            Map<FishState,HashMap<Integer,ITQOrderBook>> orderBooks,
-            Map<FishState, ITQMarketBuilder[]> orderBooksBuilder, final boolean allowMultipleTradesPerFisher,
+            HashMap<Integer,ITQOrderBook> markets,
+            ITQMarketBuilder[] builders, final boolean allowMultipleTradesPerFisher,
             final Function<Integer,Integer> unitsTradedPerMatch) {
 
         if(Log.TRACE)
             Log.trace("Building ITQ Markets for the following quotas: " + Arrays.toString(quotas));
 
 
-        //perfect, if needed create a market container/market builder container
-        if(!orderBooks.containsKey(state)) {
-            orderBooks.put(state, new HashMap<>());
-            orderBooksBuilder.put(state, new ITQMarketBuilder[numberOfSpecies]);
-        }
-        //grab the markets and its builders
-        HashMap<Integer,ITQOrderBook> markets = orderBooks.get(state);
-        ITQMarketBuilder[] builders = orderBooksBuilder.get(state);
 
         //for each species
         for(int i = 0; i < builders.length; i++)

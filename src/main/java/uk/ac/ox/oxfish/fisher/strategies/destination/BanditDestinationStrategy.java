@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
@@ -65,6 +66,8 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     private FishState model;
 
     private final boolean ignoreWastelands;
+
+    private boolean imitate = false;
 
     /**
      * the constructor looks a bit weird but it's just due to the fact that we need to first
@@ -141,6 +144,24 @@ public class BanditDestinationStrategy implements DestinationStrategy{
                 assert toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ||
                         toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
                 double reward = toAdapt.getLastFinishedTrip().getProfitPerHour(true);
+
+                //peek at friends?
+                if(imitate)
+                    for (Fisher friend : fisher.getDirectedFriends())
+                    {
+                        TripRecord friendTrip = friend.getLastFinishedTrip();
+                        if(friendTrip != null && friendTrip.getMostFishedTileInTrip() != null)
+                        {
+                            algorithm.observeReward(
+                                    friendTrip.getProfitPerHour(true),
+                                    fromMapGroupToBanditArm(discretization.getGroup(
+                                            friendTrip.getMostFishedTileInTrip()))
+                            );
+                        }
+
+
+                    }
+
                 choose(lastDestination, reward, random);
 
             }
@@ -224,5 +245,23 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      */
     public BanditSwitch getBanditSwitch() {
         return banditSwitch;
+    }
+
+    /**
+     * Getter for property 'imitate'.
+     *
+     * @return Value for property 'imitate'.
+     */
+    public boolean isImitate() {
+        return imitate;
+    }
+
+    /**
+     * Setter for property 'imitate'.
+     *
+     * @param imitate Value to set for property 'imitate'.
+     */
+    public void setImitate(boolean imitate) {
+        this.imitate = imitate;
     }
 }
