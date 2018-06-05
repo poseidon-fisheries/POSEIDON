@@ -1,0 +1,73 @@
+Abstract:
+  biologyInitializer:
+    Diffusing Logistic:
+      carryingCapacity: '5000.0'
+      differentialPercentageToMove: '0.001'
+      percentageLimitOnDailyMovement: '0.01'
+  cheaters: false
+  departingStrategy:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  destinationStrategy:
+    SNALSAR:
+      acceptableThreshold:
+        Average Profits Threshold:
+          scale: '1.0'
+      failureThreshold:
+        Fixed Threshold:
+          fixedThreshold: '0.0'
+      legal: Follow the Rules
+      profit:
+        Remembered Profits:
+          includeOpportunityCosts: true
+      safety: Safe Everywhere
+      sociallyAcceptable: Nobody Fishes Here
+  enginePower: normal 5000.0 100.0
+  fishers: 50
+  fishingStrategy:
+    Until Full With Day Limit:
+      daysAtSea: '5.0'
+  fuelTankSize: '100000.0'
+  gasPricePerLiter: '0.01'
+  gear:
+    Random Catchability:
+      gasPerHourFished: '5.0'
+      meanCatchabilityFirstSpecies: '0.01'
+      meanCatchabilityOtherSpecies: '0.01'
+      standardDeviationCatchabilityFirstSpecies: '0.0'
+      standardDeviationCatchabilityOtherSpecies: '0.0'
+  gearStrategy: Never Change Gear
+  habitatInitializer: All Sand
+  holdSize: '100.0'
+  literPerKilometer: '10.0'
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '0.0'
+      depthSmoothing: '1000000.0'
+      height: '30.0'
+      width: '30.0'
+  mapMakerDedicatedRandomSeed: 0
+  market:
+    Fixed Price Market:
+      marketPrice: '10.0'
+  networkBuilder:
+    Equal Out Degree:
+      degree: 2
+  portPositionX: 20
+  portPositionY: 15
+  ports: 1
+  regulation:
+    MPA Only:
+      startingMPAs: [
+        ]
+  speedInKmh: '5.0'
+  startingMPAs: [
+    ]
+  usePredictors: false
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
+  weatherStrategy: Ignore Weather
