@@ -153,7 +153,11 @@ import os
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180404 biomass_indonesia/calibration"
 
 #EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180516 medium_713/catchability"
-EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180516 medium_713/biomass_catchability"
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180516 medium_713/biomass_catchability"
+EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/20180516 medium_713/medium_catchability"
+
+
+#EXPERIMENT_DIRECTORY = "/home/carrknight/code/oxfish/docs/paper3_dts/mark2/exploratory/calibration/"
 
 
 SPEARMINT_DIRECTORY = "/home/carrknight/code/Spearmint/spearmint"
