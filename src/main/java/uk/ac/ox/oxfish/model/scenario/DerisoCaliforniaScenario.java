@@ -82,6 +82,8 @@ public class DerisoCaliforniaScenario extends CaliforniaAbstractScenario {
         }
         initializer.setMovementRate(recast);
 
+
+        System.out.println(biology.getSpecies());
         return biology;
     }
 

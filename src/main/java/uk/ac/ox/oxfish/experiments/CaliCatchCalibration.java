@@ -173,7 +173,9 @@ public class CaliCatchCalibration {
             {
                 writer.write(
                         "year,run,average_profits,hours_out,sole,sablefish,sablefish_catches,sablefish_biomass,short_thornyheads,long_thornyheads,rockfish" +
-                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits,actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings,median_profit,actual_median_profit" );
+                                ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration,trips,actual_profits," +
+                                "actual_hours_out,weighted_distance,active_fishers,variable_costs,earnings,median_profit,actual_median_profit," +
+                                "actual_median_trip_profit,other_landings,sole_biomass,short_biomass" );
 
                 for(Port port : state.getPorts())
                     writer.write(","+port.getName()+"_trips,"+port.getName()+"_fishers,"+port.getName()+"_profits,"+port.getName()+"_distance");
@@ -213,7 +215,11 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Total Variable Costs")+ "," +
                                          state.getLatestYearlyObservation("Total Earnings") + "," +
                                          state.getLatestYearlyObservation("Median Cash-Flow")+ "," +
-                                         state.getLatestYearlyObservation("Actual Median Cash-Flow")
+                                         state.getLatestYearlyObservation("Actual Median Cash-Flow") + "," +
+                                         state.getLatestYearlyObservation("Actual Median Trip Profits") + "," +
+                                         state.getLatestYearlyObservation("Others Landings")+ "," +
+                                 state.getLatestYearlyObservation("Biomass Dover Sole") + "," +
+                                         state.getLatestYearlyObservation("Biomass Shortspine Thornyhead")
 
 
                     );
