@@ -22,13 +22,17 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeWithHeadStartFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.util.function.ToDoubleFunction;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 11/18/15.
@@ -145,6 +149,56 @@ public class PrototypeScenarioTest {
         assertEquals(hours/trips,duration,.0001);
 
     }
+
+
+    /**
+     * if I give agents a head start, they'll use it to fish closer to port than they would have had if they had started
+     * at random
+     * @throws Exception
+     */
+
+    @Test
+    public void headStartMakesDistanceSmall() throws Exception
+    {
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setDestinationStrategy(new PerTripImitativeWithHeadStartFactory());
+        final FishState state = new FishState();
+        state.setScenario(scenario);
+        state.start();
+        for(int i=0; i<10;i++)
+            state.schedule.step(state);
+
+        double distanceWithHeadStart = state.getFishers().stream().mapToDouble(
+                new ToDoubleFunction<Fisher>() {
+                    @Override
+                    public double applyAsDouble(Fisher value) {
+                        return state.getMap().distance(value.getHomePort().getLocation(),value.getLastFinishedTrip().getMostFishedTileInTrip());
+                    }
+                }
+        ).average().getAsDouble();
+
+        scenario = new PrototypeScenario();
+        scenario.setDestinationStrategy(new PerTripImitativeWithHeadStartFactory());
+        final FishState state2 = new FishState();
+        state2.setScenario(scenario);
+        state2.start();
+        for(int i=0; i<10;i++)
+            state.schedule.step(state);
+        double distanceWithoutHeadStart = state.getFishers().stream().mapToDouble(
+                new ToDoubleFunction<Fisher>() {
+                    @Override
+                    public double applyAsDouble(Fisher value) {
+                        return state2.getMap().distance(value.getHomePort().getLocation(),value.getLastFinishedTrip().getMostFishedTileInTrip());
+                    }
+                }
+        ).average().getAsDouble();
+
+        System.out.println(distanceWithHeadStart);
+        System.out.println(distanceWithoutHeadStart);
+        assertTrue(distanceWithHeadStart<distanceWithoutHeadStart);
+    }
+
 
     @Test
     public void fixingTheSeedWorks() throws Exception

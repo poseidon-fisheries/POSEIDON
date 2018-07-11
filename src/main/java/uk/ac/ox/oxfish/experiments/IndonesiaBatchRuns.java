@@ -30,7 +30,7 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "big";
+    public static final String FILENAME = "perfectt3";
 
     public static void main(String[] args) throws IOException {
 
