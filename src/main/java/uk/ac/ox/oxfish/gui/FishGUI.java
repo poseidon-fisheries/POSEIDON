@@ -384,7 +384,7 @@ public class  FishGUI extends GUIState{
     //one of the most annoying parts of mason: overriding static methods
     public static Object getInfo()
     {
-        return "If you are reading this I was lazy and didn't write a proper description. Thank you.";
+        return "POSEIDON is a generic, simple agent-based model of fisheries. You can read more about it at https://link.springer.com/article/10.1007/s11625-018-0579-9";
     }
 
     public static String getName()

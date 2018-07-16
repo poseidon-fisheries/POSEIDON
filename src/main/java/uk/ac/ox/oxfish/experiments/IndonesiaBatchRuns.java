@@ -80,7 +80,7 @@ public class IndonesiaBatchRuns {
 
 
         while(runner.getRunsDone()<100)
-            runner.run();
+            runner.run(null);
 
     }
 }

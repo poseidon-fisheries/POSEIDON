@@ -47,9 +47,9 @@ public class BatchTest {
                 0l,
                 null);
 
-        runner.run();
-        runner.run();
-        runner.run();
+        runner.run(null);
+        runner.run(null);
+        runner.run(null);
 
     }
 

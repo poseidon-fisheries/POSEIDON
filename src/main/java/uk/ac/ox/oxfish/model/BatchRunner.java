@@ -22,9 +22,12 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -92,10 +95,13 @@ public class BatchRunner
 
 
 
-    public void run() throws IOException {
+    public StringBuffer run(@Nullable StringBuffer writer) throws IOException {
 
 
-        String simulationName = yamlFile.getFileName().toString().split("\\.")[0]+"_"+runsDone;
+        String simulationName = guessSimulationName() +"_"+runsDone;
+
+
+
         FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
                                                  getOutputFolder().resolve(simulationName),
                                                  initialSeed + runsDone,
@@ -103,7 +109,7 @@ public class BatchRunner
                                                  true, policyFile == null ? null : policyFile.toString(), yearsToRun, false,
                                                  heatmapGathererStartYear);
 
-
+        //print individually
         ArrayList<DataColumn> columns = new ArrayList<>();
         for(String column : columnsToPrint) {
             DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
@@ -117,7 +123,22 @@ public class BatchRunner
                 columns.toArray(new DataColumn[columns.size()])
         );
 
+        //print it tidyly if needed
+        if(writer!=null)
+        for(DataColumn column : columns)
+            for(int year=0; year<yearsToRun; year++)
+                writer.append(runsDone).append(",").append(year).append(",").append(column.getName()).append(
+                        ",").append(column.get(year)).append("\n");
+
+
+        //new run
         runsDone++;
+        return writer;
+
+    }
+
+    public String guessSimulationName() {
+        return yamlFile.getFileName().toString().split("\\.")[0];
     }
 
     /**
