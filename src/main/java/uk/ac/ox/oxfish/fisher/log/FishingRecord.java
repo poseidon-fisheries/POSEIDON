@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
@@ -70,6 +71,29 @@ public class FishingRecord
 
     public Catch getFishCaught() {
         return fishCaught;
+    }
+
+    /**
+     * adds to fishing records together; fails if they belong to different sea-tiles!
+     * @param original the original
+     * @param newRecord
+     * @return
+     */
+    public static  FishingRecord sumRecords(
+            FishingRecord original,
+            FishingRecord newRecord
+    ){
+
+        Preconditions.checkArgument(original.tileFished==newRecord.tileFished,
+                                    "Fishing records do not belong to same tile!");
+        return new FishingRecord(
+                        original.hoursSpentFishing + newRecord.hoursSpentFishing,
+                        original.getTileFished(),
+                        Catch.sumCatches(original.getFishCaught(),newRecord.getFishCaught())
+
+
+
+        );
     }
 
 

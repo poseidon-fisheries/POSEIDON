@@ -21,12 +21,15 @@
 package uk.ac.ox.oxfish.fisher.heatmap.regression.tripbased;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.ErrorTrackingRegression;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservation;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
+import uk.ac.ox.oxfish.model.data.MovingAverage;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -51,6 +54,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     private double currentTime;
 
     private FishState state;
+
 
     public ProfitFunctionRegression(ProfitFunction function,
                                     AlgorithmFactory<? extends  GeographicalRegression> regressionMaker,
@@ -105,7 +109,9 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
 
         double[] expectedHourlyCatches = new double[catches.length];
         for(int i=0; i<expectedHourlyCatches.length; i++)
-            expectedHourlyCatches[i] = catches[i].predict(tile, currentTime, fisher,state );
+            expectedHourlyCatches[i] = Math.max(0,
+                                                catches[i].predict(tile, currentTime, fisher,state )
+            );
         return expectedHourlyCatches;
 
     }
@@ -113,14 +119,15 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
     @Override
     public void addObservation(
             GeographicalObservation<TripRecord> observation, Fisher fisher, FishState model) {
-        for(int i=0; i<catches.length; i++)
+        for(int i=0; i<catches.length; i++) {
             catches[i].addObservation(
-                    new GeographicalObservation<>(observation.getTile(),observation.getTime(),
-                                                  observation.getValue().getTotalCatch()[i] /
-                                                          observation.getValue().getEffort()),
-                    fisher,state
+                    new GeographicalObservation<>(observation.getTile(), observation.getTime(),
+                                                  //check only the very last hour spent fishing, otherwise it's too optimistic!
+                                                  observation.getValue().getLastFishingRecordOfTile(
+                                                          observation.getTile()).getFishCaught().getWeightCaught(i)),
+                    fisher, state
             );
-
+        }
     }
 
     public GeographicalRegression<Double>[] catchesRegression() {

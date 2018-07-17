@@ -50,7 +50,7 @@ public class GasCost implements Cost{
      double price = fisher.getHomePort().getGasPricePerLiter();
      double movement = price * fisher.getBoat().expectedFuelConsumption(record.getDistanceTravelled());
      double fishing = 0;
-     for(Map.Entry<SeaTile,Integer> location :  record.getTilesFishedPerHour())
+     for(Map.Entry<SeaTile,Integer> location :  record.getFishingRecords())
      fishing+= fisher.getGear().getFuelConsumptionPerHourOfFishing(fisher,fisher.getBoat(),location.getKey()) *
      location.getValue();
      return movement + (fishing * price);

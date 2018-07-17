@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.DoubleStream;
 
 /**
@@ -75,7 +76,9 @@ public class TripRecord {
     /**
      * the places where fishing occured (and the hours spent fishing there)
      */
-    private final HashMap<SeaTile,Integer> tilesFished = new HashMap<>();
+    private final HashMap<SeaTile,FishingRecord> tilesFished = new HashMap<>();
+
+    private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
 
 
 
@@ -124,11 +127,16 @@ public class TripRecord {
 
     public void recordFishing(FishingRecord record)
     {
-
-        Integer timesFished = tilesFished.getOrDefault(record.getTileFished(), 0);
-        tilesFished.put(record.getTileFished(),timesFished+record.getHoursSpentFishing());
+        //sum new catch!
         for(int i=0; i<totalCatch.length; i++)
             totalCatch[i]+=record.getFishCaught().getWeightCaught(i);
+
+        tilesFished.merge(record.getTileFished(),
+                          record,
+                          FishingRecord::sumRecords);
+        lastFishingRecordOfTile.put(record.getTileFished(),record);
+
+
     }
 
     public void recordCosts(double newCosts)
@@ -274,7 +282,7 @@ public class TripRecord {
         return tilesFished.keySet();
     }
 
-    public Set<Map.Entry<SeaTile,Integer>> getTilesFishedPerHour() {
+    public Set<Map.Entry<SeaTile,FishingRecord>> getFishingRecords() {
         return tilesFished.entrySet();
     }
 
@@ -285,7 +293,8 @@ public class TripRecord {
             return null;
         if(tilesFished.size()==1)
             return tilesFished.keySet().iterator().next();
-        return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
+        return tilesFished.entrySet().stream().max((entry1, entry2) -> entry1.getValue().getHoursSpentFishing() > entry2.getValue().getHoursSpentFishing() ? 1 : -1).
+                get().getKey();
 
     }
 
@@ -311,8 +320,8 @@ public class TripRecord {
     public int getEffort() {
 
         int sum = 0;
-        for(Integer hours : tilesFished.values())
-            sum+=hours;
+        for(FishingRecord record : tilesFished.values())
+            sum+=record.getHoursSpentFishing();
         return sum;
     }
 
@@ -350,5 +359,14 @@ public class TripRecord {
 
     public double[] getTotalCatch() {
         return totalCatch;
+    }
+
+    /**
+     * Getter for property 'lastFishingRecordOfTile'.
+     *
+     * @return Value for property 'lastFishingRecordOfTile'.
+     */
+    public FishingRecord getLastFishingRecordOfTile(SeaTile tile) {
+        return lastFishingRecordOfTile.get(tile);
     }
 }

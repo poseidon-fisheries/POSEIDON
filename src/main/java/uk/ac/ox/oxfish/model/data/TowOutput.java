@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.data;
 
 import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -53,7 +54,7 @@ public class TowOutput implements OutputPlugin, TripListener
     @Override
     public void reactToFinishedTrip(TripRecord record) {
 
-            for (Map.Entry<SeaTile, Integer> effort : record.getTilesFishedPerHour())
+            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords())
             {
                 SeaTile tile = effort.getKey();
 
