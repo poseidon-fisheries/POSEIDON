@@ -22,15 +22,16 @@ package uk.ac.ox.oxfish.gui;
 
 import uk.ac.ox.oxfish.model.BatchRunner;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class BatchRunnerFactory
 {
-    private String yamlFile = "./inputs/first_paper/fronts.yaml";
+    private Path yamlFile = Paths.get(".","inputs","first_paper","fronts.yaml");
     private int yearsToRun = 20;
-    private String outputFolder = "outputs/batch";
-    private String policyFile = null;
+    private Path outputFolder = Paths.get("outputs","batch");
+    private Path policyFile = null;
     private long randomSeed = System.currentTimeMillis();
     private String columnsToPrint = "Total Effort,Average Cash-Flow ";
     private int numberOfRuns = 100;
@@ -43,32 +44,16 @@ public class BatchRunnerFactory
      */
     public BatchRunner build() {
         return new BatchRunner(
-                Paths.get(yamlFile),
+                yamlFile,
                 yearsToRun,
                 Arrays.asList(columnsToPrint.split(",")),
-                outputFolder == null ? null : Paths.get(outputFolder),
-                policyFile == null ? null : Paths.get(policyFile),
+                outputFolder,
+                policyFile,
                 randomSeed,
                 heatmapGathererStartYear);
     }
 
-    /**
-     * Getter for property 'yamlFile'.
-     *
-     * @return Value for property 'yamlFile'.
-     */
-    public String getYamlFile() {
-        return yamlFile;
-    }
 
-    /**
-     * Setter for property 'yamlFile'.
-     *
-     * @param yamlFile Value to set for property 'yamlFile'.
-     */
-    public void setYamlFile(String yamlFile) {
-        this.yamlFile = yamlFile;
-    }
 
     /**
      * Getter for property 'yearsToRun'.
@@ -88,12 +73,31 @@ public class BatchRunnerFactory
         this.yearsToRun = yearsToRun;
     }
 
+
+    /**
+     * Getter for property 'yamlFile'.
+     *
+     * @return Value for property 'yamlFile'.
+     */
+    public Path getYamlFile() {
+        return yamlFile;
+    }
+
+    /**
+     * Setter for property 'yamlFile'.
+     *
+     * @param yamlFile Value to set for property 'yamlFile'.
+     */
+    public void setYamlFile(Path yamlFile) {
+        this.yamlFile = yamlFile;
+    }
+
     /**
      * Getter for property 'outputFolder'.
      *
      * @return Value for property 'outputFolder'.
      */
-    public String getOutputFolder() {
+    public Path getOutputFolder() {
         return outputFolder;
     }
 
@@ -102,7 +106,7 @@ public class BatchRunnerFactory
      *
      * @param outputFolder Value to set for property 'outputFolder'.
      */
-    public void setOutputFolder(String outputFolder) {
+    public void setOutputFolder(Path outputFolder) {
         this.outputFolder = outputFolder;
     }
 
@@ -111,7 +115,7 @@ public class BatchRunnerFactory
      *
      * @return Value for property 'policyFile'.
      */
-    public String getPolicyFile() {
+    public Path getPolicyFile() {
         return policyFile;
     }
 
@@ -120,7 +124,7 @@ public class BatchRunnerFactory
      *
      * @param policyFile Value to set for property 'policyFile'.
      */
-    public void setPolicyFile(String policyFile) {
+    public void setPolicyFile(Path policyFile) {
         this.policyFile = policyFile;
     }
 

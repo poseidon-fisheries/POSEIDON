@@ -43,6 +43,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
 
     private String standardDeviationMap = ""; //by default no standard deviation
 
+    //this is the wrong name for it: it's actually liters per hour fished!
     private DoubleParameter trawlSpeed = new FixedDoubleParameter(5);
 
 

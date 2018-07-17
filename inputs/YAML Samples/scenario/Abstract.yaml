@@ -23,6 +23,7 @@ Abstract:
       dropInUtilityNeededForUnfriend: '-1.0'
       ignoreEdgeDirection: true
       ignoreFailedTrips: false
+      maxInitialDistance: -1.0
       objectiveFunction:
         Hourly Profit Objective:
           opportunityCosts: true

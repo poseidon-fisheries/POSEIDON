@@ -189,4 +189,9 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
     public SeaTile getFavoriteSpot() {
         return delegate.getFavoriteSpot();
     }
+
+
+    public void forceFavoriteSpot(SeaTile newFavoriteSpot){
+        delegate.setFavoriteSpot(newFavoriteSpot);
+    }
 }

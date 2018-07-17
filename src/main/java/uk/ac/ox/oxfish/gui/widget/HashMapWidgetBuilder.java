@@ -73,6 +73,8 @@ public class HashMapWidgetBuilder implements WidgetBuilder<JComponent,SwingMetaw
                     //the address of the field
                     address
             ));
+            if(inspected== null)
+                return new JTable();
 
             JTable table = new JTable(new MapToTable<>(inspected));
             table.getModel().addTableModelListener(new TableModelListener() {

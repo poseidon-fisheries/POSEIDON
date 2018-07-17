@@ -26,6 +26,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -99,7 +103,8 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
     }
 
 
-    class Task extends SwingWorker<Void,Void>{
+    class Task extends SwingWorker<StringBuffer,Void>{
+
 
 
 
@@ -116,17 +121,18 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
          * @throws Exception if unable to compute a result
          */
         @Override
-        protected Void doInBackground() throws Exception {
+        protected StringBuffer doInBackground() throws Exception {
+            StringBuffer tidy = new StringBuffer("run,year,variable,value\n");
             Toolkit.getDefaultToolkit().beep();
             setProgress(0);
             while(runner.getRunsDone()<numberOfRuns) {
                 taskOutput.append("Starting run " + runner.getRunsDone()+"\n");
-                runner.run();
+                tidy=runner.run(tidy);
                 taskOutput.append("Finished run " + runner.getRunsDone() +"\n");
                 publish();
             }
 
-            return null;
+            return tidy;
 
         }
 
@@ -152,7 +158,10 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
         protected void done() {
             try {
                 System.out.println("Done");
-                get();
+                //write down tidy version
+                StringBuffer batchOutput = get();
+                Files.write(runner.getOutputFolder().resolve(runner.guessSimulationName()+"_batch.csv"),
+                            batchOutput.toString().getBytes(), StandardOpenOption.CREATE);
             } catch (ExecutionException e) {
                 e.getCause().printStackTrace();
                 String msg = String.format("Unexpected problem: %s",
@@ -161,6 +170,8 @@ public class BatchRunnerProgress extends JPanel implements PropertyChangeListene
                                               msg, "Error", JOptionPane.ERROR_MESSAGE);
             } catch (InterruptedException e) {
                 // Process e here
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -21,6 +21,29 @@ Imitator-Explorator:
   dropInUtilityNeededForUnfriend: '-1.0'
   ignoreEdgeDirection: true
   ignoreFailedTrips: false
+  maxInitialDistance: -1.0
+  objectiveFunction:
+    Hourly Profit Objective:
+      opportunityCosts: true
+  probability:
+    Adaptive Probability:
+      explorationProbability: '0.2'
+      explorationProbabilityMinimum: '0.01'
+      imitationProbability: '1.0'
+      incrementMultiplier: '0.02'
+  stepSize: uniform 1.0 10.0
+-------
+Imitator-Explorator with Head Start:
+  alwaysCopyBest: true
+  automaticallyIgnoreAreasWhereFishNeverGrows: false
+  automaticallyIgnoreMPAs: false
+  backtracksOnBadExploration: true
+  dropInUtilityNeededForUnfriend: '-1.0'
+  fractionOfTilesExploredInHeadStart: '0.25'
+  ignoreEdgeDirection: true
+  ignoreFailedTrips: false
+  maxHoursOut: '120.0'
+  maxInitialDistance: -1.0
   objectiveFunction:
     Hourly Profit Objective:
       opportunityCosts: true
@@ -58,7 +81,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:

@@ -58,6 +58,7 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
     private DoubleParameter profitBeta = new FixedDoubleParameter(1d);
     private boolean automaticallyAvoidMPA = true;
     private boolean automaticallyAvoidWastelands = true;
+    private DoubleParameter hoursOut = new FixedDoubleParameter(5*24d);
 
 
     /**
@@ -99,7 +100,8 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
         //use trip simulator (poorly) to simulate trips so you can figure out what revenues and costs are
         //0: revenue
         //1: gas costs
-        ObservationExtractor[][] extractors = buildRPUEExtractors(numberOfGroups);
+        ObservationExtractor[][] extractors = buildRPUEExtractors(numberOfGroups,
+                                                                  hoursOut.apply(state.getRandom()));
 
 
         //"names" are one to one
@@ -119,9 +121,9 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
 
     }
 
-    private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups) {
+    private ObservationExtractor[][] buildRPUEExtractors(int numberOfGroups, double hoursOut) {
         ObservationExtractor[] commonExtractor = new ObservationExtractor[1];
-        commonExtractor[0] = new SimulatedHourlyProfitExtractor(5*24d);
+        commonExtractor[0] = new SimulatedHourlyProfitExtractor(hoursOut);
         ObservationExtractor[][] extractors = new ObservationExtractor[numberOfGroups][];
         for(int i=0; i<numberOfGroups; i++)
             extractors[i] = commonExtractor;
@@ -201,5 +203,23 @@ public class LogitRPUEDestinationFactory implements AlgorithmFactory<LogitDestin
      */
     public void setAutomaticallyAvoidWastelands(boolean automaticallyAvoidWastelands) {
         this.automaticallyAvoidWastelands = automaticallyAvoidWastelands;
+    }
+
+    /**
+     * Getter for property 'hoursOut'.
+     *
+     * @return Value for property 'hoursOut'.
+     */
+    public DoubleParameter getHoursOut() {
+        return hoursOut;
+    }
+
+    /**
+     * Setter for property 'hoursOut'.
+     *
+     * @param hoursOut Value to set for property 'hoursOut'.
+     */
+    public void setHoursOut(DoubleParameter hoursOut) {
+        this.hoursOut = hoursOut;
     }
 }

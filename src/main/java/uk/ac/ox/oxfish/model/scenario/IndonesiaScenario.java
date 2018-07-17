@@ -31,6 +31,9 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.RememberedProfitsExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SNALSARutilities;
+import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.plugins.TowAndAltitudePluginFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
@@ -60,8 +63,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.*;
+import java.util.stream.Collectors;
 
 /**
  * Very ugly repeat of prototype scenario because I need a proper refactor of port
@@ -347,6 +350,8 @@ public class IndonesiaScenario implements Scenario {
 
         }
 
+        addTagLandingTimeSeries(model);
+
         if(fishers.size() <=1)
             return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
         else {
@@ -355,9 +360,139 @@ public class IndonesiaScenario implements Scenario {
     }
 
 
+    /**
+     * extract landing time series by classic tags
+     */
+    private void  addTagLandingTimeSeries(FishState state){
+
+        for(String tag : new String[]{"small","big"})
+        {
+            //landings
+            for(Species species : state.getBiology().getSpecies())
+                state.getYearlyDataSet().registerGatherer(
+                        species.getName() + " " + AbstractMarket.LANDINGS_COLUMN_NAME + " of " + tag,
+                        fishState -> fishState.getFishers().stream().
+                                filter(fisher -> fisher.getTags().contains(tag)).
+                                mapToDouble(value -> value.getLatestYearlyObservation(
+                                        species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Total Income of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Average Distance From Port of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.FISHING_DISTANCE)).
+                                                                      filter(Double::isFinite).average().
+                                                                      orElse(Double.NaN), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Average Number of Trips of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.TRIPS)).average().
+                                                                      orElse(Double.NaN), 0 );
 
 
 
+            state.getYearlyDataSet().registerGatherer("Average Number of Hours Out of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.HOURS_OUT)).average().
+                                                                      orElse(Double.NaN), 0 );
+            //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
+            state.getYearlyDataSet().registerGatherer("Average Trip Duration of "+tag, new Gatherer<FishState>() {
+                @Override
+                public Double apply(FishState observed) {
+
+                    List<Fisher> taggedFishers = observed.getFishers().stream().
+                            filter(new Predicate<Fisher>() {
+                                @Override
+                                public boolean test(Fisher fisher) {
+                                    return fisher.getTags().contains(tag);
+                                }
+                            }).collect(Collectors.toList());
+
+                    //skip boats that made no trips
+                    double hoursOut = taggedFishers.stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.HOURS_OUT)).
+                            filter(value -> Double.isFinite(value)).sum();
+                    double trips = taggedFishers.stream().mapToDouble(
+                            value -> value.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)).
+                            filter(new DoublePredicate() { //skip boats that made no trips
+                        @Override
+                        public boolean test(double value) {
+                            return Double.isFinite(value);
+                        }
+                    }).sum();
+
+                    return trips > 0 ? hoursOut/trips : 0d;
+                }
+            }, 0d);
+
+            state.getYearlyDataSet().registerGatherer("Number Of Fishers of " +tag,
+                                                      fishState ->
+                                                              (double)fishState.getFishers().stream().
+                                                                      filter(fisher ->
+                                                                                     fisher.getTags().contains(tag)).count(),
+                                                      Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Number Of Active Fishers of " +tag,
+                                                      fishState ->
+                                                              (double)fishState.getFishers().stream().
+                                                                      filter(new Predicate<Fisher>() {
+                                                                          @Override
+                                                                          public boolean test(Fisher fisher) {
+                                                                              return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS)>0;
+                                                                          }
+                                                                      }).
+                                                                      filter(fisher ->
+                                                                                     fisher.getTags().contains(tag)).count(),
+                                                      Double.NaN);
+
+
+
+
+
+            state.getYearlyDataSet().registerGatherer("Average Cash-Flow of " +tag,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState observed) {
+                                                              List<Fisher> fishers = observed.getFishers().stream().
+                                                                      filter(new Predicate<Fisher>() {
+                                                                          @Override
+                                                                          public boolean test(Fisher fisher) {
+                                                                              return fisher.getTags().contains(tag);
+                                                                          }
+                                                                      }).collect(Collectors.toList());
+                                                              return fishers.stream().
+                                                                      mapToDouble(
+                                                                              new ToDoubleFunction<Fisher>() {
+                                                                                  @Override
+                                                                                  public double applyAsDouble(Fisher value) {
+                                                                                      return value.getLatestYearlyObservation(
+                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  }
+                                                                              }).sum() /
+                                                                      fishers.size();
+                                                          }
+                                                      }, Double.NaN);
+
+
+
+        }
+
+
+    }
 
 
 

@@ -60,9 +60,9 @@ public class StartingMPA {
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
             if(seaTile.getGridX()>= topLeftX &&
-                    seaTile.getGridX()<topLeftX+width &&
+                    seaTile.getGridX()<=topLeftX+width &&
                     seaTile.getGridY()>=topLeftY &&
-                    seaTile.getGridY()<topLeftY+height)
+                    seaTile.getGridY()<=topLeftY+height)
                 seaTile.assignMpa(geometry);
         }
 

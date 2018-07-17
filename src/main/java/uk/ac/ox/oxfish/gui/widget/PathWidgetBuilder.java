@@ -54,11 +54,13 @@ public class PathWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
                                                                address));
 
             JButton filer = new JButton();
-            filer.setText(directory.toString());
+            if(directory!=null)
+                filer.setText(directory.toString());
 
             final JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            chooser.setCurrentDirectory(directory.toFile());
+            if(directory!=null)
+                chooser.setCurrentDirectory(directory.toFile());
             chooser.setAcceptAllFileFilterUsed(true);
 
 
