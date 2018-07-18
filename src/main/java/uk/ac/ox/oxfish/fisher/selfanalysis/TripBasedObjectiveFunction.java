@@ -50,7 +50,8 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         //how much would it take you to get there. Otherwise just use the trip record straight:
 
         //don't bother copying if discarding strategy is different!
-        if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) )
+        if(observed.getDiscardingStrategy() != null && observer.getDiscardingStrategy()!= null &&
+                !(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) )
             return Double.NaN;
 
         //if you are looking at yourself, just look at recorded profits

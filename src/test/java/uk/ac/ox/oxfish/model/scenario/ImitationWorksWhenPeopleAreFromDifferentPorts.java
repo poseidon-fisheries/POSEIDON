@@ -23,6 +23,8 @@ package uk.ac.ox.oxfish.model.scenario;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.LinearGetterBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.SimulatedProfitCPUEObjectiveFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.TwoPortsFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -51,6 +53,13 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         scenario.setAllowFriendshipsBetweenPorts(true);
         scenario.setSmallFishers(0);
         scenario.setLargeFishers(100);
+
+        ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategySmall()).setObjectiveFunction(
+                new SimulatedProfitCPUEObjectiveFactory()
+        );
+        ((PerTripImitativeDestinationFactory) scenario.getDestinationStrategyLarge()).setObjectiveFunction(
+                new SimulatedProfitCPUEObjectiveFactory()
+        );
 
         EquidegreeBuilder networkBuilder = new EquidegreeBuilder();
         networkBuilder.setDegree(new FixedDoubleParameter(10)); //make imitation way faster this way
