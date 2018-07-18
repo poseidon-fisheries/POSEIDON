@@ -77,12 +77,7 @@ public class ProfitFunctionTest {
                         double hourlyProfits = function.hourlyProfitFromHypotheticalTripHere(
                                 fisher, record.getMostFishedTileInTrip(),
                                 state,
-                                new Function<SeaTile, double[]>() {
-                                    @Override
-                                    public double[] apply(SeaTile seaTile) {
-                                        return new double[]{record.getSoldCatch()[0] / record.getEffort()};
-                                    }
-                                },
+                                new double[]{record.getSoldCatch()[0] / record.getEffort()},
                                 false
 
 

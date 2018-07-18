@@ -89,7 +89,7 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
         this.state=state;
         this.currentTime=time;
         this.fisher=fisher;
-        return profit.hourlyProfitFromHypotheticalTripHere(fisher, tile, state, this, verbose);
+        return profit.hourlyProfitFromHypotheticalTripHere(fisher, tile, state, apply(tile), verbose);
 
 
     }

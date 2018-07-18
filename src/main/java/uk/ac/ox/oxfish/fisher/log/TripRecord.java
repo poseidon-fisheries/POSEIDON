@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -314,6 +315,25 @@ public class TripRecord {
         for(Integer hours : tilesFished.values())
             sum+=hours;
         return sum;
+    }
+
+    /**
+     * just divide total catch by hours spent fishing
+     * @return
+     */
+    @Nullable
+    public double[] getTotalCPUE(){
+
+        double[] cpue = new double[totalCatch.length];
+        double effort = getEffort();
+        if(effort==0)
+            return null;
+
+        for(int i=0; i<cpue.length; i++)
+            cpue[i] = totalCatch[i]/ effort;
+
+        return cpue;
+
     }
 
     public double[] getEarningsPerSpecie() {

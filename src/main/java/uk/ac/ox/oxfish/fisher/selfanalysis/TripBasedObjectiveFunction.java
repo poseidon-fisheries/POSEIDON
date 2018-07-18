@@ -49,47 +49,14 @@ public abstract class TripBasedObjectiveFunction implements ObjectiveFunction<Fi
         //if you are guessing the fitness of a trip that departed elsewhere, you need to simulate
         //how much would it take you to get there. Otherwise just use the trip record straight:
 
+        //don't bother copying if discarding strategy is different!
+        if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) )
+            return Double.NaN;
+
         //if you are looking at yourself, just look at recorded profits
-        if(observer == observed)
-            return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
         else
-        {
+            return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
 
-            //don't bother copying if discarding strategy is different!
-            if(!(observed.getDiscardingStrategy().getClass().equals(observer.getDiscardingStrategy().getClass())) )
-                return Double.NaN;
-
-
-            //if they are from the same port, then again return the memory
-            if((
-                    observed.getHomePort().equals(observer.getHomePort())) &&
-                    (observed.getGear().isSame(observer.getGear())))
-                return extractUtilityFromTrip(observer,lastFinishedTrip,observed);
-            else
-            //otherwise simulate!
-            {
-                //compute empirical CPUE
-                double[] cpue = lastFinishedTrip.getTotalCatch();
-                for(int i=0; i<cpue.length; i++)
-                    cpue[i] = cpue[i]/ (double)lastFinishedTrip.getEffort();
-                if(lastFinishedTrip.getMostFishedTileInTrip()==null)
-                    return Double.NaN;
-                //use it to simulate a trip
-                TripRecord simulatedTrip = LameTripSimulator.simulateRecord(
-                        observer,
-                        lastFinishedTrip.getMostFishedTileInTrip(),
-                        observer.grabState(),
-                        5 * 24d,//todo change this
-                        cpue
-                );
-                if(simulatedTrip == null) //if area is unreacheable from our port
-                    return Double.NaN;
-                //extract utility from SIMULATED trip
-                return extractUtilityFromTrip(observer,simulatedTrip,observed);
-            }
-
-
-        }
 
     }
 

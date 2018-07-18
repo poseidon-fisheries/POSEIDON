@@ -80,6 +80,13 @@ public class ObjectiveFunctions {
                   "Cash Flow Knife-Edge Objective");
 
 
+        CONSTRUCTORS.put("Simulated Profit Objective",
+                         SimulatedProfitCPUEObjectiveFactory::new);
+        NAMES.put(SimulatedProfitCPUEObjectiveFactory.class,
+                "Simulated Profit Objective");
+
+
+
     }
 
     private ObjectiveFunctions() {}

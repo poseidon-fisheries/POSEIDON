@@ -80,6 +80,8 @@ public class ProfitFunction {
         TripRecord trip = simulateTrip(fisher, expectedCatches, where, state);
         if (trip == null)
             return Double.NaN;
+        if(expectedCatches==null)
+            return Double.NaN;
 
 
         if(verbose)
@@ -140,10 +142,10 @@ public class ProfitFunction {
 
     public double hourlyProfitFromHypotheticalTripHere(
             Fisher fisher, SeaTile where, FishState state,
-            Function<SeaTile, double[]> catchExpectations, boolean verbose)
+            double[] catchExpectations, boolean verbose)
     {
         return simulateHourlyProfits(fisher,
-                                     catchExpectations.apply(where),
+                                     catchExpectations,
                                      where,
                                      state,
                                      verbose);
