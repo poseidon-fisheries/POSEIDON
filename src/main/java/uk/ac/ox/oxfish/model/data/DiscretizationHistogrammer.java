@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.data;
 
 import com.google.common.base.Joiner;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -77,9 +78,9 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
         }
         else
         {
-            for (Map.Entry<SeaTile, Integer> effort : record.getTilesFishedPerHour())
+            for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords())
             {
-                counts[discretization.getGroup(effort.getKey())]+=effort.getValue();
+                counts[discretization.getGroup(effort.getKey())]+=effort.getValue().getHoursSpentFishing();
             }
         }
     }

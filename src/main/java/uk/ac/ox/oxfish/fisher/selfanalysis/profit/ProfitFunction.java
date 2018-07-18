@@ -108,6 +108,11 @@ public class ProfitFunction {
     }
 
     public TripRecord simulateTrip(Fisher fisher, double[] expectedCatches, SeaTile where, FishState state) {
+
+        for(int i=0; i<expectedCatches.length; i++)
+            if(!Double.isFinite(expectedCatches[i]))
+                return null;
+
         TripRecord trip = simulator.simulateRecord(fisher,
                                                    where,
                                                    state,

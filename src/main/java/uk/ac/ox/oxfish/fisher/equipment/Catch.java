@@ -116,11 +116,6 @@ public class Catch {
 
     }
 
-    private double[] abundanceToBiomassVector(GlobalBiology biology) {
-        return new double[biology.getSize()];
-    }
-
-
     /**
      * create a catch object given the abundance of each species binned per age/length
      * @param ageStructure binned abundance per species
@@ -133,7 +128,7 @@ public class Catch {
         for(int i=0; i<ageStructure.length; i++)
             abundance[i] = new StructuredAbundance(ageStructure[i]);
 
-        //weigh them (assuming they are all men!)
+        //weigh them
         biomassCaught = abundanceToBiomass(biology);
         totalWeight = computeTotalWeight();
 
@@ -153,7 +148,7 @@ public class Catch {
         for(int i=0; i<maleAbundance.length; i++)
             abundance[i] = new StructuredAbundance(maleAbundance[i],femaleAbundance[i]);
 
-        //weigh them (assuming they are all men!)
+        //weigh them
         biomassCaught = abundanceToBiomass(biology);
 
         totalWeight = computeTotalWeight();
@@ -265,5 +260,46 @@ public class Catch {
      */
     public double[] getBiomassArray() {
         return Arrays.copyOf(biomassCaught,biomassCaught.length);
+    }
+
+
+    /**
+     * returns a new Catch object which represents the sum of two separate catch objects.
+     * It assumes that both inputs are congruent (they either both have abundance information or they both don't).
+     * THIS IS NOT SAFE AND WILL RUIN FIRST CATCH numbers; save ahead!
+     * @param first the first catch to sum (WILL BE MODIFIED AS SIDE EFFECT)
+     * @param second
+     * @return
+     */
+    public static Catch sumCatches(Catch first,
+                                   Catch second)
+    {
+        if(first.hasAbundanceInformation())
+        {
+            Preconditions.checkState(second.hasAbundanceInformation(), "cannot sum up incongruent catches!");
+            for(int species=0; species<first.abundance.length; species++)
+            {
+                double[][] matrixAbundance = first.abundance[species].asMatrix();
+                double[][] toAdd = second.abundance[species].asMatrix();
+                for(int i=0; i<matrixAbundance.length; i++)
+                    for(int j=0; j<toAdd.length; j++)
+                        matrixAbundance[i][j] += toAdd[i][j];
+
+            }
+            return first;
+
+        }
+        else{
+            Preconditions.checkState(!second.hasAbundanceInformation(), "cannot sum up incongruent catches!");
+
+            double[] biomass = new double[first.biomassCaught.length];
+            for(int i=0; i<biomass.length; i++)
+                biomass[i]= first.biomassCaught[i] + second.biomassCaught[i];
+            return new Catch(biomass);
+
+
+        }
+
+
     }
 }

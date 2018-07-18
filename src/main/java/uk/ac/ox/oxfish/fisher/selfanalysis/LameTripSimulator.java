@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.selfanalysis;
 
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -51,6 +52,11 @@ public class LameTripSimulator {
             double maxHoursOut,
             double[] expectedHourlyCatches)
     {
+
+        for(int i=0; i<expectedHourlyCatches.length; i++) {
+            Preconditions.checkArgument(Double.isFinite(expectedHourlyCatches[i]));
+            Preconditions.checkArgument((expectedHourlyCatches[i]>=0));
+        }
 
         int numberOfSpecies = state.getSpecies().size();
         TripRecord record = new TripRecord(numberOfSpecies, fisher.getHoursAtPort());
