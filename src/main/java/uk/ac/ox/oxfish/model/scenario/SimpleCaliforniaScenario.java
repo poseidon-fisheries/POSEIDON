@@ -218,9 +218,9 @@ public class SimpleCaliforniaScenario extends TwoPopulationsScenario {
 
         PortListFactory ports = new PortListFactory();
         ports.getPorts().clear();
-        ports.getPorts().put("Washington",new Coordinate(10,0).toString());
-        ports.getPorts().put("Oregon",new Coordinate(10,49).toString());
-        ports.getPorts().put("California",new Coordinate(10,99).toString());
+        ports.getPorts().put("Washington","10,0");
+        ports.getPorts().put("Oregon","10,49");
+        ports.getPorts().put("California","10,99");
         this.setPorts(ports);
 
         //these numbers are from the
