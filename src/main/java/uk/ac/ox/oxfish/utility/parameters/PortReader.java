@@ -127,7 +127,7 @@ public class PortReader {
      * @param map the nautical map
      * @return
      */
-    private boolean isCorrect(SeaTile tile, NauticalMap map)
+    public static boolean isCorrectLocationForPort(SeaTile tile, NauticalMap map)
     {
         if(tile.getAltitude()>=0)
         {
@@ -144,10 +144,10 @@ public class PortReader {
      * @param map
      * @return
      */
-    private SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
+    public static SeaTile correctLocation(SeaTile originalSeatile, NauticalMap map, String portName)
     {
         //if it's fine, don't move it
-        if(isCorrect(originalSeatile,map))
+        if(isCorrectLocationForPort(originalSeatile,map))
             return originalSeatile;
 
 
@@ -160,7 +160,7 @@ public class PortReader {
         {
             LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(originalSeatile, i));
             neighbors.removeAll(alreadyExplored);
-            Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrect(seaTile, map)).
+            Optional<SeaTile> acceptableNeighbor = neighbors.stream().filter(seaTile -> isCorrectLocationForPort(seaTile, map)).
                     sorted(
                             (o1, o2) -> {
                                 int comparison = Integer.compare(o1.getGridX(),o2.getGridX());

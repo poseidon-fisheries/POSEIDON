@@ -32,6 +32,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -43,6 +46,18 @@ import static org.mockito.Mockito.*;
  */
 public class FishStateUtilitiesTest {
 
+
+    @Test
+    public void averager() {
+
+        DataColumn column = new DataColumn("alpha");
+        column.add(100d);
+        column.add(200d);
+        column.add(1d);
+        column.add(2d);
+
+        assertEquals(1.5,FishStateUtilities.getAverage(column,2),.0001);
+    }
 
     @Test
     public void logistic() throws Exception {
@@ -70,7 +85,6 @@ public class FishStateUtilitiesTest {
         System.out.println(latlong);
 
     }
-
 
 
 
@@ -123,10 +137,10 @@ public class FishStateUtilitiesTest {
         assertTrue(table.equals("Shanghai,Seattle\n" +
                 "1500.0,150.0\n" +
                 "1500.0,150.0\n") ||
-                           table.equals(
-                "Seattle,Shanghai\n" +
-                        "150.0,1500.0\n" +
-                        "150.0,1500.0\n")
+                table.equals(
+                        "Seattle,Shanghai\n" +
+                                "150.0,1500.0\n" +
+                                "150.0,1500.0\n")
         ) ;
 
 
@@ -163,13 +177,72 @@ public class FishStateUtilitiesTest {
         for(int i=0; i<100; i++)
         {
             SeaTile tile = FishStateUtilities.getValidSeatileFromGroup(new MersenneTwisterFast(),
-                                                                       tiles,
-                                                                       true,
-                                                                       fisher,
-                                                                       model,
-                                                                       true,
-                                                                       100);
+                    tiles,
+                    true,
+                    fisher,
+                    model,
+                    true,
+                    100);
             assertEquals(tile,tile4);
         }
     }
+
+
+    @Test
+    public void distanceToTimeSeries() throws IOException {
+
+        //distance to itself is always zero
+
+        ArrayList<Double> input = com.google.common.collect.Lists.newArrayList(
+                13095134.58,
+                12382623.44,
+                12187480.55,
+                12308532.3,
+                11996413.38,
+                11847586.29,
+                11784681.89,
+                11683882.83,
+                11451689.01,
+                11484349.02,
+                11129178.25,
+                11041537.54,
+                10970262.92,
+                10759006.93,
+                10702457.01
+
+        );
+        assertEquals(0,
+                FishStateUtilities.timeSeriesDistance(
+                        input,
+                        input
+                ),
+                0.0001);
+
+        //transform into data column
+        DataColumn data = new DataColumn("lame");
+        for (Double observation : input) {
+            data.add(observation);
+        };
+
+        assertEquals(0,
+                FishStateUtilities.timeSeriesDistance(
+                        data,
+                        Paths.get("inputs","tests","landings.csv")
+                ),
+                0.0001);
+
+
+        //computed this distance with R
+        //169961501
+        assertEquals(169961500.94,
+                FishStateUtilities.timeSeriesDistance(
+                        data,
+                        Paths.get("inputs","tests","landings2.csv")
+                ),
+                0.01);
+
+    }
+
+
+
 }

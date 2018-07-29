@@ -45,9 +45,14 @@ public class LogisticGrowers {
 
     static {
         CONSTRUCTORS.put("Independent Logistic Grower",
-                         SimpleLogisticGrowerFactory::new);
+                SimpleLogisticGrowerFactory::new);
         NAMES.put(SimpleLogisticGrowerFactory.class,
-                  "Independent Logistic Grower");
+                "Independent Logistic Grower");
+
+        CONSTRUCTORS.put("Common Logistic Grower",
+                CommonLogisticGrowerFactory::new);
+        NAMES.put(CommonLogisticGrowerFactory.class,
+                "Common Logistic Grower");
 
     }
 }

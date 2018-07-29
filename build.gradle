@@ -87,6 +87,9 @@ dependencies
     compile fileTree(dir: 'libs/discrete-choosers', include: '*.jar')
 
 
+    // maximizer
+    compile group: 'de.openea', name : 'eva2', version : '2.2.0'
+
     //annotations
     compile group: 'com.intellij', name: 'annotations', version: '12.0'
 
@@ -155,6 +158,7 @@ task inferenceFatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.Shad
     }
 }
 
+
 //this task creates a single executable jar ("fat" because it contains all its requirements); this is mostly what gets
 //distributed
 task buildHeadless(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -179,17 +183,17 @@ task deployHeadless(type: Copy, dependsOn: buildHeadless) {
 }
 
 
-/*
-task fatJarBatch(type: FatCapsule) {
-    archiveName = "oxfish_batch.jar"
-    applicationClass 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
 
-    capsuleManifest {
-        minJavaVersion = '1.8.0'
-        minUpdateVersion =  ['1.8.0':'31']
+task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'oxfish_batch.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.gui.BatchRunnerSetup'
     }
 }
-*/
+
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec){
@@ -197,6 +201,10 @@ task buildSampleFiles(type: JavaExec){
     main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
 }
 
+task optimizer(type: JavaExec){
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'uk.ac.ox.oxfish.MainOptimizer'
+}
 
 //easy function to get formatted date
 def getDate() {

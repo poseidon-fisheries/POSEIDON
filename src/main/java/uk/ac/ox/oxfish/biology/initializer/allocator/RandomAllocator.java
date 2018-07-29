@@ -35,7 +35,7 @@ public class RandomAllocator implements BiomassAllocator {
     public RandomAllocator(double maxAllocation, double minAllocation) {
         this.maxAllocation = maxAllocation;
         this.minAllocation = minAllocation;
-        Preconditions.checkArgument(maxAllocation>minAllocation);
+        Preconditions.checkArgument(maxAllocation>=minAllocation);
     }
 
     /**

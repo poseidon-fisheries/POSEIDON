@@ -22,11 +22,13 @@ package uk.ac.ox.oxfish.geography.ports;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by carrknight on 3/13/17.
@@ -40,8 +42,8 @@ public class PortListFactoryTest {
         PortListFactory factory = new PortListFactory();
         factory.getPorts().clear();
 
-        factory.getPorts().put("Washington",new Coordinate(0,0));
-        factory.getPorts().put("Italy",new Coordinate(5,2));
+        factory.getPorts().put("Washington","0.0,0.0");
+        factory.getPorts().put("Italy","5.0,2.0");
 
         FishYAML yaml = new FishYAML();
         String dump = yaml.dump(factory);
@@ -50,8 +52,9 @@ public class PortListFactoryTest {
         assertEquals(dump.trim(),
                      "List of Ports:\n" +
                              "  ports:\n" +
-                             "    Washington: 'x:0.0,y:0.0'\n" +
-                             "    Italy: 'x:5.0,y:2.0'"
+                             "    Washington: 0.0,0.0\n" +
+                             "    Italy: 5.0,2.0\n"+
+                             "  usingGridCoordinates: true"
                      );
 
     }
@@ -69,14 +72,16 @@ public class PortListFactoryTest {
 
         PortListFactory factory = yaml.loadAs("List of Ports:\n" +
                                        "  ports:\n" +
-                                       "    Washington: x:0.0,y:0.0\n" +
-                                       "    Italy: x:7.0,y:2.0",
+                                       "    Washington: 'x:0.0,y:0.0'\n" +
+                                       "    Italy: '7.0,2.0'",
                                PortListFactory.class);
 
 
         assertEquals(factory.getPorts().size(),2);
-        assertEquals((int)factory.getPorts().get("Washington").x,0);
-        assertEquals((int)factory.getPorts().get("Italy").x,7);
+        PortListInitializer initializer = factory.apply(mock(FishState.class));
+
+        assertEquals((int)initializer.getPorts().get("Washington").x,0);
+        assertEquals((int)initializer.getPorts().get("Italy").x,7);
 
     }
 }

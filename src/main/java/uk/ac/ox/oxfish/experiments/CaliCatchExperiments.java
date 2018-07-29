@@ -32,21 +32,14 @@ public class CaliCatchExperiments {
     public static void main(String[] args) throws IOException {
 
 
-//            runMultipleTimesToBuildHistogram("2011_eei_2",
-//                                             null,
-//                                             Paths.get("docs",
-//                                                       "paper3_dts",
-//                                                       "mark2",
-//                                                       "exploratory",
-//                                                       "calibration",
-//                                                       "histograms"),
-//                                             YEARS_PER_RUN+2);
-        ///home/carrknight/code/oxfish/docs/paper3_dts/newlogbook/
-            runMultipleTimesToBuildHistogram("new",
+            runMultipleTimesToBuildHistogram("deriso_hillclimber2",
                                              null,
                                              Paths.get("docs",
                                                        "paper3_dts",
-                                                       "newlogbook"),
+                                                       "mark2",
+                                                       "exploratory",
+                                                       "calibration",
+                                                       "histograms"),
                                              YEARS_PER_RUN);
     }
 }

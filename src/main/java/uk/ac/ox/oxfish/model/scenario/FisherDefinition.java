@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
@@ -56,6 +57,7 @@ import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -126,6 +128,12 @@ public class FisherDefinition {
 
     private DoubleParameter enginePower = new NormalDoubleParameter(5000, 100);
 
+
+    /**
+     * additional variable cost (excluding oil) that we want to impose to the fishers;
+     * negative numbers are ignored!
+     */
+    private DoubleParameter hourlyVariableCost = new FixedDoubleParameter(0);
 
     /**
      * tags to add to each fisher created
@@ -211,9 +219,9 @@ public class FisherDefinition {
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
         Supplier<Boat> boatSupplier = () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                                                                        literPerKilometer.apply(random),
-                                                                        speedInKmh.apply(random)),
-                                                     new FuelTank(fuelTankSize.apply(random)));
+                literPerKilometer.apply(random),
+                speedInKmh.apply(random)),
+                new FuelTank(fuelTankSize.apply(random)));
         Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random), biology);
 
         FisherFactory fisherFactory = new FisherFactory(
@@ -235,6 +243,25 @@ public class FisherDefinition {
                 holdSupplier,
                 gear,
                 firstFisherID);
+
+        //add variable costs, if needed:
+        fisherFactory.getAdditionalSetups().add(
+                new Consumer<Fisher>() {
+                    @Override
+                    public void accept(Fisher fisher) {
+                        //don't bother if we don't have any variable costs
+                        if(hourlyVariableCost == null || hourlyVariableCost instanceof NullParameter)
+                            return;
+                        double vc = hourlyVariableCost.apply(fisher.grabRandomizer());
+                        //don't bother if variable costs are negative!
+                        if(vc>0)
+                            fisher.getAdditionalTripCosts().add(
+                                    new HourlyCost(vc)
+                            );
+
+                    }
+                }
+        );
 
         fisherFactory.getAdditionalSetups().add(new Consumer<Fisher>() {
             @Override
@@ -586,5 +613,13 @@ public class FisherDefinition {
     public void setLogbook(
             AlgorithmFactory<? extends LogbookInitializer> logbook) {
         this.logbook = logbook;
+    }
+
+    public DoubleParameter getHourlyVariableCost() {
+        return hourlyVariableCost;
+    }
+
+    public void setHourlyVariableCost(DoubleParameter hourlyVariableCost) {
+        this.hourlyVariableCost = hourlyVariableCost;
     }
 }

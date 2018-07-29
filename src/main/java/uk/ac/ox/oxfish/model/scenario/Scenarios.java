@@ -48,6 +48,9 @@ public class Scenarios {
         SCENARIOS.put("Abstract",PrototypeScenario::new);
         DESCRIPTIONS.put("Abstract", "The current model, modular and ready to use.");
 
+        SCENARIOS.put("Flexible",FlexibleScenario::new);
+        DESCRIPTIONS.put("Flexible", "The conceptual model, with multiple populations");
+
 
         SCENARIOS.put("California Map Scenario", CaliforniaAbundanceScenario::new);
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +

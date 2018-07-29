@@ -52,8 +52,6 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
             new ConstantAllocatorFactory(1);
 
 
-    private DoubleParameter initialBiomass = new FixedDoubleParameter(2500);
-
     private DoubleParameter carryingCapacity = new FixedDoubleParameter(5000);
 
 
@@ -93,11 +91,9 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
         double  movementLimit = percentageLimitOnDailyMovement.apply(state.getRandom());
 
 
-        Double actualInitialBiomass = initialBiomass.apply(state.getRandom());
         Double actualCarryingCapacity = carryingCapacity.apply(state.getRandom());
         return new SingleSpeciesBiomassInitializer(
-                biomassSuppliedPerCell ? new PerCellInitialBiomass(actualInitialBiomass) :
-                        new ConstantInitialBiomass(actualInitialBiomass)
+                new ConstantInitialBiomass(Double.NaN)
                 ,
                 initialBiomassAllocator.apply(state),
                 biomassSuppliedPerCell ? new PerCellInitialBiomass(actualCarryingCapacity) :
@@ -159,23 +155,7 @@ public class SingleSpeciesBiomassNormalizedFactory implements AlgorithmFactory<S
         this.initialCapacityAllocator = initialCapacityAllocator;
     }
 
-    /**
-     * Getter for property 'initialBiomass'.
-     *
-     * @return Value for property 'initialBiomass'.
-     */
-    public DoubleParameter getInitialBiomass() {
-        return initialBiomass;
-    }
 
-    /**
-     * Setter for property 'initialBiomass'.
-     *
-     * @param initialBiomass Value to set for property 'initialBiomass'.
-     */
-    public void setInitialBiomass(DoubleParameter initialBiomass) {
-        this.initialBiomass = initialBiomass;
-    }
 
     /**
      * Getter for property 'carryingCapacity'.

@@ -226,12 +226,27 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
         //while there is still reallocation to be done
         MersenneTwisterFast random = ((FishState) simState).getRandom();
 
-        while(Math.abs(toReallocate) > FishStateUtilities.EPSILON && !biologyList.isEmpty())
+        allocateBiomassAtRandom(biologyList, toReallocate, random, speciesIndex);
+
+
+    }
+
+    /**
+     *  given a bunch of biomass (spawning/recruiting) put them in the given boxes
+     * @param biologyList all the biology items that can receive biomass
+     * @param toReallocate the amount of biomass to allocate
+     * @param random the randomizer to use
+     * @param speciesIndex the species index
+     */
+    public static void allocateBiomassAtRandom(List<? extends VariableBiomassBasedBiology> biologyList, double toReallocate, MersenneTwisterFast random, int speciesIndex) {
+        while(toReallocate > 0 && !biologyList.isEmpty())
         {
             //pick a biology at random
             VariableBiomassBasedBiology local = biologyList.get(random.nextInt(biologyList.size()));
             //give or take some biomass out
-            double delta = toReallocate / (double) biologyList.size();
+            double delta = toReallocate<FishStateUtilities.EPSILON ?
+                    toReallocate :
+                    toReallocate / (double) biologyList.size();
             local.getCurrentBiomass()[speciesIndex] += delta;
             //if you gave some biomass
             if(delta > 0)
@@ -261,9 +276,6 @@ public class DerisoSchnuteCommonGrower implements Startable, Steppable {
 
 
         }
-
-
-
     }
 
     public boolean addAll(Collection<? extends VariableBiomassBasedBiology> c) {

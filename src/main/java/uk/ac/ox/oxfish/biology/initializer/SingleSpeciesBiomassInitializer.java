@@ -162,19 +162,36 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
-
-        if(!initialDistribution.isStarted()) {
-            initialDistribution.start(map, random);
-            habitabilityDistribution.start(map, random);
-        }
         //we are going to work on a single species!
         Species species = biology.getSpecie(speciesName);
 
+        if(!initialDistribution.isStarted()) {
+            habitabilityDistribution.start(map, random);
+
+            //if we are dealing with normalized allocators, it's a good idea to
+            //zero out the weights for areas where there can be no fish
+            if(normalizeAllocators)
+            {
+                SeaTile tile = map.getAllSeaTilesExcludingLandAsList().iterator().next();
+                double weight = habitabilityDistribution.getWeight(
+                        species,
+                        tile,
+                        map,
+                        random
+                );
+                if(weight<=0)
+                    initialDistribution.getZeroedArea().add(tile);
+            }
+
+            initialDistribution.start(map, random);
+        }
+
+
 
         double habitability = habitabilityDistribution.getWeight(species,
-                                                                 seaTile,
-                                                                 map,
-                                                                 random);
+                seaTile,
+                map,
+                random);
 
 
         //we return an empty biology object. We will fill it in the processing phase
@@ -187,7 +204,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
             Arrays.fill(currentBiomass,0d);
             Arrays.fill(carryingCapacity,0d);
             return new BiomassLocalBiology(currentBiomass,
-                                           carryingCapacity);
+                    carryingCapacity);
 
 
         }
@@ -231,9 +248,9 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         {
 
             double habitability = habitabilityDistribution.getWeight(species,
-                                                                     seaTile,
-                                                                     map,
-                                                                     random);
+                    seaTile,
+                    map,
+                    random);
 
             //don't bother if you can't live there
             if(habitability<=0 || Double.isNaN(habitability))
@@ -242,11 +259,19 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
 
             //create and assign amount of fish available initially
             double carryingCapacity = totalCarryingCapacity * habitability;
-            double startingBiomass = totalStartingBiomass *
-                    initialDistribution.getWeight(species,
-                                                  seaTile,
-                                                  map,
-                                                  random);
+            double startingBiomass;
+            if(!normalizeAllocators)
+                startingBiomass = totalStartingBiomass *
+                        initialDistribution.getWeight(species,
+                                seaTile,
+                                map,
+                                random);
+            //when normalizing, the initialDistribution only tells us the proportion of carrying capacity present
+            else
+                startingBiomass = initialDistribution.getWeight(species,
+                        seaTile,
+                        map,
+                        random) * carryingCapacity;
 
             //if inconsistent, carrying capacity limits initial biomass!
             if(startingBiomass > carryingCapacity) {
@@ -269,14 +294,14 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
             habitableAreas.put(seaTile,local);
 
             Preconditions.checkArgument(startingBiomass<=carryingCapacity,
-                                        "carrying capacity allocated less than initial biomass allocated! ");
+                    "carrying capacity allocated less than initial biomass allocated! ");
 
             if(unfishable)
                 seaTile.setBiology(new ConstantBiomassDecorator(local));
 
         }
         Preconditions.checkArgument(habitableAreas.size()==numberOfHabitableCells,
-                                    "failure at computing the correct number of habitable cells");
+                "failure at computing the correct number of habitable cells");
 
 
         //initialize the grower
@@ -284,10 +309,10 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         //initialize the diffuser
         if(!forceMovementOff) {
             BiomassDiffuserContainer diffuser = new BiomassDiffuserContainer(map, random, biology,
-                                                                             new Pair<>(
-                                                                                     species,
-                                                                                     movementRule
-                                                                             )
+                    new Pair<>(
+                            species,
+                            movementRule
+                    )
             );
             model.scheduleEveryDay(diffuser, StepOrder.BIOLOGY_PHASE);
         }
@@ -312,7 +337,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
         GlobalBiology independentGlobalBiology = new GlobalBiology(species);
         //create maps of where the fish is
         initialDistribution = new AllocatorManager(
-                normalizeAllocators,
+                false,
                 species,
                 initialAllocator,
                 independentGlobalBiology

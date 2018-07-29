@@ -27,10 +27,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Pre-generates weighted maps, normalises if needed and in
@@ -53,6 +50,12 @@ public class AllocatorManager {
      * list of allocators, one for each species
      */
     final private Map<Species,BiomassAllocator> allocators;
+
+
+    /**
+     * Seatiles where we ignore allocator and just return 0
+     */
+    final private Set<SeaTile> zeroedArea = new HashSet<>();
 
 
     private boolean started = false;
@@ -106,7 +109,7 @@ public class AllocatorManager {
         Preconditions.checkArgument(!weightMaps.isEmpty());
 
         //pre-compute only if you need to normalize
-        if(normalize) {
+        if(normalize || !zeroedArea.isEmpty()) {
             double[] sums = new double[allocators.size()];
 
 
@@ -117,8 +120,8 @@ public class AllocatorManager {
                 for (Map.Entry<Species, Map<SeaTile, Double>> speciesMap : weightMaps.entrySet()) {
                     //what's the weight here?
                     double weightHere =
-                            //weight is always 0 above ground
-                            tile.getAltitude() >= 0 ?
+                            //weight is always 0 above ground (or zeroed out)
+                            tile.getAltitude() >= 0 || zeroedArea.contains(tile)?
                                     0 :
                                     //otherwise allocate according to the right allocator
                                     allocators.get(speciesMap.getKey()).allocate(
@@ -199,5 +202,10 @@ public class AllocatorManager {
      */
     public boolean isStarted() {
         return started;
+    }
+
+
+    public Set<SeaTile> getZeroedArea() {
+        return zeroedArea;
     }
 }

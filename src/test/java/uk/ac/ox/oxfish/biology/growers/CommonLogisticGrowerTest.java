@@ -1,0 +1,56 @@
+package uk.ac.ox.oxfish.biology.growers;
+
+import org.junit.Test;
+import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import static org.junit.Assert.*;
+
+public class CommonLogisticGrowerTest {
+
+
+    @Test
+    public void growsCorrectly() {
+
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(0);
+
+        DiffusingLogisticFactory biology = new DiffusingLogisticFactory();
+        scenario.setBiologyInitializer(biology);
+        CommonLogisticGrowerFactory grower = new CommonLogisticGrowerFactory();
+        biology.setGrower(grower);
+        grower.setSteepness(new FixedDoubleParameter(.33));
+
+        biology.setCarryingCapacity(new FixedDoubleParameter(5000));
+        biology.setMaxInitialCapacity(new FixedDoubleParameter(.75));
+        biology.setMinInitialCapacity(new FixedDoubleParameter(.75));
+
+        SimpleMapInitializerFactory map = new SimpleMapInitializerFactory();
+        scenario.setMapInitializer(map);
+        map.setWidth(new FixedDoubleParameter(3));
+        map.setHeight(new FixedDoubleParameter(1));
+        map.setCoastalRoughness(new FixedDoubleParameter(0));
+        map.setMaxLandWidth(new FixedDoubleParameter(1));
+
+        FishState model = new FishState();
+        model.setScenario(scenario);
+        model.start();
+
+        assertEquals(
+                7500,
+                model.getTotalBiomass(model.getBiology().getSpecie(0)),
+                .001);
+
+        for(int i=0; i<370; i++)
+            model.schedule.step(model);
+
+
+        assertEquals(
+                8118.75,
+                model.getTotalBiomass(model.getBiology().getSpecie(0)),
+                .001);
+    }
+}

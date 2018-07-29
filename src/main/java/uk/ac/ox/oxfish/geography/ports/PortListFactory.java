@@ -23,8 +23,10 @@ package uk.ac.ox.oxfish.geography.ports;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * List of ports (actually a map!)
@@ -32,12 +34,16 @@ import java.util.LinkedHashMap;
  */
 public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
 
-    private LinkedHashMap<String,Coordinate> ports = new LinkedHashMap<>();
+    private LinkedHashMap<String,String> ports = new LinkedHashMap<>();
     {
-        ports.put("Top Port", new Coordinate(40,0));
-        ports.put("Middle Port", new Coordinate(40,24));
-        ports.put("Bottom Port", new Coordinate(40,49));
+        ports.put("Top Port", "x:40,y:0");
+        ports.put("Middle Port", "x:40,y:24");
+        ports.put("Bottom Port", "x:40,y:49");
     }
+
+
+    private boolean usingGridCoordinates = true;
+
 
     /**
      * Applies this function to the given argument.
@@ -47,7 +53,22 @@ public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
      */
     @Override
     public PortListInitializer apply(FishState state) {
-        return new PortListInitializer(ports);
+
+        LinkedHashMap<String,Coordinate> coordinatedPorts = new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> stringPort : ports.entrySet()) {
+
+            coordinatedPorts.put(
+                    stringPort.getKey(),
+                    YamlConstructor.convertToCoordinate(
+                            stringPort.getValue()
+                    )
+            );
+
+        }
+
+
+        return new PortListInitializer(coordinatedPorts, usingGridCoordinates);
     }
 
     /**
@@ -55,7 +76,7 @@ public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
      *
      * @return Value for property 'ports'.
      */
-    public LinkedHashMap<String, Coordinate> getPorts() {
+    public LinkedHashMap<String, String> getPorts() {
         return ports;
     }
 
@@ -64,7 +85,16 @@ public class PortListFactory implements AlgorithmFactory<PortListInitializer> {
      *
      * @param ports Value to set for property 'ports'.
      */
-    public void setPorts(LinkedHashMap<String, Coordinate> ports) {
+    public void setPorts(LinkedHashMap<String, String> ports) {
         this.ports = ports;
+    }
+
+
+    public boolean isUsingGridCoordinates() {
+        return usingGridCoordinates;
+    }
+
+    public void setUsingGridCoordinates(boolean usingGridCoordinates) {
+        this.usingGridCoordinates = usingGridCoordinates;
     }
 }

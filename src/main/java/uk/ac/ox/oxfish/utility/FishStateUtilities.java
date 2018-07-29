@@ -63,6 +63,7 @@ import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -1140,6 +1141,57 @@ public class FishStateUtilities {
         assert !respectMPA || fisher.isAllowedToFishHere(tile, model);
         assert !ignoreWastelands || tile.isFishingEvenPossibleHere();
         return tile;
+    }
+
+
+    public static double getAverage(DataColumn column, int startAtIndex)
+    {
+        Iterator<Double> iterator = column.iterator();
+        for(int i=0; i<startAtIndex; i++)
+            iterator.next();
+        DoubleSummaryStatistics statistics = new DoubleSummaryStatistics();
+        while(iterator.hasNext())
+            statistics.accept(iterator.next());
+
+        return statistics.getAverage();
+
+
+
+
+    }
+
+
+    public static double timeSeriesDistance(DataColumn data,
+                                            Path csvFilePath) throws IOException {
+        return timeSeriesDistance(
+                data,
+                Files.readAllLines(csvFilePath).stream().mapToDouble(
+                        value -> Double.parseDouble(value.trim())
+                ).boxed().collect(Collectors.toList())
+
+                );
+    }
+
+
+    public static double timeSeriesDistance(Iterable<Double> timeSeriesOne,
+                                            Iterable<Double> timeSeriesTwo)
+    {
+        Iterator<Double> firstIterator = timeSeriesOne.iterator();
+        Iterator<Double> secondIterator = timeSeriesTwo.iterator();
+
+
+        double error = 0;
+        while(firstIterator.hasNext())
+        {
+            Preconditions.checkArgument(secondIterator.hasNext(),
+                    "Time series are of different length");
+
+            error+= Math.abs(firstIterator.next() - secondIterator.next());
+        }
+        Preconditions.checkArgument(!secondIterator.hasNext(),
+                "Time series are of different length");
+
+        return error;
     }
 }
 

@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
+import uk.ac.ox.oxfish.utility.parameters.PortReader;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,8 +44,15 @@ public class PortListInitializer implements PortInitializer {
 
     private final LinkedHashMap<String,Coordinate> ports;
 
-    public PortListInitializer(LinkedHashMap<String, Coordinate> ports) {
+    /**
+     * if this is set to false, we assume the coordinates provided are geographical coordinates;
+     * if this is set to true, we assume the coordinates provided are grid coordinates
+     */
+    private final boolean usingGridCoordinates;
+
+    public PortListInitializer(LinkedHashMap<String, Coordinate> ports, boolean usingGridCoordinates) {
         this.ports = ports;
+        this.usingGridCoordinates = usingGridCoordinates;
         Preconditions.checkArgument(ports.size()>0);
     }
 
@@ -66,15 +74,29 @@ public class PortListInitializer implements PortInitializer {
             FishState model, GasPriceMaker gasPriceMaker) {
         List<Port> toReturn = new ArrayList<>(ports.size());
         for(Map.Entry<String,Coordinate> entry : ports.entrySet()) {
-            SeaTile location = map.getSeaTile((int) entry.getValue().x,
-                                              (int) entry.getValue().y);
+
+
+            SeaTile location;
+            if(usingGridCoordinates)
+                location = map.getSeaTile((int) entry.getValue().x,
+                        (int) entry.getValue().y);
+            else
+            {
+                location = PortReader.correctLocation(
+                        map.getSeaTile(
+                                entry.getValue()
+                        ),
+                        map,
+                        entry.getKey()
+                );
+            }
 
             Port newPort = new Port(entry.getKey(),
-                              location,
-                              marketFactory.apply(location),
-                              //ports start with price = 0 because I assume the scenario will have its own rules for gas price
+                    location,
+                    marketFactory.apply(location),
+                    //ports start with price = 0 because I assume the scenario will have its own rules for gas price
 
-                              0
+                    0
             );
             toReturn.add(newPort);
             map.addPort(newPort);
@@ -84,5 +106,9 @@ public class PortListInitializer implements PortInitializer {
 
 
         return toReturn;
+    }
+
+    public LinkedHashMap<String, Coordinate> getPorts() {
+        return ports;
     }
 }

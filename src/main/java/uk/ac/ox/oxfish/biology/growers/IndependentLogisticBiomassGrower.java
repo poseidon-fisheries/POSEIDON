@@ -114,8 +114,14 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
 
     public static double logisticStep(
             double currentBiomasses, double carryingCapacity, double malthusianParameter) {
-        return Math.min(carryingCapacity, currentBiomasses + malthusianParameter *
-                (1d - currentBiomasses / carryingCapacity) * currentBiomasses);
+        return Math.min(carryingCapacity, currentBiomasses + logisticRecruitment(currentBiomasses, carryingCapacity, malthusianParameter));
+    }
+
+    public static double logisticRecruitment(double currentBiomasses,
+                                             double carryingCapacity,
+                                             double malthusianParameter) {
+        return malthusianParameter *
+                (1d - currentBiomasses / carryingCapacity) * currentBiomasses;
     }
 
     /**

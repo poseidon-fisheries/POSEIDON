@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -53,15 +54,12 @@ public class YamlConstructor extends  Constructor {
 
         //add the ability to read/write coordinates
 
-
+/*
         this.yamlConstructors.put(new Tag("!coord"), new Construct() {
             @Override
             public Object construct(Node node) {
                 String val = (String) constructScalar((ScalarNode) node);
-                String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
-                return new Coordinate(
-                        Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
-                        Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
+                return convertToCoordinate(val);
 
             }
 
@@ -71,7 +69,7 @@ public class YamlConstructor extends  Constructor {
             }
         });
 
-
+*/
 
         //intercept the scalar nodes to see if they are actually Factories or DoubleParameters
         this.yamlClassConstructors.put(
@@ -79,15 +77,14 @@ public class YamlConstructor extends  Constructor {
                     @Override
                     public Object construct(Node nnode) {
                         //if field you are trying to fill is a coordinate
+                        /*
                         if(nnode.getType().equals(Coordinate.class))
                         {
                             String val = (String) constructScalar((ScalarNode) nnode);
-                            String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
-                            return new Coordinate(
-                                    Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
-                                    Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
+                            return convertToCoordinate(val);
 
                         }
+                        */
 
                         //if the field you are trying to fill is a double parameter
                         if(nnode.getType().equals(DoubleParameter.class))
@@ -209,7 +206,13 @@ public class YamlConstructor extends  Constructor {
         });
     }
 
-
+    @NotNull
+    public static Coordinate convertToCoordinate(String val) {
+        String[] split = val.replaceAll("x:","").replaceAll("y:","").split(",");
+        return new Coordinate(
+                Double.parseDouble(split[0].trim().replaceAll("'","").replaceAll("\"","")),
+                Double.parseDouble(split[1].trim().replaceAll("'","").replaceAll("\"","")));
+    }
 
 
     private DoubleParameter doubleParameterSplit(ScalarNode node)
