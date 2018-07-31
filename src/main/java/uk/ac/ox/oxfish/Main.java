@@ -127,8 +127,9 @@ class Main{
                                 SwingUtilities.invokeLater(() -> {
                                     if(scenarioSelector.hasScenario("yaml"))
                                         scenarioSelector.removeScenarioOption("yaml");
-                                    scenarioSelector.addScenarioOption("yaml",scenario);
-                                    scenarioSelector.select("yaml");
+                                    String name = file.getName();
+                                    scenarioSelector.addScenarioOption(name,scenario);
+                                    scenarioSelector.select(name);
                                     scenarioSelector.repaint();
                                 });
 

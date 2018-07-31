@@ -16,8 +16,8 @@ public class PortBasedWaitTimesFactory implements AlgorithmFactory<PortBasedWait
 
     private HashMap<String,Object> portWaitTimes = new HashMap<>();
     {
-        portWaitTimes.put("Port 1","0");
-        portWaitTimes.put("Port 2","10");
+        portWaitTimes.put("Port 0","0");
+ //       portWaitTimes.put("Port 2","10");
     }
 
     @Override
