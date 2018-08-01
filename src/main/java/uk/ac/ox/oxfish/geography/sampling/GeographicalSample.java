@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.geography.sampling;
 
+import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,19 +34,21 @@ import java.util.List;
  */
 public class GeographicalSample {
 
-    private final LinkedList<Double> northings = new LinkedList<>();
+    private final LinkedList<Double> secondCoordinate = new LinkedList<>();
 
-    private final LinkedList<Double> eastings = new LinkedList<>();
+    private final LinkedList<Double> firstCoordinate = new LinkedList<>();
 
     private final LinkedList<Double> observations = new LinkedList<>();
 
-    private  double minNorthing = Double.NaN;
+    private  double minSecondCoordinate = Double.NaN;
 
-    private double maxNorthing= Double.NaN;
+    private double maxSecondCoordinate = Double.NaN;
 
-    private double minEasting = Double.NaN;
+    private double minFirstCoordinate = Double.NaN;
 
-    private double maxEasting = Double.NaN;
+    private double maxFirstCoordinate = Double.NaN;
+
+    private int numberOfObservations;
 
 
     /**
@@ -67,43 +71,46 @@ public class GeographicalSample {
             String[] newLine = line.split(",");
             assert  newLine.length == 3;
             double easting = Double.parseDouble(newLine[0]);
-            eastings.add(easting);
+            firstCoordinate.add(easting);
             double northing = Double.parseDouble(newLine[1]);
-            northings.add(northing);
+            secondCoordinate.add(northing);
             observations.add(Double.parseDouble(newLine[2]));
 
 
             //if it's a min or a max, remember it
-            if(Double.isNaN(minEasting) || easting < minEasting)
-                minEasting = easting;
-            if(Double.isNaN(maxEasting) || easting > maxEasting)
-                maxEasting = easting;
-            if(Double.isNaN(minNorthing) || northing < minNorthing)
-                minNorthing = northing;
-            if(Double.isNaN(maxNorthing) || northing > maxNorthing)
-                maxNorthing = northing;
+            if(Double.isNaN(minFirstCoordinate) || easting < minFirstCoordinate)
+                minFirstCoordinate = easting;
+            if(Double.isNaN(maxFirstCoordinate) || easting > maxFirstCoordinate)
+                maxFirstCoordinate = easting;
+            if(Double.isNaN(minSecondCoordinate) || northing < minSecondCoordinate)
+                minSecondCoordinate = northing;
+            if(Double.isNaN(maxSecondCoordinate) || northing > maxSecondCoordinate)
+                maxSecondCoordinate = northing;
         }
 
+        numberOfObservations = firstCoordinate.size();
+        Preconditions.checkState(secondCoordinate.size()==numberOfObservations);;
+        Preconditions.checkState(observations.size()==numberOfObservations);
 
     }
 
 
     /**
-     * Getter for property 'northings'.
+     * Getter for property 'secondCoordinate'.
      *
-     * @return Value for property 'northings'.
+     * @return Value for property 'secondCoordinate'.
      */
-    public LinkedList<Double> getNorthings() {
-        return northings;
+    public LinkedList<Double> getSecondCoordinate() {
+        return secondCoordinate;
     }
 
     /**
-     * Getter for property 'eastings'.
+     * Getter for property 'firstCoordinate'.
      *
-     * @return Value for property 'eastings'.
+     * @return Value for property 'firstCoordinate'.
      */
-    public LinkedList<Double> getEastings() {
-        return eastings;
+    public LinkedList<Double> getFirstCoordinate() {
+        return firstCoordinate;
     }
 
     /**
@@ -116,38 +123,42 @@ public class GeographicalSample {
     }
 
     /**
-     * Getter for property 'minNorthing'.
+     * Getter for property 'minSecondCoordinate'.
      *
-     * @return Value for property 'minNorthing'.
+     * @return Value for property 'minSecondCoordinate'.
      */
-    public double getMinNorthing() {
-        return minNorthing;
+    public double getMinSecondCoordinate() {
+        return minSecondCoordinate;
     }
 
     /**
-     * Getter for property 'maxNorthing'.
+     * Getter for property 'maxSecondCoordinate'.
      *
-     * @return Value for property 'maxNorthing'.
+     * @return Value for property 'maxSecondCoordinate'.
      */
-    public double getMaxNorthing() {
-        return maxNorthing;
+    public double getMaxSecondCoordinate() {
+        return maxSecondCoordinate;
     }
 
     /**
-     * Getter for property 'minEasting'.
+     * Getter for property 'minFirstCoordinate'.
      *
-     * @return Value for property 'minEasting'.
+     * @return Value for property 'minFirstCoordinate'.
      */
-    public double getMinEasting() {
-        return minEasting;
+    public double getMinFirstCoordinate() {
+        return minFirstCoordinate;
     }
 
     /**
-     * Getter for property 'maxEasting'.
+     * Getter for property 'maxFirstCoordinate'.
      *
-     * @return Value for property 'maxEasting'.
+     * @return Value for property 'maxFirstCoordinate'.
      */
-    public double getMaxEasting() {
-        return maxEasting;
+    public double getMaxFirstCoordinate() {
+        return maxFirstCoordinate;
+    }
+
+    public int getNumberOfObservations() {
+        return numberOfObservations;
     }
 }

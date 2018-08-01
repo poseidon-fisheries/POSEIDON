@@ -87,6 +87,10 @@ public class Allocators {
                          PyramidsAllocatorFactory::new);
         NAMES.put(PyramidsAllocatorFactory.class,"Pyramids Allocator");
 
+        CONSTRUCTORS.put("From File Allocator",
+                         CoordinateFileAllocatorFactory::new);
+        NAMES.put(CoordinateFileAllocatorFactory.class,"From File Allocator");
+
 
     }
 

@@ -179,7 +179,7 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
                         map,
                         random
                 );
-                if(weight<=0)
+                if(Double.isNaN(weight) || weight<=0)
                     initialDistribution.getZeroedArea().add(tile);
             }
 
@@ -272,6 +272,9 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
                         seaTile,
                         map,
                         random) * carryingCapacity;
+
+            if(startingBiomass<=0 || Double.isNaN(startingBiomass))
+                startingBiomass = 0;
 
             //if inconsistent, carrying capacity limits initial biomass!
             if(startingBiomass > carryingCapacity) {

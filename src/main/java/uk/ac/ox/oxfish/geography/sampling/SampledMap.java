@@ -83,10 +83,10 @@ public class SampledMap implements Serializable
         Iterator<Map.Entry<String, Path>> biologyIterator = biologyFiles.entrySet().iterator();
         Map.Entry<String, Path> firstBiology = biologyIterator.next();
         GeographicalSample biologySample = new GeographicalSample(firstBiology.getValue(), true);
-        mbr = new Envelope(biologySample.getMinEasting(), biologySample.getMaxEasting(),
-                           biologySample.getMinNorthing(), biologySample.getMaxNorthing());
-        System.out.println("Map Info\nEastings from" + biologySample.getMinEasting() + " to " + biologySample.getMaxEasting());
-        System.out.println("Northings from" + biologySample.getMinNorthing() + " to " + biologySample.getMaxNorthing());
+        mbr = new Envelope(biologySample.getMinFirstCoordinate(), biologySample.getMaxFirstCoordinate(),
+                           biologySample.getMinSecondCoordinate(), biologySample.getMaxSecondCoordinate());
+        System.out.println("Map Info\nEastings from" + biologySample.getMinFirstCoordinate() + " to " + biologySample.getMaxFirstCoordinate());
+        System.out.println("Northings from" + biologySample.getMinSecondCoordinate() + " to " + biologySample.getMaxSecondCoordinate());
         //find ratio height to width
         double heightToWidth = mbr.getHeight()/mbr.getWidth();
         gridHeight = (int) Math.round(gridWidth * heightToWidth);
@@ -140,8 +140,8 @@ public class SampledMap implements Serializable
         for(int x = 0; x< gridWith; x++)
             for(int y = 0; y< gridHeight; y++)
                 backingGrid.put(x,y,new LinkedList<Double>());
-        Iterator<Double> eastings = preformattedCSV.getEastings().iterator();
-        Iterator<Double> northings = preformattedCSV.getNorthings().iterator();
+        Iterator<Double> eastings = preformattedCSV.getFirstCoordinate().iterator();
+        Iterator<Double> northings = preformattedCSV.getSecondCoordinate().iterator();
         Iterator<Double> observations = preformattedCSV.getObservations().iterator();
         for(int i=0; i<preformattedCSV.getObservations().size(); i++)
         {

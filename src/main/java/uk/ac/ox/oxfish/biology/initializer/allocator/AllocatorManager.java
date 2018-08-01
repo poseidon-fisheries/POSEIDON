@@ -129,6 +129,7 @@ public class AllocatorManager {
                                             map,
                                             random
                                     );
+                    if(Double.isFinite(weightHere))
                     sums[index] += weightHere;
                     //add to map
                     speciesMap.getValue().put(tile, weightHere);

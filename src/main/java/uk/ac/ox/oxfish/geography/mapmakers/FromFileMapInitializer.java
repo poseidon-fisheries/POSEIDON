@@ -99,18 +99,22 @@ public class FromFileMapInitializer implements MapInitializer {
 
                     sampledMap = (SampledMap) stream.readObject();
                     return sampledAltitudeToNauticalMap(sampledMap.getAltitudeGrid(),
-                                                        sampledMap.getMbr(),
-                                                        sampledMap.getGridHeight(),
-                                                        sampledMap.getGridWith(), latLong);
+                            sampledMap.getMbr(),
+                            sampledMap.getGridHeight(),
+                            sampledMap.getGridWith(), latLong);
 
                 default:
                 case "csv":
                     //otherwise read from data
                     GeographicalSample altitudeSample = new GeographicalSample(filePath,
-                                                                               header);
+                            header);
                     //create the mbr from max-min stuff
-                    Envelope mbr = new Envelope(altitudeSample.getMinEasting(), altitudeSample.getMaxEasting(),
-                                                altitudeSample.getMinNorthing(), altitudeSample.getMaxNorthing());
+                    Envelope mbr = new Envelope(
+                            //the additional epsilon is there to prevent the very edge observations from falling out
+                            altitudeSample.getMinFirstCoordinate() - 0.000001,
+                            altitudeSample.getMaxFirstCoordinate() + 0.000001,
+                            altitudeSample.getMinSecondCoordinate()- 0.000001,
+                            altitudeSample.getMaxSecondCoordinate() + 0.000001);
                     //find ratio height to width
                     double heightToWidth = mbr.getHeight()/mbr.getWidth();
                     int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);
@@ -129,7 +133,7 @@ public class FromFileMapInitializer implements MapInitializer {
                     );
 
                     return sampledAltitudeToNauticalMap(sampledAltitudeGrid, mbr, gridHeightInCells, gridWidthInCells,
-                                                        latLong);
+                            latLong);
 
             }
 
@@ -162,7 +166,7 @@ public class FromFileMapInitializer implements MapInitializer {
                         value -> value).filter(
                         aDouble -> aDouble > -9999).average();
                 altitudeGrid.set(x, y,
-                                 new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
+                        new SeaTile(x, y, average.orElseGet(() -> 1000d), new TileHabitat(0)));
             }
 
         GeomGridField unitedMap = new GeomGridField(altitudeGrid);
@@ -171,8 +175,8 @@ public class FromFileMapInitializer implements MapInitializer {
         //create the map
         Distance distance = latLong ? new EquirectangularDistanceByCoordinate() : new CartesianUTMDistance() ;
         NauticalMap nauticalMap = new NauticalMap(unitedMap, new GeomVectorField(),
-                                                  distance,
-                                                  new AStarPathfinder(distance));
+                distance,
+                new AStarPathfinder(distance));
 
         //cell distance:
         System.out.println("coordinates for 0,0 are: " + nauticalMap.getCoordinates(0,0) );
@@ -180,9 +184,9 @@ public class FromFileMapInitializer implements MapInitializer {
         System.out.println("coordinates for max,max are: " + nauticalMap.getCoordinates(
                 nauticalMap.getWidth()-1,nauticalMap.getHeight()-1) );
         System.out.println("the distance between 0,0 and 1,1 is: " +
-                                   distance.distance(nauticalMap.getSeaTile(0,0),
-                                                     nauticalMap.getSeaTile(1,1),
-                                                     nauticalMap) );
+                distance.distance(nauticalMap.getSeaTile(0,0),
+                        nauticalMap.getSeaTile(1,1),
+                        nauticalMap) );
 
         return nauticalMap;
     }
