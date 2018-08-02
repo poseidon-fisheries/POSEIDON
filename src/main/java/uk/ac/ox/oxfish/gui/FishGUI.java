@@ -47,9 +47,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.io.OptionalDataException;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -61,7 +61,28 @@ import java.util.LinkedList;
 public class  FishGUI extends GUIState{
 
     public static final int MIN_DIMENSION = 600;
-    public static final Path IMAGES_PATH = Paths.get("inputs", "images");
+    public static  Path IMAGES_PATH = Paths.get("inputs", "images");
+    static {
+        URI path = null;
+        try {
+            path = FishGUI.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+/*
+            JOptionPane.showMessageDialog(null,
+                    path.toString());
+            JOptionPane.showMessageDialog(null,
+                    Paths.get(path));
+            JOptionPane.showMessageDialog(null,
+                    Paths.get(path).getParent());
+                    */
+            if(Paths.get(path).endsWith(".jar"))
+                IMAGES_PATH = Paths.get(path).getParent().resolve("inputs").resolve("images");
+
+//            JOptionPane.showMessageDialog(null,
+//                    IMAGES_PATH.toAbsolutePath().toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+    }
     private Display2D display2D;
     private JFrame displayFrame;
 
@@ -110,7 +131,15 @@ public class  FishGUI extends GUIState{
         try {
             boatPortrayalFactory = new BoatPortrayalFactory(this);
         } catch (IOException e) {
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+            JOptionPane.showMessageDialog(null,
+
+                    IMAGES_PATH.toAbsolutePath().toString()+"\n"+
+                            FishGUI.class.getProtectionDomain().getCodeSource().getLocation().getPath().toString()+"\n"+
+                            e.toString() +"\n"+exceptionAsString);
+            throw new RuntimeException(e);
         }
     }
 
@@ -146,10 +175,21 @@ public class  FishGUI extends GUIState{
      */
     @Override
     public void start() {
-        super.start();
+
+        try {
+            super.start();
 
 
-        initialize();
+            initialize();
+
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String exceptionAsString = sw.toString();
+            JOptionPane.showMessageDialog(null,
+                    e.toString() +"\n"+exceptionAsString);
+            throw e;
+        }
 
 
 
@@ -303,7 +343,7 @@ public class  FishGUI extends GUIState{
             public JComponent buildJComponent(FishGUI gui) {
 
                 JButton button = new JButton("Print additional outputs to file");
-           //     button
+                //     button
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -316,7 +356,7 @@ public class  FishGUI extends GUIState{
                             if (chooser.showOpenDialog(gui.displayFrame) == JFileChooser.APPROVE_OPTION) {
 
                                 System.out.println("getCurrentDirectory(): "
-                                                           + chooser.getSelectedFile());
+                                        + chooser.getSelectedFile());
                                 FishStateUtilities.writeAdditionalOutputsToFolder(
                                         chooser.getSelectedFile().toPath(),
                                         (FishState) gui.state
@@ -342,7 +382,7 @@ public class  FishGUI extends GUIState{
         transformer = new CoordinateTransformer(display2D, state.getMap());
 
         MPADrawer drawer = new MPADrawer(display2D, transformer, state.getMap(),
-                                         mainPortrayal, this);
+                mainPortrayal, this);
 
 
         ((Console) controller).getTabPane().add("Policies",new RegulationTab(this, drawer) );
@@ -353,7 +393,7 @@ public class  FishGUI extends GUIState{
         scheduleRepeatingImmediatelyAfter(heatMap);
 
         displayFrame = setupDisplay2D(mainPortrayal, display2D,
-                                      "Bathymetry", true);
+                "Bathymetry", true);
         //attach it the portrayal
         display2D.attach(mainPortrayal, "Bathymetry");
         //    display2D.attach(mpaPortrayal,"MPAs");
@@ -369,9 +409,9 @@ public class  FishGUI extends GUIState{
     private void assignPortrayalToFisher(SimplePortrayal2D boatPortrayal, Fisher o) {
         TrailedPortrayal2D trailed = new TrailedPortrayal2D
                 (this,
-                 boatPortrayal,
-                 trails,
-                 50, Color.BLUE,new Color(0,0,255,0));
+                        boatPortrayal,
+                        trails,
+                        50, Color.BLUE,new Color(0,0,255,0));
         trailed.setOnlyGrowTrailWhenSelected(true);
         trailed.setOnlyShowTrailWhenSelected(false);
         CircledPortrayal2D circled = new CircledPortrayal2D(trailed);

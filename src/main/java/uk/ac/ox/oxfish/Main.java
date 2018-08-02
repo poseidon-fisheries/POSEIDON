@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 
-class Main{
+class Main {
 
 
     public static final long SEED = System.currentTimeMillis();
@@ -51,8 +51,8 @@ class Main{
 
     //main
     public static void main(String[] args) throws IOException {
-
-
+        File file=new File(".");
+        System.out.println("Current Working Directory: " + file.getAbsolutePath());
         //this is relatively messy, as all GUI functions are
         //basically it creates a widget to choose the scenario object and its parameters
         //once that's done you create a new Fisherstate and give it the  scenario
@@ -61,13 +61,13 @@ class Main{
 
         final boolean[] instantiate = {false};
 
-        final JDialog scenarioSelection = new JDialog((JFrame)null,true);
+        final JDialog scenarioSelection = new JDialog((JFrame) null, true);
         final ScenarioSelector scenarioSelector = new ScenarioSelector();
         final JPanel contentPane = new JPanel(new BorderLayout());
-        contentPane.add(scenarioSelector,BorderLayout.CENTER);
+        contentPane.add(scenarioSelector, BorderLayout.CENTER);
         //create ok and exit button
-        Box buttonBox = new Box( BoxLayout.LINE_AXIS);
-        contentPane.add(buttonBox,BorderLayout.SOUTH);
+        Box buttonBox = new Box(BoxLayout.LINE_AXIS);
+        contentPane.add(buttonBox, BorderLayout.SOUTH);
         final JButton ok = new JButton("OK");
         ok.addActionListener(e -> {
             instantiate[0] = true;
@@ -84,16 +84,16 @@ class Main{
         //create file opener (for YAML)
         final JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        Log.info("current directory: " + Paths.get(".").toFile());
+        Log.info("current directory: " + Paths.get(".").toAbsolutePath());
         chooser.setCurrentDirectory(Paths.get(".").toFile());
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.addChoosableFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if(f.isDirectory()) //you can open directories
+                if (f.isDirectory()) //you can open directories
                     return true;
                 String extension = Files.getFileExtension(f.getAbsolutePath()).trim().toLowerCase();
-                if(extension.equals("yaml") || extension.equals("yml"))
+                if (extension.equals("yaml") || extension.equals("yml"))
                     return true;
                 return false;
             }
@@ -112,30 +112,27 @@ class Main{
                     public void actionPerformed(ActionEvent e) {
 
 
-                        if (chooser.showOpenDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION)
-                        {
+                        if (chooser.showOpenDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION) {
                             File file = chooser.getSelectedFile();
                             //log that you are about to write
                             Log.info("opened file " + file);
                             FishYAML yaml = new FishYAML();
-                            try{
+                            try {
                                 //read yaml
                                 Scenario scenario = yaml.loadAs(
                                         String.join("\n", java.nio.file.Files.readAllLines(file.toPath())),
                                         Scenario.class);
                                 //add it to the swing
                                 SwingUtilities.invokeLater(() -> {
-                                    if(scenarioSelector.hasScenario("yaml"))
+                                    if (scenarioSelector.hasScenario("yaml"))
                                         scenarioSelector.removeScenarioOption("yaml");
                                     String name = file.getName();
-                                    scenarioSelector.addScenarioOption(name,scenario);
+                                    scenarioSelector.addScenarioOption(name, scenario);
                                     scenarioSelector.select(name);
                                     scenarioSelector.repaint();
                                 });
 
-                            }
-                            catch (Exception yamlError)
-                            {
+                            } catch (Exception yamlError) {
                                 Log.warn(yamlError.getMessage());
                                 Log.warn(file + " is not a valid YAML scenario!");
                             }
@@ -154,13 +151,11 @@ class Main{
                     public void actionPerformed(ActionEvent e) {
 
 
-                        if (chooser.showSaveDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION)
-                        {
+                        if (chooser.showSaveDialog(scenarioSelector) == JFileChooser.APPROVE_OPTION) {
                             File file = chooser.getSelectedFile();
                             String currentExtension = FishStateUtilities.getFilenameExtension(file);
                             //if the extension is not correct
-                            if(!(currentExtension.equalsIgnoreCase("yaml") | currentExtension.equalsIgnoreCase("yml") ))
-                            {
+                            if (!(currentExtension.equalsIgnoreCase("yaml") | currentExtension.equalsIgnoreCase("yml"))) {
                                 //force it!
                                 file = new File(file.toString() + ".yaml");
                             }
@@ -170,7 +165,7 @@ class Main{
                             FishYAML yaml = new FishYAML();
                             String toWrite = yaml.dump(scenarioSelector.getScenario());
                             try {
-                                Files.write(toWrite.getBytes(),file);
+                                Files.write(toWrite.getBytes(), file);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                                 Log.error("Failed to write to " + file);
@@ -201,7 +196,7 @@ class Main{
                 c.setVisible(true);
 
                 scenarioSelection.dispatchEvent(new WindowEvent(
-                        scenarioSelection,WindowEvent.WINDOW_CLOSING
+                        scenarioSelection, WindowEvent.WINDOW_CLOSING
                 ));
             }
         });
@@ -211,11 +206,10 @@ class Main{
         scenarioSelection.pack();
         scenarioSelection.setVisible(true);
 
-        if(instantiate[0]==true) {
+        if (instantiate[0] == true) {
             FishState state = new FishState(SEED, STEPS_PER_DAY);
             Log.set(Log.LEVEL_INFO);
             Log.setLogger(new FishStateLogger(state, Paths.get("log.txt")));
-
 
 
             state.setScenario(scenarioSelector.getScenario());
@@ -227,9 +221,8 @@ class Main{
             c.setVisible(true);
         }
 
+
+
+
     }
-
-
-
-
 }

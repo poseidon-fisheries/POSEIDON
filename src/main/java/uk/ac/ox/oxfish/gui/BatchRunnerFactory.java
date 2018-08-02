@@ -29,8 +29,16 @@ import java.util.Arrays;
 public class BatchRunnerFactory
 {
     private Path yamlFile = Paths.get(".","inputs","first_paper","fronts.yaml");
-    private int yearsToRun = 20;
     private Path outputFolder = Paths.get("outputs","batch");
+
+    {
+        String path = FishGUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        if(path.endsWith(".jar")) {
+            yamlFile = Paths.get(path).getParent().resolve("inputs").resolve("first_paper").resolve("fronts.yaml");
+            outputFolder = Paths.get(path).getParent().resolve("outputs").resolve("batch");
+        }
+    }
+    private int yearsToRun = 20;
     private Path policyFile = null;
     private long randomSeed = System.currentTimeMillis();
     private String columnsToPrint = "Total Effort,Average Cash-Flow ";
