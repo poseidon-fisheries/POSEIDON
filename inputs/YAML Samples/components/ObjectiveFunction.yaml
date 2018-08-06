@@ -19,3 +19,6 @@ Cash Flow Knife-Edge Objective:
   period: '365.0'
   threshold: '10.0'
 -------
+Simulated Profit Objective:
+  tripLength: '120.0'
+-------

@@ -152,7 +152,6 @@ Single Species Biomass Normalized:
   grower:
     Independent Logistic Grower:
       steepness: uniform 0.6 0.8
-  initialBiomass: '2500.0'
   initialBiomassAllocator:
     Random Allocator:
       maximum: '1.0'

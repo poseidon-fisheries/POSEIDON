@@ -117,6 +117,5 @@ Weak Multi-TAC by List:
 Port Based Wait Times:
   delegate: Anarchy
   portWaitTimes:
-    Port 2: '10'
-    Port 1: '0'
+    Port 0: '0'
 -------
