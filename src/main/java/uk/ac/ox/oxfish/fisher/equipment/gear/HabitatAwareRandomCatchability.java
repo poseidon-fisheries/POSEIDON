@@ -50,18 +50,18 @@ public class HabitatAwareRandomCatchability implements Gear {
     /**
      * speed (used for fuel consumption) of thrawling
      */
-    private  final double thrawlSpeed;
+    private  final double trawlSpeed;
 
 
     public HabitatAwareRandomCatchability(
             double[] sandyCatchabilityMeanPerSpecie, double[] sandyCatchabilityDeviationPerSpecie,
             double[] rockCatchabilityMeanPerSpecie, double[] rockCatchabilityDeviationPerSpecie,
-            double thrawlSpeed) {
+            double trawlSpeed) {
         this.sandyCatchabilityMeanPerSpecie = sandyCatchabilityMeanPerSpecie;
         this.sandyCatchabilityDeviationPerSpecie = sandyCatchabilityDeviationPerSpecie;
         this.rockCatchabilityMeanPerSpecie = rockCatchabilityMeanPerSpecie;
         this.rockCatchabilityDeviationPerSpecie = rockCatchabilityDeviationPerSpecie;
-        this.thrawlSpeed = thrawlSpeed;
+        this.trawlSpeed = trawlSpeed;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class HabitatAwareRandomCatchability implements Gear {
     @Override
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
-        return boat.expectedFuelConsumption(thrawlSpeed);
+        return boat.expectedFuelConsumption(trawlSpeed);
     }
 
 
@@ -123,7 +123,7 @@ public class HabitatAwareRandomCatchability implements Gear {
                 Arrays.copyOf(sandyCatchabilityDeviationPerSpecie,sandyCatchabilityDeviationPerSpecie.length),
                 Arrays.copyOf(rockCatchabilityMeanPerSpecie,rockCatchabilityMeanPerSpecie.length),
                 Arrays.copyOf(rockCatchabilityDeviationPerSpecie,rockCatchabilityDeviationPerSpecie.length),
-                thrawlSpeed);
+                trawlSpeed);
 
 
     }
@@ -133,7 +133,7 @@ public class HabitatAwareRandomCatchability implements Gear {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HabitatAwareRandomCatchability that = (HabitatAwareRandomCatchability) o;
-        return Double.compare(that.thrawlSpeed, thrawlSpeed) == 0 &&
+        return Double.compare(that.trawlSpeed, trawlSpeed) == 0 &&
                 Arrays.equals(sandyCatchabilityMeanPerSpecie, that.sandyCatchabilityMeanPerSpecie) &&
                 Arrays.equals(sandyCatchabilityDeviationPerSpecie, that.sandyCatchabilityDeviationPerSpecie) &&
                 Arrays.equals(rockCatchabilityMeanPerSpecie, that.rockCatchabilityMeanPerSpecie) &&
