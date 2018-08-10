@@ -112,6 +112,7 @@ public class TimeSeries<T> implements Steppable
     public void turnOff()
     {
         receipt.stop();
+        reset();
     }
 
     @Override
@@ -194,5 +195,10 @@ public class TimeSeries<T> implements Steppable
 
     protected T getObserved() {
         return observed;
+    }
+
+
+    protected void reset(){
+        data.clear();
     }
 }

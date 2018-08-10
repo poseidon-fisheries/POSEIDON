@@ -846,4 +846,20 @@ public class FishState  extends SimState{
     public Counter getDailyCounter() {
         return dailyCounter;
     }
+
+
+    @Override
+    public void finish() {
+        super.finish();
+        for(Fisher fisher : fishers)
+            fisher.turnOff();
+        fishers.clear();
+        yearlyDataSet.turnOff();
+        yearlyCounter.turnOff();
+        dailyCounter.turnOff();
+        dailyDataSet.turnOff();
+        map.turnOff();
+
+
+    }
 }

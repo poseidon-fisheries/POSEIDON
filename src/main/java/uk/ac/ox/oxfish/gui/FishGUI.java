@@ -172,13 +172,16 @@ public class  FishGUI extends GUIState{
                         //and now we have to do acrobatics just to keep this thing from turning off
                         Console console = (Console) controller;
 
-                        FishGUI.this.quit();
-                        FishGUI.this.state.finish();
+
                         for (Object allFrame : console.getAllFrames()) {
                             ((JFrame) allFrame).dispose();
                             
                         }
                         console.dispose();
+                        FishGUI.this.quit();
+                        FishGUI.this.state.finish();
+                        FishGUI.this.state=null;
+                        System.gc();
                         try {
                             Main.main(null);
                         } catch (IOException e1) {
