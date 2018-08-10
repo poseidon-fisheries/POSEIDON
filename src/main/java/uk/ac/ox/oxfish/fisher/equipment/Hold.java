@@ -36,9 +36,9 @@ public class Hold {
 
 
     /**
-     * pounds of fish currently transported
+     * weight of fish currently transported
      */
-    private double kgCarried = 0;
+    private double weightCarried = 0;
 
     /**
      * maximum pounds that can be held
@@ -83,10 +83,10 @@ public class Hold {
             assert consistencyCheckBiomass();
         }
 
-        assert kgCarried >=0;
-        if(kgCarried > maximumLoad + FishStateUtilities.EPSILON/2)
+        assert weightCarried >=0;
+        if(weightCarried > maximumLoad + FishStateUtilities.EPSILON/2)
             throwOverboard();
-        assert  maximumLoad >= kgCarried || Math.abs(maximumLoad- kgCarried) <= FishStateUtilities.EPSILON;
+        assert  maximumLoad >= weightCarried || Math.abs(maximumLoad- weightCarried) <= FishStateUtilities.EPSILON;
     }
 
     private void loadAbundanceCatch(Catch caught) {
@@ -110,7 +110,7 @@ public class Hold {
                 double additionalWeight = FishStateUtilities.weigh(abundance,
                                                                    biology.getSpecie(species).getMeristics(), bin);
                 abundanceCaught[species][bin] += additionalWeight;
-                kgCarried += additionalWeight;
+                weightCarried += additionalWeight;
                 fishHold[species] += additionalWeight;
             }
         }
@@ -126,7 +126,7 @@ public class Hold {
         {
             double poundsCaught = caught.getWeightCaught(i);
             fishHold[i] += poundsCaught;
-            kgCarried += poundsCaught;
+            weightCarried += poundsCaught;
             assert  poundsCaught >=0;
         }
     }
@@ -151,10 +151,10 @@ public class Hold {
         }
 
 
-        kgCarried = Arrays.stream(fishHold).sum();
+        weightCarried = Arrays.stream(fishHold).sum();
         assert !(hasAbundanceInformation()) ||
                 consistencyCheckAbundance(); //check for consistency if needed
-        assert Math.abs(kgCarried -maximumLoad)<=FishStateUtilities.EPSILON;
+        assert Math.abs(weightCarried -maximumLoad)<=FishStateUtilities.EPSILON;
         assert Math.abs(getPercentageFilled() -1.0)<=FishStateUtilities.EPSILON;
 
     }
@@ -181,7 +181,7 @@ public class Hold {
     }
 
     public double getTotalWeightOfCatchInHold() {
-        return kgCarried;
+        return weightCarried;
     }
 
     public double getWeightOfCatchInHold(Species species) {
@@ -195,7 +195,7 @@ public class Hold {
 
     public double getPercentageFilled()
     {
-        return kgCarried /maximumLoad;
+        return weightCarried /maximumLoad;
     }
 
     private boolean consistencyCheckBiomass()
@@ -203,7 +203,7 @@ public class Hold {
         double sum = 0;
         for(double pounds : fishHold)
             sum+=pounds;
-        return  Math.abs(kgCarried -sum) < FishStateUtilities.EPSILON;
+        return  Math.abs(weightCarried -sum) < FishStateUtilities.EPSILON;
     }
 
     private boolean consistencyCheckAbundance(){
@@ -221,7 +221,7 @@ public class Hold {
                 return false;
         }
         //the kgs ought to be updated correctly
-        return  Math.abs(kgCarried -sum) < FishStateUtilities.EPSILON;
+        return  Math.abs(weightCarried -sum) < FishStateUtilities.EPSILON;
 
 
     }
@@ -233,7 +233,7 @@ public class Hold {
         Catch toReturn = new Catch(fishHold);
         abundanceCaught = null;
         fishHold = new double[fishHold.length];
-        kgCarried = 0;
+        weightCarried = 0;
         assert consistencyCheckBiomass();
         return toReturn;
     }
@@ -243,7 +243,7 @@ public class Hold {
     {
         Hold toReturn = new Hold(maximumLoad,this.biology);
         toReturn.fishHold = Arrays.copyOf(fishHold,fishHold.length);
-        toReturn.kgCarried = this.kgCarried;
+        toReturn.weightCarried = this.weightCarried;
         toReturn.maximumLoad = this.maximumLoad;
         if(abundanceCaught!=null) {
             toReturn.abundanceCaught = new double[abundanceCaught.length][];
