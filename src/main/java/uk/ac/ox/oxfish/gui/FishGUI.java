@@ -36,6 +36,7 @@ import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
+import uk.ac.ox.oxfish.Main;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
@@ -152,6 +153,40 @@ public class  FishGUI extends GUIState{
     public void init(Controller controller) {
 
         super.init(controller);
+        final Box timeBox = (Box) ((Console) controller).getContentPane().getComponents()[0];
+        //turn stop button into a proper dispose and restart
+        JButton stopButton = (JButton) timeBox.getComponent(2);
+
+        //remove previous functionalities
+        for(ActionListener act : stopButton.getActionListeners()) {
+            stopButton.removeActionListener(act);
+        }
+        //the stop button will now close the gui and start a new scenario selector
+        stopButton.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+
+                        //in their infinite wisdom, MASON programmers have hard-coded a "system.exit" call
+                        //and now we have to do acrobatics just to keep this thing from turning off
+                        Console console = (Console) controller;
+
+                        FishGUI.this.quit();
+                        FishGUI.this.state.finish();
+                        for (Object allFrame : console.getAllFrames()) {
+                            ((JFrame) allFrame).dispose();
+                            
+                        }
+                        console.dispose();
+                        try {
+                            Main.main(null);
+                        } catch (IOException e1) {
+                            throw new RuntimeException(e1);
+                        }
+                    }
+                }
+        );
 
 
     }

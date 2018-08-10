@@ -103,7 +103,6 @@ public class FlexibleScenario implements Scenario {
             new LinkedList<>();
 
 
-
     private boolean portSwitching = false;
 
     /**
