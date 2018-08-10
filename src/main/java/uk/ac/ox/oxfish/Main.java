@@ -38,12 +38,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 
-class Main {
+public class Main {
 
 
     public static final long SEED = System.currentTimeMillis();
@@ -61,6 +62,7 @@ class Main {
 
         final boolean[] instantiate = {false};
 
+        //this is the first main container
         final JDialog scenarioSelection = new JDialog((JFrame) null, true);
         final ScenarioSelector scenarioSelector = new ScenarioSelector();
         final JPanel contentPane = new JPanel(new BorderLayout());
@@ -202,8 +204,52 @@ class Main {
         });
 
         buttonBox.add(restoreButton);
+        scenarioSelection.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        scenarioSelection.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if(!instantiate[0])
+                    System.exit(0);
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+
+            }
+        });
         scenarioSelection.setContentPane(contentPane);
         scenarioSelection.pack();
+        //limit its max size
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+       if(scenarioSelection.getSize().height>screenSize.height) {
+            scenarioSelection.setMaximumSize(screenSize);
+            scenarioSelection.setSize(screenSize);
+        }
         scenarioSelection.setVisible(true);
 
         if (instantiate[0] == true) {
