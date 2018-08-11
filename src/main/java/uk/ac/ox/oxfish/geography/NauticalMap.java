@@ -51,6 +51,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -265,6 +266,10 @@ public class NauticalMap implements Startable
             SeaTile tile = (SeaTile) element; //cast
             tile.turnOff();
         }
+
+        alreadyComputedNeighbors.clear();
+        coordinateCache.clear();
+        sizeOneNeighborhoods.clear();
     }
 
     /**
@@ -274,6 +279,8 @@ public class NauticalMap implements Startable
     public void recomputeTilesMPA() {
         waterSeaTiles = null;
         allTiles = null;
+        coordinateCache.clear();
+        lineTiles = null;
         //todo this works but make a test to be sure
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
             for(int j=0; j<rasterBackingGrid.getHeight(); j++)
@@ -339,7 +346,7 @@ public class NauticalMap implements Startable
     public SeaTile getSeaTile(Coordinate coordinate)
     {
         return getSeaTile(rasterBathymetry.toXCoord(coordinate.x),
-                          rasterBathymetry.toYCoord(coordinate.y));
+                rasterBathymetry.toYCoord(coordinate.y));
     }
 
     public GeomGridField getRasterBathymetry() {
@@ -384,17 +391,25 @@ public class NauticalMap implements Startable
      */
     public Table<SeaTile,Integer,Bag> alreadyComputedNeighbors = HashBasedTable.create();
 
+    /**
+     * one size lookups are even more common, so store them here
+     */
+    public Map<SeaTile,Bag> sizeOneNeighborhoods = new WeakHashMap<>();
 
 
     public Bag getMooreNeighbors(SeaTile tile, int neighborhoodSize)
     {
         Bag neighbors;
-        neighbors = alreadyComputedNeighbors.get(tile, neighborhoodSize);
+        neighbors =  neighborhoodSize == 1 ? sizeOneNeighborhoods.get(tile) :
+                alreadyComputedNeighbors.get(tile, neighborhoodSize);
         if(neighbors == null) {
             neighbors = new Bag();
             rasterBackingGrid.getMooreNeighbors(tile.getGridX(), tile.getGridY(), neighborhoodSize,
-                                                Grid2D.BOUNDED, false, neighbors, null, null);
-            alreadyComputedNeighbors.put(tile,neighborhoodSize,neighbors);
+                    Grid2D.BOUNDED, false, neighbors, null, null);
+            if(neighborhoodSize==1)
+                sizeOneNeighborhoods.put(tile,neighbors);
+            else
+                alreadyComputedNeighbors.put(tile,neighborhoodSize,neighbors);
         }
         return neighbors;
     }
@@ -426,7 +441,7 @@ public class NauticalMap implements Startable
         //check it's coastal
         Bag neighbors = new Bag();
         rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
-                                            Grid2D.BOUNDED, false, neighbors,null,null);
+                Grid2D.BOUNDED, false, neighbors,null,null);
         boolean isCoastal = false;
         for(Object tile : neighbors)
         {
@@ -486,7 +501,7 @@ public class NauticalMap implements Startable
         int tries = 0;
         do{
             toReturn = getSeaTile(random.nextInt(getWidth()),
-                                  random.nextInt(getHeight()));
+                    random.nextInt(getHeight()));
 
             tries++;
             if(tries > 100000)
@@ -530,6 +545,36 @@ public class NauticalMap implements Startable
 
     public Bag getFishersAtLocation(SeaTile tile) {
         return getFishersAtLocation(tile.getGridX(),
-                                               tile.getGridY());
+                tile.getGridY());
+    }
+
+
+    /**
+     * keep the precomputed line tiles
+     */
+    private HashSet<SeaTile> lineTiles = null;
+    /**
+     * get all tiles that are unprotected but share a border with at least one protected line!
+     * @return
+     */
+
+    public HashSet<SeaTile> getTilesOnTheMPALine()
+    {
+        if(lineTiles==null)
+        {
+            lineTiles = new HashSet<>();
+            for(SeaTile tile : getAllSeaTilesExcludingLandAsList())
+            {
+                if(!tile.isProtected() && getMooreNeighbors(tile,1).stream().anyMatch(
+                        o -> ((SeaTile) o).isProtected()))
+                {
+                    lineTiles.add(tile);
+                }
+            }
+        }
+
+            return lineTiles;
+
+
     }
 }

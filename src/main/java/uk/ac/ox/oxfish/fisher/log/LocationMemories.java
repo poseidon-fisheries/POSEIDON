@@ -72,7 +72,7 @@ public class LocationMemories<T> implements Startable, Steppable
      */
     @Override
     public void start(FishState model) {
-        receipt = model.scheduleEveryDay(this, StepOrder.DATA_RESET);
+        receipt = model.scheduleEveryYear(this, StepOrder.DATA_RESET);
     }
 
     /**
@@ -93,11 +93,13 @@ public class LocationMemories<T> implements Startable, Steppable
         {
             for (Map.Entry<SeaTile, LocationMemory<T>> memory : memories.entrySet()) {
                 int age = memory.getValue().age();
-                if (age >= minimumMemoryAgeInDaysBeforeForgetting &&
-                        ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
-                    toRemove.add(memory.getKey());
+                if (age >= minimumMemoryAgeInDaysBeforeForgetting )
+                    if(dailyForgettingProbability>=1 ||
+                            ((FishState) simState).getRandom().nextBoolean(dailyForgettingProbability))
+                        toRemove.add(memory.getKey());
 
             }
+
 
             toRemove.forEach(memories::remove);
         }

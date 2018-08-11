@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.fisher;
 
 import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
 import uk.ac.ox.oxfish.fisher.log.*;
@@ -71,12 +70,6 @@ public class FisherMemory implements Serializable, FisherStartable {
         this.dailyCounter = dailyCounter;
     }
 
-    final LocationMemories<Catch> catchMemories;
-
-    public LocationMemories<Catch> getCatchMemories() {
-        return catchMemories;
-    }
-
     final LocationMemories<TripRecord> tripMemories;
 
     public LocationMemories<TripRecord> getTripMemories() {
@@ -106,17 +99,15 @@ public class FisherMemory implements Serializable, FisherStartable {
 
 
     public FisherMemory() {
-        this(new LocationMemories<>(.99, 3000, 2),
-             new LocationMemories<>(.99, 3000, 2));
+        this(
+                new LocationMemories<>(1, 3000, 2));
     }
 
     public FisherMemory(
-            LocationMemories<Catch> catchMemories,
             LocationMemories<TripRecord> tripMemories) {
         yearlyTimeSeries = new FisherYearlyTimeSeries();
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
         this.dailyTimeSeries = new FisherDailyTimeSeries();
-        this.catchMemories = catchMemories;
         this.tripMemories = tripMemories;
     }
 
@@ -136,7 +127,6 @@ public class FisherMemory implements Serializable, FisherStartable {
         yearlyCounter.start(model);
         dailyCounter.start(model);
         tripLogger.start(model);
-        catchMemories.start(model);
         tripMemories.start(model);
         tripLogger.addTripListener(new TripListener() {
             @Override
@@ -151,7 +141,6 @@ public class FisherMemory implements Serializable, FisherStartable {
     @Override
     public void turnOff(Fisher fisher) {
         tripMemories.turnOff();
-        catchMemories.turnOff();
         tripLogger.turnOff();
         dailyCounter.turnOff();
         yearlyCounter.turnOff();
@@ -178,15 +167,6 @@ public class FisherMemory implements Serializable, FisherStartable {
     public int numberOfDailyObservations()
     {
         return dailyTimeSeries.numberOfObservations();
-    }
-
-    /**
-     * Ask the fisher what is the best tile with respect to catches made
-     * @param comparator how should the fisher compare each tile remembered
-     */
-    public SeaTile getBestSpotForCatchesRemembered(
-            Comparator<LocationMemory<Catch>> comparator) {
-        return getCatchMemories().getBestFishingSpotInMemory(comparator);
     }
 
     /**

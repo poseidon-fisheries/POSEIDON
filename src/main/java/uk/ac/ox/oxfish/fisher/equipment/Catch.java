@@ -233,7 +233,12 @@ public class Catch {
 
     public double totalCatchWeight()
     {
-        return Arrays.stream(biomassCaught).sum();
+        double sum =0;
+        for (double caught : biomassCaught) {
+            sum+=caught;
+
+        }
+        return sum;
     }
 
     @Override

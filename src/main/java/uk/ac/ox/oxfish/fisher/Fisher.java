@@ -317,7 +317,6 @@ public class Fisher implements Steppable, Startable{
         memory.getYearlyCounter().turnOff();
         memory.getDailyTimeSeries().turnOff();
         memory.getTripLogger().turnOff();
-        memory.getCatchMemories().turnOff();
         memory.getTripMemories().turnOff();
 
         //turn off the strategies
@@ -450,8 +449,8 @@ public class Fisher implements Steppable, Startable{
     {
         equipment.getBoat().consumeFuel(litersConsumed);
         getCurrentTrip().recordGasConsumption(litersConsumed);
-        Preconditions.checkState(equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride(),
-                                 "a boat has lspiRun into negative fuel territory");
+        assert  equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride() :
+                                 "a boat has lspiRun into negative fuel territory";
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 
@@ -758,7 +757,6 @@ public class Fisher implements Steppable, Startable{
         FishingRecord record = new FishingRecord(hoursSpentFishing,
                                                  here, catchOfTheDay);
         memory.getTripLogger().recordFishing(record);
-        memory.getCatchMemories().memorize(catchOfTheDay, here);
 
         //now let regulations and the hold deal with it
         status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing);
@@ -1163,15 +1161,6 @@ public class Fisher implements Steppable, Startable{
         status.setDestination(getHomePort().getLocation());
     }
 
-
-    /**
-     * Ask the fisher what is the best tile with respect to catches made
-     * @param comparator how should the fisher compare each tile remembered
-     */
-    public SeaTile getBestSpotForCatchesRemembered(
-            Comparator<LocationMemory<Catch>> comparator) {
-        return memory.getBestSpotForCatchesRemembered(comparator);
-    }
 
     /**
      *

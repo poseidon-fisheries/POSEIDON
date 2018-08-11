@@ -46,25 +46,25 @@ public class TimeSeriesTest {
         gatherer.step(state);
         gatherer.step(state);
 
-        assertEquals(gatherer.getDataView().values().iterator().next().size(), 2);
-        assertEquals(gatherer.getDataView().get("column1").get(0), 12345, .0001);
-        assertEquals(gatherer.getDataView().get("column1").get(1), 12345, .0001);
-        assertEquals(gatherer.getDataView().get("column2").get(0), 1, .0001);
-        assertEquals(gatherer.getDataView().get("column2").get(1), 1, .0001);
+        assertEquals(gatherer.numberOfObservations(), 2);
+        assertEquals(gatherer.getColumn("column1").get(0), 12345, .0001);
+        assertEquals(gatherer.getColumn("column1").get(1), 12345, .0001);
+        assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
+        assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
 
         gatherer.registerGatherer("column3", s -> Double.valueOf(s.substring(1, 2)), -1);
-        assertEquals(gatherer.getDataView().size(), 3);
+  //      assertEquals(gatherer.getNumberOfColumns(), 3);
         //old stuff hasn't changed, hopefully
-        assertEquals(gatherer.getDataView().values().iterator().next().size(), 2);
-        assertEquals(gatherer.getDataView().get("column2").get(0), 1, .0001);
-        assertEquals(gatherer.getDataView().get("column2").get(1), 1, .0001);
+        assertEquals(gatherer.numberOfObservations(), 2);
+        assertEquals(gatherer.getColumn("column2").get(0), 1, .0001);
+        assertEquals(gatherer.getColumn("column2").get(1), 1, .0001);
         //new stuff is filled with default
-        assertEquals(gatherer.getDataView().get("column3").get(0), -1, .0001);
-        assertEquals(gatherer.getDataView().get("column3").get(1),-1 ,.0001);
+        assertEquals(gatherer.getColumn("column3").get(0), -1, .0001);
+        assertEquals(gatherer.getColumn("column3").get(1),-1 ,.0001);
 
         //and it collects
         gatherer.step(state);
-        assertEquals(gatherer.getDataView().values().iterator().next().size(), 3);
-        assertEquals(gatherer.getDataView().get("column3").get(2), 2, .0001);
+        assertEquals(gatherer.numberOfObservations(), 3);
+        assertEquals(gatherer.getColumn("column3").get(2), 2, .0001);
     }
 }

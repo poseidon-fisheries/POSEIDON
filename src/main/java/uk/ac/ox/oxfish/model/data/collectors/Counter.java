@@ -94,7 +94,7 @@ public class Counter implements Startable, Steppable
      */
     public void count(String columnName, double add)
     {
-        data.put(columnName, data.get(columnName) + add);
+        data.merge(columnName, add,Double::sum);
     }
 
     /**

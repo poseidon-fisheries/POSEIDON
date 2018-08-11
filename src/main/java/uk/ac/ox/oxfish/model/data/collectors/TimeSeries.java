@@ -28,10 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Basically a map<String,Double> to collect data about an object of type T
@@ -39,14 +36,8 @@ import java.util.Map;
  */
 public class TimeSeries<T> implements Steppable
 {
-    final private LinkedHashMap<String,DataColumn> data;
+    final private LinkedHashMap<String,ColumnGatherer<T>> data;
 
-    final private Map<String,DataColumn> dataView;
-
-    /**
-     * the functions to lspiRun on studied object to gather their data
-     */
-    final private LinkedHashMap<String,Gatherer<T>> gatherers;
 
     /**
      * if this is true, gather data every year. Otherwise gather data step every step
@@ -69,11 +60,10 @@ public class TimeSeries<T> implements Steppable
         Preconditions.checkArgument(!data.containsKey(title), "Column already exists");
         int size =noGatherers() ? 0 : numberOfObservations();
         DataColumn column = new DataColumn(title);
-        data.put(title, column);
         //fill if needed
         for(int i=0; i<size; i++)
             column.add(defaultValue);
-        gatherers.put(title,  gatherer);
+        data.put(title, new ColumnGatherer<>(column,gatherer));
 
         assert consistencyCheck();
         return column;
@@ -82,9 +72,8 @@ public class TimeSeries<T> implements Steppable
 
     public DataColumn removeGatherer(String title)
     {
-        DataColumn removed = data.remove(title);
+        DataColumn removed = data.remove(title).getColumn();
         assert removed!=null;
-        gatherers.remove(title);
 
         return removed;
 
@@ -118,9 +107,10 @@ public class TimeSeries<T> implements Steppable
     @Override
     public void step(SimState simState) {
 
-        for(Map.Entry<String,DataColumn> columns : data.entrySet())
+        for(Map.Entry<String,ColumnGatherer<T>> columns : data.entrySet())
         {
-            columns.getValue().add(gatherers.get(columns.getKey()).apply(observed));
+            Gatherer<T> gatherer = columns.getValue().getGatherer();
+            columns.getValue().getColumn().add(gatherer.apply(observed));
         }
         assert consistencyCheck();
 
@@ -131,12 +121,10 @@ public class TimeSeries<T> implements Steppable
         this.policy = policy;
         this.stepOrder = stepOrder;
         data = new LinkedHashMap<>();
-        dataView = Collections.unmodifiableMap(data);
-        gatherers = new LinkedHashMap<>();
     }
 
     public TimeSeries(IntervalPolicy policy) {
-       this(policy, policy.equals(IntervalPolicy.EVERY_YEAR) ? StepOrder.YEARLY_DATA_GATHERING : StepOrder.DAILY_DATA_GATHERING);
+        this(policy, policy.equals(IntervalPolicy.EVERY_YEAR) ? StepOrder.YEARLY_DATA_GATHERING : StepOrder.DAILY_DATA_GATHERING);
     }
 
     public boolean isEmpty(){
@@ -147,8 +135,12 @@ public class TimeSeries<T> implements Steppable
         return data.isEmpty();
     }
 
+    public int getNumberOfColumns(){
+        return data.size();
+    }
+
     public int numberOfObservations() {
-        return data.values().iterator().next().size();
+        return data.values().iterator().next().getColumn().size();
     }
 
     private boolean consistencyCheck()
@@ -158,36 +150,37 @@ public class TimeSeries<T> implements Steppable
             return true;
         else
         {
-            if(data.size() != gatherers.size())
-                return false;
+
 
             int size = numberOfObservations();
-            return data.values().stream().allMatch(column -> column.size()==size);
+            return data.values().stream().allMatch(column -> column.getColumn().size()==size);
         }
     }
 
-    /**
-     * get an unmodifiable map showing the data
-     */
-    public Map<String, DataColumn> getDataView() {
-        return dataView;
-    }
 
 
     public Double getLatestObservation(String columnName)
     {
-        return data.get(columnName).getLatest();
+        return data.get(columnName).getColumn().getLatest();
     }
     /**
      * get a specific column
      */
     public DataColumn getColumn(String name){
-        return dataView.get(name);
+        ColumnGatherer<T> current = data.get(name);
+        if(current==null)
+            return null;
+        return current.getColumn();
     }
 
-   public Collection<DataColumn> getColumns(){
-       return dataView.values();
-   }
+    public Collection<DataColumn> getColumns(){
+
+        ArrayList<DataColumn> columns = new ArrayList<>(data.size());
+        for (ColumnGatherer<T> gatherer : data.values()) {
+            columns.add(gatherer.getColumn());
+        }
+        return columns;
+    }
 
     public IntervalPolicy getPolicy() {
         return policy;
@@ -200,5 +193,31 @@ public class TimeSeries<T> implements Steppable
 
     protected void reset(){
         data.clear();
+    }
+}
+
+
+/**
+ * a pairing of gatherer and column it fills. Makes it faster to loop at step time
+ */
+final class ColumnGatherer<T>{
+
+
+    private final DataColumn column;
+
+    private final Gatherer<T> gatherer;
+
+    public ColumnGatherer(DataColumn column, Gatherer<T> gatherer) {
+        this.column = column;
+        this.gatherer = gatherer;
+    }
+
+
+    public DataColumn getColumn() {
+        return column;
+    }
+
+    public Gatherer<T> getGatherer() {
+        return gatherer;
     }
 }

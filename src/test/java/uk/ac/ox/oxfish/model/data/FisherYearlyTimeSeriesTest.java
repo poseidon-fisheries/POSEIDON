@@ -49,12 +49,12 @@ public class FisherYearlyTimeSeriesTest {
         yearlyGatherer.step(mock(FishState.class));
         when(fisher.getBankBalance()).thenReturn(3d);
         yearlyGatherer.step(mock(FishState.class));
-        assertEquals(1d, yearlyGatherer.getDataView().get("CASH").get(0), .0001);
-        assertEquals(2d, yearlyGatherer.getDataView().get("CASH").get(1), .0001);
-        assertEquals(3d, yearlyGatherer.getDataView().get("CASH").get(2), .0001);
-        assertEquals(1d,yearlyGatherer.getDataView().get("NET_CASH_FLOW").get(0),.0001);
-        assertEquals(1d,yearlyGatherer.getDataView().get("NET_CASH_FLOW").get(1),.0001);
-        assertEquals(1d,yearlyGatherer.getDataView().get("NET_CASH_FLOW").get(2),.0001);
+        assertEquals(1d, yearlyGatherer.getColumn("CASH").get(0), .0001);
+        assertEquals(2d, yearlyGatherer.getColumn("CASH").get(1), .0001);
+        assertEquals(3d, yearlyGatherer.getColumn("CASH").get(2), .0001);
+        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(0),.0001);
+        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(1),.0001);
+        assertEquals(1d,yearlyGatherer.getColumn("NET_CASH_FLOW").get(2),.0001);
 
 
     }

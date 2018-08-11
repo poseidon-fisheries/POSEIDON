@@ -754,13 +754,7 @@ public class FishState  extends SimState{
                                                        int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
                                                                                            tile.getGridY());
                                                        trawlsSum += trawlsHere;
-                                                       if(!tile.isProtected() && map.getMooreNeighbors(tile,1).stream().anyMatch(
-                                                               new Predicate() {
-                                                                   @Override
-                                                                   public boolean test(Object o) {
-                                                                       return ((SeaTile) o).isProtected();
-                                                                   }
-                                                               }))
+                                                       if(map.getTilesOnTheMPALine().contains(tile))
                                                        {
                                                            lineSum +=trawlsHere;
                                                        }
