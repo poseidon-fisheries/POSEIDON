@@ -138,8 +138,8 @@ public class AStarPathfinder implements Pathfinder {
             path.add(current);
         }
         //reverse it
+        memory.put(end,start,new LinkedList<>(path));
         Collections.reverse(path);
-
         memory.put(start,end,new LinkedList<>(path));
 
         //return it!

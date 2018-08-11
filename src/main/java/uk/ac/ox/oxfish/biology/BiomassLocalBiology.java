@@ -153,7 +153,8 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     public void reactToThisAmountOfBiomassBeingFished(
             Catch caught, Catch notDiscarded, GlobalBiology biology) {
 
-        Preconditions.checkArgument(!caught.hasAbundanceInformation(), "using abundance driven catches with biomass driven biology!");
+        Preconditions.checkArgument(!caught.hasAbundanceInformation(),
+                                    "using abundance driven catches with biomass driven biology!");
 
         for(int speciesIndex =0; speciesIndex< caught.numberOfSpecies(); speciesIndex++)
         {
@@ -161,13 +162,13 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
             double biomassFishedOut = caught.getWeightCaught(speciesIndex);
             if(biomassFishedOut > 0 && !biology.getSpecie(speciesIndex).isImaginary())
             {
-                Preconditions.checkArgument(currentBiomass[speciesIndex]>=biomassFishedOut,
+                assert currentBiomass[speciesIndex]>=biomassFishedOut :
                                             "going to fish more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
-                                                    ", currentBiomass " + currentBiomass[speciesIndex]);
+                                                    ", currentBiomass " + currentBiomass[speciesIndex];
                 currentBiomass[speciesIndex]-= biomassFishedOut;
-                Preconditions.checkState(currentBiomass[speciesIndex] >=0,
+                assert currentBiomass[speciesIndex] >=0 :
                                          "fished more biomass than available for species " + speciesIndex + " , fishedOut: " + biomassFishedOut +
-                                                 ", currentBiomass " + currentBiomass[speciesIndex]);
+                                                 ", currentBiomass " + currentBiomass[speciesIndex];
             }
         }
 

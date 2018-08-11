@@ -73,8 +73,11 @@ public class RandomCatchabilityTrawl implements Gear
         double[] totalCatch = new double[modelBiology.getSize()];
         for(Species specie : species)
         {
-            double q = fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[specie.getIndex()]
+            double q =
                     + catchabilityMeanPerSpecie[specie.getIndex()];
+            //don't call the randomizer unless you absolutely have to!
+            if(catchabilityDeviationPerSpecie[specie.getIndex()]!=0)
+                q+=fisher.grabRandomizer().nextGaussian()*catchabilityDeviationPerSpecie[specie.getIndex()];
             totalCatch[specie.getIndex()] =
                     FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, specie, q);
         }

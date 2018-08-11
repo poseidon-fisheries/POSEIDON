@@ -57,6 +57,8 @@ public class EnumWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
             Enum currentEnum = ((Enum) PropertyUtils.getProperty(metawidget.getToInspect(),
                                                                  address));
 
+            if(currentEnum==null)
+                return null;
             JComboBox comboBox = new JComboBox(currentEnum.getDeclaringClass().getEnumConstants());
             comboBox.setSelectedItem(currentEnum);
 

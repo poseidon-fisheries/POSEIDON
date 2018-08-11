@@ -64,6 +64,7 @@ import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 
 /**
  * The boat catching all that delicious fish.
@@ -955,7 +956,7 @@ public class Fisher implements Steppable, Startable{
 
     @Override
     public String toString() {
-        return "Fisher " + fisherID;
+        return "Fisher " + fisherID +"; " + getTags().stream().reduce((s, s2) -> s+" - "+s2);
     }
 
     /**

@@ -88,7 +88,7 @@ public class Moving implements Action
 
 
         NauticalMap map = model.getMap();
-        //if you don't have a osmoseWFSPath, you have to find it
+        //if you don't have a path, you have to find it
         if(path==null) {
             //get the pathfinder to help
             path = map.getRoute(agent.getLocation(), agent.getDestination());
@@ -147,10 +147,11 @@ public class Moving implements Action
         if(!next.equals(agent.getLocation())) //if you have time to make at least one step
         {
 
-            assert  Math.abs(totalDistance/agent.getBoat().getSpeedInKph()- timeSpentTravelling)< FishStateUtilities.EPSILON;
+            assert  Math.abs(totalDistance/agent.getBoat().getSpeedInKph()- timeSpentTravelling)<
+                    FishStateUtilities.EPSILON;
             assert hoursLeft >= timeSpentTravelling;
             hoursLeft = hoursLeft - timeSpentTravelling;
-            hoursLeft = Math.abs(hoursLeft) < FishStateUtilities.EPSILON ? 0 : hoursLeft;
+            hoursLeft = (Math.abs(hoursLeft) < FishStateUtilities.EPSILON) ? 0 : hoursLeft;
 
             agent.move(next, map,model, totalDistance);
 

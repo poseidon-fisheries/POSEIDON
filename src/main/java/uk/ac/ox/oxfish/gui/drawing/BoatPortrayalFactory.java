@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * Colors boat portrayals given tags
@@ -88,7 +89,7 @@ public class BoatPortrayalFactory
         else if(fisher.getTags().contains("canoe"))
             correctImage = canoeIcon;
         else
-            correctImage = shipIcon;
+            correctImage = boatIcon;
 
         for (Map.Entry<String, Color> color : BOAT_COLORS.entrySet()) {
             if (fisher.getTags().contains(color.getKey()))
@@ -99,6 +100,17 @@ public class BoatPortrayalFactory
 
 
 
+
+    }
+
+    public static boolean hasColorTag(Fisher fisher)
+    {
+        return fisher.getTags().stream().anyMatch(new Predicate<String>() {
+            @Override
+            public boolean test(String s) {
+                return BOAT_COLORS.containsKey(s);
+            }
+        });
 
     }
 

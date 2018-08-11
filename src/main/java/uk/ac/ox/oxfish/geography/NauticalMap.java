@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -48,10 +49,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import javax.annotation.Nullable;
+import java.util.*;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -312,14 +311,29 @@ public class NauticalMap implements Startable
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
+
+
+
     public Coordinate getCoordinates(int gridX, int gridY)
     {
         return rasterBathymetry.toPoint(gridX,gridY).getCoordinate();
     }
 
+    /**
+     * basically getting coordinates is an expensive call; so we store previous calls here
+     */
+    private final WeakHashMap<SeaTile,Coordinate> coordinateCache = new WeakHashMap<>();
+
     public Coordinate getCoordinates(SeaTile tile)
     {
-        return rasterBathymetry.toPoint(tile.getGridX(),tile.getGridY()).getCoordinate();
+        coordinateCache.computeIfAbsent(tile, new Function<SeaTile, Coordinate>() {
+            @Nullable
+            @Override
+            public Coordinate apply(@Nullable SeaTile input) {
+                return rasterBathymetry.toPoint(tile.getGridX(),tile.getGridY()).getCoordinate();
+            }
+        });
+        return coordinateCache.get(tile);
     }
 
     public SeaTile getSeaTile(Coordinate coordinate)
