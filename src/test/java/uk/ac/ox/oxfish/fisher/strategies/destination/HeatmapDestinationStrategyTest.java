@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.probability.FixedProbability;
@@ -61,8 +62,8 @@ public class HeatmapDestinationStrategyTest {
                 new FixedProbability(0d,1d),
                 model.getMap(),
                 model.getRandom(),
-                10
-        );
+                10,
+                new HourlyProfitInTripObjective(true));
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.getAltitude()).thenReturn(-100d);
@@ -107,8 +108,8 @@ public class HeatmapDestinationStrategyTest {
                 new FixedProbability(0d,0d),
                 model.getMap(),
                 model.getRandom(),
-                10
-        );
+                10,
+                new HourlyProfitInTripObjective(true));
         SeaTile optimal = mock(SeaTile.class);
 
         when(optimal.getAltitude()).thenReturn(-100d);
@@ -150,8 +151,8 @@ public class HeatmapDestinationStrategyTest {
                 new FixedProbability(0d,1d),
                 model.getMap(),
                 model.getRandom(),
-                10
-        );
+                10,
+                new HourlyProfitInTripObjective(true));
 
 
         strategy.start(model,user);

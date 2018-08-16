@@ -100,8 +100,11 @@ public class TimeSeries<T> implements Steppable
 
     public void turnOff()
     {
-        receipt.stop();
+        if(receipt!=null) {
+            receipt.stop();
+        }
         reset();
+
     }
 
     @Override

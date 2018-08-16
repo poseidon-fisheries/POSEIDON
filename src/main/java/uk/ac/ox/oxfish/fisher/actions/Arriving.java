@@ -42,25 +42,28 @@ public class Arriving implements Action{
     public ActionResult act(FishState model, Fisher agent, Regulation regulation,double hoursLeft) {
         assert agent.isAtDestination();
 
+        //did we arrive at port? then dock
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
             return new ActionResult(new Docking(),hoursLeft);
 
-        if( (regulation.canFishHere(agent,agent.getLocation(), model) || agent.isCheater())
-                &&
-                agent.shouldIFish(model) ) //if you want to fish
-            return new ActionResult(new Fishing(),hoursLeft);
+
+        //adapt if needed
+        agent.updateDestination(model,this);
+        //we don't want to move anywhere else
+        if(agent.getDestination().equals(agent.getLocation())) {
+            //if we want to fish here, let's fish
+            if (agent.canAndWantToFishHere())
+                return new ActionResult(new Fishing(), hoursLeft);
+            else
+                //otherwise basically wait
+                return new ActionResult(new Arriving(), 0d);
+        }
+        //we got a new location? move to there!
         else
         {
-            //adapt if needed
-            agent.updateDestination(model,this);
-            //we can't fish but we don't want to move either, stay here then!
-            if(agent.getDestination().equals(agent.getLocation()))
-                return new ActionResult(new Arriving(), 0d);
-            else
-            {
-                return new ActionResult(new Moving(), hoursLeft);
-            }
+            return new ActionResult(new Moving(), hoursLeft);
         }
+
 
 
 

@@ -54,8 +54,8 @@ public class TooLateToRemoveFishers
         while (state.getYear() < 3)
             state.schedule.step(state);
 
-        //now keep running for 10 years adding 3 fishers every month
-        while (state.getYear() < 13) {
+        //now keep running for 15 years adding 3 fishers every month
+        while (state.getYear() < 18) {
             if (state.getDayOfTheYear() % 30 == 0) {
                 state.createFisher();
                 state.createFisher();
@@ -67,7 +67,7 @@ public class TooLateToRemoveFishers
         }
 
         //for the next 10 years remove the fishers
-        while (state.getYear() < 23) {
+        while (state.getYear() < 28) {
             if (state.getDayOfTheYear() % 30 == 0) {
                 state.killRandomFisher();
                 state.killRandomFisher();

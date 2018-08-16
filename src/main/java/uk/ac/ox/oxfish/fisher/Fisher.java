@@ -450,7 +450,7 @@ public class Fisher implements Steppable, Startable{
         equipment.getBoat().consumeFuel(litersConsumed);
         getCurrentTrip().recordGasConsumption(litersConsumed);
         assert  equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride() :
-                                 "a boat has lspiRun into negative fuel territory";
+                "a boat has lspiRun into negative fuel territory";
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 
@@ -573,6 +573,9 @@ public class Fisher implements Steppable, Startable{
      */
     private void updateFuelEmergencyFlag(NauticalMap map)
     {
+
+        if(getFuelLeft()>=999999999) //if you have boats this large, I am just going to assume you don't care about fuel
+            return;
 
         if(!status.isFuelEmergencyOverride())
             status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
@@ -1145,7 +1148,7 @@ public class Fisher implements Steppable, Startable{
 
 
     public Fisher replaceFriend(Fisher friendToReplace,
-                                    boolean ignoreDirection) {
+                                boolean ignoreDirection) {
         return status.getNetwork().replaceFriend(this,
                                                  friendToReplace,
                                                  ignoreDirection,
@@ -1414,6 +1417,14 @@ public class Fisher implements Steppable, Startable{
         return state;
     }
 
+
+
+    public boolean canAndWantToFishHere()
+    {
+        return (getRegulation().canFishHere(this,getLocation(), state) || isCheater())
+                &&
+                this.shouldIFish(state);
+    }
 
     public Hold getHold() {
         return equipment.getHold();

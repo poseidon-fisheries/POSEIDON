@@ -24,6 +24,7 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
 import uk.ac.ox.oxfish.model.FishState;
@@ -58,6 +59,9 @@ public class BanditDestinationStrategy implements DestinationStrategy{
     private final BanditSwitch banditSwitch;
 
     private final BanditAverage banditAverage;
+
+    final ObjectiveFunction<Fisher> objective;
+
     private Adaptation concreteAdaptation;
 
     private Fisher fisher;
@@ -75,6 +79,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
      * @param averagerMaker builds the bandit average given the number of arms
      * @param banditMaker builds the bandit algorithm given the bandit average
      * @param delegate the delegate strategy
+     * @param objective
      * @param respectMPA
      * @param ignoreWastelands
      */
@@ -82,7 +87,9 @@ public class BanditDestinationStrategy implements DestinationStrategy{
             Function<Integer, BanditAverage> averagerMaker,
             BanditSupplier banditMaker,
             MapDiscretization discretization,
-            FavoriteDestinationStrategy delegate, boolean respectMPA, boolean ignoreWastelands) {
+            FavoriteDestinationStrategy delegate,
+            ObjectiveFunction<Fisher> objective,
+            boolean respectMPA, boolean ignoreWastelands) {
         //map arms to valid map groups
         this.discretization = discretization;
 
@@ -94,6 +101,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
         algorithm = banditMaker.apply(banditAverage);
 
         this.delegate = delegate;
+        this.objective = objective;
         this.respectMPA = respectMPA;
         this.ignoreWastelands = ignoreWastelands;
     }
@@ -140,10 +148,11 @@ public class BanditDestinationStrategy implements DestinationStrategy{
             @Override
             public void adapt(Fisher toAdapt, FishState state, MersenneTwisterFast random) {
                 // observe previous trip
-                SeaTile lastDestination = delegate.getFavoriteSpot();
+                SeaTile lastDestination = toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ?
+                        delegate.getFavoriteSpot() : toAdapt.getLastFinishedTrip().getMostFishedTileInTrip();
                 assert toAdapt.getLastFinishedTrip().getMostFishedTileInTrip() == null ||
                         toAdapt.getLastFinishedTrip().getMostFishedTileInTrip().equals(lastDestination);
-                double reward = toAdapt.getLastFinishedTrip().getProfitPerHour(true);
+                double reward = objective.computeCurrentFitness(fisher,fisher);
 
                 //peek at friends?
                 if(imitate)
@@ -153,7 +162,7 @@ public class BanditDestinationStrategy implements DestinationStrategy{
                         if(friendTrip != null && friendTrip.getMostFishedTileInTrip() != null)
                         {
                             algorithm.observeReward(
-                                    friendTrip.getProfitPerHour(true),
+                                    objective.computeCurrentFitness(fisher,friend),
                                     fromMapGroupToBanditArm(discretization.getGroup(
                                             friendTrip.getMostFishedTileInTrip()))
                             );

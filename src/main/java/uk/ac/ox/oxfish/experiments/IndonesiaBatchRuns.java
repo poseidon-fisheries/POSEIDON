@@ -24,54 +24,50 @@ import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "perfectt3";
+    public static final String FILENAME = "712_optimistic_perfect_calibrated_2014_NM";
+    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice0/calibration/";
 
     public static void main(String[] args) throws IOException {
 
 
         BatchRunner runner = new BatchRunner(
-                Paths.get("docs",
-                          "20180516 medium_713",
-                          "adding_large",
-                          FILENAME+".yaml"),
-                2,
+                Paths.get(DIRECTORY,
+                          FILENAME + ".yaml"),
+                4,
                 Lists.newArrayList(
-                        "Pristipomoides multidens Landings of small",
-                        "Lutjanus malabaricus Landings of small",
-                        "Pristipomoides typus Landings of small",
-                        "Epinephelus areolatus Landings of small",
-                        "Lutjanus johnii Landings of small",
-                        "Others Landings of small",
-                        "Average Cash-Flow of small",
-                        "Average Number of Trips of small",
-                        "Average Trip Duration of small",
-                        "Average Distance From Port of small",
+                        "Snapper Landings",
+                        "Snapper Landings of population0",
+                        "Snapper Landings of population1",
+                        "Snapper Landings of population2",
+                        "Average Cash-Flow",
+                        "Average Cash-Flow of population0",
+                        "Average Cash-Flow of population1",
+                        "Average Cash-Flow of population2",
+                        "Average Number of Trips of population0",
+                        "Average Number of Trips of population1",
+                        "Average Number of Trips of population2",
+                        "Average Distance From Port of population0",
+                        "Average Distance From Port of population1",
+                        "Average Distance From Port of population2",
+                        "Average Trip Duration of population0",
+                        "Average Trip Duration of population1",
+                        "Average Trip Duration of population2",
                         //"Total Variable Costs of small",
                         //"Total Earnings of small",
 
-                        "Pristipomoides multidens Landings of big",
-                        "Lutjanus malabaricus Landings of big",
-                        "Pristipomoides typus Landings of big",
-                        "Epinephelus areolatus Landings of big",
-                        "Lutjanus johnii Landings of big",
-                        "Others Landings of big",
-                        "Average Cash-Flow of big",
-                        "Average Number of Trips of big",
-                        "Average Trip Duration of big",
-                        "Average Distance From Port of big"//,
+
                    //     "Total Variable Costs of big",
-                   //     "Total Earnings of big"
+                        "Biomass Snapper"
 
                 ),
-                Paths.get("docs",
-                          "20180516 medium_713",
-                          "adding_large",
+                Paths.get(DIRECTORY,
                           FILENAME),
                 null,
                 System.currentTimeMillis(),
@@ -79,8 +75,15 @@ public class IndonesiaBatchRuns {
         );
 
 
-        while(runner.getRunsDone()<100)
-            runner.run(null);
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, FILENAME + ".csv").toFile());
+        fileWriter.write("run,year,variable,value\n");
+        fileWriter.flush();
 
+        while(runner.getRunsDone()<100) {
+
+            StringBuffer tidy = new StringBuffer();
+            runner.run(tidy);
+            fileWriter.write(tidy.append("\n").toString());
+        }
     }
 }

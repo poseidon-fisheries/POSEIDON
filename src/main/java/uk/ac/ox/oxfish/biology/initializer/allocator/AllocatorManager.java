@@ -158,7 +158,6 @@ public class AllocatorManager {
             return weightMaps.get(species).get(tile);
         else
         {
-            assert weightMaps.get(species).isEmpty(); //no pre-computation
             return
                     //if it's above land, return 0
                     tile.getAltitude() >= 0 ?

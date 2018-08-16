@@ -25,6 +25,8 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -111,6 +113,28 @@ public class FlexibleScenario implements Scenario {
 
     private boolean portSwitching = false;
 
+
+    private LinkedHashMap<String, Number> exogenousCatches = new LinkedHashMap<>();
+
+
+    /**
+     * Getter for property 'exogenousCatches'.
+     *
+     * @return Value for property 'exogenousCatches'.
+     */
+    public LinkedHashMap<String, Number> getExogenousCatches() {
+        return exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'exogenousCatches'.
+     *
+     * @param exogenousCatches Value to set for property 'exogenousCatches'.
+     */
+    public void setExogenousCatches(LinkedHashMap<String, Number> exogenousCatches) {
+        this.exogenousCatches = exogenousCatches;
+    }
+
     /**
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
      * in the biology/fishery
@@ -188,6 +212,17 @@ public class FlexibleScenario implements Scenario {
         model.random = originalRandom;
 
 
+        //add exogenous catches
+        //add exogenous catches!
+        LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
+        for (Map.Entry<String, Number> exogenous : exogenousCatches.entrySet()) {
+            recast.put(global.getSpecie(exogenous.getKey()),exogenous.getValue().doubleValue());
+        }
+        //start it!
+
+        ExogenousCatches catches = new BiomassDrivenFixedExogenousCatches(recast);
+        model.registerStartable(catches);
+
 
 
         return new ScenarioEssentials(global,map);
@@ -223,6 +258,7 @@ public class FlexibleScenario implements Scenario {
         FisherFactory lastFactory = null;
         int definitionIndex = 0;
         for (FisherDefinition fisherDefinition : fisherDefinitions) {
+            final int populationNumber = definitionIndex;
             Pair<FisherFactory, List<Fisher>> generated = fisherDefinition.instantiateFishers(
                     model,
                     map.getPorts(),
@@ -254,6 +290,10 @@ public class FlexibleScenario implements Scenario {
                     new Consumer<Fisher>() {
                         @Override
                         public void accept(Fisher fisher) {
+                            //add population tag
+                            fisher.getTags().add("population"+ populationNumber);
+
+
                             //do not over-write given color tags!
                             if(!BoatPortrayalFactory.hasColorTag(fisher))
                                 fisher.getTags().add(
@@ -274,6 +314,19 @@ public class FlexibleScenario implements Scenario {
             lastFactory = generated.getFirst();
             fishers.addAll(generated.getSecond());
             definitionIndex++;
+            //add population number in
+            if(fisherDefinitions.size()>1)
+            {
+                if(tagsToTrackSeparately.equals(""))
+                {
+                    assert populationNumber==0;
+                    tagsToTrackSeparately = "population0";
+                }
+                else{
+                    tagsToTrackSeparately = tagsToTrackSeparately+",population"+populationNumber;
+
+                }
+            }
         }
 
 
@@ -287,6 +340,9 @@ public class FlexibleScenario implements Scenario {
 
         addTagLandingTimeSeries(model);
 
+
+
+
         if(fishers.size() <=1)
             return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
         else {
@@ -296,11 +352,27 @@ public class FlexibleScenario implements Scenario {
 
 
     /**
+     * generate time serieses for populations of fishers
+     * @param state
+     * @param number
+     */
+    private void  addTimeSeriesToSubgroup(FishState state, int number){
+
+    }
+
+
+    /**
+     * all tags for which we would like to have separate time series recording, separated by ",";
+     * so for example "small,big"
+     */
+    private String tagsToTrackSeparately = "";
+
+    /**
      * extract landing time series by classic tags
      */
     private void  addTagLandingTimeSeries(FishState state){
 
-        for(String tag : new String[]{"small","big"})
+        for(String tag : tagsToTrackSeparately.split(","))
         {
             //landings
             for(Species species : state.getBiology().getSpecies())
@@ -311,12 +383,12 @@ public class FlexibleScenario implements Scenario {
                                 mapToDouble(value -> value.getLatestYearlyObservation(
                                         species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
 
-            state.getYearlyDataSet().registerGatherer("Total Income of " +tag,
+            state.getYearlyDataSet().registerGatherer("Average Earnings of " +tag,
                                                       fishState ->
                                                               fishState.getFishers().stream().
                                                                       filter(fisher -> fisher.getTags().contains(tag)).
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN)).sum(), Double.NaN);
+                                                                              FisherYearlyTimeSeries.EARNINGS)).sum(), Double.NaN);
 
             state.getYearlyDataSet().registerGatherer("Average Distance From Port of " +tag,
                                                       fishState ->
@@ -428,12 +500,6 @@ public class FlexibleScenario implements Scenario {
 
 
     }
-
-
-
-
-
-
 
 
 
@@ -569,4 +635,24 @@ public class FlexibleScenario implements Scenario {
     public void setAllowFriendshipsAcrossPorts(boolean allowFriendshipsAcrossPorts) {
         this.allowFriendshipsAcrossPorts = allowFriendshipsAcrossPorts;
     }
+
+    /**
+     * Getter for property 'tagsToTrackSeparately'.
+     *
+     * @return Value for property 'tagsToTrackSeparately'.
+     */
+    public String getTagsToTrackSeparately() {
+        return tagsToTrackSeparately;
+    }
+
+    /**
+     * Setter for property 'tagsToTrackSeparately'.
+     *
+     * @param tagsToTrackSeparately Value to set for property 'tagsToTrackSeparately'.
+     */
+    public void setTagsToTrackSeparately(String tagsToTrackSeparately) {
+        this.tagsToTrackSeparately = tagsToTrackSeparately;
+    }
+
+
 }

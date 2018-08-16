@@ -20,6 +20,9 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.HourlyProfitObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.BanditDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -49,6 +52,10 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
 
 
     private AlgorithmFactory<? extends MapDiscretizer> discretizer = new SquaresMapDiscretizerFactory();
+
+    private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
+            new HourlyProfitObjectiveFactory(true);
+
 
 
     private boolean automaticallyIgnoreMPAs = true;
@@ -89,6 +96,7 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
                 bandit.apply(state),
                 map,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
+                objectiveFunction.apply(state),
                 automaticallyIgnoreMPAs, automaticallyIgnoreWastelands);
         banditDestinationStrategy.setImitate(imitate);
         return banditDestinationStrategy;
@@ -204,5 +212,25 @@ public class BanditDestinationFactory implements AlgorithmFactory<BanditDestinat
      */
     public void setImitate(boolean imitate) {
         this.imitate = imitate;
+    }
+
+
+    /**
+     * Getter for property 'objectiveFunction'.
+     *
+     * @return Value for property 'objectiveFunction'.
+     */
+    public AlgorithmFactory<? extends ObjectiveFunction<Fisher>> getObjectiveFunction() {
+        return objectiveFunction;
+    }
+
+    /**
+     * Setter for property 'objectiveFunction'.
+     *
+     * @param objectiveFunction Value to set for property 'objectiveFunction'.
+     */
+    public void setObjectiveFunction(
+            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        this.objectiveFunction = objectiveFunction;
     }
 }
