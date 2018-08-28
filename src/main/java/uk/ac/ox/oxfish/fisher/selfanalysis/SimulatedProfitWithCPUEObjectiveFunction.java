@@ -55,13 +55,13 @@ public class SimulatedProfitWithCPUEObjectiveFunction extends TripBasedObjective
                 observer.getGear().expectedHourlyCatch(
                         observer,
                         tile,
-                        maxHoursOut,
+                        1,
                         observer.grabState().getBiology());
         double[] theirEfficiency =
                 observed.getGear().expectedHourlyCatch(
                         observed,
                         tile,
-                        maxHoursOut,
+                        1,
                         observer.grabState().getBiology());
 
         for(int i=0; i<expectedCPUE.length; i++)

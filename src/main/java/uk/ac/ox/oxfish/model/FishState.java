@@ -841,19 +841,23 @@ public class FishState  extends SimState{
         return dailyCounter;
     }
 
-
     @Override
     public void finish() {
         super.finish();
-        for(Fisher fisher : fishers)
-            fisher.turnOff();
-        fishers.clear();
+        if(fishers!=null) {
+            for (Fisher fisher : fishers)
+                fisher.turnOff();
+            fishers.clear();
+
+        }
         yearlyDataSet.turnOff();
         yearlyCounter.turnOff();
         dailyCounter.turnOff();
         dailyDataSet.turnOff();
-        map.turnOff();
-
+        if(map!=null)
+            map.turnOff();
+        aggregateYearlySteppables.clear();
+        aggregateDailySteppables.clear();
 
     }
 }

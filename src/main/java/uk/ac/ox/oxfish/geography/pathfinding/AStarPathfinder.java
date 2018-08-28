@@ -73,8 +73,9 @@ public class AStarPathfinder implements Pathfinder {
         Preconditions.checkNotNull(map);
 
 
-        if(memory.contains(start,end))
-            return new LinkedList<>(memory.get(start,end));
+        LinkedList<SeaTile> oldPath = memory.get(start, end);
+        if(oldPath!=null)
+            return new LinkedList<>(oldPath);
 
 
         //where we will eventually put the osmoseWFSPath

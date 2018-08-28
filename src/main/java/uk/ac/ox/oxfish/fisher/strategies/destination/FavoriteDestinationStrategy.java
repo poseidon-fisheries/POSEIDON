@@ -81,21 +81,22 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
             Action currentAction) {
 
         //if we have arrived
-        // or
-        //we were going to port already
         if(fisher.getLocation().equals(favoriteSpot))
         {
-            //go back home
+            //and we are able to fish here, fish here
+            if(fisher.canAndWantToFishHere())
+                return fisher.getLocation();
+            //otherwise go back home
             return fisher.getHomePort().getLocation();
         }
         else
+            //we haven't arrived
         {
             //if we are going to port, keep going
             if(!fisher.isAtDestination() && fisher.isGoingToPort() )
                 return fisher.getHomePort().getLocation();
 
             //otherwise go/keep going to favorite spot
-//            assert  currentAction instanceof Moving || currentAction instanceof AtPort; //we haven't arrived yet. We are either moving or just left dock
             return favoriteSpot;
         }
 

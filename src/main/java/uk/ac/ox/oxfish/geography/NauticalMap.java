@@ -175,7 +175,12 @@ public class NauticalMap implements Startable
 
     public double getTotalBiology(Species species)
     {
-        return getAllSeaTilesAsList().stream().mapToDouble(value -> value.getBiomass(species)).sum();
+        double biomass = 0;
+        for (SeaTile seaTile : getAllSeaTilesExcludingLandAsList()) {
+            biomass+= seaTile.getBiomass(species);
+        }
+
+        return biomass;
     }
 
 
@@ -333,14 +338,13 @@ public class NauticalMap implements Startable
 
     public Coordinate getCoordinates(SeaTile tile)
     {
-        coordinateCache.computeIfAbsent(tile, new Function<SeaTile, Coordinate>() {
+        return coordinateCache.computeIfAbsent(tile, new Function<SeaTile, Coordinate>() {
             @Nullable
             @Override
             public Coordinate apply(@Nullable SeaTile input) {
                 return rasterBathymetry.toPoint(tile.getGridX(),tile.getGridY()).getCoordinate();
             }
         });
-        return coordinateCache.get(tile);
     }
 
     public SeaTile getSeaTile(Coordinate coordinate)

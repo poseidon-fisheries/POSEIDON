@@ -21,11 +21,12 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.ExhaustiveAcquisitionFunctionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NearestNeighborRegressionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
+import uk.ac.ox.oxfish.fisher.selfanalysis.factory.HourlyProfitObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.HeatmapDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -76,6 +77,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     private final Set<FishState> weakStateMap = Collections.newSetFromMap(new WeakHashMap<>());
 
 
+    private AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction =
+            new HourlyProfitObjectiveFactory(true);
 
 
     /**
@@ -103,8 +106,8 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
                 probability.apply(state),
                 state.getMap(),
                 state.getRandom(),
-                explorationStepSize.apply(state.getRandom()).intValue()
-        );
+                explorationStepSize.apply(state.getRandom()).intValue(),
+                objectiveFunction.apply(state));
     }
 
     private void addDataGatherers(FishState state) {
@@ -224,5 +227,25 @@ public class HeatmapDestinationFactory implements AlgorithmFactory<HeatmapDestin
     public void setAcquisition(
             AlgorithmFactory<? extends AcquisitionFunction> acquisition) {
         this.acquisition = acquisition;
+    }
+
+
+    /**
+     * Getter for property 'objectiveFunction'.
+     *
+     * @return Value for property 'objectiveFunction'.
+     */
+    public AlgorithmFactory<? extends ObjectiveFunction<Fisher>> getObjectiveFunction() {
+        return objectiveFunction;
+    }
+
+    /**
+     * Setter for property 'objectiveFunction'.
+     *
+     * @param objectiveFunction Value to set for property 'objectiveFunction'.
+     */
+    public void setObjectiveFunction(
+            AlgorithmFactory<? extends ObjectiveFunction<Fisher>> objectiveFunction) {
+        this.objectiveFunction = objectiveFunction;
     }
 }

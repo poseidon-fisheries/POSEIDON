@@ -195,6 +195,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         fisher.addPerTripAdaptation(adaptation);
         //keep in memory the last time the arm was chosen
         fisher.setDiscretizedLocationMemory(memory);
+        adaptation.adapt(fisher,model,fisher.grabRandomizer());
     }
 
     /**

@@ -141,17 +141,22 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         registerGatherer(AVERAGE_LAST_TRIP_HOURLY_PROFITS, new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                TripRecord lastTrip = value.getLastFinishedTrip();
-                                if(lastTrip == null || !Double.isFinite(lastTrip.getProfitPerHour(true) ))
-                                    return 0d;
-                                else
-                                    return lastTrip.getProfitPerHour(true);
-                            }
-                        }).average().orElse(0d);
+
+                if(fishers.size()==0)
+                    return 0d;
+
+                double sum = 0;
+                for (Fisher fisher : observed.getFishers()) {
+                    TripRecord lastTrip = fisher.getLastFinishedTrip();
+                    if (lastTrip != null ) {
+                        double lastProfits = lastTrip.getProfitPerHour(true);
+                        if(Double.isFinite(lastProfits)) //NaN or Infinite are assumed to be 0 here
+                            sum+= lastProfits;
+                    }
+
+                }
+
+                return sum/(double)fishers.size();
             }
         }, 0d);
 
@@ -159,14 +164,16 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {
-                return observed.getFishers().stream().mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-                            }
-                        }).sum() /
-                        observed.getFishers().size();
+                if (fishers.size() == 0)
+                    return 0d;
+
+                double sum = 0;
+                for (Fisher fisher : observed.getFishers()) {
+                    sum += fisher.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+
+                }
+
+                return sum / (double) fishers.size();
             }
         }, 0d);
 
@@ -180,8 +187,8 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState state1) {
-                                     return allSeaTilesAsList.stream().mapToDouble(
-                                             value -> value.getBiomass(species)).sum();
+                                     return state1.getTotalBiomass(species);
+
                                  }
                              },
                              0d);

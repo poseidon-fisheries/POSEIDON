@@ -50,7 +50,7 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
             AcquisitionFunction acquisition, boolean ignoreFailedTrips,
             AdaptationProbability probability,
             NauticalMap map, MersenneTwisterFast random, int stepSize) {
-        super(profitRegression, acquisition, ignoreFailedTrips, probability, map, random, stepSize);
+        super(profitRegression, acquisition, ignoreFailedTrips, probability, map, random, stepSize, null);
         this.regression = profitRegression;
 
     }
@@ -82,12 +82,12 @@ public class PlanningHeatmapDestinationStrategy extends HeatmapDestinationStrate
 
     @Override
     protected void learnFromTripRecord(
-            TripRecord record, SeaTile mostFishedTile, Fisher fisher, FishState model) {
+            TripRecord record, SeaTile mostFishedTile, Fisher fisherThatMadeTheTrip, FishState model) {
 
          regression.addObservation(
-                new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
+                 new GeographicalObservation<>(mostFishedTile,model.getHoursSinceStart(),
                                               record),
-                fisher,model
+                 fisherThatMadeTheTrip, model
          );
 
     }

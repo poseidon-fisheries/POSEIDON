@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -92,14 +93,15 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                 new Sensor<Fisher,SeaTile>() {
                     @Override
                     public SeaTile scan(Fisher fisher1) {
-                        if (fisher1 == fisher) //if we are sensing ourselves
-                            //override to delegate
-                            return delegate.getFavoriteSpot();
-                        else if (fisher1.getLastFinishedTrip() == null || !fisher1.getLastFinishedTrip().isCompleted() ||
-                                fisher1.getLastFinishedTrip().getTilesFished().isEmpty())
-                            return null;
+                        TripRecord trip = fisher1.getLastFinishedTrip();
+                        if (trip == null || !trip.isCompleted() ||
+                                trip.getTilesFished().isEmpty())
+                            if(fisher1==fisher)
+                                return delegate.getFavoriteSpot();
+                            else
+                                return null;
                         else
-                            return fisher1.getLastFinishedTrip().getTilesFished().iterator().next();
+                            return trip.getMostFishedTileInTrip();
                     }
                 },
                 objective,

@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalObservati
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -89,17 +90,21 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     private final RandomStep<SeaTile> explorationStep;
 
 
+    private final ObjectiveFunction<Fisher> objectiveFunction;
+
     public HeatmapDestinationStrategy(
             GeographicalRegression heatmap,
             AcquisitionFunction acquisition, boolean ignoreFailedTrips,
             AdaptationProbability probability,
             NauticalMap map,
             MersenneTwisterFast random,
-            int stepSize) {
+            int stepSize,
+            ObjectiveFunction<Fisher> objectiveFunction) {
         this.heatmap = new ErrorTrackingRegression(heatmap);
         this.acquisition = acquisition;
         this.ignoreFailedTrips = ignoreFailedTrips;
         this.probability = probability;
+        this.objectiveFunction = objectiveFunction;
         this.delegate = new FavoriteDestinationStrategy(map,random);
         this.explorationStep = DefaultBeamHillClimbing.DEFAULT_RANDOM_STEP(stepSize,5);
     }
@@ -129,13 +134,13 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
 
     protected void learnFromTripRecord(
-            TripRecord record, SeaTile mostFishedTile, final Fisher fisher, final FishState model)
+            TripRecord record, SeaTile mostFishedTile, final Fisher fisherThatMadeTheTrip, final FishState model)
     {
         heatmap.addObservation(new GeographicalObservation<>(
                 mostFishedTile,
                 model.getHoursSinceStart(),
-                record.getProfitPerHour(true)
-        ), fisher,model );
+                objectiveFunction.computeCurrentFitness(fisher,fisherThatMadeTheTrip)
+        ), fisher, model);
     }
 
     @Override
@@ -161,7 +166,7 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
                     if(!record.isCutShort() || ignoreFailedTrips)
                         if(model.getRandom().nextDouble()<=probability.getImitationProbability())
-                            learnFromTripRecord(friendTrip, tile, fisher, model);
+                            learnFromTripRecord(friendTrip, tile, friend, model);
 
             }
 

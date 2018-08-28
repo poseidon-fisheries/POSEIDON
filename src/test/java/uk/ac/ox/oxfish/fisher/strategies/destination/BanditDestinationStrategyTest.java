@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.fisher.selfanalysis.HourlyProfitInTripObjective;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
@@ -64,7 +65,7 @@ public class BanditDestinationStrategyTest {
                 banditAverage -> new EpsilonGreedyBanditAlgorithm(banditAverage,.1),
                 discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                false, false);
+                new HourlyProfitInTripObjective(true), false, false);
 
         //option 2 is the best, you should pick it!
 
@@ -101,7 +102,7 @@ public class BanditDestinationStrategyTest {
                 banditAverage -> banditAlgorithm,
                 discretization,
                 new FavoriteDestinationStrategy(chart.getRandomBelowWaterLineSeaTile(randomizer)),
-                false, false);
+                new HourlyProfitInTripObjective(true), false, false);
 
 
         int[][] chosen = new int[3][3];

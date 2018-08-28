@@ -152,7 +152,9 @@ public class  FishGUI extends GUIState{
     @Override
     public void init(Controller controller) {
 
+
         super.init(controller);
+        ((Console) controller).setSize(800,600);
         final Box timeBox = (Box) ((Console) controller).getContentPane().getComponents()[0];
         //turn stop button into a proper dispose and restart
         JButton stopButton = (JButton) timeBox.getComponent(2);
