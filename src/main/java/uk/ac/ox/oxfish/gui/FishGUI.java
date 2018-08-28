@@ -170,9 +170,14 @@ public class  FishGUI extends GUIState{
                     public void actionPerformed(ActionEvent e) {
 
 
+
+
                         //in their infinite wisdom, MASON programmers have hard-coded a "system.exit" call
                         //and now we have to do acrobatics just to keep this thing from turning off
                         Console console = (Console) controller;
+
+                        //we should probably pause, just to be safe
+                        console.setShouldRepeat(false);
 
 
                         for (Object allFrame : console.getAllFrames()) {

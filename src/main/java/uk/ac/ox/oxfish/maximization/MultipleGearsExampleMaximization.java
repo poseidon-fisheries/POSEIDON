@@ -174,10 +174,11 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         MultipleGearsExampleMaximization maximization = new MultipleGearsExampleMaximization();
-        FlexibleScenario flexibleScenario = maximization.buildInput(new double[]{-8.927,-6.675,-6.596});
+        maximization.setScenarioFile("./docs/indonesia_hub/runs/712/slice0/calibration/712_pessimistic_2014_perfect.yaml");
+        FlexibleScenario flexibleScenario = maximization.buildInput(new double[]{-8.500,-3.312,-5.292});
         FishYAML yaml = new FishYAML();
         yaml.dump(flexibleScenario,
-                  new FileWriter(DEFAULT_PATH.resolve("712_optimistic_perfect_calibrated_2014_NM2.yaml").toFile()));
+                  new FileWriter(DEFAULT_PATH.resolve("712_pessimistic_perfect_calibrated_2014.yaml").toFile()));
     }
 
 

@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "712_optimistic_perfect_calibrated_2014_NM";
+    public static final String FILENAME = "712_pessimistic_perfect_calibrated_2014";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice0/calibration/";
 
     public static void main(String[] args) throws IOException {
@@ -40,7 +40,7 @@ public class IndonesiaBatchRuns {
         BatchRunner runner = new BatchRunner(
                 Paths.get(DIRECTORY,
                           FILENAME + ".yaml"),
-                4,
+                15,
                 Lists.newArrayList(
                         "Snapper Landings",
                         "Snapper Landings of population0",
@@ -83,7 +83,9 @@ public class IndonesiaBatchRuns {
 
             StringBuffer tidy = new StringBuffer();
             runner.run(tidy);
-            fileWriter.write(tidy.append("\n").toString());
+            fileWriter.write(tidy.toString());
+            fileWriter.flush();
         }
+        fileWriter.close();
     }
 }
