@@ -216,30 +216,6 @@ task optimizer(type: JavaExec){
     main = 'uk.ac.ox.oxfish.MainOptimizer'
 }
 
-//easy function to get formatted date
-def getDate() {
-    if(ext.date==null) {
-        def date = new Date()
-        def formattedDate = date.format('yyyy-MM-dd=HH-mm-ss')
-        ext.date = formattedDate.toString()
-    }
-    return ext.date
-}
-
-ext{
-    date=null;
-    website_folder = '/home/carrknight/code/carrknight.github.io';
-
-}
-
-
-task dashboard(type: Exec) {
-    dependsOn 'appendix'
-    dependsOn 'test'
-    executable = 'python2'
-    workingDir = "${projectDir}"
-    args = [ "dashboard.py",  date, website_folder ]
-}
 
 task sample_inputs(type:JavaExec){
     main = 'uk.ac.ox.oxfish.experiments.BuildSampleInputs'
