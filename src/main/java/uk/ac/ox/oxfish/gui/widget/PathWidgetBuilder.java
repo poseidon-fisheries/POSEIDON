@@ -88,8 +88,19 @@ public class PathWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
 
                                     //so i bind it again by setter
                                     metawidget.setToInspect(beingInspected);
-                                    if(metawidget.getParent()!=null) {
-                                        metawidget.getParent().revalidate();
+                                    JRootPane root = metawidget.getRootPane();
+
+                                    if(root!=null) {
+                                       SwingUtilities.invokeLater(
+                                               new Runnable() {
+                                                   @Override
+                                                   public void run() {
+                                                       root.setSize(root.getSize());
+                                                       root.revalidate();
+
+                                                   }
+                                               }
+                                       );
 
                                     }
                                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {

@@ -60,7 +60,9 @@ public class BatchRunnerSetup extends JPanel {
 
 
         widget.setToInspect(factory);
+        widget.setLayout(new BoxLayout(widget,BoxLayout.Y_AXIS));
         add(widget,BorderLayout.CENTER);
+
 
         JButton start = new JButton("Start");
         add(start,BorderLayout.SOUTH);

@@ -109,6 +109,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                 }
                 model.schedule.step(model);
 
+                if(populations>1)
                 for(int population = 0; population<populations; population++)
                 {
                     List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
@@ -120,6 +121,18 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                     error+= FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
                             Arrays.asList(landings[population])
+                    );
+                }
+                else{
+                    List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
+                            speciesName + " Landings").stream().collect(Collectors.toList());
+
+                    for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
+                        simulatedLandings.remove(0);
+
+                    error+= FishStateUtilities.timeSeriesDistance(
+                            simulatedLandings,
+                            Arrays.asList(landings[0])
                     );
                 }
 
@@ -172,14 +185,14 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
     }
 
 
-    public static void main(String[] args) throws IOException {
-        MultipleGearsExampleMaximization maximization = new MultipleGearsExampleMaximization();
-        maximization.setScenarioFile("./docs/indonesia_hub/runs/712/slice0/calibration/712_pessimistic_2014_perfect.yaml");
-        FlexibleScenario flexibleScenario = maximization.buildInput(new double[]{-8.500,-3.312,-5.292});
-        FishYAML yaml = new FishYAML();
-        yaml.dump(flexibleScenario,
-                  new FileWriter(DEFAULT_PATH.resolve("712_pessimistic_perfect_calibrated_2014.yaml").toFile()));
-    }
+//    public static void main(String[] args) throws IOException {
+//        MultipleGearsExampleMaximization maximization = new MultipleGearsExampleMaximization();
+//        maximization.setScenarioFile("./docs/indonesia_hub/runs/712/slice0/calibration/712_pessimistic_2014_perfect.yaml");
+//        FlexibleScenario flexibleScenario = maximization.buildInput(new double[]{-8.500,-3.312,-5.292});
+//        FishYAML yaml = new FishYAML();
+//        yaml.dump(flexibleScenario,
+//                  new FileWriter(DEFAULT_PATH.resolve("712_pessimistic_perfect_calibrated_2014.yaml").toFile()));
+//    }
 
 
     @Override

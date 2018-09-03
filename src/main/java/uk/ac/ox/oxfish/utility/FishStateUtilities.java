@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
@@ -63,7 +64,6 @@ import java.security.CodeSource;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -914,11 +914,14 @@ public class FishStateUtilities {
         return result;
     }
 
+
+
     public static FishState  run(
             String simulationName, Path scenarioYaml, final Path outputFolder,
             final Long seed, final int logLevel, final boolean additionalData,
             final String policyScript, final int yearsToRun,
-            final boolean saveOnExit, Integer heatmapGathererYear) throws IOException {
+            final boolean saveOnExit, Integer heatmapGathererYear,
+            @Nullable Consumer<Scenario> scenarioSetup) throws IOException {
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
@@ -926,9 +929,14 @@ public class FishStateUtilities {
 
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
+
+
         FileWriter io = new FileWriter(outputFolder.resolve("scenario.yaml").toFile());
         yaml.dump(scenario, io);
         io.close();
+
+        if(scenarioSetup!=null)
+            scenarioSetup.accept(scenario);
 
         FishState model = new FishState(seed);
         Log.setLogger(new FishStateLogger(model,

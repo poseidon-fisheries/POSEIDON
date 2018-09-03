@@ -242,34 +242,6 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         }, 0d);
 
 
-        registerGatherer("Actual Median Trip-Profits", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                double[] profits = observed.getFishers().stream().
-                        filter(
-                                new Predicate<Fisher>() {
-                                    @Override
-                                    public boolean test(Fisher fisher) {
-                                        return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 0;
-
-                                    }
-                                }
-                        ).mapToDouble(
-                        new ToDoubleFunction<Fisher>() {
-                            @Override
-                            public double applyAsDouble(Fisher value) {
-                                return value.getLatestYearlyObservation(FisherYearlyTimeSeries.EARNINGS) -
-                                        value.getLatestYearlyObservation(FisherYearlyTimeSeries.VARIABLE_COSTS);
-                            }
-                        }).toArray();
-                if(profits.length == 0)
-                    return Double.NaN;
-                if (profits.length % 2 == 0)
-                    return  (profits[profits.length/2] + profits[profits.length/2 - 1])/2;
-                else
-                    return profits[profits.length/2];
-            }
-        }, 0d);
 
         registerGatherer("Actual Average Cash-Flow", new Gatherer<FishState>() {
             @Override

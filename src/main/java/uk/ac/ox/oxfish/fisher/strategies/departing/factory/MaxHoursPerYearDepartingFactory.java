@@ -33,6 +33,14 @@ public class MaxHoursPerYearDepartingFactory implements AlgorithmFactory<MaxHour
     private DoubleParameter maxHoursOut = new FixedDoubleParameter(1200);
 
 
+    public MaxHoursPerYearDepartingFactory() {
+    }
+
+
+    public MaxHoursPerYearDepartingFactory(double maxHoursOut) {
+        this.maxHoursOut = new FixedDoubleParameter(maxHoursOut);
+    }
+
     /**
      * Applies this function to the given argument.
      *
