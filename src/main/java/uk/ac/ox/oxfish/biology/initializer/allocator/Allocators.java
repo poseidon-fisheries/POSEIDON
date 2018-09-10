@@ -91,6 +91,10 @@ public class Allocators {
                          CoordinateFileAllocatorFactory::new);
         NAMES.put(CoordinateFileAllocatorFactory.class,"From File Allocator");
 
+        CONSTRUCTORS.put("Shape File Allocator",
+                PolygonAllocatorFactory::new);
+        NAMES.put(PolygonAllocatorFactory.class,"Shape File Allocator");
+
 
     }
 
