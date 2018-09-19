@@ -60,7 +60,6 @@ public class CoordinateFileBiomassAllocator implements BiomassAllocator {
                 biologicalSample.getNumberOfObservations()>0,
                 "The CSV provided" + csvFile + " had no data!");
 
-
         //get read to iterate!
         Iterator<Double> x = biologicalSample.getFirstCoordinate().iterator();
         Iterator<Double> y = biologicalSample.getSecondCoordinate().iterator();
@@ -69,7 +68,11 @@ public class CoordinateFileBiomassAllocator implements BiomassAllocator {
         for(int i=0; i<biologicalSample.getNumberOfObservations(); i++)
         {
             //this is quite slow. We have to do it only once though!
-            SeaTile tile = map.getSeaTile(new Coordinate(x.next(),y.next()));
+            Double currentX = x.next();
+            Double currentY = y.next();
+            Double nextValue = value.next();
+
+            SeaTile tile = map.getSeaTile(new Coordinate(currentX, currentY));
             if(tile==null) //if you are off the depth map, ignore!
                 continue;
             //get the object computing the averages, or put one in the map if
@@ -81,13 +84,13 @@ public class CoordinateFileBiomassAllocator implements BiomassAllocator {
                 observations.put(tile,statistics);
             }
             assert observations.containsKey(tile); //should be in, now!
-            statistics.accept(value.next());
+            statistics.accept(nextValue);
 
         }
         //should be done, now!
-        assert !x.hasNext();
-        assert !y.hasNext();
-        assert !value.hasNext();
+        Preconditions.checkState(!x.hasNext(),"failed to iterate all x columns; mismatch column sizes?");
+        Preconditions.checkState(!y.hasNext(),"failed to iterate all y columns; mismatch column sizes?");
+        Preconditions.checkState(!value.hasNext(),"failed to iterate all value columns; mismatch column sizes?");
 
         //initialization complete!
 

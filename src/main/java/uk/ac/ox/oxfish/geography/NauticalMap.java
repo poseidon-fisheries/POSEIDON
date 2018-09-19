@@ -244,7 +244,7 @@ public class NauticalMap implements Startable
     }
     private List<SeaTile> allTiles = null;
 
-    private List<SeaTile> waterSeaTiles = null;
+    private LinkedList<SeaTile> waterSeaTiles = null;
 
     public List<SeaTile> getAllSeaTilesExcludingLandAsList()
     {
@@ -342,7 +342,7 @@ public class NauticalMap implements Startable
             @Nullable
             @Override
             public Coordinate apply(@Nullable SeaTile input) {
-                return rasterBathymetry.toPoint(tile.getGridX(),tile.getGridY()).getCoordinate();
+                return rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate();
             }
         });
     }
@@ -501,18 +501,11 @@ public class NauticalMap implements Startable
 
     public SeaTile getRandomBelowWaterLineSeaTile(MersenneTwisterFast random)
     {
-        SeaTile toReturn;
-        int tries = 0;
-        do{
-            toReturn = getSeaTile(random.nextInt(getWidth()),
-                    random.nextInt(getHeight()));
 
-            tries++;
-            if(tries > 100000)
-                throw new RuntimeException("Tried 100000 time to get a random sea tile and failed. Maybe it's time to turnOff");
 
-        }while (toReturn.getAltitude() > 0); //keep looking if you found something at sea
-        return toReturn;
+        List<SeaTile> waterTiles = getAllSeaTilesExcludingLandAsList();
+
+        return waterTiles.get(random.nextInt(waterTiles.size()));
     }
 
     public IntGrid2D getDailyTrawlsMap() {
