@@ -81,7 +81,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Safe Everywhere
+  safety: Ignore Rules
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -92,6 +92,9 @@ Heatmap Based:
       proportionSearched: '1.0'
   explorationStepSize: uniform 1.0 10.0
   ignoreFailedTrips: false
+  objectiveFunction:
+    Hourly Profit Objective:
+      opportunityCosts: true
   probability:
     Fixed Probability:
       explorationProbability: '0.2'
@@ -146,6 +149,9 @@ Discretized Bandit:
       horizontalSplits: '2.0'
       verticalSplits: '2.0'
   imitate: false
+  objectiveFunction:
+    Hourly Profit Objective:
+      opportunityCosts: true
 -------
 Florida Longliner:
   automaticallyAvoidMPA: true
@@ -292,6 +298,9 @@ Replicator:
           horizontalSplits: '2.0'
           verticalSplits: '2.0'
       imitate: false
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
   - GSA:
       explorationSize: '20.0'
       gravitationalConstant: '100.0'
