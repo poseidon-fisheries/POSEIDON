@@ -72,7 +72,7 @@ public class GenericOptimization extends SimpleProblemDouble {
      */
     private HashMap<String,String> targetRepresentations = new HashMap<>();
     {
-        targetRepresentations.put("Pristipomoides multidens Landings of population0",)
+        targetRepresentations.put("Pristipomoides multidens Landings of population0","");
     }
 
 
