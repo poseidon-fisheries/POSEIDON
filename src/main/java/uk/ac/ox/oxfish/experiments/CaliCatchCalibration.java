@@ -46,10 +46,8 @@ import java.util.function.Consumer;
 public class CaliCatchCalibration {
 
 
-    public static final int RUNS = 100;
-    //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170322 cali_catch", "results");
-    //public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170606 cali_catchability_2", "results");
-    public static final Path MAIN_DIRECTORY = Paths.get("docs", "20170730 validation", "best");
+    public static final int RUNS = 818;
+    public static final Path MAIN_DIRECTORY = Paths.get("inputs", "groundfish_paper");
     public static final int YEARS_PER_RUN = 5;
 
     public static void main(String[] args) throws IOException {
@@ -62,49 +60,21 @@ public class CaliCatchCalibration {
                 "annealing", "intercepts", "kernel"
         };
 
-//        //pre-to-post
-//        for(String scenario : scenarios)
-//            runMultipleTimesToBuildHistogram(scenario,
-//                                             "itq_switch_script",
-//                                             Paths.get("docs", "20170730 validation", "rerun", "pretopost"),
-//                                             10);
+        //yelloweye is unprotected
+        for(String scenario : scenarios)
+            runMultipleTimesToBuildHistogram(scenario,
+                                             null,
+                                             MAIN_DIRECTORY,
+                                             YEARS_PER_RUN);
 
-
-//        //yelloweye is unprotected
-//        for(String scenario : scenarios)
-//            runMultipleTimesToBuildHistogram(scenario,
-//                                             null,
-//                                             Paths.get("docs", "20170730 validation", "rerun","noquota"),
-//                                             YEARS_PER_RUN);
-//        //yelloweye is protected by fines
-//        for(String scenario : scenarios)
-//            runMultipleTimesToBuildHistogram(scenario,
-//                                             null,
-//                                             Paths.get("docs", "20170730 validation", "rerun","fines"),
-//                                             YEARS_PER_RUN);
-
-
-        //deriso runs
-//        for(String scenario : scenarios)
-//            runMultipleTimesToBuildHistogram(scenario,
-//                                             null,
-//                                             Paths.get("docs",
-//                                                       "20170730 validation",
-//                                                       "rerun",
-//                                                       "deriso",
-//                                                       "partial_rerun"),
-//                                             YEARS_PER_RUN+1);
-        //deriso pre-to-post
+        //pre-to-post
         for(String scenario : scenarios)
             runMultipleTimesToBuildHistogram(scenario,
                                              "itq_switch_script",
-                                             Paths.get("docs",
-                                                       "20170730 validation",
-                                                       "rerun",
-                                                       "deriso",
-                                                       "partial_rerun",
-                                                       "pretopost"),
+                                             MAIN_DIRECTORY.resolve("pretopost"),
                                              10);
+
+
     }
 
     private static void runMultipleTimesToBuildHistogram(final String input) throws IOException {

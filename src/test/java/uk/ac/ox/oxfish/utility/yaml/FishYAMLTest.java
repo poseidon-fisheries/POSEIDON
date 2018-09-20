@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
@@ -32,6 +33,8 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -174,4 +177,312 @@ public class FishYAMLTest {
     }
 
 
+
+    @Test
+    public void canNavigateThroughObject()
+    {
+        Yaml yaml = new Yaml();
+        Map<String,Object> read = (Map<String, Object>)
+                yaml.load("Flexible:\n" +
+                                                    "  allowFriendshipsAcrossPorts: true\n" +
+                                                    "  biologyInitializer:\n" +
+                                                    "    Multiple Species Biomass:\n" +
+                                                    "      constantBiomass: false\n" +
+                                                    "      factories:\n" +
+                                                    "      - Single Species Biomass Normalized:\n" +
+                                                    "          biomassSuppliedPerCell: false\n" +
+                                                    "          carryingCapacity: '159793986'\n" +
+                                                    "          differentialPercentageToMove: '0.0'\n" +
+                                                    "          grower:\n" +
+                                                    "            Common Logistic Grower:\n" +
+                                                    "              steepness: '0.269'\n" +
+                                                    "          initialBiomassAllocator:\n" +
+                                                    "            Random Allocator:\n" +
+                                                    "              maximum: '0.1546'\n" +
+                                                    "              minimum: '0.1546'\n" +
+                                                    "          initialCapacityAllocator:\n" +
+                                                    "            Shape File Allocator:\n" +
+                                                    "              delegate:\n" +
+                                                    "                From File Allocator:\n" +
+                                                    "                  biomassPath: ./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv\n" +
+                                                    "                  inputFileHasHeader: true\n" +
+                                                    "              insidePoligon: true\n" +
+                                                    "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
+                                                    "          percentageLimitOnDailyMovement: '0.0'\n" +
+                                                    "          speciesName: Lutjanus malabaricus\n" +
+                                                    "          unfishable: false\n" +
+                                                    "      - Single Species Biomass Normalized:\n" +
+                                                    "          biomassSuppliedPerCell: false\n" +
+                                                    "          carryingCapacity: '30869208'\n" +
+                                                    "          differentialPercentageToMove: '0.0'\n" +
+                                                    "          grower:\n" +
+                                                    "            Common Logistic Grower:\n" +
+                                                    "              steepness: '0.6170723'\n" +
+                                                    "          initialBiomassAllocator:\n" +
+                                                    "            Random Allocator:\n" +
+                                                    "              maximum: '0.2766'\n" +
+                                                    "              minimum: '0.2766'\n" +
+                                                    "          initialCapacityAllocator:\n" +
+                                                    "            Shape File Allocator:\n" +
+                                                    "              delegate:\n" +
+                                                    "                From File Allocator:\n" +
+                                                    "                  biomassPath: ./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv\n" +
+                                                    "                  inputFileHasHeader: true\n" +
+                                                    "              insidePoligon: true\n" +
+                                                    "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
+                                                    "          percentageLimitOnDailyMovement: '0.0'\n" +
+                                                    "          speciesName: Pristipomoides multidens\n" +
+                                                    "          unfishable: false    \n" +
+                                                    "      - Single Species Biomass Normalized:\n" +
+                                                    "          biomassSuppliedPerCell: false\n" +
+                                                    "          carryingCapacity: '5738469'\n" +
+                                                    "          differentialPercentageToMove: '0.0'\n" +
+                                                    "          grower:\n" +
+                                                    "            Common Logistic Grower:\n" +
+                                                    "              steepness: '0.3010377'\n" +
+                                                    "          initialBiomassAllocator:\n" +
+                                                    "            Random Allocator:\n" +
+                                                    "              maximum: '0.787981777'\n" +
+                                                    "              minimum: '0.787981777'\n" +
+                                                    "          initialCapacityAllocator:\n" +
+                                                    "            Shape File Allocator:\n" +
+                                                    "              delegate:\n" +
+                                                    "                From File Allocator:\n" +
+                                                    "                  biomassPath: ./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv\n" +
+                                                    "                  inputFileHasHeader: true\n" +
+                                                    "              insidePoligon: true\n" +
+                                                    "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
+                                                    "          percentageLimitOnDailyMovement: '0.0'\n" +
+                                                    "          speciesName: Epinephelus areolatus\n" +
+                                                    "          unfishable: false   \n" +
+                                                    "      - Single Species Biomass Normalized:\n" +
+                                                    "          biomassSuppliedPerCell: false\n" +
+                                                    "          carryingCapacity: '3670001'\n" +
+                                                    "          differentialPercentageToMove: '0.0'\n" +
+                                                    "          grower:\n" +
+                                                    "            Common Logistic Grower:\n" +
+                                                    "              steepness: '0.6831402'\n" +
+                                                    "          initialBiomassAllocator:\n" +
+                                                    "            Random Allocator:\n" +
+                                                    "              maximum: '0.787981777'\n" +
+                                                    "              minimum: '0.787981777'\n" +
+                                                    "          initialCapacityAllocator:\n" +
+                                                    "            Shape File Allocator:\n" +
+                                                    "              delegate:\n" +
+                                                    "                From File Allocator:\n" +
+                                                    "                  biomassPath: ./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv\n" +
+                                                    "                  inputFileHasHeader: true\n" +
+                                                    "              insidePoligon: true\n" +
+                                                    "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
+                                                    "          percentageLimitOnDailyMovement: '0.0'\n" +
+                                                    "          speciesName: Lutjanus erythropterus\n" +
+                                                    "          unfishable: false            \n" +
+                                                    "  cheaters: false\n" +
+                                                    "  exogenousCatches:\n" +
+                                                    "    Lutjanus erythropterus: 98348.40\n" +
+                                                    "    Lutjanus malabaricus: 501163.14\n" +
+                                                    "    Pristipomoides multidens: 18686.26\n" +
+                                                    "    Epinephelus areolatus: 41136.48\n" +
+                                                    "  fisherDefinitions:\n" +
+                                                    "  - departingStrategy:\n" +
+                                                    "      Max Hours Per Year:\n" +
+                                                    "        maxHoursOut: '4800.0'\n" +
+                                                    "    destinationStrategy:\n" +
+                                                    "      Imitator-Explorator:\n" +
+                                                    "        alwaysCopyBest: false\n" +
+                                                    "        automaticallyIgnoreAreasWhereFishNeverGrows: true\n" +
+                                                    "        automaticallyIgnoreMPAs: true\n" +
+                                                    "        backtracksOnBadExploration: true\n" +
+                                                    "        dropInUtilityNeededForUnfriend: '-1.0'\n" +
+                                                    "        ignoreEdgeDirection: true\n" +
+                                                    "        ignoreFailedTrips: false\n" +
+                                                    "        maxInitialDistance: 378.0\n" +
+                                                    "        objectiveFunction:\n" +
+                                                    "          Simulated Profit Objective:\n" +
+                                                    "            tripLength: '288.0'\n" +
+                                                    "        probability:\n" +
+                                                    "          Fixed Probability:\n" +
+                                                    "            explorationProbability: uniform 0.05 0.5\n" +
+                                                    "            imitationProbability: '1.0'\n" +
+                                                    "        stepSize: uniform 1.0 10.0\n" +
+                                                    "    discardingStrategy: No Discarding\n" +
+                                                    "    fishingStrategy:\n" +
+                                                    "      Until Full With Day Limit:\n" +
+                                                    "        daysAtSea: '12.0'\n" +
+                                                    "    fuelTankSize: '100000.0'\n" +
+                                                    "    gear:\n" +
+                                                    "      Hold Upper Limit:\n" +
+                                                    "        delegate:\n" +
+                                                    "          Garbage Gear:\n" +
+                                                    "            delegate:\n" +
+                                                    "              Random Catchability By List:\n" +
+                                                    "                catchabilityMap: '0:0.0016,1:0.0016,2:0.0016,3:0.0016'\n" +
+                                                    "                standardDeviationMap: ''\n" +
+                                                    "                trawlSpeed: '5.0'\n" +
+                                                    "            garbageSpeciesName: Others\n" +
+                                                    "            proportionSimulatedToGarbage: '0.3'\n" +
+                                                    "            rounding: false\n" +
+                                                    "    gearStrategy: Never Change Gear\n" +
+                                                    "    holdSize: '1940.0'\n" +
+                                                    "    hourlyVariableCost: '46381.0'\n" +
+                                                    "    initialFishersPerPort:\n" +
+                                                    "      Sumenep: 454\n" +
+                                                    "      Gili Iyang: 2\n" +
+                                                    "      Brondong: 163\n" +
+                                                    "      Tanjung Pandan: 16\n" +
+                                                    "    literPerKilometer: '1.2669'\n" +
+                                                    "    logbook: No Logbook\n" +
+                                                    "    regulation: Anarchy\n" +
+                                                    "    speedInKmh: '13.0'\n" +
+                                                    "    tags: small,dropline,yellow,canoe\n" +
+                                                    "    usePredictors: false\n" +
+                                                    "    weatherStrategy: Ignore Weather\n" +
+                                                    "  - departingStrategy:\n" +
+                                                    "      Max Hours Per Year:\n" +
+                                                    "        maxHoursOut: '4800.0'\n" +
+                                                    "    destinationStrategy:\n" +
+                                                    "      Imitator-Explorator:\n" +
+                                                    "        alwaysCopyBest: false\n" +
+                                                    "        automaticallyIgnoreAreasWhereFishNeverGrows: true\n" +
+                                                    "        automaticallyIgnoreMPAs: true\n" +
+                                                    "        backtracksOnBadExploration: true\n" +
+                                                    "        dropInUtilityNeededForUnfriend: '-1.0'\n" +
+                                                    "        ignoreEdgeDirection: true\n" +
+                                                    "        ignoreFailedTrips: false\n" +
+                                                    "        maxInitialDistance: 551.0\n" +
+                                                    "        objectiveFunction:\n" +
+                                                    "          Simulated Profit Objective:\n" +
+                                                    "            tripLength: '288.0'\n" +
+                                                    "        probability:\n" +
+                                                    "          Fixed Probability:\n" +
+                                                    "            explorationProbability: uniform 0.05 0.5\n" +
+                                                    "            imitationProbability: '1.0'\n" +
+                                                    "        stepSize: uniform 1.0 10.0\n" +
+                                                    "    discardingStrategy: No Discarding\n" +
+                                                    "    fishingStrategy:\n" +
+                                                    "      Until Full With Day Limit:\n" +
+                                                    "        daysAtSea: '12.0'\n" +
+                                                    "    fuelTankSize: '100000.0'\n" +
+                                                    "    gear:\n" +
+                                                    "      Hold Upper Limit:\n" +
+                                                    "        delegate:\n" +
+                                                    "          Garbage Gear:\n" +
+                                                    "            delegate:\n" +
+                                                    "              Random Catchability By List:\n" +
+                                                    "                catchabilityMap: '0:0.0016,1:0.0016,2:0.0016,3:0.0016'\n" +
+                                                    "                standardDeviationMap: ''\n" +
+                                                    "                trawlSpeed: '5.0'\n" +
+                                                    "            garbageSpeciesName: Others\n" +
+                                                    "            proportionSimulatedToGarbage: '0.3'\n" +
+                                                    "            rounding: false\n" +
+                                                    "    gearStrategy: Never Change Gear\n" +
+                                                    "    holdSize: '6900.0'\n" +
+                                                    "    hourlyVariableCost: '106929.0'\n" +
+                                                    "    initialFishersPerPort:\n" +
+                                                    "      Bajomulyo: 54\n" +
+                                                    "      Karangsong: 5\n" +
+                                                    "      Probolinggo: 9\n" +
+                                                    "    literPerKilometer: '1.44'\n" +
+                                                    "    logbook: No Logbook\n" +
+                                                    "    regulation: Anarchy\n" +
+                                                    "    speedInKmh: '13.0'\n" +
+                                                    "    tags: blue,longline,boat,medium\n" +
+                                                    "    usePredictors: false\n" +
+                                                    "    weatherStrategy: Ignore Weather\n" +
+                                                    "  - departingStrategy:\n" +
+                                                    "      Max Hours Per Year:\n" +
+                                                    "        maxHoursOut: '4800.0'\n" +
+                                                    "    destinationStrategy:\n" +
+                                                    "      Perfect RPUE Logit:\n" +
+                                                    "        automaticallyAvoidMPA: true\n" +
+                                                    "        automaticallyAvoidWastelands: true\n" +
+                                                    "        discretizer:\n" +
+                                                    "          Squared Discretization:\n" +
+                                                    "            horizontalSplits: '10.0'\n" +
+                                                    "            verticalSplits: '10.0'\n" +
+                                                    "        hoursOut: '1440.0'\n" +
+                                                    "        profitBeta: '1.0'\n" +
+                                                    "    discardingStrategy: No Discarding\n" +
+                                                    "    fishingStrategy:\n" +
+                                                    "      Until Full With Day Limit:\n" +
+                                                    "        daysAtSea: '60.0'\n" +
+                                                    "    fuelTankSize: '100000.0'\n" +
+                                                    "    gear:\n" +
+                                                    "      Hold Upper Limit:\n" +
+                                                    "        delegate:\n" +
+                                                    "          Garbage Gear:\n" +
+                                                    "            delegate:\n" +
+                                                    "              Random Catchability By List:\n" +
+                                                    "                catchabilityMap: '0:0.0016,1:0.0016,2:0.0016,3:0.0016'\n" +
+                                                    "                standardDeviationMap: ''\n" +
+                                                    "                trawlSpeed: '5.0'\n" +
+                                                    "            garbageSpeciesName: Others\n" +
+                                                    "            proportionSimulatedToGarbage: '0.3'\n" +
+                                                    "            rounding: false\n" +
+                                                    "    gearStrategy: Never Change Gear\n" +
+                                                    "    holdSize: '13500.0'\n" +
+                                                    "    hourlyVariableCost: '162288.0'\n" +
+                                                    "    initialFishersPerPort:\n" +
+                                                    "      Bajomulyo: 21\n" +
+                                                    "      Probolinggo: 3\n" +
+                                                    "    literPerKilometer: '6.0'\n" +
+                                                    "    logbook: No Logbook\n" +
+                                                    "    regulation: Anarchy\n" +
+                                                    "    speedInKmh: '13.0'\n" +
+                                                    "    tags: black,longline,ship,big\n" +
+                                                    "    usePredictors: false\n" +
+                                                    "    weatherStrategy: Ignore Weather\n" +
+                                                    "  gasPricePerLiter: '10000.0'\n" +
+                                                    "  habitatInitializer: All Sand\n" +
+                                                    "  mapInitializer:\n" +
+                                                    "    From File Map:\n" +
+                                                    "      gridWidthInCell: '100.0'\n" +
+                                                    "      header: true\n" +
+                                                    "      latLong: true\n" +
+                                                    "      mapFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/712_map.csv\n" +
+                                                    "  mapMakerDedicatedRandomSeed: null\n" +
+                                                    "  market:\n" +
+                                                    "    Fixed Price Market:\n" +
+                                                    "      marketPrice: '40000.0'\n" +
+                                                    "  networkBuilder:\n" +
+                                                    "    Equal Out Degree:\n" +
+                                                    "      allowMutualFriendships: true\n" +
+                                                    "      degree: '2.0'\n" +
+                                                    "      equalOutDegree: true\n" +
+                                                    "  plugins: [\n" +
+                                                    "    ]\n" +
+                                                    "  portInitializer:\n" +
+                                                    "    List of Ports:\n" +
+                                                    "      ports:\n" +
+                                                    "        Sumenep: 113.972926,-7.05225\n" +
+                                                    "        Gili Iyang: 114.190362,-6.974766\n" +
+                                                    "        Bajomulyo: 111.186606,-6.658267\n" +
+                                                    "        Brondong: 112.267658,-6.867022\n" +
+                                                    "        Karangsong: 108.372488,-6.30807\n" +
+                                                    "        Tanjung Pandan: 107.62312,-2.733054\n" +
+                                                    "        Probolinggo: 113.20387,-7.728979\n" +
+                                                    "      usingGridCoordinates: false\n" +
+                                                    "  portSwitching: false\n" +
+                                                    "  tagsToTrackSeparately: ''\n" +
+                                                    "  weatherInitializer:\n" +
+                                                    "    Constant Weather:\n" +
+                                                    "      temperature: '30.0'\n" +
+                                                    "      windOrientation: '0.0'\n" +
+                                                    "      windSpeed: '0.0'\n"
+                                                    );
+
+       // System.out.println(read);
+       //System.out.println(read.get("Flexible"));
+        Object flexible = read.get("Flexible");
+        System.out.println(flexible.getClass());
+        Object biologyInitializer = ((Map<String, Object>) flexible).get("biologyInitializer");
+        System.out.println(biologyInitializer);
+        Object multiple = ((Map<String, Object>) biologyInitializer).get("Multiple Species Biomass");
+        System.out.println(multiple);
+        System.out.println(multiple.getClass());
+        Object factories = ((Map<String, Object>) multiple).get("factories");
+        System.out.println(factories);
+        System.out.println(factories.getClass());
+
+    }
 }
