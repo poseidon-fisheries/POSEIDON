@@ -23,12 +23,14 @@ package uk.ac.ox.oxfish.maximization;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class GenericOptimization extends SimpleProblemDouble {
 
@@ -70,9 +72,46 @@ public class GenericOptimization extends SimpleProblemDouble {
     /**
      * map linking the name of the YearlyDataSet in the model with the path to file containing the real time series
      */
-    private HashMap<String,String> targetRepresentations = new HashMap<>();
+    private List<YearlyDataTarget> targetRepresentations = new LinkedList<>();
     {
-        targetRepresentations.put("Pristipomoides multidens Landings of population0","");
+
+        Map<String,Integer> populations = new HashMap<>();
+        populations.put("Small",0);
+        populations.put("Medium",1);
+        populations.put("Big",2);
+
+        for (Map.Entry<String, Integer> population : populations.entrySet()) {
+            targetRepresentations.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv").toString(),
+                            "Epinephelus areolatus Landings of population"+population.getValue(),true,.8
+                    ));
+            targetRepresentations.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv").toString(),
+                            "Pristipomoides multidens Landings of population"+population.getValue(),true,.1
+                    ));
+            targetRepresentations.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv").toString(),
+                            "Lutjanus malabaricus Landings of population"+population.getValue(),true,.1
+                    ));
+            targetRepresentations.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv").toString(),
+                            "Lutjanus erythropterus Landings of population"+population.getValue(),true,.8
+                    ));
+            targetRepresentations.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv").toString(),
+                            "Other Landings of population"+population.getValue(),true,.1
+                    ));
+
+        }
+
+
+
+
     }
 
 

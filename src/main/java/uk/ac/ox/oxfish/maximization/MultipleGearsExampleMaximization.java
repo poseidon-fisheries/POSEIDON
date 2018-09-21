@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.maximization;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -32,14 +31,12 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,7 +115,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                     for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
                         simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesDistance(
+                    error+= FishStateUtilities.timeSeriesAbsoluteDistance(
                             simulatedLandings,
                             Arrays.asList(landings[population])
                     );
@@ -130,7 +127,7 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                     for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
                         simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesDistance(
+                    error+= FishStateUtilities.timeSeriesAbsoluteDistance(
                             simulatedLandings,
                             Arrays.asList(landings[0])
                     );

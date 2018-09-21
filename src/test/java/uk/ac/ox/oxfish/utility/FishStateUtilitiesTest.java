@@ -212,7 +212,7 @@ public class FishStateUtilitiesTest {
 
         );
         assertEquals(0,
-                FishStateUtilities.timeSeriesDistance(
+                FishStateUtilities.timeSeriesAbsoluteDistance(
                         input,
                         input
                 ),
@@ -225,7 +225,7 @@ public class FishStateUtilitiesTest {
         };
 
         assertEquals(0,
-                FishStateUtilities.timeSeriesDistance(
+                FishStateUtilities.timeSeriesAbsoluteDistance(
                         data,
                         Paths.get("inputs","tests","landings.csv")
                 ),
@@ -235,7 +235,7 @@ public class FishStateUtilitiesTest {
         //computed this distance with R
         //169961501
         assertEquals(169961500.94,
-                FishStateUtilities.timeSeriesDistance(
+                FishStateUtilities.timeSeriesAbsoluteDistance(
                         data,
                         Paths.get("inputs","tests","landings2.csv")
                 ),

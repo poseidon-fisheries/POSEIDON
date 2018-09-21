@@ -1169,9 +1169,9 @@ public class FishStateUtilities {
     }
 
 
-    public static double timeSeriesDistance(DataColumn data,
-                                            Path csvFilePath) throws IOException {
-        return timeSeriesDistance(
+    public static double timeSeriesAbsoluteDistance(DataColumn data,
+                                                    Path csvFilePath) throws IOException {
+        return timeSeriesAbsoluteDistance(
                 data,
                 Files.readAllLines(csvFilePath).stream().mapToDouble(
                         value -> Double.parseDouble(value.trim())
@@ -1181,8 +1181,8 @@ public class FishStateUtilities {
     }
 
 
-    public static double timeSeriesDistance(Iterable<Double> timeSeriesOne,
-                                            Iterable<Double> timeSeriesTwo)
+    public static double timeSeriesAbsoluteDistance(Iterable<Double> timeSeriesOne,
+                                                    Iterable<Double> timeSeriesTwo)
     {
         Iterator<Double> firstIterator = timeSeriesOne.iterator();
         Iterator<Double> secondIterator = timeSeriesTwo.iterator();

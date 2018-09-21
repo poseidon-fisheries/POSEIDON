@@ -3,10 +3,8 @@ package uk.ac.ox.oxfish.maximization;
 import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomCatchabilityTrawlFactory;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.DerisoCaliforniaScenario;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -80,7 +78,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
                 }
                 model.schedule.step(model);
 
-                error+=FishStateUtilities.timeSeriesDistance(
+                error+=FishStateUtilities.timeSeriesAbsoluteDistance(
                         model.getYearlyDataSet().getColumn(
                                 speciesName + " Landings"
                         ),
