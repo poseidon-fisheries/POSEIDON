@@ -2,10 +2,7 @@ package uk.ac.ox.oxfish;
 
 
 import org.yaml.snakeyaml.Yaml;
-import uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization;
-import uk.ac.ox.oxfish.maximization.MultipleGearsExampleMaximization;
-import uk.ac.ox.oxfish.maximization.OneGearExampleMaximization;
-import uk.ac.ox.oxfish.maximization.SamplePoseidonOptimization;
+import uk.ac.ox.oxfish.maximization.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,6 +23,8 @@ public class MainOptimizer {
                     new FileWriter(Paths.get("eva","example.yaml").toFile()));
             yaml.dump(new MultipleGearsExampleMaximization(),
                       new FileWriter(Paths.get("eva","flexible.yaml").toFile()));
+            yaml.dump(new GenericOptimization(),
+                    new FileWriter(Paths.get("eva","generic.yaml").toFile()));
         } catch (IOException e) {
             e.printStackTrace();
         }

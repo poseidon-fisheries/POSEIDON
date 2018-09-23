@@ -383,6 +383,19 @@ public class FlexibleScenario implements Scenario {
                                 mapToDouble(value -> value.getLatestYearlyObservation(
                                         species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
 
+            state.getYearlyDataSet().registerGatherer("Total Landings of " +tag,
+                    fishState ->
+                            fishState.getFishers().stream().
+                                    filter(fisher -> fisher.getTags().contains(tag)).
+                                    mapToDouble(value -> {
+
+                                        double sum = 0;
+                                        for(Species species : state.getBiology().getSpecies())
+                                            sum+=value.getLatestYearlyObservation(
+                                                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                                        return sum;
+                                    }).sum(), Double.NaN);
+
             state.getYearlyDataSet().registerGatherer("Average Earnings of " +tag,
                                                       fishState ->
                                                               fishState.getFishers().stream().

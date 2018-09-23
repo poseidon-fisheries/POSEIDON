@@ -2,8 +2,10 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import sim.field.geo.GeomVectorField;
 import sim.io.geo.ShapeFileImporter;
+import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.ShapeFileImporterModified;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
@@ -26,7 +28,8 @@ public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassD
         try {
 
             GeomVectorField polygon = new GeomVectorField();
-            ShapeFileImporter.read(shapeFile.toUri().toURL(), polygon);
+            ShapeFileImporterModified.read(shapeFile.toUri().toURL(), polygon,
+                    null, MasonGeometry.class);
             return new PolygonBiomassDecorator(polygon,
                     insidePoligon,
                     delegate.apply(fishState)

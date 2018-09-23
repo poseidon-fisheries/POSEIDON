@@ -31,8 +31,8 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "712_pessimistic_perfect_calibrated_2014";
-    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice0/calibration/";
+    public static final String FILENAME = "ga_2200";
+    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice1/calibration/results";
 
     public static void main(String[] args) throws IOException {
 
@@ -40,12 +40,8 @@ public class IndonesiaBatchRuns {
         BatchRunner runner = new BatchRunner(
                 Paths.get(DIRECTORY,
                           FILENAME + ".yaml"),
-                15,
+                4,
                 Lists.newArrayList(
-                        "Snapper Landings",
-                        "Snapper Landings of population0",
-                        "Snapper Landings of population1",
-                        "Snapper Landings of population2",
                         "Average Cash-Flow",
                         "Average Cash-Flow of population0",
                         "Average Cash-Flow of population1",
@@ -59,12 +55,34 @@ public class IndonesiaBatchRuns {
                         "Average Trip Duration of population0",
                         "Average Trip Duration of population1",
                         "Average Trip Duration of population2",
+                        "Epinephelus areolatus Landings of population0",
+                        "Pristipomoides multidens Landings of population0",
+                        "Lutjanus malabaricus Landings of population0",
+                        "Lutjanus erythropterus Landings of population0",
+                        "Others Landings of population0",
+
+                        "Epinephelus areolatus Landings of population1",
+                        "Pristipomoides multidens Landings of population1",
+                        "Lutjanus malabaricus Landings of population1",
+                        "Lutjanus erythropterus Landings of population1",
+                        "Others Landings of population1",
+                        "Epinephelus areolatus Landings of population2",
+                        "Pristipomoides multidens Landings of population2",
+                        "Lutjanus malabaricus Landings of population2",
+                        "Lutjanus erythropterus Landings of population2",
+                        "Others Landings of population2",
                         //"Total Variable Costs of small",
                         //"Total Earnings of small",
 
 
                    //     "Total Variable Costs of big",
-                        "Biomass Snapper"
+                        "Biomass Epinephelus areolatus",
+                        "Biomass Pristipomoides multidens",
+                        "Biomass Lutjanus malabaricus",
+                        "Biomass Lutjanus erythropterus",
+                        "Total Landings of population0",
+                        "Total Landings of population1",
+                        "Total Landings of population2"
 
                 ),
                 Paths.get(DIRECTORY,
