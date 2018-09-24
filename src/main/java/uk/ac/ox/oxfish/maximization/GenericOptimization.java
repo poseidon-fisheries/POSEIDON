@@ -213,9 +213,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-6.120,-8.766,-10.000,-1.397, 0.395,-4.318, 10.000,-5.439, 0.542, 6.905,-5.987, 2.416,-7.290,-9.440, 0.984});
+        Scenario scenario = optimization.buildScenario(new double[]{-6.808,-9.022,-5.076,-1.137, 0.124,-5.941, 7.706, 3.004,-6.680, 2.491,-5.815, 8.928,-2.765,-9.588,-2.928});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_2200.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_4000_common.yaml").toFile()));
 
     }
 

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -13,9 +14,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * the biomass of the whole map is aggregated and spawns logistically.
@@ -31,9 +30,12 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
     private final Species species;
 
-    public CommonLogisticGrower(double malthusianParameter, Species species) {
+    private final boolean distributeProportionally;
+
+    public CommonLogisticGrower(double malthusianParameter, Species species, boolean distributeProportionally) {
         this.malthusianParameter = malthusianParameter;
         this.species = species;
+        this.distributeProportionally = distributeProportionally;
     }
 
     /**
@@ -63,18 +65,23 @@ public class CommonLogisticGrower implements Startable, Steppable {
                 malthusianParameter
 
         );
-        //compute recruitment and distribute it at random
+        //compute recruitment
         recruitment = Math.min(recruitment,capacity-current);
         assert recruitment>=-FishStateUtilities.EPSILON;
         if(recruitment>FishStateUtilities.EPSILON) {
-            //grow fish
-
-            DerisoSchnuteCommonGrower.allocateBiomassAtRandom(
-                    biologies,
-                    recruitment,
-                    model.getRandom(),
-                    species.getIndex()
-            );
+            //distribute it
+            if(distributeProportionally)
+                CommonLogisticGrower.allocateBiomassProportionally(biologies,
+                        recruitment,
+                        model.getRandom(),
+                        species.getIndex());
+            else
+                DerisoSchnuteCommonGrower.allocateBiomassAtRandom(
+                        biologies,
+                        recruitment,
+                        model.getRandom(),
+                        species.getIndex()
+                );
             //count growth
             model.getYearlyCounter().count(model.getSpecies().get(species.getIndex()) +
                             " Recruitment",
@@ -110,5 +117,41 @@ public class CommonLogisticGrower implements Startable, Steppable {
     @Override
     public void turnOff() {
         biologies.clear();
+    }
+
+    /**
+     * allocates recruitment to each cell in proportion of what's missing there (in absolute terms)
+     * @param biologyList list of cells that can be repopulation
+     * @param toReallocate biomass growth
+     * @param random randomizer
+     * @param speciesIndex the species number
+     */
+    public static void allocateBiomassProportionally(List<? extends VariableBiomassBasedBiology> biologyList,
+                                                     double toReallocate,
+                                                     MersenneTwisterFast random, int speciesIndex){
+
+        if(toReallocate<FishStateUtilities.EPSILON) //don't bother with super tiny numbers
+            return;
+        double totalEmptySpace = 0;
+        for (VariableBiomassBasedBiology local : biologyList) {
+            totalEmptySpace += local.getCarryingCapacity(speciesIndex) - local.getCurrentBiomass()[speciesIndex];
+        }
+        //if there is less empty space than recruitment, just fill it all up!
+        if(totalEmptySpace<=toReallocate) {
+            for (VariableBiomassBasedBiology local : biologyList) {
+                local.getCurrentBiomass()[speciesIndex] = local.getCarryingCapacity(speciesIndex);
+            }
+        }
+        else
+        {
+            //reallocate proportional to the empty space here compared to the total empty space
+            for (VariableBiomassBasedBiology local : biologyList) {
+                double emptySpace = local.getCarryingCapacity(speciesIndex) -
+                        local.getCurrentBiomass()[speciesIndex];
+                local.getCurrentBiomass()[speciesIndex] += toReallocate * emptySpace/totalEmptySpace;
+                assert local.getCurrentBiomass()[speciesIndex] <= local.getCarryingCapacity(speciesIndex);
+            }
+
+        }
     }
 }

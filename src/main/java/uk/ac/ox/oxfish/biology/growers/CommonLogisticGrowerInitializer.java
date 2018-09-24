@@ -13,10 +13,12 @@ import java.util.Map;
 public class CommonLogisticGrowerInitializer implements LogisticGrowerInitializer {
 
     private final DoubleParameter steepness;
+    private final boolean distributeProportionally;
 
 
-    public CommonLogisticGrowerInitializer(DoubleParameter steepness) {
+    public CommonLogisticGrowerInitializer(DoubleParameter steepness, boolean distributeProportionally) {
         this.steepness = steepness;
+        this.distributeProportionally = distributeProportionally;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class CommonLogisticGrowerInitializer implements LogisticGrowerInitialize
 
         CommonLogisticGrower grower = new CommonLogisticGrower(
                 steepness.apply(random),
-                species);
+                species, distributeProportionally);
 
         //add all the biologies
         for(BiomassLocalBiology biology : biologies)

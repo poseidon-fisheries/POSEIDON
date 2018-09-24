@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogisticGrowerInitializer> {
 
     private DoubleParameter steepness = new FixedDoubleParameter(0.7);
+    private boolean distributeProportionally = false;
 
 
     public CommonLogisticGrowerFactory() {
@@ -32,7 +33,7 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      */
     @Override
     public CommonLogisticGrowerInitializer apply(FishState state) {
-        return new CommonLogisticGrowerInitializer(steepness.makeCopy());
+        return new CommonLogisticGrowerInitializer(steepness.makeCopy(), distributeProportionally);
     }
 
     /**
@@ -51,5 +52,13 @@ public class CommonLogisticGrowerFactory implements AlgorithmFactory<CommonLogis
      */
     public void setSteepness(DoubleParameter steepness) {
         this.steepness = steepness;
+    }
+
+    public boolean isDistributeProportionally() {
+        return distributeProportionally;
+    }
+
+    public void setDistributeProportionally(boolean distributeProportionally) {
+        this.distributeProportionally = distributeProportionally;
     }
 }
