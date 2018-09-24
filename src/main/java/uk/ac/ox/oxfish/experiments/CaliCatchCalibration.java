@@ -65,7 +65,7 @@ public class CaliCatchCalibration {
             runMultipleTimesToBuildHistogram(scenario,
                                              null,
                                              MAIN_DIRECTORY,
-                                             YEARS_PER_RUN);
+                                             YEARS_PER_RUN+1);
 
         //pre-to-post
         for(String scenario : scenarios)

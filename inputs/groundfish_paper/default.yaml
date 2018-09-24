@@ -1,0 +1,192 @@
+California Map Scenario:
+  biomassScaling: 1.0
+  boatLength: '22.573488'
+  boatWidth: '7.0'
+  californiaScaling: 1.0
+  countFileName: count_2011.csv
+  cruiseSpeedInKph: '16.0661'
+  departingStrategy:
+    Exit Decorator:
+      consecutiveLossYearsBeforeQuitting: '2.0'
+      decorated:
+        Fixed Rest:
+          hoursBetweenEachDeparture: '12.0'
+  destinationStrategy:
+    Imitator-Explorator:
+      alwaysCopyBest: true
+      automaticallyIgnoreAreasWhereFishNeverGrows: true
+      automaticallyIgnoreMPAs: true
+      backtracksOnBadExploration: true
+      dropInUtilityNeededForUnfriend: '-1.0'
+      ignoreEdgeDirection: true
+      ignoreFailedTrips: false
+      objectiveFunction:
+        Hourly Profit Objective:
+          opportunityCosts: true
+      probability:
+        Fixed Probability:
+          explorationProbability: '0.2'
+          imitationProbability: '1.0'
+      stepSize: uniform 1.0 5.0
+  discardingStrategy: No Discarding
+  exogenousCatches:
+    Dover Sole: '676900.0'
+    Sablefish: '4438200.0'
+  fishingStrategy:
+    Quota Bound:
+      decorated:
+        Tow Limit:
+          maxDaysOut: '15.0'
+          towLimits: '150.0'
+  fixedRecruitmentDistribution: true
+  fuelTankInLiters: '99999999'
+  gasPriceMaker:
+    Gas Price from File:
+      columnNumber: 1
+      csvFile: inputs/california/2010_gasprice.csv
+      headerInFile: true
+      loopThroughTheCSV: false
+      scaling: 0.219969157
+      separator: ','
+      yearly: true
+  gear:
+    Garbage Gear:
+      delegate:
+        Heterogeneous Selectivity Gear:
+          gears:
+            Dover Sole:
+              Double Normal Selectivity Gear:
+                ascWidth: '3.967'
+                averageCatchability: '3.5120123999999995E-4'
+                binMax: '50.0'
+                binMin: '0.0'
+                binWidth: '1.0'
+                dscWidth: '-0.764'
+                finalScaling: -2.259
+                initialScaling: .NaN
+                litersOfGasConsumedPerHour: '57.0'
+                peak: '38.953'
+                retentionAsymptote: '0.869'
+                retentionInflection: '26.962'
+                retentionSlope: '1.065'
+                top: '-1.483'
+            Longspine Thornyhead:
+              Logistic Selectivity Gear:
+                averageCatchability: '4.16E-4'
+                litersOfGasConsumedPerHour: '57.0'
+                retentionAsymptote: '0.992661'
+                retentionInflection: '21.8035'
+                retentionSlope: '1.7773'
+                selectivityAParameter: '23.5035'
+                selectivityBParameter: '9.03702'
+            Sablefish:
+              Sablefish Trawl Selectivity Gear:
+                averageCatchability: '5.2E-4'
+                litersOfGasConsumedPerHour: '57.0'
+                retentionAsymptote: '0.910947'
+                retentionInflection: '45.5128'
+                retentionSlope: '3.12457'
+            Shortspine Thornyhead:
+              Double Normal Selectivity Gear:
+                ascWidth: '4.25'
+                averageCatchability: '1.5338283999999998E-4'
+                binMax: '75.0'
+                binMin: '0.0'
+                binWidth: '1.0'
+                dscWidth: '4.85'
+                finalScaling: .NaN
+                initialScaling: .NaN
+                litersOfGasConsumedPerHour: '57.0'
+                peak: '28.05'
+                retentionAsymptote: '1.0'
+                retentionInflection: '23.74'
+                retentionSlope: '2.42'
+                top: '-0.3'
+            Yelloweye Rockfish:
+              Logistic Selectivity Gear:
+                averageCatchability: '6.3031696E-4'
+                litersOfGasConsumedPerHour: '57.0'
+                retentionAsymptote: '0.992661'
+                retentionInflection: '21.8035'
+                retentionSlope: '1.7773'
+                selectivityAParameter: '36.364'
+                selectivityBParameter: '14.009'
+      garbageSpeciesName: Others
+      proportionSimulatedToGarbage: '0.3221743'
+  gearStrategy: Never Change Gear
+  gridWidth: 50
+  holdSizePerBoat: '15000.0'
+  hourlyTravellingCosts: '165.066666666667'
+  literPerKilometer: '3.547842974'
+  logbook:
+    Logit-like Logbook:
+      dayOfTheYear: false
+      discretization:
+        Centroid File Discretization:
+          automaticallyIgnoreWastelands: true
+          filePath: inputs/california/logit/centroids_utm10N.csv
+          xColumnName: eastings
+          yColumnName: northings
+      gasPrice: false
+      gridX: false
+      gridY: false
+      habitat: false
+      identifier: ''
+      intercept: false
+      periodHabit: -1
+      periodHabitContinuous: 365
+      portDistance: true
+      simulatedCost: false
+      simulatedRevenue: false
+      timeOfObservation: false
+      windSpeed: false
+  mainDirectory: inputs/california
+  mortalityAt100PercentForOldestFish: true
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  portFileName: dts_ports_2010.csv
+  priceMap: Dover Sole:0.6698922,Sablefish:4.3235295,Shortspine Thornyhead:1.0428510,Longspine Thornyhead:1.0428510,Yelloweye Rockfish:1.0754502,Others:1.7646181
+  recruitmentNoise: '0.0'
+  regulationPostReset:
+    Multiple Regulations:
+      factories:
+      - Fishing Season:
+          respectMPA: true
+          seasonLength: '120.0'
+      - Multi-Quotas from Map:
+          initialQuotas:
+            Dover sole: 2.22345E7
+            Longspine Thornyhead: 1966250.0
+            Sablefish: 2724935
+            Shortspine thornyhead: 1481600.056
+            Yelloweye rockfish: 600.0
+          multipleTradesAllowed: true
+          quotaExchangedPerMatch:
+            Dover sole: '10'
+            Longspine Thornyhead: 10
+            Sablefish: 10
+            Shortspine thornyhead: '10'
+            Yelloweye rockfish: 6.0
+          quotaType: ITQ
+      tags:
+      - all
+      - all
+  regulationPreReset:
+    Multiple Regulations:
+      factories:
+      - Fishing Season:
+          respectMPA: true
+          seasonLength: '120.0'
+      - MPA by depth:
+          maxDepth: '200.0'
+          minDepth: '0.0'
+      tags:
+      - all
+      - all
+  resetBiologyAtYear1: true
+  sablefishDiffusingRate: 0.0
+  usePremadeInput: false
+  weatherStrategy: Ignore Weather

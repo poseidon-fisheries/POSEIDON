@@ -1,0 +1,53 @@
+scripts:
+  1:
+    PolicyScript:
+      hourlyTravellingCosts: '94.520833333'
+      discardingStrategy: 
+        Specific Discarding:
+          indices: '4'      
+      regulation: 
+        Multiple Regulations:
+          factories:
+          - Fishing Season:
+              respectMPA: true
+              seasonLength: '120.0'
+          - Multi-Quotas from Map:
+              initialQuotas:
+                Dover sole: 16865996
+                Shortspine thornyhead: 1927800
+                Sablefish: 3457800.0000012
+                Yelloweye rockfish: 67130
+                Longspine Thornyhead: 2577599.9
+              quotaType: IQ          
+          tags:
+          - all
+          - all  
+  4:
+    PolicyScript:
+      hourlyTravellingCosts: 165.066666666667
+      discardingStrategy: No Discarding
+      regulation: 
+        Multiple Regulations:
+          factories:
+          - Fishing Season:
+              respectMPA: true
+              seasonLength: '120.0'
+          - Multi-Quotas from Map:
+              initialQuotas:
+                Dover sole: 2.22345E7
+                Longspine Thornyhead: 1966250.0
+                Sablefish: 2724935
+                Shortspine thornyhead: 1481600.056
+                Yelloweye rockfish: 600.0
+              multipleTradesAllowed: true
+              quotaExchangedPerMatch:
+                Dover sole: '10'
+                Longspine Thornyhead: 10
+                Sablefish: 10
+                Shortspine thornyhead: '10'
+                Yelloweye rockfish: 6.0
+              quotaType: ITQ
+          tags:
+          - all
+          - all
+
