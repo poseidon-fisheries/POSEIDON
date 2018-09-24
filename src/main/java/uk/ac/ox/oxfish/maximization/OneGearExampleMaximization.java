@@ -78,11 +78,11 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
                 }
                 model.schedule.step(model);
 
-                error+=FishStateUtilities.timeSeriesAbsoluteDistance(
+                error+=FishStateUtilities.timeSeriesDistance(
                         model.getYearlyDataSet().getColumn(
                                 speciesName + " Landings"
                         ),
-                        Paths.get(landingData)
+                        Paths.get(landingData), 1
                 );
 
             }

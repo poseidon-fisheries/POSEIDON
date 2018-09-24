@@ -115,9 +115,9 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                     for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
                         simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesAbsoluteDistance(
+                    error+= FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
-                            Arrays.asList(landings[population])
+                            Arrays.asList(landings[population]), 1
                     );
                 }
                 else{
@@ -127,9 +127,9 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
                     for(int j=0; j<yearsToIgnore; j++) //remove years to ignore!
                         simulatedLandings.remove(0);
 
-                    error+= FishStateUtilities.timeSeriesAbsoluteDistance(
+                    error+= FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
-                            Arrays.asList(landings[0])
+                            Arrays.asList(landings[0]), 1
                     );
                 }
 

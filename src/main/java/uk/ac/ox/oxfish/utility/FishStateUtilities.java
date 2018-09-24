@@ -24,14 +24,8 @@ import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.*;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.Nullable;
-import sim.field.geo.GeomVectorField;
-import sim.util.Bag;
-import sim.util.geo.AttributeValue;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
@@ -60,9 +54,6 @@ import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1175,21 +1166,26 @@ public class FishStateUtilities {
     }
 
 
-    public static double timeSeriesAbsoluteDistance(DataColumn data,
-                                                    Path csvFilePath) throws IOException {
-        return timeSeriesAbsoluteDistance(
+    public static double timeSeriesDistance(
+            DataColumn data,
+            Path csvFilePath, final double exponent) throws IOException {
+        return timeSeriesDistance(
                 data,
                 Files.readAllLines(csvFilePath).stream().mapToDouble(
                         value -> Double.parseDouble(value.trim())
-                ).boxed().collect(Collectors.toList())
+                ).boxed().collect(Collectors.toList()
+                                  ),
+                exponent
 
                 );
     }
 
 
-    public static double timeSeriesAbsoluteDistance(Iterable<Double> timeSeriesOne,
-                                                    Iterable<Double> timeSeriesTwo)
+    public static double timeSeriesDistance(Iterable<Double> timeSeriesOne,
+                                            Iterable<Double> timeSeriesTwo,
+                                            double exponent)
     {
+        Preconditions.checkArgument(exponent>0);
         Iterator<Double> firstIterator = timeSeriesOne.iterator();
         Iterator<Double> secondIterator = timeSeriesTwo.iterator();
 
@@ -1200,7 +1196,7 @@ public class FishStateUtilities {
             Preconditions.checkArgument(secondIterator.hasNext(),
                     "Time series are of different length");
 
-            error+= Math.abs(firstIterator.next() - secondIterator.next());
+            error+= Math.pow(Math.abs(firstIterator.next() - secondIterator.next()),exponent);
         }
         Preconditions.checkArgument(!secondIterator.hasNext(),
                 "Time series are of different length");

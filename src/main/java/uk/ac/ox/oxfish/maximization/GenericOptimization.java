@@ -21,10 +21,7 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
-import uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter;
-import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
-import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
-import uk.ac.ox.oxfish.maximization.generic.YearlyDataTarget;
+import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
@@ -76,7 +73,7 @@ public class GenericOptimization extends SimpleProblemDouble {
     /**
      * map linking the name of the YearlyDataSet in the model with the path to file containing the real time series
      */
-    private List<YearlyDataTarget> targets = new LinkedList<>();
+    private List<DataTarget> targets = new LinkedList<>();
     {
 
         Map<String,Integer> populations = new HashMap<>();
@@ -85,7 +82,7 @@ public class GenericOptimization extends SimpleProblemDouble {
         populations.put("Big",2);
 
         for (Map.Entry<String, Integer> population : populations.entrySet()) {
-            targets.add(
+        /*    targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv").toString(),
                             "Lutjanus malabaricus Landings of population"+population.getValue(),true,.1
@@ -120,7 +117,41 @@ public class GenericOptimization extends SimpleProblemDouble {
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv").toString(),
                             "Total Landings of population"+population.getValue(),true,.1
                     ));
+*/
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv"),
+                            "Lutjanus malabaricus Landings of population"+population.getValue()));
 
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv"),
+                            "Pristipomoides multidens Landings of population"+population.getValue()
+                    ));
+
+
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv"),
+                            "Epinephelus areolatus Landings of population"+population.getValue()
+                    ));
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv"),
+                            "Lutjanus erythropterus Landings of population"+population.getValue()
+                    ));
+
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv"),
+                            "Others Landings of population"+population.getValue()
+                    ));
+
+            targets.add(
+                    FixedDataLastStepTarget.lastStepTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv"),
+                            "Total Landings of population"+population.getValue()
+                    ));
         }
 
 
@@ -184,7 +215,7 @@ public class GenericOptimization extends SimpleProblemDouble {
                 model.schedule.step(model);
 
                 //collect error
-                for (YearlyDataTarget target : targets) {
+                for (DataTarget target : targets) {
                     error+=target.computeError(model);
                 }
 
@@ -228,11 +259,11 @@ public class GenericOptimization extends SimpleProblemDouble {
         this.parameters = parameters;
     }
 
-    public List<YearlyDataTarget> getTargets() {
+    public List<DataTarget> getTargets() {
         return targets;
     }
 
-    public void setTargets(List<YearlyDataTarget> targets) {
+    public void setTargets(List<DataTarget> targets) {
         this.targets = targets;
     }
 

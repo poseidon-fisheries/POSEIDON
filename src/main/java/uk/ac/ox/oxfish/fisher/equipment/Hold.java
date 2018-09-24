@@ -167,7 +167,9 @@ public class Hold {
      */
     public static double throwOverboard(double[] fishHold,double maximumLoad)
     {
-        double currentLoad=  Arrays.stream(fishHold).sum();
+        double currentLoad = 0;
+        for(double held : fishHold)
+            currentLoad+=held;
         if(currentLoad>maximumLoad)
         {
             double proportionToKeep = maximumLoad / (currentLoad);

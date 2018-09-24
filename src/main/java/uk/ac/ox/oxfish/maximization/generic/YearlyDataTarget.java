@@ -35,8 +35,10 @@ import java.util.List;
  * an optimization target where we read a time series from file and compare it with
  * something the model outputted
  */
-public class YearlyDataTarget {
+public class YearlyDataTarget implements DataTarget {
 
+
+    private double exponent = 1;
 
     private String pathToCsvFile = Paths.
             get("/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice1/calibration/targets/Small_LL021 Lutjanus malabaricus.csv").
@@ -49,17 +51,29 @@ public class YearlyDataTarget {
     private boolean hasHeader = true;
 
     /**
-     * useful as a way to compute STD of error
+     * useful as a way to compute STD of error (negative or 0 means do not use)
      */
+
     private  double coefficientOfVariation = .1;
 
 
+    /**
+     *
+     * @param pathToCsvFile
+     * @param yearlyDataColumnName
+     * @param hasHeader
+     * @param coefficientOfVariation can be 0, negative or not a number; will then ignore
+     */
     public YearlyDataTarget(
-            String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader, double coefficientOfVariation) {
+            String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader,
+            double coefficientOfVariation,
+            double exponent) {
         this.pathToCsvFile = pathToCsvFile;
         this.yearlyDataColumnName = yearlyDataColumnName;
         this.hasHeader = hasHeader;
+        //can be 0, negative or not a number; will then ignore
         this.coefficientOfVariation = coefficientOfVariation;
+        this.exponent = exponent;
     }
 
 
@@ -79,14 +93,20 @@ public class YearlyDataTarget {
                 stats.accept(realTimeSeriesElement);
 
             }
-            double std = stats.getAverage() * coefficientOfVariation;
-
-
-            // average distance / std
-            return (FishStateUtilities.timeSeriesAbsoluteDistance(
+            double plainDistance = FishStateUtilities.timeSeriesDistance(
                     simulationOutput,
-                    realData
-            )/stats.getCount()) / std;
+                    realData, exponent
+            ) / stats.getCount();
+
+            double std = stats.getAverage() * coefficientOfVariation;
+            if(std <=0 || !Double.isFinite(std))
+                return plainDistance;
+            else
+            // average distance / std
+            {
+
+                return plainDistance / std;
+            }
 
         }
         catch (IOException e){
