@@ -44,6 +44,9 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "slice1", "calibration");
 
+    private String scenarioFile =   DEFAULT_PATH.resolve("very_pessimistic.yaml").toString();
+
+
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
 
     /**
@@ -82,76 +85,99 @@ public class GenericOptimization extends SimpleProblemDouble {
         populations.put("Big",2);
 
         for (Map.Entry<String, Integer> population : populations.entrySet()) {
-        /*    targets.add(
+           targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv").toString(),
-                            "Lutjanus malabaricus Landings of population"+population.getValue(),true,.1
+                            "Lutjanus malabaricus Landings of population"+population.getValue(),true,-1d,1
                     ));
 
             targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv").toString(),
-                            "Pristipomoides multidens Landings of population"+population.getValue(),true,.1
+                            "Pristipomoides multidens Landings of population"+population.getValue(),true,-1d,1
                     ));
 
 
                        targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv").toString(),
-                            "Epinephelus areolatus Landings of population"+population.getValue(),true,2
+                            "Epinephelus areolatus Landings of population"+population.getValue(),true,-1d,1
                     ));
             targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv").toString(),
-                            "Lutjanus erythropterus Landings of population"+population.getValue(),true,2
+                            "Lutjanus erythropterus Landings of population"+population.getValue(),true,-1d,1
                     ));
 
             targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv").toString(),
-                            "Others Landings of population"+population.getValue(),true,.1
+                            "Others Landings of population"+population.getValue(),true,-1d,1
                     ));
 
             targets.add(
                     new YearlyDataTarget(
                             DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv").toString(),
-                            "Total Landings of population"+population.getValue(),true,.1
-                    ));
-*/
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv"),
-                            "Lutjanus malabaricus Landings of population"+population.getValue()));
-
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv"),
-                            "Pristipomoides multidens Landings of population"+population.getValue()
+                            "Total Landings of population"+population.getValue(),true,-1d,1
                     ));
 
-
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv"),
-                            "Epinephelus areolatus Landings of population"+population.getValue()
-                    ));
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv"),
-                            "Lutjanus erythropterus Landings of population"+population.getValue()
-                    ));
-
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv"),
-                            "Others Landings of population"+population.getValue()
-                    ));
-
-            targets.add(
-                    FixedDataLastStepTarget.lastStepTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv"),
-                            "Total Landings of population"+population.getValue()
-                    ));
+            //biomass!
+//            targets.add(
+//                    new FixedDataLastStepTarget(
+//                            23690384d,
+//                            "Biomass Lutjanus malabaricus"
+//                    ));
+//            targets.add(
+//                    new FixedDataLastStepTarget(
+//                            8923736d,
+//                            "Biomass Pristipomoides multidens"
+//                    ));
+//            targets.add(
+//                    new FixedDataLastStepTarget(
+//                            4720243d,
+//                            "Biomass Epinephelus areolatus"
+//                    ));
+//            targets.add(
+//                    new FixedDataLastStepTarget(
+//                            1666529d,
+//                            "Biomass Lutjanus erythropterus"
+//                    ));
+//
+//
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv"),
+//                            "Lutjanus malabaricus Landings of population"+population.getValue()));
+//
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv"),
+//                            "Pristipomoides multidens Landings of population"+population.getValue()
+//                    ));
+//
+//
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv"),
+//                            "Epinephelus areolatus Landings of population"+population.getValue()
+//                    ));
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv"),
+//                            "Lutjanus erythropterus Landings of population"+population.getValue()
+//                    ));
+//
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv"),
+//                            "Others Landings of population"+population.getValue()
+//                    ));
+//
+//            targets.add(
+//                    FixedDataLastStepTarget.lastStepTarget(
+//                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv"),
+//                            "Total Landings of population"+population.getValue()
+//                    ));
         }
 
 
@@ -166,7 +192,6 @@ public class GenericOptimization extends SimpleProblemDouble {
 
 
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("optimistic.yaml").toString();
 
 
     private int runsPerSetting = 1;
@@ -220,7 +245,10 @@ public class GenericOptimization extends SimpleProblemDouble {
                 }
 
             }
-            return new double[]{error/(double)runsPerSetting};
+
+            double finalError = error / (double) runsPerSetting;
+            System.out.println(Arrays.toString(x) + " ---> " + finalError);
+            return new double[]{finalError};
 
         }catch (Exception e) {
             throw new RuntimeException(e);
@@ -244,9 +272,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-6.808,-9.022,-5.076,-1.137, 0.124,-5.941, 7.706, 3.004,-6.680, 2.491,-5.815, 8.928,-2.765,-9.588,-2.928});
+        Scenario scenario = optimization.buildScenario(new double[]{5.508,-9.859,-6.772,-5.834,-1.278,-9.593, 5.822, 0.537,-5.719,-0.001,-6.330, 7.982, 4.936,-4.526,-8.104});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_4000_common.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_2800_verypessimistic.yaml").toFile()));
 
     }
 

@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ga_4000_common";
+    public static final String FILENAME = "ga_2800_verypessimistic";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice1/calibration/results";
 
     public static void main(String[] args) throws IOException {
@@ -71,11 +71,7 @@ public class IndonesiaBatchRuns {
                         "Lutjanus malabaricus Landings of population2",
                         "Lutjanus erythropterus Landings of population2",
                         "Others Landings of population2",
-                        //"Total Variable Costs of small",
-                        //"Total Earnings of small",
 
-
-                   //     "Total Variable Costs of big",
                         "Biomass Epinephelus areolatus",
                         "Biomass Pristipomoides multidens",
                         "Biomass Lutjanus malabaricus",
