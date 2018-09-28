@@ -122,26 +122,26 @@ public class GenericOptimization extends SimpleProblemDouble {
                     ));
 
             //biomass!
-//            targets.add(
-//                    new FixedDataLastStepTarget(
-//                            23690384d,
-//                            "Biomass Lutjanus malabaricus"
-//                    ));
-//            targets.add(
-//                    new FixedDataLastStepTarget(
-//                            8923736d,
-//                            "Biomass Pristipomoides multidens"
-//                    ));
-//            targets.add(
-//                    new FixedDataLastStepTarget(
-//                            4720243d,
-//                            "Biomass Epinephelus areolatus"
-//                    ));
-//            targets.add(
-//                    new FixedDataLastStepTarget(
-//                            1666529d,
-//                            "Biomass Lutjanus erythropterus"
-//                    ));
+            targets.add(
+                    new FixedDataLastStepTarget(
+                            17264818d,
+                            "Biomass Lutjanus malabaricus"
+                    ));
+            targets.add(
+                    new FixedDataLastStepTarget(
+                            9116571d,
+                            "Biomass Pristipomoides multidens"
+                    ));
+            targets.add(
+                    new FixedDataLastStepTarget(
+                            2738917d,
+                            "Biomass Epinephelus areolatus"
+                    ));
+            targets.add(
+                    new FixedDataLastStepTarget(
+                            1723360d,
+                            "Biomass Lutjanus erythropterus"
+                    ));
 //
 //
 //            targets.add(
