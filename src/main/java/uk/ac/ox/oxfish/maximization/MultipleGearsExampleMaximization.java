@@ -117,8 +117,8 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
                     error+= FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
-                            Arrays.asList(landings[population]), 1
-                    );
+                            Arrays.asList(landings[population]), 1,
+                            false);
                 }
                 else{
                     List<Double> simulatedLandings = model.getYearlyDataSet().getColumn(
@@ -129,8 +129,8 @@ public class MultipleGearsExampleMaximization extends SimpleProblemDouble {
 
                     error+= FishStateUtilities.timeSeriesDistance(
                             simulatedLandings,
-                            Arrays.asList(landings[0]), 1
-                    );
+                            Arrays.asList(landings[0]), 1,
+                            false);
                 }
 
 

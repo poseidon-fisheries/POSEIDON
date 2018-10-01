@@ -39,6 +39,7 @@ public class YearlyDataTarget implements DataTarget {
 
 
     private double exponent = 1;
+    private boolean cumulative;
 
     private String pathToCsvFile = Paths.
             get("/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice1/calibration/targets/Small_LL021 Lutjanus malabaricus.csv").
@@ -58,22 +59,23 @@ public class YearlyDataTarget implements DataTarget {
 
 
     /**
-     *
-     * @param pathToCsvFile
+     *  @param pathToCsvFile
      * @param yearlyDataColumnName
      * @param hasHeader
      * @param coefficientOfVariation can be 0, negative or not a number; will then ignore
+     * @param cumulative
      */
     public YearlyDataTarget(
             String pathToCsvFile, String yearlyDataColumnName, boolean hasHeader,
             double coefficientOfVariation,
-            double exponent) {
+            double exponent, boolean cumulative) {
         this.pathToCsvFile = pathToCsvFile;
         this.yearlyDataColumnName = yearlyDataColumnName;
         this.hasHeader = hasHeader;
         //can be 0, negative or not a number; will then ignore
         this.coefficientOfVariation = coefficientOfVariation;
         this.exponent = exponent;
+        this.cumulative = cumulative;
     }
 
 
@@ -95,8 +97,8 @@ public class YearlyDataTarget implements DataTarget {
             }
             double plainDistance = FishStateUtilities.timeSeriesDistance(
                     simulationOutput,
-                    realData, exponent
-            ) / stats.getCount();
+                    realData, exponent,
+                    cumulative) / stats.getCount();
 
             double std = stats.getAverage() * coefficientOfVariation;
             if(std <=0 || !Double.isFinite(std))
@@ -188,5 +190,21 @@ public class YearlyDataTarget implements DataTarget {
      */
     public void setCoefficientOfVariation(double coefficientOfVariation) {
         this.coefficientOfVariation = coefficientOfVariation;
+    }
+
+    public double getExponent() {
+        return exponent;
+    }
+
+    public void setExponent(double exponent) {
+        this.exponent = exponent;
+    }
+
+    public boolean isCumulative() {
+        return cumulative;
+    }
+
+    public void setCumulative(boolean cumulative) {
+        this.cumulative = cumulative;
     }
 }

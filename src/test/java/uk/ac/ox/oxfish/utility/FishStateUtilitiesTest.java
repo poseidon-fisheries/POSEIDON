@@ -214,8 +214,8 @@ public class FishStateUtilitiesTest {
         assertEquals(0,
                 FishStateUtilities.timeSeriesDistance(
                         input,
-                        input, 1
-                ),
+                        input, 1,
+                        false),
                 0.0001);
 
         //transform into data column

@@ -20,8 +20,8 @@ public class YearlyDataTargetTest {
                 "fakeData",
                 true,
                 1,
-                1
-        );
+                1,
+                false);
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         DataColumn fakeData = new DataColumn("fakeData");
@@ -43,8 +43,8 @@ public class YearlyDataTargetTest {
                 "fakeData",
                 true,
                 1,
-                1
-        );
+                1,
+                false);
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         DataColumn fakeData = new DataColumn("fakeData");
@@ -71,8 +71,8 @@ public class YearlyDataTargetTest {
                 "fakeData",
                 false,
                 -1,
-                1
-        );
+                1,
+                false);
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         DataColumn fakeData = new DataColumn("fakeData");
@@ -116,8 +116,8 @@ public class YearlyDataTargetTest {
                 "fakeData",
                 false,
                 -1,
-                2
-        );
+                2,
+                false);
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         DataColumn fakeData = new DataColumn("fakeData");

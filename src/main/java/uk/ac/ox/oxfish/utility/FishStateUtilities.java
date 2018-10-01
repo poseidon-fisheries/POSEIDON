@@ -1175,15 +1175,15 @@ public class FishStateUtilities {
                         value -> Double.parseDouble(value.trim())
                 ).boxed().collect(Collectors.toList()
                                   ),
-                exponent
+                exponent,
 
-                );
+                false);
     }
 
 
     public static double timeSeriesDistance(Iterable<Double> timeSeriesOne,
                                             Iterable<Double> timeSeriesTwo,
-                                            double exponent)
+                                            double exponent, boolean cumulativeError)
     {
         Preconditions.checkArgument(exponent>0);
         Iterator<Double> firstIterator = timeSeriesOne.iterator();
@@ -1196,12 +1196,17 @@ public class FishStateUtilities {
             Preconditions.checkArgument(secondIterator.hasNext(),
                     "Time series are of different length");
 
-            error+= Math.pow(Math.abs(firstIterator.next() - secondIterator.next()),exponent);
+            double raw = firstIterator.next() - secondIterator.next();
+            if(!cumulativeError) {
+                raw =  Math.pow(Math.abs(raw),exponent);
+            }
+
+            error+= raw;
         }
         Preconditions.checkArgument(!secondIterator.hasNext(),
                 "Time series are of different length");
 
-        return error;
+        return Math.abs(error);
     }
 
 
