@@ -64,7 +64,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
      * the default encoder just returns altitude
      */
 
-    private final ColorMap depthColor = new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED);
+    private final ColorMap depthColor = new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, new Color(0,100,0));
 
 
     private final Queue<Color> defaultFishColors = new LinkedList<>();
@@ -89,7 +89,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         this.random = random;
         //add the default color map showing depth
         encodings.put("Depth", new ColorEncoding(
-                new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED),
+                depthColor,
                 seaTile -> seaTile.isProtected() ? Double.NaN : seaTile.getAltitude(), true));
 
         //add the default color map showing rocky areas

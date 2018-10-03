@@ -72,10 +72,7 @@ public class FishingSeason implements Regulation
      */
     @Override
     public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
-        if(seasonOpen(model))
-            return Double.MAX_VALUE;
-        else
-            return 0;
+        return Double.MAX_VALUE;
     }
 
     /**

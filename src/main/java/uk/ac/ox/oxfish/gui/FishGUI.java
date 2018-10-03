@@ -518,7 +518,7 @@ public class  FishGUI extends GUIState{
         portrayal.initializeGrid(model.getBiology(), model.getMap().getAllSeaTilesExcludingLandAsList());
 
         portrayal.setField(model.getRasterBathymetry().getGrid());
-        portrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, Color.RED));
+        portrayal.setMap(new TriColorMap(-6000, 0, 6000, Color.BLUE, Color.CYAN, Color.GREEN, new Color(0,100,0)));
 
         //now deal with display2d
         //change width and height to keep correct geographical ratio

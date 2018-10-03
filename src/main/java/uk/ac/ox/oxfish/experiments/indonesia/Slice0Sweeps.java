@@ -21,33 +21,28 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.collect.Lists;
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.MaxHoursPerYearDepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MaxHoursPerYearDepartingFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 
 public class Slice0Sweeps {
+
 
     public static final String FILENAME = "pessimistic";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice0/policy/";
 
 
     public static void main(String[] args) throws IOException {
-            policy("large",true);
+        policy("large",true);
     }
 
     public static void policy(String name,
@@ -145,11 +140,11 @@ public class Slice0Sweeps {
 
 
             //while (runner.getRunsDone() < 1) {
-                StringBuffer tidy = new StringBuffer();
-                runner.run(tidy);
-                fileWriter.write(tidy.toString());
-                fileWriter.flush();
-         //   }
+            StringBuffer tidy = new StringBuffer();
+            runner.run(tidy);
+            fileWriter.write(tidy.toString());
+            fileWriter.flush();
+            //   }
 
         }
         fileWriter.close();

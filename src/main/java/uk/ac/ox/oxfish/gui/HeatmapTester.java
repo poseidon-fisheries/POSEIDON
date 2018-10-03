@@ -57,6 +57,7 @@ public class HeatmapTester extends GUIState
 
     public static final int MIN_DIMENSION = 600;
     public static final Path IMAGES_PATH = Paths.get("inputs", "images");
+    public static final TriColorMap DEFAULT_MAP = new TriColorMap(-6000, 0, 6000, Color.YELLOW, Color.WHITE, new Color(0, 100, 0));
     private Display2D display2D;
     private JFrame displayFrame;
 
@@ -158,7 +159,7 @@ public class HeatmapTester extends GUIState
 
         //add heatmapper
         myPortrayal.addEnconding("Heatmap", new ColorEncoding(
-                new TriColorMap(-6000, 0, 6000, Color.YELLOW, Color.WHITE, Color.RED),
+                DEFAULT_MAP,
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
@@ -172,7 +173,7 @@ public class HeatmapTester extends GUIState
 
         //add heatmapper
         copy.addEnconding("Heatmap", new ColorEncoding(
-                new TriColorMap(-6000, 0, 6000, Color.YELLOW, Color.WHITE, Color.RED),
+                DEFAULT_MAP,
                 new Function<SeaTile, Double>() {
                     @Override
                     public Double apply(SeaTile tile) {
