@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ns_total_verypessimistic_distributionWeight";
+    public static final String FILENAME = "ga15400_total_verypessimistic_distributionWeight";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice1/calibration/results";
 
     public static void main(String[] args) throws IOException {

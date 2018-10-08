@@ -39,18 +39,18 @@ import java.nio.file.Paths;
 public class Slice1Sweeps {
 
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice1/policy/";
-
+    public static final int MIN_DAYS_OUT = 50;
 
 
     public static void main(String[] args) throws IOException {
         //policy("large", new String[]{"big"}, "very_pessimistic");
         //policy("medium", new String[]{"big","medium"}, "very_pessimistic");
-        policy("all", new String[]{"big","small","medium"}, "very_pessimistic");
+        //policy("all", new String[]{"big","small","medium"}, "very_pessimistic");
 
 
-        //policy("large", true, "optimistic");
+        //policy("large", new String[]{"big"}, "optimistic");
         //policy("medium", new String[]{"big","medium"}, "optimistic");
-        //policy("all", false, "optimistic");
+        //policy("all", new String[]{"big","small","medium"}, "optimistic");
 
         //policy("large", new String[]{"big"}, "ga_56100_verypessimistic");
         //policy("medium", new String[]{"big","medium"}, "ga_56100_verypessimistic");
@@ -69,7 +69,7 @@ public class Slice1Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(int maxDaysOut=200; maxDaysOut>=50; maxDaysOut-=10) {
+        for(int maxDaysOut = 200; maxDaysOut>= MIN_DAYS_OUT; maxDaysOut-=10) {
 
             BatchRunner runner = new BatchRunner(
                     Paths.get(DIRECTORY,

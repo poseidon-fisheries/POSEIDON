@@ -44,7 +44,7 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "slice1", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("very_pessimistic.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("optimistic.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -78,7 +78,7 @@ public class GenericOptimization extends SimpleProblemDouble {
                     new SimpleOptimizationParameter(
                             "biologyInitializer.factories$"+species+".grower.distributionalWeight",
                             .5,
-                            3
+                            10
 
                     )
             );
@@ -315,9 +315,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-5.5675260524673735, -9.25660665217622, -8.557742266613559, -6.932731420133187, -0.8111317100428496, -3.1710645372891673, -0.10897402446554039, -4.913352193193732, -1.4680342507795656, -0.23027648774338721, -1.1456113662165244, 1.9622577010472493, -4.107401430438376, 0.8394025117429366, 4.0288372467105855, 8.565377251144778, 3.456888477540746, -1.1087063233014103, -2.19463731039067});
+        Scenario scenario = optimization.buildScenario(new double[]{-5.795,-9.313,-8.744,-7.471,-1.516,-4.114, 2.989,-9.061,-8.356,-0.412,-6.789, 6.011,-6.132, 2.616,-3.891, 7.644,-4.807,-0.637, 3.513});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_total_verypessimistic_distributionWeight.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga15400_total_verypessimistic_distributionWeight.yaml").toFile()));
 
     }
 
