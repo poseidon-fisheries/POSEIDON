@@ -134,14 +134,36 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
 
             Color color =  defaultFishColors.size() == 0 ? Color.RED : defaultFishColors.poll();
             encodings.put(species.getName(), new SelfAdjustingColorEncoding(
-                    new SimpleColorMap(0, max, Color.WHITE, color),
+                    new SimpleColorMap(0, max, Color.WHITE, color){
+
+                        @Override
+                        public boolean validLevel(double value) {
+                            return true;
+                        }
+
+                        @Override
+                        public int getRGB(double level) {
+                            return getColor(level).getRGB();
+                        }
+
+                        @Override
+                        public Color getColor(double level) {
+                            if(Double.isFinite(level))
+                                return super.getColor(level);
+                            else
+                                return Color.BLACK;
+
+                        }
+                    },
                     seaTile ->
+                            seaTile.getAltitude() >= 0 ? Double.NaN :
                             BIOMASS_TRANSFORM.apply(
                                     seaTile.getBiomass(species)),
                     false,
                     max,
                     0));
-        }
+        };
+
 
     }
 

@@ -36,6 +36,7 @@ public class SelfAdjustingColorEncoding extends ColorEncoding {
 
     private final Function<SeaTile,Double> adjustingEncoding;
 
+
     public SelfAdjustingColorEncoding(
             SimpleColorMap map,
             Function<SeaTile, Double> encoding, boolean immutable, double maxValue, double minValue) {
@@ -46,6 +47,8 @@ public class SelfAdjustingColorEncoding extends ColorEncoding {
                 new Function<Double, Double>() {
                     @Override
                     public Double apply(Double value) {
+                        if(!Double.isFinite(value))
+                            return Double.NaN;
 
                         if(value>SelfAdjustingColorEncoding.this.maxValue)
                         {
