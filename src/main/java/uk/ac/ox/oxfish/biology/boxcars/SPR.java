@@ -87,7 +87,7 @@ public class SPR {
 
 
         //get the most frequent length
-        double mostFrequentLength = mostFrequentBin*lengthBinCm;
+        double mostFrequentLength = species.getLength(0,mostFrequentBin);
         //get average length for all fish above mostFrequentLength
         double sumLengthAboveThreshold = 0;
         double sumAbundanceAbovethreshold = 0;
