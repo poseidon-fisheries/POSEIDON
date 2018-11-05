@@ -29,6 +29,12 @@ public interface Meristics {
 
     double getLength(int subdivision, int bin);
 
+    /**
+     * get the weight of one fish
+     * @param subdivision at this division
+     * @param bin at this bin
+     * @return the unit weight
+     */
     double getWeight(int subdivision, int bin);
 
     /**

@@ -24,6 +24,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
+import uk.ac.ox.oxfish.maximization.generic.CommaMapOptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
@@ -34,6 +37,8 @@ import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.SelectDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -484,5 +489,47 @@ public class FishYAMLTest {
         System.out.println(factories);
         System.out.println(factories.getClass());
 
+    }
+
+
+
+
+    @Test
+    public void optimizationParameters() {
+
+        List<OptimizationParameter> parameters = new LinkedList<>();
+        //gear
+        //catchabilities
+        parameters.add(new CommaMapOptimizationParameter(
+                4, "fisherDefinitions$"+0+".gear.delegate.delegate.catchabilityMap",
+                0,
+                1
+        ));
+        //garbage collectors
+        parameters.add(new SimpleOptimizationParameter(
+                "fisherDefinitions$"+1+".gear.delegate.proportionSimulatedToGarbage",
+                .10,
+                .80
+        ));
+        parameters.add(
+                new SimpleOptimizationParameter(
+                        "biologyInitializer.factories$"+3+".grower.distributionalWeight",
+                        .5,
+                        10
+
+                )
+        );
+
+
+        FishYAML yaml = new FishYAML();
+        String output = yaml.dump(parameters);
+        System.out.println(output);
+
+        parameters = null;
+        parameters = yaml.loadAs(output,List.class);
+        System.out.println(parameters);
+        System.out.println(parameters.get(0).getClass());
+        System.out.println(parameters.get(1).getClass());
+        System.out.println(parameters.get(2).getClass());
     }
 }

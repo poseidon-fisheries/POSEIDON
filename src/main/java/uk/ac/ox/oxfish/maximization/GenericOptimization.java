@@ -44,7 +44,7 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "slice1", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("optimistic.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("pessimistic.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -315,9 +315,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-5.795,-9.313,-8.744,-7.471,-1.516,-4.114, 2.989,-9.061,-8.356,-0.412,-6.789, 6.011,-6.132, 2.616,-3.891, 7.644,-4.807,-0.637, 3.513});
+        Scenario scenario = optimization.buildScenario(new double[]{-5.937908401841871, -8.775187416881483, -8.795574436039747, -8.689064039027828, -1.7656691689733803, -5.041267395873877, 7.441815543571826, -8.509716961656945, -0.27183210362932675, -0.789784738137499, -5.447575328740677, 9.896875533729187, -8.136306082625195, -5.859790833739022, -0.358633410518905, 1.6896512155526051, -6.4692711269147685, 3.022448948468056, 9.86525665067513});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga15400_total_verypessimistic_distributionWeight.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_pessimistic.yaml").toFile()));
 
     }
 

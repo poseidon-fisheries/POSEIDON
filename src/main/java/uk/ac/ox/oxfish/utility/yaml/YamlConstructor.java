@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.utility.yaml;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.*;
@@ -51,6 +50,8 @@ public class YamlConstructor extends  Constructor {
 
     public YamlConstructor()
     {
+
+
 
         //add the ability to read/write coordinates
 
@@ -108,6 +109,7 @@ public class YamlConstructor extends  Constructor {
 
             @Override
             public Object construct(Node node) {
+
                 if(AlgorithmFactory.class.isAssignableFrom(node.getType())) {
                     //try super constructor first, most of the time it works
                     try {
@@ -164,19 +166,22 @@ public class YamlConstructor extends  Constructor {
                                        "PolicyScript"))
                 {
 
+                    PolicyScript script = new PolicyScript();
+
+
                     //now we can deal with filling it through beans
                     //first allocate subnodes correctly
                     ((MappingNode) node).setValue(
                             ((MappingNode) ((MappingNode) node).getValue().get(0).getValueNode()).getValue());
                     //set type correctly
                     node.setType(PolicyScript.class);
-                    PolicyScript script = new PolicyScript();
                     constructJavaBean2ndStep((MappingNode) node, script);
                     return script;
 
 
 
                 }
+
 
                 if(PolicyScripts.class.isAssignableFrom(node.getType()))
                 {
@@ -199,6 +204,7 @@ public class YamlConstructor extends  Constructor {
 
 
                 }
+
 
                 else
                     return super.construct(node);

@@ -23,8 +23,11 @@ package uk.ac.ox.oxfish.model.scenario;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.initializer.factory.LinearGetterBiologyFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.SimulatedProfitCPUEObjectiveFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.TwoPortsFactory;
 import uk.ac.ox.oxfish.model.FishState;
@@ -75,6 +78,9 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
         ports.setNamePort1("port1");
         ports.setNamePort2("port2");
         scenario.setPorts(ports);
+        //make sure you get in the corners
+        scenario.setFishingStrategyLarge(new MaximumStepsFactory(10));
+        scenario.setFishingStrategySmall(new MaximumStepsFactory(10));
 
         FishState state = new FishState(System.currentTimeMillis());
         state.setScenario(scenario);
@@ -117,15 +123,19 @@ public class ImitationWorksWhenPeopleAreFromDifferentPorts {
 
         //gather data:
         for(Fisher fisher : state.getFishers()) {
+            TripRecord lastTrip = fisher.getLastFinishedTrip();
+            SeaTile tile = lastTrip.getMostFishedTileInTrip();
+            int gridX = tile.getGridX();
+            int gridY = tile.getGridY();
             if (fisher.getHomePort().getName().equals("port1"))
             {
 
-                averageXFishedPort1.accept(fisher.getLastFinishedTrip().getMostFishedTileInTrip().getGridX());
-                averageYFishedPort1.accept(fisher.getLastFinishedTrip().getMostFishedTileInTrip().getGridY());
+                averageXFishedPort1.accept(gridX);
+                averageYFishedPort1.accept(gridY);
             }
             else {
-                averageXFishedPort2.accept(fisher.getLastFinishedTrip().getMostFishedTileInTrip().getGridX());
-                averageYFishedPort2.accept(fisher.getLastFinishedTrip().getMostFishedTileInTrip().getGridY());
+                averageXFishedPort2.accept(gridX);
+                averageYFishedPort2.accept(gridY);
             }
         }
 

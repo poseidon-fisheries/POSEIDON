@@ -29,6 +29,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
+import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.scenario.PolicyScript;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -191,6 +192,9 @@ public class YamlRepresenter extends Representer
                                   }});
 
         this.addClassTag(PolicyScripts.class, Tag.MAP);
+
+
+
 
 
 

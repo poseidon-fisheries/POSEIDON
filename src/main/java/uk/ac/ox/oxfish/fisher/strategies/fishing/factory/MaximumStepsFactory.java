@@ -39,6 +39,14 @@ public class MaximumStepsFactory implements AlgorithmFactory<MaximumDaysDecorato
     private DoubleParameter daysAtSea = new FixedDoubleParameter(5);
 
 
+    public MaximumStepsFactory() {
+    }
+
+
+    public MaximumStepsFactory(double daysAtSea) {
+        this.daysAtSea = new FixedDoubleParameter(daysAtSea);
+    }
+
     /**
      * Applies this function to the given argument.
      *

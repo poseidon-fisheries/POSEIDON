@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.utility.yaml;
 
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.nodes.Tag;
 
@@ -49,6 +50,8 @@ public class FishYAML extends Yaml{
         this.addImplicitResolver(new Tag("!coord"),
                                  Pattern.compile("[\\s'\"]*x:[0-9]+\\.?[0-9]*,y:[0-9]+\\.?[0-9]*[\\s'\"]*"),
                                  null);
+
+     //   this.customConstructor.addTypeDescription(new TypeDescription())
 
     }
 

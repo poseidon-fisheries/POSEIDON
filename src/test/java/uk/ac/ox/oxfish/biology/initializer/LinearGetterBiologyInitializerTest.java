@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +42,7 @@ public class LinearGetterBiologyInitializerTest {
     @Test
     public void simpleFunction() throws Exception {
 
-        FishState state = mock(FishState.class);
+        FishState state = mock(FishState.class,RETURNS_DEEP_STUBS);
         //0,0 with 0% rocky
         SeaTile zeroZero =  new SeaTile(0,0,-100,new TileHabitat(0));
         //5,5 with 50% rocky

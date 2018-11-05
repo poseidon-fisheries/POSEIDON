@@ -52,9 +52,9 @@ public class Slice1Sweeps {
         //policy("medium", new String[]{"big","medium"}, "optimistic");
         //policy("all", new String[]{"big","small","medium"}, "optimistic");
 
-        //policy("large", new String[]{"big"}, "ga_56100_verypessimistic");
-        //policy("medium", new String[]{"big","medium"}, "ga_56100_verypessimistic");
-        //policy("all", new String[]{"big","small","medium"}, "ga_56100_verypessimistic");
+        //policy("large", new String[]{"big"}, "pessimistic_2");
+        //policy("medium", new String[]{"big","medium"}, "pessimistic_2");
+        //policy("all", new String[]{"big","small","medium"}, "pessimistic_2");
 
 
        // enforcement("all","small","very_pessimistic");

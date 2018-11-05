@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -56,6 +55,11 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      */
     private DoubleParameter kYearlyParameter = new FixedDoubleParameter(0.364);
 
+    /**
+     * if this is null or NaN then the bins go from L0 to LInf; if this is not null then each bin has a fixed width
+     */
+    private Double cmPerBin = null;
+
 
     private int numberOfBins = 100;
 
@@ -76,11 +80,22 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         double LZero = recruitLengthInCm.apply(fishState.getRandom());
         double increment = (LInfinity - LZero)/(numberOfBins-1);
 
+
         //allometric weight
         double alpha = allometricAlpha.apply(fishState.getRandom());
         double beta = allometricBeta.apply(fishState.getRandom());
         lengths[0] =  LZero;
+
+        //if you are using a fixed increment, time to set it now!
+        if(Double.isFinite(cmPerBin)) {
+            increment = cmPerBin;
+            lengths[0] =  cmPerBin /2;
+
+        }
+
         weights[0] = alpha * Math.pow(lengths[0],beta)/1000d;
+
+
 
         for(int i=1; i<lengths.length; i++)
         {
@@ -217,5 +232,23 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
      */
     public void setNumberOfBins(int numberOfBins) {
         this.numberOfBins = numberOfBins;
+    }
+
+    /**
+     * Getter for property 'cmPerBin'.
+     *
+     * @return Value for property 'cmPerBin'.
+     */
+    public Double getCmPerBin() {
+        return cmPerBin;
+    }
+
+    /**
+     * Setter for property 'cmPerBin'.
+     *
+     * @param cmPerBin Value to set for property 'cmPerBin'.
+     */
+    public void setCmPerBin(Double cmPerBin) {
+        this.cmPerBin = cmPerBin;
     }
 }

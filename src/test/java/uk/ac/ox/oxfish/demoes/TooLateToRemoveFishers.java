@@ -22,6 +22,8 @@ package uk.ac.ox.oxfish.demoes;
 
 import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
+import uk.ac.ox.oxfish.biology.growers.SimpleLogisticGrowerFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -43,12 +45,13 @@ public class TooLateToRemoveFishers
         Log.info("This demo replicates the dynamics in: http://carrknight.github.io/assets/oxfish/entryexit.html");
         Log.info("You add a bunch of fishers, and after removing them the biomass is still screwed");
         PrototypeScenario scenario = new PrototypeScenario();
+        ((DiffusingLogisticFactory) scenario.getBiologyInitializer()).setGrower(new SimpleLogisticGrowerFactory(.3));
         scenario.setFishers(50);
         SimpleMapInitializerFactory simpleMapInitializerFactory = new SimpleMapInitializerFactory();
         simpleMapInitializerFactory.setCoastalRoughness(new FixedDoubleParameter(0));
         scenario.setMapInitializer(simpleMapInitializerFactory);
 
-        //lspiRun the model for a full 3 years before progressing
+        //run the model for a full 3 years before progressing
         state.setScenario(scenario);
         state.start();
         while (state.getYear() < 3)
@@ -65,9 +68,12 @@ public class TooLateToRemoveFishers
             }
             state.schedule.step(state);
         }
+        Double biomass = state.getLatestYearlyObservation("Biomass Species 0");
+        Log.info("The actual remaining biomass is: " + biomass);
+        assertTrue(biomass < 1000000);
 
-        //for the next 10 years remove the fishers
-        while (state.getYear() < 28) {
+        //for the next 5 years remove the fishers
+        while (state.getYear() < 23) {
             if (state.getDayOfTheYear() % 30 == 0) {
                 state.killRandomFisher();
                 state.killRandomFisher();
@@ -79,7 +85,7 @@ public class TooLateToRemoveFishers
         }
 
         Log.info("I am assuming that the biomass is below 10% the virgin level of 10million");
-        Double biomass = state.getLatestYearlyObservation("Biomass Species 0");
+        biomass = state.getLatestYearlyObservation("Biomass Species 0");
         Log.info("The actual remaining biomass is: " + biomass);
         assertTrue(biomass < 1000000);
     }
