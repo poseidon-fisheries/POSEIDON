@@ -74,7 +74,7 @@ public class Counter implements Startable, Steppable
      */
     public void addColumn(String columnName)
     {
-        Preconditions.checkArgument(!hasColumn(columnName));
+        Preconditions.checkArgument(!hasColumn(columnName), columnName + " column already exists!");
         data.put(columnName,0d);
     }
 

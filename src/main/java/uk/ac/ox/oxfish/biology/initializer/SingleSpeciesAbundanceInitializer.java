@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantBiomassAllocator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -270,6 +271,19 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 mortality, daily);
         if(recruitmentAllocator !=null)
             processes.setRecruitsAllocator(recruitmentAllocator);
+
+
+        model.getDailyDataSet().registerGatherer(
+                speciesName + " Recruits",
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        return processes.getLastRecruits();
+                    }
+                },
+                0d
+        );
+
 
         /**
          * this used to be collected when generating, but with other initializers it might not

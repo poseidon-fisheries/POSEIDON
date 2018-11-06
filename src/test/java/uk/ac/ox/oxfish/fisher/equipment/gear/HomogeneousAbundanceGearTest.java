@@ -66,6 +66,13 @@ public class HomogeneousAbundanceGearTest
 
         assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
 
+        //it shouldn't break if I run it again!
+        fish = gear.fish(mock(Fisher.class), tile, 1, biology);
+        assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
+                new double[]{0}, new double[]{25}, species.getMeristics()), .001);
+
+        assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
+
 
     }
 

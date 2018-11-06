@@ -44,7 +44,7 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
 
 
     public HeterogeneousGearFactory() {
-        System.out.println("done");
+
     }
 
     public HeterogeneousGearFactory(Pair<String,HomogeneousGearFactory>...

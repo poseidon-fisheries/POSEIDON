@@ -73,6 +73,7 @@ public class HeterogeneousAbundanceGear implements Gear
         return new Catch(catchesAsArray(where, hoursSpentFishing, modelBiology),modelBiology);
     }
 
+
     private StructuredAbundance[] catchesAsArray(
             SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
         StructuredAbundance[] caught = new  StructuredAbundance[modelBiology.getSize()];
@@ -81,8 +82,8 @@ public class HeterogeneousAbundanceGear implements Gear
             if(species.isImaginary() || !gears.containsKey(species) || where.getBiology().getBiomass(species)<=0)
             {
                 //if it's imaginary or not set or there is no fish, just return empty
-                double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
-                caught[species.getIndex()] = new StructuredAbundance(abundance);
+                //double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
+                caught[species.getIndex()] = new StructuredAbundance(species.getNumberOfSubdivisions(),species.getNumberOfBins());
 
             }
             else {

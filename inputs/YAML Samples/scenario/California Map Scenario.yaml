@@ -62,6 +62,26 @@ California Map Scenario:
                 retentionSlope: '2.42'
                 rounding: true
                 top: '-0.3'
+            Epinephelus areolatus:
+              Logistic Selectivity Gear:
+                averageCatchability: '0.01'
+                litersOfGasConsumedPerHour: '0.0'
+                retentionAsymptote: null
+                retentionInflection: null
+                retentionSlope: null
+                rounding: true
+                selectivityAParameter: '30.6447029784809'
+                selectivityBParameter: '6.46514981161133'
+            Lutjanus malabaricus:
+              Logistic Selectivity Gear:
+                averageCatchability: '0.01'
+                litersOfGasConsumedPerHour: '0.0'
+                retentionAsymptote: null
+                retentionInflection: null
+                retentionSlope: null
+                rounding: true
+                selectivityAParameter: '57.3802620814091'
+                selectivityBParameter: '17.0227436580102'
             Yelloweye Rockfish:
               Logistic Selectivity Gear:
                 averageCatchability: '0.00156832676'
@@ -72,6 +92,16 @@ California Map Scenario:
                 rounding: true
                 selectivityAParameter: '36.364'
                 selectivityBParameter: '14.009'
+            Pristipomoides multidens:
+              Logistic Selectivity Gear:
+                averageCatchability: '0.01'
+                litersOfGasConsumedPerHour: '0.0'
+                retentionAsymptote: null
+                retentionInflection: null
+                retentionSlope: null
+                rounding: true
+                selectivityAParameter: '41.9180563295419'
+                selectivityBParameter: '13.1000149168684'
             Sablefish:
               Sablefish Trawl Selectivity Gear:
                 averageCatchability: '0.00156832676'
@@ -80,6 +110,16 @@ California Map Scenario:
                 retentionInflection: '45.5128'
                 retentionSlope: '3.12457'
                 rounding: true
+            Lutjanus erythropterus:
+              Logistic Selectivity Gear:
+                averageCatchability: '0.01'
+                litersOfGasConsumedPerHour: '0.0'
+                retentionAsymptote: null
+                retentionInflection: null
+                retentionSlope: null
+                rounding: true
+                selectivityAParameter: '48.532533910211'
+                selectivityBParameter: '19.3556829280302'
             Dover Sole:
               Double Normal Selectivity Gear:
                 ascWidth: '3.967'

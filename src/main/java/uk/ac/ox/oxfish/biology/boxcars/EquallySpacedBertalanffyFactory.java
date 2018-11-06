@@ -87,7 +87,7 @@ public class EquallySpacedBertalanffyFactory implements AlgorithmFactory<GrowthB
         lengths[0] =  LZero;
 
         //if you are using a fixed increment, time to set it now!
-        if(Double.isFinite(cmPerBin)) {
+        if(cmPerBin != null && Double.isFinite(cmPerBin)) {
             increment = cmPerBin;
             lengths[0] =  cmPerBin /2;
 

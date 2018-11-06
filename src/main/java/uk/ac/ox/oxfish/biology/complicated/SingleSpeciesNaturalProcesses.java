@@ -29,6 +29,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -169,7 +170,7 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         //allocate stuff before mortality hits!
         //either allocate recruits with given allocator or proportional to where biomass is
         LinkedHashMap<AbundanceLocalBiology,Double> biomassWeight;
-        if(recruitsAllocator != null) {
+        if(lastRecruits > 0 && recruitsAllocator != null) {
 
             double sum = 0;
             biomassWeight = new LinkedHashMap<>();

@@ -61,7 +61,7 @@ public class FixedBoxcarAging  extends LocalAgingProcess {
             //this is just the derivative of VB per time
             double[] growthPerBin = new double[numberOfBins];
             for (int i = 0; i < numberOfBins; i++)
-                growthPerBin[i] = Math.pow(k * (LInfinity - species.getLength(subdivision,i)),0);
+                growthPerBin[i] = Math.max(k * (LInfinity - species.getLength(subdivision,i)),0);
             //turn this into graduating proportion
             //which is basically what % of length distance has been covered within deltaT (by growthPerBin)
             for (int i = 0; i < numberOfBins - 1; i++)
