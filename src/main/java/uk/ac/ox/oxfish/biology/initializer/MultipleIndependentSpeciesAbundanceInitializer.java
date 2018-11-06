@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.AbundanceLocalBiology;
+import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -13,16 +14,22 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME;
+
 public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyInitializer {
 
 
     private final List<SingleSpeciesAbundanceInitializer> individualInitializers;
 
 
+    private boolean addOtherSpecies;
+
+
     public MultipleIndependentSpeciesAbundanceInitializer(
-            List<SingleSpeciesAbundanceInitializer> individualInitializers)
+            List<SingleSpeciesAbundanceInitializer> individualInitializers, boolean addOtherSpecies)
     {
         this.individualInitializers = individualInitializers;
+        this.addOtherSpecies = addOtherSpecies;
     }
 
     @Override
@@ -69,6 +76,12 @@ public class MultipleIndependentSpeciesAbundanceInitializer implements BiologyIn
         List<Species> species = new ArrayList<>();
         for(SingleSpeciesAbundanceInitializer initializer : individualInitializers)
             species.add(initializer.generateGlobal(random, modelBeingInitialized).getSpecie(0));
+
+        //need to add an additional species to catch "all"
+        if(addOtherSpecies)
+            species.add(new Species(FAKE_SPECIES_NAME,
+                                    StockAssessmentCaliforniaMeristics.FAKE_MERISTICS,
+                                    true));
 
         return new GlobalBiology(species.toArray(new Species[species.size()]));
 

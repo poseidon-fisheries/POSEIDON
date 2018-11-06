@@ -74,8 +74,23 @@ public class HeterogeneousAbundanceGear implements Gear
     }
 
 
+    //a temp keeping a bunch of empty abundances so that when we hit an area with no fish we can just recycle these
+    //rather than building more matrices
+    private StructuredAbundance[] emptyCatchesCache;
+
+    private StructuredAbundance getEmptyCatches(GlobalBiology biology, Species species)
+    {
+        if(emptyCatchesCache==null)
+            emptyCatchesCache = new StructuredAbundance[biology.getSize()];
+        if(emptyCatchesCache[species.getIndex()]==null)
+            emptyCatchesCache[species.getIndex()] = new StructuredAbundance(species.getNumberOfSubdivisions(),species.getNumberOfBins());
+        return emptyCatchesCache[species.getIndex()];
+    }
+
     private StructuredAbundance[] catchesAsArray(
             SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+
+
         StructuredAbundance[] caught = new  StructuredAbundance[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
         {
@@ -83,7 +98,7 @@ public class HeterogeneousAbundanceGear implements Gear
             {
                 //if it's imaginary or not set or there is no fish, just return empty
                 //double[][] abundance = HomogeneousAbundanceGear.emptyAbundance(species);
-                caught[species.getIndex()] = new StructuredAbundance(species.getNumberOfSubdivisions(),species.getNumberOfBins());
+                caught[species.getIndex()] = getEmptyCatches(modelBiology,species);
 
             }
             else {

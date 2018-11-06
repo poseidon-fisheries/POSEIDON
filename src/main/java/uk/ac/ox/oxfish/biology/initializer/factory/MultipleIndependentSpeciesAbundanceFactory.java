@@ -13,7 +13,13 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
 
 
 
+
+
     private List<SingleSpeciesAbundanceFactory> factories = new LinkedList<>();
+
+    //add other species!
+    private boolean addGarbageSpecies = true;
+
     {
         SingleSpeciesAbundanceFactory first = new SingleSpeciesAbundanceFactory();
         first.setSpeciesName("Red Fish");
@@ -33,11 +39,30 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
         for(SingleSpeciesAbundanceFactory factory : factories)
             initializers.add(factory.apply(fishState));
 
-        return new MultipleIndependentSpeciesAbundanceInitializer(initializers);
+        addGarbageSpecies = true;
+        return new MultipleIndependentSpeciesAbundanceInitializer(initializers, addGarbageSpecies);
 
 
     }
 
+
+    /**
+     * Getter for property 'addGarbageSpecies'.
+     *
+     * @return Value for property 'addGarbageSpecies'.
+     */
+    public boolean isAddGarbageSpecies() {
+        return addGarbageSpecies;
+    }
+
+    /**
+     * Setter for property 'addGarbageSpecies'.
+     *
+     * @param addGarbageSpecies Value to set for property 'addGarbageSpecies'.
+     */
+    public void setAddGarbageSpecies(boolean addGarbageSpecies) {
+        this.addGarbageSpecies = addGarbageSpecies;
+    }
 
     public List<SingleSpeciesAbundanceFactory> getFactories() {
         return factories;

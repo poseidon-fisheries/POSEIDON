@@ -67,20 +67,19 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
 
         double[][] selectivity = getProbabilityMatrix(species);
 
-        double[][] filtered = new double[abundance.length][abundance[0].length];
         for(int subdivision =0; subdivision<abundance.length; subdivision++) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
-                filtered[subdivision][age] =
+                abundance[subdivision][age] =
                         abundance[subdivision][age] * selectivity[subdivision][age];
 
                 if (rounding) {
-                    filtered[subdivision][age] =
-                            FishStateUtilities.quickRounding(filtered[subdivision][age]);
+                    abundance[subdivision][age] =
+                            FishStateUtilities.quickRounding(abundance[subdivision][age]);
 
                 }
             }
         }
-        return filtered;
+        return abundance;
     }
 
     /**

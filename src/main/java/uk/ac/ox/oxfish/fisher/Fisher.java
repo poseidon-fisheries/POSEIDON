@@ -747,13 +747,14 @@ public class Fisher implements Steppable, Startable{
             //now count catches (which isn't necessarilly landings)
             for(Species species : modelBiology.getSpecies()) {
                 getDailyCounter().countCatches(species, catchOfTheDay.getWeightCaught(species));
+                /*
                 if(catchOfTheDay.hasAbundanceInformation() && species.getNumberOfBins() > 0)
                     for(int age=0; age<species.getNumberOfBins(); age++)
                     {
                         state.getDailyCounter().count(species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age,
                                                       catchOfTheDay.getWeightCaught(species,age));
                     }
-
+*/
             }
         }
         //record it
