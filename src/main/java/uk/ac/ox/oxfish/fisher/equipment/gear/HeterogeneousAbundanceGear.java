@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.Objects;
@@ -84,6 +85,9 @@ public class HeterogeneousAbundanceGear implements Gear
             emptyCatchesCache = new StructuredAbundance[biology.getSize()];
         if(emptyCatchesCache[species.getIndex()]==null)
             emptyCatchesCache[species.getIndex()] = new StructuredAbundance(species.getNumberOfSubdivisions(),species.getNumberOfBins());
+        else
+            for(int row=0; row<species.getNumberOfSubdivisions(); row++)
+                Arrays.fill(emptyCatchesCache[species.getIndex()].asMatrix()[row],0d);
         return emptyCatchesCache[species.getIndex()];
     }
 

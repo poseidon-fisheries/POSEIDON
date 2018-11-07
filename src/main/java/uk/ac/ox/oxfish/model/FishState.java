@@ -242,12 +242,21 @@ public class FishState  extends SimState{
                     String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age;
                     dailyCounter.addColumn(
                             columnName);
+                    int finalAge = age;
                     DataColumn dailyCatches = dailyDataSet.registerGatherer(
                             columnName,
                             new Gatherer<FishState>() {
                                 @Override
                                 public Double apply(FishState state) {
-                                    return dailyCounter.getColumn(columnName);
+
+                                    double sum = 0;
+                                    for(Fisher fisher : state.getFishers())
+                                    {
+                                            sum+= fisher.getCountedLandingsPerBin(species, finalAge);
+                                    }
+
+                                    return sum;
+
                                 }
                             },0
                     );

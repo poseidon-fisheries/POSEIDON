@@ -26,7 +26,9 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeWit
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.function.ToDoubleFunction;
@@ -121,9 +123,20 @@ public class PrototypeScenarioTest {
         state.setScenario(scenario);
         state.start();
 
-        for (int i = 0; i < 366; i++)
+        for (int i = 0; i < 366; i++) {
+            double landings=0;
             state.schedule.step(state);
+            for(int age=0; age<60; age++) {
+                // System.out.println(age);
+                landings+=state.getDailyDataSet().getLatestObservation( "Sablefish " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age);
+            }
+            assertEquals(landings,
+                    state.getDailyDataSet().getLatestObservation("Sablefish Catches"),
+                    .001
+                    );
 
+
+        }
         double sumHours = 0;
         double sumTrips = 0;
         double sumDuration = 0;

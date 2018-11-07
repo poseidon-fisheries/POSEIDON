@@ -717,6 +717,18 @@ public class Fisher implements Steppable, Startable{
 
 
 
+    private boolean doubleCheckCounters(Species species){
+
+        double landings = getDailyCounter().getCatchesPerSpecie(species.getIndex());
+        double sum = 0;
+        for(int i=0; i<species.getNumberOfBins(); i++)
+            sum += getDailyCounter().getSpecificLandings(species,i);
+//        System.out.println(landings);
+//        System.out.println(sum);
+        return Math.abs(sum-landings)<.01;
+
+    }
+
 
     /**
      * tell the fisher to use its gear to fish at current location. It stores everything in the hold
@@ -747,14 +759,13 @@ public class Fisher implements Steppable, Startable{
             //now count catches (which isn't necessarilly landings)
             for(Species species : modelBiology.getSpecies()) {
                 getDailyCounter().countCatches(species, catchOfTheDay.getWeightCaught(species));
-                /*
-                if(catchOfTheDay.hasAbundanceInformation() && species.getNumberOfBins() > 0)
-                    for(int age=0; age<species.getNumberOfBins(); age++)
-                    {
-                        state.getDailyCounter().count(species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age,
-                                                      catchOfTheDay.getWeightCaught(species,age));
-                    }
-*/
+
+                if(catchOfTheDay.hasAbundanceInformation() && species.getNumberOfBins() > 0) {
+                    getDailyCounter().countLandinngPerBin(species, catchOfTheDay);
+                    assert doubleCheckCounters(species);
+
+                }
+
             }
         }
         //record it
@@ -1429,5 +1440,9 @@ public class Fisher implements Steppable, Startable{
 
     public Hold getHold() {
         return equipment.getHold();
+    }
+
+    public double getCountedLandingsPerBin(Species species, int bin) {
+        return getDailyCounter().getSpecificLandings(species, bin);
     }
 }
