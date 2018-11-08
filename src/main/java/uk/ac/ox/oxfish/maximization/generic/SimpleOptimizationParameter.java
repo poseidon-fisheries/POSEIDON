@@ -78,11 +78,17 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
         Preconditions.checkArgument(maximum>=minimum);
         Preconditions.checkArgument(inputs.length==1);
 
-        double realValue = ((inputs[0]+10)/20)*(maximum-minimum);
+        double realValue =minimum+((maximum-minimum)/(10-(-10)))*(inputs[0]- (-10));
 
         //i am just going to do this the hackish way. The input could be a DoubleParameter or a straight up number. I will try the first, catch the exception
         // and try the second
 
+        quickParametrize(scenario, realValue, addressToModify);
+
+
+    }
+
+    static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
         try{
             //try as double parameter
             OptimizationParameter.navigateAndSet(
@@ -93,7 +99,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
             //try as raw number
             try{
             OptimizationParameter.navigateAndSet(
-                    scenario,addressToModify,new FixedDoubleParameter(realValue)
+                    scenario,addressToModify,realValue
 
             );}
             catch (Exception d)
@@ -101,9 +107,6 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
                 throw new RuntimeException(d);
             }
         }
-
-
-
     }
 
 

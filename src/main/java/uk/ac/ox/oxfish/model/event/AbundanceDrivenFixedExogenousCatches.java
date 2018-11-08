@@ -55,6 +55,18 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
      * @return
      */
     protected Catch mortalityEvent(FishState model, Species target, SeaTile tile, double step) {
+       return abundanceSimpleMortalityEvent(model,target,tile,step);
+    }
+
+    /**
+     * simulate exogenous catch
+     * @param model the model
+     * @param target species to kill
+     * @param tile where to kill it
+     * @param step how much at most to kill
+     * @return
+     */
+    public static Catch abundanceSimpleMortalityEvent(FishState model, Species target, SeaTile tile, double step) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
         double proportionToCatch = Math.min(1,step/tile.getBiomass(target));
@@ -71,5 +83,4 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
         tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
         return fish;
     }
-
 }

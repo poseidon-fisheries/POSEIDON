@@ -240,8 +240,6 @@ public class FishState  extends SimState{
                 for(int age=0; age<species.getNumberOfBins(); age++)
                 {
                     String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age;
-                    dailyCounter.addColumn(
-                            columnName);
                     int finalAge = age;
                     DataColumn dailyCatches = dailyDataSet.registerGatherer(
                             columnName,
@@ -494,7 +492,7 @@ public class FishState  extends SimState{
         return map.getTotalBiology(species);
     }
 
-    public double getTotalAbundance(Species species,int age)
+    public double getTotalAbundance(Species species,int bin)
     {
         return
                 map.getAllSeaTilesExcludingLandAsList().stream().filter(
@@ -509,7 +507,7 @@ public class FishState  extends SimState{
                 new ToDoubleFunction<SeaTile>() {
                     @Override
                     public double applyAsDouble(SeaTile value) {
-                        return value.getAbundance(species).getAbundanceInBin(age);
+                        return value.getAbundance(species).getAbundanceInBin(bin);
                     }
                 }
         ).sum();

@@ -159,54 +159,53 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         }
         //now create the total number of recruits
         lastRecruits = recruitment.recruit(species, species.getMeristics(),
-                                           StructuredAbundance.sum(abundances,abundances.get(0).getBins(),abundances.get(0).getSubdivisions()),
+                                           StructuredAbundance.sum(abundances, abundances.get(0).getBins(),
+                                                                   abundances.get(0).getSubdivisions()),
                                            model.getDayOfTheYear(),
                                            daysSimulated());
-        if(rounding)
-            lastRecruits = (int)(lastRecruits);
+        if (rounding)
+            lastRecruits = (int) (lastRecruits);
         abundances.clear();
 
 
         //allocate stuff before mortality hits!
         //either allocate recruits with given allocator or proportional to where biomass is
-        LinkedHashMap<AbundanceLocalBiology,Double> biomassWeight;
-        if(lastRecruits > 0 && recruitsAllocator != null) {
+        final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight= new LinkedHashMap<>();
+        if (lastRecruits > 0) {
+            if (recruitsAllocator != null) {
 
-            double sum = 0;
-            biomassWeight = new LinkedHashMap<>();
-            for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : biologies.entrySet()) {
-                double weight = recruitsAllocator.allocate(entry.getKey(),
-                                                           model.getMap(),
-                                                           model.getRandom());
-                sum+=weight;
-                biomassWeight.put(entry.getValue(), weight);
+                double sum = 0;
+                for (Map.Entry<SeaTile, AbundanceLocalBiology> entry : biologies.entrySet()) {
+                    double weight = recruitsAllocator.allocate(entry.getKey(),
+                                                               model.getMap(),
+                                                               model.getRandom());
+                    sum += weight;
+                    biomassWeight.put(entry.getValue(), weight);
+
+                }
+                Preconditions.checkArgument(sum > 0, "No area valid for recruits!");
+                for (AbundanceLocalBiology biology : biologies.values()) {
+                    biomassWeight.replace(biology, biomassWeight.get(biology) / sum);
+                    Preconditions.checkArgument(Double.isFinite(biomassWeight.get(biology)),
+                                                "some weights are not finite");
+                }
 
             }
-            Preconditions.checkArgument(sum > 0,"No area valid for recruits!");
-            for (AbundanceLocalBiology biology : biologies.values()) {
-                biomassWeight.replace(biology,biomassWeight.get(biology)/sum);
-                Preconditions.checkArgument(Double.isFinite(biomassWeight.get(biology)),
-                                            "some weights are not finite");
+            else {
+                //map for each biology its total weight
+                double totalBiomass = biologies.values().stream().mapToDouble(
+                        value -> {
+                            Double biomass = value.getBiomass(species);
+                            biomassWeight.put(value, biomass);
+                            return biomass;
+                        }).sum();
+                //reweight so they add up to 1
+                for (AbundanceLocalBiology bio : biomassWeight.keySet())
+                    biomassWeight.put(bio, biomassWeight.get(bio) / totalBiomass);
+
+
             }
-
-
         }
-        else {
-            biomassWeight = new LinkedHashMap<>();
-            //map for each biology its total weight
-            double totalBiomass = biologies.values().stream().mapToDouble(
-                    value -> {
-                        Double biomass = value.getBiomass(species);
-                        biomassWeight.put(value, biomass);
-                        return biomass;
-                    }).sum();
-            //reweight so they add up to 1
-            for(AbundanceLocalBiology bio : biomassWeight.keySet())
-                biomassWeight.put(bio,biomassWeight.get(bio)/totalBiomass);
-
-
-        }
-
 
         /***
          *      __  __         _        _ _ _
@@ -215,11 +214,11 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
          *     |_|  |_\___/_|  \__\__,_|_|_|\__|\_, |
          *                                      |__/
          */
-        biologies.values().forEach(
-                abundanceBasedLocalBiology -> mortality.cull(
-                        species.getMeristics(), rounding,
-                        abundanceBasedLocalBiology.getAbundance(species), daysSimulated()));
-
+        for (AbundanceLocalBiology abundanceBasedLocalBiology : biologies.values()) {
+            mortality.cull(
+                    species.getMeristics(), rounding,
+                    abundanceBasedLocalBiology.getAbundance(species), daysSimulated());
+        }
 
 
         /***

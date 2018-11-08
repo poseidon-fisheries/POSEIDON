@@ -50,7 +50,7 @@ public class Hold {
     /**
      * here we store fish per abundance; notice that we are storing its weight, not its raw numbers
      */
-    private double[][]  abundanceCaught;
+    private double[][] weightCaughtBinned;
 
     private final GlobalBiology biology;
 
@@ -93,23 +93,23 @@ public class Hold {
 
 
         //if this is the first time catching abundance, prepare the array!
-        if(abundanceCaught == null)
+        if(weightCaughtBinned == null)
         {
             Preconditions.checkArgument(getTotalWeightOfCatchInHold() == 0,
                                         " You are mixing abundance and non-abundance catches in hold; that's impossible");
-            abundanceCaught = new double[caught.getBiomassArray().length][];
-            for(int species =0; species< abundanceCaught.length; species++)
-                abundanceCaught[species] = new double[caught.getAbundance(species).getBins()];
+            weightCaughtBinned = new double[caught.getBiomassArray().length][];
+            for(int species = 0; species< weightCaughtBinned.length; species++)
+                weightCaughtBinned[species] = new double[caught.getAbundance(species).getBins()];
         }
 
         //now fill it with fish
-        for(int species =0; species< abundanceCaught.length; species++) {
+        for(int species = 0; species< weightCaughtBinned.length; species++) {
             StructuredAbundance abundance = caught.getAbundance(species);
             for (int bin = 0; bin < abundance.getBins(); bin++)
             {
                 double additionalWeight = FishStateUtilities.weigh(abundance,
                                                                    biology.getSpecie(species).getMeristics(), bin);
-                abundanceCaught[species][bin] += additionalWeight;
+                weightCaughtBinned[species][bin] += additionalWeight;
                 weightCarried += additionalWeight;
                 fishHold[species] += additionalWeight;
             }
@@ -143,9 +143,9 @@ public class Hold {
         //throw away abundance as well!
         if(proportionRemaining<1d && hasAbundanceInformation())
         {
-            for(int species=0; species<abundanceCaught.length; species++) {
-                for (int bin = 0; bin < abundanceCaught[species].length; bin++) {
-                    abundanceCaught[species][bin] *= proportionRemaining;
+            for(int species = 0; species< weightCaughtBinned.length; species++) {
+                for (int bin = 0; bin < weightCaughtBinned[species].length; bin++) {
+                    weightCaughtBinned[species][bin] *= proportionRemaining;
                 }
             }
         }
@@ -213,10 +213,10 @@ public class Hold {
         for(int i=0; i<biology.getSize(); i++)
         {
             double speciesSum=0;
-            for(int bin = 0; bin<abundanceCaught[i].length; bin++)
+            for(int bin = 0; bin< weightCaughtBinned[i].length; bin++)
             {
-                sum+=abundanceCaught[i][bin];
-                speciesSum+=abundanceCaught[i][bin];
+                sum+= weightCaughtBinned[i][bin];
+                speciesSum+= weightCaughtBinned[i][bin];
             }
             //the fish holds ought to be updated correctly!
             if(Math.abs(fishHold[i] -speciesSum) > FishStateUtilities.EPSILON)
@@ -233,7 +233,7 @@ public class Hold {
     public Catch  unload()
     {
         Catch toReturn = new Catch(fishHold);
-        abundanceCaught = null;
+        weightCaughtBinned = null;
         fishHold = new double[fishHold.length];
         weightCarried = 0;
         assert consistencyCheckBiomass();
@@ -247,24 +247,24 @@ public class Hold {
         toReturn.fishHold = Arrays.copyOf(fishHold,fishHold.length);
         toReturn.weightCarried = this.weightCarried;
         toReturn.maximumLoad = this.maximumLoad;
-        if(abundanceCaught!=null) {
-            toReturn.abundanceCaught = new double[abundanceCaught.length][];
-            for (int i = 0; i < abundanceCaught.length; i++)
-                toReturn.abundanceCaught[i] = Arrays.copyOf(abundanceCaught[i],abundanceCaught[i].length);
+        if(weightCaughtBinned !=null) {
+            toReturn.weightCaughtBinned = new double[weightCaughtBinned.length][];
+            for (int i = 0; i < weightCaughtBinned.length; i++)
+                toReturn.weightCaughtBinned[i] = Arrays.copyOf(weightCaughtBinned[i], weightCaughtBinned[i].length);
         }
         return toReturn;
     }
 
     public boolean hasAbundanceInformation()
     {
-        return abundanceCaught != null;
+        return weightCaughtBinned != null;
     }
 
 
     public double getWeightOfBin(Species species, int bin)
     {
         Preconditions.checkArgument(hasAbundanceInformation());
-        return abundanceCaught[species.getIndex()][bin];
+        return weightCaughtBinned[species.getIndex()][bin];
     }
 
 }

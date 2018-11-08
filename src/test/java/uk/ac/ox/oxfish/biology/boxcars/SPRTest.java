@@ -74,7 +74,7 @@ public class SPRTest {
                 new Function<Integer, Double>() {
                     @Override
                     public Double apply(Integer age) {
-                        return 0.02d * Math.pow(meristics.getLengthAtAge(age, 0), 2.94);
+                        return 0.02d/1000 * Math.pow(meristics.getLengthAtAge(age, 0), 2.94);
                     }
                 },
                 new Function<Integer, Double>() {

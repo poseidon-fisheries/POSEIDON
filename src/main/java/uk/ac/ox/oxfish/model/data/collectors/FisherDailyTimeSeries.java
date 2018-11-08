@@ -35,7 +35,7 @@ public class FisherDailyTimeSeries extends TimeSeries<Fisher> {
 
 
     public static final String CASH_COLUMN = FisherYearlyTimeSeries.CASH_COLUMN;
-    public static final String CATCHES_COLUMN_NAME = "Catches";
+    public static final String CATCHES_COLUMN_NAME = "Catches (kg)";
 
 
     public FisherDailyTimeSeries() {

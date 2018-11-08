@@ -121,8 +121,7 @@ public class AbundanceLocalBiology implements LocalBiology
     private static boolean warned = false;
 
     /**
-     * Sends a warning (since that's not usually the kind of behaviour we want) and after that
-     * kills off fish starting from the oldest male until enough biomass dies.
+     * Will only work if the catch object has biology information
      * @param caught fish taken from the sea
      * @param notDiscarded fish put in hold
      * @param biology biology object

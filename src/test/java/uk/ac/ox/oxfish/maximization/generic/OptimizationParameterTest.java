@@ -25,6 +25,9 @@ import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HeterogeneousGearFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.LogisticSelectivityGearFactory;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -105,4 +108,66 @@ public class OptimizationParameterTest {
         assertEquals(((FixedDoubleParameter) ((CommonLogisticGrowerFactory) second.getGrower()).getSteepness()).getFixedValue(),
                      10,.0001);
     }
+
+    @Test
+    public void mappedWorks() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        PrototypeScenario scenario  = new PrototypeScenario();
+        HeterogeneousGearFactory gears = new HeterogeneousGearFactory();
+
+        gears.gears.put("Pristipomoides multidens",
+                        new LogisticSelectivityGearFactory(
+                                41.9180563295419,
+                                13.1000149168684,
+                                0d,
+                                0.01d
+                        ));
+        gears.gears.put("Lutjanus malabaricus",
+                        new LogisticSelectivityGearFactory(
+                                57.3802620814091,
+                                17.0227436580102,
+                                0d,
+                                0.01d
+                        ));
+        gears.gears.put("Epinephelus areolatus",
+                        new LogisticSelectivityGearFactory(
+                                30.6447029784809,
+                                6.46514981161133,
+                                0d,
+                                0.01d
+                        )
+        );
+        gears.gears.put("Lutjanus erythropterus",
+                        new LogisticSelectivityGearFactory(
+                                48.532533910211,
+                                19.3556829280302,
+                                0d,
+                                0.01d
+                        )
+        );
+
+        HoldLimitingDecoratorFactory limiting = new HoldLimitingDecoratorFactory();
+        limiting.setDelegate(gears);
+        scenario.setGear(limiting);
+
+
+        assertEquals(
+                ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens").getAverageCatchability()).getFixedValue(),
+                .01,
+                .0001
+        );
+        //change catchability of multidens!
+        OptimizationParameter.navigateAndSet(
+                scenario,
+                "gear.delegate.gears~Pristipomoides multidens.averageCatchability",
+                new FixedDoubleParameter(22)
+        );
+        assertEquals(
+                ((FixedDoubleParameter) gears.gears.get("Pristipomoides multidens").getAverageCatchability()).getFixedValue(),
+                22,
+                .0001
+        );
+
+
+    }
+
 }

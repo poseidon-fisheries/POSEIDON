@@ -65,6 +65,12 @@ public interface OptimizationParameter {
                 Preconditions.checkState(indexed.length==2, "there should just be a $ sign at most when looking at optimization Parameters");
                 node = PropertyUtils.getIndexedProperty(node, indexed[0], Integer.parseInt(indexed[1]));
             }
+            else if(step.contains("~"))
+            {
+                String[] indexed = step.split("~");
+                Preconditions.checkState(indexed.length==2, "there should just be a ~ sign at most when looking at optimization Parameters");
+                node = PropertyUtils.getMappedProperty(node, indexed[0], indexed[1]);
+            }
             else {
                 node = PropertyUtils.getProperty(node, step);
             }
@@ -75,7 +81,13 @@ public interface OptimizationParameter {
         {
             String[] indexed = finalStep.split("\\$");
             Preconditions.checkState(indexed.length==2, "there should just be a $ sign at most when looking at optimization Parameters");
-            PropertyUtils.setIndexedProperty(node, indexed[0], Integer.parseInt(indexed[1]));
+            PropertyUtils.setIndexedProperty(node, indexed[0], Integer.parseInt(indexed[1]),value);
+        }
+        else if(finalStep.contains("~"))
+        {
+            String[] indexed = finalStep.split("~");
+            Preconditions.checkState(indexed.length==2, "there should just be a ~ sign at most when looking at optimization Parameters");
+            PropertyUtils.setMappedProperty(node, indexed[0], indexed[1],value);
         }
         else {
             PropertyUtils.setProperty(node, finalStep, value);

@@ -54,19 +54,19 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
     /**
      * retention inflection parameter
      */
-    private DoubleParameter retentionInflection = new FixedDoubleParameter(21.8035);
+    private DoubleParameter retentionInflection = new NullParameter();
 
 
     /**
      * retention slope parameter
      */
-    private DoubleParameter retentionSlope = new FixedDoubleParameter(1.7773);
+    private DoubleParameter retentionSlope = new NullParameter();
 
 
     /**
      * retention slope parameter: if null retention is ignored
      */
-    private DoubleParameter retentionAsymptote = new FixedDoubleParameter(0.992661);
+    private DoubleParameter retentionAsymptote = new NullParameter();
 
 
     private DoubleParameter litersOfGasConsumedPerHour = new FixedDoubleParameter(0);

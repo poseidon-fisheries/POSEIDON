@@ -75,9 +75,17 @@ public class SPR {
             {
 
                 double abundanceHere = abundance.getAbundance(subdivision, bin);
-                if(abundanceHere>0)
-                    count[(int)Math.round(species.getLength(subdivision, bin)/lengthBinCm)]+=
+                if(abundanceHere>0) {
+                    int countBin = (int) Math.round(species.getLength(subdivision, bin) / lengthBinCm);
+                    if(countBin>=count.length)
+                    {
+                        //we could be using a bad or simplified lengthInfinity
+                        assert species.getLength(subdivision,bin)>=lengthInfinity;
+                        countBin = count.length-1;
+                    }
+                    count[countBin]+=
                             abundanceHere;
+                }
 
             }
         }

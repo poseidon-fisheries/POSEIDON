@@ -38,13 +38,13 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static final double MINIMUM_CATCHABILITY = 0.000001;
 
-    public static final double MAXIMUM_CATCHABILITY = 0.0005;
+    public static final double MAXIMUM_CATCHABILITY = 0.0003;
 
     private static final Path DEFAULT_PATH = Paths.get("docs",
             "indonesia_hub",
-            "runs", "712", "slice1", "calibration");
+            "runs", "712", "sclice2", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("pessimistic.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("calibration_selfreplicating.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -57,21 +57,38 @@ public class GenericOptimization extends SimpleProblemDouble {
     {
 
         for(int populations=0; populations<3; populations++) {
-            //gear
-            //catchabilities
-            parameters.add(new CommaMapOptimizationParameter(
-                    4, "fisherDefinitions$"+populations+".gear.delegate.delegate.catchabilityMap",
+
+            parameters.add(new SimpleOptimizationParameter(
+                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Pristipomoides multidens.averageCatchability",
                     MINIMUM_CATCHABILITY,
                     MAXIMUM_CATCHABILITY
             ));
+
+            parameters.add(new SimpleOptimizationParameter(
+                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability",
+                    MINIMUM_CATCHABILITY,
+                    MAXIMUM_CATCHABILITY
+            ));
+            parameters.add(new SimpleOptimizationParameter(
+                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Epinephelus areolatus.averageCatchability",
+                    MINIMUM_CATCHABILITY,
+                    MAXIMUM_CATCHABILITY
+            ));
+            parameters.add(new SimpleOptimizationParameter(
+                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability",
+                    MINIMUM_CATCHABILITY,
+                    MAXIMUM_CATCHABILITY
+            ));
+
             //garbage collectors
             parameters.add(new SimpleOptimizationParameter(
                     "fisherDefinitions$"+populations+".gear.delegate.proportionSimulatedToGarbage",
-                    .10,
+                    0,
                     .80
             ));
         }
 
+        /*
         for(int species=0; species<4; species++)
         {
             parameters.add(
@@ -83,6 +100,7 @@ public class GenericOptimization extends SimpleProblemDouble {
                     )
             );
         }
+        */
 
     }
 
@@ -302,22 +320,33 @@ public class GenericOptimization extends SimpleProblemDouble {
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()),Scenario.class);
         int parameter=0;
-        for (OptimizationParameter optimizationParameter : parameters)
+      /*  for (OptimizationParameter optimizationParameter : parameters)
         {
             optimizationParameter.parametrize(scenario,
                     Arrays.copyOfRange(x,parameter,
                             parameter+optimizationParameter.size()));
             parameter+=optimizationParameter.size();
         }
+        */
+      GenericOptimization optimization = new GenericOptimization();
+      System.out.println(optimization.getProblemDimension());
         return scenario;
     }
 
 
+
+    public static void test(String[] args)
+    {
+
+
+
+    }
+
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-5.937908401841871, -8.775187416881483, -8.795574436039747, -8.689064039027828, -1.7656691689733803, -5.041267395873877, 7.441815543571826, -8.509716961656945, -0.27183210362932675, -0.789784738137499, -5.447575328740677, 9.896875533729187, -8.136306082625195, -5.859790833739022, -0.358633410518905, 1.6896512155526051, -6.4692711269147685, 3.022448948468056, 9.86525665067513});
+        Scenario scenario = optimization.buildScenario(new double[]{-6.173, 10.000, 7.196, 7.989,-8.782, 2.070, 3.455,-0.599,-9.119,-9.932, 8.932, 2.775, 3.847, 9.075,-7.568});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ga_pessimistic.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("guess_2.yaml").toFile()));
 
     }
 

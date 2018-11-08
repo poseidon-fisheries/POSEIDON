@@ -60,13 +60,16 @@ public class FixedProportionFilter implements AbundanceFilter
     {
         for(int subdivision=0; subdivision<abundance.length; subdivision++ ) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
-                abundance[subdivision][age] = (abundance[subdivision][age] * proportion);
+                abundance[subdivision][age] *=   proportion;
 
-                if (rounding) {
+
+            }
+        }
+        if (rounding) {
+            for(int subdivision=0; subdivision<abundance.length; subdivision++ )
+                for (int age = 0; age < abundance[subdivision].length; age++)
                     abundance[subdivision][age] = FishStateUtilities.quickRounding(abundance[subdivision][age]);
 
-                }
-            }
         }
         return abundance;
     }

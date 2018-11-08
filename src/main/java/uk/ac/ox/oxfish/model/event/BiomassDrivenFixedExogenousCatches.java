@@ -52,6 +52,15 @@ public class BiomassDrivenFixedExogenousCatches extends AbstractExogenousCatches
     @Override
     protected Catch mortalityEvent(
             FishState model, Species target, SeaTile tile, double step) {
+        return biomassSimpleMortalityEvent(model,
+                                           target,
+                                           tile,
+                                           step);
+    }
+
+
+    public static Catch biomassSimpleMortalityEvent(
+            FishState model, Species target, SeaTile tile, double step) {
         //take it as a fixed proportion catchability (and never more than it is available anyway)
         assert tile.getBiomass(target) > FishStateUtilities.EPSILON;
         double proportionToCatch = Math.min(1,step/tile.getBiomass(target));
