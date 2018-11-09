@@ -363,11 +363,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        double[] test = test();
-        System.out.println(Arrays.toString(test));
-        double[] fitness = optimization.evaluate(test);
-        System.out.println(Arrays.toString(fitness));
-
+        Scenario scenario = optimization.buildScenario(new double[]{-8.344,-7.963,-9.393,-6.181,-4.529, 0.741,-5.738,-7.991, 3.183,-9.689, 0.424,-3.412, 0.757, 2.407,-6.365});
+        FishYAML yaml = new FishYAML();
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_200.yaml").toFile()));
 
     }
 

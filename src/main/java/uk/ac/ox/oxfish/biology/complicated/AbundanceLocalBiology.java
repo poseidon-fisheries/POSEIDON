@@ -150,8 +150,14 @@ public class AbundanceLocalBiology implements LocalBiology
             for(int subdivision =0;subdivision<catches.getSubdivisions(); subdivision++ ) {
                 for (int bin = 0; bin < catches.getBins(); bin++) {
                     abundanceHere[subdivision][bin] -= catchesMatrix[subdivision][bin];
-                    Preconditions.checkArgument(abundanceHere[FishStateUtilities.MALE][bin] >= 0,
+                    Preconditions.checkArgument(abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON,
                                                 "There is now a negative amount of male fish left at bin " + bin);
+                    //overfished, but could be a numerical issue
+                    if(abundanceHere[subdivision][bin]<0)
+                    {
+                        assert  abundanceHere[subdivision][bin] >= -FishStateUtilities.EPSILON;
+                        abundanceHere[subdivision][bin]=0;
+                    }
 
                 }
             }

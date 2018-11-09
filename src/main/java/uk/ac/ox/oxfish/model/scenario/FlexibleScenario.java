@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
+import uk.ac.ox.oxfish.model.event.MixedExogenousCatches;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -220,7 +221,7 @@ public class FlexibleScenario implements Scenario {
         }
         //start it!
 
-        ExogenousCatches catches = new BiomassDrivenFixedExogenousCatches(recast);
+        ExogenousCatches catches = new MixedExogenousCatches(recast);
         model.registerStartable(catches);
 
 

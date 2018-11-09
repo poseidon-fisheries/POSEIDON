@@ -29,9 +29,8 @@ import java.util.LinkedHashMap;
 
 public class MixedExogenousCatches extends AbstractExogenousCatches {
     public MixedExogenousCatches(
-            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg,
-            String dataColumnName) {
-        super(exogenousYearlyCatchesInKg, dataColumnName);
+            LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg) {
+        super(exogenousYearlyCatchesInKg, "Exogenous catches of ");
     }
 
     /**
@@ -51,7 +50,7 @@ public class MixedExogenousCatches extends AbstractExogenousCatches {
             return AbundanceDrivenFixedExogenousCatches.abundanceSimpleMortalityEvent(simState,
                                                                                       target,
                                                                                       tile,
-                                                                                      step);
+                                                                                      step, false);
         else
             return BiomassDrivenFixedExogenousCatches.biomassSimpleMortalityEvent(simState,
                                                                                   target,
