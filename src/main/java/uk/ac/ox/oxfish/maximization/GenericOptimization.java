@@ -119,42 +119,47 @@ public class GenericOptimization extends SimpleProblemDouble {
         populations.put("Big",2);
 
         for (Map.Entry<String, Integer> population : populations.entrySet()) {
-           targets.add(
+            targets.add(
                     new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL021 Lutjanus malabaricus.csv").toString(),
-                            "Lutjanus malabaricus Landings of population"+population.getValue(), true, -1d, 1,
+                            DEFAULT_PATH.resolve("targets").resolve(
+                                    population.getKey() + "_LL021 Lutjanus malabaricus.csv").toString(),
+                            "Lutjanus malabaricus Landings of population" + population.getValue(), true, -1d, 1,
                             CUMULATIVE));
 
             targets.add(
                     new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LP012 Pristipomoides multidens.csv").toString(),
-                            "Pristipomoides multidens Landings of population"+population.getValue(), true, -1d, 1,
+                            DEFAULT_PATH.resolve("targets").resolve(
+                                    population.getKey() + "_LP012 Pristipomoides multidens.csv").toString(),
+                            "Pristipomoides multidens Landings of population" + population.getValue(), true, -1d, 1,
                             CUMULATIVE));
 
-
-                       targets.add(
-                    new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_SE002 Epinephelus areolatus.csv").toString(),
-                            "Epinephelus areolatus Landings of population"+population.getValue(), true, -1d, 1,
-                            CUMULATIVE));
-            targets.add(
-                    new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_LL017 Lutjanus erythropterus.csv").toString(),
-                            "Lutjanus erythropterus Landings of population"+population.getValue(), true, -1d, 1,
-                            CUMULATIVE));
 
             targets.add(
                     new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_other.csv").toString(),
-                            "Others Landings of population"+population.getValue(), true, -1d, 1,
+                            DEFAULT_PATH.resolve("targets").resolve(
+                                    population.getKey() + "_SE002 Epinephelus areolatus.csv").toString(),
+                            "Epinephelus areolatus Landings of population" + population.getValue(), true, -1d, 1,
+                            CUMULATIVE));
+            targets.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(
+                                    population.getKey() + "_LL017 Lutjanus erythropterus.csv").toString(),
+                            "Lutjanus erythropterus Landings of population" + population.getValue(), true, -1d, 1,
                             CUMULATIVE));
 
             targets.add(
                     new YearlyDataTarget(
-                            DEFAULT_PATH.resolve("targets").resolve(population.getKey()+"_total.csv").toString(),
-                            "Total Landings of population"+population.getValue(), true, -1d, 1,
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey() + "_other.csv").toString(),
+                            "Others Landings of population" + population.getValue(), true, -1d, 1,
                             CUMULATIVE));
 
+            targets.add(
+                    new YearlyDataTarget(
+                            DEFAULT_PATH.resolve("targets").resolve(population.getKey() + "_total.csv").toString(),
+                            "Total Landings of population" + population.getValue(), true, -1d, 1,
+                            CUMULATIVE));
+
+        }
             //biomass!
 //            targets.add(
 //                    new FixedDataLastStepTarget(
@@ -239,7 +244,7 @@ public class GenericOptimization extends SimpleProblemDouble {
                             "Lutjanus erythropterus Landings", true, -1d, 1,
                             CUMULATIVE));
 
-        }
+
 
 
 
@@ -320,23 +325,37 @@ public class GenericOptimization extends SimpleProblemDouble {
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()),Scenario.class);
         int parameter=0;
-      /*  for (OptimizationParameter optimizationParameter : parameters)
+       for (OptimizationParameter optimizationParameter : parameters)
         {
             optimizationParameter.parametrize(scenario,
                     Arrays.copyOfRange(x,parameter,
                             parameter+optimizationParameter.size()));
             parameter+=optimizationParameter.size();
         }
-        */
-      GenericOptimization optimization = new GenericOptimization();
-      System.out.println(optimization.getProblemDimension());
+
         return scenario;
     }
 
 
 
-    public static void test(String[] args)
+    public static double[] test()
     {
+
+        double trueInputs[] = new double[]{
+                //multidens,malabaricus,areolatus,eryhtopterus,garbage
+                0.00001116382,0.00004783977,0.00001250899,0.00003673613,0.1954266,
+                0.0002420583,0.00005223041,0.00002299836,0.00001353882,0.2743158,
+                0.0002510884,0.0000329285,0.00001766685,0.000002903146,0.175
+        };
+        double inputs[] = new double[15];
+        for(int i=0; i< inputs.length; i++)
+            inputs[i] =        (10 * (MINIMUM_CATCHABILITY + MAXIMUM_CATCHABILITY - 2 *trueInputs[i]))/(MINIMUM_CATCHABILITY - MAXIMUM_CATCHABILITY);
+        inputs[4] = (10 * (0 + .8 - 2 *trueInputs[4]))/(0 - 0.8);
+        inputs[9] = (10 * (0 + .8 - 2 *trueInputs[9]))/(0 - 0.8);
+        inputs[14] = (10 * (0 + .8 - 2 *trueInputs[14]))/(0 - 0.8);
+
+        return inputs;
+
 
 
 
@@ -344,9 +363,11 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-6.173, 10.000, 7.196, 7.989,-8.782, 2.070, 3.455,-0.599,-9.119,-9.932, 8.932, 2.775, 3.847, 9.075,-7.568});
-        FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("guess_2.yaml").toFile()));
+        double[] test = test();
+        System.out.println(Arrays.toString(test));
+        double[] fitness = optimization.evaluate(test);
+        System.out.println(Arrays.toString(fitness));
+
 
     }
 

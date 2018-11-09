@@ -68,6 +68,10 @@ public class Recruitments {
                          FixedRecruitmentFactory::new);
         NAMES.put(FixedRecruitmentFactory.class,"Fixed Recruitment");
 
+        CONSTRUCTORS.put("Linear SSB Recruitment",
+                         LinearSSBRatioSpawningFactory::new);
+        NAMES.put(LinearSSBRatioSpawningFactory.class,"Linear SSB Recruitment");
+
     }
 
 

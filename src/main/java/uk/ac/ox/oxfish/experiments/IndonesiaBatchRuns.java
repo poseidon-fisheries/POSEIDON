@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "guess_4";
+    public static final String FILENAME = "guess_4_fix";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/sclice2/calibration/results";
 
     public static void main(String[] args) throws IOException {
