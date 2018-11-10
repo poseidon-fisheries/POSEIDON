@@ -21,17 +21,22 @@
 package uk.ac.ox.oxfish.experiments;
 
 import com.google.common.collect.Lists;
+import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.experiments.indonesia.Slice2SPR;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ns_200";
+    public static final String FILENAME = "ns_2000_medium2";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/sclice2/calibration/results";
 
     public static void main(String[] args) throws IOException {
@@ -78,7 +83,10 @@ public class IndonesiaBatchRuns {
                         "Biomass Lutjanus erythropterus",
                         "Total Landings of population0",
                         "Total Landings of population1",
-                        "Total Landings of population2"
+                        "Total Landings of population2",
+                        "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
+                        "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
+                        "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus"
 
                 ),
                 Paths.get(DIRECTORY,
@@ -88,6 +96,20 @@ public class IndonesiaBatchRuns {
                 -1
         );
 
+        //add SPR counters
+        runner.setScenarioSetup(new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario scenario) {
+                MersenneTwisterFast random = new MersenneTwisterFast();
+                //add a full one
+                String surveyTag = "100_areolatus";
+                Slice2SPR.randomAreolatusSampling((FlexibleScenario) scenario, random, surveyTag, 1, null);
+                surveyTag = "100_multidens";
+                Slice2SPR.randomMultidensSampling((FlexibleScenario) scenario, random, surveyTag, 1, null);
+                surveyTag = "100_malabaricus";
+                Slice2SPR.randomMalabaricusSampling((FlexibleScenario) scenario, random, surveyTag, 1, null);
+            }
+        });
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, FILENAME + ".csv").toFile());
         fileWriter.write("run,year,variable,value\n");

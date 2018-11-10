@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracle;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -45,7 +46,7 @@ public class Slice2SPR {
 
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/sclice2/policy/";
 
-    public static final String scenarioFileName = "guess_4";
+    public static final String scenarioFileName = "ns_2000_low";
 
 
     private static final int NUMBER_OF_RUNS = 100;
@@ -277,11 +278,12 @@ public class Slice2SPR {
 
     //winning no prizes with this code
 
-    private static void randomAreolatusSampling(
+    public static void randomAreolatusSampling(
             FlexibleScenario scenario,
             MersenneTwisterFast random,
             String surveyTag,
             double probability,
+            @Nullable
             List<String> columns) {
         String speciesName = "Epinephelus areolatus";
 
@@ -300,17 +302,19 @@ public class Slice2SPR {
                         assumedVarAAreolatus, assumedVarBAreolatus, assumedLenghtAtMaturityAreolatus
                 )
         );
+        if(columns!=null)
         columns.add("SPR " + speciesName + " " + surveyTag);
 
 
     }
 
-    private static void randomMultidensSampling(
+    public static void randomMultidensSampling(
             FlexibleScenario scenario,
             MersenneTwisterFast random,
             String surveyTag,
             double probability,
-            List<String> columns) {
+            @Nullable
+                    List<String> columns) {
         String speciesName = "Pristipomoides multidens";
 
         scenario.getPlugins().add(
@@ -328,17 +332,20 @@ public class Slice2SPR {
                         assumedVarAMultidens, assumedVarBMultidens, assumedLenghtAtMaturityMultidens
                 )
         );
-        columns.add("SPR " + speciesName + " " + surveyTag);
+        if(columns!=null)
+
+            columns.add("SPR " + speciesName + " " + surveyTag);
 
 
     }
 
 
-    private static void randomMalabaricusSampling(
+    public static void randomMalabaricusSampling(
             FlexibleScenario scenario,
             MersenneTwisterFast random,
             String surveyTag,
             double probability,
+            @Nullable
             List<String> columns) {
         String speciesName = "Lutjanus malabaricus";
 
@@ -357,7 +364,9 @@ public class Slice2SPR {
                         assumedVarAMalabaricus, assumedVarBMalabaricus, assumedLenghtAtMaturityMalabaricus
                 )
         );
-        columns.add("SPR " + speciesName + " " + surveyTag);
+        if(columns!=null)
+
+            columns.add("SPR " + speciesName + " " + surveyTag);
 
 
     }
