@@ -58,7 +58,7 @@ public class Slice2SPR {
     static private final double assumedNaturalMortalityAreolatus = 0.6011646;
     static private final double assumedVarAAreolatus = 0.01142;
     static private final double assumedVarBAreolatus = 3.048;
-    static private final double assumedLenghtAtMaturityAreolatus = 21 ;
+    static public final double assumedLenghtAtMaturityAreolatus = 21 ;
 
 
 
@@ -67,7 +67,7 @@ public class Slice2SPR {
     static private final double assumedNaturalMortalityMultidens = 0.394192;
     static private final double assumedVarAMultidens = 0.02;
     static private final double assumedVarBMultidens = 2.944;
-    static private final double assumedLenghtAtMaturityMultidens = 48.0;
+    static public final double assumedLenghtAtMaturityMultidens = 48.0;
 
 
     static private final double assumedLinfMalabaricus = 86;
@@ -75,7 +75,7 @@ public class Slice2SPR {
     static private final double assumedNaturalMortalityMalabaricus = 0.3775984;
     static private final double assumedVarAMalabaricus = 0.00853;
     static private final double assumedVarBMalabaricus = 3.137;
-    static private final double assumedLenghtAtMaturityMalabaricus = 50.0;
+    static public final double assumedLenghtAtMaturityMalabaricus = 50.0;
     public static final int VIRGIN_SPAWNING_BIOMASS_AREOLATUS = 5389362;
     public static final int VIRGIN_SPAWNING_BIOMASS_MULTIDENS = 40160483;
     public static final int VIRGIN_SPAWNING_BIOMASS_MALABARICUS = 153988743;
@@ -118,6 +118,7 @@ public class Slice2SPR {
                 "Total Landings of population2"
 
         );
+
         columnsToPrint.addAll(columnNames);
 
         for(int run=0; run<NUMBER_OF_RUNS; run++)
@@ -238,6 +239,7 @@ public class Slice2SPR {
                         return new SprOracle(
                                 fishState.getBiology().getSpecie("Epinephelus areolatus"),
                                 assumedLenghtAtMaturityAreolatus,
+                                200,
                                 VIRGIN_SPAWNING_BIOMASS_AREOLATUS
                         );
                     }
@@ -251,6 +253,7 @@ public class Slice2SPR {
                         return new SprOracle(
                                 fishState.getBiology().getSpecie("Pristipomoides multidens"),
                                 assumedLenghtAtMaturityMultidens,
+                                200,
                                 VIRGIN_SPAWNING_BIOMASS_MULTIDENS
                         );
                     }
@@ -264,6 +267,7 @@ public class Slice2SPR {
                         return new SprOracle(
                                 fishState.getBiology().getSpecie("Lutjanus malabaricus"),
                                 assumedLenghtAtMaturityMalabaricus,
+                                200,
                                 VIRGIN_SPAWNING_BIOMASS_MALABARICUS
                         );
                     }

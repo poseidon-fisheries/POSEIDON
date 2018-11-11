@@ -20,9 +20,12 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 
 /**
@@ -35,15 +38,20 @@ public class SprOracle implements AdditionalStartable {
 
     private final double maturityLength;
 
+    private final int dayOfMeasurement;
+
+    private double spr = Double.NaN;
+
     /**
      * the Spawning biomass (in kg) for virgin fish
      */
     private final double virginSpawningBiomass;
     private int spawningSubdivision;
 
-    public SprOracle(Species species, double maturityLength, double virginSpawningBiomass) {
+    public SprOracle(Species species, double maturityLength, int dayOfMeasurement, double virginSpawningBiomass) {
         this.species = species;
         this.maturityLength = maturityLength;
+        this.dayOfMeasurement = dayOfMeasurement;
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 
@@ -56,6 +64,27 @@ public class SprOracle implements AdditionalStartable {
      */
     @Override
     public void start(FishState model) {
+
+        model.scheduleEveryYear(new Steppable() {
+            @Override
+            public void step(SimState simState) {
+                model.scheduleOnceInXDays(new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+
+                        double spawningBiomass = 0;
+                        for(int i=0; i<species.getNumberOfBins(); i++) {
+                            spawningSubdivision = 0;
+                            if(species.getLength(spawningSubdivision, i)>maturityLength)
+                                spawningBiomass += model.getTotalAbundance(species,i) *
+                                        species.getWeight(spawningSubdivision,i);
+                        }
+
+                        spr = spawningBiomass/virginSpawningBiomass;
+                    }
+                },StepOrder.YEARLY_DATA_GATHERING,dayOfMeasurement);
+            }
+        }, StepOrder.DAWN);
 
         model.getYearlyDataSet().registerGatherer(
                 "SPR Oracle - " + species,

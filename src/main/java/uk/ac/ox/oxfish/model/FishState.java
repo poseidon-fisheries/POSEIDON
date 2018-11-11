@@ -513,6 +513,17 @@ public class FishState  extends SimState{
         ).sum();
     }
 
+
+    public double getTotalAbundance(Species species,int subdivision, int bin)
+    {
+        double sum = 0;
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+            if(seaTile.isFishingEvenPossibleHere())
+                sum += seaTile.getAbundance(species).getAbundance(subdivision,bin);
+        }
+        return sum;
+    }
+
     /**
      * if the model hasn't started, register this object to be started when the model is. Otherwise start it now
      * @param startable the object to start

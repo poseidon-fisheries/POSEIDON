@@ -186,16 +186,44 @@ public class SPRAgent implements AdditionalStartable {
             }
         }, StepOrder.DAILY_DATA_GATHERING);
 
+        model.scheduleEveryYear(
+                new Steppable() {
+                    @Override
+                    public void step(SimState simState) {
+                        reset();
+                    }
+                },
+                StepOrder.DATA_RESET
+        );
+
         model.getYearlyDataSet().registerGatherer("SPR " + species + " " + surveyTag,
                                                   new Gatherer<FishState>() {
                                                       @Override
                                                       public Double apply(FishState fishState) {
                                                           double spr = computeSPR();
-                                                          reset();
                                                           return spr;
 
                                                       }
                                                   },Double.NaN);
+
+        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                int finalSubdivision = subdivision;
+                int finalBin = bin;
+                String columnName = species + " " + "Catches(#) " + subdivision + "." + bin + " " + surveyTag;
+                model.getYearlyDataSet().registerGatherer(
+                        columnName,
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState fishState) {
+
+                                return abundance[finalSubdivision][finalBin];
+                            }
+                        }, Double.NaN
+                );
+            }
+
+        }
 
 
 

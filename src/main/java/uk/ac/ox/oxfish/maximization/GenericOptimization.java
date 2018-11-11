@@ -44,7 +44,7 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "sclice2", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("calibration_selfreplicating.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("calibration_low_steepness.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -363,9 +363,9 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{-8.344,-7.963,-9.393,-6.181,-4.529, 0.741,-5.738,-7.991, 3.183,-9.689, 0.424,-3.412, 0.757, 2.407,-6.365});
+        Scenario scenario = optimization.buildScenario(new double[]{-9.196,-8.077,-9.722,-9.335,-2.321,-1.560,-7.296,-7.952, 4.849,-6.674, 9.278,-8.672,-8.076, 2.995, 0.518});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_200.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_2000_low.yaml").toFile()));
 
     }
 
