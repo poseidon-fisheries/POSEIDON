@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.biology.Species;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ProportionalMortalityProcessTest
 {
@@ -55,8 +56,9 @@ public class ProportionalMortalityProcessTest
         );
     }
 
+
     @Test
-    public void proportionalMortalityDaily() throws Exception {
+    public void proportionalMortalityDailyForAYear() throws Exception {
 
 
         StructuredAbundance abundance = new StructuredAbundance(
@@ -64,18 +66,25 @@ public class ProportionalMortalityProcessTest
                 new double[]{100, 10, 1}
         );
 
-        ProportionalMortalityProcess mortality = new ProportionalMortalityProcess(.365);
+        Meristics meristics = mock(Meristics.class);
 
-        mortality.cull(mock(Meristics.class),
-                       false,
-                       abundance,
-                       1
+        when(meristics.getNumberOfSubdivisions()).thenReturn(1);
+        when(meristics.getNumberOfBins()).thenReturn(3);
+        NaturalMortalityProcess mortality = new ProportionalMortalityProcess(.5
         );
+
+        for(int i=0; i<365; i++) {
+            mortality.cull(meristics,
+                    false,
+                    abundance,
+                    1
+            );
+        }
 
 
         assertArrayEquals(
                 abundance.asMatrix()[0],
-                new double[]{99.9,9.99,.999},
+                new double[]{50,5,.5},
                 .001d
         );
     }

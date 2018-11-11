@@ -42,8 +42,9 @@ import java.util.function.Consumer;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ns_2000_low3";
+    public static final String FILENAME = "ns_2000_low3_mortality";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/sclice2/calibration/results";
+    public static final int YEARS_TO_RUN = 10;
 
     public static void main(String[] args) throws IOException {
 
@@ -112,7 +113,7 @@ public class IndonesiaBatchRuns {
         BatchRunner runner = new BatchRunner(
                 Paths.get(DIRECTORY,
                           FILENAME + ".yaml"),
-                4,
+                YEARS_TO_RUN,
                 columnsToPrint,
                 Paths.get(DIRECTORY,
                           FILENAME),

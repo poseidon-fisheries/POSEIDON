@@ -64,8 +64,6 @@ public class ExponentialMortalityProcess implements NaturalMortalityProcess {
         Preconditions.checkArgument(species.getNumberOfSubdivisions() ==mortalityParameters.length,
                                     "There ought to be a mortality parameter for each subdivision/cohort");
 
-        Preconditions.checkArgument(structuredAbundance.getSubdivisions()==2,
-                                    "coded for male and female; need recode for generalization");
 
         double scaling = daysSimulated/365d;
         double[][] abundance = structuredAbundance.asMatrix();

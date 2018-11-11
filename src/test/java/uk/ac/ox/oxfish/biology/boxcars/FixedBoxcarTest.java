@@ -61,6 +61,17 @@ public class FixedBoxcarTest {
                 .0001f
 
         );
+
+
+        for(int i=0; i<1000; i++)
+            VariableProportionAging.variableAging(population, graduationRate);
+        Assert.assertArrayEquals(
+                population,
+                new double[]{0, 0, 300},
+                .0001f
+
+        );
+
     }
 
 

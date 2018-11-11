@@ -44,7 +44,7 @@ public class ProportionalMortalityProcess implements NaturalMortalityProcess {
             Meristics species, boolean rounding, StructuredAbundance structuredAbundance, int daysSimulated)
     {
         double scaling = daysSimulated/365d;
-        double effectiveMortality = yearlyMortality * scaling;
+        double effectiveMortality = 1d-Math.pow(1d-yearlyMortality,scaling);
         double[][] abundanceMatrix = structuredAbundance.asMatrix();
 
 
