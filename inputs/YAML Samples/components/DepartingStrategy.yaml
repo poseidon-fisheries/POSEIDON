@@ -24,10 +24,14 @@ Double Logistic:
   windspeedSensitivity: '0.03'
 -------
 Monthly Departing:
-  addYearlyAdapatation: false
-  explorationRate: '0.2'
-  mutationRate: '0.05'
-  probabilityEachMonthToGoOutFishing: '0.3'
+  delegate:
+    Fixed Rest:
+      hoursBetweenEachDeparture: '12.0'
+  monthsNotGoingOut:
+  - 1
+  - 12
+  - 6
+  - 7
 -------
 Unified Amateurish Dynamic Programming:
   discountRate: '0.0'

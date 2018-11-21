@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.fisher.equipment;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -105,10 +106,12 @@ public class Hold {
         //now fill it with fish
         for(int species = 0; species< weightCaughtBinned.length; species++) {
             StructuredAbundance abundance = caught.getAbundance(species);
+            Meristics meristics = biology.getSpecie(species).getMeristics();
+
             for (int bin = 0; bin < abundance.getBins(); bin++)
             {
                 double additionalWeight = FishStateUtilities.weigh(abundance,
-                                                                   biology.getSpecie(species).getMeristics(), bin);
+                                                                   meristics, bin);
                 weightCaughtBinned[species][bin] += additionalWeight;
                 weightCarried += additionalWeight;
                 fishHold[species] += additionalWeight;

@@ -131,7 +131,7 @@ public class PrototypeScenarioTest {
                 landings+=state.getDailyDataSet().getLatestObservation( "Sablefish " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age);
             }
             assertEquals(landings,
-                    state.getDailyDataSet().getLatestObservation("Sablefish Catches"),
+                    state.getDailyDataSet().getLatestObservation("Sablefish "+FisherDailyTimeSeries.CATCHES_COLUMN_NAME),
                     .001
                     );
 

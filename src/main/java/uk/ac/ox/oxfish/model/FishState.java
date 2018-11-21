@@ -346,9 +346,7 @@ public class FishState  extends SimState{
         return map.getPortMap();
     }
 
-    public GeomVectorField getCities() {
-        return map.getCities();
-    }
+
 
     public Scenario getScenario() {
         return scenario;

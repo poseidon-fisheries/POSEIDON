@@ -23,7 +23,8 @@ package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.CashFlowObjective;
-import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.departing.MonthlyDepartingDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.data.Gatherer;
@@ -38,25 +39,27 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
  * Creates the monthly departing Strategy
  * Created by carrknight on 1/6/16.
  */
-public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartingStrategy>{
+public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartingDecorator>{
 
 
-    private DoubleParameter probabilityEachMonthToGoOutFishing = new FixedDoubleParameter(.3);
+    private List<Integer> monthsNotGoingOut = new LinkedList<>();
+    {
+        monthsNotGoingOut.add(1);//jan
+        monthsNotGoingOut.add(12);//dec
+        monthsNotGoingOut.add(6); //jun
+        monthsNotGoingOut.add(7); //july
 
 
-    private boolean addYearlyAdapatation = false;
+    }
 
-    private DoubleParameter mutationRate = new FixedDoubleParameter(.05);
-
-    private DoubleParameter explorationRate = new FixedDoubleParameter(.2);
-
-    private LinkedList<FishState> registeredStates = new LinkedList<>();
+    private AlgorithmFactory<? extends DepartingStrategy> delegate = new FixedRestTimeDepartingFactory();
 
     /**
      * Applies this function to the given argument.
@@ -65,150 +68,50 @@ public class MonthlyDepartingFactory implements AlgorithmFactory<MonthlyDepartin
      * @return the function result
      */
     @Override
-    public MonthlyDepartingStrategy apply(FishState fishState) {
+    public MonthlyDepartingDecorator apply(FishState fishState) {
         boolean[] months = new boolean[12];
         for(int i=0;i<12;i++)
-            months[i] = fishState.random.nextBoolean(probabilityEachMonthToGoOutFishing.apply(fishState.getRandom()));
+            months[i] = !monthsNotGoingOut.contains(i + 1);
 
-        if(!addYearlyAdapatation)
-            return new MonthlyDepartingStrategy(months);
-        else
-        {
-            double mutationRate = this.mutationRate.apply(fishState.getRandom());
-            double explorationRate = this.explorationRate.apply(fishState.getRandom());
-            //if it's the first you are building
-            if(!registeredStates.contains(fishState))
-            {
-                //create data counters
-                fishState.getYearlyDataSet().
-                        registerGatherer("Yearly Effort In Months",
-                                         new Gatherer<FishState>() {
-                                             @Override
-                                             public Double apply(FishState fishState) {
-                                                 double sum=0;
-                                                 for(Fisher fisher : fishState.getFishers())
-                                                     for(Boolean fishing:
-                                                             ((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea())
-                                                         if(fishing)
-                                                             sum++;
+            return new MonthlyDepartingDecorator(delegate.apply(fishState),
+                                                 months);
 
-                                                 return sum;
-                                             }
-                                         },
-                                         Double.NaN
-                        );
-
-                //do it for every month too
-                for(int month=0; month<12; month++)
-                {
-                    final int currentMonth = month;
-                    fishState.getYearlyDataSet().
-                            registerGatherer("Yearly Efforts In Month " + month,
-                                             new Gatherer<FishState>() {
-                                                 @Override
-                                                 public Double apply(FishState fishState) {
-                                                     double sum=0;
-                                                     for(Fisher fisher : fishState.getFishers())
-                                                         if(((MonthlyDepartingStrategy) fisher.getDepartingStrategy()).getAllowedAtSea()[currentMonth])
-                                                             sum++;
-
-                                                     return sum;
-                                                 }
-                                             }
-                                    , Double.NaN);
-                }
-
-
-                //do this so that we know we have created the counters and we don't do so again
-                registeredStates.add(fishState);
-
-
-
-                //set the adaptation up (when the model starts)
-                fishState.registerStartable(new Startable() {
-                    @Override
-                    public void start(FishState model) {
-                        for(Fisher fisher : model.getFishers()) {
-                            fisher.addYearlyAdaptation(new ExploreImitateAdaptation<MonthlyDepartingStrategy>(
-                                    (Predicate<Fisher>) fisher1 -> true,
-                                    //beam hill-climber with random mutation chance for each month
-                                    new BeamHillClimbing<MonthlyDepartingStrategy>(
-                                            new RandomStep<MonthlyDepartingStrategy>() {
-                                                @Override
-                                                public MonthlyDepartingStrategy randomStep(
-                                                        FishState state, MersenneTwisterFast random, Fisher fisher,
-                                                        MonthlyDepartingStrategy current) {
-                                                    boolean[] months = Arrays.copyOf(current.getAllowedAtSea(), 12);
-                                                    for (int i = 0; i < 12; i++)
-                                                        if (random.nextBoolean(mutationRate))
-                                                            months[i] = !current.getAllowedAtSea()[i];
-
-                                                    return new MonthlyDepartingStrategy(months);
-                                                }
-                                            }
-                                    ),
-                                    (Actuator<Fisher,MonthlyDepartingStrategy>) (fisher1, change, model1) -> {
-                                        fisher1.setDepartingStrategy(change);
-                                    },
-                                    new Sensor<Fisher,MonthlyDepartingStrategy>() {
-                                        @Override
-                                        public MonthlyDepartingStrategy scan(Fisher fisher) {
-                                            return (MonthlyDepartingStrategy) fisher.getDepartingStrategy();
-                                        }
-                                    },
-                                    new CashFlowObjective(365),
-                                    explorationRate,
-                                    1, new Predicate<MonthlyDepartingStrategy>() {
-                                        @Override
-                                        public boolean test(MonthlyDepartingStrategy a) {
-                                            return true;
-                                        }
-                                    }
-                            ));
-                        }
-                    }
-
-                    @Override
-                    public void turnOff() {
-
-                    }
-                });
-            }
-            return new MonthlyDepartingStrategy(months);
-        }
     }
 
-
-    public DoubleParameter getProbabilityEachMonthToGoOutFishing() {
-        return probabilityEachMonthToGoOutFishing;
+    /**
+     * Getter for property 'monthsNotGoingOut'.
+     *
+     * @return Value for property 'monthsNotGoingOut'.
+     */
+    public List<Integer> getMonthsNotGoingOut() {
+        return monthsNotGoingOut;
     }
 
-    public void setProbabilityEachMonthToGoOutFishing(
-            DoubleParameter probabilityEachMonthToGoOutFishing) {
-        this.probabilityEachMonthToGoOutFishing = probabilityEachMonthToGoOutFishing;
+    /**
+     * Setter for property 'monthsNotGoingOut'.
+     *
+     * @param monthsNotGoingOut Value to set for property 'monthsNotGoingOut'.
+     */
+    public void setMonthsNotGoingOut(List<Integer> monthsNotGoingOut) {
+        this.monthsNotGoingOut = monthsNotGoingOut;
     }
 
-    public boolean isAddYearlyAdapatation() {
-        return addYearlyAdapatation;
+    /**
+     * Getter for property 'delegate'.
+     *
+     * @return Value for property 'delegate'.
+     */
+    public AlgorithmFactory<? extends DepartingStrategy> getDelegate() {
+        return delegate;
     }
 
-    public void setAddYearlyAdapatation(boolean addYearlyAdapatation) {
-        this.addYearlyAdapatation = addYearlyAdapatation;
-    }
-
-    public DoubleParameter getMutationRate() {
-        return mutationRate;
-    }
-
-    public void setMutationRate(DoubleParameter mutationRate) {
-        this.mutationRate = mutationRate;
-    }
-
-    public DoubleParameter getExplorationRate() {
-        return explorationRate;
-    }
-
-    public void setExplorationRate(DoubleParameter explorationRate) {
-        this.explorationRate = explorationRate;
+    /**
+     * Setter for property 'delegate'.
+     *
+     * @param delegate Value to set for property 'delegate'.
+     */
+    public void setDelegate(
+            AlgorithmFactory<? extends DepartingStrategy> delegate) {
+        this.delegate = delegate;
     }
 }

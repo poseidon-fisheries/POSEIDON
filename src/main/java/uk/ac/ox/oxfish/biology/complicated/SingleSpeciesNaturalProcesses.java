@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -168,8 +169,51 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
         abundances.clear();
 
 
-        //allocate stuff before mortality hits!
+        //decide where recruits are going to go before mortality hits
         //either allocate recruits with given allocator or proportional to where biomass is
+        final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight = prepareAllocation(model);
+
+        /***
+         *      __  __         _        _ _ _
+         *     |  \/  |___ _ _| |_ __ _| (_) |_ _  _
+         *     | |\/| / _ \ '_|  _/ _` | | |  _| || |
+         *     |_|  |_\___/_|  \__\__,_|_|_|\__|\_, |
+         *                                      |__/
+         */
+        kill();
+
+
+        /***
+         *        _        _
+         *       /_\  __ _(_)_ _  __ _
+         *      / _ \/ _` | | ' \/ _` |
+         *     /_/ \_\__, |_|_||_\__, |
+         *           |___/       |___/
+         */
+        agingProcess.age(biologies.values(),
+                         species,
+                         model,
+                         rounding,
+                         daysSimulated());
+
+
+        /***
+         *        _   _ _              _   _
+         *       /_\ | | |___  __ __ _| |_(_)___ _ _
+         *      / _ \| | / _ \/ _/ _` |  _| / _ \ ' \
+         *     /_/ \_\_|_\___/\__\__,_|\__|_\___/_||_|
+         *
+         */
+        //allocate new recruits in a weighted fashion
+        if(lastRecruits > 0) {
+            allocate(biomassWeight);
+
+
+        }
+    }
+
+    @NotNull
+    private LinkedHashMap<AbundanceLocalBiology, Double> prepareAllocation(FishState model) {
         final LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight= new LinkedHashMap<>();
         if (lastRecruits > 0) {
             if (recruitsAllocator != null) {
@@ -206,82 +250,52 @@ public class SingleSpeciesNaturalProcesses implements Steppable, Startable
 
             }
         }
+        return biomassWeight;
+    }
 
-        /***
-         *      __  __         _        _ _ _
-         *     |  \/  |___ _ _| |_ __ _| (_) |_ _  _
-         *     | |\/| / _ \ '_|  _/ _` | | |  _| || |
-         *     |_|  |_\___/_|  \__\__,_|_|_|\__|\_, |
-         *                                      |__/
-         */
+    private void allocate(@NotNull LinkedHashMap<AbundanceLocalBiology, Double> biomassWeight) {
+        //make sure it all sum up to 1!
+        assert Math.abs(biomassWeight.values().stream().
+                mapToDouble(
+                        new ToDoubleFunction<Double>() {
+                            @Override
+                            public double applyAsDouble(Double value) {
+                                return value;
+                            }
+                        }).sum()-1d)<.001d;
+        double leftOver = 0;
+        for (Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
+            double ratio = biologyBiomass.getValue();
+            double recruitsHere = ((lastRecruits + leftOver) * ratio);
+            StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
+
+            if(rounding)
+            {
+                recruitsHere = (int) recruitsHere;
+                int totalAllocated = 0;
+                for(int subdivision = 0; subdivision <abundance.getSubdivisions(); subdivision++) {
+                    abundance.asMatrix()[subdivision][0] += ((int) recruitsHere) / (abundance.getSubdivisions());
+                    totalAllocated+= ((int) recruitsHere) / (abundance.getSubdivisions());
+                }
+                leftOver = ((lastRecruits + leftOver) * ratio) -totalAllocated;
+
+
+            }
+            else {
+                for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
+                    abundance.asMatrix()[subdivision][0] += (recruitsHere) / ((double)abundance.getSubdivisions());
+
+                }
+            }
+
+        }
+    }
+
+    private void kill() {
         for (AbundanceLocalBiology abundanceBasedLocalBiology : biologies.values()) {
             mortality.cull(
                     species.getMeristics(), rounding,
                     abundanceBasedLocalBiology.getAbundance(species), daysSimulated());
-        }
-
-
-        /***
-         *        _        _
-         *       /_\  __ _(_)_ _  __ _
-         *      / _ \/ _` | | ' \/ _` |
-         *     /_/ \_\__, |_|_||_\__, |
-         *           |___/       |___/
-         */
-        agingProcess.age(biologies.values(),
-                         species,
-                         model,
-                         rounding,
-                         daysSimulated());
-
-
-        /***
-         *        _   _ _              _   _
-         *       /_\ | | |___  __ __ _| |_(_)___ _ _
-         *      / _ \| | / _ \/ _/ _` |  _| / _ \ ' \
-         *     /_/ \_\_|_\___/\__\__,_|\__|_\___/_||_|
-         *
-         */
-        //allocate new recruits in a weighted fashion
-        if(lastRecruits > 0) {
-
-
-            //make sure it all sum up to 1!
-            assert Math.abs(biomassWeight.values().stream().
-                    mapToDouble(
-                            new ToDoubleFunction<Double>() {
-                                @Override
-                                public double applyAsDouble(Double value) {
-                                    return value;
-                                }
-                            }).sum()-1d)<.001d;
-            double leftOver = 0;
-            for (Map.Entry<AbundanceLocalBiology, Double> biologyBiomass : biomassWeight.entrySet()) {
-                double ratio = biologyBiomass.getValue();
-                double recruitsHere = ((lastRecruits + leftOver) * ratio);
-                StructuredAbundance abundance = biologyBiomass.getKey().getAbundance(species);
-
-                if(rounding)
-                {
-                    recruitsHere = (int) recruitsHere;
-                    int totalAllocated = 0;
-                    for(int subdivision = 0; subdivision <abundance.getSubdivisions(); subdivision++) {
-                        abundance.asMatrix()[subdivision][0] += ((int) recruitsHere) / (abundance.getSubdivisions());
-                        totalAllocated+= ((int) recruitsHere) / (abundance.getSubdivisions());
-                    }
-                    leftOver = ((lastRecruits + leftOver) * ratio) -totalAllocated;
-
-
-                }
-                else {
-                    for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++) {
-                        abundance.asMatrix()[subdivision][0] += (recruitsHere) / ((double)abundance.getSubdivisions());
-
-                    }
-                }
-
-            }
-
         }
     }
 

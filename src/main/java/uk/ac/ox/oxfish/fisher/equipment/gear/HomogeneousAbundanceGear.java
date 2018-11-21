@@ -103,20 +103,18 @@ public class HomogeneousAbundanceGear implements Gear {
 
         double[][] catches = tempAbundance;
 
-        //if there is no fish, don't bother
-        if(where.getBiology().getBiomass(species)>FishStateUtilities.EPSILON) {
 
-            //you are going to fish every hour until you are done
-            int hoursSpentFishingThisSpecies = hoursSpentFishing;
+        //you are going to fish every hour until you are done
+        int hoursSpentFishingThisSpecies = hoursSpentFishing;
 
-            while (hoursSpentFishingThisSpecies > 0) {
-                double[][] hourlyCatches = fishThisSpecies(where, species);
-                for (int cohort = 0; cohort < catches.length; cohort++)
-                    for (int bin = 0; bin < catches[0].length; bin++)
-                        catches[cohort][bin] += hourlyCatches[cohort][bin];
+        while (hoursSpentFishingThisSpecies > 0) {
+            double[][] hourlyCatches = fishThisSpecies(where, species);
+            for (int cohort = 0; cohort < catches.length; cohort++)
+                for (int bin = 0; bin < catches[0].length; bin++)
+                    catches[cohort][bin] += hourlyCatches[cohort][bin];
 
-                hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies - 1;
-            }
+            hoursSpentFishingThisSpecies = hoursSpentFishingThisSpecies - 1;
+
         }
         return new StructuredAbundance(catches);
     }
@@ -177,12 +175,16 @@ public class HomogeneousAbundanceGear implements Gear {
 
         double[][] fish = prepTemplocationalAbundance(species);
         double[][] realValues = where.getAbundance(species).asMatrix();
+        boolean isNonZero = false;
         for(int subdivision=0; subdivision<realValues.length; subdivision++)
-            for(int bin=0; bin<realValues[0].length; bin++)
+            for(int bin=0; bin<realValues[0].length; bin++) {
                 fish[subdivision][bin] = realValues[subdivision][bin];
+                if(realValues[subdivision][bin]>0)
+                    isNonZero = true;
+            }
         //filter until you get the catch
-        fish = filter(species, fish);
-
+        if(isNonZero)
+            fish = filter(species, fish);
 
         return fish;
     }

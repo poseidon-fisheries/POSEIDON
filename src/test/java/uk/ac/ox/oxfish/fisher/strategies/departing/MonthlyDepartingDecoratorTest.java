@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;
@@ -32,14 +31,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class MonthlyDepartingStrategyTest {
+public class MonthlyDepartingDecoratorTest {
 
     @Test
     public void monthsMatter() throws Exception {
 
 
         //january and may
-        MonthlyDepartingStrategy strategy = new MonthlyDepartingStrategy(0,4);
+        MonthlyDepartingDecorator strategy = new MonthlyDepartingDecorator(new MaxHoursPerYearDepartingStrategy(999999),
+                                                                           0, 4);
 
         //you can depart in january
         FishState state = mock(FishState.class);

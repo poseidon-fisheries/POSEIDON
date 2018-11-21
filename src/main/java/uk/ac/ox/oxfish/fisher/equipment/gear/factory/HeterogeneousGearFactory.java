@@ -44,11 +44,12 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
 
 
     public HeterogeneousGearFactory() {
-
+        gears.clear();
     }
 
     public HeterogeneousGearFactory(Pair<String,HomogeneousGearFactory>...
                                     given) {
+        gears.clear();
         for(Pair<String,HomogeneousGearFactory> pair : given)
         {
             gears.put(pair.getFirst(),pair.getSecond());

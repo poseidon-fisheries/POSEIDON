@@ -42,9 +42,9 @@ import java.util.function.Consumer;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ns_2000_low3_mortality";
-    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/sclice2/calibration/results";
-    public static final int YEARS_TO_RUN = 10;
+    public static final String FILENAME = "ns_800_noexit_seasonal_exogenous";
+    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/calibration/results";
+    public static final int YEARS_TO_RUN = 4;
 
     public static void main(String[] args) throws IOException {
 

@@ -244,6 +244,7 @@ Multiple Species Biomass:
       unfishable: false
 -------
 Multiple Species Abundance:
+  addGarbageSpecies: true
   factories:
   - Single Species Abundance:
       aging:

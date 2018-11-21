@@ -34,9 +34,9 @@ Threshold Gear Factory:
 Logistic Selectivity Gear:
   averageCatchability: '0.0'
   litersOfGasConsumedPerHour: '0.0'
-  retentionAsymptote: '0.992661'
-  retentionInflection: '21.8035'
-  retentionSlope: '1.7773'
+  retentionAsymptote: nullparameter
+  retentionInflection: nullparameter
+  retentionSlope: nullparameter
   rounding: true
   selectivityAParameter: '23.5035'
   selectivityBParameter: '9.03702'
@@ -67,47 +67,8 @@ Sablefish Trawl Selectivity Gear:
   rounding: true
 -------
 Heterogeneous Selectivity Gear:
-  gears:
-    Epinephelus areolatus:
-      Logistic Selectivity Gear:
-        averageCatchability: '0.01'
-        litersOfGasConsumedPerHour: '0.0'
-        retentionAsymptote: null
-        retentionInflection: null
-        retentionSlope: null
-        rounding: true
-        selectivityAParameter: '30.6447029784809'
-        selectivityBParameter: '6.46514981161133'
-    Lutjanus malabaricus:
-      Logistic Selectivity Gear:
-        averageCatchability: '0.01'
-        litersOfGasConsumedPerHour: '0.0'
-        retentionAsymptote: null
-        retentionInflection: null
-        retentionSlope: null
-        rounding: true
-        selectivityAParameter: '57.3802620814091'
-        selectivityBParameter: '17.0227436580102'
-    Pristipomoides multidens:
-      Logistic Selectivity Gear:
-        averageCatchability: '0.01'
-        litersOfGasConsumedPerHour: '0.0'
-        retentionAsymptote: null
-        retentionInflection: null
-        retentionSlope: null
-        rounding: true
-        selectivityAParameter: '41.9180563295419'
-        selectivityBParameter: '13.1000149168684'
-    Lutjanus erythropterus:
-      Logistic Selectivity Gear:
-        averageCatchability: '0.01'
-        litersOfGasConsumedPerHour: '0.0'
-        retentionAsymptote: null
-        retentionInflection: null
-        retentionSlope: null
-        rounding: true
-        selectivityAParameter: '48.532533910211'
-        selectivityBParameter: '19.3556829280302'
+  gears: {
+    }
 -------
 Abundance Fixed Proportion Gear:
   averageCatchability: '1.0E-4'

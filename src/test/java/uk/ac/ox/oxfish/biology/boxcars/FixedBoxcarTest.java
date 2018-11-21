@@ -192,7 +192,7 @@ public class FixedBoxcarTest {
         //10% yearly mortality
         ProportionalMortalityFactory mortalityProcess = new ProportionalMortalityFactory();
         biology.setMortalityProcess(mortalityProcess);
-        mortalityProcess.setYearlyMortality(new FixedDoubleParameter(.1));
+        mortalityProcess.setYearlyMortality(new FixedDoubleParameter(0.095175));
         //Aphaerus rutilans numbers
         EquallySpacedBertalanffyFactory meristics = new EquallySpacedBertalanffyFactory();
         meristics.setNumberOfBins(100);

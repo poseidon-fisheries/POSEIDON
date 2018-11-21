@@ -33,6 +33,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactor
 import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -132,7 +133,7 @@ public class HoldLimitingDecoratorGearTest {
         state.schedule.step(state);
 
         double discardRate = 1d- state.getYearlyDataSet().getLatestObservation("Species 0 Landings") /
-                state.getYearlyDataSet().getLatestObservation("Species 0 Catches");
+                state.getYearlyDataSet().getLatestObservation("Species 0 "+ FisherDailyTimeSeries.CATCHES_COLUMN_NAME);
         System.out.println(discardRate);
         assertTrue(discardRate >= .05);
 
@@ -149,7 +150,7 @@ public class HoldLimitingDecoratorGearTest {
         state.schedule.step(state);
 
         discardRate = 1d- state.getYearlyDataSet().getLatestObservation("Species 0 Landings") /
-                state.getYearlyDataSet().getLatestObservation("Species 0 Catches");
+                state.getYearlyDataSet().getLatestObservation("Species 0 "+ FisherDailyTimeSeries.CATCHES_COLUMN_NAME);
         System.out.println(discardRate);
         assertTrue(discardRate <= .01);
 

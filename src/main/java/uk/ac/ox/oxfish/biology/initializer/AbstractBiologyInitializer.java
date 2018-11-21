@@ -52,6 +52,17 @@ public  abstract class AbstractBiologyInitializer implements BiologyInitializer 
             speciesArray[i] = new Species(names[i]);
         }
 
+
+
+
+
+
+
+
+
+
+
+
         //initialize all the data collection stuff
         for (Species species : speciesArray) {
             final String columnName = species + " Recruitment";

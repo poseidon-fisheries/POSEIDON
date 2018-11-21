@@ -8,6 +8,10 @@ import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.function.Function;
+
 public class PolygonBiomassDecorator implements BiomassAllocator {
 
     /**
@@ -25,19 +29,25 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
      */
     private final BiomassAllocator delegate;
 
+    /**
+     * pre-compute all the tiles so that you call "isInsideUnion" only once
+     */
+    private final HashMap<SeaTile,Boolean> insideUnion;
+
 
     public PolygonBiomassDecorator(GeomVectorField boundingPolyongs, boolean inside, BiomassAllocator delegate) {
         this.boundingPolyongs = boundingPolyongs;
         this.inside = inside;
         this.delegate = delegate;
         boundingPolyongs.computeUnion();
+        insideUnion = new HashMap<>();
     }
 
     @Override
     public double allocate(SeaTile tile, NauticalMap map, MersenneTwisterFast random) {
 
 
-        if(!boundingPolyongs.isInsideUnion(map.getCoordinates(tile)))
+        if(!checkIfInside(tile,map))
         {
             if(inside)
                 return 0;
@@ -51,6 +61,19 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
             else
                 return 0;
         }
+
+    }
+
+    private boolean checkIfInside(SeaTile tile, NauticalMap map){
+        return
+                insideUnion.computeIfAbsent(
+                        tile, new Function<SeaTile, Boolean>() {
+                            @Override
+                            public Boolean apply(SeaTile seaTile) {
+                                return boundingPolyongs.isInsideUnion(map.getCoordinates(tile));
+                            }
+                        }
+                );
 
     }
 }

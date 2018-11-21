@@ -215,6 +215,7 @@ public class Catch {
         return FishStateUtilities.weigh(abundance[species.getIndex()],species.getMeristics(),bin);
     }
 
+
     public double getWeightCaught(Species species,int subdivision, int bin)
     {
         Preconditions.checkArgument(hasAbundanceInformation());

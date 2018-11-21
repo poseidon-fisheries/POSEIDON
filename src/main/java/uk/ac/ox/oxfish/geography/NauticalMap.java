@@ -51,7 +51,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -113,11 +112,6 @@ public class NauticalMap implements Startable
      * holds the MPAs
      */
     private GeomVectorField mpaVectorField;
-
-    /**
-     * holds the cities
-     */
-    private GeomVectorField cities = new GeomVectorField();
 
 
     /**
@@ -359,10 +353,6 @@ public class NauticalMap implements Startable
 
     public GeomVectorField getMpaVectorField() {
         return mpaVectorField;
-    }
-
-    public GeomVectorField getCities() {
-        return cities;
     }
 
 

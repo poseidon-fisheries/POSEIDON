@@ -44,7 +44,7 @@ public enum Season {
     public static Season season(int dayOfTheYear)
     {
 
-        int month = (int)(dayOfTheYear / 30.42) + 1; //plus one is there so that december is the 12 month
+        int month = getMonth(dayOfTheYear);
         int day = (int) (dayOfTheYear % 30.42);
 
 
@@ -60,6 +60,10 @@ public enum Season {
             return WINTER;
         }
 
+    }
+
+    public static int getMonth(int dayOfTheYear) {
+        return (int)(dayOfTheYear / 30.42) + 1;
     }
 
     public static Season season(FishState model)

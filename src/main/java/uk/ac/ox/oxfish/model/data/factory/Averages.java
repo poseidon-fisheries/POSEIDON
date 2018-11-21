@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.model.data.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MonthlyDepartingFactory;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
