@@ -73,6 +73,8 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
 
     private DoubleParameter averageCatchability = new FixedDoubleParameter(0);
 
+    private boolean logBaseTen = true;
+
 
     public LogisticSelectivityGearFactory() {
     }
@@ -120,24 +122,25 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
                 !(retentionSlope instanceof NullParameter) &&
                 retentionInflection != null &&
                 !(retentionInflection instanceof NullParameter)
-                )
+                ) {
             return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
                                                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),
-                                                                            true, rounding),
+                                                                            true, rounding, logBaseTen),
                                                 new RetentionAbundanceFilter(true,
                                                                              retentionInflection.apply(random),
                                                                              retentionSlope.apply(random),
                                                                              retentionAsymptote.apply(random), rounding)
             );
+        }
         else
         {
             return new SelectivityAbundanceGear(litersOfGasConsumedPerHour.apply(random),
                                                 new FixedProportionFilter(averageCatchability.apply(random), rounding),
                                                 new LogisticAbundanceFilter(selectivityAParameter.apply(random),
                                                                             selectivityBParameter.apply(random),
-                                                                            true, rounding));
+                                                                            true, rounding, logBaseTen));
         }
     }
 
@@ -286,5 +289,13 @@ public class LogisticSelectivityGearFactory implements HomogeneousGearFactory {
      */
     public void setRounding(boolean rounding) {
         this.rounding = rounding;
+    }
+
+    public boolean isLogBaseTen() {
+        return logBaseTen;
+    }
+
+    public void setLogBaseTen(boolean logBaseTen) {
+        this.logBaseTen = logBaseTen;
     }
 }

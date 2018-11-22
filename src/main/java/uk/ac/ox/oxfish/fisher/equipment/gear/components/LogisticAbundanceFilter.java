@@ -20,9 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 
-import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Objects;
 
@@ -37,11 +35,14 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
 
     private final double bParameter;
 
+    private final boolean logBaseTen;
 
-    public LogisticAbundanceFilter(double aParameter, double bParameter, boolean memoization, final boolean rounding) {
+
+    public LogisticAbundanceFilter(double aParameter, double bParameter, boolean memoization, final boolean rounding, boolean logBaseTen) {
         super(memoization, rounding);
         this.aParameter = aParameter;
         this.bParameter = bParameter;
+        this.logBaseTen = logBaseTen;
     }
 
 
@@ -55,7 +56,11 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
             for(int age=0; age<species.getNumberOfBins(); age++)
             {
                 toReturn[subdivision][age] =
-                        1d/(1+Math.exp(-Math.log10(19)*( species.getLength(subdivision,age)-aParameter)/bParameter));
+                        logBaseTen ?
+                        1d/(1+Math.exp(-Math.log10(19)*( species.getLength(subdivision,age)-aParameter)/bParameter)) :
+                        1d/(1+Math.exp(-Math.log(19)*( species.getLength(subdivision,age)-aParameter)/bParameter))
+
+                ;
 
 
             }
@@ -73,13 +78,14 @@ public class LogisticAbundanceFilter extends FormulaAbundanceFilter {
         LogisticAbundanceFilter that = (LogisticAbundanceFilter) o;
         return Double.compare(that.aParameter, aParameter) == 0 &&
                 Double.compare(that.bParameter, bParameter) == 0 &&
+                Boolean.compare(logBaseTen,that.logBaseTen) == 0 &&
                 isMemoization() == that.isMemoization();
     }
 
     /** {@inheritDoc} */
     @Override
     public int hashCode() {
-        return Objects.hash(aParameter,bParameter);
+        return Objects.hash(aParameter,bParameter,logBaseTen);
     }
 
 

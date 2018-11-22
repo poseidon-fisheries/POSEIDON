@@ -135,6 +135,22 @@ public class SPRAgent implements AdditionalStartable {
 
     }
 
+
+    @VisibleForTesting
+    public double computeMaturityRatio(){
+        double matureCatch = 0;
+        double allCatches = 0;
+        for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                allCatches += abundance[subdivision][bin];
+                if(species.getLength(subdivision,bin)>= assumedLenghtAtMaturity)
+                    matureCatch+=abundance[subdivision][bin];
+            }
+        }
+        assert matureCatch <= allCatches;
+        return matureCatch/allCatches;
+    }
+
     private void reset(){
 
         //clear
@@ -159,6 +175,9 @@ public class SPRAgent implements AdditionalStartable {
 
 
     }
+
+
+
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -205,6 +224,17 @@ public class SPRAgent implements AdditionalStartable {
 
                                                       }
                                                   },Double.NaN);
+
+
+        model.getYearlyDataSet().registerGatherer("Percentage Mature Catches " + species + " " + surveyTag,
+                new Gatherer<FishState>() {
+                    @Override
+                    public Double apply(FishState fishState) {
+                        double ratio = computeMaturityRatio();
+                        return ratio;
+
+                    }
+                },Double.NaN);
 
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {

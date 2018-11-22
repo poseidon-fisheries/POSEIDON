@@ -84,7 +84,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
                                             actualGear.getCatchabilityFilter(),
                                             new LogisticAbundanceFilter(newAParameter,newBParameter,
                                                     actualGear.getSelectivity().isMemoization(),
-                                                    actualGear.getSelectivity().isRounding())
+                                                    actualGear.getSelectivity().isRounding(), true)
                                     );
                                 else
                                     return new SelectivityAbundanceGear(
@@ -92,7 +92,7 @@ public class PeriodicUpdateSelectivityFactory implements AlgorithmFactory<Period
                                             actualGear.getCatchabilityFilter(),
                                             new LogisticAbundanceFilter(newAParameter,newBParameter,
                                                     actualGear.getSelectivity().isMemoization(),
-                                                    actualGear.getSelectivity().isRounding()),
+                                                    actualGear.getSelectivity().isRounding(), true),
                                             actualGear.getRetention()
                                     );
                             }
