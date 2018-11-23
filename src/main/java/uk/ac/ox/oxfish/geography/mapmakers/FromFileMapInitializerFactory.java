@@ -46,6 +46,10 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public FromFileMapInitializerFactory() {
     }
 
+    public FromFileMapInitializerFactory(final Path mapFile) {
+        this.mapFile = mapFile;
+    }
+
 
     /**
      * Applies this function to the given argument.
