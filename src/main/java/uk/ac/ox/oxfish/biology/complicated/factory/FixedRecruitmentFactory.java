@@ -20,15 +20,18 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.FixedRecruitmentProcess;
+import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.complicated.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class FixedRecruitmentFactory implements AlgorithmFactory<FixedRecruitmentProcess> {
+public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProcess> {
 
     private DoubleParameter yearlyRecruits = new FixedDoubleParameter(10000);
+
+    private boolean yearly=false;
 
     /**
      * Applies this function to the given argument.
@@ -37,8 +40,21 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<FixedRecruitmen
      * @return the function result
      */
     @Override
-    public FixedRecruitmentProcess apply(FishState fishState) {
+    public RecruitmentProcess apply(FishState fishState) {
 
+        if(yearly)
+            return new YearlyRecruitmentProcess(){
+                @Override
+                protected double recruitYearly(Species species, Meristics meristics, StructuredAbundance abundance) {
+                    return yearlyRecruits.apply(fishState.getRandom());
+                }
+
+                @Override
+                public void addNoise(NoiseMaker noiseMaker) {
+                    throw new RuntimeException("add noise to the doubleparameter instead");
+                }
+            };
+        else
         return new FixedRecruitmentProcess(yearlyRecruits.apply(fishState.getRandom()));
 
     }
@@ -59,5 +75,13 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<FixedRecruitmen
      */
     public void setYearlyRecruits(DoubleParameter yearlyRecruits) {
         this.yearlyRecruits = yearlyRecruits;
+    }
+
+    public boolean isYearly() {
+        return yearly;
+    }
+
+    public void setYearly(boolean yearly) {
+        this.yearly = yearly;
     }
 }
