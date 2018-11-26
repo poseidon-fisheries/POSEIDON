@@ -41,7 +41,7 @@ public class AStarPathfinder implements Pathfinder {
     private final Distance distanceFunction;
 
 
-    private final Table<SeaTile,SeaTile,LinkedList<SeaTile>> memory = HashBasedTable.create();
+    private final Table<SeaTile,SeaTile,Optional<LinkedList<SeaTile>>> memory = HashBasedTable.create();
 
     /**
      * creates the A* pathfinder it uses distanceFunction both for computing the cost of moving from A to its neighbors
@@ -73,10 +73,11 @@ public class AStarPathfinder implements Pathfinder {
         Preconditions.checkNotNull(map);
 
 
-        LinkedList<SeaTile> oldPath = memory.get(start, end);
-        if(oldPath!=null)
-            return new LinkedList<>(oldPath);
+        Optional<LinkedList<SeaTile>> oldPath = memory.get(start, end);
+        if(oldPath!=null) {
 
+            return oldPath.isPresent() ? new LinkedList<>(oldPath.get()) : null;
+        }
 
         //where we will eventually put the osmoseWFSPath
         LinkedList<SeaTile> path = new LinkedList<>();
@@ -127,8 +128,11 @@ public class AStarPathfinder implements Pathfinder {
 
         //if you haven't found the osmoseWFSPath, then return null
         if(cameFrom.get(end) == null)
+        {
+            memory.put(start,end,Optional.empty());
+            memory.put(end,start,Optional.empty());
             return null;
-
+        }
         //build the osmoseWFSPath
         SeaTile current = end;
         path.add(current);
@@ -139,9 +143,9 @@ public class AStarPathfinder implements Pathfinder {
             path.add(current);
         }
         //reverse it
-        memory.put(end,start,new LinkedList<>(path));
+        memory.put(end,start,Optional.of(new LinkedList<>(path)));
         Collections.reverse(path);
-        memory.put(start,end,new LinkedList<>(path));
+        memory.put(start,end,Optional.of(new LinkedList<>(path)));
 
         //return it!
         return path;

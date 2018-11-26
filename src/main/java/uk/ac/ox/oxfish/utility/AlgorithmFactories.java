@@ -66,6 +66,8 @@ import uk.ac.ox.oxfish.geography.ports.PortInitializers;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.factory.Averages;
+import uk.ac.ox.oxfish.model.event.ExogenousCatchFactories;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
@@ -173,6 +175,8 @@ public class AlgorithmFactories {
         NAMES_MAP.put(NaturalMortalityProcess.class, Mortalities.NAMES);
         CONSTRUCTOR_MAP.put(GasPriceMaker.class, GasPriceMakers.CONSTRUCTORS);
         NAMES_MAP.put(GasPriceMaker.class, GasPriceMakers.NAMES);
+        CONSTRUCTOR_MAP.put(ExogenousCatches.class, ExogenousCatchFactories.CONSTRUCTORS);
+        NAMES_MAP.put(ExogenousCatches.class, ExogenousCatchFactories.NAMES);
 
         CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
         NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
