@@ -75,8 +75,7 @@ public class AStarPathfinder implements Pathfinder {
 
         Optional<LinkedList<SeaTile>> oldPath = memory.get(start, end);
         if(oldPath!=null) {
-
-            return oldPath.isPresent() ? new LinkedList<>(oldPath.get()) : null;
+            return oldPath.map(LinkedList::new).orElse(null);
         }
 
         //where we will eventually put the osmoseWFSPath
