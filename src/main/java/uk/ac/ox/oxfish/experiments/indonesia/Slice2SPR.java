@@ -63,11 +63,19 @@ public class Slice2SPR {
 
 
     static private final double assumedLinfMultidens = 86;
-    static private final double assumedKParameterMultidens = 0.4946723;
-    static private final double assumedNaturalMortalityMultidens = 0.394192;
+    static private final double assumedKParameterMultidens = 0.4438437;
+    static private final double assumedNaturalMortalityMultidens = 0.3775984;
     static private final double assumedVarAMultidens = 0.02;
     static private final double assumedVarBMultidens = 2.944;
-    static public final double assumedLenghtAtMaturityMultidens = 48.0;
+    static public final double assumedLenghtAtMaturityMultidens = 50;
+
+
+    static private final double assumedLinfErythropterus = 63;
+    static private final double assumedKParameterErythropterus = 0.5508334;
+    static private final double assumedNaturalMortalityErythropterus = 0.4721429;
+    static private final double assumedVarAErythropterus = 0.0244;
+    static private final double assumedVarBErythropterus = 2.87;
+    static public final double assumedLenghtAtMaturityErythropterus = 37;
 
 
     static private final double assumedLinfMalabaricus = 86;
@@ -76,6 +84,8 @@ public class Slice2SPR {
     static private final double assumedVarAMalabaricus = 0.00853;
     static private final double assumedVarBMalabaricus = 3.137;
     static public final double assumedLenghtAtMaturityMalabaricus = 50.0;
+
+
     public static final int VIRGIN_SPAWNING_BIOMASS_AREOLATUS = 5389362;
     public static final int VIRGIN_SPAWNING_BIOMASS_MULTIDENS = 40160483;
     public static final int VIRGIN_SPAWNING_BIOMASS_MALABARICUS = 153988743;
@@ -343,6 +353,37 @@ public class Slice2SPR {
 
     }
 
+
+    public static void randomErythropterusSampling(
+            FlexibleScenario scenario,
+            MersenneTwisterFast random,
+            String surveyTag,
+            double probability,
+            @Nullable
+                    List<String> columns) {
+        String speciesName = "Lutjanus erythropterus";
+
+        scenario.getPlugins().add(
+                new SPRAgentBuilder(
+                        surveyTag,
+                        speciesName,
+                        new Predicate<Fisher>() {
+                            @Override
+                            public boolean test(Fisher fisher) {
+                                return random.nextBoolean(probability);
+                            }
+                        },
+                        assumedLinfErythropterus, assumedKParameterErythropterus, assumedNaturalMortalityErythropterus,
+                        100, 1000, 5,
+                        assumedVarAErythropterus, assumedVarBErythropterus, assumedLenghtAtMaturityErythropterus
+                )
+        );
+        if(columns!=null)
+
+            columns.add("SPR " + speciesName + " " + surveyTag);
+
+
+    }
 
     public static void randomMalabaricusSampling(
             FlexibleScenario scenario,

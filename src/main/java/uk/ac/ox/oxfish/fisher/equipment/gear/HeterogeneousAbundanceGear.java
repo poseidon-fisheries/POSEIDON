@@ -58,7 +58,10 @@ public class HeterogeneousAbundanceGear implements Gear
         {
             gears.put(gearPair.getFirst(),gearPair.getSecond());
         }
+
     }
+    
+    
 
     public HeterogeneousAbundanceGear(
             HashMap<Species, HomogeneousAbundanceGear> gears) {
@@ -136,10 +139,11 @@ public class HeterogeneousAbundanceGear implements Gear
     @Override
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
-        DoubleSummaryStatistics averager = new DoubleSummaryStatistics();
+        double sum = 0;
         for(Gear gear : gears.values())
-            averager.accept(gear.getFuelConsumptionPerHourOfFishing(fisher,boat,where));
-        return averager.getAverage();
+            //this is a ugly hack but it's surprising how expensive this averaging gets
+            sum+=(gear.getFuelConsumptionPerHourOfFishing(null,null,null));
+        return sum/gears.size();
     }
 
     @Override
@@ -147,21 +151,13 @@ public class HeterogeneousAbundanceGear implements Gear
         return new HeterogeneousAbundanceGear(gears);
     }
 
-    /**
-     * Getter for property 'gears'.
-     *
-     * @return Value for property 'gears'.
-     */
-    public HashMap<Species, HomogeneousAbundanceGear> getGears() {
-        return gears;
-    }
 
     @Override
     public boolean isSame(Gear o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HeterogeneousAbundanceGear that = (HeterogeneousAbundanceGear) o;
-        return Objects.equals(getGears(), that.getGears());
+        return Objects.equals(gears, that.gears);
     }
 
 }

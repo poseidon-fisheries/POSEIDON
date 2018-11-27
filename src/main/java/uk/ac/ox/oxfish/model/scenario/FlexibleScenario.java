@@ -28,6 +28,7 @@ import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.event.BiomassDrivenFixedExogenousCatches;
 import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.event.MixedExogenousCatches;
+import uk.ac.ox.oxfish.model.event.SimpleExogenousCatchesFactory;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
@@ -115,26 +116,8 @@ public class FlexibleScenario implements Scenario {
     private boolean portSwitching = false;
 
 
-    private LinkedHashMap<String, Number> exogenousCatches = new LinkedHashMap<>();
+    private AlgorithmFactory<? extends ExogenousCatches> exogenousCatches = new SimpleExogenousCatchesFactory();
 
-
-    /**
-     * Getter for property 'exogenousCatches'.
-     *
-     * @return Value for property 'exogenousCatches'.
-     */
-    public LinkedHashMap<String, Number> getExogenousCatches() {
-        return exogenousCatches;
-    }
-
-    /**
-     * Setter for property 'exogenousCatches'.
-     *
-     * @param exogenousCatches Value to set for property 'exogenousCatches'.
-     */
-    public void setExogenousCatches(LinkedHashMap<String, Number> exogenousCatches) {
-        this.exogenousCatches = exogenousCatches;
-    }
 
     /**
      * if this is not NaN then it is used as the random seed to feed into the map-making function. This allows for randomness
@@ -212,17 +195,6 @@ public class FlexibleScenario implements Scenario {
         //substitute back the original randomizer
         model.random = originalRandom;
 
-
-        //add exogenous catches
-        //add exogenous catches!
-        LinkedHashMap<Species,Double>  recast = new LinkedHashMap<>();
-        for (Map.Entry<String, Number> exogenous : exogenousCatches.entrySet()) {
-            recast.put(global.getSpecie(exogenous.getKey()),exogenous.getValue().doubleValue());
-        }
-        //start it!
-
-        ExogenousCatches catches = new MixedExogenousCatches(recast);
-        model.registerStartable(catches);
 
 
 
@@ -341,6 +313,13 @@ public class FlexibleScenario implements Scenario {
 
         addTagLandingTimeSeries(model);
 
+
+
+        //add exogenous catches
+        //start it!
+
+        ExogenousCatches catches = exogenousCatches.apply(model);
+        model.registerStartable(catches);
 
 
 
@@ -669,4 +648,22 @@ public class FlexibleScenario implements Scenario {
     }
 
 
+    /**
+     * Getter for property 'exogenousCatches'.
+     *
+     * @return Value for property 'exogenousCatches'.
+     */
+    public AlgorithmFactory<? extends ExogenousCatches> getExogenousCatches() {
+        return exogenousCatches;
+    }
+
+    /**
+     * Setter for property 'exogenousCatches'.
+     *
+     * @param exogenousCatches Value to set for property 'exogenousCatches'.
+     */
+    public void setExogenousCatches(
+            AlgorithmFactory<? extends ExogenousCatches> exogenousCatches) {
+        this.exogenousCatches = exogenousCatches;
+    }
 }

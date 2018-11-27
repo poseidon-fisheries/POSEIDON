@@ -44,7 +44,7 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "slice3", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("calibration_fixedrecruits_noexit.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("noexit_seasonal_712cpue_fixedmediumcosts.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -282,35 +282,13 @@ public class GenericOptimization extends SimpleProblemDouble {
 
 
 
-    public static double[] test()
-    {
-
-        double trueInputs[] = new double[]{
-                //multidens,malabaricus,areolatus,eryhtopterus,garbage
-                0.00001116382,0.00004783977,0.00001250899,0.00003673613,0.1954266,
-                0.0002420583,0.00005223041,0.00002299836,0.00001353882,0.2743158,
-                0.0002510884,0.0000329285,0.00001766685,0.000002903146,0.175
-        };
-        double inputs[] = new double[15];
-        for(int i=0; i< inputs.length; i++)
-            inputs[i] =        (10 * (MINIMUM_CATCHABILITY + MAXIMUM_CATCHABILITY - 2 *trueInputs[i]))/(MINIMUM_CATCHABILITY - MAXIMUM_CATCHABILITY);
-        inputs[4] = (10 * (0 + .8 - 2 *trueInputs[4]))/(0 - 0.8);
-        inputs[9] = (10 * (0 + .8 - 2 *trueInputs[9]))/(0 - 0.8);
-        inputs[14] = (10 * (0 + .8 - 2 *trueInputs[14]))/(0 - 0.8);
-
-        return inputs;
-
-
-
-
-    }
 
     public static void main(String[] args) throws IOException {
-        GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{
-                -4.238, 7.985, 3.910, 2.827, 0.797, 4.848,-1.959, 1.570, 1.430,-2.876, 0.110,-6.152,-2.163, 4.302,-2.688});
-        FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_800_noexit.yaml").toFile()));
+//        GenericOptimization optimization = new GenericOptimization();
+//        Scenario scenario = optimization.buildScenario(new double[]{
+//                -6.329157006365141, 9.073633374381625, -1.855856098359825, -0.7605015350109641, -0.6190267698947525, 3.883378987395433, -4.490952793962361, -2.7933463633279034, 0.6865245910519451, -6.333573904488305, -0.195999403886414, -5.593082017991333, -2.008370407909314, -5.636904996728754, -5.457255990381938});
+//        FishYAML yaml = new FishYAML();
+//        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_1000_seasonal_brokenselex.yaml").toFile()));
 
     }
 

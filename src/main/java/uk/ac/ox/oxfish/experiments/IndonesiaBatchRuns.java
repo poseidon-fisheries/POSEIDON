@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "ns_800_noexit_seasonal_exogenous";
+    public static final String FILENAME = "fixed_recruits";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/calibration/results";
     public static final int YEARS_TO_RUN = 4;
 
@@ -106,10 +106,11 @@ public class IndonesiaBatchRuns {
             columnsToPrint.add("Epinephelus areolatus Catches(#) 0."+i+" 100_areolatus");
             columnsToPrint.add("Lutjanus malabaricus Catches(#) 0."+i+" 100_malabaricus");
             columnsToPrint.add("Pristipomoides multidens Catches(#) 0."+i+" 100_multidens");
+            columnsToPrint.add("Lutjanus erythropterus Catches(#) 0."+i+" 100_erythropterus");
         }
-        columnsToPrint.add("SPR Oracle - Epinephelus areolatus");
-        columnsToPrint.add("SPR Oracle - Pristipomoides multidens");
-        columnsToPrint.add("SPR Oracle - Lutjanus malabaricus");
+//        columnsToPrint.add("SPR Oracle - Epinephelus areolatus");
+//        columnsToPrint.add("SPR Oracle - Pristipomoides multidens");
+//        columnsToPrint.add("SPR Oracle - Lutjanus malabaricus");
         BatchRunner runner = new BatchRunner(
                 Paths.get(DIRECTORY,
                           FILENAME + ".yaml"),
@@ -135,49 +136,54 @@ public class IndonesiaBatchRuns {
                 Slice2SPR.randomMultidensSampling(flexible, random, surveyTag, 1, null);
                 surveyTag = "100_malabaricus";
                 Slice2SPR.randomMalabaricusSampling(flexible, random, surveyTag, 1, null);
-                flexible.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(FishState fishState) {
-                                return new SprOracle(
-                                        fishState.getBiology().getSpecie("Epinephelus areolatus"),
-                                        Slice2SPR.assumedLenghtAtMaturityAreolatus,
-                                        200,
-                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_AREOLATUS
-                                );
-                            }
-                        }
-                );
-
-                flexible.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(FishState fishState) {
-                                return new SprOracle(
-                                        fishState.getBiology().getSpecie("Pristipomoides multidens"),
-                                        Slice2SPR.assumedLenghtAtMaturityMultidens,
-                                        200,
-                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_MULTIDENS
-
-                                );
-                            }
-                        }
-                );
+                surveyTag = "100_erythropterus";
+                Slice2SPR.randomErythropterusSampling(flexible, random, surveyTag, 1, null);
 
 
-                flexible.getPlugins().add(
-                        new AlgorithmFactory<AdditionalStartable>() {
-                            @Override
-                            public AdditionalStartable apply(FishState fishState) {
-                                return new SprOracle(
-                                        fishState.getBiology().getSpecie("Lutjanus malabaricus"),
-                                        Slice2SPR.assumedLenghtAtMaturityMalabaricus,
-                                        200,
-                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_MALABARICUS
-                                );
-                            }
-                        }
-                );
+
+//                flexible.getPlugins().add(
+//                        new AlgorithmFactory<AdditionalStartable>() {
+//                            @Override
+//                            public AdditionalStartable apply(FishState fishState) {
+//                                return new SprOracle(
+//                                        fishState.getBiology().getSpecie("Epinephelus areolatus"),
+//                                        Slice2SPR.assumedLenghtAtMaturityAreolatus,
+//                                        200,
+//                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_AREOLATUS
+//                                );
+//                            }
+//                        }
+//                );
+//
+//                flexible.getPlugins().add(
+//                        new AlgorithmFactory<AdditionalStartable>() {
+//                            @Override
+//                            public AdditionalStartable apply(FishState fishState) {
+//                                return new SprOracle(
+//                                        fishState.getBiology().getSpecie("Pristipomoides multidens"),
+//                                        Slice2SPR.assumedLenghtAtMaturityMultidens,
+//                                        200,
+//                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_MULTIDENS
+//
+//                                );
+//                            }
+//                        }
+//                );
+//
+//
+//                flexible.getPlugins().add(
+//                        new AlgorithmFactory<AdditionalStartable>() {
+//                            @Override
+//                            public AdditionalStartable apply(FishState fishState) {
+//                                return new SprOracle(
+//                                        fishState.getBiology().getSpecie("Lutjanus malabaricus"),
+//                                        Slice2SPR.assumedLenghtAtMaturityMalabaricus,
+//                                        200,
+//                                        Slice2SPR.VIRGIN_SPAWNING_BIOMASS_MALABARICUS
+//                                );
+//                            }
+//                        }
+//                );
 
                 flexible.getPlugins().add(
                         new AlgorithmFactory<AdditionalStartable>() {
