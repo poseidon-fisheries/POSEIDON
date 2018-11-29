@@ -1,4 +1,9 @@
 language: java
+install: true
+
+
+script:
+- ./gradlew build --scan -s
 
 # The following options are taken from
 # https://docs.travis-ci.com/user/languages/java/#caching
