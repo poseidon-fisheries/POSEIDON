@@ -51,12 +51,7 @@ public class Arriving implements Action{
         agent.updateDestination(model,this);
         //we don't want to move anywhere else
         if(agent.getDestination().equals(agent.getLocation())) {
-            //if we want to fish here, let's fish
-            if (agent.canAndWantToFishHere())
-                return new ActionResult(new Fishing(), hoursLeft);
-            else
-                //otherwise basically wait
-                return new ActionResult(new Arriving(), 0d);
+            return new ActionResult(agent.getActionAtDestination(), hoursLeft);
         }
         //we got a new location? move to there!
         else
