@@ -106,7 +106,7 @@ public class NarrativeBestTest {
         }
         System.out.println(profits);
         //itq beats tac
-        assertTrue(profits.get("itq_best.yaml") > profits.get("tac_best.yaml")*1.5);
+        assertTrue(profits.get("itq_best.yaml") > profits.get("tac_best.yaml"));
         //itq+ beats itq
         assertTrue(profits.get("itqplus_best.yaml") > profits.get("itq_best.yaml")*1.5);
 

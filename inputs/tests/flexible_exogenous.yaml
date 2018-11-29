@@ -1,0 +1,62 @@
+Flexible:
+  allowFriendshipsAcrossPorts: true
+  biologyInitializer:
+    Single Species Biomass Normalized:
+      biomassSuppliedPerCell: false
+      carryingCapacity: '2.99189E8'
+      differentialPercentageToMove: '0.0'
+      grower:
+        Common Logistic Grower:
+          steepness: '0.262'
+      initialBiomassAllocator:
+        Random Allocator:
+          maximum: '0.25'
+          minimum: '0.15'
+      initialCapacityAllocator:
+        Depth Allocator:
+          delegate:
+            Equal Allocation:
+              constantValue: '1.0'
+          maxDepth: '2000.0'
+          minDepth: '10.0'
+      percentageLimitOnDailyMovement: '0.0'
+      speciesName: Snapper
+      unfishable: false
+  cheaters: false
+  exogenousCatches:
+    Simple Exogenous Catches:
+      yearlyBiomassToExtract:
+        Snapper: 13495500
+  fisherDefinitions: [
+    ]
+  gasPricePerLiter: '10000.0'
+  habitatInitializer: All Sand
+  mapInitializer:
+    Simple Map:
+      cellSizeInKilometers: '10.0'
+      coastalRoughness: '4.0'
+      depthSmoothing: '1000000.0'
+      height: '50.0'
+      maxLandWidth: '10.0'
+      width: '50.0'
+  mapMakerDedicatedRandomSeed: null
+  market:
+    Fixed Price Market:
+      marketPrice: '40000.0'
+  networkBuilder:
+    Equal Out Degree:
+      allowMutualFriendships: true
+      degree: '2.0'
+      equalOutDegree: true
+  plugins: [
+    ]
+  portInitializer:
+    Random Ports:
+      numberOfPorts: '1.0'
+  portSwitching: false
+  tagsToTrackSeparately: ''
+  weatherInitializer:
+    Constant Weather:
+      temperature: '30.0'
+      windOrientation: '0.0'
+      windSpeed: '0.0'
