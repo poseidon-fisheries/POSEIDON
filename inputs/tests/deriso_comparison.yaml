@@ -44,7 +44,7 @@ Simple California:
   holdSizePerBoat: '20000.0'
   hourlyTravellingCosts: '93.69'
   literPerKilometer: '3.547842974'
-  mainDirectory: /home/carrknight/code/oxfish/inputs/policy_california
+  mainDirectory: inputs/policy_california
   networkBuilder:
     Equal Out Degree:
       allowMutualFriendships: true
