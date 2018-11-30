@@ -22,26 +22,25 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.FisherEquipment;
-import uk.ac.ox.oxfish.fisher.FisherMemory;
-import uk.ac.ox.oxfish.fisher.FisherStatus;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.actions.ActionResult;
+import uk.ac.ox.oxfish.fisher.actions.Arriving;
+import uk.ac.ox.oxfish.fisher.actions.Fishing;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
  * The strategy that decides whether or not to fish once arrived and keeps being queried
  * Created by carrknight on 4/22/15.
  */
-public interface FishingStrategy extends FisherStartable{
+public interface FishingStrategy extends FisherStartable, Action {
 
     /**
      * This is called by the fisher to decide whether or not to fish and then each step after that to decide whether or
      * not to continue fishing
      *
-
      * @param random the randomizer
      * @param model the model itself
      * @return true if the fisher should fish here, false otherwise
@@ -52,6 +51,18 @@ public interface FishingStrategy extends FisherStartable{
             FishState model,
             TripRecord currentTrip);
 
-
+    /**
+     * This is called by Arriving.act to decide whether or not to fish up arrival. Most fishing
+     * strategies should use this default implementation, but FAD fishing strategies are expected to
+     * override this method and result in action types other than `Fishing`.
+     */
+    @Override
+    default ActionResult act(
+        FishState model, Fisher agent, Regulation regulation, double hoursLeft
+    ) {
+        return agent.canAndWantToFishHere() ?
+            new ActionResult(new Fishing(), hoursLeft) : // if we want to fish here, let's fish
+            new ActionResult(new Arriving(), 0d); // otherwise, basically wait
+    }
 
 }
