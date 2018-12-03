@@ -40,11 +40,11 @@ public class MaxHoursPerYearDepartingStrategyTest {
     public void maxHoursOut() throws Exception {
         Fisher fisher = mock(Fisher.class);
         MaxHoursPerYearDepartingStrategy strategy = new MaxHoursPerYearDepartingStrategy(100);
-        when(fisher.getYearlyCounterColumn(FisherYearlyTimeSeries.HOURS_OUT)).thenReturn(50d);
+        when(fisher.getHoursAtSeaThisYear()).thenReturn(50d);
 
         assertTrue(strategy.shouldFisherLeavePort(fisher,mock(FishState.class),new MersenneTwisterFast()));
 
-        when(fisher.getYearlyCounterColumn(FisherYearlyTimeSeries.HOURS_OUT)).thenReturn(150d);
+        when(fisher.getHoursAtSeaThisYear()).thenReturn(150d);
         assertFalse(strategy.shouldFisherLeavePort(fisher,mock(FishState.class),new MersenneTwisterFast()));
 
 
