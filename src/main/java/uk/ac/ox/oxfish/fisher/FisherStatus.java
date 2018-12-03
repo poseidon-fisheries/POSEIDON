@@ -30,6 +30,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -131,13 +132,14 @@ public class FisherStatus implements Serializable {
     }
 
     /**
-     * hours spent away from port
+     * hours spent away from port current trip
      */
     private double hoursAtSea;
 
     public double getHoursAtSea() {
         return hoursAtSea;
     }
+
 
     public void setHoursAtSea(double hoursAtSea) {
         this.hoursAtSea = hoursAtSea;

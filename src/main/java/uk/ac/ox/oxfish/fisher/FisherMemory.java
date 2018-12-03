@@ -94,7 +94,9 @@ public class FisherMemory implements Serializable, FisherStartable {
     private HashMap<String, Object> database = new HashMap<>();
 
 
-
+    public double getHoursAtSeaThisYear(){
+        return  yearlyCounter.getColumn(FisherYearlyTimeSeries.HOURS_OUT);
+    }
 
 
 

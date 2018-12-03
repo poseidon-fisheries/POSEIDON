@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 
 /**
@@ -61,8 +60,9 @@ public class MaxHoursPerYearDepartingStrategy implements DepartingStrategy {
     @Override
     public boolean shouldFisherLeavePort(Fisher fisher, FishState model, MersenneTwisterFast random) {
 
-        return fisher.getYearlyCounterColumn(FisherYearlyTimeSeries.HOURS_OUT) < maxHoursOut;
+        return fisher.getHoursAtSeaThisYear() < maxHoursOut;
 
 
     }
+
 }

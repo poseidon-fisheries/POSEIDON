@@ -1460,4 +1460,8 @@ public class Fisher implements Steppable, Startable{
     public void setActionAtDestination(Action actionAtDestination) {
         this.actionAtDestination = actionAtDestination;
     }
+
+    public double getHoursAtSeaThisYear() {
+        return memory.getHoursAtSeaThisYear();
+    }
 }

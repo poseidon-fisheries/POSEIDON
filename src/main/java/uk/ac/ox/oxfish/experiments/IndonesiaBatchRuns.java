@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "fixed_recruits";
+    public static final String FILENAME = "fixed_recruits_12000";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/calibration/results";
     public static final int YEARS_TO_RUN = 4;
 

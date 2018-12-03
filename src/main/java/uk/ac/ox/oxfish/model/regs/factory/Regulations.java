@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.regs.factory;
 
+import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
@@ -125,6 +126,10 @@ public class Regulations
 
         CONSTRUCTORS.put("Port Based Wait Times", PortBasedWaitTimesFactory::new);
         NAMES.put(PortBasedWaitTimesFactory.class,"Port Based Wait Times");
+
+
+        CONSTRUCTORS.put("Max Hours Out", MaxHoursOutFactory::new);
+        NAMES.put(MaxHoursOutFactory.class,"Port Based Wait Times");
 
 
     }

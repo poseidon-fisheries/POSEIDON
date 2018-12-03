@@ -44,7 +44,7 @@ public class GenericOptimization extends SimpleProblemDouble {
             "indonesia_hub",
             "runs", "712", "slice3", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("noexit_seasonal_712cpue_fixedmediumcosts.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("fixed_recruits.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -284,11 +284,11 @@ public class GenericOptimization extends SimpleProblemDouble {
 
 
     public static void main(String[] args) throws IOException {
-//        GenericOptimization optimization = new GenericOptimization();
-//        Scenario scenario = optimization.buildScenario(new double[]{
-//                -6.329157006365141, 9.073633374381625, -1.855856098359825, -0.7605015350109641, -0.6190267698947525, 3.883378987395433, -4.490952793962361, -2.7933463633279034, 0.6865245910519451, -6.333573904488305, -0.195999403886414, -5.593082017991333, -2.008370407909314, -5.636904996728754, -5.457255990381938});
-//        FishYAML yaml = new FishYAML();
-//        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("ns_1000_seasonal_brokenselex.yaml").toFile()));
+        GenericOptimization optimization = new GenericOptimization();
+        Scenario scenario = optimization.buildScenario(new double[]{
+                -5.103, 9.798,-4.174,-6.815, 0.010, 9.620,-5.879,-7.013,-9.956, 0.597, 8.138,-6.637,-7.216,-9.250,-5.593});
+        FishYAML yaml = new FishYAML();
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("fixed_recruits_12000.yaml").toFile()));
 
     }
 
@@ -323,5 +323,23 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     public void setRunsPerSetting(int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
+    }
+
+    /**
+     * Getter for property 'simulatedYears'.
+     *
+     * @return Value for property 'simulatedYears'.
+     */
+    public int getSimulatedYears() {
+        return simulatedYears;
+    }
+
+    /**
+     * Setter for property 'simulatedYears'.
+     *
+     * @param simulatedYears Value to set for property 'simulatedYears'.
+     */
+    public void setSimulatedYears(int simulatedYears) {
+        this.simulatedYears = simulatedYears;
     }
 }

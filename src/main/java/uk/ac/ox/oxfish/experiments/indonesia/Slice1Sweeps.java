@@ -23,12 +23,13 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 import com.google.common.collect.Lists;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.MaxHoursPerYearDepartingStrategy;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
+import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
@@ -38,8 +39,9 @@ import java.nio.file.Paths;
 
 public class Slice1Sweeps {
 
-    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice1/policy/";
+    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static final int MIN_DAYS_OUT = 50;
+    public static final int RUNS_PER_POLICY = 10;
 
 
     public static void main(String[] args) throws IOException {
@@ -59,11 +61,21 @@ public class Slice1Sweeps {
 
        // enforcement("all","small","very_pessimistic");
 
+
+//        policy("large", new String[]{"big"}, "fixed_recruits", 4);
+//        policy("medium", new String[]{"big","medium"}, "fixed_recruits", 4);
+//        policy("all", new String[]{"big","small","medium"}, "fixed_recruits", 4);
+//
+        policy("large", new String[]{"big"}, "optimistic_recruits", 1);
+        policy("medium", new String[]{"big","medium"}, "optimistic_recruits", 1);
+        policy("all", new String[]{"big","small","medium"}, "optimistic_recruits", 1);
+
+
     }
 
     public static void policy(
             String name,
-            String[] modifiedTags, final String filename) throws IOException {
+            String[] modifiedTags, final String filename, final int shockYear) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
@@ -147,14 +159,17 @@ public class Slice1Sweeps {
                                                         for (String tag : modifiedTags) {
                                                             if (fisher.getTags().contains(tag)) {
                                                                 fisher.setRegulation(
-                                                                        new FishingSeason(true, finalMaxDaysOut));
+                                                                        new MaxHoursOutRegulation(
+                                                                                new ProtectedAreasOnly(),
+                                                                                finalMaxDaysOut*24d
+                                                                        ));
                                                                 continue fisherloop;
                                                             }
                                                         }
                                                     }
                                                 },
                                                 StepOrder.DAWN,
-                                                4
+                                                shockYear
                                         );
 
 
@@ -180,12 +195,12 @@ public class Slice1Sweeps {
 
 
             //while (runner.getRunsDone() < 1) {
-            StringBuffer tidy = new StringBuffer();
-            runner.run(tidy);
-            fileWriter.write(tidy.toString());
-            fileWriter.flush();
-            //   }
-
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
         }
         fileWriter.close();
     }

@@ -36,7 +36,7 @@ public class FishingSeason implements Regulation
     /**
      * if true MPAs are closed at all times
      */
-    private boolean respectMPAs = true;
+    private boolean respectMPAs;
 
     /**
      * how many days a year is this open?
