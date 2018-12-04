@@ -44,7 +44,6 @@ public class TwoSpeciesITQSplit
      * 2 species ITQ, both are valuable but the quotas of the ones only available south are very few so that
      * it's better to fish north. The results are muffled by the fact that over time north gets consumed and it becomes better
      * to fish south instead anyway.
-     * @throws Exception
      */
     @Test
     public void itqAffectsGeography() throws Exception {
@@ -96,12 +95,21 @@ public class TwoSpeciesITQSplit
     /**
      * we make fish so mobile that the depletion of reds isn't a problem: we are going to see geography choices
      * being as effective as switching gear
-     * @throws Exception
      */
     @Test
-    public void TwoSpeciesITQSplitUnmuffled() throws Exception
+    public void TwoSpeciesITQSplitUnmuffled()
     {
+        //this I think has about a 2% failure rate; I am going to make it run twice. If it fails twice, we have a problem
+        try {
+            unmuffledTestOnce();
+        }
+        catch (AssertionError e){
+            unmuffledTestOnce();
 
+        }
+    }
+
+    private void unmuffledTestOnce() {
 
 
         final FishState state = new FishState(System.currentTimeMillis());
@@ -183,7 +191,6 @@ public class TwoSpeciesITQSplit
 
         //geographical choice with "fixed" biology works very strongly
         Assert.assertTrue(lateRedLandings > .6 * totalRedQuotas);
-
     }
 
 
