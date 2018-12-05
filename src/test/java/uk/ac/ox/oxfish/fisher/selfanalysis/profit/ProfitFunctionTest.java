@@ -56,7 +56,7 @@ public class ProfitFunctionTest {
         state.start();
 
 
-        ProfitFunction function = new ProfitFunction(new LameTripSimulator(),24*5);
+        ProfitFunction function = new ProfitFunction(new LameTripSimulator(),24*15);
 
         final Fisher fisher = state.getFishers().get(0);
         final int[] tripsRecorded = {0};
@@ -65,15 +65,16 @@ public class ProfitFunctionTest {
                     @Override
                     public void reactToFinishedTrip(TripRecord record) {
                         System.out.println("day : " + state.getDay());
+
                         TripRecord simulated = function.simulateTrip(fisher,
                                                                      new double[]{record.getSoldCatch()[0] / record.getEffort()},
                                                                      record.getMostFishedTileInTrip(),
                                                                      state
                                                                      );
                         //if some areas are blocked off by the map; this may give you a null; in this case just return it
-                        if(simulated==null)
+                        if(simulated==null ) {
                             return;
-
+                        }
                         tripsRecorded[0] = tripsRecorded[0] +1;
                         assertEquals(simulated.getDistanceTravelled(),record.getDistanceTravelled(),.001d);
                         assertEquals(record.getEffort()+record.getDistanceTravelled()/fisher.getBoat().getSpeedInKph() - record.getDurationInHours(),0,.1d);
