@@ -275,9 +275,6 @@ public class FishState  extends SimState{
         socialNetwork.populate(this);
         map.start(this);
 
-        //start the fishers
-        for(Fisher fisher : fishers)
-            fisher.start(this);
 
         //start the markets (for each port
         for(Port port : getPorts()) {
@@ -294,6 +291,11 @@ public class FishState  extends SimState{
                                               }
                         , Double.NaN);
         }
+
+        //start the fishers
+        for(Fisher fisher : fishers)
+            fisher.start(this);
+
 
         //start everything else that required to be started
         for(Startable startable : toStart)
@@ -446,9 +448,9 @@ public class FishState  extends SimState{
     /**
      * will step this object only once when the specific year starts. If that year is in the past, it won't step.
      * Implementation wise unfortunately I just check every year to see whether to step this or not. It's quite silly.
-     * @param steppable
-     * @param order
-     * @param year
+     * @param steppable the action to step
+     * @param order what order should it be stepped on
+     * @param year what year should this happen.
      */
     public Stoppable scheduleOnceAtTheBeginningOfYear(Steppable steppable,StepOrder order, int year)
     {
@@ -674,8 +676,15 @@ public class FishState  extends SimState{
     {
         Preconditions.checkState(fishers.size()>0, "There are no more fishers left to kill");
         Fisher sacrifice = fishers.remove(random.nextInt(fishers.size()));
+         killSpecificFisher(sacrifice);
+
+    }
+
+    public void killSpecificFisher(Fisher sacrifice)
+    {
         sacrifice.turnOff();
         map.getFisherGrid().setObjectLocation(sacrifice,-1,-1);
+        fishers.remove(sacrifice);
 
     }
 
@@ -790,8 +799,8 @@ public class FishState  extends SimState{
                                                @Override
                                                public Double apply(FishState state) {
 
-                                                   LinkedList<Double> mileage = new LinkedList<Double>();
-                                                   LinkedList<Double> catches = new LinkedList<Double>();
+                                                   LinkedList<Double> mileage = new LinkedList<>();
+                                                   LinkedList<Double> catches = new LinkedList<>();
 
                                                    Species first = biology.getSpecie(0);
 

@@ -72,6 +72,12 @@ public class Markets {
         NAMES.put(ThreePricesMarketFactory.class,
                   "Three Prices Market");
 
+        CONSTRUCTORS.put("Multiple Three Prices Markets",
+                         ThreePricesMappedFactory::new
+        );
+        NAMES.put(ThreePricesMappedFactory.class,
+                  "Multiple Three Prices Markets");
+
 
     }
 
