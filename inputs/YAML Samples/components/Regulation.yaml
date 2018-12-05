@@ -119,3 +119,7 @@ Port Based Wait Times:
   portWaitTimes:
     Port 0: '0'
 -------
+Port Based Wait Times:
+  delegate: Anarchy
+  maxHoursOut: '1000.0'
+-------

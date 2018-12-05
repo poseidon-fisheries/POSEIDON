@@ -34,6 +34,7 @@ Threshold Gear Factory:
 Logistic Selectivity Gear:
   averageCatchability: '0.0'
   litersOfGasConsumedPerHour: '0.0'
+  logBaseTen: true
   retentionAsymptote: nullparameter
   retentionInflection: nullparameter
   retentionSlope: nullparameter

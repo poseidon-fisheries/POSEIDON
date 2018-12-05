@@ -66,6 +66,7 @@ California Map Scenario:
               Logistic Selectivity Gear:
                 averageCatchability: '0.00156832676'
                 litersOfGasConsumedPerHour: '57.0'
+                logBaseTen: true
                 retentionAsymptote: null
                 retentionInflection: null
                 retentionSlope: null
@@ -101,6 +102,7 @@ California Map Scenario:
               Logistic Selectivity Gear:
                 averageCatchability: '0.00156832676'
                 litersOfGasConsumedPerHour: '57.0'
+                logBaseTen: true
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
                 retentionSlope: '1.7773'

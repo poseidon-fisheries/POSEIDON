@@ -23,9 +23,8 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 import com.google.common.collect.Lists;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.Nullable;
-import uk.ac.ox.oxfish.biology.boxcars.SPRAgent;
+import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracle;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class Slice2SPR {
 
@@ -174,72 +172,72 @@ public class Slice2SPR {
 
             //add 10, 2% sampler (16 fishers, on average)
             String surveyTag = "2.5_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .025, columns);
+            randomAreolatusSampling(scenario, surveyTag, .025, columns);
             //add 10, 5% sampler (40 fishers, on average)
             surveyTag = "5_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .05, columns);
+            randomAreolatusSampling(scenario, surveyTag, .05, columns);
             //add 10, 10% sampler (80 fishers, on average)
             surveyTag = "10_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .1, columns);
+            randomAreolatusSampling(scenario, surveyTag, .1, columns);
             //add 10, 20% sampler (160 fishers, on average)
             surveyTag = "20_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .2, columns);
+            randomAreolatusSampling(scenario, surveyTag, .2, columns);
             //add 10, 40% sampler (160 fishers, on average)
             surveyTag = "40_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .4, columns);
+            randomAreolatusSampling(scenario, surveyTag, .4, columns);
             //add 10, 80% sampler
             surveyTag = "80_areolatus_v"+i;
-            randomAreolatusSampling(scenario, random, surveyTag, .8, columns);
+            randomAreolatusSampling(scenario, surveyTag, .8, columns);
 
             //multidens
             //add 10, 2% sampler (16 fishers, on average)
             surveyTag = "2.5_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .025, columns);
+            randomMultidensSampling(scenario, surveyTag, .025, columns);
             //add 10, 5% sampler (40 fishers, on average)
             surveyTag = "5_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .05, columns);
+            randomMultidensSampling(scenario, surveyTag, .05, columns);
             //add 10, 10% sampler (80 fishers, on average)
             surveyTag = "10_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .1, columns);
+            randomMultidensSampling(scenario, surveyTag, .1, columns);
             //add 10, 20% sampler (160 fishers, on average)
             surveyTag = "20_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .2, columns);
+            randomMultidensSampling(scenario, surveyTag, .2, columns);
             //add 10, 40% sampler (160 fishers, on average)
             surveyTag = "40_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .4, columns);
+            randomMultidensSampling(scenario, surveyTag, .4, columns);
             //add 10, 80% sampler
             surveyTag = "80_multidens_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .8, columns);
+            randomMultidensSampling(scenario, surveyTag, .8, columns);
 
             //malabaricus
             //add 10, 2% sampler (16 fishers, on average)
             surveyTag = "2.5_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .025, columns);
+            randomMultidensSampling(scenario, surveyTag, .025, columns);
             //add 10, 5% sampler (40 fishers, on average)
             surveyTag = "5_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .05, columns);
+            randomMultidensSampling(scenario, surveyTag, .05, columns);
             //add 10, 10% sampler (80 fishers, on average)
             surveyTag = "10_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .1, columns);
+            randomMultidensSampling(scenario, surveyTag, .1, columns);
             //add 10, 20% sampler (160 fishers, on average)
             surveyTag = "20_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .2, columns);
+            randomMultidensSampling(scenario, surveyTag, .2, columns);
             //add 10, 40% sampler (160 fishers, on average)
             surveyTag = "40_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .4, columns);
+            randomMultidensSampling(scenario, surveyTag, .4, columns);
             //add 10, 80% sampler
             surveyTag = "80_malabaricus_v"+i;
-            randomMultidensSampling(scenario, random, surveyTag, .8, columns);
+            randomMultidensSampling(scenario, surveyTag, .8, columns);
 
         }
 
         //add a full one
         String surveyTag = "100_areolatus";
-        randomAreolatusSampling(scenario, random, surveyTag, 1, columns);
+        randomAreolatusSampling(scenario, surveyTag, 1, columns);
         surveyTag = "100_multidens";
-        randomMultidensSampling(scenario, random, surveyTag, 1, columns);
+        randomMultidensSampling(scenario, surveyTag, 1, columns);
         surveyTag = "100_malabaricus";
-        randomMalabaricusSampling(scenario, random, surveyTag, 1, columns);
+        randomMalabaricusSampling(scenario, surveyTag, 1, columns);
 
         //add the oracles
         scenario.getPlugins().add(
@@ -294,23 +292,17 @@ public class Slice2SPR {
 
     public static void randomAreolatusSampling(
             FlexibleScenario scenario,
-            MersenneTwisterFast random,
             String surveyTag,
             double probability,
             @Nullable
-            List<String> columns) {
+                    List<String> columns) {
         String speciesName = "Epinephelus areolatus";
 
         scenario.getPlugins().add(
                 new SPRAgentBuilder(
                         surveyTag,
                         speciesName,
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return random.nextBoolean(probability);
-                            }
-                        },
+                        probability,
                         assumedLinfAreolatus, assumedKParameterAreolatus, assumedNaturalMortalityAreolatus,
                         100, 1000, 5,
                         assumedVarAAreolatus, assumedVarBAreolatus, assumedLenghtAtMaturityAreolatus
@@ -324,7 +316,6 @@ public class Slice2SPR {
 
     public static void randomMultidensSampling(
             FlexibleScenario scenario,
-            MersenneTwisterFast random,
             String surveyTag,
             double probability,
             @Nullable
@@ -335,12 +326,7 @@ public class Slice2SPR {
                 new SPRAgentBuilder(
                         surveyTag,
                         speciesName,
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return random.nextBoolean(probability);
-                            }
-                        },
+                        probability,
                         assumedLinfMultidens, assumedKParameterMultidens, assumedNaturalMortalityMultidens,
                         100, 1000, 5,
                         assumedVarAMultidens, assumedVarBMultidens, assumedLenghtAtMaturityMultidens
@@ -356,7 +342,6 @@ public class Slice2SPR {
 
     public static void randomErythropterusSampling(
             FlexibleScenario scenario,
-            MersenneTwisterFast random,
             String surveyTag,
             double probability,
             @Nullable
@@ -367,12 +352,7 @@ public class Slice2SPR {
                 new SPRAgentBuilder(
                         surveyTag,
                         speciesName,
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return random.nextBoolean(probability);
-                            }
-                        },
+                        probability,
                         assumedLinfErythropterus, assumedKParameterErythropterus, assumedNaturalMortalityErythropterus,
                         100, 1000, 5,
                         assumedVarAErythropterus, assumedVarBErythropterus, assumedLenghtAtMaturityErythropterus
@@ -387,23 +367,17 @@ public class Slice2SPR {
 
     public static void randomMalabaricusSampling(
             FlexibleScenario scenario,
-            MersenneTwisterFast random,
             String surveyTag,
             double probability,
             @Nullable
-            List<String> columns) {
+                    List<String> columns) {
         String speciesName = "Lutjanus malabaricus";
 
         scenario.getPlugins().add(
                 new SPRAgentBuilder(
                         surveyTag,
                         speciesName,
-                        new Predicate<Fisher>() {
-                            @Override
-                            public boolean test(Fisher fisher) {
-                                return random.nextBoolean(probability);
-                            }
-                        },
+                        probability,
                         assumedLinfMalabaricus, assumedKParameterMalabaricus, assumedNaturalMortalityMalabaricus,
                         100, 1000, 5,
                         assumedVarAMalabaricus, assumedVarBMalabaricus, assumedLenghtAtMaturityMalabaricus
@@ -417,77 +391,6 @@ public class Slice2SPR {
     }
 
 
-    /**
-     * a factory whose only job is to put a given SPRAgent into the model
-     */
-    private static  class SPRAgentBuilder implements AlgorithmFactory<SPRAgent> {
 
-        private final String surveyTag;
-
-        private final String speciesName;
-
-        private final Predicate<Fisher> samplingSelector;
-
-        private final double assumedLinf;
-
-        private final double assumedKParameter;
-
-        private final double assumedNaturalMortality;
-
-        private final int assumedMaxAge;
-
-        private final double assumedVirginRecruits;
-
-        private final double assumedLengthBinCm;
-
-        private final double assumedVarA;
-
-        private final double assumedVarB;
-
-        private final double assumedLenghtAtMaturity;
-
-
-        public SPRAgentBuilder(
-                String surveyTag, String speciesName,
-                Predicate<Fisher> samplingSelector, double assumedLinf, double assumedKParameter,
-                double assumedNaturalMortality, int assumedMaxAge, double assumedVirginRecruits,
-                double assumedLengthBinCm,
-                double assumedVarA, double assumedVarB, double assumedLenghtAtMaturity) {
-            this.surveyTag = surveyTag;
-            this.speciesName = speciesName;
-            this.samplingSelector = samplingSelector;
-            this.assumedLinf = assumedLinf;
-            this.assumedKParameter = assumedKParameter;
-            this.assumedNaturalMortality = assumedNaturalMortality;
-            this.assumedMaxAge = assumedMaxAge;
-            this.assumedVirginRecruits = assumedVirginRecruits;
-            this.assumedLengthBinCm = assumedLengthBinCm;
-            this.assumedVarA = assumedVarA;
-            this.assumedVarB = assumedVarB;
-            this.assumedLenghtAtMaturity = assumedLenghtAtMaturity;
-        }
-
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param fishState the function argument
-         * @return the function result
-         */
-        @Override
-        public SPRAgent apply(FishState fishState) {
-            return new SPRAgent(surveyTag,
-                                fishState.getBiology().getSpecie(speciesName),
-                                samplingSelector,
-                                assumedLinf,
-                                assumedKParameter,
-                                assumedNaturalMortality,
-                                assumedMaxAge,
-                                assumedVirginRecruits,
-                                assumedLengthBinCm,
-                                assumedVarA,
-                                assumedVarB,
-                                assumedLenghtAtMaturity);
-        }
-    }
 
 }
