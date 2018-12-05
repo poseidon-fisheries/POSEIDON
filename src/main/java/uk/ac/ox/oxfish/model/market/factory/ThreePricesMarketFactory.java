@@ -43,6 +43,20 @@ public class ThreePricesMarketFactory implements AlgorithmFactory<ThreePricesMar
     private DoubleParameter priceAboveThresholds= new FixedDoubleParameter(10);
 
 
+    public ThreePricesMarketFactory() {
+    }
+
+    public ThreePricesMarketFactory(
+            double lowAgeThreshold, double highAgeThreshold,
+            double priceBelowThreshold, double priceBetweenThresholds,
+            double priceAboveThresholds) {
+        this.lowAgeThreshold = new FixedDoubleParameter(lowAgeThreshold);
+        this.highAgeThreshold = new FixedDoubleParameter(highAgeThreshold);
+        this.priceBelowThreshold = new FixedDoubleParameter(priceBelowThreshold);
+        this.priceBetweenThresholds = new FixedDoubleParameter(priceBetweenThresholds);
+        this.priceAboveThresholds = new FixedDoubleParameter(priceAboveThresholds);
+    }
+
     /**
      * Applies this function to the given argument.
      *
