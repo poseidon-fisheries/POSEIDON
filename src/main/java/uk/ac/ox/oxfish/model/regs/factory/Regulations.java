@@ -131,6 +131,9 @@ public class Regulations
         CONSTRUCTORS.put("Max Hours Out", MaxHoursOutFactory::new);
         NAMES.put(MaxHoursOutFactory.class,"Port Based Wait Times");
 
+        CONSTRUCTORS.put("Trigger Regulation", TriggerRegulationFactory::new);
+        NAMES.put(TriggerRegulationFactory.class,"Trigger Regulation");
+
 
     }
 

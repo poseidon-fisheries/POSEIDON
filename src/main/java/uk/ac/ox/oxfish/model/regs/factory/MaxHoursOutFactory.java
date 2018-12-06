@@ -40,6 +40,11 @@ public class MaxHoursOutFactory implements AlgorithmFactory<MaxHoursOutRegulatio
     }
 
 
+    public MaxHoursOutFactory(double maxHoursOut) {
+        this.maxHoursOut = new FixedDoubleParameter(maxHoursOut);
+    }
+
+
     /**
      * Applies this function to the given argument.
      *

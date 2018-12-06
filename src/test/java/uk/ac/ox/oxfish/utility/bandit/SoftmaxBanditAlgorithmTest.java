@@ -85,7 +85,18 @@ public class SoftmaxBanditAlgorithmTest {
     {
 
         //About 1 out of 5000 trials fail
+        try {
+            tenOptionsMAImplementation();
+        }
+        catch (AssertionError error)
+        {
+            tenOptionsMAImplementation();
+        }
 
+
+    }
+
+    private void tenOptionsMAImplementation() {
         //option 10 is the best, you should pick it!
         MersenneTwisterFast random = new MersenneTwisterFast();
         SoftmaxBanditAlgorithm bandit = new SoftmaxBanditAlgorithm(
@@ -99,8 +110,6 @@ public class SoftmaxBanditAlgorithmTest {
         //now you should be playing most
         System.out.println(bandit.getNumberOfObservations(9));
         assertTrue(bandit.getNumberOfObservations(9) > 500);
-
-
     }
 
 }
