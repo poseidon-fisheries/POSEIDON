@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 public class IndonesiaBatchRuns {
 
 
-    public static final String FILENAME = "fixed_recruits_12000";
+    public static final String FILENAME = "optimistic_recruits_spinup_fixedmarket";
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/calibration/results";
     public static final int YEARS_TO_RUN = 4;
 
@@ -131,13 +131,13 @@ public class IndonesiaBatchRuns {
                 //add a full one
                 String surveyTag = "100_areolatus";
                 FlexibleScenario flexible = (FlexibleScenario) scenario;
-                Slice2SPR.randomAreolatusSampling(flexible, random, surveyTag, 1, null);
+                Slice2SPR.randomAreolatusSampling(flexible, surveyTag, 1, null);
                 surveyTag = "100_multidens";
-                Slice2SPR.randomMultidensSampling(flexible, random, surveyTag, 1, null);
+                Slice2SPR.randomMultidensSampling(flexible, surveyTag, 1, null);
                 surveyTag = "100_malabaricus";
-                Slice2SPR.randomMalabaricusSampling(flexible, random, surveyTag, 1, null);
+                Slice2SPR.randomMalabaricusSampling(flexible, surveyTag, 1, null);
                 surveyTag = "100_erythropterus";
-                Slice2SPR.randomErythropterusSampling(flexible, random, surveyTag, 1, null);
+                Slice2SPR.randomErythropterusSampling(flexible, surveyTag, 1, null);
 
 
 
