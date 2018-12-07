@@ -69,6 +69,7 @@ public class SPR {
         double maxLength =  species.getLengthAtAge(Integer.MAX_VALUE,0);
         int bins =  (int)Math.ceil(maxLength / lengthBinCm) + 1;
         //find most frequent length!
+        int totalCount =0;
         double[] count = new double[bins];
         for(int bin=0; bin< abundance.getBins(); bin++) {
             for (int subdivision = 0; subdivision < abundance.getSubdivisions(); subdivision++)
@@ -85,10 +86,13 @@ public class SPR {
                     }
                     count[countBin]+=
                             abundanceHere;
+                    totalCount+=abundanceHere;
                 }
 
             }
         }
+        if(totalCount==0)
+            return Double.NaN;
         int mostFrequentBin = 0;
         for(int i=1; i<count.length; i++)
             mostFrequentBin = count[i]>count[mostFrequentBin] ? i : mostFrequentBin;
