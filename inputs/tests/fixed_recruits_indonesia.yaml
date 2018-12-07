@@ -17,16 +17,16 @@ Flexible:
                 Equal Allocation:
                   constantValue: '1.0'
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/multidens_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
               fishPerBinPerSex:
@@ -71,10 +71,10 @@ Flexible:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/multidens_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/multidens_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
               yearly: true
@@ -95,16 +95,16 @@ Flexible:
                 Equal Allocation:
                   constantValue: '1.0'
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/malabaricus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
               fishPerBinPerSex:
@@ -149,10 +149,10 @@ Flexible:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/malabaricus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
               yearly: true
@@ -173,16 +173,16 @@ Flexible:
                 Equal Allocation:
                   constantValue: '1.0'
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/areolatus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
               fishPerBinPerSex:
@@ -227,10 +227,10 @@ Flexible:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/areolatus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
               yearly: true
@@ -251,16 +251,16 @@ Flexible:
                 Equal Allocation:
                   constantValue: '1.0'
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/erythropterus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
               fishPerBinPerSex:
@@ -305,10 +305,10 @@ Flexible:
             Shape File Allocator:
               delegate:
                 From File Allocator:
-                  biomassPath: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv
+                  biomassPath: ./inputs/indonesia/712/erythropterus_pixellated_map.csv
                   inputFileHasHeader: true
               insidePoligon: true
-              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp
+              shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
               yearly: true
@@ -682,7 +682,7 @@ Flexible:
       gridWidthInCell: '100.0'
       header: true
       latLong: true
-      mapFile: /home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/712_map.csv
+      mapFile: ./inputs/indonesia/712/712_map.csv
   mapMakerDedicatedRandomSeed: null
   market:
     Multiple Three Prices Markets:
