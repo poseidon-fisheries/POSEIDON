@@ -92,15 +92,7 @@ public class SprOracle implements AdditionalStartable {
                     @Override
                     public Double apply(FishState fishState) {
 
-                        double spawningBiomass = 0;
-                        for(int i=0; i<species.getNumberOfBins(); i++) {
-                            spawningSubdivision = 0;
-                            if(species.getLength(spawningSubdivision, i)>maturityLength)
-                                spawningBiomass += fishState.getTotalAbundance(species,i) *
-                                        species.getWeight(spawningSubdivision,i);
-                        }
-
-                        return spawningBiomass/virginSpawningBiomass;
+                        return spr;
                     }
                 },Double.NaN
         );

@@ -28,7 +28,9 @@ import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
@@ -57,7 +59,7 @@ public class Slice3Sweeps {
 
     public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 3;
+    public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
 
 
@@ -74,7 +76,7 @@ public class Slice3Sweeps {
 //        effortControl("large", new String[]{"big"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
 //        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
 
-//        effortControl("all", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
+    //    effortControl("all4", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 //        effortControl("large", new String[]{"big"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 //        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 
@@ -94,12 +96,28 @@ public class Slice3Sweeps {
 //        pricePremium("premium_multidens","optimistic_recruits_spinup_fixedmarket",1,"Pristipomoides multidens");
 
 
-//        adaptiveSPR("spr_malabaricus",MIN_DAYS_OUT,"optimistic_recruits","Lutjanus malabaricus","100_malabaricus");
-//        adaptiveSPR("spr_multidens",MIN_DAYS_OUT,"optimistic_recruits","Pristipomoides multidens","100_multidens");
-//        adaptiveSPR("spr_malabaricus",MIN_DAYS_OUT,"fixed_recruits","Lutjanus malabaricus","100_malabaricus");
-//        adaptiveSPR("spr_multidens",MIN_DAYS_OUT,"fixed_recruits","Pristipomoides multidens","100_multidens");
-//        adaptiveSPR("spr_malabaricus",MIN_DAYS_OUT,"optimistic_recruits_spinup_fixedmarket","Lutjanus malabaricus","100_malabaricus");
-//        adaptiveSPR("spr_multidens",MIN_DAYS_OUT,"optimistic_recruits_spinup_fixedmarket","Pristipomoides multidens","100_multidens");
+//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits", "Lutjanus malabaricus", "100_malabaricus",
+//                    false);
+//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "optimistic_recruits", "Pristipomoides multidens", "100_multidens",
+//                    false);
+//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "fixed_recruits", "Lutjanus malabaricus", "100_malabaricus", false);
+//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "fixed_recruits", "Pristipomoides multidens", "100_multidens", false);
+//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket", "Lutjanus malabaricus", "100_malabaricus",
+//                    false);
+//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket", "Pristipomoides multidens", "100_multidens",
+//                    false);
+
+//        adaptiveSPR("oraclespr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket",
+//                    "Lutjanus malabaricus", "100_malabaricus",
+//                    true);
+//        adaptiveSPR("oraclespr_multidens", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket",
+//                    "Pristipomoides multidens", "100_multidens",
+//                    true);
+
+//
+//        recruitmentFailure("recruit_failure","fixed_recruits",4,2);
+//        recruitmentFailure("recruit_failure","optimistic_recruits",4,2);
+//        recruitmentFailure("recruit_failure","optimistic_recruits_spinup_fixedmarket",4,2);
     }
 
     private static void effortControl(
@@ -346,8 +364,8 @@ public class Slice3Sweeps {
             final int minDaysOut,
             final String filename,
             final String speciesTargeted,
-            final String survey_name
-    )throws IOException {
+            final String survey_name,
+            boolean oracleTargeting)throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
@@ -366,19 +384,23 @@ public class Slice3Sweeps {
             int finalMaxDaysOut = maxDaysOut;
             runner.setScenarioSetup(
                     scenario -> {
-                      for(FisherDefinition definition : ((FlexibleScenario) scenario).getFisherDefinitions()) {
-                          TriggerRegulationFactory regulation = new TriggerRegulationFactory();
-                          regulation.setBusinessAsUsual(new AnarchyFactory());
-                          regulation.setEmergency(new MaxHoursOutFactory(finalMaxDaysOut *24));
-                          regulation.setHighThreshold(new FixedDoubleParameter(.4));
-                          regulation.setLowThreshold(new FixedDoubleParameter(.2));
-                          regulation.setIndicatorName("SPR "+speciesTargeted+ " " + survey_name);
+                        for(FisherDefinition definition : ((FlexibleScenario) scenario).getFisherDefinitions()) {
+                            TriggerRegulationFactory regulation = new TriggerRegulationFactory();
+                            regulation.setBusinessAsUsual(new AnarchyFactory());
+                            regulation.setEmergency(new MaxHoursOutFactory(finalMaxDaysOut *24));
+                            regulation.setHighThreshold(new FixedDoubleParameter(.4));
+                            regulation.setLowThreshold(new FixedDoubleParameter(.2));
+                            if(oracleTargeting)
+                                regulation.setIndicatorName("SPR Oracle - "+speciesTargeted);
+                            else
+                                regulation.setIndicatorName("SPR "+speciesTargeted+ " " + survey_name);
 
 
-                          definition.setRegulation(
-                                  regulation
-                          );
-                      }
+
+                            definition.setRegulation(
+                                    regulation
+                            );
+                        }
 
 
                     }
@@ -404,6 +426,99 @@ public class Slice3Sweeps {
         fileWriter.close();
     }
 
+
+
+    //no policy, but simulates a year 1 death of all bin 0 and bin 1 population
+    private static void recruitmentFailure(
+            String name,
+            final String filename, final int shockYear, final int runs) throws IOException {
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+
+            BatchRunner runner = setupRunner(filename);
+
+            for(int failure = 1; failure>=0; failure--) {
+
+
+                //basically we want year 4 to change big boats regulations.
+                //because I coded "run" poorly, we have to go through this series of pirouettes
+                //to get it done right
+                int finalFailure = failure;
+                runner.setScenarioSetup(
+                        scenario -> {
+
+                            //at year 4, impose regulation
+                            FlexibleScenario flexible = (FlexibleScenario) scenario;
+                            flexible.getPlugins().add(
+                                    fishState -> new AdditionalStartable() {
+                                        /**
+                                         * this gets called by the fish-state right after the scenario has started. It's
+                                         * useful to set up steppables
+                                         * or just to percolate a reference to the model
+                                         *
+                                         * @param model the model
+                                         */
+                                        @Override
+                                        public void start(FishState model) {
+                                            if (finalFailure >0) {
+                                                model.scheduleOnceAtTheBeginningOfYear(new Steppable() {
+                                                    @Override
+                                                    public void step(SimState simState) {
+
+                                                        for (SeaTile tile : model.getMap().getAllSeaTilesExcludingLandAsList())
+                                                            for (Species species : model.getSpecies()) {
+
+
+                                                                double[][] matrix = tile.getAbundance(
+                                                                        species).asMatrix();
+                                                                if(matrix == null || matrix.length==0 ||
+                                                                        matrix[0].length ==0 ||
+                                                                species.isImaginary())
+                                                                    continue;
+                                                                matrix[0][0] = 0;
+                                                                matrix[0][1] = 0;
+                                                            }
+
+
+                                                    }
+                                                }, StepOrder.DAWN, shockYear);
+                                            }
+                                        }
+                                        /**
+                                         * tell the startable to turnoff,
+                                         */
+                                        @Override
+                                        public void turnOff() {
+
+                                        }
+                                    }
+                            );
+
+                        }
+                );
+
+
+                runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                    @Override
+                    public void consume(StringBuffer writer, FishState model, Integer year) {
+                        writer.append(finalFailure).append(",");
+                    }
+                });
+
+
+                //while (runner.getRunsDone() < 1) {
+                for (int i = 0; i < runs; i++) {
+                    StringBuffer tidy = new StringBuffer();
+                    runner.run(tidy);
+                    fileWriter.write(tidy.toString());
+                    fileWriter.flush();
+                }
+            }
+        fileWriter.close();
+
+    }
 
 
     @NotNull
@@ -454,6 +569,10 @@ public class Slice3Sweeps {
                 "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
                 "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
                 "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
+                "SPR Oracle - " + "Epinephelus areolatus",
+                "SPR Oracle - " + "Pristipomoides multidens" ,
+                "SPR Oracle - " + "Lutjanus malabaricus",
+                "SPR Oracle - " + "Lutjanus erythropterus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
                 "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",

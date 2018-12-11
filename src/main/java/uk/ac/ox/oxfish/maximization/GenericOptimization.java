@@ -36,15 +36,15 @@ import java.util.*;
 
 public class GenericOptimization extends SimpleProblemDouble {
 
-    public static final double MINIMUM_CATCHABILITY = 0.0000001;
+    public static final double MINIMUM_CATCHABILITY = 9.0E-8;
 
-    public static final double MAXIMUM_CATCHABILITY = 0.0008;
+    public static final double MAXIMUM_CATCHABILITY = 9.5E-4;
 
     private static final Path DEFAULT_PATH = Paths.get("docs",
             "indonesia_hub",
             "runs", "712", "slice3", "calibration");
 
-    private String scenarioFile =   DEFAULT_PATH.resolve("fixed_recruits.yaml").toString();
+    private String scenarioFile =   DEFAULT_PATH.resolve("optimistic_recruits_spinup.yaml").toString();
 
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
@@ -286,9 +286,9 @@ public class GenericOptimization extends SimpleProblemDouble {
     public static void main(String[] args) throws IOException {
         GenericOptimization optimization = new GenericOptimization();
         Scenario scenario = optimization.buildScenario(new double[]{
-                -5.103, 9.798,-4.174,-6.815, 0.010, 9.620,-5.879,-7.013,-9.956, 0.597, 8.138,-6.637,-7.216,-9.250,-5.593});
+                -4.838, 9.717,-6.565, 9.583, 2.259, 9.715,-5.683,-7.864,-6.954,-0.173, 4.501,-7.934,-9.377,-4.030,-5.920});
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("fixed_recruits_12000.yaml").toFile()));
+        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("optimistic_recruits_spinup.yaml").toFile()));
 
     }
 
