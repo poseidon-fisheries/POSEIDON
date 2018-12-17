@@ -24,7 +24,6 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 
 
 import com.google.common.collect.Lists;
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -37,8 +36,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
+import uk.ac.ox.oxfish.model.plugins.TowAndAltitudePluginFactory;
 import uk.ac.ox.oxfish.model.regs.FishingSeason;
 import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
+import uk.ac.ox.oxfish.model.regs.PortBasedWaitTimesDecorator;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
@@ -52,6 +53,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -92,15 +94,22 @@ public class Slice3Sweeps {
 //        pricePremium("premium_malabaricus","optimistic_recruits",10,"Lutjanus malabaricus");
 //        pricePremium("premium_multidens","optimistic_recruits",10,"Pristipomoides multidens");
 //        pricePremium("premium_malabaricus3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
- //       pricePremium("premium_multidens3","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
+      //    pricePremium("premium_ero3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus erythropterus");
+        //       pricePremium("premium_multidens3","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
+     //   pricePremium("premium_ero3","pessimistic_recruits_spinup",10,"Lutjanus erythropterus");
+
 //        pricePremium("premium_malabaricus3","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
  //       pricePremium("premium_multidens3","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
 
 
-//        pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
+       // pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
 //        pricePenalty("malus_multidens","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
 //        pricePenalty("malus_malabaricus","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
 //        pricePenalty("malus_multidens","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
+
+
+   //    delays("delay_all", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, 50);
+   //     delays("delay_all", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, 50);
 
 //        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits", "Lutjanus malabaricus", "100_malabaricus",
 //                    false);
@@ -137,7 +146,7 @@ public class Slice3Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
 
             int finalMaxDaysOut = maxDaysOut;
@@ -210,6 +219,105 @@ public class Slice3Sweeps {
         fileWriter.close();
     }
 
+
+
+
+
+    private static void delays(
+            String name,
+            String[] modifiedTags, final String filename, final int shockYear,
+            final int maxDelay) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=5) {
+
+            BatchRunner runner = setupRunner(filename, 15);
+
+
+            int finalWaitTime = waitTimes;
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        //at year 4, impose regulation
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+                        flexible.getPlugins().add(
+                                fishState -> new AdditionalStartable() {
+                                    @Override
+                                    public void start(FishState model) {
+
+                                        model.scheduleOnceAtTheBeginningOfYear(
+                                                (Steppable) simState -> {
+
+                                                    HashMap<String, Integer> waitTimes = new HashMap<>();
+                                                    waitTimes.put("Sumenep",finalWaitTime);
+                                                    waitTimes.put("Gili Iyang",finalWaitTime);
+                                                    waitTimes.put("Bajomulyo",finalWaitTime);
+                                                    waitTimes.put("Brondong",finalWaitTime);
+                                                    waitTimes.put("Karangsong",finalWaitTime);
+                                                    waitTimes.put("Tanjung Pandan",finalWaitTime);
+                                                    waitTimes.put("Probolinggo",finalWaitTime);
+
+
+                                                    fisherloop:
+                                                    for (Fisher fisher :
+                                                            ((FishState) simState).getFishers()) {
+
+                                                        for (String tag : modifiedTags) {
+                                                            if (fisher.getTags().contains(tag)) {
+                                                                fisher.setRegulation(
+                                                                        new PortBasedWaitTimesDecorator(
+                                                                                new ProtectedAreasOnly(),
+                                                                                waitTimes
+                                                                        ));
+                                                                continue fisherloop;
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                StepOrder.DAWN,
+                                                shockYear
+                                        );
+
+
+                                    }
+
+                                    @Override
+                                    public void turnOff() {
+
+                                    }
+                                }
+                        );
+
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalWaitTime).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
     private static void fleetReduction(
             String name,
             final String filename, final int shockYear) throws IOException {
@@ -220,7 +328,7 @@ public class Slice3Sweeps {
 
         for(double probability=0; probability<=.05; probability=FishStateUtilities.round5(probability+.005)) {
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
 
 
@@ -312,7 +420,7 @@ public class Slice3Sweeps {
 
         for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+.5)) {
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
 
 
@@ -368,7 +476,6 @@ public class Slice3Sweeps {
      * lowers the price of fish caught below the maturity value
      * @param name
      * @param filename
-     * @param shockYear
      * @param premiumSpecies
      * @throws IOException
      */
@@ -384,7 +491,7 @@ public class Slice3Sweeps {
 
         for(double markup=0; markup<=1; markup=FishStateUtilities.round(markup+.25)) {
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
 
 
@@ -456,7 +563,7 @@ public class Slice3Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
 
 
@@ -520,7 +627,7 @@ public class Slice3Sweeps {
         fileWriter.flush();
 
 
-            BatchRunner runner = setupRunner(filename);
+            BatchRunner runner = setupRunner(filename, 15);
 
             for(int failure = 1; failure>=0; failure--) {
 
@@ -604,8 +711,10 @@ public class Slice3Sweeps {
     }
 
 
+
+
     @NotNull
-    public static BatchRunner setupRunner(String filename) {
+    public static BatchRunner setupRunner(String filename, final int yearsToRun) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
                 "Average Cash-Flow",
                 "Average Cash-Flow of population0",
@@ -683,7 +792,7 @@ public class Slice3Sweeps {
         return new BatchRunner(
                 Paths.get(DIRECTORY,
                           filename + ".yaml"),
-                15,
+                yearsToRun,
                 columnsToPrint,
                 Paths.get(DIRECTORY,
                           filename),
@@ -692,6 +801,8 @@ public class Slice3Sweeps {
                 -1
         );
     }
+
+
 
 
     public static void enforcement(
@@ -706,7 +817,7 @@ public class Slice3Sweeps {
             for(double probabilityOfCheating = 0; probabilityOfCheating<=1; probabilityOfCheating+=.2) {
 
                 probabilityOfCheating = FishStateUtilities.round(probabilityOfCheating);
-                BatchRunner runner = setupRunner(filename);
+                BatchRunner runner = setupRunner(filename, 15);
 
 
                 int finalMaxDaysOut = maxDaysOut;
