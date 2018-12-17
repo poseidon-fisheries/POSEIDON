@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -68,9 +69,10 @@ public class GarbageGearDecorator implements GearDecorator {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology) {
         //delegate
-        Catch nonGarbage = delegate.fish(fisher, where, hoursSpentFishing, modelBiology);
+        Catch nonGarbage = delegate.fish(fisher, localBiology,context , hoursSpentFishing, modelBiology);
         //shouldn't be any garbage collected so far
         assert nonGarbage.getWeightCaught(garbageSpecies) == 0;
         double totalNonGarbageWeight = nonGarbage.totalCatchWeight();

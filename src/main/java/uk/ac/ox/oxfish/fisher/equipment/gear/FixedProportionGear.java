@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -49,14 +50,15 @@ public class FixedProportionGear implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology) {
 
-        return new Catch(catchesToArray(where, hoursSpentFishing, modelBiology, proportionFished));
+        return new Catch(catchesToArray(localBiology, hoursSpentFishing, modelBiology, proportionFished));
     }
 
 
     private double[] catchesToArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished)
+            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology, double proportionFished)
     {
         Preconditions.checkArgument(hoursSpentFishing==1);
         //catch fish

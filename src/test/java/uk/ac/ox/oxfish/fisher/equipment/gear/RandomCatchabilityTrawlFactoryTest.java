@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Mockito.*;
 
 
@@ -62,10 +61,10 @@ public class RandomCatchabilityTrawlFactoryTest {
         when(random.nextGaussian()).thenReturn(0d); //no deviation
 
         GlobalBiology biology = new GlobalBiology(new Species("test"));
-        assertEquals(500, thrawl.fish(mock, tile, 1, biology).getWeightCaught(0), .0001d);
+        assertEquals(500, thrawl.fish(mock, tile,tile , 1, biology).getWeightCaught(0), .0001d);
         verify(tile,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any()); //gear alone doesn't kill off fish
         when(random.nextGaussian()).thenReturn(2d); //no deviation
-        assertEquals(700, thrawl.fish(mock, tile, 1, biology).getWeightCaught(0), .0001d);
+        assertEquals(700, thrawl.fish(mock, tile,tile , 1, biology).getWeightCaught(0), .0001d);
 
     }
 

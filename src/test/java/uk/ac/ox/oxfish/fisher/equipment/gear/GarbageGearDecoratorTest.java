@@ -25,7 +25,6 @@ import uk.ac.ox.oxfish.biology.EmptyLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.DummyNaturalMortality;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
 import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
@@ -57,7 +56,7 @@ public class GarbageGearDecoratorTest {
         where.setBiology(local);
 
         Gear gear = new GarbageGearDecorator(second, 1.5, new OneSpecieGear(first,.5), true);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where, 1 , biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 0, .001);
         assertEquals(fishCaught.getWeightCaught(second), 0, .001);
@@ -78,7 +77,7 @@ public class GarbageGearDecoratorTest {
         where.setBiology(local);
 
         Gear gear = new GarbageGearDecorator(second, 2, new OneSpecieGear(first,.5), true);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,where , 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 50, .001);
         assertEquals(fishCaught.getWeightCaught(second), 100, .001);
@@ -145,7 +144,7 @@ public class GarbageGearDecoratorTest {
 
         SeaTile mock = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
-        Catch caught = gear.fish(mock(Fisher.class), mock, 1, biology);
+        Catch caught = gear.fish(mock(Fisher.class), mock,mock , 1, biology);
         assertEquals(caught.getWeightCaught(0), 19.880139, .001);
         assertEquals(caught.getWeightCaught(1), 9, .001); //meristics round!
         assertEquals(caught.getTotalWeight(), 9+19.880139, .001);

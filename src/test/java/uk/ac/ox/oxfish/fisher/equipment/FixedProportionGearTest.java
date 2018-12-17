@@ -47,7 +47,7 @@ public class FixedProportionGearTest {
         where.setBiology(local);
 
         FixedProportionGear gear = new FixedProportionGear(.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where, where, 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 0, .001);
         assertEquals(fishCaught.getWeightCaught(second), 0, .001);
@@ -68,7 +68,7 @@ public class FixedProportionGearTest {
         where.setBiology(local);
 
         FixedProportionGear gear = new FixedProportionGear(.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,where , 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 50, .001);
         assertEquals(fishCaught.getWeightCaught(second), 0, .001);
@@ -114,7 +114,7 @@ public class FixedProportionGearTest {
         where.setBiology(local);
 
         FixedProportionGear gear = new FixedProportionGear(.5);
-        Catch fishCaught = gear.fish(mock(Fisher.class), where,1 , biology);
+        Catch fishCaught = gear.fish(mock(Fisher.class), where,where , 1, biology);
 
         assertEquals(fishCaught.getWeightCaught(first), 0, .001);
         assertEquals(fishCaught.getWeightCaught(second), 50, .001);

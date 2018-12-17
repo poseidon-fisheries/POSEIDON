@@ -24,7 +24,6 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -60,14 +59,14 @@ public class HomogeneousAbundanceGearTest
         GlobalBiology biology = new GlobalBiology(species);
 
 
-        Catch fish = gear.fish(mock(Fisher.class), tile, 1, biology);
+        Catch fish = gear.fish(mock(Fisher.class), tile,tile , 1, biology);
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
                 new double[]{0}, new double[]{25}, species.getMeristics()), .001);
 
         assertEquals(fish.getAbundance(0).asMatrix()[FEMALE][0], 25, .001);
 
         //it shouldn't break if I run it again!
-        fish = gear.fish(mock(Fisher.class), tile, 1, biology);
+        fish = gear.fish(mock(Fisher.class), tile,tile , 1, biology);
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
                 new double[]{0}, new double[]{25}, species.getMeristics()), .001);
 
@@ -93,7 +92,7 @@ public class HomogeneousAbundanceGearTest
         Species species = new Species("test", new FromListMeristics(new double[]{1},2));
         GlobalBiology biology = new GlobalBiology(species);
 
-        Catch fish = gear.fish(mock(Fisher.class), tile,1, biology);
+        Catch fish = gear.fish(mock(Fisher.class), tile,tile , 1, biology);
 
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(
                 new double[]{0}, new double[]{50}, species.getMeristics()), .001);
@@ -143,7 +142,7 @@ public class HomogeneousAbundanceGearTest
         Species species = new Species("test", new FromListMeristics(new double[]{1},2));
         GlobalBiology biology = new GlobalBiology(species);
 
-        Catch fish = gear.fish(mock(Fisher.class), tile, 2, biology);
+        Catch fish = gear.fish(mock(Fisher.class), tile, tile, 2, biology);
 
         //you are going to catch 50 on the first hour and 50 in the other second (this is because seatile is mocked and doesn't kill off biology)
         assertEquals(fish.getWeightCaught(0), FishStateUtilities.weigh(

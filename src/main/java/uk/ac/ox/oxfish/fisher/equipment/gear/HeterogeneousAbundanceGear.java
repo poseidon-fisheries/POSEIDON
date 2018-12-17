@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Arrays;
-import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -70,11 +70,12 @@ public class HeterogeneousAbundanceGear implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology)
     {
         Preconditions.checkArgument(hoursSpentFishing>0);
         //create array containing biomass
-        return new Catch(catchesAsArray(where, hoursSpentFishing, modelBiology),modelBiology);
+        return new Catch(catchesAsArray(localBiology, hoursSpentFishing, modelBiology), modelBiology);
     }
 
 
@@ -95,7 +96,7 @@ public class HeterogeneousAbundanceGear implements Gear
     }
 
     private StructuredAbundance[] catchesAsArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
 
 
         StructuredAbundance[] caught = new  StructuredAbundance[modelBiology.getSize()];

@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
@@ -548,7 +549,7 @@ public class FishStateUtilities {
      * @return
      */
     public static double catchSpecieGivenCatchability(
-            SeaTile where, int hoursSpentFishing, Species species, double q) {
+            LocalBiology where, int hoursSpentFishing, Species species, double q) {
         Preconditions.checkState(q >= 0);
         Preconditions.checkArgument(hoursSpentFishing== Fishing.MINIMUM_HOURS_TO_PRODUCE_A_CATCH);
         //catch

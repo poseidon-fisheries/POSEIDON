@@ -20,8 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -47,8 +47,9 @@ public class HoldLimitingDecoratorGear implements GearDecorator {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        Catch original = delegate.fish(fisher, where, hoursSpentFishing, modelBiology);
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology) {
+        Catch original = delegate.fish(fisher, localBiology, context, hoursSpentFishing, modelBiology);
 
         double[] biomassArray = original.getBiomassArray();
         double spaceLeft = fisher.getMaximumHold() - fisher.getTotalWeightOfCatchInHold();

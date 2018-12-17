@@ -79,7 +79,7 @@ public class FishingTest {
         Port port = new Port("Port 0", fishState.getMap().getSeaTile(1, 1), mock(MarketMap.class), 0);
 
         Gear gear = mock(Gear.class);
-        when(gear.fish(any(),any(),anyInt(),any())).thenReturn(new Catch(species, 50.0, biology));
+        when(gear.fish(any(), any(),any() , anyInt(), any())).thenReturn(new Catch(species, 50.0, biology));
         Fisher fisher = new Fisher(0, port,
                                    new MersenneTwisterFast(),
                                    new AnarchyFactory().apply(fishState),
@@ -124,7 +124,7 @@ public class FishingTest {
         //fish again does nothing because it's full
         fisher.step(fishState);
         assertEquals(100.0, fisher.getTotalWeightOfCatchInHold(), .001);
-        verify(gear,times(3)).fish(any(),any(),anyInt(), any());
+        verify(gear,times(3)).fish(any(), any(),any() , anyInt(), any());
 
 
     }

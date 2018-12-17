@@ -27,6 +27,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -55,17 +56,16 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.collectors.*;
-import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
 
 /**
  * The boat catching all that delicious fish.
@@ -744,15 +744,57 @@ public class Fisher implements Steppable, Startable{
      * @param state the model
      * @return the fish caught and stored (barring overcapacity)
      */
-    public Catch fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state)
+    public void fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state)
     {
+
+        //compute the catches (but kill nothing yet)
+        fishHere(modelBiology,hoursSpentFishing,state,status.getLocation());
+
+
+    }
+
+    /**
+     * tell the fisher to use its gear to fish at local biology provided by the caller. This is useful if you
+     * are not specifically referring to catching stuff straight out of the SeaTile
+     * @param modelBiology the global biology object
+     * @param hoursSpentFishing hours spent on this activity
+     * @param state the model
+     * @param localBiology this is what will need to "react" to the amount caught
+     * @return the fish caught and stored (barring overcapacity)
+     */
+    public void fishHere(GlobalBiology modelBiology, int hoursSpentFishing, FishState state, LocalBiology localBiology)
+    {
+        //preamble
         SeaTile here = status.getLocation();
         Preconditions.checkState(here.getAltitude() < 0, "can't fish on land!");
+        //compute the catches (but kill nothing yet)
+        Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
+                                                               localBiology,
+                                                               hoursSpentFishing,
+                                                               modelBiology,
+                                                               state);
+        //make local react to catches (involves killing, usually)
+        removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
+        //pull the fish up, store it, and burn fuel
+        recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getFirst(), catchesAndKept.getSecond());
 
-        //catch fish
-        Catch catchOfTheDay = equipment.getGear().fish(this, here, hoursSpentFishing, modelBiology);
-        Catch notDiscarded = discardingStrategy.chooseWhatToKeep(
-                here,
+
+    }
+
+
+
+    private Pair<Catch,Catch> computeCatchesHere(SeaTile context,
+                                                 LocalBiology biology,
+                                                int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
+    {
+        //transfer fish from local to here
+        Catch catchOfTheDay = equipment.getGear().fish(this,
+                                                       biology,
+                                                       context ,
+                                                       hoursSpentFishing,
+                                                       modelBiology);
+        Catch kept = discardingStrategy.chooseWhatToKeep(
+                context,
                 this,
                 catchOfTheDay,
                 hoursSpentFishing,
@@ -760,9 +802,13 @@ public class Fisher implements Steppable, Startable{
                 state,
                 grabRandomizer()
         );
-        //if you actually caught something
+        return new Pair<>(catchOfTheDay,kept);
+    }
+
+    private void removeFishAfterFishing(
+            GlobalBiology modelBiology, Catch catchOfTheDay, Catch notDiscarded, LocalBiology biology) {
         if(catchOfTheDay.totalCatchWeight()> FishStateUtilities.EPSILON) {
-            here.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);
+            biology.reactToThisAmountOfBiomassBeingFished(catchOfTheDay, notDiscarded, modelBiology);
             //now count catches (which isn't necessarilly landings)
             for(Species species : modelBiology.getSpecies()) {
                 getDailyCounter().countCatches(species, catchOfTheDay.getWeightCaught(species));
@@ -775,6 +821,10 @@ public class Fisher implements Steppable, Startable{
 
             }
         }
+    }
+
+    private void recordAndHaulCatch(int hoursSpentFishing, SeaTile here, Catch catchOfTheDay, Catch notDiscarded) {
+        //learn, record and collect
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,
                                                  here, catchOfTheDay);
@@ -792,11 +842,6 @@ public class Fisher implements Steppable, Startable{
 
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
         memory.getDailyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
-
-
-
-
-        return catchOfTheDay;
     }
 
     public Gear getGear() {

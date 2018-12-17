@@ -24,6 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.StructuredAbundance;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -31,7 +32,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -69,9 +69,10 @@ public class HomogeneousAbundanceGear implements Gear {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology)
     {
-        StructuredAbundance[] catches = catchesToArray(where, hoursSpentFishing, modelBiology);
+        StructuredAbundance[] catches = catchesToArray(localBiology, hoursSpentFishing, modelBiology);
 
 
         return new Catch(catches,modelBiology);
@@ -80,7 +81,7 @@ public class HomogeneousAbundanceGear implements Gear {
     }
 
     private StructuredAbundance[] catchesToArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
         //create array containing biomass
         StructuredAbundance[] abundances = new StructuredAbundance[modelBiology.getSize()];
         for(Species species : modelBiology.getSpecies())
@@ -97,7 +98,7 @@ public class HomogeneousAbundanceGear implements Gear {
      * @param species
      * @return
      */
-    public StructuredAbundance catchesAsAbundanceForThisSpecies(SeaTile where, int hoursSpentFishing, Species species) {
+    public StructuredAbundance catchesAsAbundanceForThisSpecies(LocalBiology where, int hoursSpentFishing, Species species) {
         //prepare empty array
         prepTempAbundance(species);
 
@@ -170,7 +171,7 @@ public class HomogeneousAbundanceGear implements Gear {
      * @return
      */
     protected double[][] fishThisSpecies(
-            SeaTile where, Species species) {
+            LocalBiology where, Species species) {
         //get the array of the fish (but perform a safety copy)
 
         double[][] fish = prepTemplocationalAbundance(species);

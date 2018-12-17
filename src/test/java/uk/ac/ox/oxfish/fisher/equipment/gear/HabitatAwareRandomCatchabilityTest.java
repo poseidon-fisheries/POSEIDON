@@ -58,13 +58,13 @@ public class HabitatAwareRandomCatchabilityTest
 
         Fisher fisher = mock(Fisher.class);
         when(fisher.grabRandomizer()).thenReturn(new MersenneTwisterFast());
-        Catch fishCaught = gear.fish(fisher, tile, 1, biology);
+        Catch fishCaught = gear.fish(fisher, tile,tile , 1, biology);
         //gear does not kill off the fish
         verify(tile,never()).reactToThisAmountOfBiomassBeingFished(any(),any(),any());
 
         Assert.assertEquals(20, fishCaught.getWeightCaught(species), .01);
         when(tile.getRockyPercentage()).thenReturn(0d);
-        Assert.assertEquals(10, gear.fish(fisher, tile, 1, biology).getWeightCaught(species), .01);
+        Assert.assertEquals(10, gear.fish(fisher, tile,tile , 1, biology).getWeightCaught(species), .01);
 
 
 

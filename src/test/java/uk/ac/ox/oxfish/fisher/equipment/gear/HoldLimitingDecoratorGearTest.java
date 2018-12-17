@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.FixedProportionGearFactory;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.HoldLimitingDecoratorFactory;
-import uk.ac.ox.oxfish.fisher.strategies.gear.FixedGearStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
@@ -60,12 +59,13 @@ public class HoldLimitingDecoratorGearTest {
 
         //catches 100 units
         Gear delegate = mock(Gear.class);
-        when(delegate.fish(any(),any(),anyInt(),any())).thenReturn(
+        when(delegate.fish(any(), any(), any(), anyInt(), any())).thenReturn(
                 new Catch(new double[]{70,30})
         );
 
         HoldLimitingDecoratorGear gear = new HoldLimitingDecoratorGear(delegate);
-        Catch haul = gear.fish(fisher, mock(SeaTile.class), 100, mock(GlobalBiology.class));
+        SeaTile tile = mock(SeaTile.class);
+        Catch haul = gear.fish(fisher, tile,tile , 100, mock(GlobalBiology.class));
         assertEquals(haul.getTotalWeight(),50d,.001);
         assertEquals(haul.getWeightCaught(0),35d,.001);
         assertEquals(haul.getWeightCaught(1),15d,.001);
@@ -97,7 +97,7 @@ public class HoldLimitingDecoratorGearTest {
         StructuredAbundance firstCatch = new StructuredAbundance(new double[]{1, 1, 1});
         StructuredAbundance secondCatch = new StructuredAbundance(new double[]{1, 1});
         Gear delegate = mock(Gear.class);
-        when(delegate.fish(any(),any(),anyInt(),any())).thenReturn(
+        when(delegate.fish(any(), any(), any(), anyInt(), any())).thenReturn(
                 new Catch(
                         new StructuredAbundance[]{firstCatch,secondCatch},
                         bio
@@ -105,7 +105,8 @@ public class HoldLimitingDecoratorGearTest {
         );
 
         HoldLimitingDecoratorGear gear = new HoldLimitingDecoratorGear(delegate);
-        Catch haul = gear.fish(fisher, mock(SeaTile.class), 100, bio);
+        SeaTile tile = mock(SeaTile.class);
+        Catch haul = gear.fish(fisher, tile, tile, 100, bio);
         assertTrue(haul.hasAbundanceInformation());
         assertEquals(haul.getTotalWeight(),200d,.001);
         assertEquals(haul.getWeightCaught(0),120d,.001);

@@ -80,7 +80,7 @@ public class AbundanceDrivenFixedExogenousCatches extends AbstractExogenousCatch
                 new Pair<>(target, simulatedGear)
         );
         //catch it
-        Catch fish = gear.fish(null, tile, 1, model.getBiology());
+        Catch fish = gear.fish(null, tile,tile , 1, model.getBiology());
         tile.reactToThisAmountOfBiomassBeingFished(fish,fish,model.getBiology());
         return fish;
     }

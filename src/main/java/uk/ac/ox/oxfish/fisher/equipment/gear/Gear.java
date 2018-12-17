@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -34,8 +35,8 @@ public interface Gear {
 
     Catch fish(
             Fisher fisher,
-            SeaTile where,
-            int hoursSpentFishing,
+            LocalBiology localBiology,
+            SeaTile context, int hoursSpentFishing,
             GlobalBiology modelBiology);
 
     /**

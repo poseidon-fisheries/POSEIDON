@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -53,20 +54,22 @@ public class OneSpecieGear implements Gear {
     /**
      * catches a fixed proportion of the targeted specie and nothing of all the others
      * @param fisher the fisher
-     * @param where where the fisher is fishing
+     * @param localBiology where the fisher is fishing
+     * @param context
      * @param hoursSpentFishing hours spent fishing
      * @param modelBiology the biology (list of available species)
      * @return the catch
      */
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
-        double[] caught = catchesAsArray(where, hoursSpentFishing, modelBiology);
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology) {
+        double[] caught = catchesAsArray(localBiology, hoursSpentFishing, modelBiology);
         return new Catch(caught);
     }
 
     private double[] catchesAsArray(
-            SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
         double[] caught = new double[modelBiology.getSize()];
         if(proportionCaught>0) {
             FishStateUtilities.catchSpecieGivenCatchability(where, hoursSpentFishing, targetedSpecies,

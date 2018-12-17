@@ -85,7 +85,7 @@ public class HeterogeneousAbundanceGearTest
 
         SeaTile mock = mock(SeaTile.class,RETURNS_DEEP_STUBS);
         when(mock.getBiology().getBiomass(any())).thenReturn(1d);
-        Catch caught = gear.fish(mock(Fisher.class), mock, 1, biology);
+        Catch caught = gear.fish(mock(Fisher.class), mock, mock, 1, biology);
         assertEquals(caught.getWeightCaught(0), 19.880139, .001);
         assertEquals(caught.getWeightCaught(1), 19.880139*2, .001);
 

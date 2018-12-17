@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -66,9 +67,10 @@ public class HabitatAwareRandomCatchability implements Gear {
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology) {
         List<Species> species = modelBiology.getSpecies();
-        double[] totalCatch = catchesAsArray(fisher, where, hoursSpentFishing, modelBiology, species);
+        double[] totalCatch = catchesAsArray(fisher, context, hoursSpentFishing, modelBiology, species);
         return new Catch(totalCatch);
 
 

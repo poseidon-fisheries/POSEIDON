@@ -21,7 +21,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.Species;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * A gear that is given a mean and standard deviation catchability for each specie.
@@ -62,13 +61,14 @@ public class RandomCatchabilityTrawl implements Gear
 
     @Override
     public Catch fish(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology)
+            Fisher fisher, LocalBiology localBiology, SeaTile context,
+            int hoursSpentFishing, GlobalBiology modelBiology)
     {
-        return new Catch(catchesAsArray(fisher, where, hoursSpentFishing, modelBiology));
+        return new Catch(catchesAsArray(fisher, localBiology, hoursSpentFishing, modelBiology));
     }
 
     private double[] catchesAsArray(
-            Fisher fisher, SeaTile where, int hoursSpentFishing, GlobalBiology modelBiology) {
+            Fisher fisher, LocalBiology where, int hoursSpentFishing, GlobalBiology modelBiology) {
         double[] totalCatch = new double[modelBiology.getSize()];
         for(int i=0; i<modelBiology.getSize(); i++)
         {
