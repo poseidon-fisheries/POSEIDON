@@ -79,22 +79,28 @@ public class Slice3Sweeps {
     //    effortControl("all4", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 //        effortControl("large", new String[]{"big"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 //        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
-
-
+//        effortControl("all", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, MIN_DAYS_OUT);
 
 //       fleetReduction("fleetreduction","optimistic_recruits",1);
 //       fleetReduction("fleetreduction","fixed_recruits",4);
 //        fleetReduction("fleetreduction","optimistic_recruits_spinup_fixedmarket",1);
+//        fleetReduction("fleetreduction","pessimistic_recruits_spinup",1);
 
-//        pricePremium("premium_malabaricus","fixed_recruits",4,"Lutjanus malabaricus");
-//        pricePremium("premium_multidens","fixed_recruits",4,"Pristipomoides multidens");
-//
-//        pricePremium("premium_malabaricus","optimistic_recruits",1,"Lutjanus malabaricus");
-//        pricePremium("premium_multidens","optimistic_recruits",1,"Pristipomoides multidens");
-//
-//        pricePremium("premium_malabaricus","optimistic_recruits_spinup_fixedmarket",1,"Lutjanus malabaricus");
-//        pricePremium("premium_multidens","optimistic_recruits_spinup_fixedmarket",1,"Pristipomoides multidens");
 
+//        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
+//        pricePremium("premium_multidens","fixed_recruits",10,"Pristipomoides multidens");
+//        pricePremium("premium_malabaricus","optimistic_recruits",10,"Lutjanus malabaricus");
+//        pricePremium("premium_multidens","optimistic_recruits",10,"Pristipomoides multidens");
+//        pricePremium("premium_malabaricus3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
+ //       pricePremium("premium_multidens3","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
+//        pricePremium("premium_malabaricus3","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
+ //       pricePremium("premium_multidens3","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
+
+
+//        pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
+//        pricePenalty("malus_multidens","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
+//        pricePenalty("malus_malabaricus","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
+//        pricePenalty("malus_multidens","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
 
 //        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits", "Lutjanus malabaricus", "100_malabaricus",
 //                    false);
@@ -115,7 +121,7 @@ public class Slice3Sweeps {
 //                    true);
 
 //
-//        recruitmentFailure("recruit_failure","fixed_recruits",4,2);
+   //     recruitmentFailure("recruit_failure2","fixed_recruits",4,10);
 //        recruitmentFailure("recruit_failure","optimistic_recruits",4,2);
 //        recruitmentFailure("recruit_failure","optimistic_recruits_spinup_fixedmarket",4,2);
     }
@@ -296,7 +302,7 @@ public class Slice3Sweeps {
 
     private static void pricePremium(
             String name,
-            final String filename, final int shockYear,
+            final String filename, final int maturityBin,
             final String premiumSpecies
     )throws IOException {
 
@@ -304,22 +310,19 @@ public class Slice3Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+.1)) {
+        for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+.5)) {
 
             BatchRunner runner = setupRunner(filename);
 
 
 
 
-            //basically we want year 4 to change big boats regulations.
-            //because I coded "run" poorly, we have to go through this series of pirouettes
-            //to get it done right
+
             double finalMarkup = markup;
+            //add markup in the scenario
             runner.setScenarioSetup(
                     scenario -> {
-                        MersenneTwisterFast fakeRandom = new MersenneTwisterFast(0);
 
-                        //at year 4, impose regulation
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
 
                         ThreePricesMarketFactory market =
@@ -327,12 +330,15 @@ public class Slice3Sweeps {
                                 premiumSpecies
                         );
 
-                        market.setHighAgeThreshold(
+                        market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
+                        double newPrice = ((FixedDoubleParameter) market.getPriceAboveThresholds()).getFixedValue() *
+                                (1d + finalMarkup);
+                        market.setPriceAboveThresholds(
                                 new FixedDoubleParameter(
-                                ((FixedDoubleParameter) market.getHighAgeThreshold()).getFixedValue() *
-                                        (1d+ finalMarkup)
+                                        newPrice
                                 )
                         );
+                        System.out.println(newPrice);
 
                     }
             );
@@ -356,6 +362,83 @@ public class Slice3Sweeps {
         }
         fileWriter.close();
     }
+
+
+    /**
+     * lowers the price of fish caught below the maturity value
+     * @param name
+     * @param filename
+     * @param shockYear
+     * @param premiumSpecies
+     * @throws IOException
+     */
+    private static void pricePenalty(
+            String name,
+            final String filename, final int maturityBin,
+            final String premiumSpecies
+    )throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(double markup=0; markup<=1; markup=FishStateUtilities.round(markup+.25)) {
+
+            BatchRunner runner = setupRunner(filename);
+
+
+
+
+
+            double finalMarkup = markup;
+            //add markup in the scenario
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+                        ThreePricesMarketFactory market =
+                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                                        premiumSpecies
+                                );
+
+                        market.setLowAgeThreshold(new FixedDoubleParameter(maturityBin));
+                        if(((FixedDoubleParameter) market.getHighAgeThreshold()).getFixedValue()<=maturityBin)
+                            market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin+1));
+
+
+                        double newPrice = ((FixedDoubleParameter) market.getPriceBelowThreshold()).getFixedValue() *
+                                (finalMarkup);
+                        market.setPriceBelowThreshold(
+                                new FixedDoubleParameter(
+                                        newPrice
+                                )
+                        );
+                        System.out.println(newPrice);
+
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalMarkup).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
 
 
     //"SPR " + "Pristipomoides multidens" + " " + "100_multidens"
@@ -569,10 +652,10 @@ public class Slice3Sweeps {
                 "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
                 "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
                 "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
-                "SPR Oracle - " + "Epinephelus areolatus",
-                "SPR Oracle - " + "Pristipomoides multidens" ,
-                "SPR Oracle - " + "Lutjanus malabaricus",
-                "SPR Oracle - " + "Lutjanus erythropterus",
+//                "SPR Oracle - " + "Epinephelus areolatus",
+//                "SPR Oracle - " + "Pristipomoides multidens" ,
+//                "SPR Oracle - " + "Lutjanus malabaricus",
+//                "SPR Oracle - " + "Lutjanus erythropterus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
                 "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
