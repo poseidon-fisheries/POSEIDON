@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
-import uk.ac.ox.oxfish.fisher.actions.MaybeFish;
 import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
@@ -171,12 +170,6 @@ public class Fisher implements Steppable, Startable{
 
 
     private DiscardingStrategy discardingStrategy;
-
-    /**
-     * The action to be executed when a fisher has arrived at destination. In most cases,
-     * this will be to "maybe fish", but FAD fishers might intend to deploy FADs or make FAD sets.
-     */
-    private Action actionAtDestination = new MaybeFish();
 
     /**
      * the turnOff switch to call when the fisher is turned off
@@ -685,8 +678,6 @@ public class Fisher implements Steppable, Startable{
                                                                             getCurrentTrip());
 
     }
-
-
 
     /**
      * store the catch
@@ -1481,8 +1472,6 @@ public class Fisher implements Steppable, Startable{
         return state;
     }
 
-
-
     public boolean canAndWantToFishHere()
     {
         return (getRegulation().canFishHere(this,getLocation(), state) || isCheater())
@@ -1496,14 +1485,6 @@ public class Fisher implements Steppable, Startable{
 
     public double getCountedLandingsPerBin(Species species, int bin) {
         return getDailyCounter().getSpecificLandings(species, bin);
-    }
-
-    public Action getActionAtDestination() {
-        return actionAtDestination;
-    }
-
-    public void setActionAtDestination(Action actionAtDestination) {
-        this.actionAtDestination = actionAtDestination;
     }
 
     public double getHoursAtSeaThisYear() {

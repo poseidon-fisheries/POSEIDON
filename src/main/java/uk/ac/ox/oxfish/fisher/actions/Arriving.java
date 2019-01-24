@@ -46,21 +46,16 @@ public class Arriving implements Action{
         if (agent.getLocation().equals(agent.getHomePort().getLocation()))
             return new ActionResult(new Docking(),hoursLeft);
 
-
         //adapt if needed
         agent.updateDestination(model,this);
         //we don't want to move anywhere else
         if(agent.getDestination().equals(agent.getLocation())) {
-            return new ActionResult(agent.getActionAtDestination(), hoursLeft);
+            return agent.getFishingStrategy().act(model, agent, regulation, hoursLeft);
         }
         //we got a new location? move to there!
         else
         {
             return new ActionResult(new Moving(), hoursLeft);
         }
-
-
-
-
     }
 }
