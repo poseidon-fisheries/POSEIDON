@@ -23,12 +23,15 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 
 
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
+import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
@@ -59,14 +62,54 @@ import java.util.List;
 
 public class Slice3Sweeps {
 
-    public static final String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
+    //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
+    public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 1;
+    public static final int RUNS_PER_POLICY = 10;
     public static final int MAX_DAYS_OUT = 250;
+    public static  int POPULATIONS = 4;
 
 
     public static void main(String[] args) throws IOException {
+        DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
+        POPULATIONS = 4;
 
+        //effort control
+        //all boats are controlled
+        effortControl("all_manyruns",
+                      new String[]{"big","small","medium","small10"},
+                      "pessimistic_spinup",
+                      1, MIN_DAYS_OUT);
+        effortControl("all_manyruns",
+                      new String[]{"big","small","medium","small10"},
+                      "optimistic_spinup",
+                      1, MIN_DAYS_OUT);
+
+        //only boats >10GT are controlled
+        effortControl("10_manyruns",
+                      new String[]{"big","medium","small10"},
+                      "optimistic_spinup",
+                      1, MIN_DAYS_OUT);
+        effortControl("10_manyruns",
+                      new String[]{"big","medium","small10"},
+                      "pessimistic_spinup",
+                      1, MIN_DAYS_OUT);
+
+
+        //price premium
+        pricePremium("premium_multidens","optimistic_spinup",10,"Pristipomoides multidens");
+        pricePremium("premium_multidens","pessimistic_spinup",10,"Pristipomoides multidens");
+        selectivityTest("selectivity_sweep","optimistic_spinup");
+        selectivityTest("selectivity_sweep","pessimistic_spinup");
+        pricePenalty("malus_multidens","optimistic_spinup",10,"Pristipomoides multidens");
+        pricePenalty("malus_multidens","pessimistic_spinup",10,"Pristipomoides multidens");
+
+
+    }
+
+    public static void main3(String[] args) throws IOException {
+        DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
+        POPULATIONS = 3;
 
 //        effortControl("all", new String[]{"big","small","medium"}, "fixed_recruits", 4, MIN_DAYS_OUT);
 //        effortControl("large", new String[]{"big"}, "fixed_recruits", 4, MIN_DAYS_OUT);
@@ -74,19 +117,32 @@ public class Slice3Sweeps {
 
 
 //
-//        effortControl("all", new String[]{"big","small","medium"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
+//        effortControl("all_manyruns",
+//                      new String[]{"big","small","medium"},
+//                      "optimistic_recruits",
+//                      1, MIN_DAYS_OUT);
 //        effortControl("large", new String[]{"big"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
 //        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
 
-    //    effortControl("all4", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
+//        effortControl("all_manyruns",
+//                      new String[]{"big","small","medium"},
+//                      "optimistic_recruits_spinup_fixedmarket",
+//                      1,
+//                      MIN_DAYS_OUT);
 //        effortControl("large", new String[]{"big"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
 //        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
-//        effortControl("all", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, MIN_DAYS_OUT);
+
+
+//        effortControl("all_manyruns",
+//                      new String[]{"big","small","medium"},
+//                      "pessimistic_recruits_spinup",
+//                      1,
+//                      MIN_DAYS_OUT);
 
 //       fleetReduction("fleetreduction","optimistic_recruits",1);
 //       fleetReduction("fleetreduction","fixed_recruits",4);
-//        fleetReduction("fleetreduction","optimistic_recruits_spinup_fixedmarket",1);
-//        fleetReduction("fleetreduction","pessimistic_recruits_spinup",1);
+//        fleetReduction("fleetreduction_manyruns","optimistic_recruits_spinup_fixedmarket",1);
+//        fleetReduction("fleetreduction_manyruns","pessimistic_recruits_spinup",1);
 
 
 //        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
@@ -94,22 +150,22 @@ public class Slice3Sweeps {
 //        pricePremium("premium_malabaricus","optimistic_recruits",10,"Lutjanus malabaricus");
 //        pricePremium("premium_multidens","optimistic_recruits",10,"Pristipomoides multidens");
 //        pricePremium("premium_malabaricus3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
-      //    pricePremium("premium_ero3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus erythropterus");
+        //    pricePremium("premium_ero3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus erythropterus");
         //       pricePremium("premium_multidens3","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
-     //   pricePremium("premium_ero3","pessimistic_recruits_spinup",10,"Lutjanus erythropterus");
+        //   pricePremium("premium_ero3","pessimistic_recruits_spinup",10,"Lutjanus erythropterus");
 
-//        pricePremium("premium_malabaricus3","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
- //       pricePremium("premium_multidens3","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
+        //    pricePremium("premium_malabaricus_manyruns","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
+        //       pricePremium("premium_multidens3","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
 
 
-       // pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
+        // pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
 //        pricePenalty("malus_multidens","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
 //        pricePenalty("malus_malabaricus","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
 //        pricePenalty("malus_multidens","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
 
 
-   //    delays("delay_all", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, 50);
-   //     delays("delay_all", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, 50);
+        //    delays("delay_all_manyruns", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, 50);
+        //      delays("delay_all_manyruns", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, 50);
 
 //        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits", "Lutjanus malabaricus", "100_malabaricus",
 //                    false);
@@ -130,9 +186,25 @@ public class Slice3Sweeps {
 //                    true);
 
 //
-   //     recruitmentFailure("recruit_failure2","fixed_recruits",4,10);
+        //     recruitmentFailure("recruit_failure2","fixed_recruits",4,10);
 //        recruitmentFailure("recruit_failure","optimistic_recruits",4,2);
 //        recruitmentFailure("recruit_failure","optimistic_recruits_spinup_fixedmarket",4,2);
+
+
+//        selectivityTest("selectivity_sweep","optimistic_recruits_spinup_fixedmarket");
+//        selectivityTest("selectivity_sweep","pessimistic_recruits_spinup");
+
+
+
+
+
+        //FURTHER
+        DIRECTORY = DIRECTORY + "further/";
+        //pricePremium("premium_malabaricus_manyruns","pessimistic_recruits_spinup_doublegear",10,"Lutjanus malabaricus");
+    /*    pricePremium("premium_malabaricus_manyruns","optimistic_recruits_spinup_fixedmarket_doublegear",
+                     10,"Lutjanus malabaricus");
+                     */
+
     }
 
     private static void effortControl(
@@ -146,7 +218,7 @@ public class Slice3Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
             int finalMaxDaysOut = maxDaysOut;
@@ -234,10 +306,10 @@ public class Slice3Sweeps {
 
         for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=5) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
-            int finalWaitTime = waitTimes;
+            int finalWaitTime = waitTimes *24;
 
             //basically we want year 4 to change big boats regulations.
             //because I coded "run" poorly, we have to go through this series of pirouettes
@@ -328,7 +400,7 @@ public class Slice3Sweeps {
 
         for(double probability=0; probability<=.05; probability=FishStateUtilities.round5(probability+.005)) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
 
@@ -420,7 +492,7 @@ public class Slice3Sweeps {
 
         for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+.5)) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
 
@@ -435,8 +507,8 @@ public class Slice3Sweeps {
 
                         ThreePricesMarketFactory market =
                                 ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
-                                premiumSpecies
-                        );
+                                        premiumSpecies
+                                );
 
                         market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
                         double newPrice = ((FixedDoubleParameter) market.getPriceAboveThresholds()).getFixedValue() *
@@ -491,7 +563,7 @@ public class Slice3Sweeps {
 
         for(double markup=0; markup<=1; markup=FishStateUtilities.round(markup+.25)) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
 
@@ -563,7 +635,7 @@ public class Slice3Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, 15);
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
 
@@ -627,85 +699,85 @@ public class Slice3Sweeps {
         fileWriter.flush();
 
 
-            BatchRunner runner = setupRunner(filename, 15);
+        BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
-            for(int failure = 1; failure>=0; failure--) {
-
-
-                //basically we want year 4 to change big boats regulations.
-                //because I coded "run" poorly, we have to go through this series of pirouettes
-                //to get it done right
-                int finalFailure = failure;
-                runner.setScenarioSetup(
-                        scenario -> {
-
-                            //at year 4, impose regulation
-                            FlexibleScenario flexible = (FlexibleScenario) scenario;
-                            flexible.getPlugins().add(
-                                    fishState -> new AdditionalStartable() {
-                                        /**
-                                         * this gets called by the fish-state right after the scenario has started. It's
-                                         * useful to set up steppables
-                                         * or just to percolate a reference to the model
-                                         *
-                                         * @param model the model
-                                         */
-                                        @Override
-                                        public void start(FishState model) {
-                                            if (finalFailure >0) {
-                                                model.scheduleOnceAtTheBeginningOfYear(new Steppable() {
-                                                    @Override
-                                                    public void step(SimState simState) {
-
-                                                        for (SeaTile tile : model.getMap().getAllSeaTilesExcludingLandAsList())
-                                                            for (Species species : model.getSpecies()) {
+        for(int failure = 1; failure>=0; failure--) {
 
 
-                                                                double[][] matrix = tile.getAbundance(
-                                                                        species).asMatrix();
-                                                                if(matrix == null || matrix.length==0 ||
-                                                                        matrix[0].length ==0 ||
-                                                                species.isImaginary())
-                                                                    continue;
-                                                                matrix[0][0] = 0;
-                                                                matrix[0][1] = 0;
-                                                            }
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            int finalFailure = failure;
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        //at year 4, impose regulation
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+                        flexible.getPlugins().add(
+                                fishState -> new AdditionalStartable() {
+                                    /**
+                                     * this gets called by the fish-state right after the scenario has started. It's
+                                     * useful to set up steppables
+                                     * or just to percolate a reference to the model
+                                     *
+                                     * @param model the model
+                                     */
+                                    @Override
+                                    public void start(FishState model) {
+                                        if (finalFailure >0) {
+                                            model.scheduleOnceAtTheBeginningOfYear(new Steppable() {
+                                                @Override
+                                                public void step(SimState simState) {
+
+                                                    for (SeaTile tile : model.getMap().getAllSeaTilesExcludingLandAsList())
+                                                        for (Species species : model.getSpecies()) {
 
 
-                                                    }
-                                                }, StepOrder.DAWN, shockYear);
-                                            }
-                                        }
-                                        /**
-                                         * tell the startable to turnoff,
-                                         */
-                                        @Override
-                                        public void turnOff() {
+                                                            double[][] matrix = tile.getAbundance(
+                                                                    species).asMatrix();
+                                                            if(matrix == null || matrix.length==0 ||
+                                                                    matrix[0].length ==0 ||
+                                                                    species.isImaginary())
+                                                                continue;
+                                                            matrix[0][0] = 0;
+                                                            matrix[0][1] = 0;
+                                                        }
 
+
+                                                }
+                                            }, StepOrder.DAWN, shockYear);
                                         }
                                     }
-                            );
+                                    /**
+                                     * tell the startable to turnoff,
+                                     */
+                                    @Override
+                                    public void turnOff() {
 
-                        }
-                );
+                                    }
+                                }
+                        );
 
-
-                runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                    @Override
-                    public void consume(StringBuffer writer, FishState model, Integer year) {
-                        writer.append(finalFailure).append(",");
                     }
-                });
+            );
 
 
-                //while (runner.getRunsDone() < 1) {
-                for (int i = 0; i < runs; i++) {
-                    StringBuffer tidy = new StringBuffer();
-                    runner.run(tidy);
-                    fileWriter.write(tidy.toString());
-                    fileWriter.flush();
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalFailure).append(",");
                 }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for (int i = 0; i < runs; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
             }
+        }
         fileWriter.close();
 
     }
@@ -714,63 +786,37 @@ public class Slice3Sweeps {
 
 
     @NotNull
-    public static BatchRunner setupRunner(String filename, final int yearsToRun) {
+    public static BatchRunner setupRunner(String filename, final int yearsToRun,
+                                          final int populations) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
                 "Average Cash-Flow",
-                "Average Cash-Flow of population0",
-                "Average Cash-Flow of population1",
-                "Average Cash-Flow of population2",
-                "Average Number of Trips of population0",
-                "Average Number of Trips of population1",
-                "Average Number of Trips of population2",
-                "Number Of Active Fishers of population0",
-                "Number Of Active Fishers of population1",
-                "Number Of Active Fishers of population2",
-                "Average Distance From Port of population0",
-                "Average Distance From Port of population1",
-                "Average Distance From Port of population2",
-                "Average Trip Duration of population0",
-                "Average Trip Duration of population1",
-                "Average Trip Duration of population2",
-                "Epinephelus areolatus Landings of population0",
-                "Pristipomoides multidens Landings of population0",
-                "Lutjanus malabaricus Landings of population0",
-                "Lutjanus erythropterus Landings of population0",
-                "Others Landings of population0",
-
-                "Epinephelus areolatus Landings of population1",
-                "Pristipomoides multidens Landings of population1",
-                "Lutjanus malabaricus Landings of population1",
-                "Lutjanus erythropterus Landings of population1",
-                "Others Landings of population1",
-                "Epinephelus areolatus Landings of population2",
-                "Pristipomoides multidens Landings of population2",
-                "Lutjanus malabaricus Landings of population2",
-                "Lutjanus erythropterus Landings of population2",
-                "Others Landings of population2",
-
-                "Biomass Epinephelus areolatus",
-                "Biomass Pristipomoides multidens",
-                "Biomass Lutjanus malabaricus",
-                "Biomass Lutjanus erythropterus",
-                "Total Landings of population0",
-                "Total Landings of population1",
-                "Total Landings of population2",
-
                 "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
                 "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
                 "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
-//                "SPR Oracle - " + "Epinephelus areolatus",
-//                "SPR Oracle - " + "Pristipomoides multidens" ,
-//                "SPR Oracle - " + "Lutjanus malabaricus",
-//                "SPR Oracle - " + "Lutjanus erythropterus",
+                "SPR Oracle - " + "Epinephelus areolatus",
+                "SPR Oracle - " + "Pristipomoides multidens" ,
+                "SPR Oracle - " + "Lutjanus malabaricus",
+                "SPR Oracle - " + "Lutjanus erythropterus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
                 "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
-                "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus"
+                "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus");
 
-        );
+        for(int i=0; i<populations; i++){
+            columnsToPrint.add("Average Cash-Flow of population"+i);
+            columnsToPrint.add("Average Number of Trips of population"+i);
+            columnsToPrint.add("Number Of Active Fishers of population"+i);
+            columnsToPrint.add("Average Distance From Port of population"+i);
+            columnsToPrint.add("Average Trip Duration of population"+i);
+            columnsToPrint.add("Epinephelus areolatus Landings of population"+i);
+            columnsToPrint.add("Pristipomoides multidens Landings of population"+i);
+            columnsToPrint.add("Lutjanus malabaricus Landings of population"+i);
+            columnsToPrint.add("Lutjanus erythropterus Landings of population"+i);
+            columnsToPrint.add("Others Landings of population"+i);
+        }
+
+
         for(int i=0; i<25; i++) {
             columnsToPrint.add("Epinephelus areolatus Catches (kg) - age bin " + i);
             columnsToPrint.add("Pristipomoides multidens Catches (kg) - age bin " + i);
@@ -804,6 +850,69 @@ public class Slice3Sweeps {
 
 
 
+    //sweep selectivity of small boats, see if it makes a difference anyway
+    private static void selectivityTest(
+            String name,
+            final String filename) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(double increase=0; increase<=3; increase=FishStateUtilities.round5(increase+.1)) {
+
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+
+
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            double finalIncrease = increase;
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+                        Preconditions.checkArgument(flexible.getFisherDefinitions().get(0).getTags().contains("small"));
+                        ;
+                        HomogeneousGearFactory malabaricus =
+                                ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) flexible.getFisherDefinitions().get(
+                                        0).getGear()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+
+                        ((LogisticSelectivityGearFactory) malabaricus).setSelectivityAParameter(
+                                new FixedDoubleParameter(
+                                        ((FixedDoubleParameter) ((LogisticSelectivityGearFactory) malabaricus).getSelectivityAParameter()).getFixedValue()
+                                                * finalIncrease
+                                )
+                        );
+
+
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalIncrease).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
+
+
 
     public static void enforcement(
             String name,
@@ -817,7 +926,7 @@ public class Slice3Sweeps {
             for(double probabilityOfCheating = 0; probabilityOfCheating<=1; probabilityOfCheating+=.2) {
 
                 probabilityOfCheating = FishStateUtilities.round(probabilityOfCheating);
-                BatchRunner runner = setupRunner(filename, 15);
+                BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
 
                 int finalMaxDaysOut = maxDaysOut;

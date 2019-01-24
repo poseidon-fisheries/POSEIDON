@@ -54,7 +54,8 @@ public class StructuredAbundance {
      */
     public StructuredAbundance(double[] ageStructure)
     {
-        //Preconditions.checkArgument(ageStructure.length > 0); not true anymore since it could be an emptybiology forced to return an empty structure
+        //Preconditions.checkArgument(ageStructure.length > 0); not true anymore since it could be an empty
+        // biology forced to return an empty structure
         abundance = new double[1][];
         abundance[0] = ageStructure;
     }

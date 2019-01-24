@@ -1191,6 +1191,20 @@ public class FishStateUtilities {
     }
 
 
+    public static double getWeightedAverage(double[] observations, double[] weight)
+    {
+        Preconditions.checkArgument(observations.length==weight.length);
+        double sum = 0;
+        double denominator = 0;
+        for(int i=0; i<observations.length; i++)
+        {
+            sum += observations[i] * weight[i];
+            denominator += weight[i];
+        }
+        return sum/denominator;
+    }
+
+
     public static double timeSeriesDistance(
             DataColumn data,
             Path csvFilePath, final double exponent) throws IOException {

@@ -244,5 +244,13 @@ public class FishStateUtilitiesTest {
     }
 
 
+    @Test
+    public void weightedAverage() {
 
+        double[] observations = new double[]{100,200,300};
+        double[] weight = new double[]{1,1,10};
+        double average = FishStateUtilities.getWeightedAverage(observations, weight);
+        assertEquals(275,average,.0001);
+
+    }
 }
