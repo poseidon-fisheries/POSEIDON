@@ -65,7 +65,7 @@ public class Slice3Sweeps {
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 10;
+    public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
 
@@ -76,33 +76,34 @@ public class Slice3Sweeps {
 
         //effort control
         //all boats are controlled
-        effortControl("all_manyruns",
-                      new String[]{"big","small","medium","small10"},
-                      "pessimistic_spinup",
-                      1, MIN_DAYS_OUT);
-        effortControl("all_manyruns",
-                      new String[]{"big","small","medium","small10"},
-                      "optimistic_spinup",
-                      1, MIN_DAYS_OUT);
+//        effortControl("all_manyruns_quick2",
+//                      new String[]{"big","small","medium","small10"},
+//                      "pessimistic_spinup",
+//                      1, MIN_DAYS_OUT);
+//        effortControl("all_manyruns_quick2",
+//                      new String[]{"big","small","medium","small10"},
+//                      "optimistic_spinup",
+//                      1, MIN_DAYS_OUT);
+//
+//        //only boats >10GT are controlled
+//        effortControl("10_manyruns_quick2",
+//                      new String[]{"big","medium","small10"},
+//                      "optimistic_spinup",
+//                      1, MIN_DAYS_OUT);
+//        effortControl("10_manyruns_quick2",
+//                      new String[]{"big","medium","small10"},
+//                      "pessimistic_spinup",
+//                      1, MIN_DAYS_OUT);
 
-        //only boats >10GT are controlled
-        effortControl("10_manyruns",
-                      new String[]{"big","medium","small10"},
-                      "optimistic_spinup",
-                      1, MIN_DAYS_OUT);
-        effortControl("10_manyruns",
-                      new String[]{"big","medium","small10"},
-                      "pessimistic_spinup",
-                      1, MIN_DAYS_OUT);
-
-
-        //price premium
-        pricePremium("premium_multidens","optimistic_spinup",10,"Pristipomoides multidens");
-        pricePremium("premium_multidens","pessimistic_spinup",10,"Pristipomoides multidens");
-        selectivityTest("selectivity_sweep","optimistic_spinup");
-        selectivityTest("selectivity_sweep","pessimistic_spinup");
-        pricePenalty("malus_multidens","optimistic_spinup",10,"Pristipomoides multidens");
-        pricePenalty("malus_multidens","pessimistic_spinup",10,"Pristipomoides multidens");
+//
+//        //price premium
+//        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
+//        selectivityTest("selectivity_sweep_quick2","optimistic_spinup");
+//        pricePenalty("malus_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
+//
+//        pricePremium("premium_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
+//        selectivityTest("selectivity_sweep_quick2","pessimistic_spinup");
+//        pricePenalty("malus_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
 
 
     }
@@ -794,6 +795,10 @@ public class Slice3Sweeps {
                 "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
                 "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
                 "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
+                "Biomass Epinephelus areolatus",
+                "Biomass Pristipomoides multidens",
+                "Biomass Lutjanus malabaricus",
+                "Biomass Lutjanus erythropterus",
                 "SPR Oracle - " + "Epinephelus areolatus",
                 "SPR Oracle - " + "Pristipomoides multidens" ,
                 "SPR Oracle - " + "Lutjanus malabaricus",
@@ -804,6 +809,7 @@ public class Slice3Sweeps {
                 "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus");
 
         for(int i=0; i<populations; i++){
+            columnsToPrint.add("Total Landings of population"+i);
             columnsToPrint.add("Average Cash-Flow of population"+i);
             columnsToPrint.add("Average Number of Trips of population"+i);
             columnsToPrint.add("Number Of Active Fishers of population"+i);
@@ -886,6 +892,27 @@ public class Slice3Sweeps {
                                                 * finalIncrease
                                 )
                         );
+
+
+                        if(flexible.getFisherDefinitions().size()==4)
+                        {
+                            Preconditions.checkArgument(flexible.getFisherDefinitions().get(3).getTags().contains("small10"));
+
+
+                            malabaricus =
+                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) flexible.getFisherDefinitions().get(
+                                            3).getGear()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+
+                            ((LogisticSelectivityGearFactory) malabaricus).setSelectivityAParameter(
+                                    new FixedDoubleParameter(
+                                            ((FixedDoubleParameter) ((LogisticSelectivityGearFactory) malabaricus).getSelectivityAParameter()).getFixedValue()
+                                                    * finalIncrease
+                                    )
+                            );
+                        }
+
+
+
 
 
                     }
