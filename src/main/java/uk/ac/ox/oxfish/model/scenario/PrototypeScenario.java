@@ -437,11 +437,16 @@ public class PrototypeScenario implements Scenario {
 
         }
 
+        HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put(FishState.DEFAULT_POPULATION_NAME,
+                    fisherFactory);
 
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),fisherFactory );
+            return new ScenarioPopulation(fisherList,new SocialNetwork(new EmptyNetworkBuilder()),
+
+                                          factory );
         else {
-            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
         }
     }
 

@@ -60,9 +60,9 @@ public class TooLateToRemoveFishers
         //now keep running for 15 years adding 3 fishers every month
         while (state.getYear() < 18) {
             if (state.getDayOfTheYear() % 30 == 0) {
-                state.createFisher();
-                state.createFisher();
-                state.createFisher();
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
                 //   state.createFisher();
                 //   state.createFisher();
             }

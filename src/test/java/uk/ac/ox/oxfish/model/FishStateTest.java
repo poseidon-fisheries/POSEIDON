@@ -96,9 +96,9 @@ public class FishStateTest {
 
         assertEquals(4,state.getFishers().size());
         assertTrue(state.canCreateMoreFishers());
-        state.createFisher();
-        state.createFisher();
-        state.createFisher();
+        state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+        state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+        state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         state.schedule.step(state);
         assertEquals(7,state.getFishers().size());
         state.schedule.step(state);
@@ -110,7 +110,7 @@ public class FishStateTest {
         assertEquals(5,state.getFishers().size());
 
         Log.info("Testing that new fishers collect data just like the old ones");
-        Fisher newguy = state.createFisher();
+        Fisher newguy = state.createFisher(FishState.DEFAULT_POPULATION_NAME);
         for(int i=0; i<10; i++)
             state.schedule.step(state);
         assertEquals(10,newguy.getDailyData().numberOfObservations());

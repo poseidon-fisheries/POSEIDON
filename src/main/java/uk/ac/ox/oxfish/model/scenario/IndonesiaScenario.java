@@ -351,11 +351,13 @@ public class IndonesiaScenario implements Scenario {
         }
 
         addTagLandingTimeSeries(model);
-
+        HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put(FishState.DEFAULT_POPULATION_NAME,
+                    lastFactory);
         if(fishers.size() <=1)
-            return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
+            return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), factory );
         else {
-            return new ScenarioPopulation(fishers, new SocialNetwork(networkBuilder), lastFactory);
+            return new ScenarioPopulation(fishers, new SocialNetwork(networkBuilder), factory);
         }
     }
 
