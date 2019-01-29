@@ -111,10 +111,6 @@ test{
         maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
 }
 
-//this just mentions what the gradle version for the "wrapper" gradlew ought to be
-task wrapper(type: Wrapper) {
-
-}
 
 
 
@@ -229,6 +225,11 @@ task appendix(type:JavaExec){
     classpath = sourceSets.main.runtimeClasspath
 }
 
+task execute(type:JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "package.MyDefaultMain"
+
+}
 
 
 task algorithms(type:JavaExec){

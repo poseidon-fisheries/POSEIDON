@@ -40,10 +40,7 @@ import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMappedFactory;
 import uk.ac.ox.oxfish.model.market.factory.ThreePricesMarketFactory;
 import uk.ac.ox.oxfish.model.plugins.TowAndAltitudePluginFactory;
-import uk.ac.ox.oxfish.model.regs.FishingSeason;
-import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
-import uk.ac.ox.oxfish.model.regs.PortBasedWaitTimesDecorator;
-import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
+import uk.ac.ox.oxfish.model.regs.*;
 import uk.ac.ox.oxfish.model.regs.factory.AnarchyFactory;
 import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TriggerRegulationFactory;
@@ -76,7 +73,7 @@ public class Slice3Sweeps {
 
         //effort control
         //all boats are controlled
-//        effortControl("all_manyruns_quick2",
+//        effortControl("all_manyruns",
 //                      new String[]{"big","small","medium","small10"},
 //                      "pessimistic_spinup",
 //                      1, MIN_DAYS_OUT);
@@ -86,11 +83,11 @@ public class Slice3Sweeps {
 //                      1, MIN_DAYS_OUT);
 //
 //        //only boats >10GT are controlled
-//        effortControl("10_manyruns_quick2",
+//        effortControl("10_manyruns",
 //                      new String[]{"big","medium","small10"},
 //                      "optimistic_spinup",
 //                      1, MIN_DAYS_OUT);
-//        effortControl("10_manyruns_quick2",
+//        effortControl("10_manyruns",
 //                      new String[]{"big","medium","small10"},
 //                      "pessimistic_spinup",
 //                      1, MIN_DAYS_OUT);
@@ -106,6 +103,24 @@ public class Slice3Sweeps {
 //        pricePenalty("malus_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
 
 
+        //fleet reduction
+//        fleetReduction("fleetreduction_quick","optimistic_spinup",1);
+//        fleetReduction("fleetreduction_quick","pessimistic_spinup",1);
+
+
+//
+//            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
+//              delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+//
+//            delays("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
+//              delays("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
+//
+
+            delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
+              delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+
+            delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
+              delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
     }
 
     public static void main3(String[] args) throws IOException {
@@ -348,6 +363,102 @@ public class Slice3Sweeps {
                                                                         new PortBasedWaitTimesDecorator(
                                                                                 new ProtectedAreasOnly(),
                                                                                 waitTimes
+                                                                        ));
+                                                                continue fisherloop;
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                StepOrder.DAWN,
+                                                shockYear
+                                        );
+
+
+                                    }
+
+                                    @Override
+                                    public void turnOff() {
+
+                                    }
+                                }
+                        );
+
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalWaitTime).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
+
+    private static void delaysOnce(
+            String name,
+            String[] modifiedTags, final String filename, final int shockYear,
+            final int maxDelay) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=10) {
+
+            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+
+
+            int finalWaitTime = waitTimes;
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        //at year 4, impose regulation
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+                        flexible.getPlugins().add(
+                                fishState -> new AdditionalStartable() {
+                                    @Override
+                                    public void start(FishState model) {
+
+                                        model.scheduleOnceAtTheBeginningOfYear(
+                                                (Steppable) simState -> {
+
+
+
+                                                    fisherloop:
+                                                    for (Fisher fisher :
+                                                            ((FishState) simState).getFishers()) {
+
+                                                        for (String tag : modifiedTags) {
+                                                            if (fisher.getTags().contains(tag)) {
+
+                                                                int endDate = model.getRandom().nextInt(365);
+                                                                int startDate = endDate-finalWaitTime;
+                                                                if(startDate<0) {
+                                                                    endDate = endDate + startDate;
+                                                                    startDate=0;
+                                                                }
+
+                                                                fisher.setRegulation(
+                                                                        new ArbitraryPause(
+                                                                                startDate,
+                                                                                endDate,
+                                                                                fisher.getRegulation()
                                                                         ));
                                                                 continue fisherloop;
                                                             }
