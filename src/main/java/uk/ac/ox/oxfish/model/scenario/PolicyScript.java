@@ -85,6 +85,9 @@ public class PolicyScript
 
     private Integer changeInNumberOfFishers = null;
 
+
+    private String nameOfPopulation = FishState.DEFAULT_POPULATION_NAME;
+
     public PolicyScript() {
     }
 
@@ -99,7 +102,7 @@ public class PolicyScript
                 fisher.setRegulation(regulation.apply(state));
             }
             //new fishers will follow these new rules
-            state.getFisherFactory().setRegulations(regulation);
+            state.getFisherFactory(nameOfPopulation).setRegulations(regulation);
         }
         //apply gear
         if(gear != null) {
@@ -107,7 +110,7 @@ public class PolicyScript
                 fisher.setGear(gear.apply(state));
             }
             //new fishers will use the new gear
-            state.getFisherFactory().setGear(gear);
+            state.getFisherFactory(nameOfPopulation).setGear(gear);
         }
 
         if(departingStrategy != null) {
@@ -115,7 +118,7 @@ public class PolicyScript
                 fisher.setDepartingStrategy(departingStrategy.apply(state));
             }
             //new fishers will use the new strategy
-            state.getFisherFactory().setDepartingStrategy(departingStrategy);
+            state.getFisherFactory(nameOfPopulation).setDepartingStrategy(departingStrategy);
         }
 
         if(destinationStrategy != null) {
@@ -123,7 +126,7 @@ public class PolicyScript
                 fisher.setDestinationStrategy(destinationStrategy.apply(state));
             }
             //new fishers will use the new strategy
-            state.getFisherFactory().setDestinationStrategy(destinationStrategy);
+            state.getFisherFactory(nameOfPopulation).setDestinationStrategy(destinationStrategy);
         }
 
         if(discardingStrategy != null)
@@ -132,7 +135,7 @@ public class PolicyScript
                 fisher.setDiscardingStrategy(discardingStrategy.apply(state));
             }
             //new fishers will use the new strategy
-            state.getFisherFactory().setDiscardingStrategy(discardingStrategy);
+            state.getFisherFactory(nameOfPopulation).setDiscardingStrategy(discardingStrategy);
         }
 
         if(hourlyTravellingCosts != null)
@@ -148,7 +151,7 @@ public class PolicyScript
                         hourlyTravellingCosts.apply(state.getRandom())
                 ));
             }
-            state.getFisherFactory().getAdditionalSetups().add(
+            state.getFisherFactory(nameOfPopulation).getAdditionalSetups().add(
                     new Consumer<Fisher>() {
                         @Override
                         public void accept(Fisher fisher) {
@@ -174,7 +177,7 @@ public class PolicyScript
                 fisher.setFishingStrategy(fishingStrategy.apply(state));
             }
             //new fishers will use the new strategy
-            state.getFisherFactory().setFishingStrategy(fishingStrategy);
+            state.getFisherFactory(nameOfPopulation).setFishingStrategy(fishingStrategy);
         }
 
         if(weatherStrategy != null) {
@@ -182,7 +185,7 @@ public class PolicyScript
                 fisher.setWeatherStrategy(weatherStrategy.apply(state));
             }
             //new fishers will use the new strategy
-            state.getFisherFactory().setWeatherStrategy(weatherStrategy);
+            state.getFisherFactory(nameOfPopulation).setWeatherStrategy(weatherStrategy);
         }
 
 
@@ -191,7 +194,7 @@ public class PolicyScript
         if(changeInNumberOfFishers != null) {
             if(changeInNumberOfFishers>0)
                 for (int i = 0; i < changeInNumberOfFishers; i++)
-                    state.createFisher();
+                    state.createFisher(nameOfPopulation);
             else
             {
                 for (int i = 0; i < -changeInNumberOfFishers; i++)
@@ -369,5 +372,23 @@ public class PolicyScript
      */
     public void setRemoveAllMPAs(boolean removeAllMPAs) {
         this.removeAllMPAs = removeAllMPAs;
+    }
+
+    /**
+     * Getter for property 'nameOfPopulation'.
+     *
+     * @return Value for property 'nameOfPopulation'.
+     */
+    public String getNameOfPopulation() {
+        return nameOfPopulation;
+    }
+
+    /**
+     * Setter for property 'nameOfPopulation'.
+     *
+     * @param nameOfPopulation Value to set for property 'nameOfPopulation'.
+     */
+    public void setNameOfPopulation(String nameOfPopulation) {
+        this.nameOfPopulation = nameOfPopulation;
     }
 }

@@ -69,7 +69,7 @@ import java.util.function.ToIntFunction;
 public class FishState  extends SimState{
 
 
-
+    public static final String DEFAULT_POPULATION_NAME = "default_population";
     /**
      * contains the geography of the map
      */
@@ -103,7 +103,7 @@ public class FishState  extends SimState{
     /**
      * created by the scenario (optionally, could be null) this object is used to add fishers on the fly.
      */
-    private FisherFactory fisherFactory;
+    private Map<String,FisherFactory> fisherFactory;
 
     /**
      * all the objects that need to be started when this model starts but also need a reference to the original fisher
@@ -250,7 +250,7 @@ public class FishState  extends SimState{
                                     double sum = 0;
                                     for(Fisher fisher : state.getFishers())
                                     {
-                                            sum+= fisher.getCountedLandingsPerBin(species, finalAge);
+                                        sum+= fisher.getCountedLandingsPerBin(species, finalAge);
                                     }
 
                                     return sum;
@@ -503,14 +503,14 @@ public class FishState  extends SimState{
                             }
                         }
                 ).
-        mapToDouble(
-                new ToDoubleFunction<SeaTile>() {
-                    @Override
-                    public double applyAsDouble(SeaTile value) {
-                        return value.getAbundance(species).getAbundanceInBin(bin);
-                    }
-                }
-        ).sum();
+                        mapToDouble(
+                                new ToDoubleFunction<SeaTile>() {
+                                    @Override
+                                    public double applyAsDouble(SeaTile value) {
+                                        return value.getAbundance(species).getAbundanceInBin(bin);
+                                    }
+                                }
+                        ).sum();
     }
 
 
@@ -532,7 +532,7 @@ public class FishState  extends SimState{
     {
         if(started) {
             startable.start(this);
-          //  scheduleOnce((Steppable) simState -> startable.start(FishState.this), StepOrder.DAWN);
+            //  scheduleOnce((Steppable) simState -> startable.start(FishState.this), StepOrder.DAWN);
         }
         else
             toStart.add(startable);
@@ -636,17 +636,17 @@ public class FishState  extends SimState{
      */
     public boolean canCreateMoreFishers()
     {
-        return fisherFactory!=null;
+        return fisherFactory!=null && !fisherFactory.isEmpty();
     }
 
     /**
      * called usually by GUI. Call this after the scenario has started not before!
      * @return
      */
-    public Fisher createFisher()
+    public Fisher createFisher(String nameOfPopulation)
     {
         Preconditions.checkState(canCreateMoreFishers());
-        Fisher newborn = fisherFactory.buildFisher(this);
+        Fisher newborn = fisherFactory.get(nameOfPopulation).buildFisher(this);
         getFishers().add(newborn);
         getSocialNetwork().addFisher(newborn,this);
         registerStartable(newborn);
@@ -659,24 +659,22 @@ public class FishState  extends SimState{
      *
      * @return Value for property 'fisherFactory'.
      */
-    public FisherFactory getFisherFactory() {
-        return fisherFactory;
+    public FisherFactory getFisherFactory(String nameOfPopulation) {
+        return fisherFactory.get(nameOfPopulation);
+
+
     }
 
-    /**
-     * Setter for property 'fisherFactory'.
-     *
-     * @param fisherFactory Value to set for property 'fisherFactory'.
-     */
-    public void setFisherFactory(FisherFactory fisherFactory) {
-        this.fisherFactory = fisherFactory;
+    public Set<Map.Entry<String, FisherFactory>> getFisherFactories(){
+        return  fisherFactory.entrySet();
+
     }
 
     public void killRandomFisher()
     {
         Preconditions.checkState(fishers.size()>0, "There are no more fishers left to kill");
         Fisher sacrifice = fishers.remove(random.nextInt(fishers.size()));
-         killSpecificFisher(sacrifice);
+        killSpecificFisher(sacrifice);
 
     }
 
@@ -777,7 +775,7 @@ public class FishState  extends SimState{
                                                    for(SeaTile tile : map.getAllSeaTilesExcludingLandAsList())
                                                    {
                                                        int trawlsHere = map.getDailyTrawlsMap().get(tile.getGridX(),
-                                                                                           tile.getGridY());
+                                                                                                    tile.getGridY());
                                                        trawlsSum += trawlsHere;
                                                        if(map.getTilesOnTheMPALine().contains(tile))
                                                        {
@@ -795,37 +793,37 @@ public class FishState  extends SimState{
 
 
         this.yearlyDataSet.registerGatherer("Mileage-Catch Correlation",
-                                           new Gatherer<FishState>() {
-                                               @Override
-                                               public Double apply(FishState state) {
+                                            new Gatherer<FishState>() {
+                                                @Override
+                                                public Double apply(FishState state) {
 
-                                                   LinkedList<Double> mileage = new LinkedList<>();
-                                                   LinkedList<Double> catches = new LinkedList<>();
+                                                    LinkedList<Double> mileage = new LinkedList<>();
+                                                    LinkedList<Double> catches = new LinkedList<>();
 
-                                                   Species first = biology.getSpecie(0);
+                                                    Species first = biology.getSpecie(0);
 
-                                                   for(Fisher fisher : fishers)
-                                                   {
-                                                       Gear gear = fisher.getGear();
-                                                       if(gear instanceof RandomCatchabilityTrawl)
-                                                       {
-                                                           mileage.add(((RandomCatchabilityTrawl) gear).getGasPerHourFished());
-                                                           catches.add(fisher.getLatestYearlyObservation(first.getName() + " Landings"));
-                                                       }
-                                                   }
+                                                    for(Fisher fisher : fishers)
+                                                    {
+                                                        Gear gear = fisher.getGear();
+                                                        if(gear instanceof RandomCatchabilityTrawl)
+                                                        {
+                                                            mileage.add(((RandomCatchabilityTrawl) gear).getGasPerHourFished());
+                                                            catches.add(fisher.getLatestYearlyObservation(first.getName() + " Landings"));
+                                                        }
+                                                    }
 
-                                                   if(mileage.size()>0)
-                                                       return FishStateUtilities.computeCorrelation(
-                                                               Doubles.toArray(mileage),
-                                                               Doubles.toArray(catches)
-                                                       );
-                                                   else
-                                                       return Double.NaN;
+                                                    if(mileage.size()>0)
+                                                        return FishStateUtilities.computeCorrelation(
+                                                                Doubles.toArray(mileage),
+                                                                Doubles.toArray(catches)
+                                                        );
+                                                    else
+                                                        return Double.NaN;
 
 
 
-                                               }
-                                           }
+                                                }
+                                            }
                 , Double.NaN);
     }
 

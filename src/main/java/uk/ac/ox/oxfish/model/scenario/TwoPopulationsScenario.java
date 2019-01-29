@@ -76,6 +76,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -533,12 +534,16 @@ public class TwoPopulationsScenario implements Scenario{
         model.getYearlyDataSet().registerGatherer("Large Fishers Total Effort",
                                                   FishStateUtilities.generateYearlySum(largeEffort),Double.NaN);
 
-
+        HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put("large",
+                    largeFishersFactory);
+        factory.put("small",
+                    smallFisherFactory);
 
         if(fisherList.size() <=1)
-            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), largeFishersFactory );
+            return new ScenarioPopulation(fisherList, new SocialNetwork(new EmptyNetworkBuilder()), factory );
         else {
-            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), largeFishersFactory);
+            return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
         }
     }
 

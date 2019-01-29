@@ -726,6 +726,7 @@ public class OsmoseWFSScenario implements Scenario{
             }
         });
 
+
         return new ScenarioPopulation(
                 fisherList,
                 new SocialNetwork(networkBuilder),

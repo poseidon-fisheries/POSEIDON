@@ -24,6 +24,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The result of calling populateModel from the scenario
@@ -44,9 +45,9 @@ public class ScenarioPopulation
     private final SocialNetwork network;
 
     /**
-     * method to create and kill fishers while the model is running
+     * method to create and kill fishers while the model is running; mapping name of the population to fishery factory
      */
-    private final FisherFactory factory;
+    private final Map<String,FisherFactory> factory;
 
     /**
      * The list of agents and a network ready to be populated!
@@ -55,7 +56,7 @@ public class ScenarioPopulation
      * @param factory
      */
     public ScenarioPopulation(List<Fisher> population, SocialNetwork network,
-                              FisherFactory factory) {
+                              Map<String,FisherFactory> factory) {
         this.population = population;
         this.network = network;
         this.factory = factory;
@@ -70,7 +71,7 @@ public class ScenarioPopulation
         return network;
     }
 
-    public FisherFactory getFactory() {
+    public Map<String,FisherFactory> getFactory() {
         return factory;
     }
 }

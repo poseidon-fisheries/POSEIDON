@@ -64,10 +64,10 @@ public class Scenarios {
         SCENARIOS.put("OSMOSE WFS",OsmoseWFSScenario::new);
         DESCRIPTIONS.put("OSMOSE WFS", "A pre-set OSMOSE scenario to simulate the west florida shelf");
 
-
-        SCENARIOS.put("Policy California",SimpleCaliforniaScenario::new);
-        DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
-
+//
+//        SCENARIOS.put("Policy California",SimpleCaliforniaScenario::new);
+//        DESCRIPTIONS.put("Policy California","California Scenario for the masses!");
+//
         SCENARIOS.put("Simple California",DerisoCaliforniaScenario::new);
         DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
 

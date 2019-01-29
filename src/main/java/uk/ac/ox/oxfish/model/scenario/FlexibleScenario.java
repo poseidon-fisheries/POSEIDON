@@ -228,7 +228,7 @@ public class FlexibleScenario implements Scenario {
 
         List<Fisher> fishers = new LinkedList<>();
         //arbitrary fisher factory
-        FisherFactory lastFactory = null;
+        Map<String,FisherFactory> factory = new LinkedHashMap<>();
         int definitionIndex = 0;
         for (FisherDefinition fisherDefinition : fisherDefinitions) {
             final int populationNumber = definitionIndex;
@@ -284,7 +284,7 @@ public class FlexibleScenario implements Scenario {
                     });
 
 
-            lastFactory = generated.getFirst();
+            factory.put("population"+ populationNumber,generated.getFirst());
             fishers.addAll(generated.getSecond());
             definitionIndex++;
             //add population number in
@@ -324,9 +324,9 @@ public class FlexibleScenario implements Scenario {
 
 
         if(fishers.size() <=1)
-            return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), lastFactory );
+            return new ScenarioPopulation(fishers, new SocialNetwork(new EmptyNetworkBuilder()), factory );
         else {
-            return new ScenarioPopulation(fishers, new SocialNetwork(networkBuilder), lastFactory);
+            return new ScenarioPopulation(fishers, new SocialNetwork(networkBuilder), factory);
         }
     }
 

@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
 import uk.ac.ox.oxfish.gui.drawing.*;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import javax.swing.*;
@@ -54,6 +55,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * The GUI of FishState
@@ -335,17 +337,20 @@ public class  FishGUI extends GUIState{
 
         //if possible create buttons to add fishers
         if(state.canCreateMoreFishers()) {
-            policyButtons.add(gui -> {
-                JButton button = new JButton("Add 1 Fisher");
-                button.addActionListener(e -> {
-                    scheduleImmediatelyBefore(
-                            state1->
-                                    state.createFisher()
-                    );
+            for (Map.Entry<String, FisherFactory> factory : state.getFisherFactories()) {
+                policyButtons.add(gui -> {
+                    JButton button = new JButton("Add Fisher - " + factory.getKey());
+                    button.addActionListener(e -> {
+                        scheduleImmediatelyBefore(
+                                state1->
+                                        state.createFisher(factory.getKey())
+                        );
 
+                    });
+                    return button;
                 });
-                return button;
-            });
+            }
+
         }
 
         //create a button to kill fishers, grey it out when there are no more fishers

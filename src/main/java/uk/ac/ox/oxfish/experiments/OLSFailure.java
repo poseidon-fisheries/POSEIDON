@@ -118,7 +118,7 @@ public class OLSFailure {
 
             //add 10 more fishers
             for(int i=0; i<5; i++)
-                state.createFisher();
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
 
             for (Port port : state.getPorts()) {
                 port.setGasPricePerLiter(

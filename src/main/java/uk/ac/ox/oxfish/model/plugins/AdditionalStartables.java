@@ -66,6 +66,11 @@ public class AdditionalStartables {
         NAMES.put(SprOracleBuilder.class,
                   "SPR Oracle");
 
+        CONSTRUCTORS.put("Fish Entry By Profit",
+                         FisherEntryByProfitFactory::new
+        );
+        NAMES.put(FisherEntryByProfitFactory.class,
+                  "Fish Entry By Profit");
 
     }
 

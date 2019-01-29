@@ -95,12 +95,18 @@ public class Slice3Sweeps {
 //
 //        //price premium
 //        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
+        pricePremium("premium_malabaricus_quick3","optimistic_spinup",10,"Lutjanus malabaricus");
 //        selectivityTest("selectivity_sweep_quick2","optimistic_spinup");
-//        pricePenalty("malus_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
+ //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
+        //pricePenalty("malus_malabaricus_quick","optimistic_spinup",10,"Lutjanus malabaricus");
 //
 //        pricePremium("premium_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
+ //       pricePremium("premium_malabaricus_quick2","pessimistic_spinup",10,"Lutjanus malabaricus");
+      //  pricePenalty("malus_malabaricus_quick","pessimistic_spinup",10,"Lutjanus malabaricus");
+
+
 //        selectivityTest("selectivity_sweep_quick2","pessimistic_spinup");
-//        pricePenalty("malus_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
+      //  pricePenalty("malus_multidens_manyruns","pessimistic_spinup",10,"Pristipomoides multidens");
 
 
         //fleet reduction

@@ -57,11 +57,11 @@ public class LinearIncreaseInFishers
         {
             if (state.getDayOfTheYear() % 30 == 0)
             {
-                state.createFisher();
-                state.createFisher();
-                state.createFisher();
-                state.createFisher();
-                state.createFisher();
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
             }
             state.schedule.step(state);
         }
@@ -105,8 +105,8 @@ public class LinearIncreaseInFishers
         {
             if (state.getDayOfTheYear() % 30 == 0)
             {
-                state.createFisher();
-                state.createFisher();
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
+                state.createFisher(FishState.DEFAULT_POPULATION_NAME);
               //  state.createFisher();
              //   state.createFisher();
              //   state.createFisher();

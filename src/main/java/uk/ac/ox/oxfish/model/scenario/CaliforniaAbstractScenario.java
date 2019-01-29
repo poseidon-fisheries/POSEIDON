@@ -728,9 +728,11 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                                   allSeaTilesAsList.stream().mapToDouble(value -> value.getBiomass(species)).sum());
         }
 
+        HashMap<String, FisherFactory> factory = new HashMap<>();
+        factory.put(FishState.DEFAULT_POPULATION_NAME,
+                    fisherFactory);
 
-
-        return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), fisherFactory);
+        return new ScenarioPopulation(fisherList, new SocialNetwork(networkBuilder), factory);
 
 
     }
