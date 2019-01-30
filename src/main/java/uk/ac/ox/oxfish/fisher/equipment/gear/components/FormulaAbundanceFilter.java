@@ -49,6 +49,14 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
         this.rounding = rounding;
     }
 
+
+    //most formula filters will probably be single use, so it's probably even faster to just store the last used selectivity
+    //without going through the general formula filter
+    private double[][] lastUsedSelectivity = null;
+
+    private Species lastCalledSpecies = null;
+
+
     /**
      * table for memoization: stores the selectivity array for each species so you don't need to recompute it
      */
@@ -67,6 +75,8 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
 
         double[][] selectivity = getProbabilityMatrix(species);
 
+        lastUsedSelectivity = selectivity;
+        lastCalledSpecies = species;
         for(int subdivision =0; subdivision<abundance.length; subdivision++) {
             for (int age = 0; age < abundance[subdivision].length; age++) {
                 abundance[subdivision][age] =
@@ -96,8 +106,11 @@ public abstract class FormulaAbundanceFilter implements AbundanceFilter {
      */
     public double[][] getProbabilityMatrix(Species species){
         double[][] selectivity = null;
-        if(memoization)
-            selectivity = precomputed.get(this,species);
+        if(memoization) {
+            if(species==lastCalledSpecies && lastUsedSelectivity!=null)
+                return lastUsedSelectivity;
+            selectivity = precomputed.get(this, species);
+        }
         if(selectivity == null) {
             selectivity = computeSelectivity(species);
             if(memoization)

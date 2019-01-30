@@ -53,9 +53,11 @@ public class FixedOptimizationParameter implements OptimizationParameter {
      * @param inputs   the numerical values of the parameters to set
      */
     @Override
-    public void parametrize(Scenario scenario, double[] inputs) {
+    public double parametrize(Scenario scenario, double[] inputs) {
         SimpleOptimizationParameter.quickParametrize(scenario,
                                                      realValue,
                                                      address);
+        return realValue;
+
     }
 }

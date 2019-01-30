@@ -47,7 +47,7 @@ public class HomogeneousAbundanceGear implements Gear {
     /**
      * the list of all filters, to use sequentially
      */
-    private final ImmutableList<AbundanceFilter> filters;
+    private final AbundanceFilter[] filters;
 
 
     /**
@@ -61,7 +61,7 @@ public class HomogeneousAbundanceGear implements Gear {
      */
     public HomogeneousAbundanceGear(double litersOfGasConsumedEachHourFishing,
                                     AbundanceFilter... filters) {
-        this.filters = ImmutableList.copyOf(filters);
+        this.filters = Arrays.copyOf(filters,filters.length);
         this.litersOfGasConsumedEachHourFishing=litersOfGasConsumedEachHourFishing;
         Preconditions.checkArgument(filters.length > 0, "no filters provided");
     }
@@ -221,7 +221,7 @@ public class HomogeneousAbundanceGear implements Gear {
     @Override
     public Gear makeCopy() {
         return new HomogeneousAbundanceGear(litersOfGasConsumedEachHourFishing,
-                                            filters.toArray(new AbundanceFilter[filters.size()]));
+                                            filters);
 
 
     }

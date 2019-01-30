@@ -62,9 +62,7 @@ public class BoxCarSimulator {
                 biology.getAbundance(species).asMatrix()[0][0] += recruit;
 
             }
-            System.out.println("year " + year + " total weight: " +
-                    FishStateUtilities.weigh(biology.getAbundance(species),
-                            meristics));
+
 
         }
 

@@ -97,15 +97,12 @@ public class Counter implements Startable, Steppable
     {
 
         data.compute(columnName,
-                     new BiFunction<String, Double, Double>() {
-                         @Override
-                         public Double apply(String s, Double oldValue) {
-                             if(oldValue==null)
-                                 throw new NullPointerException("No column exists");
-                             else
-                                 return Double.sum(oldValue,add);
+                     (s, oldValue) -> {
+                         if(oldValue==null)
+                             throw new NullPointerException("No column exists");
+                         else
+                             return oldValue + add;
 
-                         }
                      });
     }
 

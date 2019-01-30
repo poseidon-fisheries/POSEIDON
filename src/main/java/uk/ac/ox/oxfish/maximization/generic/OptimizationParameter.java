@@ -44,7 +44,7 @@ public interface OptimizationParameter {
      * @param scenario the scenario to modify
      * @param inputs the numerical values of the parameters to set
      */
-    public void parametrize(Scenario scenario, double inputs[] );
+    public double parametrize(Scenario scenario, double inputs[] );
 
 
 

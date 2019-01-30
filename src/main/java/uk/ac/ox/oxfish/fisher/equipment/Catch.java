@@ -109,7 +109,7 @@ public class Catch {
         this.abundance = abundance;
         Preconditions.checkArgument(biology.getSize() == abundance.length);
 
-        //weigh them (assuming they are all men!)
+        //weigh them
         biomassCaught = abundanceToBiomass(biology);
         totalWeight = computeTotalWeight();
 

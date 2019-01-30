@@ -150,6 +150,12 @@ public class BiologyInitializers {
         NAMES.put(LinearGetterBiologyFactory.class,"Linear Getter Biology");
 
 
+
+        CONSTRUCTORS.put("Boxcar Biology",
+                         SingleSpeciesBoxcarFactory::new);
+        NAMES.put(SingleSpeciesBoxcarFactory.class,"Boxcar Biology");
+
+
     }
 
     private BiologyInitializers() {}

@@ -78,7 +78,7 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
      * @param inputs   the numerical values of the parameters to set
      */
     @Override
-    public void parametrize(Scenario scenario, double[] inputs) {
+    public double parametrize(Scenario scenario, double[] inputs) {
 
         Preconditions.checkArgument(inputs.length==size);
         Preconditions.checkArgument(size>0);
@@ -105,6 +105,9 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
         {
             throw new RuntimeException(e);
         }
+
+
+        return realValue;
 
 
     }

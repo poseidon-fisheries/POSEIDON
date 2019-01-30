@@ -451,7 +451,6 @@ public class Fisher implements Steppable, Startable{
         getCurrentTrip().recordGasConsumption(litersConsumed);
         assert  equipment.getBoat().getFuelCapacityInLiters()>=0 || isFuelEmergencyOverride() :
                 "a boat has lspiRun into negative fuel territory";
-        memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersConsumed);
     }
 
     /**
@@ -496,6 +495,8 @@ public class Fisher implements Steppable, Startable{
         status.setFuelEmergencyOverride(false);
         status.setExogenousEmergencyOverride(false);
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.HOURS_OUT, status.getHoursAtSea());
+        memory.getYearlyCounter().count(FisherYearlyTimeSeries.FUEL_CONSUMPTION, litersBought);
+
         //now pay for it
         double gasExpenditure = litersBought * status.getHomePort().getGasPricePerLiter();
         spendForTrip(gasExpenditure);
@@ -829,7 +830,8 @@ public class Fisher implements Steppable, Startable{
         final double litersBurned = equipment.getGear().getFuelConsumptionPerHourOfFishing(this,
                                                                                            equipment.getBoat(),
                                                                                            here) * hoursSpentFishing;
-        consumeFuel(litersBurned);
+        if(litersBurned>0)
+            consumeFuel(litersBurned);
 
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
         memory.getDailyCounter().count(FisherYearlyTimeSeries.EFFORT, hoursSpentFishing);
