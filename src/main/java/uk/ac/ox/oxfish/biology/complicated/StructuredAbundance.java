@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -162,5 +163,13 @@ public class StructuredAbundance {
         return  FishStateUtilities.weigh(this,species.getMeristics());
 
 
+    }
+
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("abundance", abundance)
+                .toString();
     }
 }

@@ -62,7 +62,7 @@ public class Slice3Sweeps {
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 1;
+    public static final int RUNS_PER_POLICY = 5;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
 
@@ -95,7 +95,7 @@ public class Slice3Sweeps {
 //
 //        //price premium
 //        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
-        pricePremium("premium_malabaricus_quick3","optimistic_spinup",10,"Lutjanus malabaricus");
+     //   pricePremium("premium_malabaricus_quick3","optimistic_spinup",10,"Lutjanus malabaricus");
 //        selectivityTest("selectivity_sweep_quick2","optimistic_spinup");
  //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
         //pricePenalty("malus_malabaricus_quick","optimistic_spinup",10,"Lutjanus malabaricus");
@@ -112,7 +112,8 @@ public class Slice3Sweeps {
         //fleet reduction
 //        fleetReduction("fleetreduction_quick","optimistic_spinup",1);
 //        fleetReduction("fleetreduction_quick","pessimistic_spinup",1);
-
+   //     fleetReduction("fleetreduction_10_quick","optimistic_spinup",1,"small");
+ //       fleetReduction("fleetreduction_10_quick","pessimistic_spinup",1,"small");
 
 //
 //            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
@@ -121,12 +122,12 @@ public class Slice3Sweeps {
 //            delays("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
 //              delays("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
 //
-
-            delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
-              delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
-
-            delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
-              delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
+//
+//            delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
+//              delaysOnce("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+//
+//            delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
+//              delaysOnce("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
     }
 
     public static void main3(String[] args) throws IOException {
@@ -163,8 +164,7 @@ public class Slice3Sweeps {
 
 //       fleetReduction("fleetreduction","optimistic_recruits",1);
 //       fleetReduction("fleetreduction","fixed_recruits",4);
-//        fleetReduction("fleetreduction_manyruns","optimistic_recruits_spinup_fixedmarket",1);
-//        fleetReduction("fleetreduction_manyruns","pessimistic_recruits_spinup",1);
+
 
 
 //        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
@@ -510,7 +510,7 @@ public class Slice3Sweeps {
 
     private static void fleetReduction(
             String name,
-            final String filename, final int shockYear) throws IOException {
+            final String filename, final int shockYear, String exclude) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
@@ -551,7 +551,8 @@ public class Slice3Sweeps {
                                                 List<Fisher> toKill = new LinkedList<>();
 
                                                 for(Fisher fisher : model.getFishers()) {
-                                                    if (model.getRandom().nextDouble() < finalProbability)
+                                                    if (!fisher.getTags().contains(exclude) &&
+                                                            model.getRandom().nextDouble() < finalProbability)
                                                         toKill.add(fisher);
                                                 }
                                                 for (Fisher sacrifice : toKill) {
