@@ -259,4 +259,6 @@ public class BatchRunner
         void consume(StringBuffer writer, FishState model, Integer year);
 
     }
+
+
 }

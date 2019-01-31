@@ -23,3 +23,7 @@ Three Prices Market:
   priceBelowThreshold: '10.0'
   priceBetweenThresholds: '10.0'
 -------
+Multiple Three Prices Markets:
+  markets: {
+    }
+-------

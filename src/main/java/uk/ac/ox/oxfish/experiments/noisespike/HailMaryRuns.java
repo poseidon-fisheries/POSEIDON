@@ -20,13 +20,28 @@
 
 package uk.ac.ox.oxfish.experiments.noisespike;
 
-import com.google.common.io.Files;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
+import uk.ac.ox.oxfish.model.regs.Anarchy;
+import uk.ac.ox.oxfish.model.regs.FishingSeason;
+import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
+import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
+import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -34,11 +49,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * basically we throw a whole lot of runs at a set of acceptable ranges and we hope some pass, which we store
@@ -50,8 +68,8 @@ public class HailMaryRuns {
     /**
      * what changes
      */
-    private List<SimpleOptimizationParameter> parameters = new LinkedList<>();
-    {
+    private static final List<SimpleOptimizationParameter> parameters = new LinkedList<>();
+    static {
         //those I should really switch to optimization
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$0.gear.averageCatchability",
@@ -122,14 +140,14 @@ public class HailMaryRuns {
 
 
 
-    private final Path scenarioFile = Paths.get("docs", "20190129 spr_project", "zzz.yaml");
+    private final static Path scenarioFile = Paths.get("docs", "20190129 spr_project", "zzz.yaml");
 
     /**
      * what tells us if the result is good or crap
      */
-    private List<AcceptableRangePredicate> predicates = new LinkedList<>();
+    private static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
 
-    {
+    static {
         predicates.add(new AcceptableRangePredicate(
                 0.05,0.35,"Bt/K Red Fish"
         ));
@@ -140,9 +158,9 @@ public class HailMaryRuns {
     }
 
     /**
-     * here we store each run and the year it was first successfull
+     * here we store each sweep and the year it was first successfull
      */
-    private final Path outputFile = Paths.get("docs", "20190129 spr_project", "zzz5.csv");
+    private final static Path outputFile = Paths.get("docs", "20190129 spr_project", "zzz5.csv");
 
 
     private final static int NUMBER_OF_TRIES = 10000;
@@ -150,11 +168,15 @@ public class HailMaryRuns {
 
 
 
-    private void run() throws IOException {
+    public static void sweep(
+            final Path outputFile,
+            final List<SimpleOptimizationParameter> parameters,
+            final Path scenarioFile,
+            long originalSeed, final int maxYearsToRun, final int numberOfTries) throws IOException {
 
         FileWriter writer = new FileWriter(outputFile.toFile());
         writer.write("seed");
-        for (SimpleOptimizationParameter parameter : parameters) {
+        for (SimpleOptimizationParameter parameter : HailMaryRuns.parameters) {
             writer.write(",");
             writer.write(parameter.getAddressToModify());
         }
@@ -162,12 +184,12 @@ public class HailMaryRuns {
         writer.write("\n");
         writer.flush();
 
-        MersenneTwisterFast fast = new MersenneTwisterFast();
+        MersenneTwisterFast fast = new MersenneTwisterFast(originalSeed);
 
-        for(int i=0; i<NUMBER_OF_TRIES; i++)
+        for(int i = 0; i< numberOfTries; i++)
         {
 
-            Pair<Scenario, double[]> scenarioPair = buildScenario(fast);
+            Pair<Scenario, double[]> scenarioPair = setupScenario(fast, parameters, scenarioFile);
             long seed = fast.nextLong();
             ((FlexibleScenario) scenarioPair.getFirst()).setMapMakerDedicatedRandomSeed(seed);
 
@@ -176,14 +198,14 @@ public class HailMaryRuns {
             model.setScenario(scenarioPair.getFirst());
             model.start();
      //       System.out.println("starting run");
-            while (model.getYear() <= MAX_YEARS_TO_RUN) {
+            while (model.getYear() <= maxYearsToRun) {
                 model.schedule.step(model);
         //        System.out.println(model.getFishers().size());
             }
             model.schedule.step(model);
 
             int validYear;
-            for (validYear = MAX_YEARS_TO_RUN; validYear > 0; validYear--) {
+            for (validYear = maxYearsToRun; validYear > 0; validYear--) {
 
                 boolean valid = true;
                 for (AcceptableRangePredicate predicate : predicates) {
@@ -226,27 +248,335 @@ public class HailMaryRuns {
 
     }
 
-    public Pair<Scenario,double[]> buildScenario(MersenneTwisterFast random) throws FileNotFoundException {
+
+    static public void runPolicyAnalysis(
+            Path fileWithAcceptableParameters,
+            int groupColumnIndex,
+            int randomSeedColumnIndex,
+            int yearsToRunColumn,
+            Consumer<FishState> policyToImplement,
+            List<SimpleOptimizationParameter> parameterObjects,
+            String simulationTitle,
+            Path scenarioFile,
+            Path outputFolder,
+                          List<String> columnsToPrint,
+            int maxYearsToRun) throws IOException {
+
+
+        FileWriter fileWriter = new FileWriter(outputFolder.resolve(simulationTitle+".csv").toFile());
+        fileWriter.write("run,year,group,seed,shock_year,variable,value\n");
+        fileWriter.flush();
+
+        //open the file with acceptable parameters
+        List<String> parameterFile = Files.readAllLines(fileWithAcceptableParameters);
+        //first column I assume it's a header
+        String header = parameterFile.get(0);
+        String[] columns = header.split(",");
+        //one column is the group, one column is the years to run, one column is the random seed;
+        //the rest are all parameters
+        Preconditions.checkArgument(columns.length > 3);
+
+        //here we store the real parameters
+        double[][] parameters = new double[parameterFile.size()-1][columns.length-3];
+        //here we store the group associated with each column
+        int[] groups = new int[parameterFile.size()-1];
+        long[] randomSeeds = new long[parameterFile.size()-1]; //random seeds here
+        int[] yearsToPolicy = new int[parameterFile.size()-1];
+
+        //fill up the parameters now
+        parameterFile.remove(0); //pop the header out
+        for (int row = 0; row < parameterFile.size(); row++) {
+
+            String[] splitRow = parameterFile.get(row).split(",");
+            Preconditions.checkArgument(splitRow.length==parameters[0].length+3);
+
+            int columnsAlreadyFilled = 0;
+            for(int column=0; column<splitRow.length; column++)
+                if(column==groupColumnIndex)
+                {
+                    groups[row] = Integer.parseInt(splitRow[column]);
+
+                }
+                else if(column==randomSeedColumnIndex )
+                {
+                    randomSeeds[row] = Long.parseLong(splitRow[column]);
+                }
+                else if(column == yearsToRunColumn){
+                    yearsToPolicy[row] = Integer.parseInt(splitRow[column]);
+            }
+                else {
+                    parameters[row][columnsAlreadyFilled] = Double.parseDouble(splitRow[column]);
+                    columnsAlreadyFilled++;
+                }
+
+                Preconditions.checkState(columnsAlreadyFilled == parameters[0].length,
+                                         "failed to fill all columns in row " + row);
+
+        }
+
+
+
+        BatchRunner runner = new BatchRunner(
+                scenarioFile,
+                maxYearsToRun,
+                columnsToPrint,
+                outputFolder,
+                null,
+                System.currentTimeMillis(),
+                -1
+
+        );
+        runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+            @Override
+            public void consume(StringBuffer writer, FishState model, Integer year) {
+                writer.append(groups[runner.getRunsDone()]).append(",").
+                        append(randomSeeds[runner.getRunsDone()]).append(",").
+                        append(yearsToPolicy[runner.getRunsDone()]).append(",");
+            }
+        });
+
+        Consumer<Scenario> scenarioConsumer = new Consumer<Scenario>() {
+            @Override
+            public void accept(Scenario scenario) {
+                //first, let's make sure we set up the right seed
+                int currentRow = runner.getRunsDone();
+                ((FlexibleScenario) scenario).setMapMakerDedicatedRandomSeed(randomSeeds[currentRow]);
+                //then let's update all the parameters
+                setupScenario(scenario,parameters[currentRow],parameterObjects,true);
+                //then schedule yourself to change policy at the right year
+                ((FlexibleScenario) scenario).getPlugins().add(state -> new AdditionalStartable() {
+                    @Override
+                    public void start(FishState model) {
+                        state.scheduleOnceAtTheBeginningOfYear(
+                                (Steppable) simState -> policyToImplement.accept(((FishState) simState)),
+                                StepOrder.DAWN,
+                                yearsToPolicy[currentRow]+1
+                        );
+                    }
+
+                    @Override
+                    public void turnOff() {
+                        //YOU FOOLS I CANNOT EVER BE STOPPED
+                    }
+                });
+
+
+            }
+        };
+
+        runner.setScenarioSetup(scenarioConsumer);
+
+        //ugh done
+
+        for(int runs =0; runs<parameters.length; runs++)
+        {
+            StringBuffer tidy = new StringBuffer();
+            runner.run(tidy);
+            fileWriter.write(tidy.toString());
+            fileWriter.flush();
+        }
+
+        fileWriter.close();
+
+
+    }
+
+    /**
+     * reads scenario, builds random vector and passes it along
+     * @param random randomizer needed
+     * @param parameters list of all parameters that will modify the scenario
+     * @param scenarioFile scenario file to modify
+     * @return a pair with the scenario object and the real values applied to its parameters
+     * @throws FileNotFoundException
+     */
+    public static Pair<Scenario,double[]> setupScenario(
+            MersenneTwisterFast random,
+            final List<SimpleOptimizationParameter> parameters,
+            final Path scenarioFile) throws FileNotFoundException {
+
+        double[] randomValues = new double[parameters.size()];
+        for (int i = 0; i < randomValues.length; i++) {
+            randomValues[i] = random.nextDouble() * 20 - 10;
+        }
+
+
         FishYAML yaml = new FishYAML();
         Scenario scenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), Scenario.class);
-        double[] values = new double[parameters.size()];
-        for (int i = 0; i < this.parameters.size(); i++) {
-            double randomParam = this.parameters.get(i).parametrize(scenario,
-                                                                    new double[]{random.nextDouble() * 20 - 10});
-            values[i] = randomParam;
+
+        return setupScenario(scenario, randomValues, parameters,false);
+    }
+
+
+    public static Pair<Scenario,double[]> setupScenario( Scenario scenario,
+                                                 double[] randomValues,
+                                                         List<SimpleOptimizationParameter> parameters,
+                                                         //if this flag is true, you are passing real values
+                                                         boolean realValues) {
+
+        Preconditions.checkState(parameters.size()==randomValues.length);
+        double[] values = new double[randomValues.length];
+        for (int i = 0; i < randomValues.length; i++) {
+            double real;
+            if(realValues)
+            {
+                real =
+                        parameters.get(i).parametrizeRealValue(scenario,
+                                                     randomValues[i]);
+            }
+            else {
+                real = parameters.get(i).parametrize(scenario,
+                                                                   new double[]{randomValues[i]});
+            }
+            values[i] = real;
         }
 
 
         return new Pair<>(scenario,values);
     }
 
-    public static void main(String[] args) throws IOException {
+
+    public static void mainSearch(String[] args) throws IOException {
         HailMaryRuns hailMaryRuns = new HailMaryRuns();
-        hailMaryRuns.run();
+        hailMaryRuns.sweep(outputFile, hailMaryRuns.parameters, scenarioFile, System.currentTimeMillis(),
+                           MAX_YEARS_TO_RUN, NUMBER_OF_TRIES);
     }
 
 
+    public static void main(String[] args) throws IOException {
 
 
+        List<String> columnsToPrint = Lists.newArrayList(
+                "Bt/K Red Fish",
+                "Red Fish Landings",
+                "Average Cash-Flow",
+                "Average Variable Costs",
+                "Average Number of Trips",
+                "Average Distance From Port",
+                "Average Trip Duration",
+                "SPR " + "Red Fish" + " " + "spr_agent",
+                "Biomass " + "Red Fish",
+                "Total Effort",
+                "Actual Average Cash-Flow",
+                "Average Trip Duration",
+                "Number Of Active Fishers",
+                "Average Hours Out"
+
+
+        );
+
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                    }
+//                },
+//                parameters,
+//                "no_change",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+//
+
+
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//                        for (Fisher fisher : state.getFishers()) {
+//                            fisher.setRegulation(new FishingSeason(true,
+//                                                                   100));
+//                        }
+//                    }
+//                },
+//                parameters,
+//                "hundred_days",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+
+
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//                        for (Fisher fisher : state.getFishers()) {
+//                            fisher.setRegulation(new FishingSeason(true,
+//                                                                   5));
+//                        }
+//                    }
+//                },
+//                parameters,
+//                "five_days",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+
+//
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                        for (Port port : state.getPorts()) {
+//                            ((FixedPriceMarket) port.getDefaultMarketMap().getMarket(state.getBiology().getSpecie("Red Fish"))).setPrice(20000);
+//                        }
+//
+//                    }
+//                },
+//                parameters,
+//                "tax",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+//
+//                HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                        //new fishers aren't allowed out!
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+//                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,true));
+//                        }
+//
+//                        //all the other fishers are only allowed 100 days out
+//                        for (Fisher fisher : state.getFishers()) {
+//                            fisher.setRegulation(new FishingSeason(true,
+//                                                                   100));
+//                        }
+//
+//                    }
+//                },
+//                parameters,
+//                "noentry_hundred_days",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+//
+//    }
+
+
+    }
 
 }

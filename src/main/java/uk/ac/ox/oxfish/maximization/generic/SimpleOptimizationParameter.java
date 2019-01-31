@@ -89,6 +89,13 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
 
     }
 
+    public double parametrizeRealValue(Scenario scenario, double realValue)
+    {
+        quickParametrize(scenario, realValue, addressToModify);
+        return realValue;
+
+    }
+
     static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
         try{
             //try as double parameter

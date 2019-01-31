@@ -123,3 +123,13 @@ Port Based Wait Times:
   delegate: Anarchy
   maxHoursOut: '1000.0'
 -------
+Trigger Regulation:
+  businessAsUsual: Anarchy
+  emergency:
+    Fishing Season:
+      respectMPA: true
+      seasonLength: '50.0'
+  highThreshold: '3000000.0'
+  indicatorName: Biomass Species 0
+  lowThreshold: '1000000.0'
+-------
