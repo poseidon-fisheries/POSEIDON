@@ -36,6 +36,7 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
 
     private DoubleParameter profitRatioToEntrantsMultiplier = new FixedDoubleParameter(100);
 
+    private DoubleParameter maxEntrantsPerYear = new FixedDoubleParameter(50);
 
     /**
      * Applies this function to the given argument.
@@ -49,7 +50,8 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
                 profitDataColumnName,
                 costsFinalColumnName,
                 populationName,
-                profitRatioToEntrantsMultiplier.apply(state.getRandom())
+                profitRatioToEntrantsMultiplier.apply(state.getRandom()),
+                maxEntrantsPerYear.apply(state.getRandom()).intValue()
         );
     }
 

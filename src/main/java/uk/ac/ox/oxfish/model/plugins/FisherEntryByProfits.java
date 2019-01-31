@@ -39,14 +39,16 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
 
     private final double rateToEntryMultiplier;
 
+    private final int maxEntrantsPerYear;
 
     public FisherEntryByProfits(
             String profitDataColumnName, String costsFinalColumnName, String populationName,
-            double rateToEntryMultiplier) {
+            double rateToEntryMultiplier, int maxEntrantsPerYear) {
         this.profitDataColumnName = profitDataColumnName;
         this.costsFinalColumnName = costsFinalColumnName;
         this.populationName = populationName;
         this.rateToEntryMultiplier = rateToEntryMultiplier;
+        this.maxEntrantsPerYear = maxEntrantsPerYear;
     }
 
     private Stoppable stoppable;
@@ -98,8 +100,10 @@ public class FisherEntryByProfits implements AdditionalStartable, Steppable {
                 model.getLatestYearlyObservation(profitDataColumnName),
                 model.getLatestYearlyObservation(costsFinalColumnName)
         );
-        if(newEntrants>0)
-            for(int i=0; i<newEntrants; i++)
+        if(newEntrants>0) {
+            newEntrants = Math.min(newEntrants,maxEntrantsPerYear);
+            for (int i = 0; i < newEntrants; i++)
                 model.createFisher(populationName);
+        }
     }
 }

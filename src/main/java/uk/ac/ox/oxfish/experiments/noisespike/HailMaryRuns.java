@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.experiments.noisespike;
 
+import com.google.common.io.Files;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
@@ -66,7 +67,7 @@ public class HailMaryRuns {
         );
         parameters.add(
                 new SimpleOptimizationParameter("plugins$0.profitRatioToEntrantsMultiplier",
-                                                0.1,1)
+                                                .1,2)
         );
         //those that probably will remain noise
         parameters.add(
@@ -130,7 +131,7 @@ public class HailMaryRuns {
 
     {
         predicates.add(new AcceptableRangePredicate(
-                0.05,0.4,"SPR Red Fish spr_agent"
+                0.05,0.35,"Bt/K Red Fish"
         ));
                 predicates.add(new AcceptableRangePredicate(
                 2000000,5000000,"Red Fish Landings"
@@ -141,7 +142,7 @@ public class HailMaryRuns {
     /**
      * here we store each run and the year it was first successfull
      */
-    private final Path outputFile = Paths.get("docs", "20190129 spr_project", "zzz2.csv");
+    private final Path outputFile = Paths.get("docs", "20190129 spr_project", "zzz5.csv");
 
 
     private final static int NUMBER_OF_TRIES = 10000;
@@ -207,6 +208,10 @@ public class HailMaryRuns {
 
             writer.flush();
 
+            FileWriter scenarioSave = new FileWriter(outputFile.getParent().resolve("dump").resolve("test" + i + ".yaml").toFile());
+            FishYAML yaml = new FishYAML(); scenarioSave.write(yaml.dump(scenarioPair.getFirst()));
+            scenarioSave.flush();
+            scenarioSave.close();
 
         }
 

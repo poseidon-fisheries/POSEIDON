@@ -31,7 +31,10 @@ import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.BiomassAllocator;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -152,9 +155,30 @@ public class SingleSpeciesBoxcarFactory implements AlgorithmFactory<SingleSpecie
 
         double[] abundances = structuredAbundance.asMatrix()[0];
 
+        final double carryingCapacity = FishStateUtilities.weigh(structuredAbundance,meristicsInstance);
+        System.out.println("================================= ");
+        System.out.println("carrying capacity " + carryingCapacity);
 
         InitialAbundanceFromListFactory abundance = new InitialAbundanceFromListFactory();
         abundance.setFishPerBinPerSex(Doubles.asList(abundances));
+
+        state.registerStartable(new Startable() {
+            @Override
+            public void start(FishState model) {
+                model.getYearlyDataSet().registerGatherer("Bt/K " + speciesName,
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
+                                return state.getTotalBiomass(state.getBiology().getSpecie(speciesName))/carryingCapacity;
+                            }
+                        },Double.NaN);
+            }
+
+            @Override
+            public void turnOff() {
+
+            }
+        });
 
         return new SingleSpeciesAbundanceInitializer(
                 speciesName,
