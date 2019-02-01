@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -86,6 +85,11 @@ public class BatchRunner
     private Consumer<Scenario>  scenarioSetup;
 
     /**
+     * this is a hook for anything you want to do to FishState after the scenario is loaded but BEFORE start is called
+     */
+    private Consumer<FishState> beforeStartSetup;
+
+    /**
      * function to add columns between the year-run columns and the data columns from the model itself.
      */
     private ColumnModifier columnModifier;
@@ -113,16 +117,19 @@ public class BatchRunner
         String simulationName = guessSimulationName() +"_"+runsDone;
 
 
-
+        long startTime = System.currentTimeMillis();
         FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
-                                                 getOutputFolder().resolve(simulationName),
-                                                 initialSeed + runsDone,
-                                                 Log.LEVEL_INFO,
-                                                 true, policyFile == null ?
-                                                         null : policyFile.toString(),
-                                                 yearsToRun, false,
-                                                 heatmapGathererStartYear,
-                                                 getScenarioSetup());
+                getOutputFolder().resolve(simulationName),
+                initialSeed + runsDone,
+                Log.LEVEL_INFO,
+                true, policyFile == null ?
+                        null : policyFile.toString(),
+                yearsToRun, false,
+                heatmapGathererStartYear,
+                getScenarioSetup(),
+                beforeStartSetup
+        );
+        System.out.println("Run took: " + (System.currentTimeMillis()-startTime)/1000 + " seconds");
 
         //print individually
         ArrayList<DataColumn> columns = new ArrayList<>();
@@ -140,18 +147,18 @@ public class BatchRunner
 
         //print it tidyly if needed
         if(writer!=null)
-        for(DataColumn column : columns)
-            for(int year=0; year<yearsToRun; year++) {
-                writer.append(runsDone).append(",").append(year).append(",");
-               if(columnModifier!=null)
-                   columnModifier.consume(writer,
-                                          model,
-                                          year);
+            for(DataColumn column : columns)
+                for(int year=0; year<yearsToRun; year++) {
+                    writer.append(runsDone).append(",").append(year).append(",");
+                    if(columnModifier!=null)
+                        columnModifier.consume(writer,
+                                model,
+                                year);
 
-                writer.append(column.getName()).append(
-                        ",").append(column.get(year)).append("\n");
+                    writer.append(column.getName()).append(
+                            ",").append(column.get(year)).append("\n");
 
-            }
+                }
         //new run
         runsDone++;
         return writer;
@@ -261,4 +268,11 @@ public class BatchRunner
     }
 
 
+    public Consumer<FishState> getBeforeStartSetup() {
+        return beforeStartSetup;
+    }
+
+    public void setBeforeStartSetup(Consumer<FishState> beforeStartSetup) {
+        this.beforeStartSetup = beforeStartSetup;
+    }
 }

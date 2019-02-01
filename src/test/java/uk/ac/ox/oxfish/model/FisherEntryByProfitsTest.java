@@ -32,7 +32,7 @@ public class FisherEntryByProfitsTest {
     @Test
     public void directTest() {
 
-        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100, );
+        FisherEntryByProfits profits = new FisherEntryByProfits("a", "b", "c", 100,100 );
 
         //10% returns
         int fishers = profits.newEntrants(100, 1000);
@@ -59,7 +59,7 @@ public class FisherEntryByProfitsTest {
 
     @Test
     public void testReadingComprehension() {
-        FisherEntryByProfits profits = new FisherEntryByProfits("a","b","c",100, );
+        FisherEntryByProfits profits = new FisherEntryByProfits("a","b","c",100,100 );
 
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
         when(model.getLatestYearlyObservation("a")).thenReturn(100d);

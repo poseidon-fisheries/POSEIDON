@@ -73,7 +73,7 @@ public class YamlMain {
         FishStateUtilities.run(simulationName, inputFile, Paths.get("output", simulationName), main.seed, main.logLevel,
                                main.additionalData, main.policyScript,
                                main.yearsToRun, main.saveOnExit,
-                               main.towHeatmapGatherer, null);
+                               main.towHeatmapGatherer, null, null);
 
 
     }

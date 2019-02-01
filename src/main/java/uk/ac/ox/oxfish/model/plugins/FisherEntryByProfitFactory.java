@@ -87,4 +87,13 @@ public class FisherEntryByProfitFactory implements AlgorithmFactory<FisherEntryB
             DoubleParameter profitRatioToEntrantsMultiplier) {
         this.profitRatioToEntrantsMultiplier = profitRatioToEntrantsMultiplier;
     }
+
+
+    public DoubleParameter getMaxEntrantsPerYear() {
+        return maxEntrantsPerYear;
+    }
+
+    public void setMaxEntrantsPerYear(DoubleParameter maxEntrantsPerYear) {
+        this.maxEntrantsPerYear = maxEntrantsPerYear;
+    }
 }

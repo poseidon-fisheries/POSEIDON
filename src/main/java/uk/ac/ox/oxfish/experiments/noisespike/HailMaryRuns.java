@@ -64,7 +64,7 @@ import java.util.function.Consumer;
 public class HailMaryRuns {
 
 
-    public static final int MAX_YEARS_TO_RUN = 20;
+    public static final int MAX_YEARS_TO_RUN = 50;
     /**
      * what changes
      */
@@ -118,12 +118,20 @@ public class HailMaryRuns {
                                                 0.248,0.558)
         );
         parameters.add(
+                new SimpleOptimizationParameter("biologyInitializer.lengthAtMaturity",
+                                                45,70)
+        );
+        parameters.add(
                 new SimpleOptimizationParameter("biologyInitializer.virginRecruits",
                                                 4000000,12000000)
         );
         parameters.add(
                 new SimpleOptimizationParameter("biologyInitializer.cumulativePhi",
                                                 2,10)
+        );
+        parameters.add(
+                new SimpleOptimizationParameter("biologyInitializer.steepness",
+                                                0.8,0.95)
         );
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$0.holdSize",
@@ -140,7 +148,7 @@ public class HailMaryRuns {
 
 
 
-    private final static Path scenarioFile = Paths.get("docs", "20190129 spr_project", "zzz.yaml");
+    private final static Path scenarioFile = Paths.get("docs", "20190129 spr_project", "three_years_to_quit.yaml");
 
     /**
      * what tells us if the result is good or crap
@@ -160,7 +168,7 @@ public class HailMaryRuns {
     /**
      * here we store each sweep and the year it was first successfull
      */
-    private final static Path outputFile = Paths.get("docs", "20190129 spr_project", "zzz5.csv");
+    private final static Path outputFile = Paths.get("docs", "20190129 spr_project", "fiftyyears3.csv");
 
 
     private final static int NUMBER_OF_TRIES = 10000;
@@ -193,14 +201,13 @@ public class HailMaryRuns {
             long seed = fast.nextLong();
             ((FlexibleScenario) scenarioPair.getFirst()).setMapMakerDedicatedRandomSeed(seed);
 
+
             //run the model
             FishState model = new FishState(seed);
             model.setScenario(scenarioPair.getFirst());
             model.start();
-     //       System.out.println("starting run");
             while (model.getYear() <= maxYearsToRun) {
                 model.schedule.step(model);
-        //        System.out.println(model.getFishers().size());
             }
             model.schedule.step(model);
 
@@ -263,6 +270,7 @@ public class HailMaryRuns {
             int maxYearsToRun) throws IOException {
 
 
+        System.out.println("Starting: " + simulationTitle);
         FileWriter fileWriter = new FileWriter(outputFolder.resolve(simulationTitle+".csv").toFile());
         fileWriter.write("run,year,group,seed,shock_year,variable,value\n");
         fileWriter.flush();
@@ -435,14 +443,13 @@ public class HailMaryRuns {
     }
 
 
-    public static void mainSearch(String[] args) throws IOException {
-        HailMaryRuns hailMaryRuns = new HailMaryRuns();
-        hailMaryRuns.sweep(outputFile, hailMaryRuns.parameters, scenarioFile, System.currentTimeMillis(),
+    public static void main(String[] args) throws IOException {
+        sweep(outputFile, parameters, scenarioFile, System.currentTimeMillis(),
                            MAX_YEARS_TO_RUN, NUMBER_OF_TRIES);
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void mainPolicy(String[] args) throws IOException {
 
 
         List<String> columnsToPrint = Lists.newArrayList(
@@ -457,15 +464,14 @@ public class HailMaryRuns {
                 "Biomass " + "Red Fish",
                 "Total Effort",
                 "Actual Average Cash-Flow",
-                "Average Trip Duration",
                 "Number Of Active Fishers",
                 "Average Hours Out"
 
 
         );
-
+//
 //        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
 //                0, 2, 1,
 //                new Consumer<FishState>() {
 //                    @Override
@@ -474,29 +480,34 @@ public class HailMaryRuns {
 //                    }
 //                },
 //                parameters,
-//                "no_change",
+//                "three_inputs_no_change",
 //                scenarioFile,
 //                Paths.get("docs", "20190129 spr_project", "policy"),
 //                columnsToPrint,
 //                MAX_YEARS_TO_RUN+10
 //        );
-//
-
 
 //        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
 //                0, 2, 1,
 //                new Consumer<FishState>() {
 //                    @Override
 //                    public void accept(FishState state) {
+//
+//
+//                        FishingSeasonFactory season = new FishingSeasonFactory(180,true);
+//                        //new fishers are also only allowed 5 days at sea
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+//                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,false));
+//                        }
+//
 //                        for (Fisher fisher : state.getFishers()) {
-//                            fisher.setRegulation(new FishingSeason(true,
-//                                                                   100));
+//                            fisher.setRegulation(season.apply(state));
 //                        }
 //                    }
 //                },
 //                parameters,
-//                "hundred_days",
+//                "threeyears_180_days_noentry",
 //                scenarioFile,
 //                Paths.get("docs", "20190129 spr_project", "policy"),
 //                columnsToPrint,
@@ -504,47 +515,29 @@ public class HailMaryRuns {
 //        );
 
 
-//        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
-//                0, 2, 1,
-//                new Consumer<FishState>() {
-//                    @Override
-//                    public void accept(FishState state) {
-//                        for (Fisher fisher : state.getFishers()) {
-//                            fisher.setRegulation(new FishingSeason(true,
-//                                                                   5));
-//                        }
-//                    }
-//                },
-//                parameters,
-//                "five_days",
-//                scenarioFile,
-//                Paths.get("docs", "20190129 spr_project", "policy"),
-//                columnsToPrint,
-//                MAX_YEARS_TO_RUN+10
-//        );
 
 //
-//        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
-//                0, 2, 1,
-//                new Consumer<FishState>() {
-//                    @Override
-//                    public void accept(FishState state) {
-//
-//                        for (Port port : state.getPorts()) {
-//                            ((FixedPriceMarket) port.getDefaultMarketMap().getMarket(state.getBiology().getSpecie("Red Fish"))).setPrice(20000);
-//                        }
-//
-//                    }
-//                },
-//                parameters,
-//                "tax",
-//                scenarioFile,
-//                Paths.get("docs", "20190129 spr_project", "policy"),
-//                columnsToPrint,
-//                MAX_YEARS_TO_RUN+10
-//        );
+        HailMaryRuns.runPolicyAnalysis(
+                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
+                0, 2, 1,
+                new Consumer<FishState>() {
+                    @Override
+                    public void accept(FishState state) {
+
+                        for (Port port : state.getPorts()) {
+                            ((FixedPriceMarket) port.getDefaultMarketMap().
+                                    getMarket(state.getBiology().getSpecie("Red Fish"))).setPrice(20000);
+                        }
+
+                    }
+                },
+                parameters,
+                "threeyears_tax",
+                scenarioFile,
+                Paths.get("docs", "20190129 spr_project", "policy"),
+                columnsToPrint,
+                MAX_YEARS_TO_RUN+10
+        );
 //
 //                HailMaryRuns.runPolicyAnalysis(
 //                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
@@ -575,6 +568,64 @@ public class HailMaryRuns {
 //        );
 //
 //    }
+
+
+
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                        //new fishers aren't allowed out!
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+//                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,true));
+//                        }
+//
+//                        //all the other fishers are only allowed 100 days out
+//                        for (Fisher fisher : state.getFishers()) {
+//                            fisher.setRegulation(new FishingSeason(true,
+//                                                                   150));
+//                        }
+//
+//                    }
+//                },
+//                parameters,
+//                "noentry_150_days",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
+//
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                        //new fishers aren't allowed out!
+//                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+//                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,true));
+//                        }
+//
+//                        //all the other fishers are only allowed 100 days out
+//                        for (Fisher fisher : state.getFishers()) {
+//                            fisher.setRegulation(new FishingSeason(true,
+//                                    180));
+//                        }
+//
+//                    }
+//                },
+//                parameters,
+//                "noentry_180_days",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
 
 
     }

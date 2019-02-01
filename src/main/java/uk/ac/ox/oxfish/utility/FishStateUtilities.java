@@ -943,7 +943,8 @@ public class FishStateUtilities {
             final Long seed, final int logLevel, final boolean additionalData,
             final String policyScript, final int yearsToRun,
             final boolean saveOnExit, Integer heatmapGathererYear,
-            @Nullable Consumer<Scenario> scenarioSetup) throws IOException {
+            @Nullable Consumer<Scenario> scenarioSetup,
+            @Nullable  Consumer<FishState> preStartSetup) throws IOException {
         outputFolder.toFile().mkdirs();
 
         //create scenario and files
@@ -975,8 +976,8 @@ public class FishStateUtilities {
         else
             gatherer=null;
 
-
-
+        if(preStartSetup!=null)
+            preStartSetup.accept(model);
         model.start();
 
         if(additionalData) {
