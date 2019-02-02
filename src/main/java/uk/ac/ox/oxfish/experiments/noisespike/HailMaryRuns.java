@@ -168,7 +168,7 @@ public class HailMaryRuns {
     /**
      * here we store each sweep and the year it was first successfull
      */
-    private final static Path outputFile = Paths.get("docs", "20190129 spr_project", "fiftyyears3.csv");
+    private final static Path outputFile = Paths.get("docs", "20190129 spr_project", "fiftyyears11.csv");
 
 
     private final static int NUMBER_OF_TRIES = 10000;
@@ -443,13 +443,13 @@ public class HailMaryRuns {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void mainSweep(String[] args) throws IOException {
         sweep(outputFile, parameters, scenarioFile, System.currentTimeMillis(),
                            MAX_YEARS_TO_RUN, NUMBER_OF_TRIES);
     }
 
 
-    public static void mainPolicy(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
 
         List<String> columnsToPrint = Lists.newArrayList(
@@ -471,7 +471,7 @@ public class HailMaryRuns {
         );
 //
 //        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
+//                Paths.get("docs", "20190129 spr_project", "policy", "fiftyyearsinputs.csv"),
 //                0, 2, 1,
 //                new Consumer<FishState>() {
 //                    @Override
@@ -480,64 +480,64 @@ public class HailMaryRuns {
 //                    }
 //                },
 //                parameters,
-//                "three_inputs_no_change",
+//                "fiftyyears_no_change",
 //                scenarioFile,
 //                Paths.get("docs", "20190129 spr_project", "policy"),
 //                columnsToPrint,
 //                MAX_YEARS_TO_RUN+10
 //        );
 
-//        HailMaryRuns.runPolicyAnalysis(
-//                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
-//                0, 2, 1,
-//                new Consumer<FishState>() {
-//                    @Override
-//                    public void accept(FishState state) {
-//
-//
-//                        FishingSeasonFactory season = new FishingSeasonFactory(180,true);
-//                        //new fishers are also only allowed 5 days at sea
-//                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
-//                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,false));
-//                        }
-//
-//                        for (Fisher fisher : state.getFishers()) {
-//                            fisher.setRegulation(season.apply(state));
-//                        }
-//                    }
-//                },
-//                parameters,
-//                "threeyears_180_days_noentry",
-//                scenarioFile,
-//                Paths.get("docs", "20190129 spr_project", "policy"),
-//                columnsToPrint,
-//                MAX_YEARS_TO_RUN+10
-//        );
-
-
-
-//
         HailMaryRuns.runPolicyAnalysis(
-                Paths.get("docs", "20190129 spr_project", "policy", "inputs_three_years.csv"),
+                Paths.get("docs", "20190129 spr_project", "policy", "fiftyyearsinputs.csv"),
                 0, 2, 1,
                 new Consumer<FishState>() {
                     @Override
                     public void accept(FishState state) {
 
-                        for (Port port : state.getPorts()) {
-                            ((FixedPriceMarket) port.getDefaultMarketMap().
-                                    getMarket(state.getBiology().getSpecie("Red Fish"))).setPrice(20000);
+
+                        FishingSeasonFactory season = new FishingSeasonFactory(100,true);
+                        //new fishers are also only allowed 5 days at sea
+                        for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
+                            fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,false));
                         }
 
+                        for (Fisher fisher : state.getFishers()) {
+                            fisher.setRegulation(season.apply(state));
+                        }
                     }
                 },
                 parameters,
-                "threeyears_tax",
+                "fiftyyears_100_days_noentry",
                 scenarioFile,
                 Paths.get("docs", "20190129 spr_project", "policy"),
                 columnsToPrint,
                 MAX_YEARS_TO_RUN+10
         );
+
+
+
+//
+//        HailMaryRuns.runPolicyAnalysis(
+//                Paths.get("docs", "20190129 spr_project", "policy", "fiftyyearsinputs.csv"),
+//                0, 2, 1,
+//                new Consumer<FishState>() {
+//                    @Override
+//                    public void accept(FishState state) {
+//
+//                        for (Port port : state.getPorts()) {
+//                            ((FixedPriceMarket) port.getDefaultMarketMap().
+//                                    getMarket(state.getBiology().getSpecie("Red Fish"))).setPrice(20000);
+//                        }
+//
+//                    }
+//                },
+//                parameters,
+//                "fiftyyears_tax",
+//                scenarioFile,
+//                Paths.get("docs", "20190129 spr_project", "policy"),
+//                columnsToPrint,
+//                MAX_YEARS_TO_RUN+10
+//        );
 //
 //                HailMaryRuns.runPolicyAnalysis(
 //                Paths.get("docs", "20190129 spr_project", "policy", "inputs.csv"),
