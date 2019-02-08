@@ -495,7 +495,7 @@ public class HailMaryRuns {
                     public void accept(FishState state) {
 
 
-                        FishingSeasonFactory season = new FishingSeasonFactory(100,true);
+                        FishingSeasonFactory season = new FishingSeasonFactory(120,true);
                         //new fishers are also only allowed 5 days at sea
                         for (Map.Entry<String, FisherFactory> fisherFactory : state.getFisherFactories()) {
                             fisherFactory.getValue().setRegulations(new FishingSeasonFactory(0,false));
@@ -507,7 +507,7 @@ public class HailMaryRuns {
                     }
                 },
                 parameters,
-                "fiftyyears_100_days_noentry",
+                "fiftyyears_120_days_noentry",
                 scenarioFile,
                 Paths.get("docs", "20190129 spr_project", "policy"),
                 columnsToPrint,

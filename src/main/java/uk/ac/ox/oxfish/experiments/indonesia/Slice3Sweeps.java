@@ -77,13 +77,17 @@ public class Slice3Sweeps {
 //                      new String[]{"big","small","medium","small10"},
 //                      "pessimistic_spinup",
 //                      1, MIN_DAYS_OUT);
-//        effortControl("all_manyruns_quick2",
+//        effortControl("all_manyruns_quick_byfifty",
 //                      new String[]{"big","small","medium","small10"},
 //                      "optimistic_spinup",
 //                      1, MIN_DAYS_OUT);
-//
+
+//                effortControl("all_quick",
+//                      new String[]{"big","small","medium","small10"},
+//                      "fixed_recruits",
+//                      1, MIN_DAYS_OUT);
 //        //only boats >10GT are controlled
-//        effortControl("10_manyruns",
+//        effortControl("10_manyruns_byfifty",
 //                      new String[]{"big","medium","small10"},
 //                      "optimistic_spinup",
 //                      1, MIN_DAYS_OUT);
@@ -91,42 +95,58 @@ public class Slice3Sweeps {
 //                      new String[]{"big","medium","small10"},
 //                      "pessimistic_spinup",
 //                      1, MIN_DAYS_OUT);
-
+//        effortControl("10_quick",
+//                      new String[]{"big","medium","small10"},
+//                      "fixed_recruits",
+//                      1, MIN_DAYS_OUT);
 //
 //        //price premium
 //        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
-//        pricePremium("premium_malabaricus_quick3","optimistic_spinup",10,"Lutjanus malabaricus");
+      //  pricePremium("premium_malabaricus_quick_byfifty","optimistic_spinup",10,"Lutjanus malabaricus");
+//        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
 //        selectivityTest("selectivity_sweep_quick2","optimistic_spinup");
+        selectivityTest("selectivity_sweep_quick3","optimistic_spinup");
  //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
-        //pricePenalty("malus_malabaricus_quick","optimistic_spinup",10,"Lutjanus malabaricus");
+//        pricePenalty("malus_malabaricus_fiftyyears",
+//                     "optimistic_spinup",
+//                     10,
+//                     "Lutjanus malabaricus");
+//        pricePenalty("malus_malabaricus_",
+//                     "fixed_recruits",
+//                     10,
+//                     "Lutjanus malabaricus");
 //
 //        pricePremium("premium_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
  //       pricePremium("premium_malabaricus_quick2","pessimistic_spinup",10,"Lutjanus malabaricus");
       //  pricePenalty("malus_malabaricus_quick","pessimistic_spinup",10,"Lutjanus malabaricus");
 
 
-//        selectivityTest("selectivity_sweep_quick2","pessimistic_spinup");
+     //   selectivityTest("selectivity_sweep_quick3","pessimistic_spinup");
       //  pricePenalty("malus_multidens_manyruns","pessimistic_spinup",10,"Pristipomoides multidens");
 
 
         //fleet reduction
-//        fleetReduction("fleetreduction_quick","optimistic_spinup",1);
+   //     fleetReduction("fleetreduction_byfifty","optimistic_spinup",1);
 //        fleetReduction("fleetreduction_quick","pessimistic_spinup",1);
 
-
+     //   fleetReduction("fleetreduction_quick","fixed_recruits",1);
 //
 //            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
 //              delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+
 //
 //            delays("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
 //              delays("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
 //
 
-            delaysOnce("delay_once_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
-              delaysOnce("delay_once_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+        //    delaysOnce("delay_once_all_quick_byfifty", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 200);
+        //      delaysOnce("delay_once_all_quick3", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 200);
+   //     delaysOnce("delay_once_all_quick", new String[]{"big","small","medium","small10"}, "fixed_recruits", 1, 200);
 
-            delaysOnce("delay_once_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
-              delaysOnce("delay_once_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
+          //  delaysOnce("delay_once_10_quick2_byfifty", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 200);
+//              delaysOnce("delay_once_10_quick2", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 200);
+       // delaysOnce("delay_once_10_quick", new String[]{"big","medium","small10"}, "fixed_recruits", 1, 200);
+
     }
 
     public static void main3(String[] args) throws IOException {
@@ -456,8 +476,8 @@ public class Slice3Sweeps {
                                                                 int endDate = model.getRandom().nextInt(365);
                                                                 int startDate = endDate-finalWaitTime;
                                                                 if(startDate<0) {
-                                                                    endDate = endDate + startDate;
-                                                                    startDate=0;
+                                                                    endDate = finalWaitTime+100;
+                                                                    startDate=100;
                                                                 }
 
                                                                 fisher.setRegulation(
@@ -608,7 +628,7 @@ public class Slice3Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+.5)) {
+        for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+1)) {
 
             BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
@@ -908,6 +928,19 @@ public class Slice3Sweeps {
                                           final int populations) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
                 "Average Cash-Flow",
+                "Lutjanus malabaricus Earnings",
+                "Lutjanus malabaricus Landings",
+                "Epinephelus areolatus Earnings",
+                "Epinephelus areolatus Landings",
+                "Lutjanus erythropterus Earnings",
+                "Lutjanus erythropterus Landings",
+                "Pristipomoides multidens Earnings",
+                "Pristipomoides multidens Landings",
+                "Actual Average Hours Out",
+//                "Actual Average Hours Out of population0",
+//                "Actual Average Hours Out of population1",
+//                "Actual Average Hours Out of population2",
+//                "Actual Average Hours Out of population3",
                 "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
                 "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
@@ -982,7 +1015,7 @@ public class Slice3Sweeps {
         fileWriter.write("run,year,policy,variable,value\n");
         fileWriter.flush();
 
-        for(double increase=0; increase<=3; increase=FishStateUtilities.round5(increase+.1)) {
+        for(double increase=0; increase<=3; increase=FishStateUtilities.round5(increase+1)) {
 
             BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
 
