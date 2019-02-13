@@ -51,4 +51,8 @@ public class HourlyCost implements Cost{
             Fisher fisher, FishState model, TripRecord record, double revenue, double durationInHours) {
         return hourlyCost * durationInHours;
     }
+
+    public double getHourlyCost() {
+        return hourlyCost;
+    }
 }

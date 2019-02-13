@@ -60,6 +60,7 @@ public class BatchRunner
     /**
      * where to print output
      */
+    @Nullable
     private final Path outputFolder;
 
     /**
@@ -95,15 +96,17 @@ public class BatchRunner
     private ColumnModifier columnModifier;
 
     public BatchRunner(
-            Path yamlFile, int yearsToRun, List<String> columnsToPrint,
-            Path outputFolder, Path policyFile, long initialSeed,
+            Path yamlFile, int yearsToRun,@Nullable List<String> columnsToPrint,
+            @Nullable Path outputFolder, Path policyFile, long initialSeed,
             Integer heatmapGathererStartYear) {
         this.yamlFile = yamlFile;
         this.initialSeed = initialSeed;
         this.yearsToRun = yearsToRun;
         this.columnsToPrint = new LinkedList<>();
-        for(String column : columnsToPrint)
-            this.columnsToPrint.add(column.trim());
+        if(columnsToPrint!=null) {
+            for (String column : columnsToPrint)
+                this.columnsToPrint.add(column.trim());
+        }
         this.outputFolder = outputFolder;
         this.policyFile = policyFile;
         this.heatmapGathererStartYear = heatmapGathererStartYear;
@@ -119,7 +122,7 @@ public class BatchRunner
 
         long startTime = System.currentTimeMillis();
         FishState model = FishStateUtilities.run(simulationName, getYamlFile(),
-                getOutputFolder().resolve(simulationName),
+                outputFolder == null ? null : getOutputFolder().resolve(simulationName),
                 initialSeed + runsDone,
                 Log.LEVEL_INFO,
                 true, policyFile == null ?
@@ -133,18 +136,26 @@ public class BatchRunner
 
         //print individually
         ArrayList<DataColumn> columns = new ArrayList<>();
+        if(columnsToPrint==null | columnsToPrint.isEmpty())
+            for (DataColumn column : model.getYearlyDataSet().getColumns()) {
+                columnsToPrint.add(column.getName());
+            }
+
+        System.out.println(columnsToPrint);
         for(String column : columnsToPrint) {
             DataColumn columnToPrint = model.getYearlyDataSet().getColumn(column);
+
             Preconditions.checkState(columnToPrint!=null, "Can't find column " + column);
             columns.add(columnToPrint);
         }
 
 
-        FishStateUtilities.printCSVColumnsToFile(
-                outputFolder.resolve(simulationName+"_run"+runsDone+".csv").toFile(),
-                columns.toArray(new DataColumn[columns.size()])
-        );
-
+        if(outputFolder!=null) {
+            FishStateUtilities.printCSVColumnsToFile(
+                    outputFolder.resolve(simulationName + "_run" + runsDone + ".csv").toFile(),
+                    columns.toArray(new DataColumn[columns.size()])
+            );
+        }
         //print it tidyly if needed
         if(writer!=null)
             for(DataColumn column : columns)

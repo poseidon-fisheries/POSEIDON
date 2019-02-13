@@ -54,7 +54,9 @@ public class BatchRunnerFactory
         return new BatchRunner(
                 yamlFile,
                 yearsToRun,
-                Arrays.asList(columnsToPrint.split(",")),
+                columnsToPrint!=null && columnsToPrint.contains(",") ?
+                        Arrays.asList(columnsToPrint.split(",")) :
+                        null,
                 outputFolder,
                 policyFile,
                 randomSeed,
