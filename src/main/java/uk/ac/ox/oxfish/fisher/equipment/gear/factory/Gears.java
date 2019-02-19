@@ -103,6 +103,10 @@ public class Gears {
         CONSTRUCTORS.put("Hold Upper Limit",
                          HoldLimitingDecoratorFactory::new);
         NAMES.put(HoldLimitingDecoratorFactory.class,"Hold Upper Limit");
+
+        CONSTRUCTORS.put("Purse Seine Gear", PurseSeineGearFactory::new);
+        NAMES.put(PurseSeineGearFactory.class, "Purse Seine Gear");
+
     }
 
 }

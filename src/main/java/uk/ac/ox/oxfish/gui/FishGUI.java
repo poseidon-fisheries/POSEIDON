@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.gui;
 
 import javafx.collections.ListChangeListener;
+import org.jetbrains.annotations.Nullable;
 import sim.display.Console;
 import sim.display.Controller;
 import sim.display.Display2D;
@@ -30,11 +31,13 @@ import sim.engine.Steppable;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
 import sim.portrayal.SimplePortrayal2D;
+import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.geo.GeomPortrayal;
 import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import sim.portrayal.simple.OvalPortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
 import uk.ac.ox.oxfish.Main;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -109,6 +112,7 @@ public class  FishGUI extends GUIState{
     private ListChangeListener<Fisher> fisherListListener;
     private ListChangeListener<Fisher> enableDisableFisherListListener;
 
+    @Nullable private ContinuousPortrayal2D fadMapPortrayal = null;
 
     /**
      * create a random fishstate with seed = milliseconds since epoch
@@ -291,6 +295,11 @@ public class  FishGUI extends GUIState{
         boats.setField(state.getFisherGrid());
         boats.setPortrayalForRemainder(null);
 
+        if (state.getFadMap() != null) {
+            fadMapPortrayal = new ContinuousPortrayal2D();
+            fadMapPortrayal.setField(state.getFadMap().getField());
+            fadMapPortrayal.setPortrayalForAll(new OvalPortrayal2D(Color.yellow, 0.5));
+        }
 
         for(Fisher o : state.getFishers()) {
             assignPortrayalToFisher(boatPortrayalFactory.build(o), o);
@@ -451,6 +460,7 @@ public class  FishGUI extends GUIState{
         display2D.attach(trails, "Boat Trails");
         display2D.attach(boats, "Boats");
         display2D.attach(ports, "Ports");
+        if (fadMapPortrayal != null) display2D.attach(fadMapPortrayal, "Fads");
 
         displayFrame.setVisible(true);
 
