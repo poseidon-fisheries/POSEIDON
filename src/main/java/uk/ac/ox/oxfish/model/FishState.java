@@ -42,6 +42,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
@@ -89,6 +90,11 @@ public class FishState  extends SimState{
      * list of all objects that need to be started when the model actually starts
      */
     private List<Startable> toStart;
+
+    /**
+     * may contain the fad map, if fads are used in the scenario (null otherwise)
+     */
+    private FadMap fadMap = null;
 
     /**
      * Dataset of all the columns that are updated daily
@@ -883,4 +889,8 @@ public class FishState  extends SimState{
         aggregateDailySteppables.clear();
 
     }
+
+    public FadMap getFadMap() { return fadMap; }
+
+    public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
 }
