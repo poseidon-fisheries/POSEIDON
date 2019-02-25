@@ -6,7 +6,7 @@ library(here)
 source(here("scripts", "extract_ncdf_data.R"))
 
 bounds <-
-  read_csv("antigua_convention_area.csv") %>%
+  read_csv("depth.csv") %>%
   summarise(min_lon = min(x), max_lon = max(x), min_lat = min(y), max_lat = max(y))
 
 nc_file_dir <- path_home("Desktop") # for now...
@@ -16,7 +16,7 @@ nc_file_path <- path(nc_file_dir, nc_file_name)
 if (!file_exists(nc_file_path)) {
   base_url <- str_glue("ftp://ftp.hycom.org/datasets/GLBv0.08/expt_56.3/data/", year(date), "/")
   download.file(str_glue(base_url, nc_file_name), nc_file_path, mode = "wb")
-}
+  }
 
 nc <- nc_open(nc_file_path)
 df <-
@@ -39,5 +39,5 @@ df %>%
   geom_tile(aes(x = lon, y = lat, fill = value)) +
   coord_fixed() +
   facet_wrap(vars(component)) +
-  scale_fill_distiller(palette = "RdBu") +
+  scale_fill_distiller(palette = "RdBu", limits = c(-1, 1)) +
   theme_minimal()

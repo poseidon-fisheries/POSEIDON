@@ -121,4 +121,4 @@ depth_df <-
   filter(lon < -125) %>%
   transmute(x = lon, y = lat, depth = 1000000) %>%
   bind_rows(download_depth_df(850, left_lon, top_lat, right_lon, bottom_lat, 0.1)) %>%
-  write_csv(here("antigua_convention_area.csv"))
+  write_csv(here("depth.csv"))
