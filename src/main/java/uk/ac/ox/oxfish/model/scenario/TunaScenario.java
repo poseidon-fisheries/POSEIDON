@@ -49,10 +49,10 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class TunaScenario implements Scenario {
 
-    private final Path MAIN_DIRECTORY = Paths.get("inputs", "tuna");
-    private final Path MAP_FILE = MAIN_DIRECTORY.resolve("antigua_convention_area.csv");
-    private final Path PORTS_FILE = MAIN_DIRECTORY.resolve("ports.csv");
-    private final Path CURRENTS_FILE = MAIN_DIRECTORY.resolve("currents.csv");
+    private final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
+    private final Path MAP_FILE = INPUT_DIRECTORY.resolve("antigua_convention_area.csv");
+    private final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
+    private final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
 
     private final FromFilePortInitializer portInitializer = new FromFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer =
