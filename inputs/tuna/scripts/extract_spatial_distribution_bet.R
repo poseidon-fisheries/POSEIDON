@@ -1,5 +1,4 @@
 library(tidyverse)
-library(viridis)
 library(ncdf4)
 library(here)
 
@@ -12,10 +11,9 @@ df <-
   mutate(value = value / sum(value))
 
 df %>%
-  filter(between(lat, -20, 20)) %>%
   ggplot() +
   geom_tile(aes(x = lon, y = lat, fill = value)) +
   coord_fixed() +
-  scale_fill_viridis() +
+  scale_fill_viridis_c() +
   theme_minimal()
 
