@@ -49,10 +49,10 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class TunaScenario implements Scenario {
 
-    static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
-    static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
-    static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
+    public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
+    public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
+    public static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
+    public static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
 
     private final FromFilePortInitializer portInitializer = new FromFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer =
@@ -153,8 +153,6 @@ public class TunaScenario implements Scenario {
         final WeatherInitializer weatherInitializer = this.weatherInitializer.apply(model);
         final NauticalMap map = mapInitializer.apply(model)
             .makeMap(model.random, globalBiology, model);
-
-        //map.setPathfinder(new StraightLinePathfinder());
 
         //this next static method calls biology.initialize, weather.initialize and the like
         NauticalMapFactory.initializeMap(
