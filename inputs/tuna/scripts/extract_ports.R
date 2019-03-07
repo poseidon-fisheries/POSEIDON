@@ -1,6 +1,5 @@
 library(tidyverse) # must be loaded before Hmisc (https://github.com/tidyverse/haven/issues/86#issuecomment-421645194)
 library(Hmisc) # `apt install mdbtools` needed for `mdb.get` to work
-library(stringdist)
 library(biogeo)
 library(knitr)
 library(here)
@@ -49,6 +48,16 @@ vessels_df <-
   mutate(link = paste0("[", name, "](", url, ")")) %>%
   select(-reassigned_port_name)
 
+vessels_df %>%
+  ggplot(aes(`Gross tonnage`)) +
+  geom_histogram(color = "grey20", alpha = 0.8) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_blank()
+  )
+
+
 # show ports occupying same lon/lat cells
 vessels_df %>%
   group_by(`Port of registration`, wpi_port_name) %>%
@@ -89,6 +98,17 @@ known_ports %>%
   inner_join(ports_df) %>%
   dplyr::select(wpi_port_name, country, num_ships, lon, lat) %>%
   kable()
+
+known_ports %>%
+  left_join(ports_df) %>%
+  mutate(port = fct_reorder(str_glue("{wpi_port_name} ({country})"), num_ships, .desc = TRUE)) %>%
+  ggplot(aes(port, num_ships, fill = country, color = country)) +
+  geom_col(alpha = 0.8) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 
 # Ports outside area:
 vessels_df %>%
