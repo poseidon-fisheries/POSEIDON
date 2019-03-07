@@ -1,5 +1,5 @@
+library(raster) # must come before tidyverse not to mask `select`
 library(tidyverse)
-library(raster)
 library(httr)
 
 download_depth_df <- function (land_height, left_lon, top_lat, right_lon, bottom_lat, resolution) {
