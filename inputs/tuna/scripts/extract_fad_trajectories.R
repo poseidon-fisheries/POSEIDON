@@ -89,7 +89,7 @@ df %>%
     lon = first(lon),
     lat = first(lat),
     start = first(date_time),
-    duration = floor(as.numeric(difftime(last(date_time), start), units = "days"))
+    duration = ceiling(as.numeric(difftime(last(date_time), start), units = "days"))
   ) %>%
   filter(duration >= 1) %>%
   write_csv(here("fad_trajectories_validation_cases.csv"))
@@ -147,8 +147,9 @@ df %>%
 df %>%
   group_by(segment) %>%
   filter(n() > 10) %>%
-  ungroup() %>%
-  filter(segment %in% sample(segment, 12)) %>%
+  nest() %>%
+  sample_n(20) %>%
+  unnest() %>%
   arrange(date_time) %>%
   ggplot(aes(x = lon, y = lat)) +
   geom_path(aes(group = segment), alpha = 0.6) +
