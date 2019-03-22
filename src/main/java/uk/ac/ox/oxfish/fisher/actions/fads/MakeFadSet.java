@@ -46,7 +46,7 @@ public class MakeFadSet implements FadAction {
         // TODO: Gala told us that FAD sets are usually made at dawn. How should this be handled?
         if (isPossible(model, fisher)) {
             // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
-            fisher.fishHere(model.getBiology(), (int) getDuration(), model);
+            fisher.fishHere(model.getBiology(), (int) getDuration(), model, targetFad.getAggregatedBiology());
             model.recordFishing(fisher.getLocation());
             // TODO: picking up the FAD might not always be the thing to do
             return new ActionResult(new PickUpFad(targetFad), hoursLeft - getDuration());
