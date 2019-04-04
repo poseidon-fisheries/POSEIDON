@@ -116,7 +116,7 @@ public class SPRAgentTest {
                 )
         );
         agent.start(model);
-        agent.observeFishers();
+        agent.step(model);
         double spr = agent.computeSPR();
         assertEquals(0.08894,spr,.0001);
 
