@@ -939,13 +939,13 @@ public class FishStateUtilities {
 
 
     public static FishState  run(
-            String simulationName, Path scenarioYaml, final Path outputFolder,
+            String simulationName, Path scenarioYaml,
+            @Nullable final Path outputFolder,
             final Long seed, final int logLevel, final boolean additionalData,
             final String policyScript, final int yearsToRun,
             final boolean saveOnExit, Integer heatmapGathererYear,
             @Nullable Consumer<Scenario> scenarioSetup,
             @Nullable  Consumer<FishState> preStartSetup) throws IOException {
-        outputFolder.toFile().mkdirs();
 
         //create scenario and files
         String fullScenario = String.join("\n", Files.readAllLines(scenarioYaml));
@@ -954,17 +954,29 @@ public class FishStateUtilities {
         Scenario scenario = yaml.loadAs(fullScenario, Scenario.class);
 
 
-        FileWriter io = new FileWriter(outputFolder.resolve("scenario.yaml").toFile());
-        yaml.dump(scenario, io);
-        io.close();
+
+        if(outputFolder!=null) {
+            outputFolder.toFile().mkdirs();
+
+            FileWriter io = new FileWriter(outputFolder.resolve("scenario.yaml").toFile());
+            yaml.dump(scenario, io);
+            io.close();
+
+        }
 
         if(scenarioSetup!=null)
             scenarioSetup.accept(scenario);
 
         FishState model = new FishState(seed);
-        Log.setLogger(new FishStateLogger(model,
-                                          outputFolder.resolve(simulationName+ "_log.txt")));
-        Log.set(logLevel);
+
+        if(outputFolder!=null)
+        {
+            Log.setLogger(new FishStateLogger(model,
+                    outputFolder.resolve(simulationName+ "_log.txt")));
+            Log.set(logLevel);
+        }
+
+
         model.setScenario(scenario);
 
         TowHeatmapGatherer gatherer;
@@ -1002,28 +1014,31 @@ public class FishStateUtilities {
                 Log.debug("Year " + model.getYear() + " starting");
         }
 
-        FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
-        ModelResults results =  new ModelResults(model);
-        yaml.dump(results,writer);
+        if(outputFolder!=null) {
 
-        writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
-        writer.write(Long.toString(seed));
-        writer.close();
+            FileWriter writer = new FileWriter(outputFolder.resolve("result.yaml").toFile());
+            ModelResults results = new ModelResults(model);
+            yaml.dump(results, writer);
 
-        if(gatherer != null)
-        {
-            writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile());
-            writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
+            writer = new FileWriter(outputFolder.resolve("seed.txt").toFile());
+            writer.write(Long.toString(seed));
             writer.close();
 
+            if(gatherer != null)
+            {
+                writer = new FileWriter(outputFolder.resolve("tow_heatmap.txt").toFile());
+                writer.write(FishStateUtilities.gridToCSV(gatherer.getTowHeatmap()));
+                writer.close();
+
+            }
+            writeAdditionalOutputsToFolder(outputFolder, model);
+            if(saveOnExit)
+                writeModelToFile(
+                        outputFolder.resolve(simulationName+".checkpoint").toFile(),
+                        model);
         }
-        writeAdditionalOutputsToFolder(outputFolder, model);
 
 
-        if(saveOnExit)
-            writeModelToFile(
-                    outputFolder.resolve(simulationName+".checkpoint").toFile(),
-                    model);
 
         return model;
     }

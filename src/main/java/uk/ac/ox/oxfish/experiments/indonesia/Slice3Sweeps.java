@@ -32,6 +32,8 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
@@ -104,8 +106,8 @@ public class Slice3Sweeps {
 //        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
       //  pricePremium("premium_malabaricus_quick_byfifty","optimistic_spinup",10,"Lutjanus malabaricus");
 //        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
-//        selectivityTest("selectivity_sweep_quick2","optimistic_spinup");
-        selectivityTest("selectivity_sweep_quick3","optimistic_spinup");
+        selectivityTest("selectivity_sweep_quick","fixed_recruits");
+      //  selectivityTest("selectivity_sweep_quick3","optimistic_spinup");
  //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
 //        pricePenalty("malus_malabaricus_fiftyyears",
 //                     "optimistic_spinup",
@@ -131,13 +133,15 @@ public class Slice3Sweeps {
 
      //   fleetReduction("fleetreduction_quick","fixed_recruits",1);
 //
-//            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
+ //           delays("delay_all_quick2", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
 //              delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
+  //            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "fixed_recruits", 1, 50);
 
 //
-//            delays("delay_10_quick", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
+ //           delays("delay_10_quick2", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
 //              delays("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
-//
+      //        delays("delay_10_quick", new String[]{"big","small10","medium"}, "fixed_recruits", 1, 50);
+
 
         //    delaysOnce("delay_once_all_quick_byfifty", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 200);
         //      delaysOnce("delay_once_all_quick3", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 200);
@@ -147,6 +151,24 @@ public class Slice3Sweeps {
 //              delaysOnce("delay_once_10_quick2", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 200);
        // delaysOnce("delay_once_10_quick", new String[]{"big","medium","small10"}, "fixed_recruits", 1, 200);
 
+
+//
+//        variableCostTest("variable_cost",
+//                new String[]{"small","small10"},
+//                "optimistic_spinup",
+//                1
+//                );
+//
+//        variableCostTest("variable_cost",
+//                new String[]{"small","small10"},
+//                "pessimistic_spinup",
+//                1
+//                );
+//        variableCostTest("variable_cost",
+//                new String[]{"small","small10"},
+//                "fixed_recruits",
+//                4
+//        );
     }
 
     public static void main3(String[] args) throws IOException {
@@ -235,6 +257,7 @@ public class Slice3Sweeps {
 
 //        selectivityTest("selectivity_sweep","optimistic_recruits_spinup_fixedmarket");
 //        selectivityTest("selectivity_sweep","pessimistic_recruits_spinup");
+
 
 
 
@@ -1004,6 +1027,97 @@ public class Slice3Sweeps {
         );
     }
 
+
+    private static void variableCostTest(
+            String name, String[] modifiedTags,
+            final String filename, int shockYear) throws IOException {
+
+        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_" + name + ".csv").toFile());
+        fileWriter.write("run,year,policy,variable,value\n");
+        fileWriter.flush();
+
+        for (double increase = 1; increase <= 3; increase = FishStateUtilities.round5(increase + .25)) {
+
+            BatchRunner runner = setupRunner(filename, 15, POPULATIONS);
+
+
+            //basically we want year 4 to change big boats regulations.
+            //because I coded "run" poorly, we have to go through this series of pirouettes
+            //to get it done right
+            double finalIncrease = increase;
+
+
+            runner.setScenarioSetup(
+                    scenario -> {
+
+                        //at year 4, impose regulation
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+
+                        flexible.getPlugins().add(
+                                fishState -> new AdditionalStartable() {
+                                    @Override
+                                    public void start(FishState model) {
+
+                                        model.scheduleOnceAtTheBeginningOfYear(
+                                                (Steppable) simState -> {
+                                                    fisherloop:
+                                                    for (Fisher fisher :
+                                                            ((FishState) simState).getFishers()) {
+
+                                                        for (String tag : modifiedTags) {
+                                                            if (fisher.getTags().contains(tag)) {
+
+                                                                Cost hourlyCost = fisher.getAdditionalTripCosts().remove();
+                                                                Preconditions.checkState(hourlyCost instanceof HourlyCost,
+                                                                        "I assumed here there would be only one additional cost! Careful with this sweep");
+                                                                double newCosts = ((HourlyCost) hourlyCost).getHourlyCost() * finalIncrease;
+
+                                                                fisher.getAdditionalTripCosts().add(
+                                                                        new HourlyCost(newCosts)
+                                                                );
+
+                                                                continue fisherloop;
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                StepOrder.DAWN,
+                                                shockYear
+                                        );
+
+
+                                    }
+
+                                    @Override
+                                    public void turnOff() {
+
+                                    }
+                                }
+                        );
+
+                    }
+            );
+
+
+            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+                @Override
+                public void consume(StringBuffer writer, FishState model, Integer year) {
+                    writer.append(finalIncrease).append(",");
+                }
+            });
+
+
+            //while (runner.getRunsDone() < 1) {
+            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+                StringBuffer tidy = new StringBuffer();
+                runner.run(tidy);
+                fileWriter.write(tidy.toString());
+                fileWriter.flush();
+            }
+        }
+        fileWriter.close();
+    }
 
 
     //sweep selectivity of small boats, see if it makes a difference anyway
