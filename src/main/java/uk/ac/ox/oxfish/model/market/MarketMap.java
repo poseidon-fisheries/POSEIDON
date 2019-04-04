@@ -64,6 +64,10 @@ public class MarketMap {
         return marketList[species.getIndex()].sellFish(hold, fisher, regulation, state, species);
 
     }
+    
+    public double getSpeciesPrice(int speciesIndex){
+    	return marketList[speciesIndex].getMarginalPrice();
+    }
 
 
     public Collection<Market> getMarkets()

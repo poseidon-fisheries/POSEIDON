@@ -20,19 +20,19 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.DoubleStream;
+
 import com.google.common.base.Preconditions;
+import com.sun.istack.internal.Nullable;
+
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.DoubleStream;
 
 /**
  * Holds summary statistics of a trip, specifically how much money was made and how much was spent.
@@ -41,6 +41,12 @@ import java.util.stream.DoubleStream;
  */
 public class TripRecord {
 
+	/**
+	 * the simulation time (day) of the trip
+	 */
+	
+	private int tripDate;
+	
     /**
      * how long did the trip take
      */
@@ -104,12 +110,13 @@ public class TripRecord {
 
     private Port terminal;
 
-    public TripRecord(int numberOfSpecies, double hoursSpentAtPort)
+    public TripRecord(int numberOfSpecies, double hoursSpentAtPort, int day)
     {
         soldCatch = new double[numberOfSpecies];
         earningsPerSpecie = new double[numberOfSpecies];
         totalCatch = new double[numberOfSpecies];
         this.hoursSinceLastTrip = hoursSpentAtPort;
+        this.tripDate = day;
     }
 
 
@@ -371,6 +378,14 @@ public class TripRecord {
      */
     public double getLitersOfGasConsumed() {
         return litersOfGasConsumed;
+    }
+    
+    /**
+     * Getter for the date of the trip, the integer day of the simulation
+     * @return
+     */
+    public int getTripDate(){
+    	return tripDate;
     }
 
     public void recordGasConsumption(double litersConsumed){

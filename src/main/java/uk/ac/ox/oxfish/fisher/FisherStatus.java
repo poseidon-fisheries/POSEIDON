@@ -20,8 +20,12 @@
 
 package uk.ac.ox.oxfish.fisher;
 
-import ec.util.MersenneTwisterFast;
+import java.io.Serializable;
+import java.util.LinkedList;
+
 import org.metawidget.inspector.annotation.UiHidden;
+
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
@@ -30,12 +34,9 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.regs.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.regs.Regulation;
-
-import java.io.Serializable;
-import java.util.LinkedList;
 
 /**
  * contains all the transitory variables of  a fisher including:
@@ -118,6 +119,35 @@ public class FisherStatus implements Serializable {
         this.regulation = regulation;
     }
 
+    
+    /** 
+     * The community Standards to obey
+     */
+    
+    private  RegionalRestrictions communalStandards;
+    
+    public RegionalRestrictions getCommunalStandards(){
+    	return communalStandards;
+    }
+    
+    public void setCommunalStandards(RegionalRestrictions communalStandards){
+    	this.communalStandards = communalStandards;
+    }
+    
+    /**
+     * The reputational risks to observe
+     */
+    
+    private RegionalRestrictions reputationalRisk;
+    
+    public RegionalRestrictions getReputationalRisk(){
+    	return reputationalRisk;
+    }
+    
+    public void setReputationalRisk(RegionalRestrictions reputationalRisk){
+    	this.reputationalRisk = reputationalRisk;
+    }
+    
     /**
      * the state of the fisher: the next action they are taking
      */
@@ -358,7 +388,14 @@ public class FisherStatus implements Serializable {
     public boolean isAllowedToFishHere(Fisher agent, SeaTile tile, FishState model) {
         return regulation.canFishHere(agent, tile, model);
     }
+    
+    public boolean isBadByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    	return communalStandards.canFishHere(agent, tile, model);
+    }
 
+    public boolean isBadReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    	return regulation.canFishHere(agent, tile, model);
+    }
 
     /**
      * Getter for property 'exogenousEmergencyOverride'.
