@@ -5,6 +5,7 @@ import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
 import uk.ac.ox.oxfish.biology.BiomassTotalResetter;
 import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
+import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgentFactory;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.*;
@@ -71,6 +72,14 @@ public class AdditionalStartables {
         );
         NAMES.put(FisherEntryByProfitFactory.class,
                   "Fish Entry By Profit");
+
+
+        CONSTRUCTORS.put("Fishing Mortality Agent",
+                         FishingMortalityAgentFactory::new
+        );
+        NAMES.put(FishingMortalityAgentFactory.class,
+                  "Fishing Mortality Agent");
+
 
     }
 
