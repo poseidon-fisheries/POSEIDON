@@ -30,8 +30,11 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 import uk.ac.ox.oxfish.model.data.collectors.*;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FisherMemory implements Serializable, FisherStartable {
@@ -75,7 +78,40 @@ public class FisherMemory implements Serializable, FisherStartable {
     public LocationMemories<TripRecord> getTripMemories() {
         return tripMemories;
     }
+    
+    final List<SharedTripRecord> sharedTrips;
+    
+    public List<SharedTripRecord> getSharedTrips(){
+    	return sharedTrips;
+    }
+    
+    //At this point, we will assume they are friends
+    public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
+    	List<SharedTripRecord> sharedTripList=null;
+    	for(SharedTripRecord sharedTrip: sharedTrips){
+    		if(sharedTrip.sharedWithAll() || sharedTrip.getSharedFriends().contains(friend)){
+    			sharedTripList.add(sharedTrip);
+    		}
+    	}
+    	return sharedTripList;
+    }
 
+    public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
+    	//if it has been shared before, update allFriends or add to the sharedFriends collection
+    	boolean previouslyShared = false;
+    	for(SharedTripRecord sharedTrip: sharedTrips){
+    		if(sharedTrip.getTrip()==trip){
+    			previouslyShared=true;
+    			if(allFriends) sharedTrip.shareWithAllFriends();
+    			if(sharedFriends!=null) sharedTrip.shareWithMoreFriends(sharedFriends);
+    			break;
+    		}
+    	}
+    	if(!previouslyShared){
+    		SharedTripRecord newSharedTrip = new SharedTripRecord(trip, allFriends, sharedFriends);
+    	}
+    }
+    
     /**
      * stores trip information
      */
@@ -111,6 +147,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
         this.dailyTimeSeries = new FisherDailyTimeSeries();
         this.tripMemories = tripMemories;
+        this.sharedTrips = null;
     }
 
     @Override

@@ -456,11 +456,11 @@ public class Fisher implements Steppable, Startable{
     /**
      * departs
      */
-    public void undock() {
+    public void undock(FishState model) {
         assert this.status.getHoursAtSea() == 0;
         assert isAtPort();
         status.getHomePort().depart(this);
-        memory.getTripLogger().newTrip(getHoursAtPort());
+        memory.getTripLogger().newTrip(getHoursAtPort(), model.getDay());
         status.setHoursAtPort(0);
     }
 
@@ -1007,6 +1007,22 @@ public class Fisher implements Steppable, Startable{
     public List<TripRecord> getFinishedTrips() {
         return memory.getTripLogger().getFinishedTrips();
     }
+    
+    public List<SharedTripRecord> getSharedTrips(){
+    	return memory.getSharedTrips();
+    }
+    
+    public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
+    	Collection<Fisher> friends = this.getDirectedFriends();
+    	if(friends.contains(friend))
+    		return memory.getTripsSharedWith(friend);
+    	else
+    		return null;
+    }
+    
+    public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
+    	memory.shareTrip(trip, allFriends, sharedFriends);
+    }
 
     public String getAction() {
         return status.getAction().getClass().getSimpleName();
@@ -1274,6 +1290,14 @@ public class Fisher implements Steppable, Startable{
     public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
         return status.isAllowedToFishHere(this, tile, model);
     }
+    
+    public boolean isBadReputationToFishHere(SeaTile tile, FishState model){
+    	return status.isBadReputationToFishHere(this, tile, model);
+    }
+    
+    public boolean isBadByCommunityStandardsToFishHere(SeaTile tile, FishState model){
+    	return status.isBadByCommunityStandardsToFishHere(this, tile, model);
+    }
 
     /**
      * Getter for property 'gearStrategy'.
@@ -1362,6 +1386,9 @@ public class Fisher implements Steppable, Startable{
         return status.getOpportunityCosts();
     }
 
+    public double getExpectedFuelConsumption(double distanceKM){
+    	return equipment.getBoat().expectedFuelConsumption(distanceKM);
+    }
 
 
     public int numberOfDailyObservations() {

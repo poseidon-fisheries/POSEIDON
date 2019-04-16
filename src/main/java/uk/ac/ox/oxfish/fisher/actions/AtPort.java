@@ -51,7 +51,7 @@ public class AtPort implements Action {
             agent.updateGear(model.getRandom(),model,this);
             agent.updateDestination(model,this);
             assert !agent.getDestination().equals(agent.getHomePort().getLocation()); //shouldn't have chosen to go to port because that's weird
-            agent.undock();
+            agent.undock(model);
             return new ActionResult(new Moving(),hoursLeft);
         }
         else //you don't want to leave this hour, try again next hour

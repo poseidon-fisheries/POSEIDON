@@ -20,8 +20,21 @@
 
 package uk.ac.ox.oxfish.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Doubles;
+
 import ec.util.MersenneTwisterFast;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,20 +59,21 @@ import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
-import uk.ac.ox.oxfish.model.data.collectors.*;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
+import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.model.data.collectors.FishStateYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.ThreePricesMarket;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.scenario.*;
+import uk.ac.ox.oxfish.model.scenario.FisherFactory;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
+import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
 
 /**
  *
@@ -528,32 +542,6 @@ public class FishState  extends SimState{
                 sum += seaTile.getAbundance(species).getAbundance(subdivision,bin);
         }
         return sum;
-    }
-
-    /**
-     * sums up the count of fish in all sea tiles and returns it as an array (safe to modify)
-     * @param species
-     * @return
-     */
-    public double[][] getTotalAbundance(Species species)
-    {
-
-        double[][] totalAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-
-        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
-
-            for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            {
-                for (int bin = 0; bin < species.getNumberOfBins(); bin++)
-                {
-                    if (seaTile.isFishingEvenPossibleHere())
-                        totalAbundance[subdivision][bin] += seaTile.getAbundance(species).getAbundance(subdivision, bin);
-                }
-            }
-        }
-        assert totalAbundance[species.getNumberOfSubdivisions()-1][species.getNumberOfBins()-1] ==
-                getTotalAbundance(species,species.getNumberOfSubdivisions()-1,species.getNumberOfBins()-1);
-        return totalAbundance;
     }
 
     /**
