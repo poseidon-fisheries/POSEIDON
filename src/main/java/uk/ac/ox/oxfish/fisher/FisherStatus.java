@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.regs.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 /**
@@ -123,7 +124,7 @@ public class FisherStatus implements Serializable {
      * The community Standards to obey
      */
     
-    private  RegionalRestrictions communalStandards;
+    private RegionalRestrictions communalStandards;
     
     public RegionalRestrictions getCommunalStandards(){
     	return communalStandards;
