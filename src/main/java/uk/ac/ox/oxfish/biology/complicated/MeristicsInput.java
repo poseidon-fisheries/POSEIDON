@@ -27,28 +27,57 @@ package uk.ac.ox.oxfish.biology.complicated;
  */
 public class MeristicsInput {
 
+
+    //last bin
     private int maxAge;
+
+
+
+    /**
+     * LENGTH-WEIGHT parameters
+     */
+    private  double maxLengthMale; //linfinity male
+    private  double maxLengthFemale; //linfinity female
+    private  double KParameterFemale; //growth slope female
+    private double KParameterMale; //growth slope male
+    private double weightParameterAFemale; //allometric parameter A female
+    private  double weightParameterBFemale; //allometric parameter B female
+    private double weightParameterAMale; //allometric parameter A male
+    private  double weightParameterBMale; //allometric parameter B female
+
+    //age you are considered "old" (after this bin, you reach L infinity)
     private  int ageOld;
+    //age when young
     private  double youngAgeMale;
-    private  double youngLengthMale;
-    private  double maxLengthMale;
-    private double KParameterMale;
-    private double weightParameterAMale;
-    private  double weightParameterBMale;
-    private  double mortalityParameterMMale;
     private double youngAgeFemale;
+
+    // length when "young"
+    private  double youngLengthMale;
     private  double youngLengthFemale;
-    private  double maxLengthFemale;
-    private  double KParameterFemale;
-    private double weightParameterAFemale;
-    private  double weightParameterBFemale;
+
+    /***
+     * MORTALITY
+     */
+    //instantaneous mortality male
+    private  double mortalityParameterMMale;
+    //instantaneous mortality female
     private  double mortalityParameterMFemale;
+    /**
+     * RECRUITMENT PARAMETERS
+     */
+    //maturity parameter 1
     private double maturityInflection;
+    //maturity parameter 2
     private  double maturitySlope;
+    //fecundity parameter 1
     private  double fecundityIntercept;
+    //fecundity parameter 2
     private  double fecunditySlope;
+    //recruits when at full capacity
     private int virginRecruits;
+    //resilience of the stock in terms of recruitment
     private  double steepness;
+    //yelloweye was a special case where relative fecundity was part of the equation, if you need to use the same formula, this is set to true
     private  boolean addRelativeFecundityToSpawningBiomass;
 
     public MeristicsInput() {
