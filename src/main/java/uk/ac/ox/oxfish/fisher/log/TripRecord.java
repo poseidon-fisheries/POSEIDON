@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.stream.DoubleStream;
 
 import com.google.common.base.Preconditions;
-import com.sun.istack.internal.Nullable;
 
+import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;

@@ -545,6 +545,32 @@ public class FishState  extends SimState{
     }
 
     /**
+     * sums up the count of fish in all sea tiles and returns it as an array (safe to modify)
+     * @param species
+     * @return
+     */
+    public double[][] getTotalAbundance(Species species)
+    {
+
+        double[][] totalAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+
+            for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
+            {
+                for (int bin = 0; bin < species.getNumberOfBins(); bin++)
+                {
+                    if (seaTile.isFishingEvenPossibleHere())
+                        totalAbundance[subdivision][bin] += seaTile.getAbundance(species).getAbundance(subdivision, bin);
+                }
+            }
+        }
+        assert totalAbundance[species.getNumberOfSubdivisions()-1][species.getNumberOfBins()-1] ==
+                getTotalAbundance(species,species.getNumberOfSubdivisions()-1,species.getNumberOfBins()-1);
+        return totalAbundance;
+    }
+
+    /**
      * if the model hasn't started, register this object to be started when the model is. Otherwise start it now
      * @param startable the object to start
      */
