@@ -44,7 +44,7 @@ public interface Regulation extends FisherStartable
      * @return true if the fisher can fish
      */
     boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
-
+    
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      * @param agent the fisher selling its catch
