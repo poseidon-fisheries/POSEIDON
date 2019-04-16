@@ -46,8 +46,9 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public FromFileMapInitializerFactory() {
     }
 
-    public FromFileMapInitializerFactory(final Path mapFile) {
+    public FromFileMapInitializerFactory(final Path mapFile, final double gridWidthInCells) {
         this.mapFile = mapFile;
+        this.gridWidthInCell = new FixedDoubleParameter(gridWidthInCells);
     }
 
 

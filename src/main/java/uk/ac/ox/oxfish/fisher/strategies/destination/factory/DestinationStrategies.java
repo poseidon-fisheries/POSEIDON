@@ -152,6 +152,11 @@ public class DestinationStrategies
         NAMES.put(ReplicatorDestinationFactory.class,
                   "Replicator");
 
+        CONSTRUCTORS.put("Random Plan FAD Destination Strategy",
+            RandomPlanFadDestinationStrategyFactory::new);
+        NAMES.put(RandomPlanFadDestinationStrategyFactory.class,
+            "Random Plan FAD Destination Strategy");
+
     }
 
     private DestinationStrategies() {}

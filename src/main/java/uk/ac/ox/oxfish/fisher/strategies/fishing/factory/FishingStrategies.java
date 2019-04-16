@@ -54,6 +54,10 @@ public class FishingStrategies {
         NAMES.put(MaximumStepsFactory.class,"Until Full With Day Limit");
         CONSTRUCTORS.put("WFS Logit Return", FloridaLogitReturnFactory::new);
         NAMES.put(FloridaLogitReturnFactory.class,"WFS Logit Return");
+        CONSTRUCTORS.put("Random FAD Fishing Strategy", RandomFadFishingStrategyFactory::new);
+        NAMES.put(RandomFadFishingStrategyFactory.class, "Random FAD Fishing Strategy");
+        CONSTRUCTORS.put("Follow Plan FAD Fishing Strategy", FollowPlanFadFishingStrategyFactory::new);
+        NAMES.put(FollowPlanFadFishingStrategyFactory.class, "Follow Plan FAD Fishing Strategy");
 
     }
 
