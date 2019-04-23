@@ -64,6 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -200,6 +201,25 @@ public class FisherDefinition {
         return toReturn;
     }
 
+    Supplier<Engine> makeEngineSupplier(MersenneTwisterFast random) {
+        return () -> new Engine(enginePower.apply(random), literPerKilometer.apply(random), speedInKmh.apply(random));
+    }
+
+    Supplier<FuelTank> makeFuelTankSupplier(MersenneTwisterFast random) {
+        return () -> new FuelTank(fuelTankSize.apply(random));
+    }
+
+    Supplier<Hold> makeHoldSupplier(MersenneTwisterFast random, GlobalBiology biology) {
+        return () -> new Hold(holdSize.apply(random), biology);
+    }
+
+    Supplier<Boat> makeBoatSupplier(MersenneTwisterFast random) {
+        return () -> new Boat(10, 10,
+            makeEngineSupplier(random).get(),
+            makeFuelTankSupplier(random).get()
+        );
+    }
+
     public FisherFactory getFisherFactory(FishState model, List<Port> ports, int firstFisherID){
 
         final GlobalBiology biology = model.getBiology();
@@ -214,15 +234,10 @@ public class FisherDefinition {
         LogbookInitializer log = logbook.apply(model);
         log.start(model);
 
-
-
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
-        Supplier<Boat> boatSupplier = () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                literPerKilometer.apply(random),
-                speedInKmh.apply(random)),
-                new FuelTank(fuelTankSize.apply(random)));
-        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random), biology);
+        Supplier<Boat> boatSupplier = makeBoatSupplier(random);
+        Supplier<Hold> holdSupplier = makeHoldSupplier(random, biology);
 
         FisherFactory fisherFactory = new FisherFactory(
                 //default to grabbing first port!
