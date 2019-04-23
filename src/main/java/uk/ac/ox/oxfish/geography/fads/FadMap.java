@@ -1,9 +1,5 @@
 package uk.ac.ox.oxfish.geography.fads;
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -17,10 +13,23 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.currents.CurrentMaps;
+import uk.ac.ox.oxfish.geography.currents.VectorGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * This class is mostly a wrapper around the DriftingObjectsMap class, but it adds a couple bits of functionality:
+ * - It's a MASON Steppable, which applies drift when stepped.
+ * - It has methods for deploying and removing FADs, setting the appropriate callback in the former case.
+ */
 public class FadMap implements Startable, Steppable {
 
     private final DriftingObjectsMap driftingObjectsMap;
@@ -28,20 +37,21 @@ public class FadMap implements Startable, Steppable {
     private final GlobalBiology globalBiology;
     private final Function<FadManager, Fad> fadFactory;
 
+    private final CurrentMaps currentsMaps;
+
     private Stoppable stoppable;
 
-    public FadMap(
+    FadMap(
         NauticalMap nauticalMap,
+        CurrentMaps currentsMaps,
         GlobalBiology globalBiology,
-        Function<Double2D, Double2D> move,
         Function<FadManager, Fad> fadFactory
     ) {
         this.nauticalMap = nauticalMap;
+        this.currentsMaps = currentsMaps;
         this.globalBiology = globalBiology;
         this.fadFactory = fadFactory;
-        this.driftingObjectsMap = new DriftingObjectsMap(
-            nauticalMap.getWidth(), nauticalMap.getHeight(), move
-        );
+        this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
     }
 
     @Override
@@ -54,28 +64,10 @@ public class FadMap implements Startable, Steppable {
         if (stoppable != null) stoppable.stop();
     }
 
-    @NotNull
-    private Optional<SeaTile> getSeaTile(Double2D location) {
-        return Optional.ofNullable(
-            nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
-        );
-    }
-
-    @NotNull
-    public Optional<SeaTile> getFadTile(Fad fad) {
-        return Optional
-            .ofNullable(driftingObjectsMap.getObjectLocation(fad))
-            .flatMap(this::getSeaTile);
-    }
-
-    @NotNull
-    private Stream<Fad> allFads() {
-        return driftingObjectsMap.objects().map(o -> (Fad) o);
-    }
-
     @Override
     public void step(SimState simState) {
-        driftingObjectsMap.applyDrift();
+        VectorGrid2D currentsMap = currentsMaps.atSteps(simState.schedule.getSteps());
+        driftingObjectsMap.applyDrift(currentsMap::move);
         for (Fad fad : allFads().collect(Collectors.toList())) { // use copy, as FADs can be removed
             final Optional<SeaTile> seaTile = getFadTile(fad)
                 .filter(tile -> tile.getAltitude() <= 0);
@@ -86,7 +78,26 @@ public class FadMap implements Startable, Steppable {
         }
     }
 
+    @NotNull
+    private Stream<Fad> allFads() {
+        return driftingObjectsMap.objects().map(o -> (Fad) o);
+    }
+
+    @NotNull
+    public Optional<SeaTile> getFadTile(Fad fad) {
+        return Optional
+            .ofNullable(driftingObjectsMap.getObjectLocation(fad))
+            .flatMap(this::getSeaTile);
+    }
+
     public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
+
+    @NotNull
+    private Optional<SeaTile> getSeaTile(Double2D location) {
+        return Optional.ofNullable(
+            nauticalMap.getSeaTile((int) (location.x), (int) (location.y))
+        );
+    }
 
     @NotNull
     public Fad deployFad(FadManager owner, Double2D location) {
