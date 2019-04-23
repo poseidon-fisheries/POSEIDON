@@ -19,8 +19,10 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -33,17 +35,22 @@ public class FadMap implements Startable, Steppable {
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
+    private final Function<FadManager, Fad> fadFactory;
+
     private final CurrentMaps currentsMaps;
+
     private Stoppable stoppable;
 
     FadMap(
         NauticalMap nauticalMap,
         CurrentMaps currentsMaps,
-        GlobalBiology globalBiology
+        GlobalBiology globalBiology,
+        Function<FadManager, Fad> fadFactory
     ) {
         this.nauticalMap = nauticalMap;
         this.currentsMaps = currentsMaps;
         this.globalBiology = globalBiology;
+        this.fadFactory = fadFactory;
         this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
     }
 
@@ -63,34 +70,29 @@ public class FadMap implements Startable, Steppable {
     public void step(SimState simState) {
         VectorGrid2D currentsMap = currentsMaps.atSteps(simState.schedule.getSteps());
         driftingObjectsMap.applyDrift(currentsMap::move);
-        allFads().forEach(fad ->
-            getFadTile(fad)
-                .flatMap(FadMap::getVariableBiomassBasedBiology)
-                .ifPresent(biology -> fad.aggregateFish(biology, globalBiology))
-        );
+        for (Fad fad : allFads().collect(Collectors.toList())) { // use copy, as FADs can be removed
+            final Optional<SeaTile> seaTile = getFadTile(fad)
+                .filter(SeaTile::isWater);
+            if (seaTile.isPresent())
+                fad.aggregateFish(seaTile.get(), globalBiology);
+            else
+                remove(fad);
+        }
     }
 
     @NotNull
-    public Stream<Fad> allFads() {
+    private Stream<Fad> allFads() {
         return driftingObjectsMap.objects().map(o -> (Fad) o);
     }
 
     @NotNull
     public Optional<SeaTile> getFadTile(Fad fad) {
-        return getFadLocation(fad).flatMap(this::getSeaTile);
+        return Optional
+            .ofNullable(driftingObjectsMap.getObjectLocation(fad))
+            .flatMap(this::getSeaTile);
     }
 
-    @NotNull
-    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
-        return Optional.of(seaTile)
-            .map(SeaTile::getBiology)
-            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
-            .map(biology -> (VariableBiomassBasedBiology) biology);
-    }
-
-    @NotNull Optional<Double2D> getFadLocation(Fad fad) {
-        return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
-    }
+    public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
 
     @NotNull
     private Optional<SeaTile> getSeaTile(Double2D location) {
@@ -99,31 +101,13 @@ public class FadMap implements Startable, Steppable {
         );
     }
 
-    public void deployFad(Fad fad, Double2D location) {
-        driftingObjectsMap.add(fad, location, onMove(fad));
-    }
-
     @NotNull
-    private BiConsumer<Double2D, Optional<Double2D>> onMove(Fad fad) {
-        return (oldLoc, newLoc) -> {
-            final Optional<SeaTile> newSeaTile = newLoc.flatMap(this::getSeaTile);
-            if (newSeaTile.isPresent()) {
-                if (newSeaTile.get().isLand()) {
-                    // When the FAD hits land, we need to release the aggregated fish in the sea tile it
-                    // previously occupied and then tell the drifting object map that the FAD should be removed
-                    // (which will in turn trigger another call back to this function).
-                    getSeaTile(oldLoc)
-                        .flatMap(FadMap::getVariableBiomassBasedBiology)
-                        .ifPresent(biology -> fad.releaseFish(biology, globalBiology));
-                    remove(fad);
-                }
-            } else {
-                // The FAD does not have a location anymore, either because is has drifted off the map
-                // or because it was explicitly removed. In that case, all that's left to do is to tell
-                // the FAD's owner about it.
-                fad.getOwner().loseFad(fad);
-            }
-        };
+    public Fad deployFad(FadManager owner, Double2D location) {
+        Fad fad = fadFactory.apply(owner);
+        driftingObjectsMap.add(fad, location, (oldLoc, newLoc) -> {
+            if (!newLoc.flatMap(this::getSeaTile).isPresent()) fad.getOwner().loseFad(fad);
+        });
+        return fad;
     }
 
     public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
