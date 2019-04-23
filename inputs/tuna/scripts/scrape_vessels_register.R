@@ -10,15 +10,15 @@ pages_df <-
   html_nodes(".VesselNameLink > a") %>%
   html_attr("href") %>%
   paste0(base_url, .) %>%
-  map_df(~tibble(url = ., html = map(url, read_html)))
+  map_df(~ tibble(url = ., html = map(url, read_html)))
 
 df <-
   pages_df %>%
   transmute(
     url = url,
-    name = map_chr(html, ~html_text(html_node(., ".VesselNameTitle"))),
-    activity = map_chr(html, ~html_text(html_node(., ".VesselActivity"))),
-    details = map(html, ~html_node(., "#DetailsTable") %>%
+    name = map_chr(html, ~ html_text(html_node(., ".VesselNameTitle"))),
+    activity = map_chr(html, ~ html_text(html_node(., ".VesselActivity"))),
+    details = map(html, ~ html_node(., "#DetailsTable") %>%
       html_table(fill = TRUE) %>%
       transmute(
         key = if_else(X2 == X3, X1, X2),
@@ -28,5 +28,7 @@ df <-
   ) %>%
   unnest() %>%
   spread(key, value) %>%
-  mutate_all(~ifelse(. == "", NA, .)) %>%
-  write_csv(here("raw", "vessels_register.csv"))
+  mutate_all(~ ifelse(. == "", NA, .)) %>%
+  arrange(`IATTC Vessel Number`)
+
+write_csv(df, here("raw", "vessels_register.csv"))
