@@ -22,26 +22,17 @@ public class FadManager {
     private FadInitializer fadInitializer;
     private Fisher fisher;
     private int numFadsInStock;
-
-    public FadManager(FadMap fadMap, FadInitializer fadInitializer, int numFadsInStock) {
-        this.fadInitializer = fadInitializer;
+    public FadManager(FadMap fadMap, int numFadsInStock) {
         checkArgument(numFadsInStock >= 0);
         this.numFadsInStock = numFadsInStock;
         this.fadMap = fadMap;
     }
-
     public Fisher getFisher() { return fisher; }
-
     public void setFisher(Fisher fisher) {
         this.fisher = fisher;
     }
-
     public ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
-
     public FadMap getFadMap() { return fadMap; }
-
-    public boolean anyFadsHere() { return !getFadsHere().isEmpty(); }
-
     private Bag getFadsHere() {
         checkNotNull(fisher);
         return fadMap.fadsAt(fisher.getLocation());
