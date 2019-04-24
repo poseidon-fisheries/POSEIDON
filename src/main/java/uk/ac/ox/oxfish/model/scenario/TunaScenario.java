@@ -201,6 +201,7 @@ public class TunaScenario implements Scenario {
                 ));
                 fisherFactory.setHoldSupplier(() -> new Hold(
                     record.getDouble("carrying_capacity_in_t") * 1000,
+                    record.getInt("hold_volume_in_m3"),
                     model.getBiology()
                 ));
                 return fisherFactory.buildFisher(model);

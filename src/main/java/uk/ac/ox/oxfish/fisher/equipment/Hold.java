@@ -22,8 +22,6 @@ package uk.ac.ox.oxfish.fisher.equipment;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
-import javax.measure.Quantity;
-import javax.measure.quantity.Volume;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
@@ -54,7 +52,7 @@ public class Hold {
      *  As of now, this is only used to establish the IATTC vessel class of purse seiners;
      *  it doesn't enter in any actual capacity calculations: that's the job of `maximumLoadInKg`.
      */
-    private final Optional<Quantity<Volume>> volume;
+    private final Optional<Integer> volumeInCubicMetres;
 
     private double[] fishHold;
 
@@ -67,17 +65,17 @@ public class Hold {
 
     private Hold(
         double maximumLoadInKg,
-        Optional<Quantity<Volume>> volume,
+        Optional<Integer> volumeInCubicMetres,
         GlobalBiology biology
     ) {
         this.maximumLoad = maximumLoadInKg;
-        this.volume = volume;
+        this.volumeInCubicMetres = volumeInCubicMetres;
         this.biology = biology;
         fishHold = new double[biology.getSize()];
     }
 
-    public Hold(double maximumLoadInKg, Quantity<Volume> volume, GlobalBiology biology) {
-        this(maximumLoadInKg, Optional.of(volume), biology);
+    public Hold(double maximumLoadInKg, int volumeInCubicMetres, GlobalBiology biology) {
+        this(maximumLoadInKg, Optional.of(volumeInCubicMetres), biology);
     }
 
     /**
@@ -292,8 +290,8 @@ public class Hold {
         return weightCaughtBinned[species.getIndex()][bin];
     }
 
-    public Optional<Quantity<Volume>> getVolume() {
-        return volume;
+    public Optional<Integer> getVolumeInCubicMetres() {
+        return volumeInCubicMetres;
     }
 
 }
