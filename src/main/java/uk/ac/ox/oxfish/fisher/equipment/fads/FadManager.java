@@ -19,21 +19,17 @@ public class FadManager {
     private final ListOrderedSet<Fad> deployedFads = new ListOrderedSet<>();
     private Fisher fisher;
     private int numFadsInStock;
-
     public FadManager(FadMap fadMap, int numFadsInStock) {
         checkArgument(numFadsInStock >= 0);
         this.numFadsInStock = numFadsInStock;
         this.fadMap = fadMap;
     }
-
-    public ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
-
-    public FadMap getFadMap() { return fadMap; }
-
+    public Fisher getFisher() { return fisher; }
     public void setFisher(Fisher fisher) {
         this.fisher = fisher;
     }
-
+    public ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
+    public FadMap getFadMap() { return fadMap; }
     private Bag getFadsHere() {
         checkNotNull(fisher);
         return fadMap.fadsAt(fisher.getLocation());
