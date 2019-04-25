@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.DiffusingLogisticFactory;
@@ -43,6 +44,7 @@ import java.util.function.Supplier;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.sis.measure.Units.CUBIC_METRE;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
@@ -199,7 +201,7 @@ public class TunaScenario implements Scenario {
                 ));
                 fisherFactory.setHoldSupplier(() -> new Hold(
                     record.getDouble("carrying_capacity_in_t") * 1000,
-                    record.getInt("hold_volume_in_m3"),
+                    Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE),
                     model.getBiology()
                 ));
                 return fisherFactory.buildFisher(model);

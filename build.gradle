@@ -102,6 +102,8 @@ dependencies
     compile "com.google.guava:guava:23.0"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
+    // Apache SIS, useful for reading netCDF files, units of measure and coordinate operations
+    compile group: 'org.apache.sis.core', name: 'sis-referencing', version: '0.8'
 
 }
 
