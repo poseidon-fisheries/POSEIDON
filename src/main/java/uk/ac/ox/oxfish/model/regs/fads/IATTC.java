@@ -2,15 +2,19 @@ package uk.ac.ox.oxfish.model.regs.fads;
 
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 
+import static org.apache.sis.measure.Units.CUBIC_METRE;
+import static uk.ac.ox.oxfish.model.regs.fads.IATTC.CapacityClass.*;
+
 public class IATTC {
 
-    private static int volumeInCubicMetres(Hold hold) {
-        return hold.getVolumeInCubicMetres().orElseThrow(() -> new IllegalArgumentException(
-            hold + " doesn't have the volume information needed to establish its IATTC class."
-        ));
+    private static long volumeInCubicMetres(Hold hold) {
+        return hold.getVolume()
+            // Hold volumes should normally be integers, but we round just in case
+            .map(v -> Math.round(v.to(CUBIC_METRE).getValue().doubleValue()))
+            .orElseThrow(() -> new IllegalArgumentException(
+                hold + " doesn't have the volume information needed to establish its IATTC class."
+            ));
     }
-
-    public static int capacityClass(Hold hold) { return capacityClass(volumeInCubicMetres(hold)); }
 
     /**
      * I couldn't find the canonical source for this, but it's stated in a few places, notably
@@ -18,27 +22,35 @@ public class IATTC {
      * It seems that around 2010, IATTC changed from weight based capacity classes to volume based
      * ones because the latter is more objective.
      */
-    public static int capacityClass(int holdVolumeInCubicMetres) {
-        final int v = holdVolumeInCubicMetres;
-        if (v < 54) return 1;
-        else if (v < 108) return 2;
-        else if (v < 213) return 3;
-        else if (v < 319) return 4;
-        else if (v <= 425) return 2;
-        else return 6;
+    public static CapacityClass capacityClass(Hold hold) {
+        final long v = volumeInCubicMetres(hold);
+        if (v < 54) return CLASS_1;
+        else if (v < 108) return CLASS_2;
+        else if (v < 213) return CLASS_3;
+        else if (v < 319) return CLASS_4;
+        else if (v <= 425) return CLASS_5;
+        else return CLASS_6;
     }
 
     /**
      * Return the number of FADs that can be active at the same time for purse seine vessels
-     * according to IATTC resolution C-17-02.8.
-     * This is currently hard coded, but we'll most likely want to make this changeable.
+     * according to IATTC resolution C-17-02.8. This is currently hard coded, but we'll most likely
+     * want to make this changeable.
      */
     public static int activeFadsLimit(Hold hold) {
-        final int c = capacityClass(hold);
-        if (c <= 3) return 70;
-        else if (c <= 5) return 120;
-        else if (volumeInCubicMetres(hold) < 1200) return 300;
-        else return 450;
+        switch (capacityClass(hold)) {
+            case CLASS_1:
+            case CLASS_2:
+            case CLASS_3:
+                return 70;
+            case CLASS_4:
+            case CLASS_5:
+                return 120;
+            default:
+                return volumeInCubicMetres(hold) < 1200 ? 300 : 450;
+        }
     }
+
+    public enum CapacityClass {CLASS_1, CLASS_2, CLASS_3, CLASS_4, CLASS_5, CLASS_6}
 
 }
