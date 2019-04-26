@@ -3,13 +3,12 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -46,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
@@ -66,19 +66,25 @@ public class TunaScenario implements Scenario {
     private FromFileMapInitializerFactory mapInitializer =
         new FromFileMapInitializerFactory(MAP_FILE, 120);
     private FadMapFactory fadMap = new FadMapFactory(CURRENTS_FILE);
-    private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer = new DiffusingLogisticFactory();
+    private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-
     public TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FollowPlanFadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new RandomPlanFadDestinationStrategyFactory());
     }
 
-    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() {
+        return biologyInitializers;
+    }
+
+    public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) {
+        this.biologyInitializers = biologyInitializers;
+    }
+
     public Path getPortFilePath() {
         return portInitializer.getFilePath();
     }
@@ -98,17 +104,6 @@ public class TunaScenario implements Scenario {
         this.mapInitializer = mapInitializer;
     }
 
-    public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializer() {
-        return biologyInitializer;
-    }
-
-    public void setBiologyInitializer(
-        AlgorithmFactory<? extends BiologyInitializer> biologyInitializer
-    ) {
-        this.mapInitializer = mapInitializer;
-    }
-
-    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
         return weatherInitializer;
     }
@@ -226,4 +221,45 @@ public class TunaScenario implements Scenario {
 
     }
 
+    public static class TunaSpeciesBiomassInitializerFactory
+        implements AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
+        private SingleSpeciesBiomassFactory bigeyeBiomassInitializer = new SingleSpeciesBiomassFactory();
+        private SingleSpeciesBiomassFactory yellowfinBiomassInitializer = new SingleSpeciesBiomassFactory();
+        private SingleSpeciesBiomassFactory skipjackBiomassInitializer = new SingleSpeciesBiomassFactory();
+
+        {
+            bigeyeBiomassInitializer.setSpeciesName("Bigeye");
+            // Steepness is "r" from Total_OCIATTC_PT_results_n=1.csv, for now
+            bigeyeBiomassInitializer.setGrower(new CommonLogisticGrowerFactory(0.530001));
+            bigeyeBiomassInitializer.setInitialBiomassAllocator(new ConstantAllocatorFactory());
+
+            yellowfinBiomassInitializer.setSpeciesName("Yellowfin");
+            yellowfinBiomassInitializer.setGrower(new CommonLogisticGrowerFactory());
+
+            skipjackBiomassInitializer.setSpeciesName("Skipjack");
+            skipjackBiomassInitializer.setGrower(new CommonLogisticGrowerFactory());
+        }
+
+        public SingleSpeciesBiomassFactory getBigeyeBiomassInitializer() {
+            return bigeyeBiomassInitializer;
+        }
+
+        public SingleSpeciesBiomassFactory getYellowfinBiomassInitializer() {
+            return yellowfinBiomassInitializer;
+        }
+
+        public SingleSpeciesBiomassFactory getSkipjackBiomassInitializer() {
+            return skipjackBiomassInitializer;
+        }
+
+        @Override
+        public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
+            final List<SingleSpeciesBiomassInitializer> biomassInitializers =
+                Stream.of(bigeyeBiomassInitializer, yellowfinBiomassInitializer, skipjackBiomassInitializer)
+                    .map(factory -> factory.apply(fishState)).collect(toList());
+            return new MultipleIndependentSpeciesBiomassInitializer(
+                biomassInitializers, false, false
+            );
+        }
+    }
 }
