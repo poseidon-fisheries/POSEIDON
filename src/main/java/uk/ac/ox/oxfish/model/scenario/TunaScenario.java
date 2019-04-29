@@ -38,6 +38,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -71,6 +72,7 @@ public class TunaScenario implements Scenario {
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private int numberOfFishersPerPort = 300;
     private FisherDefinition fisherDefinition = new FisherDefinition();
+
     public TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FollowPlanFadFishingStrategyFactory());
@@ -193,18 +195,14 @@ public class TunaScenario implements Scenario {
 
         final List<Fisher> fishers =
             parseAllRecords(BOATS_FILE).stream().map(record -> {
-                fisherFactory.setPortSupplier(() -> portsByName.get(record.getString("port_name")));
-                fisherFactory.setBoatSupplier(() -> new Boat(
-                    record.getDouble("length_in_m"),
-                    record.getDouble("beam_in_m"),
-                    engineSupplier.get(),
-                    fuelTankSupplier.get()
-                ));
-                fisherFactory.setHoldSupplier(() -> new Hold(
-                    record.getDouble("carrying_capacity_in_t") * 1000,
-                    Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE),
-                    model.getBiology()
-                ));
+                final String portName = record.getString("port_name");
+                final Double length = record.getDouble("length_in_m");
+                final Double beam = record.getDouble("beam_in_m");
+                final double carryingCapacity = record.getDouble("carrying_capacity_in_t") * 1000;
+                final Volume holdVolume = Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                fisherFactory.setPortSupplier(() -> portsByName.get(portName));
+                fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engineSupplier.get(), fuelTankSupplier.get()));
+                fisherFactory.setHoldSupplier(() -> new Hold(carryingCapacity, holdVolume, model.getBiology()));
                 return fisherFactory.buildFisher(model);
             }).collect(toList());
 
