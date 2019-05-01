@@ -8,7 +8,8 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -38,6 +39,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import javax.measure.quantity.Mass;
 import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +53,10 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.sis.measure.Units.CUBIC_METRE;
+import static org.apache.sis.measure.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
+import static uk.ac.ox.oxfish.utility.Measures.TONNE;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 public class TunaScenario implements Scenario {
@@ -61,6 +66,7 @@ public class TunaScenario implements Scenario {
     public static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
     public static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
     public static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
+    public static final Path HABITABILITY_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
 
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer =
@@ -198,11 +204,11 @@ public class TunaScenario implements Scenario {
                 final String portName = record.getString("port_name");
                 final Double length = record.getDouble("length_in_m");
                 final Double beam = record.getDouble("beam_in_m");
-                final double carryingCapacity = record.getDouble("carrying_capacity_in_t") * 1000;
+                final Mass carryingCapacity = Quantities.create(record.getDouble("carrying_capacity_in_t"), TONNE);
                 final Volume holdVolume = Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
                 fisherFactory.setPortSupplier(() -> portsByName.get(portName));
                 fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engineSupplier.get(), fuelTankSupplier.get()));
-                fisherFactory.setHoldSupplier(() -> new Hold(carryingCapacity, holdVolume, model.getBiology()));
+                fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
                 return fisherFactory.buildFisher(model);
             }).collect(toList());
 
@@ -225,39 +231,56 @@ public class TunaScenario implements Scenario {
 
     public static class TunaSpeciesBiomassInitializerFactory
         implements AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
-        private SingleSpeciesBiomassFactory bigeyeBiomassInitializer = new SingleSpeciesBiomassFactory();
-        private SingleSpeciesBiomassFactory yellowfinBiomassInitializer = new SingleSpeciesBiomassFactory();
-        private SingleSpeciesBiomassFactory skipjackBiomassInitializer = new SingleSpeciesBiomassFactory();
+        // Current parameter source is: `POSEIDON Tuna Team Folder/Surplus production model/Total_OCIATTC_PT_results_n=2.csv`
+        private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = makeBiomassInitializerFactory(
+            "Bigeye",
+            0.519167947920457, // logistic growth rate (r) (TODO: confirm number)
+            Quantities.create(694817, TONNE), // total carrying capacity (K) (TODO: confirm number)
+            Quantities.create(400000, TONNE), // total biomass (TODO: get real number instead of eyeballing from the plot)
+            HABITABILITY_BET_FILE
+        );
+        // TODO: private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory("Yellowfin", ...);
+        // TODO: private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory("Skipjack", ...);
 
-        {
-            bigeyeBiomassInitializer.setSpeciesName("Bigeye");
-            // Steepness is "r" from Total_OCIATTC_PT_results_n=1.csv, for now
-            bigeyeBiomassInitializer.setGrower(new CommonLogisticGrowerFactory(0.530001));
-            bigeyeBiomassInitializer.setInitialBiomassAllocator(new ConstantAllocatorFactory());
+        private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
+            String speciesName,
+            double logisticGrowthRate,
+            Mass totalCarryingCapacity,
+            Mass totalBiomass,
+            Path initialCapacityFile
+        ) {
+            final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
+            factory.setSpeciesName(speciesName);
+            factory.setGrower(new CommonLogisticGrowerFactory(logisticGrowthRate));
+            factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
+            factory.setBiomassSuppliedPerCell(false);
 
-            yellowfinBiomassInitializer.setSpeciesName("Yellowfin");
-            yellowfinBiomassInitializer.setGrower(new CommonLogisticGrowerFactory());
+            final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
+            factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-            skipjackBiomassInitializer.setSpeciesName("Skipjack");
-            skipjackBiomassInitializer.setGrower(new CommonLogisticGrowerFactory());
+            final CoordinateFileAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
+            initialCapacityAllocator.setBiomassPath(initialCapacityFile);
+            initialCapacityAllocator.setInputFileHasHeader(true);
+            factory.setInitialCapacityAllocator(initialCapacityAllocator);
+
+            return factory;
         }
 
-        public SingleSpeciesBiomassFactory getBigeyeBiomassInitializer() {
+        private CoordinateFileAllocatorFactory makeCoordinateFileAllocatorFactory(Path path) {
+            final CoordinateFileAllocatorFactory factory = new CoordinateFileAllocatorFactory();
+            factory.setBiomassPath(path);
+            factory.setInputFileHasHeader(true);
+            return factory;
+        }
+
+        public SingleSpeciesBiomassNormalizedFactory getBigeyeBiomassInitializer() {
             return bigeyeBiomassInitializer;
-        }
-
-        public SingleSpeciesBiomassFactory getYellowfinBiomassInitializer() {
-            return yellowfinBiomassInitializer;
-        }
-
-        public SingleSpeciesBiomassFactory getSkipjackBiomassInitializer() {
-            return skipjackBiomassInitializer;
         }
 
         @Override
         public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
             final List<SingleSpeciesBiomassInitializer> biomassInitializers =
-                Stream.of(bigeyeBiomassInitializer, yellowfinBiomassInitializer, skipjackBiomassInitializer)
+                Stream.of(bigeyeBiomassInitializer) // TODO: yellowfinBiomassInitializer, skipjackBiomassInitializer
                     .map(factory -> factory.apply(fishState)).collect(toList());
             return new MultipleIndependentSpeciesBiomassInitializer(
                 biomassInitializers, false, false
