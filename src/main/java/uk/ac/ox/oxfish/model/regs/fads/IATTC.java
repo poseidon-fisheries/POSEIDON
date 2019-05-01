@@ -4,13 +4,14 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 
 import static org.apache.sis.measure.Units.CUBIC_METRE;
 import static uk.ac.ox.oxfish.model.regs.fads.IATTC.CapacityClass.*;
+import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 public class IATTC {
 
     private static long volumeInCubicMetres(Hold hold) {
         return hold.getVolume()
             // Hold volumes should normally be integers, but we round just in case
-            .map(v -> Math.round(v.to(CUBIC_METRE).getValue().doubleValue()))
+            .map(v -> Math.round(asDouble(v, CUBIC_METRE)))
             .orElseThrow(() -> new IllegalArgumentException(
                 hold + " doesn't have the volume information needed to establish its IATTC class."
             ));
