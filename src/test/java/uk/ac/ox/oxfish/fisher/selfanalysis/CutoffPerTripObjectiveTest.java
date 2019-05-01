@@ -45,12 +45,12 @@ public class CutoffPerTripObjectiveTest {
         Fisher fisher = mock(Fisher.class);
         TripLogger logger = new TripLogger();
         logger.setNumberOfSpecies(1);
-        logger.newTrip(0);
+        logger.newTrip(0,0);
         logger.recordCosts(100);
         logger.recordEarnings(0,1,100);
         logger.finishTrip(10, mock(Port.class));
 
-        logger.newTrip(0);
+        logger.newTrip(0,0);
         logger.recordCosts(100);
         logger.recordEarnings(0,1,200);
         logger.finishTrip(10,mock(Port.class) );

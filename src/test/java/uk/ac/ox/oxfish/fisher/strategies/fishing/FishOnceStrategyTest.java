@@ -43,7 +43,7 @@ public class FishOnceStrategyTest
     @Test
     public void fishOnce() throws Exception {
 
-        TripRecord record = new TripRecord(1,100d);
+        TripRecord record = new TripRecord(1,100d,0);
 
         FishOnceStrategy strategy = new FishOnceFactory().apply(mock(FishState.class));
 

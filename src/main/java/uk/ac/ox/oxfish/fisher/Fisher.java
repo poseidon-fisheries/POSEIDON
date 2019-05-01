@@ -456,11 +456,11 @@ public class Fisher implements Steppable, Startable{
     /**
      * departs
      */
-    public void undock(FishState model) {
+    public void undock() {
         assert this.status.getHoursAtSea() == 0;
         assert isAtPort();
         status.getHomePort().depart(this);
-        memory.getTripLogger().newTrip(getHoursAtPort(), model.getDay());
+        memory.getTripLogger().newTrip(getHoursAtPort(), state.getDay());
         status.setHoursAtPort(0);
     }
 

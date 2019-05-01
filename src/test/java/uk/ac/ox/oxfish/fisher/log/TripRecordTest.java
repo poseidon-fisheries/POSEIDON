@@ -37,7 +37,7 @@ public class TripRecordTest {
     @Test
     public void records() throws Exception 
     {
-        TripRecord record = new TripRecord(1, 0d);
+        TripRecord record = new TripRecord(1, 0d,0);
         record.recordCosts(100);
         record.recordEarnings(0,1,200);
         record.completeTrip(10, mock(Port.class));
@@ -49,7 +49,7 @@ public class TripRecordTest {
     public void opportunityCosts() throws Exception {
 
 
-        TripRecord record = new TripRecord(1, 123d);
+        TripRecord record = new TripRecord(1, 123d,0);
         record.recordCosts(100);
         record.recordOpportunityCosts(50);
         record.recordEarnings(0,1,200);
@@ -60,7 +60,7 @@ public class TripRecordTest {
 
     @Test
     public void profitsAreCorrect() throws Exception {
-        TripRecord record = new TripRecord(2,123d );
+        TripRecord record = new TripRecord(2,123d,0 );
         record.recordCosts(100);
         record.recordEarnings(0,1,200);
         record.recordEarnings(1,1,100);
