@@ -64,10 +64,10 @@ public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
-    public static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
-    public static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
-    public static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
-    public static final Path HABITABILITY_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
+    private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
+    private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
+    private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
+    private static final Path HABITABILITY_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
 
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer =
@@ -79,20 +79,23 @@ public class TunaScenario implements Scenario {
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
 
-    public TunaScenario() {
+    TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FollowPlanFadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new RandomPlanFadDestinationStrategyFactory());
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() {
         return biologyInitializers;
     }
 
+    @SuppressWarnings("unused")
     public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) {
         this.biologyInitializers = biologyInitializers;
     }
 
+    @SuppressWarnings("unused")
     public Path getPortFilePath() {
         return portInitializer.getFilePath();
     }
@@ -112,6 +115,7 @@ public class TunaScenario implements Scenario {
         this.mapInitializer = mapInitializer;
     }
 
+    @SuppressWarnings("unused")
     public AlgorithmFactory<? extends WeatherInitializer> getWeatherInitializer() {
         return weatherInitializer;
     }
@@ -262,13 +266,7 @@ public class TunaScenario implements Scenario {
             return factory;
         }
 
-        private CoordinateFileAllocatorFactory makeCoordinateFileAllocatorFactory(Path path) {
-            final CoordinateFileAllocatorFactory factory = new CoordinateFileAllocatorFactory();
-            factory.setBiomassPath(path);
-            factory.setInputFileHasHeader(true);
-            return factory;
-        }
-
+        @SuppressWarnings("unused")
         public SingleSpeciesBiomassNormalizedFactory getBigeyeBiomassInitializer() {
             return bigeyeBiomassInitializer;
         }
