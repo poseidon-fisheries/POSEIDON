@@ -94,6 +94,7 @@ public class CentroidMapDiscretizerTest {
                         0,1
                 )
         );
+        state.getMap().recomputeTilesMPA();
 
         assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
         assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
@@ -127,6 +128,7 @@ public class CentroidMapDiscretizerTest {
                         0,1
                 )
         );
+        state.getMap().recomputeTilesMPA();
 
         assertEquals(new Coordinate(0.125,.875,0),state.getMap().getCoordinates(0, 0));
         assertEquals(new Coordinate(.875,0.125,0),state.getMap().getCoordinates(3, 3));
