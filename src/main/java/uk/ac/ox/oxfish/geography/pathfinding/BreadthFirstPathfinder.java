@@ -73,7 +73,7 @@ public class BreadthFirstPathfinder implements Pathfinder {
             for(Object next : neighbors)
             {
                 SeaTile neighbor = ((SeaTile) next);
-                if(neighbor.getAltitude()<0 && !cameFrom.containsKey(neighbor)) //ignore tiles that aren't in the sea or that we explored already
+                if(neighbor.getAltitude() <0 && !cameFrom.containsKey(neighbor)) //ignore tiles that aren't in the sea or that we explored already
                 {
                     frontier.add(neighbor);
                     cameFrom.put(neighbor,current);
