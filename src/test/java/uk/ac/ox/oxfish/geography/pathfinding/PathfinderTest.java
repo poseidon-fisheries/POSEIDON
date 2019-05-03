@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.geography.pathfinding;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.collections15.CollectionUtils;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -33,7 +32,7 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 import java.util.Deque;
 
-import static org.apache.commons.collections15.CollectionUtils.isEqualCollection;
+import static com.google.common.collect.Iterables.elementsEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -46,9 +45,8 @@ import static org.mockito.Mockito.mock;
  */
 public class PathfinderTest {
 
-
     @Test
-    public void simplePathfindingTest() throws Exception {
+    public void simplePathfindingTest() {
 
         //3x3 map, where  the middle column (0,1 and 1,1 but not 2,1) has land in it
         NauticalMap map = makeMap(new int[][]{
@@ -58,47 +56,56 @@ public class PathfinderTest {
         });
 
         //we want to go from 0,0 to 0,2
-        SeaTile start = map.getSeaTile(0,0);
-        SeaTile end = map.getSeaTile(0,2);
+        SeaTile start = map.getSeaTile(0, 0);
+        SeaTile end = map.getSeaTile(0, 2);
 
         //start with direct pathfinder
         StraightLinePathfinder liner = new StraightLinePathfinder();
         Deque<SeaTile> route = liner.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertEquals(route.size(), 3);
         route.poll();
-        assertEquals(route.peekFirst(),map.getSeaTile(0,1)); //it paths overland
-
-
+        assertEquals(route.peekFirst(), map.getSeaTile(0, 1)); //it paths overland
 
         //now let's do BreadthFirst
         BreadthFirstPathfinder breadthFirst = new BreadthFirstPathfinder();
         route = breadthFirst.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertTrue(route.size() > 3);
-        assertTrue(!route.contains(map.getSeaTile(0,1)));
-        assertTrue(!route.contains(map.getSeaTile(1,1)));
+        assertFalse(route.contains(map.getSeaTile(0, 1)));
+        assertFalse(route.contains(map.getSeaTile(1, 1)));
         route.poll();
-
 
         //let's do A*
         AStarPathfinder star = new AStarPathfinder(new CartesianDistance(1));
         route = star.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertEquals(route.size(), 5);
-        assertTrue(!route.contains(map.getSeaTile(0,1)));
-        assertTrue(!route.contains(map.getSeaTile(1,1)));
+        assertFalse(route.contains(map.getSeaTile(0, 1)));
+        assertFalse(route.contains(map.getSeaTile(1, 1)));
         route.poll();
     }
 
+    private NauticalMap makeMap(int[][] altitude) {
+        assert (altitude.length > 0);
+        ObjectGrid2D grid2D = new ObjectGrid2D(altitude.length, altitude[0].length);
+        for (int i = 0; i < altitude.length; i++)
+            for (int j = 0; j < altitude[i].length; j++)
+                grid2D.set(i, j, new SeaTile(i, j, altitude[i][j], new TileHabitat(0d)));
+        return new NauticalMap(
+            new GeomGridField(grid2D), new GeomVectorField(),
+            new CartesianDistance(1), mock(Pathfinder.class)
+        );
+    }
+
     @Test
-    public void fallbackPathfindingTest() throws Exception {
+    public void fallbackPathfindingTest() {
 
         NauticalMap map = makeMap(new int[][]{
             {-1, 10, -1},
@@ -120,10 +127,10 @@ public class PathfinderTest {
             topLeft, map.getSeaTile(1, 0), bottomLeft
         );
         final Deque<SeaTile> straightRoute = fallbackPathfinder.getRoute(map, topLeft, bottomLeft);
-        assertTrue(isEqualCollection(straightRoute, expectedStraightRoute));
-        assertTrue(isEqualCollection(straightRoute, aStarPathfinder.getRoute(map, topLeft, bottomLeft)));
-        assertTrue(isEqualCollection(straightRoute, breadthFirstPathfinder.getRoute(map, topLeft, bottomLeft)));
-        assertTrue(isEqualCollection(straightRoute, straightLinePathfinder.getRoute(map, topLeft, bottomLeft)));
+        assertTrue(elementsEqual(straightRoute, expectedStraightRoute));
+        assertTrue(elementsEqual(straightRoute, aStarPathfinder.getRoute(map, topLeft, bottomLeft)));
+        assertTrue(elementsEqual(straightRoute, breadthFirstPathfinder.getRoute(map, topLeft, bottomLeft)));
+        assertTrue(elementsEqual(straightRoute, straightLinePathfinder.getRoute(map, topLeft, bottomLeft)));
 
         // Route around land from top left to top right
         final Deque<SeaTile> routeAround = fallbackPathfinder.getRoute(map, topLeft, topRight);
@@ -134,10 +141,10 @@ public class PathfinderTest {
             map.getSeaTile(1, 2),
             topRight
         );
-        assertTrue(isEqualCollection(routeAround, expectedRouteAround));
-        assertTrue(isEqualCollection(routeAround, aStarPathfinder.getRoute(map, topLeft, topRight)));
-        assertTrue(isEqualCollection(routeAround, breadthFirstPathfinder.getRoute(map, topLeft, topRight)));
-        assertFalse(isEqualCollection(routeAround, straightLinePathfinder.getRoute(map, topLeft, topRight)));
+        assertTrue(elementsEqual(routeAround, expectedRouteAround));
+        assertTrue(elementsEqual(routeAround, aStarPathfinder.getRoute(map, topLeft, topRight)));
+        assertTrue(elementsEqual(routeAround, breadthFirstPathfinder.getRoute(map, topLeft, topRight)));
+        assertFalse(elementsEqual(routeAround, straightLinePathfinder.getRoute(map, topLeft, topRight)));
 
         // Fallback and aStar (but not StraightLine) should return null if the map is impassable
         // (BreadthFirstPathFinder would stall, so we're not testing it)
@@ -151,16 +158,6 @@ public class PathfinderTest {
         assertNull(fallbackPathfinder.getRoute(impassableMap, start, end));
         assertNull(aStarPathfinder.getRoute(impassableMap, start, end));
         assertNotNull(straightLinePathfinder.getRoute(impassableMap, start, end));
-    }
-
-    private NauticalMap makeMap(int[][] altitude) {
-        assert (altitude.length > 0);
-        ObjectGrid2D grid2D = new ObjectGrid2D(altitude.length, altitude[0].length);
-        for (int i = 0; i < altitude.length; i++)
-            for (int j = 0; j < altitude[i].length; j++)
-                grid2D.set(i, j, new SeaTile(i, j, altitude[i][j], new TileHabitat(0d)));
-        return new NauticalMap(new GeomGridField(grid2D), new GeomVectorField(),
-            new CartesianDistance(1), mock(Pathfinder.class));
     }
 
 }
