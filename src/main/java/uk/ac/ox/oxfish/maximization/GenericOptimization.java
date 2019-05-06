@@ -36,9 +36,9 @@ import java.util.*;
 
 public class GenericOptimization extends SimpleProblemDouble {
 
-    public static final double MINIMUM_CATCHABILITY = 9.0E-8;
+    public static final double MINIMUM_CATCHABILITY = 1.0E-5;
 
-    public static final double MAXIMUM_CATCHABILITY = 1.5E-3;
+    public static final double MAXIMUM_CATCHABILITY = 1.0E-3;
 
     private static final Path DEFAULT_PATH = Paths.get("docs",
             "indonesia_hub",
@@ -56,37 +56,81 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     {
 
-        for(int populations=0; populations<3; populations++) {
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Dover Sole.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Pristipomoides multidens.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Epinephelus areolatus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Sablefish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            //garbage collectors
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.proportionSimulatedToGarbage",
-                    0,
-                    .80
-            ));
-        }
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.proportionSimulatedToGarbage.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+
+        parameters.add(new SimpleOptimizationParameter(
+                "holdSizePerBoat",
+                2500,
+                15000
+        ));
+//
+//
+//        for(int populations=0; populations<3; populations++) {
+//
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Pristipomoides multidens.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Epinephelus areolatus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//
+//            //garbage collectors
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.proportionSimulatedToGarbage",
+//                    0,
+//                    .80
+//            ));
+//        }
 
         /*
         for(int species=0; species<4; species++)

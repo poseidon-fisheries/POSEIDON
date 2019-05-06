@@ -85,15 +85,29 @@ public class BoxCarSimulator {
 
         FishState state = new FishState();
 
+        GrowthBinByList meristicInstance = meristics.apply(state);
         BoxCarSimulator simulator = new BoxCarSimulator(
                 10000,
                 aging.apply(state),
                 maturity.apply(state),
-                meristics.apply(state),
+                meristicInstance,
                 process);
         StructuredAbundance structuredAbundance = simulator.virginCondition(state, 1000);
 
         System.out.println(structuredAbundance);
+
+        double spawningBiomass = 0;
+        //compute the cumulative spawning biomass
+        for(int i=0; i< structuredAbundance.getBins(); i++)
+        {
+            if(meristicInstance.getWeight(0,i) > 0 & meristicInstance.getLength(0,i)>=
+                    maturity.getLengthAtMaturity())
+                    spawningBiomass += meristicInstance.getWeight(0,i) *structuredAbundance.getAbundance(0,i);
+
+
+        }
+        System.out.println(spawningBiomass);
+
     }
 
 }

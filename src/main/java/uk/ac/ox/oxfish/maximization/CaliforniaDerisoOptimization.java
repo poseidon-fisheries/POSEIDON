@@ -1,38 +1,41 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.GarbageGearFactory;
-import uk.ac.ox.oxfish.fisher.equipment.gear.factory.RandomTrawlStringFactory;
+import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
+import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
-import uk.ac.ox.oxfish.model.scenario.DerisoCaliforniaScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     private String scenarioFile =
-            Paths.get("docs","paper3_dts","mark2",
-                    "exploratory","calibration","histograms","deriso_new_manual3.yaml").toString();
+            Paths.get("docs","groundfish","calibration","step1_catchability","clamped.yaml").toString();
+
+//
+//            Paths.get("docs","paper3_dts","mark2",
+//                    "exploratory","calibration","histograms","deriso_new_manual3.yaml").toString();
 
 
     private String summaryDirectory =
-            Paths.get("docs","paper3_dts","mark2",
-                    "exploratory","eva").toString();
+            Paths.get("docs","groundfish","calibration","step1_catchability").toString();
 
     private long seed = 0;
 
-
-    // basically how much a +1 in input means in terms of % change in parameter
-    private double multiplier =  .1;
 
 
     private int yearsToRun = 5;
@@ -41,35 +44,89 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
     //TARGETS
-    private static final double YELLOW_QUOTA = 800;
-    private static final double DOVER_QUOTA = 21190006.5696815;
-    private static final double LONGSPINE_QUOTA = 1788870.1;
-    private static final double SABLEFISH_QUOTA = 1418397.36611325;
-    private static final double SHORTSPINE_QUOTA = 1319456.10095308;
+    private static final double YELLOW_QUOTA = 600.0;
+    private static final double DOVER_QUOTA = 22234500;
+    private static final double LONGSPINE_QUOTA = 1966250.0;
+    private static final double SABLEFISH_QUOTA = 2724935;
+    private static final double SHORTSPINE_QUOTA = 1481600.056;
     private static final double[] YELLOW_ATTAINMENT = new double[]{6.6, 2};
-    private static final double[] DOVER_ATTAINMENT = new double[]{29.98 , 3.75};
-    private static final double[] LONGSPINE_ATTAINMENT = new double[]{48.425 , 4.61 };
-    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{49.714 , 4.71 };
-    private static final double[] SABLEFISH_ATTAINMENT = new double[]{91.8, 7.51264925998236};
-    private static final double[] HOURS_AT_SEA = new double[]{1024.32, 94.3844054915853};
-    private static final double[] PROFITS = new double[]{116019.255, 13962};
-    private static final double[] DISTANCE = new double[]{103.484794189846, 51.7606763378253};
-    private static final double[] DURATION = new double[]{60.70, 31.95};
+    private static final double[] DOVER_ATTAINMENT = new double[]{33.25 , 3.09};
+    private static final double[] LONGSPINE_ATTAINMENT = new double[]{51.5 , 5.06 };
+    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{52.5 , 5.06 };
+    private static final double[] SABLEFISH_ATTAINMENT = new double[]{83.65, 6.181};
+    private static final double[] HOURS_AT_SEA = new double[]{999.936, 120.382023907226};
+    private static final double[] PROFITS = new double[]{89308, 21331};
+    private static final double[] DISTANCE = new double[]{90.88762, 32};
+    private static final double[] DURATION = new double[]{69.097625, 33};
 
-
-    private double startingDoverCatchability = 6e-05;
-    private double startingLongspineCatchability = 2e-04;
-    private double startingSablefishCatchability = 3.17986760953e-05;
-    private double startingShortspineCatchability = 4.32282202495e-05;
-    private double startingYelloweyeCatchability = 4.11440673662e-07;
 
 
     private int runsPerSetting = 1;
 
+
+
+    /**
+     * list of all parameters that can be changed
+     */
+    private List<OptimizationParameter> parameters = new LinkedList<>();
+
+    private static final double MINIMUM_CATCHABILITY = 1.0e-05;
+    private static final double MAXIMUM_CATCHABILITY = 1.0e-03;
+
+    {
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Dover Sole.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Sablefish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.proportionSimulatedToGarbage",
+                0,
+                0.5
+        ));
+
+
+        parameters.add(new SimpleOptimizationParameter(
+                "holdSizePerBoat",
+                1500,
+                15000
+        ));
+
+
+        for (OptimizationParameter parameter : parameters) {
+            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
+        }
+    }
+
     @Override
     public double[] evaluate(double[] x) {
 
-        FishYAML yaml = new FishYAML();
         try {
             double error = 0;
             Path scenarioPath = Paths.get(scenarioFile);
@@ -77,16 +134,16 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
             for(int i=0; i<runsPerSetting; i++)
             {
-                DerisoCaliforniaScenario derisoScenario = yaml.loadAs(
-                        new FileReader(scenarioPath.toFile()),
-                        DerisoCaliforniaScenario.class);
+                FishYAML yaml = new FishYAML();
 
 
-                modifyScenarioFile(x, derisoScenario);
+
+                Scenario scenario = yaml.loadAs(new FileReader(Paths.get(scenarioFile).toFile()),Scenario.class);
+                prepareScenario(x, scenario);
 
 
-                FishState model = new FishState(getSeed()+i);
-                model.setScenario(derisoScenario);
+                FishState model = new FishState(System.currentTimeMillis());
+                model.setScenario(scenario);
                 model.start();
                 System.out.println("starting run");
                 while (model.getYear() < yearsToRun) {
@@ -193,51 +250,36 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     }
 
+    public void prepareScenario(double[] evaParameters, Scenario justReadScenario) {
+        int parameter=0;
+        for (OptimizationParameter optimizationParameter : parameters)
+        {
+            optimizationParameter.parametrize(justReadScenario,
+                    Arrays.copyOfRange(evaParameters,parameter,
+                            parameter+optimizationParameter.size()));
+            parameter+=optimizationParameter.size();
+        }
+    }
 
-    //saves best option so far
+
     public static void main(String[] args) throws IOException {
-        FishYAML yaml = new FishYAML();
+        double[] best = new double[]{ 7.356, 3.178, 5.895,-6.384,-5.930,-6.160, 1.701};
+
         CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
-
-        //produce local best
-        Path scenarioPath = Paths.get(optimization.scenarioFile);
+        FishYAML yaml = new FishYAML();
 
 
-        DerisoCaliforniaScenario derisoScenario = yaml.loadAs(
-                new FileReader(scenarioPath.toFile()),
-                DerisoCaliforniaScenario.class);
 
-
-        optimization.modifyScenarioFile(
-                //new double[]{ 0.610,-1.203,-1.558,-1.730,-0.601, 0.528}
-                new double[]{ 0.054,-0.482,-1.303,-0.947, 0.342,-1.823}
-                ,derisoScenario);
-
-        yaml.dump(derisoScenario,
-                new FileWriter(
-                        Paths.get("docs/paper3_dts/mark2/exploratory/calibration/histograms/",
-                                "deriso_hillclimber2.yaml").toFile()
-                ));
+        Scenario scenario = yaml.loadAs(
+                new FileReader(Paths.get(optimization.scenarioFile).toFile()),
+                Scenario.class);
+        optimization.prepareScenario(best,scenario);
+        yaml.dump(scenario,
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best.yaml").toFile()));
 
 
     }
 
-    public void modifyScenarioFile(double[] x, DerisoCaliforniaScenario derisoScenario) {
-        //change inputs
-        String dover = "0:"+String.valueOf(startingDoverCatchability * (1d+x[0]*multiplier));
-        String longspine = "1:"+String.valueOf(startingLongspineCatchability * (1d+x[1]*multiplier));
-        String sablefish = "2:"+String.valueOf(startingSablefishCatchability * (1d+x[2]*multiplier));
-        String shortspine ="3:"+ String.valueOf(startingShortspineCatchability * (1d+x[3]*multiplier));
-        String yelloweye = "4:"+String.valueOf(startingYelloweyeCatchability * (1d+x[4]*multiplier));
-
-
-        ((RandomTrawlStringFactory) ((GarbageGearFactory) derisoScenario.getGear()).getDelegate()).setCatchabilityMap(
-                dover+","+longspine+","+sablefish+","+shortspine+","+yelloweye
-        );
-
-        FixedDoubleParameter hold = (FixedDoubleParameter) derisoScenario.getHoldSizePerBoat();
-        hold.setFixedValue(hold.getFixedValue() * (1+x[5]*multiplier));
-    }
 
     //computes abs(x-mu)/sigma
     public static double deviation(DataColumn data,
@@ -260,16 +302,20 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                                              int yearsToSkip)
     {
 
+        attainment = attainment/100d;
+        standardDeviation = standardDeviation/100d;
         return Math.abs(
-                100*FishStateUtilities.getAverage(data,yearsToSkip)/quota - attainment
+                FishStateUtilities.getAverage(data,yearsToSkip)/quota - attainment
         )/standardDeviation;
+
+
 
     }
 
     @Override
     public int getProblemDimension() {
-        //5 catchabilities, 1 hold size
-        return 6;
+        //5 catchabilities + 1 garbage, 1 hold size
+        return 7;
     }
 
     public String getScenarioFile() {
@@ -296,13 +342,6 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         this.summaryDirectory = summaryDirectory;
     }
 
-    public double getMultiplier() {
-        return multiplier;
-    }
-
-    public void setMultiplier(double multiplier) {
-        this.multiplier = multiplier;
-    }
 
     public int getYearsToRun() {
         return yearsToRun;
@@ -320,45 +359,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         this.yearsToIgnore = yearsToIgnore;
     }
 
-    public double getStartingDoverCatchability() {
-        return startingDoverCatchability;
-    }
 
-    public void setStartingDoverCatchability(double startingDoverCatchability) {
-        this.startingDoverCatchability = startingDoverCatchability;
-    }
-
-    public double getStartingLongspineCatchability() {
-        return startingLongspineCatchability;
-    }
-
-    public void setStartingLongspineCatchability(double startingLongspineCatchability) {
-        this.startingLongspineCatchability = startingLongspineCatchability;
-    }
-
-    public double getStartingSablefishCatchability() {
-        return startingSablefishCatchability;
-    }
-
-    public void setStartingSablefishCatchability(double startingSablefishCatchability) {
-        this.startingSablefishCatchability = startingSablefishCatchability;
-    }
-
-    public double getStartingShortspineCatchability() {
-        return startingShortspineCatchability;
-    }
-
-    public void setStartingShortspineCatchability(double startingShortspineCatchability) {
-        this.startingShortspineCatchability = startingShortspineCatchability;
-    }
-
-    public double getStartingYelloweyeCatchability() {
-        return startingYelloweyeCatchability;
-    }
-
-    public void setStartingYelloweyeCatchability(double startingYelloweyeCatchability) {
-        this.startingYelloweyeCatchability = startingYelloweyeCatchability;
-    }
 
     public int getRunsPerSetting() {
         return runsPerSetting;
@@ -366,5 +367,14 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     public void setRunsPerSetting(int runsPerSetting) {
         this.runsPerSetting = runsPerSetting;
+    }
+
+
+    public List<OptimizationParameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<OptimizationParameter> parameters) {
+        this.parameters = parameters;
     }
 }

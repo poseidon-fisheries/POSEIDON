@@ -57,17 +57,16 @@ public class ArrayFilter  implements AbundanceFilter{
     @Override
     public double[][] filter(Species species, double[][] abundance) {
 
-        double[][] filtered = new double[abundance.length][abundance[0].length];
         for(int subdivision =0; subdivision < abundance.length; subdivision++)
         {
             for (int age = 0; age < abundance[subdivision].length; age++) {
-                filtered[subdivision][age] = (filters[subdivision][age] * abundance[subdivision][age]);
+                abundance[subdivision][age] = (filters[subdivision][age] * abundance[subdivision][age]);
                 if (round) {
-                    filtered[subdivision][age] =FishStateUtilities.quickRounding(filtered[subdivision][age]);
+                    abundance[subdivision][age] =FishStateUtilities.quickRounding(abundance[subdivision][age]);
                 }
 
             }
         }
-        return filtered;
+        return abundance;
     }
 }

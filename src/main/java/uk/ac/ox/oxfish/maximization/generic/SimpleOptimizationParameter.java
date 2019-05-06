@@ -47,6 +47,8 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
     private double maximum = 5;
 
 
+    private boolean alwaysPositive = false;
+
     public SimpleOptimizationParameter() {
     }
 
@@ -79,6 +81,10 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
         Preconditions.checkArgument(inputs.length==1);
 
         double realValue =minimum+((maximum-minimum)/(10-(-10)))*(inputs[0]- (-10));
+        if(realValue < 0 & alwaysPositive)
+            realValue = 0;
+
+
 
         //i am just going to do this the hackish way. The input could be a DoubleParameter or a straight up number. I will try the first, catch the exception
         // and try the second
@@ -170,5 +176,14 @@ public class SimpleOptimizationParameter implements OptimizationParameter {
      */
     public void setMaximum(double maximum) {
         this.maximum = maximum;
+    }
+
+
+    public boolean isAlwaysPositive() {
+        return alwaysPositive;
+    }
+
+    public void setAlwaysPositive(boolean alwaysPositive) {
+        this.alwaysPositive = alwaysPositive;
     }
 }
