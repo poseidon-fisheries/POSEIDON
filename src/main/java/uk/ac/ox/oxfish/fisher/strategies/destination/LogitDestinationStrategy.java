@@ -208,17 +208,22 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         if(!fisher.isAllowedAtSea())
             return;
 
-        double[][] input = this.input.getRegressionInput(fisher, state);
-        if(log!=null)
-            log.recordInput(input);
-        int armChosen = classifier.choose(input, random);
-        if(log!=null)
-            log.recordChoice(armChosen,
-                             state.getYear(),
-                             state.getDayOfTheYear());
+        SeaTile destination = null;
+        while(destination == null) {
+            double[][] input = this.input.getRegressionInput(fisher, state);
+            if (log != null)
+                log.recordInput(input);
+            int armChosen = classifier.choose(input, random);
+            if (log != null)
+                log.recordChoice(armChosen,
+                                 state.getYear(),
+                                 state.getDayOfTheYear());
 
-        
-        SeaTile destination = this.input.getLastExtraction().get(armChosen);
+
+            destination = this.input.getLastExtraction().get(armChosen);
+            if(destination.getAltitude()>0)
+                destination=null;
+        }
 
         delegate.setFavoriteSpot(destination);
 

@@ -34,7 +34,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     private String summaryDirectory =
             Paths.get("docs","groundfish","calibration","step1_catchability").toString();
 
-    private long seed = 0;
+    private long seed = 2;
 
 
 
@@ -104,12 +104,12 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 MINIMUM_CATCHABILITY,
                 MAXIMUM_CATCHABILITY
         ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.proportionSimulatedToGarbage",
-                0,
-                0.5
-        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.proportionSimulatedToGarbage",
+//                0,
+//                0.5
+//        ));
 
 
         parameters.add(new SimpleOptimizationParameter(
@@ -202,7 +202,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
                 error +=
                         deviation(
-                                model.getYearlyDataSet().getColumn("Actual Average Cash-Flow"),
+                                model.getYearlyDataSet().getColumn("Average Cash-Flow"),
                                 PROFITS[0],
                                 PROFITS[1],
                                 1
@@ -314,8 +314,8 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     @Override
     public int getProblemDimension() {
-        //5 catchabilities + 1 garbage, 1 hold size
-        return 7;
+        //5 catchabilities + (1 garbage) + 1 hold size
+        return 6;
     }
 
     public String getScenarioFile() {

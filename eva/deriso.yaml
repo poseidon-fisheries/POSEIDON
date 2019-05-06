@@ -10,13 +10,11 @@ parameters:
   alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Yelloweye Rockfish.averageCatchability,
   alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.proportionSimulatedToGarbage,
-  alwaysPositive: true, maximum: 0.5, minimum: 0.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
   alwaysPositive: true, maximum: 15000.0, minimum: 1500.0}
 runsPerSetting: 1
 scenarioFile: docs/groundfish/calibration/step1_catchability/clamped.yaml
-seed: 0
+seed: 2
 summaryDirectory: docs/groundfish/calibration/step1_catchability
 yearsToIgnore: 1
 yearsToRun: 5
