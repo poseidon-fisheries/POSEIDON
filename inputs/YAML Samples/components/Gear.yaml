@@ -89,3 +89,12 @@ Hold Upper Limit:
     Fixed Proportion:
       catchabilityPerHour: '0.01'
 -------
+Hour Delay Gear:
+  delegate:
+    Fixed Proportion:
+      catchabilityPerHour: '0.01'
+  hoursItTake: '12.0'
+-------
+Purse Seine Gear:
+  initialNumberOfFads: 400
+-------

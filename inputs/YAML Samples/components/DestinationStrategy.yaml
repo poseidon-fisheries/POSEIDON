@@ -81,7 +81,7 @@ SNALSAR:
   profit:
     Remembered Profits:
       includeOpportunityCosts: true
-  safety: Ignore Rules
+  safety: Socially Acceptable Everywhere
   sociallyAcceptable: Nobody Fishes Here
 -------
 Heatmap Based:
@@ -305,4 +305,7 @@ Replicator:
       explorationSize: '20.0'
       gravitationalConstant: '100.0'
       initialSpeed: '0.0'
+-------
+Random Plan FAD Destination Strategy:
+  numberOfStepsToPlan: 30
 -------

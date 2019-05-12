@@ -286,8 +286,15 @@ public class Catch {
     public static Catch sumCatches(Catch first,
                                    Catch second)
     {
+        //one might be empty, if so skip all this
+
+
         if(first.hasAbundanceInformation())
         {
+            if(!second.hasAbundanceInformation() && second.getTotalWeight() == 0)
+                //second is empty, it's okay
+                return first;
+
             Preconditions.checkState(second.hasAbundanceInformation(), "cannot sum up incongruent catches!");
             for(int species=0; species<first.abundance.length; species++)
             {
@@ -302,6 +309,10 @@ public class Catch {
 
         }
         else{
+            if(second.hasAbundanceInformation() && first.getTotalWeight() == 0)
+                //first is empty, it's okay
+                return second;
+
             Preconditions.checkState(!second.hasAbundanceInformation(), "cannot sum up incongruent catches!");
 
             double[] biomass = new double[first.biomassCaught.length];
