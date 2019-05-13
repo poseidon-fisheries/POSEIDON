@@ -80,6 +80,11 @@ public class Gears {
                          LogisticSelectivityGearFactory::new);
         NAMES.put(LogisticSelectivityGearFactory.class,"Logistic Selectivity Gear");
 
+
+        CONSTRUCTORS.put("Simple Logistic Selectivity Gear",
+                SimpleLogisticGearFactory::new);
+        NAMES.put(SimpleLogisticGearFactory.class,"Simple Logistic Selectivity Gear");
+
         CONSTRUCTORS.put("Double Normal Selectivity Gear",
                          DoubleNormalGearFactory::new);
         NAMES.put(DoubleNormalGearFactory.class,"Double Normal Selectivity Gear");
