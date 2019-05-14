@@ -84,6 +84,8 @@ public class DestinationStrategies
         NAMES.put(BetterThanAverageEroteticDestinationFactory.class,
                   "Better Than Average Erotetic");
 
+
+
         CONSTRUCTORS.put("SNALSAR",
                          SNALSARDestinationFactory::new);
         NAMES.put(SNALSARDestinationFactory.class,
@@ -113,6 +115,11 @@ public class DestinationStrategies
                          BanditDestinationFactory::new);
         NAMES.put(BanditDestinationFactory.class,
                   "Discretized Bandit");
+
+        CONSTRUCTORS.put("Simple Random Utility Model",
+                SimpleRUMDestinationFactory::new);
+        NAMES.put(SimpleRUMDestinationFactory.class,
+                "Simple Random Utility Model");
 
         CONSTRUCTORS.put("Florida Longliner",
                          FloridaLogitDestinationFactory::new);

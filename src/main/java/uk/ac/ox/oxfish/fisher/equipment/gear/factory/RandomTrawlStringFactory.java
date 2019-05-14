@@ -27,7 +27,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
-import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
 
 import java.util.Map;
 
@@ -72,7 +71,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
         Preconditions.checkArgument(catchabilities.size() > 0, "no catchability!");
         for(Map.Entry<String,String> catchability : catchabilities.entrySet())
         {
-            means[Integer.parseInt(catchability.getKey().trim())] = YamlConstructor.parseDoubleParameter(
+            means[Integer.parseInt(catchability.getKey().trim())] = DoubleParameter.parseDoubleParameter(
                     catchability.getValue().trim()
             ).apply(state.getRandom());
         }
@@ -81,7 +80,7 @@ public class RandomTrawlStringFactory implements AlgorithmFactory<RandomCatchabi
             Map<String, String> deviations = Splitter.on(",").withKeyValueSeparator(":").split(standardDeviationMap);
             assert !deviations.isEmpty();
                 for (Map.Entry<String, String> deviation : deviations.entrySet()) {
-                    std[Integer.parseInt(deviation.getKey().trim())] = YamlConstructor.parseDoubleParameter(
+                    std[Integer.parseInt(deviation.getKey().trim())] = DoubleParameter.parseDoubleParameter(
                             deviation.getValue().trim()
                     ).apply(state.getRandom());
                 }

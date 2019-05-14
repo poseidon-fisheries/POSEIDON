@@ -35,5 +35,32 @@ public interface DoubleParameter extends Function<MersenneTwisterFast,Double>
 {
 
 
+    static DoubleParameter parseDoubleParameter(String nodeContent) {
+        //trim and split
+        final String[] split = nodeContent.trim().replaceAll("(')|(\")", "").split("\\s+");
+
+        if(split[0].toLowerCase().trim().equals("nullparameter"))
+            return new NullParameter();
+
+        if(split.length == 1)
+            //fixed
+            return new FixedDoubleParameter(Double.parseDouble(split[0]));
+
+        if(split[0].toLowerCase().equals("normal"))
+            return new NormalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("uniform"))
+            return new UniformDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("sin"))
+            return new SinusoidalDoubleParameter(Double.parseDouble(split[1]), Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("select"))
+            return new SelectDoubleParameter(nodeContent.trim().replace("select",""));
+
+        throw new IllegalArgumentException("Do not recognize this double parameter!");
+
+    }
+
     DoubleParameter makeCopy();
 }

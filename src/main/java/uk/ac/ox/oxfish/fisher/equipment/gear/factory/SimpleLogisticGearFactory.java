@@ -2,12 +2,9 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
-import uk.ac.ox.oxfish.fisher.equipment.gear.SelectivityAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FixedProportionFilter;
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticAbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticSimpleFilter;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
