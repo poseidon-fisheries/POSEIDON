@@ -50,7 +50,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
     /**
      * this is either a fisher you are following or null, in which case I expect to look at all fishers!
      */
-    private final Fisher fisherTracked;
+    private Fisher fisherTracked;
 
     /**
      * this function is applied uncritically to all TripRecords to obtain a numerical value from them
@@ -190,5 +190,24 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
      */
     public double[] getLastYearAverage() {
         return lastYearAverage;
+    }
+
+
+    /**
+     * Getter for property 'fisherTracked'.
+     *
+     * @return Value for property 'fisherTracked'.
+     */
+    public Fisher getFisherTracked() {
+        return fisherTracked;
+    }
+
+    /**
+     * Setter for property 'fisherTracked'.
+     *
+     * @param fisherTracked Value to set for property 'fisherTracked'.
+     */
+    public void setFisherTracked(Fisher fisherTracked) {
+        this.fisherTracked = fisherTracked;
     }
 }
