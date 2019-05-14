@@ -54,9 +54,9 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
     /**
      * map linking species we want to study their CPUE of and the beta parameter associated with them
      */
-    private LinkedHashMap<String,String>  betaCPUE = new LinkedHashMap();
+    private LinkedHashMap<String,DoubleParameter>  betaCPUE = new LinkedHashMap();
     {
-        betaCPUE.put("Species 0", "1");
+        betaCPUE.put("Species 0", new FixedDoubleParameter(1));
     }
 
 
@@ -133,8 +133,8 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
         betas[0][1] = betaHabit.apply(state.getRandom());
         betas[0][2] = betaRevenue.apply(state.getRandom());
         int i=3;
-        for (Map.Entry<String, String> cpues : betaCPUE.entrySet()) {
-            betas[0][i] = DoubleParameter.parseDoubleParameter(cpues.getValue()).apply(state.getRandom());
+        for (Map.Entry<String, DoubleParameter> cpues : betaCPUE.entrySet()) {
+            betas[0][i] = cpues.getValue().apply(state.getRandom());
             i++;
         }
 
@@ -205,7 +205,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
                         discretization
                 )
         );
-        for (Map.Entry<String, String> cpueBeta : betaCPUE.entrySet()) {
+        for (Map.Entry<String, DoubleParameter> cpueBeta : betaCPUE.entrySet()) {
             extractors.add(
                     new TripLaggedExtractor(
                             new Function<TripRecord, Double>() {
@@ -251,11 +251,11 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
         this.betaRevenue = betaRevenue;
     }
 
-    public LinkedHashMap<String, String> getBetaCPUE() {
+    public LinkedHashMap<String, DoubleParameter> getBetaCPUE() {
         return betaCPUE;
     }
 
-    public void setBetaCPUE(LinkedHashMap<String, String> betaCPUE) {
+    public void setBetaCPUE(LinkedHashMap<String, DoubleParameter> betaCPUE) {
         this.betaCPUE = betaCPUE;
     }
 

@@ -23,16 +23,16 @@ import java.util.List;
 
 public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
-    private String scenarioFile =
-            Paths.get("docs","groundfish","calibration","step1_catchability","clamped.yaml").toString();
 
-//
-//            Paths.get("docs","paper3_dts","mark2",
-//                    "exploratory","calibration","histograms","deriso_new_manual3.yaml").toString();
+    ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
+    private String scenarioFile =
+            Paths.get("docs","groundfish","calibration","step1_catchability",
+                    "logit","start_nogarbage.yaml").toString();
 
 
     private String summaryDirectory =
-            Paths.get("docs","groundfish","calibration","step1_catchability").toString();
+            Paths.get("docs","groundfish","calibration",
+                    "step1_catchability","logit").toString();
 
     private long seed = 2;
 
@@ -75,35 +75,35 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     {
 
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Dover Sole.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Sablefish.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Dover Sole.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Sablefish.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
 //
 //        parameters.add(new SimpleOptimizationParameter(
 //                "gear.proportionSimulatedToGarbage",
@@ -112,12 +112,45 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //        ));
 
 
+//        parameters.add(new SimpleOptimizationParameter(
+//                "holdSizePerBoat",
+//                1500,
+//                15000
+//        ));
+
+
         parameters.add(new SimpleOptimizationParameter(
-                "holdSizePerBoat",
-                1500,
-                15000
+                "destinationStrategy.betaDistance",
+
+                -0.01,
+                -0.001
         ));
 
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaHabit",
+                0,
+                3
+        ));
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaRevenue",
+                0,
+                1
+        ));
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaCPUE~Dover Sole",
+                -1,
+                1
+        ));
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaCPUE~Sablefish",
+                -1,
+                1
+        ));
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaCPUE~Yelloweye Rockfish",
+                -1,
+                1
+        ));
 
         for (OptimizationParameter parameter : parameters) {
             ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
@@ -153,76 +186,107 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
                 //catches errors
+                double soleError = deviationAttainment(
+                        model.getYearlyDataSet().getColumn("Dover Sole Landings"),
+                        DOVER_QUOTA,
+                        DOVER_ATTAINMENT[0],
+                        DOVER_ATTAINMENT[1],
+                        1);
                 error +=
-                        deviationAttainment(
-                                model.getYearlyDataSet().getColumn("Dover Sole Landings"),
-                                DOVER_QUOTA,
-                                DOVER_ATTAINMENT[0],
-                                DOVER_ATTAINMENT[1],
-                                1);
+                        soleError;
+                double longspineLandings = deviationAttainment(
+                        model.getYearlyDataSet().getColumn("Longspine Thornyhead Landings"),
+                        LONGSPINE_QUOTA,
+                        LONGSPINE_ATTAINMENT[0],
+                        LONGSPINE_ATTAINMENT[1],
+                        1);
                 error +=
-                        deviationAttainment(
-                                model.getYearlyDataSet().getColumn("Longspine Thornyhead Landings"),
-                                LONGSPINE_QUOTA,
-                                LONGSPINE_ATTAINMENT[0],
-                                LONGSPINE_ATTAINMENT[1],
-                                1);
+                        longspineLandings;
+                double shortspineLanding = deviationAttainment(
+                        model.getYearlyDataSet().getColumn("Shortspine Thornyhead Landings"),
+                        SHORTSPINE_QUOTA,
+                        SHORTSPINE_ATTAINMENT[0],
+                        SHORTSPINE_ATTAINMENT[1],
+                        1);
                 error +=
-                        deviationAttainment(
-                                model.getYearlyDataSet().getColumn("Shortspine Thornyhead Landings"),
-                                SHORTSPINE_QUOTA,
-                                SHORTSPINE_ATTAINMENT[0],
-                                SHORTSPINE_ATTAINMENT[1],
-                                1);
+                        shortspineLanding;
 
+                double rockfishLandings = deviationAttainment(
+                        model.getYearlyDataSet().getColumn("Yelloweye Rockfish Landings"),
+                        YELLOW_QUOTA,
+                        YELLOW_ATTAINMENT[0],
+                        YELLOW_ATTAINMENT[1],
+                        1);
                 error +=
-                        deviationAttainment(
-                                model.getYearlyDataSet().getColumn("Yelloweye Rockfish Landings"),
-                                YELLOW_QUOTA,
-                                YELLOW_ATTAINMENT[0],
-                                YELLOW_ATTAINMENT[1],
-                                1);
+                        rockfishLandings;
 
+                double sablefishLandings = deviationAttainment(
+                        model.getYearlyDataSet().getColumn("Sablefish Landings"),
+                        SABLEFISH_QUOTA,
+                        SABLEFISH_ATTAINMENT[0],
+                        SABLEFISH_ATTAINMENT[1],
+                        1);
                 error +=
-                        deviationAttainment(
-                                model.getYearlyDataSet().getColumn("Sablefish Landings"),
-                                SABLEFISH_QUOTA,
-                                SABLEFISH_ATTAINMENT[0],
-                                SABLEFISH_ATTAINMENT[1],
-                                1);
+                        sablefishLandings;
 
 
+                double actualAverageHoursOut = deviation(
+                        model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
+                        HOURS_AT_SEA[0],
+                        HOURS_AT_SEA[1],
+                        1
+                );
                 error +=
-                        deviation(
-                                model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
-                                HOURS_AT_SEA[0],
-                                HOURS_AT_SEA[1],
-                                1
-                        );
+                        actualAverageHoursOut;
 
+                double cashflow = deviation(
+                        model.getYearlyDataSet().getColumn("Average Cash-Flow"),
+                        PROFITS[0],
+                        PROFITS[1],
+                        1
+                );
                 error +=
-                        deviation(
-                                model.getYearlyDataSet().getColumn("Average Cash-Flow"),
-                                PROFITS[0],
-                                PROFITS[1],
-                                1
-                        );
+                        cashflow;
 
+                double duration = deviation(
+                        model.getYearlyDataSet().getColumn("Average Trip Duration"),
+                        DURATION[0],
+                        DURATION[1],
+                        1
+                );
                 error +=
-                        deviation(
-                                model.getYearlyDataSet().getColumn("Average Trip Duration"),
-                                DURATION[0],
-                                DURATION[1],
-                                1
-                        );
+                        duration;
 
+                double distanceFromPort = deviation(
+                        model.getYearlyDataSet().getColumn("Average Distance From Port"),
+                        DISTANCE[0],
+                        DISTANCE[1],
+                        1
+                );
                 error +=
-                        deviation(
-                                model.getYearlyDataSet().getColumn("Average Distance From Port"),
-                                DISTANCE[0],
-                                DISTANCE[1],
-                                1
-                        );
+                        distanceFromPort;
+
+
+                Files.write(
+                        Paths.get(summaryDirectory).resolve(
+                                scenarioPath.getFileName() + "_all_errors_"+seed+".csv"
+                        ),
+                        (
+                                soleError +"," +
+                                        longspineLandings +"," +
+                                        shortspineLanding +"," +
+                                        rockfishLandings +"," +
+                                        sablefishLandings +"," +
+                                        actualAverageHoursOut +"," +
+                                        cashflow +"," +
+                                        duration +"," +
+                                        distanceFromPort +"," +
+
+                                        Arrays.toString(x).
+                                                replace("[","").
+                                                replace("]","") +"\n").getBytes(),
+                        StandardOpenOption.WRITE,StandardOpenOption.CREATE,StandardOpenOption.APPEND
+                );
 
             }
 
@@ -263,7 +327,8 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
     public static void main(String[] args) throws IOException {
-        double[] best = new double[]{ 7.356, 3.178, 5.895,-6.384,-5.930,-6.160, 1.701};
+        double[] best = new double[]{ 8.182,	2.095,	4.119,	-6.497,	2.363,	-3.791
+        };
 
         CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
         FishYAML yaml = new FishYAML();
@@ -275,7 +340,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 Scenario.class);
         optimization.prepareScenario(best,scenario);
         yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best.yaml").toFile()));
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_2.yaml").toFile()));
 
 
     }
@@ -315,7 +380,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     @Override
     public int getProblemDimension() {
         //5 catchabilities + (1 garbage) + 1 hold size
-        return 6;
+        return parameters.size();
     }
 
     public String getScenarioFile() {
@@ -378,3 +443,4 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         this.parameters = parameters;
     }
 }
+
