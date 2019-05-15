@@ -1,17 +1,19 @@
 !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
 parameters:
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaDistance,
-  alwaysPositive: true, maximum: -0.001, minimum: -0.01}
+  alwaysPositive: false, maximum: -0.001, minimum: -0.01}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.intercept,
+  alwaysPositive: false, maximum: 100.0, minimum: 0.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaHabit,
-  alwaysPositive: true, maximum: 3.0, minimum: 0.0}
+  alwaysPositive: false, maximum: 3.0, minimum: -3.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaRevenue,
-  alwaysPositive: true, maximum: 1.0, minimum: 0.0}
+  alwaysPositive: false, maximum: 1.0, minimum: 0.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Dover Sole,
-  alwaysPositive: true, maximum: 1.0, minimum: -1.0}
+  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Sablefish,
-  alwaysPositive: true, maximum: 1.0, minimum: -1.0}
+  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Yelloweye Rockfish,
-  alwaysPositive: true, maximum: 1.0, minimum: -1.0}
+  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
 runsPerSetting: 1
 scenarioFile: docs/groundfish/calibration/step1_catchability/logit/start_nogarbage.yaml
 seed: 2

@@ -118,6 +118,10 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //                15000
 //        ));
 
+        //        for (OptimizationParameter parameter : parameters) {
+//            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
+//        }
+
 
         parameters.add(new SimpleOptimizationParameter(
                 "destinationStrategy.betaDistance",
@@ -127,8 +131,14 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
         ));
 
         parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaHabit",
+                "destinationStrategy.intercept",
                 0,
+                100
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.betaHabit",
+                -3,
                 3
         ));
         parameters.add(new SimpleOptimizationParameter(
@@ -152,9 +162,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 1
         ));
 
-        for (OptimizationParameter parameter : parameters) {
-            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
-        }
+
     }
 
     @Override

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import org.jetbrains.annotations.NotNull;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PeriodHabitContinuousExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
@@ -44,6 +45,8 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
     protected AlgorithmFactory<? extends MapDiscretizer> discretizer =
             new SquaresMapDiscretizerFactory();
 
+
+    private DoubleParameter intercept = new FixedDoubleParameter(1);
 
     private DoubleParameter betaDistance = new FixedDoubleParameter(-1);
 
@@ -128,13 +131,18 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
     protected double[][] buildBetas(FishState state, int areas) {
         //the same parameters for all the choices
-        double[][] betas = new double[areas][3 + betaCPUE.size()];
-        betas[0][0] = betaDistance.apply(state.getRandom());
-        betas[0][1] = betaHabit.apply(state.getRandom());
-        betas[0][2] = betaRevenue.apply(state.getRandom());
-        int i=3;
-        for (Map.Entry<String, DoubleParameter> cpues : betaCPUE.entrySet()) {
-            betas[0][i] = cpues.getValue().apply(state.getRandom());
+        double[][] betas = new double[areas][4 + betaCPUE.size()];
+        betas[0][0] = intercept.apply(state.getRandom());
+        betas[0][1] = betaDistance.apply(state.getRandom());
+        betas[0][2] = betaHabit.apply(state.getRandom());
+        betas[0][3] = betaRevenue.apply(state.getRandom());
+        int i=4;
+        for (Map.Entry cpues : betaCPUE.entrySet()) {
+
+            betas[0][i] =
+                    cpues.getValue() instanceof  String ?
+                            DoubleParameter.parseDoubleParameter((String) cpues.getValue()).apply(state.getRandom()) :
+                            ((DoubleParameter) cpues.getValue()).apply(state.getRandom());
             i++;
         }
 
@@ -154,12 +162,13 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
             FishState state, MapDiscretization discretization, int areas, double[][] betas) {
         //get the extractors
         ObservationExtractor[][] extractors = new ObservationExtractor[betas.length][];
-        ObservationExtractor[] commonExtractor = new ObservationExtractor[3 + betaCPUE.size()];
-        commonExtractor[0] = new PortDistanceExtractor();
-        commonExtractor[1] = new PeriodHabitContinuousExtractor(discretization,
+        ObservationExtractor[] commonExtractor = new ObservationExtractor[4 + betaCPUE.size()];
+        commonExtractor[0] = new InterceptExtractor(1);
+        commonExtractor[1] = new PortDistanceExtractor();
+        commonExtractor[2] = new PeriodHabitContinuousExtractor(discretization,
                 365);
         List<TripLaggedExtractor> otherExtractors = getTripLaggedExtractors(discretization,state);
-        int i=2;
+        int i=3;
         for (TripLaggedExtractor laggedExtractor : otherExtractors) {
             commonExtractor[i] = laggedExtractor;
             i++;
@@ -281,5 +290,13 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
     public void setFleetWide(boolean fleetWide) {
         this.fleetWide = fleetWide;
+    }
+
+    public DoubleParameter getIntercept() {
+        return intercept;
+    }
+
+    public void setIntercept(DoubleParameter intercept) {
+        this.intercept = intercept;
     }
 }
