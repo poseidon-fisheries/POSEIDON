@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
@@ -209,6 +210,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
             return;
 
         SeaTile destination = null;
+        int numberOfTrials = 0;
         while(destination == null) {
             double[][] input = this.input.getRegressionInput(fisher, state);
             if (log != null)
@@ -221,8 +223,13 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
 
             destination = this.input.getLastExtraction().get(armChosen);
-            if(destination.getAltitude()>0)
+            if(destination!=null && destination.getAltitude()>0)
                 destination=null;
+            if(numberOfTrials++>100) {
+                Log.warn("Failed to compute any valid logit here, failed to adapt");
+                return;
+            }
+
         }
 
         delegate.setFavoriteSpot(destination);
