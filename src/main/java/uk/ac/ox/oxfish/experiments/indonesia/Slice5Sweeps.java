@@ -30,6 +30,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.HeterogeneousAbundanceGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.*;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
@@ -48,6 +49,7 @@ import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TriggerRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -59,118 +61,68 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Slice3Sweeps {
+public class Slice5Sweeps {
 
+    private static final String SCENARIO_NAME = "lbspr_baseline_yearly";
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 1;
+    public static final int RUNS_PER_POLICY = 10;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
 
 
     public static void main(String[] args) throws IOException {
-   //     DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
-        POPULATIONS = 4;
 
         //effort control
         //all boats are controlled
-        effortControl("all_manyruns",
+        effortControl("all",
                       new String[]{"big","small","medium","small10"},
-                      "pessimistic_spinup",
-                      1, MIN_DAYS_OUT);
-        effortControl("all_manyruns_quick_byfifty2",
-                      new String[]{"big","small","medium","small10"},
-                      "optimistic_spinup",
-                      1, MIN_DAYS_OUT);
-
-                effortControl("all_quick",
-                      new String[]{"big","small","medium","small10"},
-                      "fixed_recruits",
+                      SCENARIO_NAME,
                       1, MIN_DAYS_OUT);
 
 
-//        //only boats >10GT are controlled
-//        effortControl("10_manyruns_byfifty2",
-//                      new String[]{"big","medium","small10"},
-//                      "optimistic_spinup",
-//                      1, MIN_DAYS_OUT);
-//        effortControl("10_manyruns",
-//                      new String[]{"big","medium","small10"},
-//                      "pessimistic_spinup",
-//                      1, MIN_DAYS_OUT);
-//        effortControl("10_quick",
-//                      new String[]{"big","medium","small10"},
-//                      "fixed_recruits",
-//                      1, MIN_DAYS_OUT);
-//
-//        //price premium
-//        pricePremium("premium_multidens_quick3","optimistic_spinup",10,"Pristipomoides multidens");
-        pricePremium("premium_malabaricus_quick_byfifty3","optimistic_spinup",10,"Lutjanus malabaricus");
-//        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
-      //  selectivityTest("selectivity_sweep_quick2","fixed_recruits");
-      //  selectivityTest("selectivity_sweep_quick3","optimistic_spinup");
- //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
-//        pricePenalty("malus_malabaricus_fiftyyears2",
-//                     "optimistic_spinup",
-//                     10,
-//                     "Lutjanus malabaricus");
-//        pricePenalty("malus_malabaricus_2",
- //                    "fixed_recruits",
-  //                   10,
-   //                  "Lutjanus malabaricus");
-//
-//        pricePremium("premium_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
- //       pricePremium("premium_malabaricus_quick2","pessimistic_spinup",10,"Lutjanus malabaricus");
-      //  pricePenalty("malus_malabaricus_quick","pessimistic_spinup",10,"Lutjanus malabaricus");
 
+////        //only boats >10GT are controlled
+        effortControl("10",
+                      new String[]{"big","medium","small10"},
+                      SCENARIO_NAME,
+                      1, MIN_DAYS_OUT);
 
-     //   selectivityTest("selectivity_sweep_quick3","pessimistic_spinup");
-      //  pricePenalty("malus_multidens_manyruns","pessimistic_spinup",10,"Pristipomoides multidens");
+////
+////        //price premium
+        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+
+        //selectivity test
+         selectivityTest("selectivity_sweep", SCENARIO_NAME);
+
+         //price penalty
+        pricePenalty("malus_malabaricus",
+                     SCENARIO_NAME,
+                     10,
+                     "Lutjanus malabaricus");
+
 
 
         //fleet reduction
- //       fleetReduction("fleetreduction_byfifty2","optimistic_spinup",1);
-//        fleetReduction("fleetreduction_quick","pessimistic_spinup",1);
+          fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 
-      //  fleetReduction("fleetreduction_quick2","fixed_recruits",1);
-//
- //           delays("delay_all_quick2", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
-//              delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
-  //            delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "fixed_recruits", 1, 50);
+          //delays
+        delays("delay_all", new String[]{"big","small","medium","small10"},
+               SCENARIO_NAME, 1, 50);
 
-//
- //           delays("delay_10_quick2", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 50);
-//              delays("delay_10_quick", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 50);
-      //        delays("delay_10_quick", new String[]{"big","small10","medium"}, "fixed_recruits", 1, 50);
-
-
-      //      delaysOnce("delay_once_all_quick_byfifty2", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 200);
-        //      delaysOnce("delay_once_all_quick3", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 200);
-   //     delaysOnce("delay_once_all_quick", new String[]{"big","small","medium","small10"}, "fixed_recruits", 1, 200);
-
-          //  delaysOnce("delay_once_10_quick2_byfifty", new String[]{"big","small10","medium"}, "optimistic_spinup", 1, 200);
-//              delaysOnce("delay_once_10_quick2", new String[]{"big","small10","medium"}, "pessimistic_spinup", 1, 200);
-       // delaysOnce("delay_once_10_quick", new String[]{"big","medium","small10"}, "fixed_recruits", 1, 200);
 
 
 //
-//        variableCostTest("variable_cost",
-//                new String[]{"small","small10"},
-//                "optimistic_spinup",
-//                1
-//                );
-//
-//        variableCostTest("variable_cost",
-//                new String[]{"small","small10"},
-//                "pessimistic_spinup",
-//                1
-//                );
-//        variableCostTest("variable_cost",
-//                new String[]{"small","small10"},
-//                "fixed_recruits",
-//                4
-//        );
+        delays("delay_10", new String[]{"big","small10","medium"},
+               SCENARIO_NAME, 1, 50);
+
+
+
+         delaysOnce("delay_once",
+                    new String[]{"big","small","medium","small10"},
+                    SCENARIO_NAME, 1, 200);
     }
 
 
@@ -974,7 +926,7 @@ public class Slice3Sweeps {
 
                                                                 Cost hourlyCost = fisher.getAdditionalTripCosts().remove();
                                                                 Preconditions.checkState(hourlyCost instanceof HourlyCost,
-                                                                        "I assumed here there would be only one additional cost! Careful with this sweep");
+                                                                                         "I assumed here there would be only one additional cost! Careful with this sweep");
                                                                 double newCosts = ((HourlyCost) hourlyCost).getHourlyCost() * finalIncrease;
 
                                                                 fisher.getAdditionalTripCosts().add(
@@ -1050,13 +1002,14 @@ public class Slice3Sweeps {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
                         Preconditions.checkArgument(flexible.getFisherDefinitions().get(0).getTags().contains("small"));
                         ;
+                        DelayGearDecoratorFactory gear = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                                0).getGear();
                         HomogeneousGearFactory malabaricus =
-                                ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) flexible.getFisherDefinitions().get(
-                                        0).getGear()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+                                ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) gear.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
 
-                        ((LogisticSelectivityGearFactory) malabaricus).setSelectivityAParameter(
+                        ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
                                 new FixedDoubleParameter(
-                                        ((FixedDoubleParameter) ((LogisticSelectivityGearFactory) malabaricus).getSelectivityAParameter()).getFixedValue()
+                                        ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
                                                 * finalIncrease
                                 )
                         );
@@ -1067,13 +1020,14 @@ public class Slice3Sweeps {
                             Preconditions.checkArgument(flexible.getFisherDefinitions().get(3).getTags().contains("small10"));
 
 
+                            gear = (DelayGearDecoratorFactory) flexible.getFisherDefinitions().get(
+                                    3).getGear();
                             malabaricus =
-                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) flexible.getFisherDefinitions().get(
-                                            3).getGear()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
+                                    ((HeterogeneousGearFactory) ((GarbageGearFactory) ((HoldLimitingDecoratorFactory) gear.getDelegate()).getDelegate()).getDelegate()).getGears().get("Lutjanus malabaricus");
 
-                            ((LogisticSelectivityGearFactory) malabaricus).setSelectivityAParameter(
+                            ((SimpleLogisticGearFactory) malabaricus).setSelexParameter1(
                                     new FixedDoubleParameter(
-                                            ((FixedDoubleParameter) ((LogisticSelectivityGearFactory) malabaricus).getSelectivityAParameter()).getFixedValue()
+                                            ((FixedDoubleParameter) ((SimpleLogisticGearFactory) malabaricus).getSelexParameter1()).getFixedValue()
                                                     * finalIncrease
                                     )
                             );

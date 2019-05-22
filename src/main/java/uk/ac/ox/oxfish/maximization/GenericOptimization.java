@@ -47,6 +47,8 @@ public class GenericOptimization extends SimpleProblemDouble {
     private String scenarioFile =   DEFAULT_PATH.resolve("pessimistic_recruits_spinup.yaml").toString();
 
 
+    private boolean maximization = false;
+
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
 
     /**
@@ -301,6 +303,8 @@ public class GenericOptimization extends SimpleProblemDouble {
             }
 
             double finalError = error / (double) runsPerSetting;
+            if(maximization)
+                finalError = finalError * (-1);
             System.out.println(Arrays.toString(x) + " ---> " + finalError);
             return new double[]{finalError};
 
@@ -328,11 +332,18 @@ public class GenericOptimization extends SimpleProblemDouble {
 
 
     public static void main(String[] args) throws IOException {
-        GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{
-                8.698, 10.000,-8.063, 9.692, 6.399, 8.065,-1.761,-8.324, 9.044, 9.921, 9.991,-6.950,-9.557,-9.905,-3.539});
+
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("pessimistic_recruits_spinup.yaml").toFile()));
+        Path optimizationFile = Paths.get("docs", "indonesia_hub", "runs", "712", "slice5", "calibration",
+                              "baseline_optimizationproblem.yaml");
+        GenericOptimization optimization =
+                yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
+        System.out.println(optimization.scenarioFile);
+        Scenario scenario = optimization.buildScenario(new double[]{
+                -4.681, 2.394,-8.519, 2.539,-2.620, 2.842,-3.506,-7.016,-1.160,-4.163, 1.037,-7.187,-9.219,-0.642,-3.209, 0.981, 1.142, 1.711, 4.947, 2.101});
+        Path outputFile = optimizationFile.getParent().resolve("baseline_best.yaml");
+        //  FishYAML yaml = new FishYAML();
+        yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 
     }
 
@@ -385,5 +396,24 @@ public class GenericOptimization extends SimpleProblemDouble {
      */
     public void setSimulatedYears(int simulatedYears) {
         this.simulatedYears = simulatedYears;
+    }
+
+
+    /**
+     * Getter for property 'maximization'.
+     *
+     * @return Value for property 'maximization'.
+     */
+    public boolean isMaximization() {
+        return maximization;
+    }
+
+    /**
+     * Setter for property 'maximization'.
+     *
+     * @param maximization Value to set for property 'maximization'.
+     */
+    public void setMaximization(boolean maximization) {
+        this.maximization = maximization;
     }
 }
