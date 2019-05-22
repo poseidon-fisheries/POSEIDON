@@ -91,7 +91,7 @@ public class TripLaggedExtractorTest {
         when(fakeFisher.getFinishedTrips()).thenReturn(records);
 
 
-        TripLaggedExtractor extractor = new TripLaggedExtractor(fakeFisher,
+        TripLaggedExtractor extractor = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
@@ -175,7 +175,7 @@ public class TripLaggedExtractorTest {
         when(fakeFisher2.getFinishedTrips()).thenReturn(records2);
 
 
-        TripLaggedExtractor extractorFisher1 = new TripLaggedExtractor(fakeFisher1,
+        TripLaggedExtractor extractorFisher1 = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
@@ -183,7 +183,7 @@ public class TripLaggedExtractorTest {
                                                                     }
                                                                 },
                                                                 discretizer);
-        TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(null,
+        TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
