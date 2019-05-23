@@ -99,6 +99,7 @@ public class TripLaggedExtractorTest {
                                                                     }
                                                                 },
                                                                 discretizer);
+        extractor.setFisherTracked(fakeFisher);
 
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(600);
@@ -183,6 +184,7 @@ public class TripLaggedExtractorTest {
                                                                     }
                                                                 },
                                                                 discretizer);
+        extractorFisher1.setFisherTracked(fakeFisher1);
         TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
@@ -200,6 +202,7 @@ public class TripLaggedExtractorTest {
         extractorFisher1.step(model);
         fleetwideExtractor.start(model);
         fleetwideExtractor.step(model);
+
 
         assertEquals(extractorFisher1.extract(tile1,Double.NaN,null,model),55d,.0001);
         assertEquals(extractorFisher1.extract(tile2,Double.NaN,null,model),0d,.0001);
