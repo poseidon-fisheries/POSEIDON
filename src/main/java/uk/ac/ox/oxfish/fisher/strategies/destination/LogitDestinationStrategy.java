@@ -211,15 +211,14 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
         SeaTile destination = null;
         int numberOfTrials = 0;
+        double[][] input = this.input.getRegressionInput(fisher, state);
+        if (log != null)
+            log.recordInput(input);
+        int armChosen = - 1;
         while(destination == null) {
-            double[][] input = this.input.getRegressionInput(fisher, state);
-            if (log != null)
-                log.recordInput(input);
-            int armChosen = classifier.choose(input, random);
-            if (log != null)
-                log.recordChoice(armChosen,
-                                 state.getYear(),
-                                 state.getDayOfTheYear());
+
+            armChosen = classifier.choose(input, random);
+
 
 
             destination = this.input.getLastExtraction().get(armChosen);
@@ -231,6 +230,10 @@ public class LogitDestinationStrategy implements DestinationStrategy{
             }
 
         }
+        if (log != null)
+            log.recordChoice(armChosen,
+                    state.getYear(),
+                    state.getDayOfTheYear());
 
         delegate.setFavoriteSpot(destination);
 

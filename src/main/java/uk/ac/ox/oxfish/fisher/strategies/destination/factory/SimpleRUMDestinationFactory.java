@@ -5,6 +5,8 @@ import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PeriodHabitContinuousExtractor;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.PortDistanceExtractor;
+import uk.ac.ox.oxfish.fisher.log.LogisticLog;
+import uk.ac.ox.oxfish.fisher.log.LogisticLogs;
 import uk.ac.ox.oxfish.fisher.log.TripLaggedExtractor;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FavoriteDestinationStrategy;
@@ -54,6 +56,7 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
     private DoubleParameter betaRevenue = new FixedDoubleParameter(1);
 
+
     /**
      * map linking species we want to study their CPUE of and the beta parameter associated with them
      */
@@ -71,6 +74,12 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
     private boolean fleetWide = true;
 
 
+    private boolean logToFile = false;
+
+
+    private Locker<FishState, LogisticLogs> logLocker = new Locker<>();
+
+
     public AlgorithmFactory<? extends MapDiscretizer> getDiscretizer() {
         return discretizer;
     }
@@ -79,6 +88,8 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
         this.discretizer = discretizer;
     }
 
+
+    private int COUNTER = 0;
 
     @Override
     public LogitWithLaggedExtractorsDestinationStrategy apply(FishState state) {
@@ -113,8 +124,9 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
                 buildExtractors(state, discretization, areas, betas);
         ObservationExtractor[][] extractors = extractorPair.getFirst();
 
-        return new LogitWithLaggedExtractorsDestinationStrategy(
-                betas,extractors,
+        LogitWithLaggedExtractorsDestinationStrategy logitWithLaggedExtractorsDestinationStrategy =
+                new LogitWithLaggedExtractorsDestinationStrategy(
+                betas, extractors,
                 validAreas,
                 discretization,
                 new FavoriteDestinationStrategy(state.getMap(), state.getRandom()),
@@ -125,6 +137,38 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
                 extractorPair.getSecond()
 
         );
+
+        if(logToFile)
+        {
+            LogisticLogs logs = logLocker.presentKey(state,
+                    new Supplier<LogisticLogs>() {
+                        @Override
+                        public LogisticLogs get() {
+                            LogisticLogs logisticLogs = new LogisticLogs();
+                            logisticLogs.setFileName("simpleRUM.csv");
+                            state.getOutputPlugins().add(logisticLogs);
+                            return logisticLogs;
+
+                        }
+                    });
+            String[] columnNames = new String[betaCPUE.size() + 4];
+            columnNames[0]= "intercept";
+            columnNames[1]= "distance";
+            columnNames[2]= "habit";
+            columnNames[3]= "revenue";
+            int z=0;
+            for (Map.Entry<String, DoubleParameter> cpue : betaCPUE.entrySet()) {
+                columnNames[4+z]=cpue.getKey()+"_cpue";
+                z++;
+            }
+
+            LogisticLog log = new LogisticLog(columnNames,COUNTER++);
+            logs.add(log);
+            logitWithLaggedExtractorsDestinationStrategy.setLog(log);
+        }
+
+
+        return logitWithLaggedExtractorsDestinationStrategy;
 
     }
 
@@ -298,5 +342,13 @@ public class SimpleRUMDestinationFactory implements AlgorithmFactory<LogitWithLa
 
     public void setIntercept(DoubleParameter intercept) {
         this.intercept = intercept;
+    }
+
+    public boolean isLogToFile() {
+        return logToFile;
+    }
+
+    public void setLogToFile(boolean logToFile) {
+        this.logToFile = logToFile;
     }
 }

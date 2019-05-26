@@ -63,7 +63,7 @@ import java.util.List;
 
 public class Slice5Sweeps {
 
-    private static final String SCENARIO_NAME = "lbspr_baseline_yearly";
+    private static final String SCENARIO_NAME = "baseline_best";
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;

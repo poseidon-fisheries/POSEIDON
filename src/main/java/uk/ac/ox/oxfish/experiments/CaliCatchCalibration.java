@@ -46,9 +46,9 @@ import java.util.function.Consumer;
 public class CaliCatchCalibration {
 
 
-    public static final int RUNS = 818;
-    public static final Path MAIN_DIRECTORY = Paths.get("inputs", "groundfish_paper");
-    public static final int YEARS_PER_RUN = 5;
+    public static final int RUNS = 100; // 1006 is bonferroni with power 95%, delta 20%
+    public static final Path MAIN_DIRECTORY =  Paths.get("docs","groundfish","yesgarbage");// Paths.get("inputs", "groundfish_paper");
+    public static final int YEARS_PER_RUN = 6;
 
     public static void main(String[] args) throws IOException {
 
@@ -57,15 +57,16 @@ public class CaliCatchCalibration {
         String[] scenarios = new String[]{
                 "default", "clamped", "eei",
                 "perfect", "random", "bandit",
-                "annealing", "intercepts", "kernel"
+                "annealing", "intercepts", "kernel",
+                "perfect_cell", "fleetwide","nofleetwide"
         };
 
-        //yelloweye is unprotected
-        for(String scenario : scenarios)
-            runMultipleTimesToBuildHistogram(scenario,
-                                             null,
-                                             MAIN_DIRECTORY,
-                                             YEARS_PER_RUN+1);
+
+//        for(String scenario : scenarios)
+//            runMultipleTimesToBuildHistogram(scenario,
+//                    null,
+//                    MAIN_DIRECTORY,
+//                    YEARS_PER_RUN+1);
 
         //pre-to-post
         for(String scenario : scenarios)
@@ -88,12 +89,12 @@ public class CaliCatchCalibration {
 
         //does nothing consumer
         runMultipleTimesToBuildHistogram(input, policyFile, mainDirectory, yearsPerRun,
-                                         new Consumer<FishState>() {
-                                             @Override
-                                             public void accept(FishState fishState) {
+                new Consumer<FishState>() {
+                    @Override
+                    public void accept(FishState fishState) {
 
-                                             }
-                                         });
+                    }
+                });
 
     }
 
@@ -116,7 +117,7 @@ public class CaliCatchCalibration {
 
             FishYAML yaml = new FishYAML();
             CaliforniaAbstractScenario scenario = yaml.loadAs(new FileReader(mainDirectory.resolve(input + ".yaml").toFile()),
-                                                              CaliforniaAbstractScenario.class);
+                    CaliforniaAbstractScenario.class);
             scenario.setLogbook(new NoLogbookFactory());
 
             FishState state = new FishState(run);
@@ -160,45 +161,45 @@ public class CaliCatchCalibration {
                     boolean isITQOn = state.getYearlyDataSet().getColumn("ITQ Prices Of Sablefish") != null ;
                     boolean isyelloweyeITQOn = state.getYearlyDataSet().getColumn("ITQ Prices Of Yelloweye Rockfish") != null ;
                     writer.write(state.getYear() + "," + run + "," +
-                                         state.getLatestYearlyObservation("Average Cash-Flow") + "," +
-                                         state.getLatestYearlyObservation("Average Hours Out") + "," +
-                                         state.getLatestYearlyObservation("Dover Sole Landings") + "," +
-                                         state.getLatestYearlyObservation("Sablefish Landings") + "," +
-                                         state.getLatestYearlyObservation("Sablefish Catches") + "," +
-                                         state.getLatestYearlyObservation("Biomass Sablefish") + "," +
-                                         state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + "," +
-                                         state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
-                                         state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
-                                         // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
-                                         (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Sablefish")) + "," +
-                                         state.getLatestYearlyObservation("Average Distance From Port") + "," +
-                                         state.getLatestYearlyObservation("Average Trip Duration") + "," +
-                                         state.getLatestYearlyObservation("Average Number of Trips") + "," +
-                                         state.getLatestYearlyObservation("Actual Average Cash-Flow") + "," +
-                                         state.getLatestYearlyObservation("Actual Average Hours Out") + "," +
-                                         state.getLatestYearlyObservation("Weighted Average Distance From Port") + "," +
-                                         state.getLatestYearlyObservation("Number Of Active Fishers")+ "," +
-                                         state.getLatestYearlyObservation("Total Variable Costs")+ "," +
-                                         state.getLatestYearlyObservation("Total Earnings") + "," +
-                                         state.getLatestYearlyObservation("Median Cash-Flow")+ "," +
-                                         state.getLatestYearlyObservation("Actual Median Cash-Flow") + "," +
-                                         state.getLatestYearlyObservation("Actual Median Trip Profits") + "," +
-                                         state.getLatestYearlyObservation("Others Landings")+ "," +
-                                 state.getLatestYearlyObservation("Biomass Dover Sole") + "," +
-                                         state.getLatestYearlyObservation("Biomass Shortspine Thornyhead")
+                            state.getLatestYearlyObservation("Average Cash-Flow") + "," +
+                            state.getLatestYearlyObservation("Average Hours Out") + "," +
+                            state.getLatestYearlyObservation("Dover Sole Landings") + "," +
+                            state.getLatestYearlyObservation("Sablefish Landings") + "," +
+                            state.getLatestYearlyObservation("Sablefish Catches (kg)") + "," +
+                            state.getLatestYearlyObservation("Biomass Sablefish") + "," +
+                            state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + "," +
+                            state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
+                            state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
+                            // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
+                            (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
+                            (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
+                            (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
+                            (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
+                            (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Sablefish")) + "," +
+                            state.getLatestYearlyObservation("Average Distance From Port") + "," +
+                            state.getLatestYearlyObservation("Average Trip Duration") + "," +
+                            state.getLatestYearlyObservation("Average Number of Trips") + "," +
+                            state.getLatestYearlyObservation("Actual Average Cash-Flow") + "," +
+                            state.getLatestYearlyObservation("Actual Average Hours Out") + "," +
+                            state.getLatestYearlyObservation("Weighted Average Distance From Port") + "," +
+                            state.getLatestYearlyObservation("Number Of Active Fishers")+ "," +
+                            state.getLatestYearlyObservation("Total Variable Costs")+ "," +
+                            state.getLatestYearlyObservation("Total Earnings") + "," +
+                            state.getLatestYearlyObservation("Median Cash-Flow")+ "," +
+                            state.getLatestYearlyObservation("Actual Median Cash-Flow") + "," +
+                            state.getLatestYearlyObservation("Actual Median Trip Profits") + "," +
+                            state.getLatestYearlyObservation("Others Landings")+ "," +
+                            state.getLatestYearlyObservation("Biomass Dover Sole") + "," +
+                            state.getLatestYearlyObservation("Biomass Shortspine Thornyhead")
 
 
                     );
                     for (Port port : state.getPorts())
                         writer.write("," +
-                                             state.getLatestYearlyObservation(port.getName() + " " + FisherYearlyTimeSeries.TRIPS) + "," +
-                                             state.getLatestYearlyObservation(port.getName() + " Number Of Active Fishers") + "," +
-                                             state.getLatestYearlyObservation("Average Cash-Flow at " + port.getName()) + "," +
-                                             state.getLatestYearlyObservation(port.getName() + " Average Distance From Port")
+                                state.getLatestYearlyObservation(port.getName() + " " + FisherYearlyTimeSeries.TRIPS) + "," +
+                                state.getLatestYearlyObservation(port.getName() + " Number Of Active Fishers") + "," +
+                                state.getLatestYearlyObservation("Average Cash-Flow at " + port.getName()) + "," +
+                                state.getLatestYearlyObservation(port.getName() + " Average Distance From Port")
                         );
                     writer.write("\n");
                 }
@@ -215,3 +216,4 @@ public class CaliCatchCalibration {
     }
 
 }
+

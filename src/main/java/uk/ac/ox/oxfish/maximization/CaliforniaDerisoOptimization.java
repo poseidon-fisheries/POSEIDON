@@ -27,7 +27,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
     private String scenarioFile =
             Paths.get("docs","groundfish","calibration","step1_catchability",
-                    "logit","start_nogarbage.yaml").toString();
+                    "logit","start_garbage.yaml").toString();
 
 
     private String summaryDirectory =
@@ -75,36 +75,36 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     {
 
-//        parameters.add(new SimpleOptimizationParameter(
-//                "gear.delegate.gears~Dover Sole.averageCatchability",
-//                MINIMUM_CATCHABILITY,
-//                MAXIMUM_CATCHABILITY
-//        ));
-//
-//        parameters.add(new SimpleOptimizationParameter(
-//                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
-//                MINIMUM_CATCHABILITY,
-//                MAXIMUM_CATCHABILITY
-//        ));
-//
-//        parameters.add(new SimpleOptimizationParameter(
-//                "gear.delegate.gears~Sablefish.averageCatchability",
-//                MINIMUM_CATCHABILITY,
-//                MAXIMUM_CATCHABILITY
-//        ));
-//
-//        parameters.add(new SimpleOptimizationParameter(
-//                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
-//                MINIMUM_CATCHABILITY,
-//                MAXIMUM_CATCHABILITY
-//        ));
-//
-//        parameters.add(new SimpleOptimizationParameter(
-//                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
-//                MINIMUM_CATCHABILITY,
-//                MAXIMUM_CATCHABILITY
-//        ));
-//
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Dover Sole.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Sablefish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
 //        parameters.add(new SimpleOptimizationParameter(
 //                "gear.proportionSimulatedToGarbage",
 //                0,
@@ -112,55 +112,55 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //        ));
 
 
+        parameters.add(new SimpleOptimizationParameter(
+                "holdSizePerBoat",
+                1500,
+                15000
+        ));
+
+                for (OptimizationParameter parameter : parameters) {
+            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
+        }
+
+
 //        parameters.add(new SimpleOptimizationParameter(
-//                "holdSizePerBoat",
-//                1500,
-//                15000
+//                "destinationStrategy.betaDistance",
+//
+//                -0.01,
+//                -0.001
 //        ));
-
-        //        for (OptimizationParameter parameter : parameters) {
-//            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
-//        }
-
-
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaDistance",
-
-                -0.01,
-                -0.001
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.intercept",
-                0,
-                100
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaHabit",
-                -3,
-                3
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaRevenue",
-                0,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Dover Sole",
-                -1,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Sablefish",
-                -1,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Yelloweye Rockfish",
-                -1,
-                1
-        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.intercept",
+//                0,
+//                100
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaHabit",
+//                -3,
+//                3
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaRevenue",
+//                0,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Dover Sole",
+//                -1,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Sablefish",
+//                -1,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Yelloweye Rockfish",
+//                -1,
+//                1
+//        ));
 
 
     }
@@ -335,7 +335,16 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
     public static void main(String[] args) throws IOException {
-        double[] best = new double[]{ 8.182,	2.095,	4.119,	-6.497,	2.363,	-3.791
+        double[] best = new double[]{
+                -6.54989698953394,
+                2.4101791878656	,
+                7.36414452079267,
+                2.18409562587165,
+                -2.38602534330794,
+                5.31933183001022,
+                2.06909287377259
+
+
         };
 
         CaliforniaDerisoOptimization optimization = new CaliforniaDerisoOptimization();
@@ -348,7 +357,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 Scenario.class);
         optimization.prepareScenario(best,scenario);
         yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_2.yaml").toFile()));
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_garbage_fleetwide.yaml").toFile()));
 
 
     }

@@ -335,12 +335,12 @@ public class GenericOptimization extends SimpleProblemDouble {
 
         FishYAML yaml = new FishYAML();
         Path optimizationFile = Paths.get("docs", "indonesia_hub", "runs", "712", "slice5", "calibration",
-                              "baseline_optimizationproblem.yaml");
+                              "optimizationproblem.yaml");
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -4.681, 2.394,-8.519, 2.539,-2.620, 2.842,-3.506,-7.016,-1.160,-4.163, 1.037,-7.187,-9.219,-0.642,-3.209, 0.981, 1.142, 1.711, 4.947, 2.101});
+                -3.489,-9.081, 4.900, 2.991,-2.576, 1.725, 6.780,-6.834, 2.897, 5.585,-8.792, 3.085,-5.891,-4.162,-6.231,-4.699, 3.986,-0.076, 4.407, 5.733});
         Path outputFile = optimizationFile.getParent().resolve("baseline_best.yaml");
         //  FishYAML yaml = new FishYAML();
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
