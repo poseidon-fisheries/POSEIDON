@@ -91,7 +91,7 @@ public class TripLaggedExtractorTest {
         when(fakeFisher.getFinishedTrips()).thenReturn(records);
 
 
-        TripLaggedExtractor extractor = new TripLaggedExtractor(fakeFisher,
+        TripLaggedExtractor extractor = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
@@ -99,6 +99,7 @@ public class TripLaggedExtractorTest {
                                                                     }
                                                                 },
                                                                 discretizer);
+        extractor.setFisherTracked(fakeFisher);
 
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(600);
@@ -175,7 +176,7 @@ public class TripLaggedExtractorTest {
         when(fakeFisher2.getFinishedTrips()).thenReturn(records2);
 
 
-        TripLaggedExtractor extractorFisher1 = new TripLaggedExtractor(fakeFisher1,
+        TripLaggedExtractor extractorFisher1 = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
@@ -183,7 +184,8 @@ public class TripLaggedExtractorTest {
                                                                     }
                                                                 },
                                                                 discretizer);
-        TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(null,
+        extractorFisher1.setFisherTracked(fakeFisher1);
+        TripLaggedExtractor fleetwideExtractor = new TripLaggedExtractor(
                                                                 new Function<TripRecord, Double>() {
                                                                     @Override
                                                                     public Double apply(TripRecord tripRecord) {
@@ -200,6 +202,7 @@ public class TripLaggedExtractorTest {
         extractorFisher1.step(model);
         fleetwideExtractor.start(model);
         fleetwideExtractor.step(model);
+
 
         assertEquals(extractorFisher1.extract(tile1,Double.NaN,null,model),55d,.0001);
         assertEquals(extractorFisher1.extract(tile2,Double.NaN,null,model),0d,.0001);

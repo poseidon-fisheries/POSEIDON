@@ -12,15 +12,9 @@ parameters:
   alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
   alwaysPositive: true, maximum: 15000.0, minimum: 1500.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.explorationProbability,
-  alwaysPositive: true, maximum: 0.8, minimum: 0.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.imitationProbability,
-  alwaysPositive: true, maximum: 1.0, minimum: 0.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.stepSize,
-  alwaysPositive: true, maximum: 10.0, minimum: 0.0}
 runsPerSetting: 1
-scenarioFile: docs/groundfish/calibration/alternative_opti/eei_start.yaml
+scenarioFile: docs/groundfish/calibration/step1_catchability/logit/start_garbage.yaml
 seed: 2
-summaryDirectory: docs/groundfish/calibration/alternative_opti
+summaryDirectory: docs/groundfish/calibration/step1_catchability/logit
 yearsToIgnore: 1
 yearsToRun: 5

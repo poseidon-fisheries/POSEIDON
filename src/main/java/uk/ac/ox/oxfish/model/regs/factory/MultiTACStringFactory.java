@@ -27,7 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
-import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -104,7 +104,7 @@ public class MultiTACStringFactory implements AlgorithmFactory<MultiQuotaRegulat
         //go for each input and read the results
         for(Map.Entry<String,String> input : quotasInputted.entrySet())
         {
-            Double yearlyQuota = YamlConstructor.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
+            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
             Preconditions.checkArgument(yearlyQuota>0, "quotas must start above 0!");
             Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;

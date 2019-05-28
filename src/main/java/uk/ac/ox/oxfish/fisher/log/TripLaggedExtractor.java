@@ -73,10 +73,8 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
 
 
     public TripLaggedExtractor(
-            @Nullable Fisher fisher,
             Function<TripRecord, Double> variableOfInterest,
             MapDiscretization discretization) {
-        this.fisherTracked = fisher;
         this.variableOfInterest = variableOfInterest;
         this.discretization = discretization;
         this.lastYearAverage = new double[discretization.getNumberOfGroups()];
@@ -140,7 +138,7 @@ public class TripLaggedExtractor implements Startable, Steppable, ObservationExt
      */
     @Override
     public void start(FishState model) {
-        if(stoppable!=null)
+        if(stoppable==null)
             stoppable = model.scheduleEveryYear(this, StepOrder.DAWN);
     }
 
