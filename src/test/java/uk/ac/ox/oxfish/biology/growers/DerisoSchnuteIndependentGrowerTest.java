@@ -43,8 +43,8 @@ public class DerisoSchnuteIndependentGrowerTest {
         //numbers are from sablefish
 
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new Double[]{527154d},
-                                        new Double[]{527154d});
+                new BiomassLocalBiology(new double[]{527154d},
+                                        new double[]{527154d});
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
@@ -76,8 +76,8 @@ public class DerisoSchnuteIndependentGrowerTest {
         //numbers are from sablefish
 
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new Double[]{527154d},
-                                        new Double[]{527154d});
+                new BiomassLocalBiology(new double[]{527154d},
+                                        new double[]{527154d});
 
         ArrayList<Double> biomasses = Lists.newArrayList(527154d, 527154d, 527154d, 527154d, 527154d, 527154d);
         DerisoSchnuteIndependentGrower grower =
@@ -112,8 +112,8 @@ public class DerisoSchnuteIndependentGrowerTest {
         double virginB = 8883d;
         double virginV = 85.13962;
         BiomassLocalBiology biology =
-                new BiomassLocalBiology(new Double[]{virginB},
-                                        new Double[]{virginB});
+                new BiomassLocalBiology(new double[]{virginB},
+                                        new double[]{virginB});
 
         ArrayList<Double> biomasses = Lists.newArrayList(virginB, virginB, virginB, virginB, virginB,
                                                          virginB, virginB, virginB, virginB, virginB,

@@ -61,8 +61,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void allocateEqually() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
@@ -80,8 +80,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void fillToBrim() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
@@ -100,8 +100,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void alreadyFull() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{200d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{200d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{200d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{200d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
@@ -119,8 +119,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void allocateMoreToEmptyOne() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{0d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{0d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
@@ -138,8 +138,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void allocateMoreToEmptyOneAgain() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{0d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{0d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(
@@ -157,8 +157,8 @@ public class CommonLogisticGrowerTest {
     @Test
     public void allocateMoreToEmptyOneWithWeight() {
 
-        BiomassLocalBiology first = new BiomassLocalBiology(new Double[]{0d},new Double[]{200d});
-        BiomassLocalBiology second = new BiomassLocalBiology(new Double[]{100d},new Double[]{200d});
+        BiomassLocalBiology first = new BiomassLocalBiology(new double[]{0d}, new double[]{200d});
+        BiomassLocalBiology second = new BiomassLocalBiology(new double[]{100d}, new double[]{200d});
         ArrayList<BiomassLocalBiology> biologies = Lists.newArrayList(first, second);
 
         CommonLogisticGrower.allocateBiomassProportionally(

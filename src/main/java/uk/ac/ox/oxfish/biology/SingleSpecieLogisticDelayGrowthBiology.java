@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.EvictingQueue;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -81,10 +81,10 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
     public SingleSpecieLogisticDelayGrowthBiology(
             Species species, double currentBiomass, double maxBiomass, int yearDelays, double aParameter,
             double bParameter) {
-        Preconditions.checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
-        Preconditions.checkArgument(maxBiomass > 0);
-        Preconditions.checkArgument(currentBiomass <= maxBiomass);
-        Preconditions.checkArgument(currentBiomass >= 0);
+        checkArgument(yearDelays > 0, "Use undelayed biology rather than feeding 0 to a delayed one");
+        checkArgument(maxBiomass > 0);
+        checkArgument(currentBiomass <= maxBiomass);
+        checkArgument(currentBiomass >= 0);
         this.species = species;
         this.yearDelays = yearDelays;
         pastBiomass = EvictingQueue.create(yearDelays);
@@ -103,12 +103,10 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species)
+    public double getBiomass(Species species)
     {
-        if(species == this.species)
-            return currentBiomass;
-        else
-            return null;
+        checkArgument(species == this.species, "%s != %s", species, this.species);
+        return currentBiomass;
     }
 
     /**
@@ -123,7 +121,7 @@ public class SingleSpecieLogisticDelayGrowthBiology extends AbstractBiomassBased
         //focus on only the one you care about!
         double biomassFished = caught.getWeightCaught(this.species);
 
-        Preconditions.checkArgument(biomassFished <= currentBiomass);
+        checkArgument(biomassFished <= currentBiomass);
         currentBiomass-= biomassFished;
 
     }

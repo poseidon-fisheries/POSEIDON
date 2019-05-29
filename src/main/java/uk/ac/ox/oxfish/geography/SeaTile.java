@@ -142,7 +142,7 @@ public class SeaTile implements Startable, LocalBiology{
      * @param species  the species you care about
      * @return the biomass of this species
      */
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return biology.getBiomass(species);
     }
 

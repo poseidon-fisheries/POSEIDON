@@ -38,12 +38,12 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     /**
      * the current amount of biomass in this spot
      */
-    private Double[] currentBiomass;
+    private double[] currentBiomass;
 
     /**
      * the maximum amount of biomass
      */
-    private Double[] carryingCapacity;
+    private double[] carryingCapacity;
 
 
     /**
@@ -52,7 +52,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @param carryingCapacity the maximum amount of fish
      */
     public BiomassLocalBiology(
-            Double[] currentBiomass, Double[] carryingCapacity) {
+            double[] currentBiomass, double[] carryingCapacity) {
         Preconditions.checkArgument(currentBiomass.length==carryingCapacity.length);
 
         this.currentBiomass = Arrays.copyOf(currentBiomass,currentBiomass.length);
@@ -76,9 +76,9 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
         assert initialMaxCapacity>= initialMinCapacity;
         assert  initialMaxCapacity >=0;
         assert  initialMinCapacity <=1;
-        this.carryingCapacity = new Double[species];
+        this.carryingCapacity = new double[species];
         Arrays.fill(this.carryingCapacity, carryingCapacity);
-        this.currentBiomass = new Double[species];
+        this.currentBiomass = new double[species];
 
         for(int i=0; i<currentBiomass.length; i++)
         {
@@ -102,7 +102,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         final int index = species.getIndex();
         if(index>=this.currentBiomass.length)
             return 0d; //don't have it
@@ -116,7 +116,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @return the carrying capacity for this species at this location
      */
     @Override
-    public Double getCarryingCapacity(Species species)
+    public double getCarryingCapacity(Species species)
     {
         final int index = species.getIndex();
         if(index>=this.carryingCapacity.length)
@@ -131,7 +131,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
      * @return the carrying capacity for this species at this location
      */
     @Override
-    public Double getCarryingCapacity(int index)
+    public double getCarryingCapacity(int index)
     {
         if(index>=this.carryingCapacity.length)
             return 0d; //don't have it
@@ -285,7 +285,7 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
 
 
     @Override
-    public Double[] getCurrentBiomass() {
+    public double[] getCurrentBiomass() {
         return currentBiomass;
     }
 

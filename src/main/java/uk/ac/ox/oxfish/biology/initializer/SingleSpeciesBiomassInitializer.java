@@ -199,8 +199,8 @@ public class SingleSpeciesBiomassInitializer implements BiologyInitializer{
             return new EmptyLocalBiology();
         else{
             numberOfHabitableCells++;
-            Double[] currentBiomass = new Double[biology.getSize()];
-            Double[] carryingCapacity = new Double[biology.getSize()];
+            double[] currentBiomass = new double[biology.getSize()];
+            double[] carryingCapacity = new double[biology.getSize()];
             Arrays.fill(currentBiomass,0d);
             Arrays.fill(carryingCapacity,0d);
             return new BiomassLocalBiology(currentBiomass,
