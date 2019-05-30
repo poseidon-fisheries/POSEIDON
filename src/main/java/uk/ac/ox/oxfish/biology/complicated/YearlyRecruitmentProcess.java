@@ -20,15 +20,21 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 
 /**
- * recruitment that happens only once a year
+ * recruitment function that knows how many recruits it needs every year. Can be made to act daily in which case
+ * each day produces 1/365th of the recruitment
  */
 public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
 
     private static final int SPAWNING_DAY = 364;
+
+    private final boolean recruitEveryday;
+
+    public YearlyRecruitmentProcess(boolean recruitEveryday) {
+        this.recruitEveryday = recruitEveryday;
+    }
 
     /**
      * Computes the number of new recruits per sex
@@ -44,15 +50,24 @@ public abstract class YearlyRecruitmentProcess implements RecruitmentProcess {
             Species species, Meristics meristics, StructuredAbundance abundance, int dayOfTheYear, int daysSimulated) {
 
 
-        //recruits yearly only
-        if(daysSimulated == 1 && dayOfTheYear != SPAWNING_DAY)
-            return 0d;
+        //recruits yearly only?
+        if(!recruitEveryday) {
+            if (daysSimulated == 1 && dayOfTheYear != SPAWNING_DAY)
+            {
+                return 0d;
+            }
+            else
+            {
+                return computeYearlyRecruitment(species, meristics, abundance);
+            }
+        }
         else
-            return recruitYearly(species, meristics, abundance);
-
+        {
+            return computeYearlyRecruitment(species, meristics, abundance) * daysSimulated/365;
+        }
     }
 
-    protected abstract double recruitYearly(Species species, Meristics meristics, StructuredAbundance abundance);
+    protected abstract double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance);
 
 
 

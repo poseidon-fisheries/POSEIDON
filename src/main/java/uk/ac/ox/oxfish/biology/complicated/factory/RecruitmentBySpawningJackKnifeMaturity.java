@@ -22,15 +22,12 @@ package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentBySpawningBiomass;
-import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Function;
-
-import static uk.ac.ox.oxfish.utility.FishStateUtilities.FEMALE;
 
 public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<RecruitmentBySpawningBiomass> {
 
@@ -60,6 +57,17 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
 
 
     /**
+     * when this is set to true, we assume that half of the population in each bin is male and doesn't count for SSB purposes
+     * This is achieved by dividing maturity in half
+     */
+    private boolean halfFemalePopulation = false;
+
+
+    /**
+     * if this flag is set to true, there will be new recruits every day
+     */
+    private boolean recruitsDaily = false;
+    /**
      * Applies this function to the given argument.
      *
      * @param fishState the function argument
@@ -77,16 +85,17 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
                     @Override
                     public double[] apply(Species species) {
                         double[] actualMaturity = new double[species.getNumberOfBins()];
+                        double maxMaturity = halfFemalePopulation ? 0.5 : 1;
                         for(int bin=0; bin<species.getNumberOfBins(); bin++)
-                            actualMaturity[bin] = species.getLength(subdivisionThatSpawns,bin) >= lengthAtMaturity ? 1.0 : 0;
+                            actualMaturity[bin] = species.getLength(subdivisionThatSpawns,bin) >= lengthAtMaturity ? maxMaturity : 0;
                         return actualMaturity;
 
                     }
                 },
                 null,
-                subdivisionThatSpawns
+                subdivisionThatSpawns,
 
-        );
+                recruitsDaily);
 
     }
 
@@ -181,4 +190,19 @@ public class RecruitmentBySpawningJackKnifeMaturity implements AlgorithmFactory<
     }
 
 
+    public boolean isHalfFemalePopulation() {
+        return halfFemalePopulation;
+    }
+
+    public void setHalfFemalePopulation(boolean halfFemalePopulation) {
+        this.halfFemalePopulation = halfFemalePopulation;
+    }
+
+    public boolean isRecruitsDaily() {
+        return recruitsDaily;
+    }
+
+    public void setRecruitsDaily(boolean recruitsDaily) {
+        this.recruitsDaily = recruitsDaily;
+    }
 }

@@ -21,13 +21,13 @@
 package uk.ac.ox.oxfish.biology;
 
 public interface VariableBiomassBasedBiology extends LocalBiology {
-    Double getCarryingCapacity(Species species);
+    double getCarryingCapacity(Species species);
 
-    Double getCarryingCapacity(int index);
+    double getCarryingCapacity(int index);
 
     void setCarryingCapacity(Species s, double newCarryingCapacity);
 
     void setCurrentBiomass(Species s, double newCurrentBiomass);
 
-    Double[] getCurrentBiomass();
+    double[] getCurrentBiomass();
 }

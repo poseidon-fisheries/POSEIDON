@@ -41,7 +41,7 @@ public class ConstantLocalBiology extends AbstractBiomassBasedBiology {
      * returned the fixed biomass
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return fixedBiomass;
     }
 

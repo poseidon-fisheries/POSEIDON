@@ -82,11 +82,11 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
 
 
             BiomassLocalBiology local = new BiomassLocalBiology(
-                    new Double[]{
+                    new double[]{
                             carryingCapacityFirst * random.nextDouble(),
                             carryingCapacitySecond * random.nextDouble()
                     },
-                    new Double[]{
+                    new double[]{
                             carryingCapacityFirst, carryingCapacitySecond
                     }
             );

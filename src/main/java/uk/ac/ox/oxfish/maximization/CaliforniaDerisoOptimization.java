@@ -27,12 +27,12 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
     private String scenarioFile =
             Paths.get("docs","groundfish","calibration","step1_catchability",
-                    "logit","start_garbage.yaml").toString();
+                    "map","start.yaml").toString();
 
 
     private String summaryDirectory =
-            Paths.get("docs","groundfish","calibration",
-                    "step1_catchability","logit").toString();
+            Paths.get("docs","groundfish","calibration","step1_catchability",
+                    "map").toString();
 
     private long seed = 2;
 
@@ -336,13 +336,13 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         double[] best = new double[]{
-                -6.54989698953394,
-                2.4101791878656	,
-                7.36414452079267,
-                2.18409562587165,
-                -2.38602534330794,
-                5.31933183001022,
-                2.06909287377259
+                -1.40347379858342,
+                9.37268507344749,
+                7.74253632142309,
+                -6.00011591839622,
+                2.7591705869591,
+                6.84793762259298
+
 
 
         };
@@ -357,7 +357,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 Scenario.class);
         optimization.prepareScenario(best,scenario);
         yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_garbage_fleetwide.yaml").toFile()));
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_cpuemap.yaml").toFile()));
 
 
     }

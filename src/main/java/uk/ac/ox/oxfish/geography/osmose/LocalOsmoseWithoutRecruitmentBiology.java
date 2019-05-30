@@ -87,7 +87,7 @@ public class LocalOsmoseWithoutRecruitmentBiology extends AbstractBiomassBasedBi
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
 
         return getBiomass(species.getIndex());
 

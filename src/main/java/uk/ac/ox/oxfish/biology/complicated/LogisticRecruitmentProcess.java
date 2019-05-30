@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.complicated;
 
-import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -40,7 +39,9 @@ public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
 
 
     public LogisticRecruitmentProcess(double carryingCapacity,
-                                      double malthusianParameter) {
+                                      double malthusianParameter,
+                                      boolean recruitEveryDay) {
+        super(recruitEveryDay);
         this.carryingCapacity = carryingCapacity;
         this.malthusianParameter = malthusianParameter;
     }
@@ -54,7 +55,7 @@ public class LogisticRecruitmentProcess extends YearlyRecruitmentProcess {
      * @return the number of male + female recruits
      */
     @Override
-    public double recruitYearly(
+    public double computeYearlyRecruitment(
             Species species, Meristics meristics, StructuredAbundance abundance) {
 
         //weigh

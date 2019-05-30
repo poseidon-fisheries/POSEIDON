@@ -35,7 +35,7 @@ public class LogisticGrowthTest
     public void logisticGrowthWorks() throws Exception {
 
         BiomassLocalBiology bio = new BiomassLocalBiology(
-                new Double[]{100d,200d,0d}, new Double[]{100d,400d,0d}
+                new double[]{100d,200d,0d}, new double[]{100d,400d,0d}
         );
         Species species0 = new Species("0"); species0.resetIndexTo(0);
         Species species1 = new Species("1"); species1.resetIndexTo(1);
@@ -82,7 +82,7 @@ public class LogisticGrowthTest
     public void logisticGrowthWorksOneSpecies() throws Exception {
 
         BiomassLocalBiology bio = new BiomassLocalBiology(
-                new Double[]{80d,200d,0d}, new Double[]{100d,400d,0d}
+                new double[]{80d,200d,0d}, new double[]{100d,400d,0d}
         );
         Species species0 = new Species("0"); species0.resetIndexTo(0);
         Species species1 = new Species("1"); species1.resetIndexTo(1);

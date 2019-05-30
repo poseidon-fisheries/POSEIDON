@@ -82,7 +82,7 @@ public class GetterLocalBiology extends AbstractBiomassBasedBiology {
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
 
         if(species==this.species)
             return Math.max(0,biomass.apply(state));

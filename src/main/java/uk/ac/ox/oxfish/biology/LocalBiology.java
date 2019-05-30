@@ -42,7 +42,7 @@ public interface LocalBiology extends Startable
      * @param species  the species you care about
      * @return the biomass of this species
      */
-    Double getBiomass(Species species);
+    double getBiomass(Species species);
 
     /**
      * Tells the local biology that a fisher (or something anyway) fished this much biomass from this location

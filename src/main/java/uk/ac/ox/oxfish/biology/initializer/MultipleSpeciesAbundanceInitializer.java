@@ -181,7 +181,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                                 meristics.getCumulativePhi(),
                                 meristics.isAddRelativeFecundityToSpawningBiomass(),
                                 meristics.getMaturity(),
-                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE),
+                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE, false),
                 species,
                 rounding, agingProcess,
                 new NoAbundanceDiffusion(),

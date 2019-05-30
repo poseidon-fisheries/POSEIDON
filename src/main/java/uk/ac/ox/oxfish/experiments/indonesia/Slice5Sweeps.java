@@ -63,11 +63,11 @@ import java.util.List;
 
 public class Slice5Sweeps {
 
-    private static final String SCENARIO_NAME = "baseline_best";
+    private static final String SCENARIO_NAME = "baseline_female";
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 10;
+    public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
 

@@ -8,6 +8,8 @@ import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgentFactory;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
+import uk.ac.ox.oxfish.biology.complicated.SnapshotAbundanceResetter;
+import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.fisher.strategies.discarding.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
@@ -47,6 +49,11 @@ public class AdditionalStartables {
                   "Biomass Total Resetter");
 
 
+        CONSTRUCTORS.put("Abundance Snapshot Resetter",
+                SnapshotAbundanceResetterFactory::new
+        );
+        NAMES.put(SnapshotAbundanceResetterFactory.class,
+                "Abundance Snapshot Resetter");
 
 
         CONSTRUCTORS.put("Abundance Gatherers",

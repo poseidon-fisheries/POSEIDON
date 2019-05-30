@@ -83,7 +83,7 @@ public class RecruitmentBySpawningFactory  implements AlgorithmFactory<Recruitme
                     steepness.apply(state.getRandom()),
                     cumulativePhi.apply(state.getRandom()),
                     addRelativeFecundityToSpawningBiomass,
-                    maturity, relativeFecundity, femaleSubdivisionIndex);
+                    maturity, relativeFecundity, femaleSubdivisionIndex, false);
         else
             return new RecruitmentBySpawningBiomassDelayed(
                     virginRecruits.apply(state.getRandom()).intValue(),

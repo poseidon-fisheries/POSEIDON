@@ -46,7 +46,7 @@ public class LogisticRecruitmentFactory implements AlgorithmFactory<LogisticRecr
     @Override
     public LogisticRecruitmentProcess apply(FishState fishState) {
         return new LogisticRecruitmentProcess(carryingCapacity.apply(fishState.getRandom()),
-                                              malthusianParameter.apply(fishState.getRandom()));
+                                              malthusianParameter.apply(fishState.getRandom()), false);
     }
 
     public DoubleParameter getCarryingCapacity() {
