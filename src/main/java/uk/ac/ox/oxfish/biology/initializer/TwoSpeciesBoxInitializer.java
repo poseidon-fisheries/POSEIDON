@@ -163,8 +163,8 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
 
 
         BiomassLocalBiology toReturn =  new BiomassLocalBiology(
-                new Double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
-                new Double[]{firstSpeciesCapacity,secondSpeciesCapacity});
+                new double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
+                new double[]{firstSpeciesCapacity,secondSpeciesCapacity});
         biologies.put(seaTile,toReturn);
         return toReturn;
     }

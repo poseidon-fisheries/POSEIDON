@@ -134,16 +134,16 @@ public class GenericBiomassInitializer extends AbstractBiologyInitializer
         }
 
         //create carrying capcities and put them in
-        Double[] carringCapacities = new  Double[biology.getSize()];
-        Double[] currentCapacity = new Double[biology.getSize()];
+        double[] carringCapacities = new  double[biology.getSize()];
+        double[] currentCapacity = new double[biology.getSize()];
         for(Species species : biology.getSpecies())
         {
-            Double k = carryingCapacity.get(species.getIndex()).apply(random) *
+            double k = carryingCapacity.get(species.getIndex()).apply(random) *
                     manager.getWeight(species, seaTile,map ,random );
             carringCapacities[species.getIndex()] = k;
 
-            Double min = minInitialCapacity.apply(random);
-            Double max = maxInitialCapacity.apply(random);
+            double min = minInitialCapacity.apply(random);
+            double max = maxInitialCapacity.apply(random);
             currentCapacity[species.getIndex()] =
                     ((max - min)*random.nextDouble(true, true) + min)
                             * k;

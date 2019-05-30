@@ -18,7 +18,7 @@ public class ConstantBiomassDecorator implements VariableBiomassBasedBiology {
 
 
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return delegate.getBiomass(species);
     }
 
@@ -44,12 +44,12 @@ public class ConstantBiomassDecorator implements VariableBiomassBasedBiology {
 
 
     @Override
-    public Double getCarryingCapacity(Species species) {
+    public double getCarryingCapacity(Species species) {
         return delegate.getCarryingCapacity(species);
     }
 
     @Override
-    public Double getCarryingCapacity(int index) {
+    public double getCarryingCapacity(int index) {
         return delegate.getCarryingCapacity(index);
     }
 
@@ -64,7 +64,7 @@ public class ConstantBiomassDecorator implements VariableBiomassBasedBiology {
     }
 
     @Override
-    public Double[] getCurrentBiomass() {
+    public double[] getCurrentBiomass() {
         return delegate.getCurrentBiomass();
     }
 }

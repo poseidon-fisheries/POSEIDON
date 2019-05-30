@@ -56,7 +56,7 @@ public class SchoolLocalBiology extends AbstractBiomassBasedBiology {
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
 
         double sum = 0;
         for(InfiniteSchool school : schools)

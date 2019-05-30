@@ -81,7 +81,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
         {
             //grow fish
 
-            Double[] currentBiomasses = biology.getCurrentBiomass();
+            double[] currentBiomasses = biology.getCurrentBiomass();
 
 
 
@@ -89,7 +89,7 @@ public class IndependentLogisticBiomassGrower implements Startable, Steppable{
             assert currentBiomasses[speciesIndex] >=0;
             //grows logistically
 
-            Double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
+            double carryingCapacity = biology.getCarryingCapacity(speciesIndex);
             if(carryingCapacity > FishStateUtilities.EPSILON && carryingCapacity > currentBiomasses[speciesIndex]) {
                 double oldBiomass = currentBiomasses[speciesIndex];
                 currentBiomasses[speciesIndex] = logisticStep(currentBiomasses[speciesIndex],
