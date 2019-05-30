@@ -66,7 +66,7 @@ public class HeatmapDestinationStrategyTest {
                 new HourlyProfitInTripObjective(true));
         SeaTile optimal = mock(SeaTile.class);
 
-        when(optimal.getAltitude()).thenReturn(-100d);
+        when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
 
         strategy.start(model,user);
@@ -112,7 +112,7 @@ public class HeatmapDestinationStrategyTest {
                 new HourlyProfitInTripObjective(true));
         SeaTile optimal = mock(SeaTile.class);
 
-        when(optimal.getAltitude()).thenReturn(-100d);
+        when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
 
         strategy.start(model,user);
@@ -161,7 +161,7 @@ public class HeatmapDestinationStrategyTest {
         SeaTile optimal = mock(SeaTile.class);
         assertNotEquals(strategy.getFavoriteSpot(),
                         optimal);
-        when(optimal.getAltitude()).thenReturn(-100d);
+        when(optimal.isWater()).thenReturn(true);
         when(optimizer.pick(any(), any(), any(),any(),any() )).thenReturn(optimal);
         strategy.reactToFinishedTrip(mock(TripRecord.class,RETURNS_DEEP_STUBS));
         assertEquals(strategy.getFavoriteSpot(),

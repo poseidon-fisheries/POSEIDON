@@ -116,7 +116,7 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
 
                         SeaTile tile = map.getSeaTile(x + w, y + h);
                         //if it's in the sea
-                        if(tile != null && tile.getAltitude() < 0)
+                        if(tile != null && tile.isWater())
                         {
                             //make it rocky
                             tile.setHabitat(new TileHabitat(1d));
@@ -126,10 +126,10 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
                 }
                 //get the border if it exists
                 SeaTile border = map.getSeaTile(x+w,y+rockyHeight);
-                if(border!= null && border.getAltitude() < 0)
+                if(border!= null && border.isWater())
                     borderTiles.add(border);
                 border = map.getSeaTile(x+w,y-1);
-                if(border!= null && border.getAltitude() < 0)
+                if(border!= null && border.isWater())
                     borderTiles.add(border);
 
             }
@@ -143,13 +143,13 @@ public class RockyRectanglesHabitatInitializer implements HabitatInitializer
                 //lower border
                 SeaTile border = map.getSeaTile(x-1, y + h);
                 //if it's in the sea
-                if(border != null && border.getAltitude() < 0)
+                if(border != null && border.isWater())
                 {
                     borderTiles.add(border);
                 }
                 //higher border
                 border = map.getSeaTile(x+rockyWidth, y + h);
-                if(border != null && border.getAltitude() < 0)
+                if(border != null && border.isWater())
                 {
                     borderTiles.add(border);
                 }

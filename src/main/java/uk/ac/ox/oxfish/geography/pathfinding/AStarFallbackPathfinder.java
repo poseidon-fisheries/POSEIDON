@@ -39,7 +39,7 @@ public class AStarFallbackPathfinder implements Pathfinder {
         // We don't know that path, see if we can get a straight path
         final Deque<SeaTile> straightPath = straightLinePathfinder.getRoute(map, start, end);
         final boolean pathCrossesLand = straightPath.stream().anyMatch(seaTile ->
-            seaTile.getAltitude() >= 0 && !seaTile.isPortHere()
+            seaTile.isLand() && !seaTile.isPortHere()
         );
         if (!pathCrossesLand) {
             // We have a straight path across water, put it in memory and return it

@@ -90,7 +90,7 @@ public class LinearGetterBiologyInitializer implements BiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
 
-        if(seaTile.getAltitude()>=0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
 
         Species species = biology.getSpecie(0);

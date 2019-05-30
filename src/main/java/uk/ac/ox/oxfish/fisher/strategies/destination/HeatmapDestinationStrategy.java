@@ -172,10 +172,10 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
 
         //find the optimal
         SeaTile optimal = acquisition.pick(model.getMap(), heatmap, model, fisher, delegate.getFavoriteSpot() );
-        Preconditions.checkState(optimal.getAltitude()<0);
+        Preconditions.checkState(optimal.isWater());
         if(model.getRandom().nextDouble()<=probability.getExplorationProbability()) {
             optimal = explorationStep.randomStep(model, model.getRandom(), fisher, optimal);
-            Preconditions.checkState(optimal.getAltitude()<0);
+            Preconditions.checkState(optimal.isWater());
         }
         delegate.setFavoriteSpot(optimal);
     }

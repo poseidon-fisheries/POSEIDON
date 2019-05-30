@@ -47,6 +47,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.MasonUtils;
 
 import java.util.Collections;
 import java.util.Deque;
@@ -256,7 +257,7 @@ public class NauticalMap implements Startable
 
         if(waterSeaTiles == null) {
             waterSeaTiles = new LinkedList<>(getAllSeaTilesAsList());
-            waterSeaTiles.removeIf(seaTile -> seaTile.getAltitude() >=0);
+            waterSeaTiles.removeIf(SeaTile::isLand);
         }
         return waterSeaTiles;
     }
@@ -430,18 +431,12 @@ public class NauticalMap implements Startable
 
         //check location
         SeaTile portSite = port.getLocation();
-        Preconditions.checkArgument(portSite.getAltitude() >= 0, "port is not on land");
+        Preconditions.checkArgument(portSite.isLand(), "port is not on land");
         //check it's coastal
         Bag neighbors = new Bag();
         rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
                 Grid2D.BOUNDED, false, neighbors,null,null);
-        boolean isCoastal = false;
-        for(Object tile : neighbors)
-        {
-            isCoastal = ((SeaTile)tile).getAltitude() < 0;
-            if(isCoastal)
-                break;
-        }
+        boolean isCoastal = MasonUtils.<SeaTile>bagToStream(neighbors).anyMatch(SeaTile::isWater);
         Preconditions.checkArgument(isCoastal,"port has no neighboring sea tiles");
 
         //put it in the masterlist

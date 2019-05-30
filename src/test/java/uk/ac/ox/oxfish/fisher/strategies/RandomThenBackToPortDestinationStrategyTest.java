@@ -81,7 +81,7 @@ public class RandomThenBackToPortDestinationStrategyTest {
             SeaTile destination = strategy.chooseDestination(fisher,
                                                              random, model, action);
             assertEquals(destination.getGridX(),0);
-            assertTrue(destination.getAltitude() < 0);
+            assertTrue(destination.isWater());
         }
 
 

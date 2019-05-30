@@ -70,7 +70,7 @@ public class RandomRockyRectangles implements   RockyRectangleMaker {
                 y = random.nextInt(mapHeight);
             }
             //can't be on land
-            while (map.getSeaTile(x, y).getAltitude() > 0);
+            while (map.getSeaTile(x, y).isLand());
 
 
             //get rectangle size

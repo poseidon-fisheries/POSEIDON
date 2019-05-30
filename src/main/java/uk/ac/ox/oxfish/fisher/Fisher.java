@@ -758,7 +758,7 @@ public class Fisher implements Steppable, Startable{
     {
         //preamble
         SeaTile here = status.getLocation();
-        Preconditions.checkState(here.getAltitude() < 0, "can't fish on land!");
+        Preconditions.checkState(here.isWater(), "can't fish on land!");
         //compute the catches (but kill nothing yet)
         Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
                                                                localBiology,

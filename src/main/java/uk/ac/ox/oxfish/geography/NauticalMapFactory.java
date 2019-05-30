@@ -199,7 +199,7 @@ public class NauticalMapFactory {
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++) {
                         SeaTile tile = (SeaTile) baseGrid.field[x][y];
-                        if (tile.getAltitude() < 0)
+                        if (!tile.isLand())
                             continue; //if it's ocean, don't bother
 
                         Bag neighbors = new Bag();
@@ -207,7 +207,7 @@ public class NauticalMapFactory {
                         //count how many neighbors are ocean
                         int seaNeighbors = 0;
                         for (Object neighbor : neighbors) {
-                            if (((SeaTile) neighbor).getAltitude() < 0)
+                            if (((SeaTile) neighbor).isWater())
                                 seaNeighbors++;
                         }
                         //if it has at least one neighbor, 40% chance of turning into sea
@@ -216,7 +216,7 @@ public class NauticalMapFactory {
                     }
                 //remove all the marked land tiles and turn them into ocean
                 for (SeaTile toRemove : toFlip) {
-                    assert toRemove.getAltitude() >= 0; //should be removing land!
+                    assert toRemove.isLand(); //should be removing land!
                     SeaTile substitute = new SeaTile(toRemove.getGridX(), toRemove.getGridY(), -random.nextInt(5000),
                                                      new TileHabitat(0d));
                     assert baseGrid.field[toRemove.getGridX()][toRemove.getGridY()] == toRemove;
@@ -353,7 +353,7 @@ public class NauticalMapFactory {
                             int x = random.nextInt(width);
                             int y = random.nextInt(height);
                             SeaTile toChange = (SeaTile) baseGrid.get(x, y);
-                            if (toChange.getAltitude() > 0) //land is cool man
+                            if (toChange.isLand()) //land is cool man
                             {
                                 assert toChange.getBiomass(null) <= 0;
                                 continue;

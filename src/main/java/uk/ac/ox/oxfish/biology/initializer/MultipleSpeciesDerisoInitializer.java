@@ -183,7 +183,7 @@ public class MultipleSpeciesDerisoInitializer implements AllocatedBiologyInitial
             int mapWidthInCells, NauticalMap map) {
 
 
-        if(seaTile.getAltitude() >= 0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
         else
         {

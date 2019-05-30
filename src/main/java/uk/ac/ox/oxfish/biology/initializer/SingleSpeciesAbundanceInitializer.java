@@ -199,7 +199,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
             int mapWidthInCells, NauticalMap map) {
 
 
-        if(seaTile.getAltitude() >= 0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
         //weight we want to allocate to this area
         double weight = intialAbundanceAllocator.allocate(seaTile,
