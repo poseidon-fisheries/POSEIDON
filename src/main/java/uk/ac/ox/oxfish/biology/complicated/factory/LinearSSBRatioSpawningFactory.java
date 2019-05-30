@@ -47,9 +47,9 @@ public class LinearSSBRatioSpawningFactory implements AlgorithmFactory<LinearSSB
         return new LinearSSBRatioSpawning(
                 virginRecruits.apply(fishState.getRandom()),
                 lengthAtMaturity.apply(fishState.getRandom()),
-                virginSpawningBiomass.apply(fishState.getRandom())
+                virginSpawningBiomass.apply(fishState.getRandom()),
 
-        );
+                false);
     }
 
     /**

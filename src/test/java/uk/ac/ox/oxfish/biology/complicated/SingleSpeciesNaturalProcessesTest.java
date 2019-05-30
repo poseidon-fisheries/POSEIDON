@@ -72,7 +72,7 @@ public class SingleSpeciesNaturalProcessesTest {
                         meristics.isAddRelativeFecundityToSpawningBiomass(),
                         meristics.getMaturity(),
                         meristics.getRelativeFecundity(),
-                        FEMALE),
+                        FEMALE, false),
                 species,
                 true, new StandardAgingProcess(false),
                 new NoAbundanceDiffusion(),

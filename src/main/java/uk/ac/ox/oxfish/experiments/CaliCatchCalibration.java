@@ -58,7 +58,8 @@ public class CaliCatchCalibration {
                 "default", "clamped", "eei",
                 "perfect", "random", "bandit",
                 "annealing", "intercepts", "kernel",
-                "perfect_cell", "fleetwide","nofleetwide"
+                "perfect_cell", "fleetwide","nofleetwide",
+                "nofleetwide_identity"
         };
 
 
@@ -69,12 +70,17 @@ public class CaliCatchCalibration {
 //                    YEARS_PER_RUN+1);
 
         //pre-to-post
-        for(String scenario : scenarios)
-            runMultipleTimesToBuildHistogram(scenario,
-                                             "itq_switch_script",
-                                             MAIN_DIRECTORY.resolve("pretopost"),
-                                             10);
+//        for(String scenario : scenarios)
+//            runMultipleTimesToBuildHistogram(scenario,
+//                                             "itq_switch_script",
+//                                             MAIN_DIRECTORY.resolve("pretopost"),
+//                                             10);
 
+                for(String scenario : scenarios)
+            runMultipleTimesToBuildHistogram(scenario,
+                    null,
+                    MAIN_DIRECTORY.resolve("map"),
+                    YEARS_PER_RUN+2);
 
     }
 

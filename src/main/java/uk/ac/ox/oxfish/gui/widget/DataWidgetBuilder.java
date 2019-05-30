@@ -36,8 +36,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * For every Dataset add a bunch of buttons to plot that column. Also do that for every Collection or Map or Maps of maps.
@@ -217,7 +217,19 @@ public class DataWidgetBuilder implements WidgetBuilder<JComponent,SwingMetawidg
         GridLayout layout = new GridLayout(0, 1);
         JPanel buttons = new JPanel(layout);
 
-        for(DataColumn column : dataset.getColumns()){
+        List<DataColumn> reordered = new LinkedList<>();
+
+        for(DataColumn column : dataset.getColumns())
+            reordered.add(column);
+
+        Collections.sort(reordered, new Comparator<DataColumn>() {
+            @Override
+            public int compare(DataColumn o1, DataColumn o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
+
+        for(DataColumn column : reordered){
             JButton columnButton = new JButton(column.getName());
             Box box = new Box(BoxLayout.X_AXIS);
             box.add(columnButton);

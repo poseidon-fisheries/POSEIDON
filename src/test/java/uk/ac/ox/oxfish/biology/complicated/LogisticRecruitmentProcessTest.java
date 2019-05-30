@@ -42,8 +42,8 @@ public class LogisticRecruitmentProcessTest {
     public void logisticGrowth() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                400d,.5
-        );
+                400d,.5,
+                false);
         double recruit = process.recruit(mock(Species.class), meristics,
                                          new StructuredAbundance(new double[]{0, 0, 0}, new double[]{12, 4, 60}),0 ,365 );
 
@@ -59,8 +59,8 @@ public class LogisticRecruitmentProcessTest {
     public void noRecruitsAboveCarryingCapacity() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                201,100
-        );
+                201,100,
+                false);
         double recruit = process.recruit(mock(Species.class), meristics,
                                          new StructuredAbundance(
                                       new double[]{0, 0, 0}, new double[]{12, 4, 60}),0 ,365);
@@ -78,8 +78,8 @@ public class LogisticRecruitmentProcessTest {
     public void noGrowthFromDepletion() throws Exception {
 
         LogisticRecruitmentProcess process = new LogisticRecruitmentProcess(
-                400d,.5
-        );
+                400d,.5,
+                false);
         double recruit = process.recruit(mock(Species.class), meristics,
                                          new StructuredAbundance(
                                       new double[]{0, 0, 0}, new double[]{0,0, 0}),0 ,365);

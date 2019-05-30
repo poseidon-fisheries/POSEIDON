@@ -60,14 +60,16 @@ public class LinearSSBRatioSpawning extends YearlyRecruitmentProcess {
         return virginSpawningBiomass;
     }
 
-    public LinearSSBRatioSpawning(double virginRecruits, double lenghtAtMaturity, double virginSpawningBiomass) {
+    public LinearSSBRatioSpawning(double virginRecruits, double lenghtAtMaturity,
+                                  double virginSpawningBiomass, boolean recruitEveryDay) {
+        super(recruitEveryDay);
         this.virginRecruits = virginRecruits;
         this.lenghtAtMaturity = lenghtAtMaturity;
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 
     @Override
-    protected double recruitYearly(
+    protected double computeYearlyRecruitment(
             Species species, Meristics meristics, StructuredAbundance abundance) {
 
         double currentSpawningBiomass = 0;

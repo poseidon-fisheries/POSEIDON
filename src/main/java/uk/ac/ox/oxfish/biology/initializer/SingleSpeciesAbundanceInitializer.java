@@ -163,7 +163,7 @@ public class SingleSpeciesAbundanceInitializer implements BiologyInitializer
                 cali.isAddRelativeFecundityToSpawningBiomass(),
                 cali.getMaturity(),
                 cali.getRelativeFecundity(),
-                FEMALE);
+                FEMALE, false);
         aging = new StandardAgingProcess(false);
 
         this.daily = false;

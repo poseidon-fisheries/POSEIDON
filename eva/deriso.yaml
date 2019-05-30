@@ -13,8 +13,8 @@ parameters:
 - !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
   alwaysPositive: true, maximum: 15000.0, minimum: 1500.0}
 runsPerSetting: 1
-scenarioFile: docs/groundfish/calibration/step1_catchability/logit/start_garbage.yaml
+scenarioFile: docs/groundfish/calibration/step1_catchability/map/start.yaml
 seed: 2
-summaryDirectory: docs/groundfish/calibration/step1_catchability/logit
+summaryDirectory: docs/groundfish/calibration/step1_catchability/map
 yearsToIgnore: 1
 yearsToRun: 5

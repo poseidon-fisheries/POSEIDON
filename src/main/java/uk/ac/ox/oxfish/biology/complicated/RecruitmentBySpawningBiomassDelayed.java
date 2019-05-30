@@ -43,7 +43,7 @@ public class RecruitmentBySpawningBiomassDelayed extends RecruitmentBySpawningBi
             int yearDelay) {
         super(virginRecruits, steepness, cumulativePhi, addRelativeFecundityToSpawningBiomass, maturity,
               relativeFecundity,
-              femaleSubdivision);
+              femaleSubdivision, false);
         this.yearDelay = yearDelay;
     }
 
