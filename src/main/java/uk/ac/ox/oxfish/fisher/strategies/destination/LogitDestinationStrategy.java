@@ -222,7 +222,7 @@ public class LogitDestinationStrategy implements DestinationStrategy{
 
 
             destination = this.input.getLastExtraction().get(armChosen);
-            if(destination!=null && destination.getAltitude()>0)
+            if(destination!=null && destination.isLand())
                 destination=null;
             if(numberOfTrials++>100) {
                 Log.warn("Failed to compute any valid logit here, failed to adapt");

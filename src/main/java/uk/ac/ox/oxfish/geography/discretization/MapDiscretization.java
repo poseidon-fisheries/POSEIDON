@@ -72,7 +72,7 @@ public class MapDiscretization {
         groups = discretizer.discretize(map);
         //filter out all land tiles
         for (int i = 0; i < groups.length; i++) {
-            groups[i] = groups[i].stream().filter(tile -> tile.getAltitude() < 0).collect(Collectors.toList());
+            groups[i] = groups[i].stream().filter(SeaTile::isWater).collect(Collectors.toList());
             //lock changes
             groups[i] = Collections.unmodifiableList(groups[i]);
         }
@@ -125,7 +125,7 @@ public class MapDiscretization {
             return null;
         }
         assert grouped.containsKey(tile);
-        assert tile.getAltitude()<=0;
+        assert tile.isWater();
         return grouped.get(tile);
     }
 

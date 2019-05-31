@@ -126,7 +126,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     public static LocalBiology generateAbundanceBiologyExceptOnLand(
             GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceLocalBiology> locals) {
-        if(seaTile.getAltitude() >= 0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
 
 

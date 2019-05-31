@@ -71,7 +71,7 @@ public class RandomConstantBiologyInitializer extends AbstractBiologyInitializer
     {
         assert minBiomass > maxBiomass;
 
-            if (seaTile.getAltitude() > 0)
+            if (seaTile.isLand())
                 return new EmptyLocalBiology();
             else
                 return new ConstantLocalBiology(random.nextDouble()* (maxBiomass - minBiomass)+ minBiomass);

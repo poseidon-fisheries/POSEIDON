@@ -77,13 +77,13 @@ public class RandomPortInitializer implements PortInitializer {
             {
 
                 SeaTile possible = (SeaTile) baseGrid.get(x, y);
-                if(possible.getAltitude() <= 0) //sea tiles aren't welcome!
+                if(possible.isWater()) //sea tiles aren't welcome!
                     continue;
                 int neighboringSeaTiles = 0;
                 Bag neighbors = new Bag();
                 baseGrid.getMooreNeighbors(x, y, 1, Grid2D.BOUNDED, false, neighbors, null, null);
                 for(Object neighbor : neighbors)
-                    if(((SeaTile)neighbor).getAltitude() < 0 )
+                    if(((SeaTile)neighbor).isWater())
                         neighboringSeaTiles++;
 
                 if(neighboringSeaTiles >=1)

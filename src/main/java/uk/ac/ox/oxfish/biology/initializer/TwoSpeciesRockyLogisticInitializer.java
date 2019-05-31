@@ -67,7 +67,7 @@ public class TwoSpeciesRockyLogisticInitializer extends RockyLogisticInitializer
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
-        if(seaTile.getAltitude() >=0)
+        if(seaTile.isLand())
             return new EmptyLocalBiology();
         else
         {

@@ -129,7 +129,7 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
 
-        if(seaTile.getAltitude() > 0)
+        if(seaTile.isLand())
             return new EmptyLocalBiology();
 
         //start by assuming both species are in

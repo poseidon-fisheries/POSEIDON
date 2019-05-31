@@ -110,7 +110,7 @@ public class FavoriteDestinationStrategy implements DestinationStrategy {
     public void setFavoriteSpot(SeaTile favoriteSpot) {
         this.favoriteSpot = favoriteSpot;
 
-        Preconditions.checkArgument(this.favoriteSpot.getAltitude()<0);
+        Preconditions.checkArgument(this.favoriteSpot.isWater());
     }
 
 

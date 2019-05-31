@@ -75,7 +75,7 @@ public class TowHeatmapGatherer implements Steppable, Startable{
             for (int x = 0; x < model.getMap().getWidth(); x++)
                 for (int y = 0; y < model.getMap().getHeight(); y++)
                 {
-                    if(model.getMap().getSeaTile(x,y).getAltitude()>0)
+                    if(model.getMap().getSeaTile(x,y).isLand())
                         towHeatmap[x][model.getMap().getHeight() - y - 1] = Double.NaN;
                     else
                         towHeatmap[x][model.getMap().getHeight() - y - 1] += trawls.get(x, y);

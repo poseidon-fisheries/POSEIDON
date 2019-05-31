@@ -165,7 +165,7 @@ public abstract class AbstractAbundanceDiffuser implements AbundanceDiffuser {
             SeaTile newTile = (SeaTile) inBag;
             if (biologies.containsKey(newTile))
             {
-                assert newTile.getAltitude() <= 0;
+                assert newTile.isWater();
                 assert newTile.getBiology() instanceof AbundanceLocalBiology;
                 toKeep.add(newTile);
             }

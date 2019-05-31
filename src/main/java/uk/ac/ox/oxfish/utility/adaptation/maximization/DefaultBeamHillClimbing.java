@@ -49,7 +49,7 @@ public class DefaultBeamHillClimbing extends BeamHillClimbing<SeaTile> {
                     int x = current.getGridX() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
                     int y = current.getGridY() + (random.nextBoolean() ? random.nextInt(maxStep+1) : -random.nextInt(maxStep+1));
                     SeaTile candidate = state.getMap().getSeaTile(x,y);
-                    if(candidate!=null && current!= candidate && candidate.getAltitude()<0
+                    if(candidate!=null && current!= candidate && candidate.isWater()
                             &&!fisher.getHomePort().getLocation().equals(candidate) )
                         return candidate;
                 }
