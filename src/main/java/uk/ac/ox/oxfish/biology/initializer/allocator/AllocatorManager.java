@@ -121,7 +121,7 @@ public class AllocatorManager {
                     //what's the weight here?
                     double weightHere =
                             //weight is always 0 above ground (or zeroed out)
-                            tile.getAltitude() >= 0 || zeroedArea.contains(tile)?
+                            tile.isLand() || zeroedArea.contains(tile)?
                                     0 :
                                     //otherwise allocate according to the right allocator
                                     allocators.get(speciesMap.getKey()).allocate(
@@ -160,7 +160,7 @@ public class AllocatorManager {
         {
             return
                     //if it's above land, return 0
-                    tile.getAltitude() >= 0 ?
+                    tile.isLand() ?
                             0 :
                             //otherwise allocate according to the right allocator
                             allocators.get(species).allocate(

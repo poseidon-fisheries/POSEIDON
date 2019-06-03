@@ -156,10 +156,10 @@ public class PortReader {
      */
     public static boolean isCorrectLocationForPort(SeaTile tile, NauticalMap map)
     {
-        if(tile.getAltitude()>=0)
+        if(tile.isLand())
         {
             LinkedList<SeaTile> neighbors = new LinkedList<SeaTile>(map.getMooreNeighbors(tile, 1));
-            return neighbors.stream().anyMatch(seaTile -> seaTile.getAltitude()<0);
+            return neighbors.stream().anyMatch(SeaTile::isWater);
         }
 
         return false;

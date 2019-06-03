@@ -19,8 +19,7 @@ public class DeployFad implements FadAction {
 
     @Override
     public boolean isPossible(FishState model, Fisher fisher) {
-        return fisher.getLocation().getAltitude() <= 0 &&
-            getFadManager(fisher).getNumFadsInStock() > 0;
+        return fisher.getLocation().isWater() && getFadManager(fisher).getNumFadsInStock() > 0;
     }
 
     @Override

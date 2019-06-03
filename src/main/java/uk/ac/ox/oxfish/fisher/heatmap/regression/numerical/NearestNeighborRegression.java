@@ -152,7 +152,7 @@ public class NearestNeighborRegression implements GeographicalRegression<Double>
     @Override
     public double predict(SeaTile tile, double time, Fisher fisher, FishState model) {
 
-        if(tile.getAltitude()>=0)
+        if (tile.isLand())
             return Double.NaN;
         else
             return predict(ObservationExtractor.convertToFeatures(tile, time, fisher, extractors, model));

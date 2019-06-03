@@ -259,7 +259,9 @@ public class SeaTile implements Startable, LocalBiology{
         return biology.getAbundance(species);
     }
 
+    public boolean isLand() { return altitude >= 0; }
 
+    public boolean isWater() { return !isLand(); }
 
     public Port grabPortHere() {
         return portHere;

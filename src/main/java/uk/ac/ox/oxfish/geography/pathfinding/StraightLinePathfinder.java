@@ -73,16 +73,16 @@ public class StraightLinePathfinder implements Pathfinder {
 
             //can you move your preferred way?
             SeaTile bestSeaTile = map.getSeaTile(candidateX, candidateY);
-            if (bestSeaTile.getAltitude() <= 0 || bestSeaTile.isPortHere()) {
+            if (bestSeaTile.isWater() || bestSeaTile.isPortHere()) {
                 path.add(bestSeaTile);
                 x = candidateX;
                 y = candidateY;
             }
             //try to move on the x axis only then
-            else if (candidateX != x && map.getSeaTile(candidateX, y).getAltitude() <= 0) {
+            else if (candidateX != x && map.getSeaTile(candidateX, y).isWater()) {
                 x = candidateX;
                 path.add(map.getSeaTile(candidateX, y));
-            } else if (candidateY != y && map.getSeaTile(x, candidateY).getAltitude() <= 0) {
+            } else if (candidateY != y && map.getSeaTile(x, candidateY).isWater()) {
                 y = candidateY;
                 path.add(map.getSeaTile(x, candidateY));
 

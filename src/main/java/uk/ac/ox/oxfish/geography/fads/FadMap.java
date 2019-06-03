@@ -70,7 +70,7 @@ public class FadMap implements Startable, Steppable {
         driftingObjectsMap.applyDrift(currentsMap::move);
         for (Fad fad : allFads().collect(Collectors.toList())) { // use copy, as FADs can be removed
             final Optional<SeaTile> seaTile = getFadTile(fad)
-                .filter(tile -> tile.getAltitude() <= 0);
+                .filter(SeaTile::isWater);
             if (seaTile.isPresent())
                 fad.aggregateFish(seaTile.get(), globalBiology);
             else

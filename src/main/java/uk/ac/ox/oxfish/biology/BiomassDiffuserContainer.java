@@ -119,7 +119,7 @@ public class BiomassDiffuserContainer implements Steppable {
         final List<SeaTile> tiles = map.getAllSeaTilesExcludingLandAsList().stream().filter(new Predicate<SeaTile>() {
             @Override
             public boolean test(SeaTile tile) {
-                return tile.getAltitude() < 0 && tile.getBiology() instanceof BiomassLocalBiology;
+                return tile.isWater() && tile.getBiology() instanceof BiomassLocalBiology;
             }
         }).collect(
                 Collectors.toList());
@@ -202,7 +202,7 @@ public class BiomassDiffuserContainer implements Steppable {
         for(Object inBag : mooreNeighbors)
         {
             SeaTile newTile = (SeaTile) inBag;
-            if (newTile.getAltitude() < 0 && newTile.getBiology() instanceof BiomassLocalBiology)
+            if (newTile.isWater() && newTile.getBiology() instanceof BiomassLocalBiology)
             {
                 toKeep.add(newTile);
             }

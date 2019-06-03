@@ -443,7 +443,7 @@ public abstract class CaliforniaAbstractScenario implements Scenario {
                             getBiologyInitializer()
                                     .generateLocal(biology, seaTile, model.getRandom(), gridHeight, gridWidth,map ));
                     //if it's sea (don't bother counting otherwise)
-                    if (seaTile.getAltitude() < 0)
+                    if (seaTile.isWater())
                     {
                         int i = 0;
                         //each specie grid value is an ObjectGrid2D whose cells are themselves list of observations
