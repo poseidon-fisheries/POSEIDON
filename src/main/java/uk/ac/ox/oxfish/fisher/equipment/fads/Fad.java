@@ -6,7 +6,8 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.biology.aggregation.FishAggregation;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.geography.SeaTile;
+
+import static java.lang.Math.min;
 
 public class Fad implements FishAggregation {
 
@@ -14,8 +15,11 @@ public class Fad implements FishAggregation {
     private final VariableBiomassBasedBiology aggregatedBiology;
     final private double proportionFished;
 
-    public Fad(FadManager owner, VariableBiomassBasedBiology aggregatedBiology,
-        double proportionFished) {
+    public Fad(
+        FadManager owner,
+        VariableBiomassBasedBiology aggregatedBiology,
+        double proportionFished
+    ) {
         this.owner = owner;
         this.aggregatedBiology = aggregatedBiology;
         this.proportionFished = proportionFished;
@@ -24,29 +28,43 @@ public class Fad implements FishAggregation {
     @Override
     public LocalBiology getAggregatedBiology() { return aggregatedBiology; }
 
-    public FadManager getOwner() { return owner; }
-
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
     */
     @Override
-    public void aggregateFish(SeaTile seaTile, GlobalBiology globalBiology) {
-        if (proportionFished > 0 && seaTile.isFishingEvenPossibleHere()) {
+    public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
+        if (proportionFished > 0) {
             // Calculate the catches and add them to the FAD biology:
             double[] catches = new double[globalBiology.getSize()];
             for (Species species : globalBiology.getSpecies()) {
                 double currentBiomass = aggregatedBiology.getBiomass(species);
                 double maxCatch = aggregatedBiology.getCarryingCapacity(species) - currentBiomass;
-                double caught = Math.min(seaTile.getBiomass(species) * proportionFished, maxCatch);
+                double caught = min(seaTileBiology.getBiomass(species) * proportionFished, maxCatch);
                 aggregatedBiology.setCurrentBiomass(species, currentBiomass + caught);
                 catches[species.getIndex()] = caught;
             }
             // Remove the catches from the underlying biology:
             final Catch catchObject = new Catch(catches);
-            seaTile.getBiology()
-                .reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
+            seaTileBiology.reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
         }
     }
 
+    public FadManager getOwner() { return owner; }
+
+    public void releaseFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
+        for (Species species : globalBiology.getSpecies()) {
+            // Remove biomass from the FAD...
+            final Double fadBiomass = aggregatedBiology.getBiomass(species);
+            aggregatedBiology.setCurrentBiomass(species, 0);
+
+            // ...and send that biomass down to the sea tile's biology.
+            // In the unlikely event that the sea tile's carrying capacity is exceeded,
+            // the extra fish is lost.
+            final Double seaTileBiomass = seaTileBiology.getBiomass(species);
+            final Double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
+            final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
+            seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
+        }
+    }
 }
