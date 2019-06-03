@@ -8,6 +8,8 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static java.lang.Math.min;
 
+import static java.lang.Math.min;
+
 public class Fad {
 
     private final FadManager owner;
@@ -16,28 +18,30 @@ public class Fad {
 
     public Fad(
         FadManager owner,
-        BiomassLocalBiology aggregatedBiology,
-        double attractionRate
+        VariableBiomassBasedBiology aggregatedBiology,
+        double proportionFished
     ) {
         this.owner = owner;
         this.aggregatedBiology = aggregatedBiology;
         this.attractionRate = attractionRate;
     }
 
-    public BiomassLocalBiology getAggregatedBiology() { return aggregatedBiology; }
+    @Override
+    public LocalBiology getAggregatedBiology() { return aggregatedBiology; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
     */
+    @Override
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
-        if (attractionRate > 0) {
+        if (proportionFished > 0) {
             // Calculate the catches and add them to the FAD biology:
             double[] catches = new double[globalBiology.getSize()];
             for (Species species : globalBiology.getSpecies()) {
                 double currentBiomass = aggregatedBiology.getBiomass(species);
                 double maxCatch = aggregatedBiology.getCarryingCapacity(species) - currentBiomass;
-                double caught = min(seaTileBiology.getBiomass(species) * attractionRate, maxCatch);
+                double caught = min(seaTileBiology.getBiomass(species) * proportionFished, maxCatch);
                 aggregatedBiology.setCurrentBiomass(species, currentBiomass + caught);
                 catches[species.getIndex()] = caught;
             }
@@ -52,14 +56,14 @@ public class Fad {
     public void releaseFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
         for (Species species : globalBiology.getSpecies()) {
             // Remove biomass from the FAD...
-            final double fadBiomass = aggregatedBiology.getBiomass(species);
+            final Double fadBiomass = aggregatedBiology.getBiomass(species);
             aggregatedBiology.setCurrentBiomass(species, 0);
 
             // ...and send that biomass down to the sea tile's biology.
             // In the unlikely event that the sea tile's carrying capacity is exceeded,
             // the extra fish is lost.
-            final double seaTileBiomass = seaTileBiology.getBiomass(species);
-            final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
+            final Double seaTileBiomass = seaTileBiology.getBiomass(species);
+            final Double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
             final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
             seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
         }
