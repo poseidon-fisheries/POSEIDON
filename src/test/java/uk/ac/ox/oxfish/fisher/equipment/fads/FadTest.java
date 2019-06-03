@@ -50,10 +50,10 @@ public class FadTest {
     /**
      * Make a new biology with the given carrying capacity and zero biomass
      */
-    private VariableBiomassBasedBiology makeBiology(Double carryingCapacityValue) {
-        Double[] biomass = new Double[globalBiology.getSize()];
+    private VariableBiomassBasedBiology makeBiology(double carryingCapacityValue) {
+        double[] biomass = new double[globalBiology.getSize()];
         Arrays.fill(biomass, 0.0);
-        Double[] carryingCapacity = new Double[globalBiology.getSize()];
+        double[] carryingCapacity = new double[globalBiology.getSize()];
         Arrays.fill(carryingCapacity, carryingCapacityValue);
         return new BiomassLocalBiology(biomass, carryingCapacity);
     }
