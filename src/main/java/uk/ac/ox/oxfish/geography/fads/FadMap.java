@@ -76,7 +76,7 @@ public class FadMap implements Startable, Steppable {
     }
 
     @NotNull
-    private Stream<Fad> allFads() {
+    public Stream<Fad> allFads() {
         return driftingObjectsMap.objects().map(o -> (Fad) o);
     }
 

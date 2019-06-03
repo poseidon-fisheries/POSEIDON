@@ -54,5 +54,10 @@ public class LogisticGrowers {
         NAMES.put(CommonLogisticGrowerFactory.class,
                 "Common Logistic Grower");
 
+        CONSTRUCTORS.put("FAD-Aware Common Logistic Grower",
+            FadAwareCommonLogisticGrowerInitializerFactory::new);
+        NAMES.put(FadAwareCommonLogisticGrowerInitializerFactory.class,
+            "FAD-Aware Common Logistic Grower");
+
     }
 }
