@@ -5,8 +5,12 @@ import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.geography.currents.CurrentMaps;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -19,7 +23,7 @@ public class FadTest {
     public void releaseFish() {
 
         // Make a full FAD, with a carrying capacity of 0.75...
-        final VariableBiomassBasedBiology fadBiology = makeBiology(0.75);
+        final BiomassLocalBiology fadBiology = makeBiology(0.75);
         fillBiology(fadBiology);
         final Fad fad = new Fad(mock(FadManager.class), fadBiology, 0);
 
@@ -50,7 +54,7 @@ public class FadTest {
     /**
      * Make a new biology with the given carrying capacity and zero biomass
      */
-    private VariableBiomassBasedBiology makeBiology(double carryingCapacityValue) {
+    private BiomassLocalBiology makeBiology(double carryingCapacityValue) {
         double[] biomass = new double[globalBiology.getSize()];
         Arrays.fill(biomass, 0.0);
         double[] carryingCapacity = new double[globalBiology.getSize()];

@@ -38,7 +38,7 @@ public class FadMapFactory implements AlgorithmFactory<FadMap> {
 
         // TODO: turn this into a FadFactory class
         final Function<FadManager, Fad> fadFactory = (owner) -> {
-            final VariableBiomassBasedBiology fadBiology =
+            final BiomassLocalBiology fadBiology =
                 new BiomassLocalBiology(1.0, fishState.getBiology().getSize(), fishState.random);
             return new Fad(owner, fadBiology, 0.01);
         };

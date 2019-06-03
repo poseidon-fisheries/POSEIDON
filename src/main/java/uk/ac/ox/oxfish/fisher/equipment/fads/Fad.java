@@ -14,11 +14,11 @@ public class Fad {
 
     private final FadManager owner;
     private final BiomassLocalBiology aggregatedBiology;
-    final private double attractionRate; // proportion of underlying biomass attracted per day
+    final private double proportionFished;
 
     public Fad(
         FadManager owner,
-        VariableBiomassBasedBiology aggregatedBiology,
+        BiomassLocalBiology aggregatedBiology,
         double proportionFished
     ) {
         this.owner = owner;
@@ -27,7 +27,7 @@ public class Fad {
     }
 
     @Override
-    public LocalBiology getAggregatedBiology() { return aggregatedBiology; }
+    public BiomassLocalBiology getAggregatedBiology() { return aggregatedBiology; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start

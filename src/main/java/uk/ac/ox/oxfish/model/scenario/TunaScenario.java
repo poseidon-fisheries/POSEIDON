@@ -3,7 +3,7 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.collect.ImmutableMap;
 import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
+import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
@@ -253,7 +253,7 @@ public class TunaScenario implements Scenario {
         ) {
             final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
             factory.setSpeciesName(speciesName);
-            factory.setGrower(new CommonLogisticGrowerFactory(logisticGrowthRate));
+            factory.setGrower(new FadAwareCommonLogisticGrowerInitializerFactory(logisticGrowthRate));
             factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
             factory.setBiomassSuppliedPerCell(false);
 
