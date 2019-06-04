@@ -5,12 +5,11 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.biology.aggregation.FishAggregation;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static java.lang.Math.min;
 
-public class Fad implements FishAggregation {
+public class Fad {
 
     private final FadManager owner;
     private final BiomassLocalBiology aggregatedBiology;
@@ -26,14 +25,12 @@ public class Fad implements FishAggregation {
         this.proportionFished = proportionFished;
     }
 
-    @Override
     public BiomassLocalBiology getAggregatedBiology() { return aggregatedBiology; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
     */
-    @Override
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
         if (proportionFished > 0) {
             // Calculate the catches and add them to the FAD biology:
