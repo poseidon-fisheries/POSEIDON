@@ -1,5 +1,13 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
+import static com.google.common.base.Preconditions.checkState;
+import static org.apache.sis.measure.Units.HOUR;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.utility.Measures.toHours;
+
+import java.util.Optional;
+
+import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -7,15 +15,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkState;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.HOUR;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class DeployFad implements FadAction {
 
@@ -41,8 +41,8 @@ public class DeployFad implements FadAction {
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(seaTile); }
 
-    @Override public Quantity<Time> getDuration() {
+    @Override public Time getDuration() {
         // TODO: what is the right number and where should it come from?
-        return getQuantity(1, HOUR);
+        return Quantities.create(1, HOUR);
     }
 }

@@ -1,7 +1,9 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.utility.Measures.toHours;
+
+import java.util.Optional;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -11,13 +13,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import javax.measure.Quantity;
 import javax.measure.quantity.Time;
-import java.util.Optional;
-
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear.SUCCESSFUL_SET_PROBABILITY;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class MakeFadSet implements FadAction {
 
@@ -33,12 +29,8 @@ public class MakeFadSet implements FadAction {
         if (isPossible(model, fisher)) {
             // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
             final int duration = toHours(getDuration());
-            if (model.getRandom().nextDouble() < SUCCESSFUL_SET_PROBABILITY) {
-                fisher.fishHere(model.getBiology(), duration, model, targetFad.getAggregatedBiology());
-                model.recordFishing(fisher.getLocation());
-            } else {
-                targetFad.releaseFish(getSeaTileBiology(fisher), model.getBiology());
-            }
+            fisher.fishHere(model.getBiology(), duration, model, targetFad.getAggregatedBiology());
+            model.recordFishing(fisher.getLocation());
             // TODO: picking up the FAD might not always be the thing to do
             return new ActionResult(new PickUpFad(targetFad), hoursLeft - duration);
         } else {
@@ -78,7 +70,7 @@ public class MakeFadSet implements FadAction {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
     }
 
-    @Override public Quantity<Time> getDuration() {
+    @Override public Time getDuration() {
         return PurseSeineGear.DURATION_OF_SET;
     }
 

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -8,20 +9,14 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import javax.measure.Quantity;
 import javax.measure.quantity.Time;
 
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.HOUR;
+import static org.apache.sis.measure.Units.HOUR;
 
 public class PurseSeineGear implements Gear {
 
     // TODO: this should probably be a general Gear property
-    public final static Quantity<Time> DURATION_OF_SET = getQuantity(4, HOUR);
-
-    // See https://github.com/nicolaspayette/tuna/issues/8
-    public final static double SUCCESSFUL_SET_PROBABILITY = 0.957;
-
+    public final static Time DURATION_OF_SET = Quantities.create(4, HOUR);
     private final FadManager fadManager;
 
     public PurseSeineGear(FadManager fadManager) { this.fadManager = fadManager; }
