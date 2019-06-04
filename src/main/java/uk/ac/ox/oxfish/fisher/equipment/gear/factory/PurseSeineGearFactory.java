@@ -7,7 +7,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private int initialNumberOfFads = 400;
+    private int initialNumberOfFads = Integer.MAX_VALUE;
 
     public int getInitialNumberOfFads() { return initialNumberOfFads; }
 
