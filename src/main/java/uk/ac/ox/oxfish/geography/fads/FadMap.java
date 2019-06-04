@@ -22,7 +22,6 @@ import uk.ac.ox.oxfish.model.StepOrder;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -35,24 +34,24 @@ public class FadMap implements Startable, Steppable {
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
-    private final Function<FadManager, Fad> fadFactory;
-
+    private final FadInitializer fadInitializer;
     private final CurrentMaps currentsMaps;
-
     private Stoppable stoppable;
 
     FadMap(
         NauticalMap nauticalMap,
         CurrentMaps currentsMaps,
         GlobalBiology globalBiology,
-        Function<FadManager, Fad> fadFactory
+        FadInitializer fadInitializer
     ) {
         this.nauticalMap = nauticalMap;
         this.currentsMaps = currentsMaps;
         this.globalBiology = globalBiology;
-        this.fadFactory = fadFactory;
+        this.fadInitializer = fadInitializer;
         this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
     }
+
+    public GlobalBiology getGlobalBiology() { return globalBiology; }
 
     @Override
     public void start(FishState model) {
@@ -104,7 +103,7 @@ public class FadMap implements Startable, Steppable {
 
     @NotNull
     public Fad deployFad(FadManager owner, Double2D location) {
-        Fad fad = fadFactory.apply(owner);
+        Fad fad = fadInitializer.apply(owner);
         driftingObjectsMap.add(fad, location, onMove(fad));
         return fad;
     }
