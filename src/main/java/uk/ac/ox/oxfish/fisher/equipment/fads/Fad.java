@@ -8,8 +8,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
 import static java.lang.Math.min;
 
-import static java.lang.Math.min;
-
 public class Fad {
 
     private final FadManager owner;
@@ -26,14 +24,12 @@ public class Fad {
         this.attractionRate = attractionRate;
     }
 
-    @Override
     public BiomassLocalBiology getAggregatedBiology() { return aggregatedBiology; }
 
     /* For now, just aggregate fish in fixed proportion of the underlying biomass.
        We'll probably need different types of FADs in the future when we start
        complexifying the model.
     */
-    @Override
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
         if (proportionFished > 0) {
             // Calculate the catches and add them to the FAD biology:
