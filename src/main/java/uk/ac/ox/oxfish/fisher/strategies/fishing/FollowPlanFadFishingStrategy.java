@@ -9,6 +9,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import static uk.ac.ox.oxfish.utility.Measures.toHours;
+
 public class FollowPlanFadFishingStrategy implements FishingStrategy {
 
     private FadDestinationStrategy fadDestinationStrategy(Fisher fisher) {
@@ -34,7 +36,7 @@ public class FollowPlanFadFishingStrategy implements FishingStrategy {
     ) {
         return fadDestinationStrategy(fisher).pollActionQueue()
             .filter(fadAction -> fadAction.isPossible(model, fisher))
-            .map(fadAction -> new ActionResult(fadAction, hoursLeft - fadAction.getDuration()))
+            .map(fadAction -> new ActionResult(fadAction, hoursLeft - toHours(fadAction.getDuration())))
             .orElse(new ActionResult(new Arriving(), 0));
     }
 

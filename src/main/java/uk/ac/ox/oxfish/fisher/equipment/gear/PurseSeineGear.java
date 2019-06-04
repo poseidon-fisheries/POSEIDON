@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -8,10 +9,14 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import javax.measure.quantity.Time;
+
+import static org.apache.sis.measure.Units.HOUR;
+
 public class PurseSeineGear implements Gear {
 
-    // TODO: this should probably be a general Gear property, and maybe double instead of int
-    public final static int DURATION_OF_SET = 1;
+    // TODO: this should probably be a general Gear property
+    public final static Time DURATION_OF_SET = Quantities.create(4, HOUR);
     private final FadManager fadManager;
 
     public PurseSeineGear(FadManager fadManager) { this.fadManager = fadManager; }

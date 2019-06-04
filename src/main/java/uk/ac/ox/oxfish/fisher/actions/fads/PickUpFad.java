@@ -1,8 +1,12 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
+import static org.apache.sis.measure.Units.HOUR;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 import java.util.Optional;
+
+import org.apache.sis.measure.Quantities;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -11,6 +15,8 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+
+import javax.measure.quantity.Time;
 
 public class PickUpFad implements FadAction {
 
@@ -24,7 +30,7 @@ public class PickUpFad implements FadAction {
     ) {
         if (isPossible(model, fisher)) {
             getFadManager(fisher).pickUpFad(targetFad);
-            return new ActionResult(new Arriving(), hoursLeft - getDuration());
+            return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
         } else {
             // it can happen that the FAD has drifted away, in which case the fisher has to
             // reconsider its course of action
@@ -38,8 +44,8 @@ public class PickUpFad implements FadAction {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
     }
 
-    @Override public double getDuration() {
-        return 1.0; // TODO: how long does it take to pick up a FAD?
+    @Override public Time getDuration() {
+        return Quantities.create(1, HOUR); // TODO: how long does it take to pick up a FAD?
     }
 
     @Override public boolean isPossible(FishState model, Fisher fisher) {
