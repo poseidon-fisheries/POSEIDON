@@ -6,19 +6,18 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.utility.Measures;
 
-import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static tech.units.indriya.unit.Units.KILOGRAM;
+import static org.apache.sis.measure.Units.KILOGRAM;
 
 public class FadInitializer implements Function<FadManager, Fad> {
 
-    private final Quantity<Mass> carryingCapacity;
+    private final Mass carryingCapacity;
     private final double attractionRate;
 
-    FadInitializer(Quantity<Mass> carryingCapacity, double attractionRate) {
+    FadInitializer(Mass carryingCapacity, double attractionRate) {
         this.carryingCapacity = carryingCapacity;
         this.attractionRate = attractionRate;
     }

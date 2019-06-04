@@ -12,12 +12,12 @@ public class Fad {
 
     private final FadManager owner;
     private final BiomassLocalBiology aggregatedBiology;
-    final private double proportionFished;
+    final private double attractionRate; // proportion of underlying biomass attracted per day
 
     public Fad(
         FadManager owner,
         BiomassLocalBiology aggregatedBiology,
-        double proportionFished
+        double attractionRate
     ) {
         this.owner = owner;
         this.aggregatedBiology = aggregatedBiology;
@@ -31,13 +31,13 @@ public class Fad {
        complexifying the model.
     */
     public void aggregateFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
-        if (proportionFished > 0) {
+        if (attractionRate > 0) {
             // Calculate the catches and add them to the FAD biology:
             double[] catches = new double[globalBiology.getSize()];
             for (Species species : globalBiology.getSpecies()) {
                 double currentBiomass = aggregatedBiology.getBiomass(species);
                 double maxCatch = aggregatedBiology.getCarryingCapacity(species) - currentBiomass;
-                double caught = min(seaTileBiology.getBiomass(species) * proportionFished, maxCatch);
+                double caught = min(seaTileBiology.getBiomass(species) * attractionRate, maxCatch);
                 aggregatedBiology.setCurrentBiomass(species, currentBiomass + caught);
                 catches[species.getIndex()] = caught;
             }

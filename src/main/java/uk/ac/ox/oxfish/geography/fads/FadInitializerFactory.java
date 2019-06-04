@@ -1,13 +1,13 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import ec.util.MersenneTwisterFast;
+import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
+import static org.apache.sis.measure.Units.KILOGRAM;
 
 public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
 
@@ -31,7 +31,7 @@ public class FadInitializerFactory implements AlgorithmFactory<FadInitializer> {
     @Override public FadInitializer apply(FishState fishState) {
         final MersenneTwisterFast random = fishState.getRandom();
         return new FadInitializer(
-            getQuantity(fadCarryingCapacityInKg.apply(random), KILOGRAM),
+            Quantities.create(fadCarryingCapacityInKg.apply(random), KILOGRAM),
             attractionRateInPercent.apply(random) / 100d
         );
     }
