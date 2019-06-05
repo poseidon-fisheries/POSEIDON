@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
-
-import java.util.Optional;
+import uk.ac.ox.oxfish.biology.LocalBiology;
+import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -14,33 +12,17 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
 import javax.measure.quantity.Time;
+import java.util.Optional;
+
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear.SUCCESSFUL_SET_PROBABILITY;
+import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class MakeFadSet implements FadAction {
 
     private Fad targetFad;
 
     public MakeFadSet(Fad targetFad) { this.targetFad = targetFad; }
-
-    private boolean isFadHere(Fisher fisher) {
-        return getActionTile(fisher)
-            .filter(fadTile -> fadTile.equals(fisher.getLocation()))
-            .isPresent();
-    }
-
-    private boolean isFishingAllowedHere(FishState model, Fisher fisher) {
-        return fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model);
-    }
-
-    public boolean isPossible(FishState model, Fisher fisher) {
-        return isFadHere(fisher) && (isFishingAllowedHere(model, fisher) || fisher.isCheater());
-    }
-
-    private PurseSeineGear getPurseSeineGear(Fisher fisher) {
-        if (fisher.getGear() instanceof PurseSeineGear)
-            return (PurseSeineGear) fisher.getGear();
-        else throw new IllegalStateException(
-            "MakeFadSet action can only be used with PurseSeineGear.");
-    }
 
     @Override
     public ActionResult act(
@@ -50,8 +32,12 @@ public class MakeFadSet implements FadAction {
         if (isPossible(model, fisher)) {
             // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
             final int duration = toHours(getDuration());
-            fisher.fishHere(model.getBiology(), duration, model, targetFad.getAggregatedBiology());
-            model.recordFishing(fisher.getLocation());
+            if (model.getRandom().nextDouble() < SUCCESSFUL_SET_PROBABILITY) {
+                fisher.fishHere(model.getBiology(), duration, model, targetFad.getAggregatedBiology());
+                model.recordFishing(fisher.getLocation());
+            } else {
+                targetFad.releaseFish(getSeaTileBiology(fisher), model.getBiology());
+            }
             // TODO: picking up the FAD might not always be the thing to do
             return new ActionResult(new PickUpFad(targetFad), hoursLeft - duration);
         } else {
@@ -62,6 +48,26 @@ public class MakeFadSet implements FadAction {
         }
     }
 
+    /**
+     * Cast the sea tile's biology to the VariableBiomassBasedBiology needed to
+     * release the FAD's biomass in the underlying ocean if needed.
+     * This will have to be rewritten in a more general way when we move to
+     * age structure biology, but we'll cross that bridge when we get there.
+     */
+    private VariableBiomassBasedBiology getSeaTileBiology(Fisher fisher) {
+        final LocalBiology localBiology = fisher.getLocation().getBiology();
+        if (localBiology instanceof VariableBiomassBasedBiology)
+            return (VariableBiomassBasedBiology) localBiology;
+        else throw new IllegalStateException(
+            "MakeFadSet action can only be used with VariableBiomassBasedBiology sea tile biologies.");
+    }
+
+    private boolean isFadHere(Fisher fisher) {
+        return getActionTile(fisher)
+            .filter(fadTile -> fadTile.equals(fisher.getLocation()))
+            .isPresent();
+    }
+
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
@@ -69,6 +75,18 @@ public class MakeFadSet implements FadAction {
 
     @Override public Time getDuration() {
         return PurseSeineGear.DURATION_OF_SET;
+    }
+
+    @Override public boolean isPossible(FishState model, Fisher fisher) {
+        return isFadHere(fisher) &&
+            (fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model) || fisher.isCheater());
+    }
+
+    private PurseSeineGear getPurseSeineGear(Fisher fisher) {
+        if (fisher.getGear() instanceof PurseSeineGear)
+            return (PurseSeineGear) fisher.getGear();
+        else throw new IllegalStateException(
+            "MakeFadSet action can only be used with PurseSeineGear.");
     }
 
 }
