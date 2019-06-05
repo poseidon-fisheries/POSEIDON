@@ -17,6 +17,10 @@ public class PurseSeineGear implements Gear {
 
     // TODO: this should probably be a general Gear property
     public final static Time DURATION_OF_SET = Quantities.create(4, HOUR);
+
+    // See https://github.com/nicolaspayette/tuna/issues/8
+    public final static double SUCCESSFUL_SET_PROBABILITY = 0.957;
+
     private final FadManager fadManager;
 
     public PurseSeineGear(FadManager fadManager) { this.fadManager = fadManager; }
