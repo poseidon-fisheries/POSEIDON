@@ -52,14 +52,14 @@ public class Fad {
     public void releaseFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
         for (Species species : globalBiology.getSpecies()) {
             // Remove biomass from the FAD...
-            final Double fadBiomass = aggregatedBiology.getBiomass(species);
+            final double fadBiomass = aggregatedBiology.getBiomass(species);
             aggregatedBiology.setCurrentBiomass(species, 0);
 
             // ...and send that biomass down to the sea tile's biology.
             // In the unlikely event that the sea tile's carrying capacity is exceeded,
             // the extra fish is lost.
-            final Double seaTileBiomass = seaTileBiology.getBiomass(species);
-            final Double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
+            final double seaTileBiomass = seaTileBiology.getBiomass(species);
+            final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
             final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
             seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
         }
