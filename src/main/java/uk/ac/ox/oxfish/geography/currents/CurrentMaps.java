@@ -5,17 +5,17 @@ import java.util.function.Function;
 
 public class CurrentMaps {
 
-    private final List<VectorGrid2D> currentsMaps;
-    private Function<Long, Integer> currentsSchedule; // function from Schedule.getSteps to a currentsMaps index
+    private final List<VectorGrid2D> vectorGrids;
+    private Function<Long, Integer> currentsSchedule; // function from Schedule.getSteps to a vectorGrids index
 
     public CurrentMaps(
-        List<VectorGrid2D> currentsMaps, Function<Long, Integer> currentsSchedule
+        List<VectorGrid2D> vectorGrids, Function<Long, Integer> currentsSchedule
     ) {
-        this.currentsMaps = currentsMaps;
+        this.vectorGrids = vectorGrids;
         this.currentsSchedule = currentsSchedule;
     }
 
     public VectorGrid2D atSteps(long steps) {
-        return currentsMaps.get(currentsSchedule.apply(steps));
+        return vectorGrids.get(currentsSchedule.apply(steps));
     }
 }

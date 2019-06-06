@@ -14,7 +14,7 @@ public class VectorGrid2D {
     private final DoubleGrid2D uGrid;
     private final DoubleGrid2D vGrid;
 
-    VectorGrid2D(int width, int height, Map<SeaTile, Double2D> vectors) {
+    public VectorGrid2D(int width, int height, Map<SeaTile, Double2D> vectors) {
         uGrid = new DoubleGrid2D(width, height, 0.0);
         vGrid = new DoubleGrid2D(width, height, 0.0);
         vectors.forEach((seaTile, vector) -> {
