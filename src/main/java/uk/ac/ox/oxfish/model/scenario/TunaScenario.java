@@ -243,9 +243,9 @@ public class TunaScenario implements Scenario {
         // Current parameter source is: `POSEIDON Tuna Team Folder/Surplus production model/Total_OCIATTC_PT_results_n=2.csv`
         private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = makeBiomassInitializerFactory(
             "Bigeye",
-            0.519167947920457, // logistic growth rate (r) (TODO: confirm number)
-            Quantities.create(694817, TONNE), // total carrying capacity (K) (TODO: confirm number)
-            Quantities.create(400000, TONNE), // total biomass (TODO: get real number instead of eyeballing from the plot)
+            0.265079184, // logistic growth rate (r)
+            Quantities.create(1440940, TONNE), // total carrying capacity (K)
+            Quantities.create(337224, TONNE), // total biomass
             HABITABILITY_BET_FILE
         );
         // TODO: private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory("Yellowfin", ...);
