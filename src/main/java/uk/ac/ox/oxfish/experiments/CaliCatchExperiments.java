@@ -40,6 +40,6 @@ public class CaliCatchExperiments {
                                                        "exploratory",
                                                        "calibration",
                                                        "histograms"),
-                                             YEARS_PER_RUN);
+                                             YEARS_PER_RUN, CaliCatchCalibration.RUNS);
     }
 }
