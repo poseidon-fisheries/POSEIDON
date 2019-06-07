@@ -48,6 +48,7 @@ vessels_df <-
     # Reassign some ships as per notes from K.
     # When operating from > 1 ports, took first one in document
     `IATTC Vessel Number` == 14604 ~ "PAGO PAGO HARBOR",
+    `IATTC Vessel Number` == 3430 ~ "PAGO PAGO HARBOR",
     `IATTC Vessel Number` == 3196 ~ "MAZATLAN",
     `IATTC Vessel Number` == 3694 ~ "MAZATLAN",
     `IATTC Vessel Number` == 14592 ~ "MANTA",
@@ -79,7 +80,16 @@ vessels_df <-
     `IATTC Vessel Number` == 3937 ~ "GUAYAQUIL", # for POSORJA
     TRUE ~ wpi_port_name
   )) %>%
-  mutate(link = paste0("[", name, "](", url, ")")) %>%
+  mutate(
+    link = paste0("[", name, "](", url, ")"),
+    `Fish hold volume (m3)` =
+      str_match(., "(^\\d+)(?:.*Total capacity: (\\d+)m3)?") %>%
+        {
+          coalesce(.[, 3], .[, 2])
+        } %>%
+        as.integer()
+  ) %>%
+  filter(`Fish hold volume (m3)` >= 108) %>% # keep only class 3 and up
   select(-reassigned_port_name)
 
 # Unknown ports:
@@ -139,16 +149,10 @@ boats_df <-
   inner_join(known_ports) %>%
   transmute(
     port_name = wpi_port_name,
-    hold_volume_in_m3 = `Fish hold volume (m3)` %>%
-      str_match(., "(^\\d+)(?:.*Total capacity: (\\d+)m3)?") %>%
-      {
-        coalesce(.[, 3], .[, 2])
-      } %>%
-      as.integer(),
+    hold_volume_in_m3 = `Fish hold volume (m3)`,
     carrying_capacity_in_t = `Carrying capacity (t)`,
     length_in_m = Length,
-    beam_in_m = Beam,
-    engine_power_in_hp = `Engine power (HP)`
+    beam_in_m = Beam
   )
 
 write_csv(boats_df, here("boats.csv"))
@@ -189,4 +193,3 @@ depth_df <-
   transmute(x = lon, y = lat, depth = 1000000) %>%
   bind_rows(download_depth_df(850, limits$west, limits$south, limits$east, limits$north, 0.1)) %>%
   write_csv(here("depth.csv"))
-
