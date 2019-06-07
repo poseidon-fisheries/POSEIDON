@@ -43,6 +43,7 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.measure.quantity.Mass;
+import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,6 +58,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.sis.measure.Units.CUBIC_METRE;
 import static org.apache.sis.measure.Units.KILOGRAM;
+import static org.apache.sis.measure.Units.KILOMETRES_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.TONNE;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
@@ -68,12 +70,12 @@ public class TunaScenario implements Scenario {
     public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
     private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
     private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
+    private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
+
     private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
     private static final Path HABITABILITY_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
-
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
-    private FromFileMapInitializerFactory mapInitializer =
-        new FromFileMapInitializerFactory(MAP_FILE, 120);
+    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 120);
     private FadInitializerFactory fadInitializer = new FadInitializerFactory();
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
@@ -209,6 +211,11 @@ public class TunaScenario implements Scenario {
         final Supplier<Engine> engineSupplier = fisherDefinition.makeEngineSupplier(model.random);
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
 
+        final Map<Integer, Speed> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
+            r -> r.getInt("class"),
+            r -> Quantities.create(r.getDouble("speed"), KILOMETRES_PER_HOUR)) // TODO: verify this
+        );
+
         final List<Fisher> fishers =
             parseAllRecords(BOATS_FILE).stream().map(record -> {
                 final String portName = record.getString("port_name");
@@ -216,8 +223,13 @@ public class TunaScenario implements Scenario {
                 final Double beam = record.getDouble("beam_in_m");
                 final Mass carryingCapacity = Quantities.create(record.getDouble("carrying_capacity_in_t"), TONNE);
                 final Volume holdVolume = Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                final Engine engine = new Engine(
+                    Double.NaN, // Unused
+                    0.0, // TODO
+                    asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRES_PER_HOUR)
+                );
                 fisherFactory.setPortSupplier(() -> portsByName.get(portName));
-                fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engineSupplier.get(), fuelTankSupplier.get()));
+                fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
                 fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
                 return fisherFactory.buildFisher(model);
             }).collect(toList());
