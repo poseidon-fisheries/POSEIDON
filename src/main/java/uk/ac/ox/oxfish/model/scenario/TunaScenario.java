@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInit
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -68,6 +69,7 @@ public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
+    public static final Path IATTC_SHAPE_FILE = INPUT_DIRECTORY.resolve("shape").resolve("RFB_IATTC.shp");
     private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
     private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
     private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
@@ -283,7 +285,10 @@ public class TunaScenario implements Scenario {
             final CoordinateFileAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
             initialCapacityAllocator.setBiomassPath(initialCapacityFile);
             initialCapacityAllocator.setInputFileHasHeader(true);
-            factory.setInitialCapacityAllocator(initialCapacityAllocator);
+            final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
+            polygonAllocatorFactory.setShapeFile(IATTC_SHAPE_FILE);
+            polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
+            factory.setInitialCapacityAllocator(polygonAllocatorFactory);
 
             return factory;
         }
