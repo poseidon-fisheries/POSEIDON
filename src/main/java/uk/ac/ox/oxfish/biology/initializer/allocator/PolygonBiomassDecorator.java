@@ -1,15 +1,11 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 import ec.util.MersenneTwisterFast;
 import sim.field.geo.GeomVectorField;
-import sim.util.Bag;
-import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.function.Function;
 
 public class PolygonBiomassDecorator implements BiomassAllocator {
@@ -17,7 +13,7 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
     /**
      * polygons where biomass is allowed
      */
-    private final GeomVectorField boundingPolyongs;
+    private final GeomVectorField boundingPolygons;
 
     /**
      * if this is true, biomass is within the polygons. If this is false, biomass is allowed only outside of it.
@@ -35,11 +31,11 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
     private final HashMap<SeaTile,Boolean> insideUnion;
 
 
-    public PolygonBiomassDecorator(GeomVectorField boundingPolyongs, boolean inside, BiomassAllocator delegate) {
-        this.boundingPolyongs = boundingPolyongs;
+    public PolygonBiomassDecorator(GeomVectorField boundingPolygons, boolean inside, BiomassAllocator delegate) {
+        this.boundingPolygons = boundingPolygons;
         this.inside = inside;
         this.delegate = delegate;
-        boundingPolyongs.computeUnion();
+        boundingPolygons.computeUnion();
         insideUnion = new HashMap<>();
     }
 
@@ -70,7 +66,7 @@ public class PolygonBiomassDecorator implements BiomassAllocator {
                         tile, new Function<SeaTile, Boolean>() {
                             @Override
                             public Boolean apply(SeaTile seaTile) {
-                                return boundingPolyongs.isInsideUnion(map.getCoordinates(tile));
+                                return boundingPolygons.isInsideUnion(map.getCoordinates(tile));
                             }
                         }
                 );
