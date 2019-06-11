@@ -76,7 +76,9 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
 
     private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
-    private static final Path HABITABILITY_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
+    private static final Path BIOMASS_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
+    private static final Path BIOMASS_SKJ_FILE = INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv");
+    private static final Path BIOMASS_YFT_FILE = INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 120);
     private FadInitializerFactory fadInitializer = new FadInitializerFactory();
@@ -262,10 +264,22 @@ public class TunaScenario implements Scenario {
             0.265079184, // logistic growth rate (r)
             Quantities.create(1440940, TONNE), // total carrying capacity (K)
             Quantities.create(337224, TONNE), // total biomass
-            HABITABILITY_BET_FILE
+            BIOMASS_BET_FILE
         );
-        // TODO: private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory("Yellowfin", ...);
-        // TODO: private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory("Skipjack", ...);
+        private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory(
+            "Yellowfin",
+            0.879, // logistic growth rate (r)
+            Quantities.create(1202770, TONNE), // total carrying capacity (K)
+            Quantities.create(507295, TONNE), // total biomass
+            BIOMASS_YFT_FILE
+        );
+        private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory(
+            "Skipjack",
+            0.270, // logistic growth rate (r)
+            Quantities.create(7401000, TONNE), // total carrying capacity (K)
+            Quantities.create(8744000, TONNE), // total biomass
+            BIOMASS_SKJ_FILE
+        );
 
         private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
             String speciesName,
@@ -299,10 +313,16 @@ public class TunaScenario implements Scenario {
             return bigeyeBiomassInitializer;
         }
 
+        @SuppressWarnings("unused")
+        public SingleSpeciesBiomassNormalizedFactory getYellowfinBiomassInitializer() { return yellowfinBiomassInitializer; }
+
+        @SuppressWarnings("unused")
+        public SingleSpeciesBiomassNormalizedFactory getSkipjackBiomassInitializer() { return skipjackBiomassInitializer; }
+
         @Override
         public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
             final List<SingleSpeciesBiomassInitializer> biomassInitializers =
-                Stream.of(bigeyeBiomassInitializer) // TODO: yellowfinBiomassInitializer, skipjackBiomassInitializer
+                Stream.of(bigeyeBiomassInitializer, yellowfinBiomassInitializer, skipjackBiomassInitializer)
                     .map(factory -> factory.apply(fishState)).collect(toList());
             return new MultipleIndependentSpeciesBiomassInitializer(
                 biomassInitializers, false, false
