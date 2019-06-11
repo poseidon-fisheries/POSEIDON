@@ -16,17 +16,50 @@ import java.util.Map;
 /**
  * the plugin/additionalStartable version of AbundanceResetter + BiomassSnapshot
  */
-public class SnapshotAbundanceResetter implements AdditionalStartable {
+public class SnapshotBiologyResetter implements AdditionalStartable {
 
 
 
-    private final HashMap<AbundanceResetter,SnapshotBiomassAllocator> resetters;
+    private final HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters;
 
 
 
     private final int yearsBeforeReset;
 
-    public SnapshotAbundanceResetter(GlobalBiology biology, int yearsBeforeReset) {
+
+    private SnapshotBiologyResetter(int yearsBeforeReset,
+                                    HashMap<BiologyResetter,SnapshotBiomassAllocator> resetters)
+    {
+        this.yearsBeforeReset = yearsBeforeReset;
+        this.resetters = resetters;
+    }
+
+
+    public static SnapshotBiologyResetter abundanceResetter(GlobalBiology biology,
+                                                            int yearsBeforeReset){
+
+
+        LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
+        for (Species species : biology.getSpecies()) {
+            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
+            resetters.put(new AbundanceResetter(snapper,species),snapper);
+        }
+        return new SnapshotBiologyResetter(yearsBeforeReset,resetters);
+    }
+
+    public static SnapshotBiologyResetter biomassResetter(GlobalBiology biology,
+                                                            int yearsBeforeReset){
+
+
+        LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
+        for (Species species : biology.getSpecies()) {
+            SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
+            resetters.put(new BiomassResetter(snapper,species),snapper);
+        }
+        return new SnapshotBiologyResetter(yearsBeforeReset,resetters);
+    }
+
+    public SnapshotBiologyResetter(GlobalBiology biology, int yearsBeforeReset) {
 
         this.yearsBeforeReset=yearsBeforeReset;
         resetters = new LinkedHashMap<>();
@@ -44,7 +77,7 @@ public class SnapshotAbundanceResetter implements AdditionalStartable {
         model.scheduleOnce(new Steppable() {
             @Override
             public void step(SimState simState) {
-                for (AbundanceResetter resetter : resetters.keySet()) {
+                for (BiologyResetter resetter : resetters.keySet()) {
                     resetter.recordAbundance(model.getMap());
                 }
             }
@@ -55,7 +88,7 @@ public class SnapshotAbundanceResetter implements AdditionalStartable {
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        for (Map.Entry<AbundanceResetter, SnapshotBiomassAllocator>
+                        for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
                                 resetter : resetters.entrySet()) {
                             resetter.getValue().takeSnapshort(
                                     model.getMap(),

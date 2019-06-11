@@ -11,7 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
  * memorizes abundance and then redistributes according to given allocator
  * it according to the given allocators
  */
-public class AbundanceResetter  {
+public class AbundanceResetter implements BiologyResetter {
 
     private BiomassAllocator allocator;
 
@@ -27,7 +27,8 @@ public class AbundanceResetter  {
 
 
 
-    public void recordAbundance( NauticalMap map)
+    @Override
+    public void recordAbundance(NauticalMap map)
     {
         recordedAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
@@ -81,8 +82,10 @@ public class AbundanceResetter  {
 
 
 
-    public void resetAbundance(NauticalMap map,
-                               MersenneTwisterFast random)
+    @Override
+    public void resetAbundance(
+            NauticalMap map,
+            MersenneTwisterFast random)
     {
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
             resetAbundanceHere(seaTile,map,random);

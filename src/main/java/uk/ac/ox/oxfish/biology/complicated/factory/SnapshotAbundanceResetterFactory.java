@@ -1,19 +1,17 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.SnapshotAbundanceResetter;
+import uk.ac.ox.oxfish.biology.complicated.SnapshotBiologyResetter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<SnapshotAbundanceResetter> {
+public class SnapshotAbundanceResetterFactory implements AlgorithmFactory<SnapshotBiologyResetter> {
 
 
     private int yearsToReset = 1;
 
     @Override
-    public SnapshotAbundanceResetter apply(FishState state) {
-        return new SnapshotAbundanceResetter(state.getBiology(),yearsToReset);
+    public SnapshotBiologyResetter apply(FishState state) {
+        return SnapshotBiologyResetter.abundanceResetter(state.getBiology(), yearsToReset);
     }
 
 

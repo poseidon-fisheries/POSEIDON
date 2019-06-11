@@ -1,16 +1,12 @@
 package uk.ac.ox.oxfish.model.plugins;
 
-import uk.ac.ox.oxfish.biology.BiomassLocationResetter;
 import uk.ac.ox.oxfish.biology.BiomassResetterFactory;
-import uk.ac.ox.oxfish.biology.BiomassTotalResetter;
 import uk.ac.ox.oxfish.biology.BiomassTotalResetterFactory;
 import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgentFactory;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
-import uk.ac.ox.oxfish.biology.complicated.SnapshotAbundanceResetter;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
-import uk.ac.ox.oxfish.fisher.strategies.discarding.*;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
