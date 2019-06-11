@@ -70,7 +70,7 @@ public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
-    public static final Path IATTC_SHAPE_FILE = INPUT_DIRECTORY.resolve("shape").resolve("RFB_IATTC.shp");
+    private static final Path IATTC_SHAPE_FILE = INPUT_DIRECTORY.resolve("shape").resolve("RFB_IATTC.shp");
     private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
     private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
     private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
