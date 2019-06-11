@@ -3,10 +3,12 @@ package uk.ac.ox.oxfish.utility;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Mass;
+import javax.measure.quantity.Speed;
 import javax.measure.quantity.Time;
 
 import static org.apache.sis.measure.Units.HOUR;
 import static org.apache.sis.measure.Units.KILOGRAM;
+import static org.apache.sis.measure.Units.KILOMETRES_PER_HOUR;
 
 public class Measures {
 
@@ -14,6 +16,11 @@ public class Measures {
      * the definition of metric tonnes as a javax.measure
      */
     public static final Unit<Mass> TONNE = KILOGRAM.multiply(1000); // 1 t = 1000 kg
+
+    /**
+     * the definition of knots as a javax.measure
+     */
+    public static final Unit<Speed> KNOTS = KILOMETRES_PER_HOUR.multiply(1.852);
 
     /**
      * @param t A Time duration

@@ -61,6 +61,7 @@ import static org.apache.sis.measure.Units.CUBIC_METRE;
 import static org.apache.sis.measure.Units.KILOGRAM;
 import static org.apache.sis.measure.Units.KILOMETRES_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
+import static uk.ac.ox.oxfish.utility.Measures.KNOTS;
 import static uk.ac.ox.oxfish.utility.Measures.TONNE;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
@@ -215,7 +216,7 @@ public class TunaScenario implements Scenario {
 
         final Map<Integer, Speed> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
             r -> r.getInt("class"),
-            r -> Quantities.create(r.getDouble("speed"), KILOMETRES_PER_HOUR)) // TODO: verify this
+            r -> Quantities.create(r.getDouble("speed"), KNOTS))
         );
 
         final List<Fisher> fishers =
