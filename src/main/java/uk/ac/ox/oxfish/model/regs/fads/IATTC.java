@@ -1,8 +1,9 @@
 package uk.ac.ox.oxfish.model.regs.fads;
 
+import javax.measure.Quantity;
 import javax.measure.quantity.Volume;
 
-import static org.apache.sis.measure.Units.CUBIC_METRE;
+import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 public class IATTC {
@@ -12,7 +13,7 @@ public class IATTC {
      * according to IATTC resolution C-17-02.8. This is currently hard coded, but we'll most likely
      * want to make this changeable.
      */
-    public static int activeFadsLimit(Volume holdVolume) {
+    public static int activeFadsLimit(Quantity<Volume> holdVolume) {
         switch (capacityClass(holdVolume)) {
             case 1:
             case 2:
@@ -32,7 +33,7 @@ public class IATTC {
      * It seems that around 2010, IATTC changed from weight based capacity classes to volume based
      * ones because the latter is more objective.
      */
-    public static int capacityClass(Volume holdVolume) {
+    public static int capacityClass(Quantity<Volume> holdVolume) {
         final long v = volumeInCubicMetres(holdVolume);
         if (v < 54) return 1;
         else if (v < 108) return 2;
@@ -42,7 +43,7 @@ public class IATTC {
         else return 6;
     }
 
-    private static long volumeInCubicMetres(Volume holdVolume) {
+    private static long volumeInCubicMetres(Quantity<Volume> holdVolume) {
         // Hold volumes should normally be integers, but we round just in case
         return Math.round(asDouble(holdVolume, CUBIC_METRE));
     }

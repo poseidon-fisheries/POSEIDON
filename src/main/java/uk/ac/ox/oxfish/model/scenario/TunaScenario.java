@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.sis.measure.Quantities;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -42,6 +41,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
@@ -56,12 +56,13 @@ import java.util.stream.Stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.apache.sis.measure.Units.CUBIC_METRE;
-import static org.apache.sis.measure.Units.KILOGRAM;
-import static org.apache.sis.measure.Units.KILOMETRES_PER_HOUR;
+import static si.uom.NonSI.KNOT;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
+import static tech.units.indriya.unit.Units.CUBIC_METRE;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-import static uk.ac.ox.oxfish.utility.Measures.KNOTS;
-import static uk.ac.ox.oxfish.utility.Measures.TONNE;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
@@ -207,9 +208,9 @@ public class TunaScenario implements Scenario {
 
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
 
-        final Map<Integer, Speed> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
+        final Map<Integer, Quantity<Speed>> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
             r -> r.getInt("class"),
-            r -> Quantities.create(r.getDouble("speed"), KNOTS))
+            r -> getQuantity(r.getDouble("speed"), KNOT))
         );
 
         final List<Fisher> fishers =
@@ -217,12 +218,12 @@ public class TunaScenario implements Scenario {
                 final String portName = record.getString("port_name");
                 final Double length = record.getDouble("length_in_m");
                 final Double beam = record.getDouble("beam_in_m");
-                final Mass carryingCapacity = Quantities.create(record.getDouble("carrying_capacity_in_t"), TONNE);
-                final Volume holdVolume = Quantities.create(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
+                final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
                 final Engine engine = new Engine(
                     Double.NaN, // Unused
                     0.0, // TODO
-                    asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRES_PER_HOUR)
+                    asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRE_PER_HOUR)
                 );
                 fisherFactory.setPortSupplier(() -> portsByName.get(portName));
                 fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
@@ -253,30 +254,30 @@ public class TunaScenario implements Scenario {
         private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = makeBiomassInitializerFactory(
             "Bigeye",
             0.265079184, // logistic growth rate (r)
-            Quantities.create(1440940, TONNE), // total carrying capacity (K)
-            Quantities.create(337224, TONNE), // total biomass
+            getQuantity(1440940, TONNE), // total carrying capacity (K)
+            getQuantity(337224, TONNE), // total biomass
             BIOMASS_BET_FILE
         );
         private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory(
             "Yellowfin",
             0.879, // logistic growth rate (r)
-            Quantities.create(1202770, TONNE), // total carrying capacity (K)
-            Quantities.create(507295, TONNE), // total biomass
+            getQuantity(1202770, TONNE), // total carrying capacity (K)
+            getQuantity(507295, TONNE), // total biomass
             BIOMASS_YFT_FILE
         );
         private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory(
             "Skipjack",
             0.270, // logistic growth rate (r)
-            Quantities.create(7401000, TONNE), // total carrying capacity (K)
-            Quantities.create(8744000, TONNE), // total biomass
+            getQuantity(7401000, TONNE), // total carrying capacity (K)
+            getQuantity(8744000, TONNE), // total biomass
             BIOMASS_SKJ_FILE
         );
 
         private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
             String speciesName,
             double logisticGrowthRate,
-            Mass totalCarryingCapacity,
-            Mass totalBiomass,
+            Quantity<Mass> totalCarryingCapacity,
+            Quantity<Mass> totalBiomass,
             Path initialCapacityFile
         ) {
             final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
