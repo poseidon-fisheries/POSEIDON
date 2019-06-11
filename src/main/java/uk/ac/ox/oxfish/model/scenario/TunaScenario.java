@@ -24,7 +24,6 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomPlanFadDestin
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FollowPlanFadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
-import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -81,7 +80,6 @@ public class TunaScenario implements Scenario {
     private static final Path BIOMASS_YFT_FILE = INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 120);
-    private FadInitializerFactory fadInitializer = new FadInitializerFactory();
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
@@ -93,12 +91,6 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setFishingStrategy(new FollowPlanFadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new RandomPlanFadDestinationStrategyFactory());
     }
-
-    @SuppressWarnings("unused")
-    public FadInitializerFactory getFadInitializer() { return fadInitializer; }
-
-    @SuppressWarnings("unused")
-    public void setFadInitializer(FadInitializerFactory fadInitializer) { this.fadInitializer = fadInitializer; }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() {
@@ -199,7 +191,7 @@ public class TunaScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
-        FadMapFactory fadMapFactory = new FadMapFactory(CURRENTS_FILE, fadInitializer.apply(model));
+        FadMapFactory fadMapFactory = new FadMapFactory(CURRENTS_FILE);
         final FadMap fadMap = fadMapFactory.apply(model);
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);

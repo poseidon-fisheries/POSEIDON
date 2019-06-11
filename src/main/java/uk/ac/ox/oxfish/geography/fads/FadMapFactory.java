@@ -11,12 +11,10 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentsMapFactory.makeCurrents
 
 public class FadMapFactory implements AlgorithmFactory<FadMap> {
 
-    private final FadInitializer fadInitializer;
     private Path currentsVectorFilePath;
 
-    public FadMapFactory(Path currentsVectorFilePath, FadInitializer fadInitializer) {
+    public FadMapFactory(Path currentsVectorFilePath) {
         this.currentsVectorFilePath = currentsVectorFilePath;
-        this.fadInitializer = fadInitializer;
     }
 
     @SuppressWarnings("unused")
@@ -32,7 +30,7 @@ public class FadMapFactory implements AlgorithmFactory<FadMap> {
     @Override public FadMap apply(FishState fishState) {
         final NauticalMap nauticalMap = fishState.getMap();
         final CurrentMaps currentMaps = makeCurrentsMaps(nauticalMap, currentsVectorFilePath);
-        return new FadMap(nauticalMap, currentMaps, fishState.getBiology(), fadInitializer);
+        return new FadMap(nauticalMap, currentMaps, fishState.getBiology());
     }
 
 }

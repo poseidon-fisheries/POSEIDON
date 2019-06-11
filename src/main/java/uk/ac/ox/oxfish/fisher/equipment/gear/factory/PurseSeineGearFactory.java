@@ -9,6 +9,15 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private int initialNumberOfFads = Integer.MAX_VALUE;
+    private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
+
+    @SuppressWarnings("unused")
+    public FadInitializerFactory getFadInitializerFactory() { return fadInitializerFactory; }
+
+    @SuppressWarnings("unused")
+    public void setFadInitializerFactory(
+        FadInitializerFactory fadInitializerFactory
+    ) { this.fadInitializerFactory = fadInitializerFactory; }
 
     @SuppressWarnings("unused")
     public int getInitialNumberOfFads() { return initialNumberOfFads; }

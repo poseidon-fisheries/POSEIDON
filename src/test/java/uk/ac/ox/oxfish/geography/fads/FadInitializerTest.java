@@ -22,8 +22,8 @@ public class FadInitializerTest {
         final FadInitializer fadInitializer =
             new FadInitializer(Quantities.create(1d, TONNE), 0d);
         final FadMap fadMap =
-            new FadMap(mock(NauticalMap.class), mock(CurrentMaps.class), globalBiology, fadInitializer);
-        final FadManager fadManager = new FadManager(fadMap, 0);
+            new FadMap(mock(NauticalMap.class), mock(CurrentMaps.class), globalBiology);
+        final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
 
         final Fad fad = fadInitializer.apply(fadManager);
         for (Species species : globalBiology.getSpecies())

@@ -33,20 +33,17 @@ public class FadMap implements Startable, Steppable {
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
-    private final FadInitializer fadInitializer;
     private final CurrentMaps currentsMaps;
     private Stoppable stoppable;
 
     FadMap(
         NauticalMap nauticalMap,
         CurrentMaps currentsMaps,
-        GlobalBiology globalBiology,
-        FadInitializer fadInitializer
+        GlobalBiology globalBiology
     ) {
         this.nauticalMap = nauticalMap;
         this.currentsMaps = currentsMaps;
         this.globalBiology = globalBiology;
-        this.fadInitializer = fadInitializer;
         this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
     }
 
@@ -80,9 +77,7 @@ public class FadMap implements Startable, Steppable {
 
     @NotNull
     public Optional<SeaTile> getFadTile(Fad fad) {
-        return Optional
-            .ofNullable(driftingObjectsMap.getObjectLocation(fad))
-            .flatMap(this::getSeaTile);
+        return getFadLocation(fad).flatMap(this::getSeaTile);
     }
 
     @NotNull
@@ -93,6 +88,10 @@ public class FadMap implements Startable, Steppable {
             .map(biology -> (VariableBiomassBasedBiology) biology);
     }
 
+    @NotNull Optional<Double2D> getFadLocation(Fad fad) {
+        return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
+    }
+
     @NotNull
     private Optional<SeaTile> getSeaTile(Double2D location) {
         return Optional.ofNullable(
@@ -100,11 +99,8 @@ public class FadMap implements Startable, Steppable {
         );
     }
 
-    @NotNull
-    public Fad deployFad(FadManager owner, Double2D location) {
-        Fad fad = fadInitializer.apply(owner);
+    public void deployFad(Fad fad, Double2D location) {
         driftingObjectsMap.add(fad, location, onMove(fad));
-        return fad;
     }
 
     public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
