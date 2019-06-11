@@ -213,7 +213,6 @@ public class TunaScenario implements Scenario {
 
         final Map<String, Port> portsByName = ports.stream().collect(toMap(Port::getName, identity()));
 
-        final Supplier<Engine> engineSupplier = fisherDefinition.makeEngineSupplier(model.random);
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
 
         final Map<Integer, Speed> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
