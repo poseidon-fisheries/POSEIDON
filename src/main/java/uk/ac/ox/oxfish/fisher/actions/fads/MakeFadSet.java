@@ -59,8 +59,12 @@ public class MakeFadSet implements FadAction {
         final LocalBiology localBiology = fisher.getLocation().getBiology();
         if (localBiology instanceof VariableBiomassBasedBiology)
             return (VariableBiomassBasedBiology) localBiology;
-        else throw new IllegalStateException(
-            "MakeFadSet action can only be used with VariableBiomassBasedBiology sea tile biologies.");
+        else {
+            throw new IllegalStateException(
+                "MakeFadSet action can only be used with VariableBiomassBasedBiology sea tile biologies.\n" +
+                    fisher.getLocation() + " biology is " + localBiology
+            );
+        }
     }
 
     private boolean isFadHere(Fisher fisher) {
@@ -80,6 +84,7 @@ public class MakeFadSet implements FadAction {
 
     @Override public boolean isPossible(FishState model, Fisher fisher) {
         return isFadHere(fisher) &&
+            (fisher.getLocation().getBiology() instanceof VariableBiomassBasedBiology) &&
             (fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model) || fisher.isCheater());
     }
 
