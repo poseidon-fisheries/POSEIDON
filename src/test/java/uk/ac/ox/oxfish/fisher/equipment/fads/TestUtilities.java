@@ -3,13 +3,13 @@ package uk.ac.ox.oxfish.fisher.equipment.fads;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
-import uk.ac.ox.oxfish.utility.Measures;
 
+import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.Arrays;
 
-import static org.apache.sis.measure.Units.KILOGRAM;
 import static org.junit.Assert.assertEquals;
+import static tech.units.indriya.unit.Units.KILOGRAM;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 
 /**
@@ -20,7 +20,7 @@ public class TestUtilities {
     /**
      * Make a new biology with the given carrying capacity and zero biomass
      */
-    public static BiomassLocalBiology makeBiology(GlobalBiology globalBiology, Mass carryingCapacity) {
+    public static BiomassLocalBiology makeBiology(GlobalBiology globalBiology, Quantity<Mass> carryingCapacity) {
         return makeBiology(globalBiology, asDouble(carryingCapacity, KILOGRAM));
     }
 

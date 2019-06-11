@@ -102,8 +102,8 @@ dependencies
     compile "com.google.guava:guava:23.0"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
-    // Apache SIS, useful for reading netCDF files, units of measure and coordinate operations
-    compile group: 'org.apache.sis.core', name: 'sis-referencing', version: '0.8'
+    // Reference implementation of JSR-385 for units of measure
+    compile group: 'systems.uom', name: 'systems-common', version: '1.0'
 
 }
 

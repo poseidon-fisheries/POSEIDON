@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.sis.measure.Quantities;
 import org.junit.Test;
 import sim.engine.Schedule;
 import sim.engine.SimState;
@@ -17,6 +16,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.currents.CurrentMaps;
 import uk.ac.ox.oxfish.geography.currents.VectorGrid2D;
 
+import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
 import java.util.Map;
 import java.util.Optional;
@@ -25,12 +25,13 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static si.uom.NonSI.TONNE;
+import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
-import static uk.ac.ox.oxfish.utility.Measures.TONNE;
 
 public class FadMapTest {
 
@@ -46,7 +47,7 @@ public class FadMapTest {
 
         final GlobalBiology globalBiology = new GlobalBiology(new Species("A"), new Species("B"));
 
-        final Mass k = Quantities.create(1, TONNE);
+        final Quantity<Mass> k = getQuantity(1, TONNE);
         // Make a current map that moves FADs west
         final Double2D currentVector = new Double2D(-0.3, 0);
         final Map<SeaTile, Double2D> vectors = nauticalMap

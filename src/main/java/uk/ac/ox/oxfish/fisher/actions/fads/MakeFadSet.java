@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
+import javax.measure.Quantity;
 import javax.measure.quantity.Time;
 import java.util.Optional;
 
@@ -73,7 +74,7 @@ public class MakeFadSet implements FadAction {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
     }
 
-    @Override public Time getDuration() {
+    @Override public Quantity<Time> getDuration() {
         return PurseSeineGear.DURATION_OF_SET;
     }
 
