@@ -7,8 +7,8 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -289,7 +289,7 @@ public class TunaScenario implements Scenario {
             final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
             factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-            final CoordinateFileAllocatorFactory initialCapacityAllocator = new CoordinateFileAllocatorFactory();
+            final SmootherFileAllocatorFactory initialCapacityAllocator = new SmootherFileAllocatorFactory();
             initialCapacityAllocator.setBiomassPath(initialCapacityFile);
             initialCapacityAllocator.setInputFileHasHeader(true);
             final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
