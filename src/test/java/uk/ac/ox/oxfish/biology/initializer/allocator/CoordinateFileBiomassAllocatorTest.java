@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
@@ -34,7 +33,7 @@ public class CoordinateFileBiomassAllocatorTest {
         //let's just read the depth flipped upside down for abundance
         path = Paths.get("inputs", "tests", "flipped_map.csv");
         CoordinateFileBiomassAllocator allocator = new CoordinateFileBiomassAllocator(
-                path,true
+                 path,true
         );
         assertEquals(6,allocator.allocate(map.getSeaTile(0,0),map,new MersenneTwisterFast()),.0001);
         assertEquals(6,allocator.allocate(map.getSeaTile(0,1),map,new MersenneTwisterFast()),.0001);
