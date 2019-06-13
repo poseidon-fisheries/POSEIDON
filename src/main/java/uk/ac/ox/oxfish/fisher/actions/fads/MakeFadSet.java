@@ -34,7 +34,7 @@ public class MakeFadSet implements FadAction {
             // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
             final int duration = toHours(getDuration());
             if (model.getRandom().nextDouble() < SUCCESSFUL_SET_PROBABILITY) {
-                fisher.fishHere(model.getBiology(), duration, model, targetFad.getAggregatedBiology());
+                fisher.fishHere(model.getBiology(), duration, model, targetFad.getBiology());
                 model.recordFishing(fisher.getLocation());
             } else {
                 targetFad.releaseFish(getSeaTileBiology(fisher), model.getBiology());

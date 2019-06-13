@@ -29,7 +29,7 @@ public class FadAwareCommonLogisticGrower extends CommonLogisticGrower {
         final FishState model = (FishState) simState;
         final List<BiomassLocalBiology> biologies = Stream.concat(
             seaTileBiologies.stream(),
-            model.getFadMap().allFads().map(Fad::getAggregatedBiology)
+            model.getFadMap().allFads().map(Fad::getBiology)
         ).collect(toList());
         grow(model, biologies);
     }

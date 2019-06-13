@@ -70,16 +70,16 @@ public class FadMapTest {
         // Put a FAD at the East edge of the central row
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
         final Fad fad = fadManager.deployFad(startTile);
-        fillBiology(fad.getAggregatedBiology());
+        fillBiology(fad.getBiology());
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getAggregatedBiology());
+        assertFullBiology(fad.getBiology());
         assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
 
         // If we step once, the FAD should still be in its starting tile
         // and the biologies should not have changed
         fadMap.step(simState);
         assertEquals(Optional.of(startTile), fadMap.getFadTile(fad));
-        assertFullBiology(fad.getAggregatedBiology());
+        assertFullBiology(fad.getBiology());
         assertEmptyBiology((VariableBiomassBasedBiology) startTile.getBiology());
 
         // Let it drift to the island
@@ -87,7 +87,7 @@ public class FadMapTest {
         // The FAD should have been removed from the map
         assertEquals(Optional.empty(), fadMap.getFadTile(fad));
         // And the fish should be released in the starting cell
-        assertEmptyBiology(fad.getAggregatedBiology());
+        assertEmptyBiology(fad.getBiology());
         assertFullBiology((VariableBiomassBasedBiology) startTile.getBiology());
     }
 
