@@ -41,6 +41,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
         LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
         for (Species species : biology.getSpecies()) {
+            if(species.isImaginary())
+                continue;
             SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
             resetters.put(new AbundanceResetter(snapper,species),snapper);
         }
@@ -53,6 +55,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
         LinkedHashMap<BiologyResetter,SnapshotBiomassAllocator> resetters = new LinkedHashMap<>();
         for (Species species : biology.getSpecies()) {
+            if(species.isImaginary())
+                continue;
             SnapshotBiomassAllocator snapper = new SnapshotBiomassAllocator();
             resetters.put(new BiomassResetter(snapper,species),snapper);
         }
@@ -101,7 +105,7 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
 
                     }
                 },
-                StepOrder.DAWN,
+                StepOrder.AFTER_DATA,
                 yearsBeforeReset
         );
     }

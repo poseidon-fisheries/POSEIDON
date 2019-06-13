@@ -210,7 +210,8 @@ public class BiomassLocalBiology extends AbstractBiomassBasedBiology implements 
     public void setCurrentBiomass(Species s, double newCurrentBiomass)
     {
 
-        Preconditions.checkArgument(newCurrentBiomass >= 0, "new biomass can't be negative!");
+        Preconditions.checkArgument(newCurrentBiomass >= 0, "new biomass can't be negative; you gave me " +
+        newCurrentBiomass + " for species " + s + " and carrying capacity: " + carryingCapacity[s.getIndex()]);
         final int index = s.getIndex();
         if(index >=currentBiomass.length)
             growArrays(index +1);

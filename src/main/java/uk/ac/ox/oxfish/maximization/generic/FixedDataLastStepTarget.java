@@ -36,6 +36,9 @@ public class FixedDataLastStepTarget implements DataTarget {
 
     private double fixedTarget = 100;
 
+    private double exponent = 1;
+
+
     private String columnName = "Average Cash-Flow";
 
     /**
@@ -49,7 +52,7 @@ public class FixedDataLastStepTarget implements DataTarget {
 
         DataColumn simulationOutput = model.getYearlyDataSet().getColumn(columnName);
 
-        return Math.abs(simulationOutput.getLatest() - fixedTarget);
+        return Math.pow(Math.abs(simulationOutput.getLatest() - fixedTarget),exponent);
 
     }
 
@@ -117,5 +120,14 @@ public class FixedDataLastStepTarget implements DataTarget {
      */
     public void setColumnName(String columnName) {
         this.columnName = columnName;
+    }
+
+
+    public double getExponent() {
+        return exponent;
+    }
+
+    public void setExponent(double exponent) {
+        this.exponent = exponent;
     }
 }

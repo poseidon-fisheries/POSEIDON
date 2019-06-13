@@ -247,7 +247,7 @@ public class SeaTile implements Startable, LocalBiology{
      */
     public boolean isFishingEvenPossibleHere()
     {
-        if(altitude > 0 || getBiology() instanceof EmptyLocalBiology)
+        if(isLand() || getBiology() instanceof EmptyLocalBiology)
             return false;
         else
             return true;
