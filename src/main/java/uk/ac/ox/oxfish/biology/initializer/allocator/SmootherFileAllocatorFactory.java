@@ -30,7 +30,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class SmootherFileAllocatorFactory implements AlgorithmFactory<SmoothFileBiomassAllocator>
+public class SmootherFileAllocatorFactory implements FileBiomassAllocatorFactory
 {
 
 

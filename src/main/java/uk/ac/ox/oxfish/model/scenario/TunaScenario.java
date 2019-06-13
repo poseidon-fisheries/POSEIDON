@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
@@ -256,21 +258,24 @@ public class TunaScenario implements Scenario {
             0.265079184, // logistic growth rate (r)
             getQuantity(1440940, TONNE), // total carrying capacity (K)
             getQuantity(337224, TONNE), // total biomass
-            BIOMASS_BET_FILE
+            BIOMASS_BET_FILE,
+            CoordinateFileAllocatorFactory::new
         );
         private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory(
             "Yellowfin",
             0.879, // logistic growth rate (r)
             getQuantity(1202770, TONNE), // total carrying capacity (K)
             getQuantity(507295, TONNE), // total biomass
-            BIOMASS_YFT_FILE
+            BIOMASS_YFT_FILE,
+            SmootherFileAllocatorFactory::new
         );
         private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory(
             "Skipjack",
-            0.270, // logistic growth rate (r)
-            getQuantity(7401000, TONNE), // total carrying capacity (K)
-            getQuantity(8744000, TONNE), // total biomass
-            BIOMASS_SKJ_FILE
+            1.1520938, // logistic growth rate (r)
+            getQuantity(4776000, TONNE), // total carrying capacity (K)
+            getQuantity(3567169, TONNE), // total biomass
+            BIOMASS_SKJ_FILE,
+            SmootherFileAllocatorFactory::new
         );
 
         private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
@@ -278,7 +283,8 @@ public class TunaScenario implements Scenario {
             double logisticGrowthRate,
             Quantity<Mass> totalCarryingCapacity,
             Quantity<Mass> totalBiomass,
-            Path initialCapacityFile
+            Path initialCapacityFile,
+            Supplier<FileBiomassAllocatorFactory> biomassAllocatorSupplier
         ) {
             final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
             factory.setSpeciesName(speciesName);
@@ -289,7 +295,7 @@ public class TunaScenario implements Scenario {
             final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
             factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-            final SmootherFileAllocatorFactory initialCapacityAllocator = new SmootherFileAllocatorFactory();
+            final FileBiomassAllocatorFactory initialCapacityAllocator = biomassAllocatorSupplier.get();
             initialCapacityAllocator.setBiomassPath(initialCapacityFile);
             initialCapacityAllocator.setInputFileHasHeader(true);
             final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
@@ -313,9 +319,11 @@ public class TunaScenario implements Scenario {
 
         @Override
         public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
-            final List<SingleSpeciesBiomassInitializer> biomassInitializers =
-                Stream.of(bigeyeBiomassInitializer, yellowfinBiomassInitializer, skipjackBiomassInitializer)
-                    .map(factory -> factory.apply(fishState)).collect(toList());
+            final List<SingleSpeciesBiomassInitializer> biomassInitializers = Stream.of(
+                bigeyeBiomassInitializer,
+                yellowfinBiomassInitializer,
+                skipjackBiomassInitializer
+            ).map(factory -> factory.apply(fishState)).collect(toList());
             return new MultipleIndependentSpeciesBiomassInitializer(
                 biomassInitializers, false, false
             );

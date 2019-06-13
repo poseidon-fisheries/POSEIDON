@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class CoordinateFileAllocatorFactory implements AlgorithmFactory<CoordinateFileBiomassAllocator> {
+public class CoordinateFileAllocatorFactory implements FileBiomassAllocatorFactory {
 
 
     private Path biomassPath = Paths.get("inputs","tests","fake_indo_abundance.csv");
@@ -20,19 +20,19 @@ public class CoordinateFileAllocatorFactory implements AlgorithmFactory<Coordina
                 inputFileHasHeader);
     }
 
-    public Path getBiomassPath() {
+    @Override public Path getBiomassPath() {
         return biomassPath;
     }
 
-    public void setBiomassPath(Path biomassPath) {
+    @Override public void setBiomassPath(Path biomassPath) {
         this.biomassPath = biomassPath;
     }
 
-    public boolean isInputFileHasHeader() {
+    @Override public boolean isInputFileHasHeader() {
         return inputFileHasHeader;
     }
 
-    public void setInputFileHasHeader(boolean inputFileHasHeader) {
+    @Override public void setInputFileHasHeader(boolean inputFileHasHeader) {
         this.inputFileHasHeader = inputFileHasHeader;
     }
 }
