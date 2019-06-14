@@ -511,7 +511,8 @@ public class FishState  extends SimState{
 
     public double getTotalBiomass(Species species)
     {
-        return map.getTotalBiology(species);
+        final double fadBiomass = fadMap == null ? 0 : fadMap.getTotalBiomass(species);
+        return fadBiomass + map.getTotalBiology(species);
     }
 
     public double getTotalAbundance(Species species,int bin)

@@ -9,6 +9,7 @@ import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -143,4 +144,8 @@ public class FadMap implements Startable, Steppable {
      */
     @NotNull
     public Continuous2D getField() { return driftingObjectsMap.getField(); }
+
+    public double getTotalBiomass(Species species) {
+        return allFads().mapToDouble(fad -> fad.getBiology().getBiomass(species)).sum();
+    }
 }
