@@ -74,6 +74,7 @@ public class FixedBoxcarAging  extends LocalAgingProcess {
 
 
         this.delegate = new VariableProportionAging(graduatingRates);
+        this.delegate.start(species);
 
 
     }
