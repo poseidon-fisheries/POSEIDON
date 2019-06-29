@@ -68,7 +68,7 @@ public class Slice5Sweeps {
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;
-    public static final int RUNS_PER_POLICY = 10;
+    public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
 
@@ -85,7 +85,7 @@ public class Slice5Sweeps {
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
 
-
+/*
 ////        //only boats >10GT are controlled
         effortControl("10",
                       new String[]{"big","medium","small10"},
@@ -126,6 +126,8 @@ public class Slice5Sweeps {
          delaysOnce("delay_once",
                     new String[]{"big","small","medium","small10"},
                     SCENARIO_NAME, SHOCK_YEAR, 200);
+
+ */
     }
 
 

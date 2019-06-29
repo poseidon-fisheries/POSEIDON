@@ -20,9 +20,11 @@
 
 package uk.ac.ox.oxfish.experiments;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.initializers.NoLogbookFactory;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbstractScenario;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
@@ -35,6 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Created by carrknight on 3/31/17.
@@ -43,7 +47,7 @@ public class CaliCatchCalibration {
 
 
     public static final int RUNS = 1006; // is bonferroni with power 95%, delta 20%
-    public static final Path MAIN_DIRECTORY =  Paths.get("docs","groundfish","yesgarbage");// Paths.get("inputs", "groundfish_paper");
+    public static final Path MAIN_DIRECTORY =  Paths.get("inputs", "groundfish_paper");
     public static final int YEARS_PER_RUN = 5;
 
     public static void main(String[] args) throws IOException {
@@ -51,61 +55,119 @@ public class CaliCatchCalibration {
 
 
         String[] scenarios = new String[]{
-//                "default", "clamped", "eei",
-//                "fleetwide","nofleetwide",
-//                "perfect", "random", "bandit",
-//                "annealing",
-                "intercepts",
-//                "kernel",
-//                "perfect_cell",
-//                "nofleetwide_identity"
+                       "default",
+                "clamped",
+                         "eei",
+                          "fleetwide",
+                      "nofleetwide",
+                      "perfect",
+                "random",
+                    "bandit",
+                 "annealing",
+                 "intercepts",
+                "kernel",
+                   "perfect_cell",
+                "nofleetwide_identity"
         };
 
-
+//
         for(String scenario : scenarios)
             runMultipleTimesToBuildHistogram(scenario,
                                              null,
                                              MAIN_DIRECTORY.resolve("longrun"),
                                              YEARS_PER_RUN+2,RUNS);
-
-
-        //pre-to-post
+//
+//
+//        //pre-to-post
         for(String scenario : scenarios)
             runMultipleTimesToBuildHistogram(scenario,
                                              "itq_switch_script",
                                              MAIN_DIRECTORY.resolve("pretopost"),
                                              11,
                                              100);
-
+//
         //north quota
         for(String scenario : scenarios)
             runMultipleTimesToBuildHistogram(scenario,
                                              null,
                                              MAIN_DIRECTORY.resolve("northquota"),
                                              YEARS_PER_RUN+2,
+                                             RUNS);
+
+        //pre-to-post north
+        for(String scenario : scenarios)
+            runMultipleTimesToBuildHistogram(scenario,
+                                             "itq_switch_script",
+                                             MAIN_DIRECTORY.resolve("northquota_pretopost"),
+                                             11,
                                              100);
-//
+
+        //north CPUE map
+        for(String scenario : scenarios)
+            runMultipleTimesToBuildHistogram(scenario,
+                                             null,
+                                             MAIN_DIRECTORY.resolve("northquota_map"),
+                                             YEARS_PER_RUN+2,
+                                             100);
 
 
         //ANTs
         // historical
-//        runMultipleTimesToBuildHistogram(
-//                "ant_worse",
-//                null,
-//                Paths.get("docs", "groundfish", "ants", "ant_historical"),
-//                YEARS_PER_RUN+2,
-//                null,
-//                100);
+        runMultipleTimesToBuildHistogram(
+                "ant_worse",
+                null,
+                Paths.get("docs", "groundfish", "ants", "ant_historical"),
+                YEARS_PER_RUN+2,
+                null,
+                100);
 
 
-//        runMultipleTimesToBuildHistogram(
-//                "ant_worse",
-//                null,
-//                Paths.get("docs", "groundfish", "ants", "ant_eei"),
-//                YEARS_PER_RUN+2,
-//                null,
-//                100
-//        );
+        runMultipleTimesToBuildHistogram(
+                "ant_worse",
+                null,
+                Paths.get("docs", "groundfish", "ants", "ant_eei"),
+                YEARS_PER_RUN+2,
+                null,
+                100
+        );
+
+//
+                runMultipleTimesToBuildHistogram(
+                "kernel_worst",
+                null,
+                Paths.get("docs", "groundfish", "ants", "ant_heatmap"),
+                YEARS_PER_RUN+2,
+                null,
+                100
+        );
+
+        //movement test
+        runMultipleTimesToBuildHistogram("clamped_plus_movement",
+                                         null,
+                                         Paths.get("docs", "groundfish", "ants", "movement_test"),
+                                         11,
+                                         100);
+
+        //RUM cheating
+
+        runMultipleTimesToBuildHistogram(
+                "nofleetwide_cheating_2",
+                null,
+                Paths.get("docs", "groundfish","yesgarbage",
+                          "ants", "cheating_northquota"),
+                YEARS_PER_RUN+2,
+                null,
+                100
+        );
+        runMultipleTimesToBuildHistogram(
+                "fleetwide_cheating",
+                null,
+                Paths.get("docs", "groundfish","yesgarbage",
+                          "ants", "cheating_northquota"),
+                YEARS_PER_RUN+2,
+                null,
+                100
+        );
 
     }
 
@@ -154,6 +216,34 @@ public class CaliCatchCalibration {
             FishState state = new FishState(run);
             state.setScenario(scenario);
 
+            //add the "only look at profits for boats making more than 1 trip that year"
+
+            state.getYearlyDataSet().
+                    registerGatherer("Actual Average Profits", new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(FishState observed) {
+                            return observed.getFishers().stream().
+                                    filter(
+                                            new Predicate<Fisher>() {
+                                                @Override
+                                                public boolean test(Fisher fisher) {
+                                                    return fisher.getLatestYearlyObservation(FisherYearlyTimeSeries.TRIPS) > 1;
+
+                                                }
+                                            }
+                                    ).
+
+                                    mapToDouble(
+                                            new ToDoubleFunction<Fisher>() {
+                                                @Override
+                                                public double applyAsDouble(Fisher value) {
+                                                    return value.getLatestYearlyObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                                                }
+                                            }).average().orElse(0d);
+                        }
+                    }, 0d);
+
+
             //run the model
             state.start();
 
@@ -170,6 +260,7 @@ public class CaliCatchCalibration {
 
             state.schedule.step(state);
             state.schedule.step(state);
+
 
 
             if(header)
@@ -201,16 +292,21 @@ public class CaliCatchCalibration {
                                          state.getLatestYearlyObservation("Shortspine Thornyhead Landings") + "," +
                                          state.getLatestYearlyObservation("Longspine Thornyhead Landings") + "," +
                                          state.getLatestYearlyObservation("Yelloweye Rockfish Landings") + "," +
-                                         // ",yelloweye_price,doversole_price,short_price,long_price,sable_price,avg_distance,avg_duration");
-                                         (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
-                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Sablefish")) + "," +
+                                         // OLD VERSION:::: averages out daily rather than by volume, which pushes prices too high and looks a bit silly:
+//                                         (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Prices Of Yelloweye Rockfish")) + "," +
+//                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Dover Sole")) + "," +
+//                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Shortspine Thornyhead")) + "," +
+//                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Longspine Thornyhead")) + "," +
+//                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Prices Of Sablefish")) + "," +
+                                         (!isyelloweyeITQOn ? Double.NaN : state.getLatestYearlyObservation("ITQ Weighted Prices Of Yelloweye Rockfish")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Weighted Prices Of Dover Sole")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Weighted Prices Of Shortspine Thornyhead")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Weighted Prices Of Longspine Thornyhead")) + "," +
+                                         (!isITQOn ? Double.NaN :state.getLatestYearlyObservation("ITQ Weighted Prices Of Sablefish")) + "," +
                                          state.getLatestYearlyObservation("Average Distance From Port") + "," +
                                          state.getLatestYearlyObservation("Average Trip Duration") + "," +
                                          state.getLatestYearlyObservation("Average Number of Trips") + "," +
-                                         state.getLatestYearlyObservation("Actual Average Cash-Flow") + "," +
+                                         state.getLatestYearlyObservation("Actual Average Profits") + "," +
                                          state.getLatestYearlyObservation("Actual Average Hours Out") + "," +
                                          state.getLatestYearlyObservation("Weighted Average Distance From Port") + "," +
                                          state.getLatestYearlyObservation("Number Of Active Fishers")+ "," +

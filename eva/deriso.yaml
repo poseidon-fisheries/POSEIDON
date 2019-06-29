@@ -1,22 +1,12 @@
 !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
 parameters:
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaDistance,
-  alwaysPositive: false, maximum: -0.001, minimum: -0.01}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.intercept,
-  alwaysPositive: false, maximum: 100.0, minimum: 0.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaHabit,
-  alwaysPositive: false, maximum: 3.0, minimum: -3.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaRevenue,
-  alwaysPositive: false, maximum: 1.0, minimum: 0.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Dover Sole,
-  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Sablefish,
-  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.betaCPUE~Yelloweye Rockfish,
-  alwaysPositive: false, maximum: 1.0, minimum: -1.0}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.multiplier,
+  alwaysPositive: false, maximum: 3.0, minimum: 0.1}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.stepSize,
+  alwaysPositive: false, maximum: 20.0, minimum: 1.0}
 runsPerSetting: 1
-scenarioFile: docs/groundfish/calibration/northquota_yesgarbage/nofleetwide_identity.yaml
-seed: 2
+scenarioFile: docs/groundfish/calibration/northquota_yesgarbage/annealing_cheating_start.yaml
+seed: 0
 summaryDirectory: docs/groundfish/calibration/northquota_yesgarbage
-yearsToIgnore: 1
-yearsToRun: 5
+yearsToIgnore: 5
+yearsToRun: 7

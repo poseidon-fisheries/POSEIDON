@@ -334,14 +334,17 @@ public class GenericOptimization extends SimpleProblemDouble {
     public static void main(String[] args) throws IOException {
 
         FishYAML yaml = new FishYAML();
-        Path optimizationFile = Paths.get("docs", "indonesia_hub", "runs", "712", "slice5", "calibration",
+        Path optimizationFile =
+        Paths.get("docs", "indonesia_hub", "runs", "712","slice5","calibration",
                               "optimizationproblem.yaml");
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -3.489,-9.081, 4.900, 2.991,-2.576, 1.725, 6.780,-6.834, 2.897, 5.585,-8.792, 3.085,-5.891,-4.162,-6.231,-4.699, 3.986,-0.076, 4.407, 5.733});
-        Path outputFile = optimizationFile.getParent().resolve("baseline_best.yaml");
+                -4.388744868936048, -9.554892619122551, 2.5360256738634854, 4.83763941967204, -3.7553676533379514, 0.786388274699865, 4.590084278859104, -5.457967572001298, 3.822039147469229, -1.5444711474464468, 3.4249860442806526, -1.550768852393031, -5.491435483684056, -6.967094823061919, -1.6915323273073388, 2.4140143041660114, -2.8317213428471795, -1.9445272344100184, -0.5161393606292566, -2.191176230983821
+
+        });
+        Path outputFile = optimizationFile.getParent().resolve("lime2_best.yaml");
         //  FishYAML yaml = new FishYAML();
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 

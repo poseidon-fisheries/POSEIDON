@@ -27,7 +27,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
     ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
     private String scenarioFile =
             Paths.get("docs","groundfish","calibration","northquota_yesgarbage",
-                    "fleetwide_cheating_start.yaml").toString();
+                    "annealing_cheating_start.yaml").toString();
 
 
     private String summaryDirectory =
@@ -38,9 +38,10 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
 
 
-    private int yearsToRun = 7;
+    private int yearsToRun = 7; //in reality since years count to 0 this means we simulate 8 years total
 
-    private int yearsToIgnore = 5;
+    private int yearsToIgnore = 5; //years to ignore 5 means you are targeting validation days; switch it back to 2 if you are not
+    //doing sensitivity analysis for "cheating" runs
 
 
     //TARGETS
@@ -123,46 +124,59 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
 //        }
 
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaDistance",
+//
+//                -0.01,
+//                -0.001
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.intercept",
+//                0,
+//                100
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaHabit",
+//                -3,
+//                3
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaRevenue",
+//                0,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Dover Sole",
+//                -1,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Sablefish",
+//                -1,
+//                1
+//        ));
+//        parameters.add(new SimpleOptimizationParameter(
+//                "destinationStrategy.betaCPUE~Yelloweye Rockfish",
+//                -1,
+//                1
+//        ));
 
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaDistance",
 
-                -0.01,
-                -0.001
-        ));
+                parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.probability.multiplier",
 
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.intercept",
-                0,
-                100
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaHabit",
-                -3,
+                0.1,
                 3
         ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaRevenue",
-                0,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Dover Sole",
-                -1,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Sablefish",
-                -1,
-                1
-        ));
-        parameters.add(new SimpleOptimizationParameter(
-                "destinationStrategy.betaCPUE~Yelloweye Rockfish",
-                -1,
-                1
-        ));
+                parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.stepSize",
 
+                1,
+                20
+        ));
 
     }
 
@@ -337,7 +351,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         double[] best = new double[]{
-                0.387, 1.489, 2.477, 1.300,-2.172, 3.983,-6.199
+                -2.850,-0.822, 8.506,-0.121,-3.353,-3.860, 5.221
 
 
 
@@ -353,7 +367,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 Scenario.class);
         optimization.prepareScenario(best,scenario);
         yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("nofleetwide_cheating.yaml").toFile()));
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("fleetwide_cheating.yaml").toFile()));
 
 
     }
