@@ -63,7 +63,7 @@ import java.util.List;
 
 public class Slice5Sweeps {
 
-    private static final String SCENARIO_NAME = "lime2_best_adjusted_steepness07";
+    private static final String SCENARIO_NAME = "lime2_best_adjusted_steepness06";
     private static final int YEARS_TO_RUN = 20;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";

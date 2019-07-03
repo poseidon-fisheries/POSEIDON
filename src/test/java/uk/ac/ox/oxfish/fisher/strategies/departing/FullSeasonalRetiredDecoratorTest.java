@@ -26,8 +26,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class FullSeasonalRetiredDecoratorTest {
 
@@ -47,6 +46,7 @@ public class FullSeasonalRetiredDecoratorTest {
         when(model.getDay()).thenReturn(1000); //pass the test
 
         decorator.start(model, fisher);
+        verify(fisher,times(1)).getAdditionalVariables();
 
         //
         assertEquals(decorator.getStatus(),EffortStatus.FULLTIME);
@@ -91,6 +91,10 @@ public class FullSeasonalRetiredDecoratorTest {
         decorator.updateEffortLevel(fisher,model);
         assertEquals(decorator.getStatus(),EffortStatus.RETIRED);
 
+
+
+        verify(fisher,times(11)).getAdditionalVariables();
+
     }
 
 
@@ -132,5 +136,8 @@ public class FullSeasonalRetiredDecoratorTest {
         when(friend2.getLatestYearlyObservation("Average Cash-Flow")).thenReturn(320d);
         decorator.updateEffortLevel(fisher,model);
         assertEquals(decorator.getStatus(),EffortStatus.SEASONAL);
+
+        verify(fisher,times(3)).getAdditionalVariables();
+
     }
 }

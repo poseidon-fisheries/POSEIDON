@@ -1519,4 +1519,25 @@ public class Fisher implements Steppable, Startable{
     public double getHoursAtSeaThisYear() {
         return memory.getHoursAtSeaThisYear();
     }
+
+
+    /**
+     * Getter for property 'additionalVariables'.
+     *
+     * @return Value for property 'additionalVariables'.
+     */
+    public HashMap<String, Object> getAdditionalVariables() {
+        return status.getAdditionalVariables();
+    }
+
+
+    /**
+     * you've been active if you are currently out at sea or you have finished at least a trip
+     * in the past 365 days!
+     * @return
+     */
+    public boolean hasBeenActiveThisYear(){
+        return getLastFinishedTrip().getTripDate()> state.getDay()-364 ||
+                (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
+    }
 }

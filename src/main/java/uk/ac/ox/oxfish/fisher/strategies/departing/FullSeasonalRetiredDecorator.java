@@ -46,6 +46,8 @@ import java.util.function.ToDoubleFunction;
 public class FullSeasonalRetiredDecorator implements DepartingStrategy{
 
 
+    public static final String SEASONALITY_VARIABLE_NAME = "Seasonality";
+
     private EffortStatus status;
 
 
@@ -122,6 +124,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
                 updateEffortLevel(fisher, model);
             }
         }, StepOrder.AFTER_DATA);
+        fisher.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME, status);
 
     }
 
@@ -177,6 +180,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
                 break;
         }
 
+        fisher.getAdditionalVariables().put(SEASONALITY_VARIABLE_NAME,status);
 
 
     }

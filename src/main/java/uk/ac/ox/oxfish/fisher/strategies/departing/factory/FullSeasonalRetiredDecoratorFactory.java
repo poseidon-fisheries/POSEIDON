@@ -20,13 +20,22 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.EffortStatus;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.Startable;
+import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+
+import java.util.function.Supplier;
+
+import static uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator.SEASONALITY_VARIABLE_NAME;
+import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.TRIPS;
 
 public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<FullSeasonalRetiredDecorator> {
 
@@ -58,6 +67,11 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
 
 
     /**
+     * makes sure we create only one instance for each data gatherer
+     */
+    private final Locker<FishState, Startable> dataGatherer = new Locker<>();
+
+    /**
      * Applies this function to the given argument.
      *
      * @param state the function argument
@@ -65,6 +79,18 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      */
     @Override
     public FullSeasonalRetiredDecorator apply(FishState state) {
+
+
+        if(dataGatherer.getCurrentKey()!=state) {
+            Startable startable = dataGatherer.presentKey(state, new Supplier<Startable>() {
+                @Override
+                public Startable get() {
+                    return buildDataGatherers();
+                }
+            });
+            state.registerStartable(startable);
+        }
+
         double fulltimeProbability = probabilityStartingFullTime.apply(state.getRandom());
         return new FullSeasonalRetiredDecorator(
                 state.random.nextDouble()< fulltimeProbability ? EffortStatus.FULLTIME : EffortStatus.SEASONAL,
@@ -77,6 +103,98 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
 
 
         );
+    }
+
+
+    private final Startable buildDataGatherers(){
+
+        return new Startable(){
+            /**
+             * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
+             * or just to percolate a reference to the model
+             *
+             * @param model the model
+             */
+            @Override
+            public void start(FishState model) {
+                model.getYearlyDataSet().registerGatherer(
+                        "Full-time fishers",
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
+                                double sum=0;
+                                for (Fisher fisher : state.getFishers()) {
+
+                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                                    //either you are "full time" or you don't have a seasonal/nonseasonal
+                                    // variable at which point you are full time as long as you go on at least a trip
+                                    if(status == EffortStatus.FULLTIME || (status == null &&
+                                            fisher.hasBeenActiveThisYear()))
+                                        sum++;
+
+                                }
+                                return sum;
+
+                            }
+                        },
+                        Double.NaN
+                );
+
+                model.getYearlyDataSet().registerGatherer(
+                        "Seasonal fishers",
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
+                                double sum=0;
+                                for (Fisher fisher : state.getFishers()) {
+
+                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                                    if(status == EffortStatus.SEASONAL)
+                                        sum++;
+
+                                }
+                                return sum;
+
+                            }
+                        },
+                        Double.NaN
+                );
+
+                model.getYearlyDataSet().registerGatherer(
+                        "Retired fishers",
+                        new Gatherer<FishState>() {
+                            @Override
+                            public Double apply(FishState state) {
+                                double sum=0;
+                                for (Fisher fisher : state.getFishers()) {
+
+                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
+                                    //either you are "full time" or you don't have a seasonal/nonseasonal
+                                    // variable at which point you are full time as long as you go on at least a trip
+                                    if(status == EffortStatus.RETIRED || (status == null &&
+                                            fisher.hasBeenActiveThisYear()))
+                                        sum++;
+
+                                }
+                                return sum;
+
+                            }
+                        },
+                        Double.NaN
+                );
+
+
+            }
+
+            /**
+             * tell the startable to turnoff,
+             */
+            @Override
+            public void turnOff() {
+
+            }
+        };
+
     }
 
     /**
@@ -187,4 +305,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     public void setVariableName(String variableName) {
         this.variableName = variableName;
     }
+
+
+
 }
