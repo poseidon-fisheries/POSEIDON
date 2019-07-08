@@ -99,6 +99,13 @@ public class AdditionalStartables {
         NAMES.put(FisherEntryConstantRateFactory.class,
                   "Fish Entry Constant Rate");
 
+
+        CONSTRUCTORS.put("Full-time Seasonal Retired Data Collectors",
+                         FullSeasonalRetiredDataCollectorsFactory::new
+        );
+        NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class,
+                  "Full-time Seasonal Retired Data Collectors");
+
     }
 
 }

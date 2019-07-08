@@ -488,6 +488,30 @@ public class FlexibleScenario implements Scenario {
                                                       }, Double.NaN);
 
 
+            state.getYearlyDataSet().registerGatherer("Actual Average Cash-Flow of " +tag,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState observed) {
+                                                              List<Fisher> fishers = observed.getFishers().stream().
+                                                                      filter(new Predicate<Fisher>() {
+                                                                          @Override
+                                                                          public boolean test(Fisher fisher) {
+                                                                              return fisher.hasBeenActiveThisYear() &&
+                                                                                      fisher.getTags().contains(tag);
+                                                                          }
+                                                                      }).collect(Collectors.toList());
+                                                              return fishers.stream().
+                                                                      mapToDouble(
+                                                                              new ToDoubleFunction<Fisher>() {
+                                                                                  @Override
+                                                                                  public double applyAsDouble(Fisher value) {
+                                                                                      return value.getLatestYearlyObservation(
+                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  }
+                                                                              }).sum() /
+                                                                      fishers.size();
+                                                          }
+                                                      }, Double.NaN);
 
         }
 

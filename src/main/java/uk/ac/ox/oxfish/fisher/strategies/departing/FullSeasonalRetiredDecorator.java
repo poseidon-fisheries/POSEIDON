@@ -75,12 +75,31 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
     private final String targetVariable ;
 
 
+    private final int neverSwitchBeforeThisYear;
+
+
+
     public FullSeasonalRetiredDecorator(
             EffortStatus status,
             double targetIncome,
             double minimumIncome,
             int maxHoursOutWhenSeasonal,
             DepartingStrategy delegate, String targetVariable) {
+
+        this(status,targetIncome,minimumIncome,maxHoursOutWhenSeasonal,delegate,targetVariable,-1);
+    }
+
+
+
+    public FullSeasonalRetiredDecorator(
+            EffortStatus status,
+            double targetIncome,
+            double minimumIncome,
+            int maxHoursOutWhenSeasonal,
+            DepartingStrategy delegate,
+            String targetVariable,
+            int neverSwitchBeforeThisYear
+            ) {
         this.targetVariable = targetVariable;
         Preconditions.checkState(maxHoursOutWhenSeasonal>=0);
         this.status = status;
@@ -88,6 +107,7 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
         this.minimumIncome = minimumIncome;
         this.delegate = delegate;
         seasonalDelegate = new MaxHoursPerYearDepartingStrategy(maxHoursOutWhenSeasonal);
+        this.neverSwitchBeforeThisYear = neverSwitchBeforeThisYear;
     }
 
     /**
@@ -148,7 +168,9 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
     {
 
         //don't bother the first year
-        if(state.getDay()<365)
+        if(state.getDay()<364)
+            return;
+        if(state.getYear()<neverSwitchBeforeThisYear)
             return;
 
 
@@ -170,6 +192,8 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
                 double maxFriendsProfits = fisher.getDirectedFriends().stream().mapToDouble(new ToDoubleFunction<Fisher>() {
                     @Override
                     public double applyAsDouble(Fisher value) {
+                        if(value.getYearlyData().getColumn(targetVariable)==null)
+                            throw new RuntimeException("Could not observe" + targetVariable + " for fisher " + value);
                         return value.getLatestYearlyObservation(targetVariable);
                     }
                 }).max().orElse(Double.NaN);

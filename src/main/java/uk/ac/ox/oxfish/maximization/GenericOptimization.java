@@ -335,16 +335,15 @@ public class GenericOptimization extends SimpleProblemDouble {
 
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
-        Paths.get("docs", "indonesia_hub", "runs", "712","slice5","calibration",
-                              "optimizationproblem.yaml");
+        Paths.get("docs", "indonesia_hub", "runs", "712","biomass_slice","calibration",
+                              "optimization_lime2_nospinup_entryexit_start.yaml");
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -4.388744868936048, -9.554892619122551, 2.5360256738634854, 4.83763941967204, -3.7553676533379514, 0.786388274699865, 4.590084278859104, -5.457967572001298, 3.822039147469229, -1.5444711474464468, 3.4249860442806526, -1.550768852393031, -5.491435483684056, -6.967094823061919, -1.6915323273073388, 2.4140143041660114, -2.8317213428471795, -1.9445272344100184, -0.5161393606292566, -2.191176230983821
-
+                -1.085,-6.437,-5.268,-4.382,-5.500, 10.000, 9.573, 4.088,-8.877, 8.551, 7.615, 9.428, 2.288, 2.719, 7.083, 9.800, 8.365, 8.681,-0.057, 9.057, 8.655, 9.081, 0.872,-5.680
         });
-        Path outputFile = optimizationFile.getParent().resolve("lime2_best.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("lime2_nospinup_entryexit_best.yaml");
         //  FishYAML yaml = new FishYAML();
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 

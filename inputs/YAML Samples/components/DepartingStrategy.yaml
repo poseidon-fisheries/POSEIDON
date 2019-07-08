@@ -63,3 +63,13 @@ Exit Decorator:
     Fixed Rest:
       hoursBetweenEachDeparture: '12.0'
 -------
+Full-time Seasonal Retired Decorator:
+  delegate:
+    Max Hours Per Year:
+      maxHoursOut: '1200.0'
+  maxHoursOutWhenSeasonal: '100.0'
+  minimumVariable: '0.0'
+  probabilityStartingFullTime: '1.0'
+  targetVariable: '100.0'
+  variableName: TRIP_PROFITS_PER_HOUR
+-------

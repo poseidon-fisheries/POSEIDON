@@ -45,10 +45,18 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
 
     private Stoppable stoppable;
 
+    private final int doNotGrowBeforeThisYear;
+
 
     public FisherEntryConstantRate(double growthRateInPercentage, String populationName) {
+        this(growthRateInPercentage,populationName,-1);
+    }
+
+
+    public FisherEntryConstantRate(double growthRateInPercentage, String populationName, int doNotGrowBeforeThisYear) {
         this.growthRateInPercentage = growthRateInPercentage;
         this.populationName = populationName;
+        this.doNotGrowBeforeThisYear = doNotGrowBeforeThisYear;
     }
 
     /**
@@ -80,6 +88,9 @@ public class FisherEntryConstantRate implements AdditionalStartable, Steppable {
     public void step(SimState simState) {
 
         FishState model = ((FishState) simState);
+        if(model.getYear()<doNotGrowBeforeThisYear)
+            return;
+
 
         double currentActiveFishers = 0;
         // count the fisher as active if it has been on at least a trip in the past 365 days!

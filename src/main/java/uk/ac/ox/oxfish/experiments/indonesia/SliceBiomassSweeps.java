@@ -27,14 +27,14 @@ import java.util.List;
 public class SliceBiomassSweeps {
 
 
-    private static final String SCENARIO_NAME = "mmaf_early";
-    public static final int YEARS_TO_RUN = 15;
+    private static final String SCENARIO_NAME = "lime2_nospinup_NOentryexit_best";
+    private static final int YEARS_TO_RUN = 15;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
-    public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/biomass_slice/calibration/sweep/";
-    public static final int MIN_DAYS_OUT = 10;
-    public static final int RUNS_PER_POLICY = 1;
-    public static final int MAX_DAYS_OUT = 250;
-    public static  int POPULATIONS = 4;
+    private static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/biomass_slice/calibration/sweep/";
+    private static final int MIN_DAYS_OUT = 10;
+    private static final int RUNS_PER_POLICY = 1;
+    private static final int MAX_DAYS_OUT = 250;
+    private static  int POPULATIONS = 4;
 
 
     public static  int SHOCK_YEAR = 1;
@@ -456,11 +456,11 @@ public class SliceBiomassSweeps {
     public static BatchRunner setupRunner(String filename, final int yearsToRun,
                                           final int populations) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
-                "Average Cash-Flow",
-                "Average Cash-Flow of population0",
-                "Average Cash-Flow of population1",
-                "Average Cash-Flow of population2",
-                "Average Cash-Flow of population3",
+                "Actual Average Cash-Flow",
+                "Actual Average Cash-Flow of population0",
+                "Actual Average Cash-Flow of population1",
+                "Actual Average Cash-Flow of population2",
+                "Actual Average Cash-Flow of population3",
                 "Average Number of Trips of population0",
                 "Average Number of Trips of population1",
                 "Average Number of Trips of population2",
@@ -502,7 +502,27 @@ public class SliceBiomassSweeps {
                 "Total Landings of population0",
                 "Total Landings of population1",
                 "Total Landings of population2",
-                "Total Landings of population3");
+                "Total Landings of population3",
+
+
+                "Full-time fishers",
+                "Full-time fishers of population0",
+                "Full-time fishers of population1",
+                "Full-time fishers of population2",
+                "Full-time fishers of population3",
+                "Seasonal fishers",
+                "Seasonal fishers of population0",
+                "Seasonal fishers of population1",
+                "Seasonal fishers of population2",
+                "Seasonal fishers of population3",
+                "Retired fishers",
+                "Retired fishers of population0",
+                "Retired fishers of population1",
+                "Retired fishers of population2",
+                "Retired fishers of population3"
+
+
+                );
 
 
 

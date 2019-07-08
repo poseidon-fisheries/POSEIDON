@@ -13,7 +13,7 @@ Oscillating Weather:
 CSV Fixed Weather:
   columnNumber: 1
   headerInFile: true
-  pathToCSV: /home/carrknight/code/POSEIDON/inputs/test/weather.csv
+  pathToCSV: /home/carrknight/code/oxfish/inputs/test/weather.csv
   separator: ','
   temperature: '30.0'
 -------

@@ -108,7 +108,7 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
                          fisher -> observed.getYearlyCounterColumn(HOURS_OUT),Double.NaN);
         registerGatherer(PROFITS_PER_HOUR,
                          fisher ->
-                                 (observed.getYearlyCounterColumn(EARNINGS)+observed.getYearlyCounterColumn(VARIABLE_COSTS))/
+                                 (observed.getYearlyCounterColumn(EARNINGS)-observed.getYearlyCounterColumn(VARIABLE_COSTS))/
                                  observed.getYearlyCounterColumn(HOURS_OUT), Double.NaN);
 
         //this is a set because it gets accessed by two different gatherers and can be filled by either

@@ -23,7 +23,11 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MaxHoursPerYearDepartingFactory;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -138,6 +142,36 @@ public class FullSeasonalRetiredDecoratorTest {
         assertEquals(decorator.getStatus(),EffortStatus.SEASONAL);
 
         verify(fisher,times(3)).getAdditionalVariables();
+
+    }
+
+
+    @Test
+    public void itActuallyReducesEffort(){
+
+        //should switch to seasonal after a year and should go out less!
+        PrototypeScenario scenario = new PrototypeScenario();
+        scenario.setFishers(10);
+        FullSeasonalRetiredDecoratorFactory seasonal = new FullSeasonalRetiredDecoratorFactory();
+        seasonal.setDecorated(new MaxHoursPerYearDepartingFactory(5000));
+        seasonal.setMaxHoursOutWhenSeasonal(new FixedDoubleParameter(50));
+        seasonal.setMinimumVariable(new FixedDoubleParameter(Double.MAX_VALUE)); //going to fail!
+        seasonal.setTargetVariable(new FixedDoubleParameter(Double.MAX_VALUE)); //going to fail!
+        scenario.setDepartingStrategy(seasonal);
+
+        FishState state = new FishState();
+        state.setScenario(scenario);
+        state.start();
+        while(state.getYear()<2)
+            state.schedule.step(state);
+
+
+        assertTrue(state.getYearlyDataSet().getColumn("Average Number of Trips").get(0)>
+                10 *
+                        state.getYearlyDataSet().getColumn("Average Number of Trips").get(1));
+
+
+
 
     }
 }

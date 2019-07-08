@@ -20,22 +20,18 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.departing.factory;
 
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.departing.EffortStatus;
+import uk.ac.ox.oxfish.model.plugins.FullSeasonalRetiredDataCollectors;
 import uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
-import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Supplier;
-
-import static uk.ac.ox.oxfish.fisher.strategies.departing.FullSeasonalRetiredDecorator.SEASONALITY_VARIABLE_NAME;
-import static uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries.TRIPS;
 
 public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<FullSeasonalRetiredDecorator> {
 
@@ -58,12 +54,16 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     private DoubleParameter minimumVariable = new FixedDoubleParameter(0);
 
 
-    private AlgorithmFactory<? extends DepartingStrategy> delegate = new MaxHoursPerYearDepartingFactory();
+    private AlgorithmFactory<? extends DepartingStrategy> decorated = new MaxHoursPerYearDepartingFactory();
 
 
     private DoubleParameter maxHoursOutWhenSeasonal = new FixedDoubleParameter(100);
 
     private String variableName = "TRIP_PROFITS_PER_HOUR";
+
+
+    private DoubleParameter firstYearYouCanSwitch = new FixedDoubleParameter(-1);
+
 
 
     /**
@@ -81,15 +81,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     public FullSeasonalRetiredDecorator apply(FishState state) {
 
 
-        if(dataGatherer.getCurrentKey()!=state) {
-            Startable startable = dataGatherer.presentKey(state, new Supplier<Startable>() {
-                @Override
-                public Startable get() {
-                    return buildDataGatherers();
-                }
-            });
-            state.registerStartable(startable);
-        }
+
 
         double fulltimeProbability = probabilityStartingFullTime.apply(state.getRandom());
         return new FullSeasonalRetiredDecorator(
@@ -97,8 +89,9 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
                 targetVariable.apply(state.getRandom()),
                 minimumVariable.apply(state.getRandom()),
                 maxHoursOutWhenSeasonal.apply(state.getRandom()).intValue(),
-                delegate.apply(state),
-                variableName
+                decorated.apply(state),
+                variableName,
+                firstYearYouCanSwitch.apply(state.getRandom()).intValue()
 
 
 
@@ -106,96 +99,7 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     }
 
 
-    private final Startable buildDataGatherers(){
 
-        return new Startable(){
-            /**
-             * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
-             * or just to percolate a reference to the model
-             *
-             * @param model the model
-             */
-            @Override
-            public void start(FishState model) {
-                model.getYearlyDataSet().registerGatherer(
-                        "Full-time fishers",
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState state) {
-                                double sum=0;
-                                for (Fisher fisher : state.getFishers()) {
-
-                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
-                                    //either you are "full time" or you don't have a seasonal/nonseasonal
-                                    // variable at which point you are full time as long as you go on at least a trip
-                                    if(status == EffortStatus.FULLTIME || (status == null &&
-                                            fisher.hasBeenActiveThisYear()))
-                                        sum++;
-
-                                }
-                                return sum;
-
-                            }
-                        },
-                        Double.NaN
-                );
-
-                model.getYearlyDataSet().registerGatherer(
-                        "Seasonal fishers",
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState state) {
-                                double sum=0;
-                                for (Fisher fisher : state.getFishers()) {
-
-                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
-                                    if(status == EffortStatus.SEASONAL)
-                                        sum++;
-
-                                }
-                                return sum;
-
-                            }
-                        },
-                        Double.NaN
-                );
-
-                model.getYearlyDataSet().registerGatherer(
-                        "Retired fishers",
-                        new Gatherer<FishState>() {
-                            @Override
-                            public Double apply(FishState state) {
-                                double sum=0;
-                                for (Fisher fisher : state.getFishers()) {
-
-                                    Object status = fisher.getAdditionalVariables().get(SEASONALITY_VARIABLE_NAME);
-                                    //either you are "full time" or you don't have a seasonal/nonseasonal
-                                    // variable at which point you are full time as long as you go on at least a trip
-                                    if(status == EffortStatus.RETIRED || (status == null &&
-                                            fisher.hasBeenActiveThisYear()))
-                                        sum++;
-
-                                }
-                                return sum;
-
-                            }
-                        },
-                        Double.NaN
-                );
-
-
-            }
-
-            /**
-             * tell the startable to turnoff,
-             */
-            @Override
-            public void turnOff() {
-
-            }
-        };
-
-    }
 
     /**
      * Getter for property 'probabilityStartingFullTime'.
@@ -256,18 +160,18 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      *
      * @return Value for property 'delegate'.
      */
-    public AlgorithmFactory<? extends DepartingStrategy> getDelegate() {
-        return delegate;
+    public AlgorithmFactory<? extends DepartingStrategy> getDecorated() {
+        return decorated;
     }
 
     /**
      * Setter for property 'delegate'.
      *
-     * @param delegate Value to set for property 'delegate'.
+     * @param decorated Value to set for property 'delegate'.
      */
-    public void setDelegate(
-            AlgorithmFactory<? extends DepartingStrategy> delegate) {
-        this.delegate = delegate;
+    public void setDecorated(
+            AlgorithmFactory<? extends DepartingStrategy> decorated) {
+        this.decorated = decorated;
     }
 
     /**
@@ -307,5 +211,21 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
     }
 
 
+    /**
+     * Getter for property 'firstYearYouCanSwitch'.
+     *
+     * @return Value for property 'firstYearYouCanSwitch'.
+     */
+    public DoubleParameter getFirstYearYouCanSwitch() {
+        return firstYearYouCanSwitch;
+    }
 
+    /**
+     * Setter for property 'firstYearYouCanSwitch'.
+     *
+     * @param firstYearYouCanSwitch Value to set for property 'firstYearYouCanSwitch'.
+     */
+    public void setFirstYearYouCanSwitch(DoubleParameter firstYearYouCanSwitch) {
+        this.firstYearYouCanSwitch = firstYearYouCanSwitch;
+    }
 }

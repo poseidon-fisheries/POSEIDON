@@ -306,6 +306,8 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+
+
     /**
      * tell the startable to turnoff,
      */
@@ -331,6 +333,8 @@ public class Fisher implements Steppable, Startable{
         bimonthlyAdaptation.turnOff(this);
         yearlyAdaptation.turnOff(this);
         tripAdaptation.turnOff(this);
+
+        getSocialNetwork().removeFisher(this,state);
     }
 
     @Override

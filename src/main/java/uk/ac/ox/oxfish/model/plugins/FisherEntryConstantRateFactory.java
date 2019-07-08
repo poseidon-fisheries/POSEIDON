@@ -42,6 +42,8 @@ public class FisherEntryConstantRateFactory implements AlgorithmFactory<FisherEn
     private String populationName = "population0";
 
 
+    private DoubleParameter firstYearEntryOccurs = new FixedDoubleParameter(-1);
+
     /**
      * Applies this function to the given argument.
      *
@@ -52,7 +54,8 @@ public class FisherEntryConstantRateFactory implements AlgorithmFactory<FisherEn
     public FisherEntryConstantRate apply(FishState state) {
 
         return new FisherEntryConstantRate(growthRateInPercentage.apply(state.getRandom()),
-                                           populationName);
+                                           populationName,
+                                           firstYearEntryOccurs.apply(state.getRandom()).intValue());
     }
 
     /**
@@ -89,5 +92,23 @@ public class FisherEntryConstantRateFactory implements AlgorithmFactory<FisherEn
      */
     public void setPopulationName(String populationName) {
         this.populationName = populationName;
+    }
+
+    /**
+     * Getter for property 'firstYearEntryOccurs'.
+     *
+     * @return Value for property 'firstYearEntryOccurs'.
+     */
+    public DoubleParameter getFirstYearEntryOccurs() {
+        return firstYearEntryOccurs;
+    }
+
+    /**
+     * Setter for property 'firstYearEntryOccurs'.
+     *
+     * @param firstYearEntryOccurs Value to set for property 'firstYearEntryOccurs'.
+     */
+    public void setFirstYearEntryOccurs(DoubleParameter firstYearEntryOccurs) {
+        this.firstYearEntryOccurs = firstYearEntryOccurs;
     }
 }
