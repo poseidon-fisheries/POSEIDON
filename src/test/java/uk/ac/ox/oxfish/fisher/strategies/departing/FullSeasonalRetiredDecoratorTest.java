@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.departing;
 
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
+import org.mockito.MockSettings;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.MaxHoursPerYearDepartingFactory;
@@ -114,12 +115,13 @@ public class FullSeasonalRetiredDecoratorTest {
                 new FixedRestTimeDepartingStrategy(0),
                 "Average Cash-Flow");
 
-        Fisher fisher = mock(Fisher.class);
+        Fisher fisher = mock(Fisher.class,  RETURNS_DEEP_STUBS);
 
-        Fisher friend1 = mock(Fisher.class);
-        Fisher friend2 = mock(Fisher.class);
+        Fisher friend1 = mock(Fisher.class,  RETURNS_DEEP_STUBS);
+        Fisher friend2 = mock(Fisher.class,  RETURNS_DEEP_STUBS);
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(1000); //pass the test
+
 
 
         when(fisher.getDirectedFriends()).thenReturn(Lists.newArrayList(friend1,friend2));
