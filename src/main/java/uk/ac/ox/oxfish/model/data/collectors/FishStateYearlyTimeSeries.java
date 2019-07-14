@@ -531,7 +531,6 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
         }, 0d);
 
 
-
         registerGatherer("Average Hours Out", new Gatherer<FishState>() {
             @Override
             public Double apply(FishState ignored) {

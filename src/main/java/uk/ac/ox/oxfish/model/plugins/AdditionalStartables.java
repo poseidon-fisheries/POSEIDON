@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -105,6 +106,20 @@ public class AdditionalStartables {
         );
         NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class,
                   "Full-time Seasonal Retired Data Collectors");
+
+        CONSTRUCTORS.put("Biomass Depletion Data Collectors",
+                         BiomassDepletionGathererFactory::new
+        );
+        NAMES.put(BiomassDepletionGathererFactory.class,
+                  "Biomass Depletion Data Collectors");
+
+        CONSTRUCTORS.put("Tow Long Logger",
+                         TowLongLoggerFactory::new
+        );
+        NAMES.put(TowLongLoggerFactory.class,
+                  "Tow Long Logger");
+
+
 
     }
 

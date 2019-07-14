@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.model.data.collectors.*;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -169,7 +168,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         tripMemories.start(model);
         tripLogger.addTripListener(new TripListener() {
             @Override
-            public void reactToFinishedTrip(TripRecord record) {
+            public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                 SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
                 if (mostFishedTileInTrip != null)
                     tripMemories.memorize(record, mostFishedTileInTrip);

@@ -409,6 +409,18 @@ public class FlexibleScenario implements Scenario {
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
                                                                               FisherYearlyTimeSeries.HOURS_OUT)).average().
                                                                       orElse(Double.NaN), 0 );
+
+
+
+
+            state.getYearlyDataSet().registerGatherer("Total Hours Out of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.HOURS_OUT)).sum(),
+                                                      0 );
+
             //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
             state.getYearlyDataSet().registerGatherer("Average Trip Duration of "+tag, new Gatherer<FishState>() {
                 @Override

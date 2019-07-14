@@ -170,16 +170,30 @@ public class FisherDefinition {
     }
 
 
+    /**
+     * other additional setups we may want to add to the fisher;
+     */
+    private List<Consumer<Fisher>> additionalSetups = new LinkedList<>();
+
+
     //keeps track of how many fish have been built so far
     //so that we can match each to a specific port
     //when we have built enough, fishCreation resets to 0
     private int fishCreationIndex =0;
-    public Port getNextFisher(List<Port> ports)
+    public Port getNextFisher(List<Port> ports,
+                              FishState model)
     {
         assert fishCreationIndex <flatPortArray.length;
-
-        String portName = flatPortArray[fishCreationIndex];
-
+        String portName;
+        //you are creating the original fishers!
+        if(fishCreationIndex< flatPortArray.length) {
+            portName= flatPortArray[fishCreationIndex];
+        }
+        //you are creating additional fishers!, then pick stochastically
+        else {
+            assert model.getDay()>0;
+            portName = flatPortArray[model.getRandom().nextInt(flatPortArray.length)];
+        }
 
 
         Port toReturn = ports.stream().filter(new Predicate<Port>() {
@@ -192,11 +206,7 @@ public class FisherDefinition {
         });
 
         fishCreationIndex++;
-        if(fishCreationIndex >=flatPortArray.length)
-        {
-            assert fishCreationIndex ==flatPortArray.length;
-            fishCreationIndex =0;
-        }
+
         return toReturn;
     }
 
@@ -229,7 +239,7 @@ public class FisherDefinition {
                 new Supplier<Port>() {
                     @Override
                     public Port get() {
-                        return getNextFisher(ports);
+                        return getNextFisher(ports,  model);
                     }
                 },
                 regulation,
@@ -292,6 +302,9 @@ public class FisherDefinition {
                         }
                     }
             );
+
+        //add other setups
+        fisherFactory.getAdditionalSetups().addAll(additionalSetups);
 
 
 
@@ -621,5 +634,12 @@ public class FisherDefinition {
 
     public void setHourlyVariableCost(DoubleParameter hourlyVariableCost) {
         this.hourlyVariableCost = hourlyVariableCost;
+    }
+
+    /**
+     *  not sure about exposing this to YAML constructor; that's why it's "grab" and not "get"
+     */
+    public List<Consumer<Fisher>> grabAdditionalSetups() {
+        return additionalSetups;
     }
 }

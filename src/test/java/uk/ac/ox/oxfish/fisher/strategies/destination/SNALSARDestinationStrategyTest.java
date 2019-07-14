@@ -89,7 +89,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -131,7 +131,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -189,7 +189,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -234,7 +234,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {

@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.log;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
@@ -97,7 +98,7 @@ public class TripLogger implements Startable
     /**
      * log the trip is over
      */
-    public TripRecord finishTrip(double hoursAtSea, Port terminal)
+    public TripRecord finishTrip(double hoursAtSea, Port terminal, Fisher fisher)
     {
 
         //it must have taken more than 0 hours to do a trip
@@ -110,7 +111,7 @@ public class TripLogger implements Startable
         lastFinishedTrip = currentTrip;
         //tell the listeners
         for(TripListener listener : listeners)
-            listener.reactToFinishedTrip(currentTrip);
+            listener.reactToFinishedTrip(currentTrip, fisher);
 
         return currentTrip;
     }

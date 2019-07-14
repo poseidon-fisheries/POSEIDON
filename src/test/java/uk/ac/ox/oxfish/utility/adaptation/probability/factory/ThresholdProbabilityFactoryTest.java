@@ -60,27 +60,27 @@ public class ThresholdProbabilityFactoryTest {
         //trip returns exactly profits equal to average
         TripRecord record = mock(TripRecord.class);
         when(record.getProfitPerHour(true)).thenReturn(10d);
-        ten.reactToFinishedTrip(record);
-        twenty.reactToFinishedTrip(record);
-        five.reactToFinishedTrip(record);
+        ten.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
+        twenty.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
+        five.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
         assertEquals(1d,ten.getExplorationProbability(),.001);
         assertEquals(1d,twenty.getExplorationProbability(),.001);
         assertEquals(0d,five.getExplorationProbability(),.001);
 
         //very low profits: everybody explores
         when(record.getProfitPerHour(true)).thenReturn(2d);
-        ten.reactToFinishedTrip(record);
-        twenty.reactToFinishedTrip(record);
-        five.reactToFinishedTrip(record);
+        ten.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
+        twenty.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
+        five.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
         assertEquals(1d,ten.getExplorationProbability(),.001);
         assertEquals(1d,twenty.getExplorationProbability(),.001);
         assertEquals(1d,five.getExplorationProbability(),.001);
 
         //very high profits, nobody explores
         when(record.getProfitPerHour(true)).thenReturn(21d);
-        ten.reactToFinishedTrip(record);
-        twenty.reactToFinishedTrip(record);
-        five.reactToFinishedTrip(record);
+        ten.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
+        twenty.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
+        five.reactToFinishedTrip(record,mock(Fisher.class,RETURNS_DEEP_STUBS));
         assertEquals(0d,ten.getExplorationProbability(),.001);
         assertEquals(0d,twenty.getExplorationProbability(),.001);
         assertEquals(0d,five.getExplorationProbability(),.001);

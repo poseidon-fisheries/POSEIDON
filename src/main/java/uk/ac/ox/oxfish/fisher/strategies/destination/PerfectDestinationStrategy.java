@@ -28,7 +28,6 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.ProfitFunction;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FixedFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -112,8 +111,8 @@ public class PerfectDestinationStrategy implements DestinationStrategy, TripList
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
-        SeaTile favoriteSpot = pickBest(fisher, model);
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
+        SeaTile favoriteSpot = pickBest(this.fisher, model);
         if(favoriteSpot!=null) //not going to make a selection when you are not allowed out!
             delegate.setFavoriteSpot(favoriteSpot);
     }

@@ -54,13 +54,13 @@ public class DiscretizationHistogrammerTest {
 
         TripRecord record = mock(TripRecord.class);
         when(record.getMostFishedTileInTrip()).thenReturn(tile1);
-        histogrammer.reactToFinishedTrip(record);
-        histogrammer.reactToFinishedTrip(record);
-        histogrammer.reactToFinishedTrip(record);
+        histogrammer.reactToFinishedTrip(record, null );
+        histogrammer.reactToFinishedTrip(record, null );
+        histogrammer.reactToFinishedTrip(record,null );
         when(record.getMostFishedTileInTrip()).thenReturn(tile2);
-        histogrammer.reactToFinishedTrip(record);
+        histogrammer.reactToFinishedTrip(record,null );
         when(record.getMostFishedTileInTrip()).thenReturn(tile3);
-        histogrammer.reactToFinishedTrip(record);
+        histogrammer.reactToFinishedTrip(record, null );
 
         assertEquals("3,2,0,0",histogrammer.composeFileContents());
 

@@ -415,6 +415,8 @@ public class FishState  extends SimState{
         return  ((scheduleTime / stepsPerDay) / 365);
     }
 
+
+
     public int getHour() {
         return (int) (schedule.getTime() % stepsPerDay * 24 / stepsPerDay);
     }

@@ -144,17 +144,17 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record)
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher)
     {
         SeaTile tile = record.getMostFishedTileInTrip();
         if(tile!=null)
             if(!record.isCutShort() || ignoreFailedTrips)
-                learnFromTripRecord(record, tile, fisher, model);
+                learnFromTripRecord(record, tile, this.fisher, model);
 
         //go through your friends and add their observations if they are new
         // (with imitation probability)
-        if(fisher.getDirectedFriends()!=null)
-            for(Fisher friend : fisher.getDirectedFriends())
+        if(this.fisher.getDirectedFriends()!=null)
+            for(Fisher friend : this.fisher.getDirectedFriends())
             {
                 TripRecord friendTrip = friend.getLastFinishedTrip();
                 //if you have already been through this don't worry
@@ -171,10 +171,10 @@ public class HeatmapDestinationStrategy implements DestinationStrategy, TripList
             }
 
         //find the optimal
-        SeaTile optimal = acquisition.pick(model.getMap(), heatmap, model, fisher, delegate.getFavoriteSpot() );
+        SeaTile optimal = acquisition.pick(model.getMap(), heatmap, model, this.fisher, delegate.getFavoriteSpot() );
         Preconditions.checkState(optimal.isWater());
         if(model.getRandom().nextDouble()<=probability.getExplorationProbability()) {
-            optimal = explorationStep.randomStep(model, model.getRandom(), fisher, optimal);
+            optimal = explorationStep.randomStep(model, model.getRandom(), this.fisher, optimal);
             Preconditions.checkState(optimal.isWater());
         }
         delegate.setFavoriteSpot(optimal);

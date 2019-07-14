@@ -5,30 +5,41 @@ import org.jetbrains.annotations.NotNull;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.BatchRunner;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.AltitudeOutput;
+import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
+import uk.ac.ox.oxfish.model.plugins.FisherEntryConstantRateFactory;
 import uk.ac.ox.oxfish.model.regs.ArbitraryPause;
 import uk.ac.ox.oxfish.model.regs.MaxHoursOutRegulation;
 import uk.ac.ox.oxfish.model.regs.PortBasedWaitTimesDecorator;
 import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
+import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
+import uk.ac.ox.oxfish.model.regs.factory.PortBasedWaitTimesFactory;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
+import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class SliceBiomassSweeps {
 
 
-    private static final String SCENARIO_NAME = "lime2_nospinup_NOentryexit_best";
-    private static final int YEARS_TO_RUN = 15;
+    private static final String SCENARIO_NAME = "lime2_4years_entryexit_best";
+    private static final int YEARS_TO_RUN = 19;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     private static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/biomass_slice/calibration/sweep/";
     private static final int MIN_DAYS_OUT = 10;
@@ -36,54 +47,113 @@ public class SliceBiomassSweeps {
     private static final int MAX_DAYS_OUT = 250;
     private static  int POPULATIONS = 4;
 
+    public static  int SHOCK_YEAR = 4;
 
-    public static  int SHOCK_YEAR = 1;
+
+
+    private static final Consumer<Scenario> removeEntry = new Consumer<Scenario>() {
+        @Override
+        public void accept(Scenario scenario) {
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            flexible.getPlugins().removeIf(new Predicate<AlgorithmFactory<? extends AdditionalStartable>>() {
+                @Override
+                public boolean test(
+                        AlgorithmFactory<? extends AdditionalStartable> algorithmFactory) {
+                    return algorithmFactory instanceof FisherEntryConstantRateFactory;
+                }
+            });
+        }
+    };
+
+    private static final Consumer<Scenario> removeReEntry = new Consumer<Scenario>() {
+        @Override
+        public void accept(Scenario scenario) {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
+                if(!(fisherDefinition.getDepartingStrategy() instanceof FullSeasonalRetiredDecoratorFactory ))
+                    continue;
+                else
+
+                    ((FullSeasonalRetiredDecoratorFactory) fisherDefinition.getDepartingStrategy()).setTargetVariable(
+                            new FixedDoubleParameter(999999999d));
+            }
+
+        }
+    };
+
+
 
     public static void main(String[] args) throws IOException {
 
         //effort control
         //all boats are controlled
-        effortControl("all",
-                new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
+        effortControl("all2",
+                      new String[]{"big", "small", "medium", "small10", "population0", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT);
 
+        effortControl("all2_noentry",
+                      new String[]{"big", "small", "medium", "small10", "population0", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT,
+                      removeEntry);
+
+        effortControl("all2_noentry_noreentry",
+                      new String[]{"big", "small", "medium", "small10", "population0", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT,
+                      removeEntry, removeReEntry);
 
 
 ////        //only boats >10GT are controlled
-        effortControl("10",
-                new String[]{"big","medium","small10"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
+        effortControl("102",
+                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT);
 
+        effortControl("102_noentry",
+                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT,
+                      removeEntry);
 
-
-
-        //fleet reduction
-        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
-
-        //delays
-        delays("delay_all", new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
-
-
+        effortControl("102_noentry_noreentry",
+                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT,
+                      removeEntry, removeReEntry);
 
 //
-        delays("delay_10", new String[]{"big","small10","medium"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
-
-
-
-        delaysOnce("delay_once",
-                new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME, SHOCK_YEAR, 200);
+////
+////        //fleet reduction
+//        fleetReduction("fleetreduction", SCENARIO_NAME, SHOCK_YEAR);
+////
+////        //delays
+//        delays("delay_all", new String[]{"big","small","medium","small10","population0","population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+//////
+//        delays("delay_10", new String[]{"big","small10","medium","population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+////
+////
+////
+//        delaysOnce("delay_once",
+//                new String[]{"big","small","medium","small10","population0","population1","population2","population3"},
+//                SCENARIO_NAME, SHOCK_YEAR, 200);
+//    }
     }
-
 
     private static void effortControl(
             String name,
             String[] modifiedTags, final String filename, final int shockYear,
-            final int minDaysOut) throws IOException {
+            final int minDaysOut,
+            Consumer<Scenario>... additionalSetups) throws IOException {
 
         FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
         fileWriter.write("run,year,policy,variable,value\n");
@@ -94,55 +164,101 @@ public class SliceBiomassSweeps {
             BatchRunner runner = setupRunner(filename, YEARS_TO_RUN,POPULATIONS);
 
 
+
+
             int finalMaxDaysOut = maxDaysOut;
 
             //basically we want year 4 to change big boats regulations.
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
-            runner.setScenarioSetup(
-                    scenario -> {
+            Consumer<Scenario> setup = scenario -> {
 
-                        //at year 4, impose regulation
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        flexible.getPlugins().add(
-                                fishState -> new AdditionalStartable() {
-                                    @Override
-                                    public void start(FishState model) {
+                //at year 4, impose regulation
+                FlexibleScenario flexible = (FlexibleScenario) scenario;
 
-                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                (Steppable) simState -> {
-                                                    System.out.println("Shock at day " + model.getDay());
-                                                    fisherloop:
-                                                    for (Fisher fisher :
-                                                            ((FishState) simState).getFishers()) {
 
-                                                        for (String tag : modifiedTags) {
-                                                            if (fisher.getTags().contains(tag)) {
-                                                                fisher.setRegulation(
-                                                                        new MaxHoursOutRegulation(
-                                                                                new ProtectedAreasOnly(),
-                                                                                finalMaxDaysOut*24d
-                                                                        ));
-                                                                continue fisherloop;
-                                                            }
-                                                        }
+                flexible.getPlugins().add(
+                        fishState -> new AdditionalStartable() {
+                            @Override
+                            public void start(FishState model) {
+
+
+                                model.scheduleOnceAtTheBeginningOfYear(
+                                        (Steppable) simState -> {
+                                            System.out.println("Shock at day " + model.getDay());
+
+                                            //force this on ALL current agents
+
+                                            fisherloop:
+                                            for (Fisher fisher :
+                                                    ((FishState) simState).getFishers()) {
+
+                                                for (String tag : modifiedTags) {
+                                                    if (fisher.getTags().contains(tag)) {
+                                                        fisher.setRegulation(
+                                                                new MaxHoursOutRegulation(
+                                                                        new ProtectedAreasOnly(),
+                                                                        finalMaxDaysOut * 24d
+                                                                ));
+                                                        continue fisherloop;
                                                     }
-                                                },
-                                                StepOrder.DAWN,
-                                                shockYear
-                                        );
+                                                }
+                                            }
+
+                                            //make sure it applies to new agents too
+                                            fisherloop:
+                                            for (Map.Entry<String, FisherFactory> fisherFactory :
+                                                    ((FishState) simState).getFisherFactories()) {
+                                                for (String tag : modifiedTags) {
+                                                    if (fisherFactory.getKey().equalsIgnoreCase(tag)) {
+                                                        MaxHoursOutFactory regulation = new MaxHoursOutFactory();
+                                                        regulation.setDelegate(new ProtectedAreasOnlyFactory());
+                                                        regulation.setMaxHoursOut(new FixedDoubleParameter(finalMaxDaysOut*24d));
+                                                        fisherFactory.getValue().setRegulations(regulation);
+                                                        continue fisherloop;
+                                                    }
+
+                                                }
+                                            }
 
 
-                                    }
+                                        },
+                                        StepOrder.DAWN,
+                                        shockYear
+                                );
 
-                                    @Override
-                                    public void turnOff() {
 
-                                    }
-                                }
-                        );
+                            }
 
-                    }
+
+                            @Override
+                            public void turnOff() {
+
+                            }
+                        }
+                );
+
+            };
+
+            //add tow logger
+            setup=setup.andThen(new Consumer<Scenario>() {
+                @Override
+                public void accept(Scenario scenario) {
+                    TowLongLoggerFactory log = new TowLongLoggerFactory();
+                    log.setFileName("towlog_"+name+"_"+finalMaxDaysOut+".csv");
+                    ((FlexibleScenario) scenario).getPlugins().add(log);
+
+                }
+            });
+
+
+            for (Consumer<Scenario> additionalSetup : additionalSetups) {
+                setup = setup.andThen(additionalSetup);
+            }
+
+
+            runner.setScenarioSetup(
+                    setup
             );
 
 
@@ -161,6 +277,7 @@ public class SliceBiomassSweeps {
                 fileWriter.write(tidy.toString());
                 fileWriter.flush();
             }
+
         }
         fileWriter.close();
     }
@@ -185,6 +302,25 @@ public class SliceBiomassSweeps {
 
             int finalWaitTime = waitTimes *24;
 
+
+            final HashMap<String, Integer> waitTimesMap = new HashMap<>();
+            final HashMap<String, Object> waitTimesObject = new HashMap<>();
+            waitTimesMap.put("Sumenep",finalWaitTime);
+            waitTimesMap.put("Gili Iyang",finalWaitTime);
+            waitTimesMap.put("Bajomulyo",finalWaitTime);
+            waitTimesMap.put("Brondong",finalWaitTime);
+            waitTimesMap.put("Karangsong",finalWaitTime);
+            waitTimesMap.put("Tanjung Pandan",finalWaitTime);
+            waitTimesMap.put("Probolinggo",finalWaitTime);
+
+            waitTimesObject.put("Sumenep",finalWaitTime);
+            waitTimesObject.put("Gili Iyang",finalWaitTime);
+            waitTimesObject.put("Bajomulyo",finalWaitTime);
+            waitTimesObject.put("Brondong",finalWaitTime);
+            waitTimesObject.put("Karangsong",finalWaitTime);
+            waitTimesObject.put("Tanjung Pandan",finalWaitTime);
+            waitTimesObject.put("Probolinggo",finalWaitTime);
+
             //basically we want year 4 to change big boats regulations.
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
@@ -201,14 +337,7 @@ public class SliceBiomassSweeps {
                                         model.scheduleOnceAtTheBeginningOfYear(
                                                 (Steppable) simState -> {
 
-                                                    HashMap<String, Integer> waitTimes = new HashMap<>();
-                                                    waitTimes.put("Sumenep",finalWaitTime);
-                                                    waitTimes.put("Gili Iyang",finalWaitTime);
-                                                    waitTimes.put("Bajomulyo",finalWaitTime);
-                                                    waitTimes.put("Brondong",finalWaitTime);
-                                                    waitTimes.put("Karangsong",finalWaitTime);
-                                                    waitTimes.put("Tanjung Pandan",finalWaitTime);
-                                                    waitTimes.put("Probolinggo",finalWaitTime);
+
 
 
                                                     fisherloop:
@@ -220,108 +349,30 @@ public class SliceBiomassSweeps {
                                                                 fisher.setRegulation(
                                                                         new PortBasedWaitTimesDecorator(
                                                                                 new ProtectedAreasOnly(),
-                                                                                waitTimes
+                                                                                waitTimesMap
                                                                         ));
                                                                 continue fisherloop;
                                                             }
                                                         }
                                                     }
-                                                },
-                                                StepOrder.DAWN,
-                                                shockYear
-                                        );
 
 
-                                    }
-
-                                    @Override
-                                    public void turnOff() {
-
-                                    }
-                                }
-                        );
-
-                    }
-            );
-
-
-            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
-                @Override
-                public void consume(StringBuffer writer, FishState model, Integer year) {
-                    writer.append(finalWaitTime).append(",");
-                }
-            });
-
-
-            //while (runner.getRunsDone() < 1) {
-            for(int i = 0; i< RUNS_PER_POLICY; i++) {
-                StringBuffer tidy = new StringBuffer();
-                runner.run(tidy);
-                fileWriter.write(tidy.toString());
-                fileWriter.flush();
-            }
-        }
-        fileWriter.close();
-    }
-
-    private static void delaysOnce(
-            String name,
-            String[] modifiedTags, final String filename, final int shockYear,
-            final int maxDelay) throws IOException {
-
-        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
-        fileWriter.write("run,year,policy,variable,value\n");
-        fileWriter.flush();
-
-        for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=10) {
-
-            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN,POPULATIONS);
-
-
-            int finalWaitTime = waitTimes;
-
-            //basically we want year 4 to change big boats regulations.
-            //because I coded "run" poorly, we have to go through this series of pirouettes
-            //to get it done right
-            runner.setScenarioSetup(
-                    scenario -> {
-
-                        //at year 4, impose regulation
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        flexible.getPlugins().add(
-                                fishState -> new AdditionalStartable() {
-                                    @Override
-                                    public void start(FishState model) {
-
-                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                (Steppable) simState -> {
-
-
-
+                                                    //make sure it applies to new agents too
                                                     fisherloop:
-                                                    for (Fisher fisher :
-                                                            ((FishState) simState).getFishers()) {
-
+                                                    for (Map.Entry<String, FisherFactory> fisherFactory :
+                                                            ((FishState) simState).getFisherFactories()) {
                                                         for (String tag : modifiedTags) {
-                                                            if (fisher.getTags().contains(tag)) {
-
-                                                                int endDate = model.getRandom().nextInt(365);
-                                                                int startDate = endDate-finalWaitTime;
-                                                                if(startDate<0) {
-                                                                    endDate = finalWaitTime+100;
-                                                                    startDate=100;
-                                                                }
-
-                                                                fisher.setRegulation(
-                                                                        new ArbitraryPause(
-                                                                                startDate,
-                                                                                endDate,
-                                                                                fisher.getRegulation()
-                                                                        ));
+                                                            if (fisherFactory.getKey().equalsIgnoreCase(tag)) {
+                                                                PortBasedWaitTimesFactory regulation = new PortBasedWaitTimesFactory();
+                                                                regulation.setPortWaitTimes(waitTimesObject);
+                                                                regulation.setDelegate(new ProtectedAreasOnlyFactory());
+                                                                fisherFactory.getValue().setRegulations(regulation);
                                                                 continue fisherloop;
                                                             }
+
                                                         }
                                                     }
+
                                                 },
                                                 StepOrder.DAWN,
                                                 shockYear
@@ -360,6 +411,135 @@ public class SliceBiomassSweeps {
         fileWriter.close();
     }
 
+//    private static void delaysOnce(
+//            String name,
+//            String[] modifiedTags, final String filename, final int shockYear,
+//            final int maxDelay) throws IOException {
+//
+//        FileWriter fileWriter = new FileWriter(Paths.get(DIRECTORY, filename + "_"+name+".csv").toFile());
+//        fileWriter.write("run,year,policy,variable,value\n");
+//        fileWriter.flush();
+//
+//        for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=10) {
+//
+//            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN,POPULATIONS);
+//
+//
+//            int finalWaitTime = waitTimes;
+//
+//            //basically we want year 4 to change big boats regulations.
+//            //because I coded "run" poorly, we have to go through this series of pirouettes
+//            //to get it done right
+//            runner.setScenarioSetup(
+//                    scenario -> {
+//
+//                        //at year 4, impose regulation
+//                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+//                        flexible.getPlugins().add(
+//                                fishState -> new AdditionalStartable() {
+//                                    @Override
+//                                    public void start(FishState model) {
+//
+//                                        model.scheduleOnceAtTheBeginningOfYear(
+//                                                (Steppable) simState -> {
+//
+//
+//
+//                                                    fisherloop:
+//                                                    for (Fisher fisher :
+//                                                            ((FishState) simState).getFishers()) {
+//
+//                                                        for (String tag : modifiedTags) {
+//                                                            if (fisher.getTags().contains(tag)) {
+//
+//                                                                int endDate = model.getRandom().nextInt(365);
+//                                                                int startDate = endDate-finalWaitTime;
+//                                                                if(startDate<0) {
+//                                                                    endDate = finalWaitTime+100;
+//                                                                    startDate=100;
+//                                                                }
+//
+//                                                                fisher.setRegulation(
+//                                                                        new ArbitraryPause(
+//                                                                                startDate,
+//                                                                                endDate,
+//                                                                                fisher.getRegulation()
+//                                                                        ));
+//                                                                continue fisherloop;
+//                                                            }
+//                                                        }
+//                                                    }
+//
+//
+//                                                    //make sure it applies to new agents too
+//                                                    fisherloop:
+//                                                    for (Map.Entry<String, FisherFactory> fisherFactory :
+//                                                            ((FishState) simState).getFisherFactories()) {
+//                                                        for (String tag : modifiedTags) {
+//                                                            if (fisherFactory.getKey().equalsIgnoreCase(tag)) {
+//                                                                fisherFactory.getValue().getAdditionalSetups().add(
+//                                                                        new Consumer<Fisher>() {
+//                                                                            @Override
+//                                                                            public void accept(Fisher fisher) {
+//
+//                                                                                int endDate = model.getRandom().nextInt(365);
+//                                                                                int startDate = endDate-finalWaitTime;
+//                                                                                if(startDate<0) {
+//                                                                                    endDate = finalWaitTime+100;
+//                                                                                    startDate=100;
+//                                                                                }
+//
+//                                                                                fisher.setRegulation(new ArbitraryPause(
+//                                                                                        startDate,endDate,fisher.getRegulation()
+//                                                                                ));
+//                                                                            }
+//                                                                        }
+//                                                                );
+//
+//                                                                continue fisherloop;
+//                                                            }
+//
+//                                                        }
+//                                                    }
+//
+//                                                },
+//                                                StepOrder.DAWN,
+//                                                shockYear
+//                                        );
+//
+//
+//                                    }
+//
+//                                    @Override
+//                                    public void turnOff() {
+//
+//                                    }
+//                                }
+//                        );
+//
+//                    }
+//            );
+//
+//
+//            runner.setColumnModifier(new BatchRunner.ColumnModifier() {
+//                @Override
+//                public void consume(StringBuffer writer, FishState model, Integer year) {
+//                    writer.append(finalWaitTime).append(",");
+//                }
+//            });
+//
+//
+//            //while (runner.getRunsDone() < 1) {
+//            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+//                StringBuffer tidy = new StringBuffer();
+//                runner.run(tidy);
+//                fileWriter.write(tidy.toString());
+//                fileWriter.flush();
+//            }
+//        }
+//        fileWriter.close();
+//    }
+//
     private static void fleetReduction(
             String name,
             final String filename, final int shockYear) throws IOException {
@@ -499,10 +679,28 @@ public class SliceBiomassSweeps {
                 "Biomass Pristipomoides multidens",
                 "Biomass Lutjanus malabaricus",
                 "Biomass Lutjanus erythropterus",
+
+                "Depletion Epinephelus areolatus",
+                "Depletion Pristipomoides multidens",
+                "Depletion Lutjanus malabaricus",
+                "Depletion Lutjanus erythropterus",
+
+                "Landings/MSY Epinephelus areolatus",
+                "Landings/MSY Pristipomoides multidens",
+                "Landings/MSY Lutjanus malabaricus",
+                "Landings/MSY Lutjanus erythropterus",
+
+
+
                 "Total Landings of population0",
                 "Total Landings of population1",
                 "Total Landings of population2",
                 "Total Landings of population3",
+
+                "Total Hours Out of population0",
+                "Total Hours Out of population1",
+                "Total Hours Out of population2",
+                "Total Hours Out of population3",
 
 
                 "Full-time fishers",
@@ -519,20 +717,21 @@ public class SliceBiomassSweeps {
                 "Retired fishers of population0",
                 "Retired fishers of population1",
                 "Retired fishers of population2",
-                "Retired fishers of population3"
+                "Retired fishers of population3",
+                "Average Hours Out"
 
 
-                );
+        );
 
 
 
         return new BatchRunner(
                 Paths.get(DIRECTORY,
-                        filename + ".yaml"),
+                          filename + ".yaml"),
                 yearsToRun,
                 columnsToPrint,
                 Paths.get(DIRECTORY,
-                        filename),
+                          filename),
                 null,
                 System.currentTimeMillis(),
                 -1

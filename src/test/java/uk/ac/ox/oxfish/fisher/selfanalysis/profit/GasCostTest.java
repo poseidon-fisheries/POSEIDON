@@ -58,7 +58,7 @@ public class GasCostTest {
         fisher.addTripListener(
                 new TripListener() {
                     @Override
-                    public void reactToFinishedTrip(TripRecord record) {
+                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                         System.out.println("day : " + state.getDay());
                         assertEquals(cost.cost(fisher, state, record, 0d, fisher.getHoursAtSea()),
                                      record.getTotalCosts(), .001d);

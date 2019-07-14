@@ -336,14 +336,14 @@ public class GenericOptimization extends SimpleProblemDouble {
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
         Paths.get("docs", "indonesia_hub", "runs", "712","biomass_slice","calibration",
-                              "optimization_lime2_nospinup_entryexit_start.yaml");
+                              "optimization_lime2_4years_entryexit_start.yaml");
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -1.085,-6.437,-5.268,-4.382,-5.500, 10.000, 9.573, 4.088,-8.877, 8.551, 7.615, 9.428, 2.288, 2.719, 7.083, 9.800, 8.365, 8.681,-0.057, 9.057, 8.655, 9.081, 0.872,-5.680
+                -7.439,-9.032,-8.697,-2.125,-3.354,-9.514,-4.487,-10.000,-9.204, 2.723,-8.058, 1.629,-2.850, 4.363,-7.512,-5.689, 3.022,-10.000, 6.765,-6.032,-0.404, 5.465,-2.366,-7.027
         });
-        Path outputFile = optimizationFile.getParent().resolve("lime2_nospinup_entryexit_best.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("sweep").resolve("lime2_4years_entryexit_best.yaml");
         //  FishYAML yaml = new FishYAML();
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 
