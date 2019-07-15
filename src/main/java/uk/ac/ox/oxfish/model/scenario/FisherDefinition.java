@@ -183,7 +183,7 @@ public class FisherDefinition {
     public Port getNextFisher(List<Port> ports,
                               FishState model)
     {
-        assert fishCreationIndex <flatPortArray.length;
+        // this assret is not true anymore; now after creating the first batch of fishers the rest is randomized assert fishCreationIndex <flatPortArray.length;
         String portName;
         //you are creating the original fishers!
         if(fishCreationIndex< flatPortArray.length) {
