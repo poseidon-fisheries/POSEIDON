@@ -42,7 +42,7 @@ California Map Scenario:
       csvFile: inputs/california/2007_gasprice.csv
       headerInFile: true
       loopThroughTheCSV: false
-      scaling: 0.219969157
+      scaling: 0.2199692
       separator: ','
       yearly: true
   gear:
@@ -53,7 +53,7 @@ California Map Scenario:
             Dover Sole:
               Double Normal Selectivity Gear:
                 ascWidth: '3.967'
-                averageCatchability: '3.5120123999999995E-4'
+                averageCatchability: '9.10009E-4'
                 binMax: '50.0'
                 binMin: '0.0'
                 binWidth: '1.0'
@@ -68,7 +68,7 @@ California Map Scenario:
                 top: '-1.483'
             Longspine Thornyhead:
               Logistic Selectivity Gear:
-                averageCatchability: '4.16E-4'
+                averageCatchability: '6.087025E-4'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
@@ -77,7 +77,7 @@ California Map Scenario:
                 selectivityBParameter: '9.03702'
             Sablefish:
               Sablefish Trawl Selectivity Gear:
-                averageCatchability: '5.2E-4'
+                averageCatchability: '7.088905E-4'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.910947'
                 retentionInflection: '45.5128'
@@ -85,7 +85,7 @@ California Map Scenario:
             Shortspine Thornyhead:
               Double Normal Selectivity Gear:
                 ascWidth: '4.25'
-                averageCatchability: '1.5338283999999998E-4'
+                averageCatchability: '1.833985E-4'
                 binMax: '75.0'
                 binMin: '0.0'
                 binWidth: '1.0'
@@ -100,7 +100,7 @@ California Map Scenario:
                 top: '-0.3'
             Yelloweye Rockfish:
               Logistic Selectivity Gear:
-                averageCatchability: '6.3031696E-4'
+                averageCatchability: '6.219684999999999E-4'
                 litersOfGasConsumedPerHour: '57.0'
                 retentionAsymptote: '0.992661'
                 retentionInflection: '21.8035'
@@ -111,7 +111,7 @@ California Map Scenario:
       proportionSimulatedToGarbage: '0.3221743'
   gearStrategy: Never Change Gear
   gridWidth: 50
-  holdSizePerBoat: '15000.0'
+  holdSizePerBoat: '5691.075'
   hourlyTravellingCosts: 94.520833333
   literPerKilometer: '3.547842974'
   logbook:
@@ -170,7 +170,7 @@ California Map Scenario:
       factories:
       - Anarchy
       - MPA by depth:
-          maxDepth: 200
+          maxDepth: 275
           minDepth: 0
       tags:
       - all

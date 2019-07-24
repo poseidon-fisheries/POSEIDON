@@ -42,6 +42,13 @@ Logistic Selectivity Gear:
   selectivityAParameter: '23.5035'
   selectivityBParameter: '9.03702'
 -------
+Simple Logistic Selectivity Gear:
+  averageCatchability: '0.0'
+  litersOfGasConsumedPerHour: '0.0'
+  rounding: false
+  selexParameter1: '15.0948823'
+  selexParameter2: '0.5391'
+-------
 Double Normal Selectivity Gear:
   ascWidth: '3.77'
   averageCatchability: '0.0'

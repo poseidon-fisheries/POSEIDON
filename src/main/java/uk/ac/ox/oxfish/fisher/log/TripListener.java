@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
+
 import java.io.Serializable;
 
 /**
@@ -28,6 +30,6 @@ import java.io.Serializable;
  */
 public interface TripListener extends Serializable{
 
-    void reactToFinishedTrip(TripRecord record);
+    void reactToFinishedTrip(TripRecord record, Fisher fisher);
 
 }

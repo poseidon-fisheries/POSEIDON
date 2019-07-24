@@ -306,6 +306,8 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+
+
     /**
      * tell the startable to turnoff,
      */
@@ -331,6 +333,8 @@ public class Fisher implements Steppable, Startable{
         bimonthlyAdaptation.turnOff(this);
         yearlyAdaptation.turnOff(this);
         tripAdaptation.turnOff(this);
+
+        getSocialNetwork().removeFisher(this,state);
     }
 
     @Override
@@ -528,7 +532,7 @@ public class Fisher implements Steppable, Startable{
 
 
         //finish trip!
-        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort());
+        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(),this );
         //account for the costs
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
         memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
@@ -1518,5 +1522,30 @@ public class Fisher implements Steppable, Startable{
 
     public double getHoursAtSeaThisYear() {
         return memory.getHoursAtSeaThisYear();
+    }
+
+
+    /**
+     * Getter for property 'additionalVariables'.
+     *
+     * @return Value for property 'additionalVariables'.
+     */
+    public HashMap<String, Object> getAdditionalVariables() {
+        return status.getAdditionalVariables();
+    }
+
+
+    /**
+     * you've been active if you are currently out at sea or you have finished at least a trip
+     * in the past 365 days!
+     * @return
+     */
+    public boolean hasBeenActiveThisYear(){
+
+        if(getLastFinishedTrip() == null)
+            return false;
+
+        return getLastFinishedTrip().getTripDate()> state.getDay()-364 ||
+                (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
     }
 }

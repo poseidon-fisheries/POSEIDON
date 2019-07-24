@@ -25,11 +25,13 @@ public class SnapshotBiomassAllocator implements BiomassAllocator {
             if(!seaTile.isFishingEvenPossibleHere())
                 continue;
             Double biomassHere = seaTile.getBiomass(species);
+            Preconditions.checkState(Double.isFinite(biomassHere));
             total+=biomassHere;
             weightMap.put(seaTile, biomassHere);
         }
         //now again, normalize to 1
         double finalTotal = total;
+        Preconditions.checkState(total>0, "nothing to reallocate for " + species);
         weightMap.replaceAll((seaTile, oldbiomass) -> oldbiomass/ finalTotal);
 
 

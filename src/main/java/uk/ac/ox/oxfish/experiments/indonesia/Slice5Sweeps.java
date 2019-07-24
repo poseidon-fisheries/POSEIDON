@@ -63,7 +63,8 @@ import java.util.List;
 
 public class Slice5Sweeps {
 
-    private static final String SCENARIO_NAME = "baseline_female";
+    private static final String SCENARIO_NAME = "lime2_best_adjusted_steepness06";
+    private static final int YEARS_TO_RUN = 20;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;
@@ -72,6 +73,8 @@ public class Slice5Sweeps {
     public static  int POPULATIONS = 4;
 
 
+    public static  int SHOCK_YEAR = 2;
+
     public static void main(String[] args) throws IOException {
 
         //effort control
@@ -79,15 +82,15 @@ public class Slice5Sweeps {
         effortControl("all",
                       new String[]{"big","small","medium","small10"},
                       SCENARIO_NAME,
-                      1, MIN_DAYS_OUT);
+                SHOCK_YEAR, MIN_DAYS_OUT);
 
 
-
+/*
 ////        //only boats >10GT are controlled
         effortControl("10",
                       new String[]{"big","medium","small10"},
                       SCENARIO_NAME,
-                      1, MIN_DAYS_OUT);
+                SHOCK_YEAR, MIN_DAYS_OUT);
 
 ////
 ////        //price premium
@@ -110,19 +113,21 @@ public class Slice5Sweeps {
 
           //delays
         delays("delay_all", new String[]{"big","small","medium","small10"},
-               SCENARIO_NAME, 1, 50);
+               SCENARIO_NAME, SHOCK_YEAR, 50);
 
 
 
 //
         delays("delay_10", new String[]{"big","small10","medium"},
-               SCENARIO_NAME, 1, 50);
+               SCENARIO_NAME, SHOCK_YEAR, 50);
 
 
 
          delaysOnce("delay_once",
                     new String[]{"big","small","medium","small10"},
-                    SCENARIO_NAME, 1, 200);
+                    SCENARIO_NAME, SHOCK_YEAR, 200);
+
+ */
     }
 
 
@@ -137,7 +142,7 @@ public class Slice5Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
             int finalMaxDaysOut = maxDaysOut;
@@ -225,7 +230,7 @@ public class Slice5Sweeps {
 
         for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=5) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
             int finalWaitTime = waitTimes *24;
@@ -320,7 +325,7 @@ public class Slice5Sweeps {
 
         for(int waitTimes = 0; waitTimes<= maxDelay; waitTimes+=10) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
             int finalWaitTime = waitTimes;
@@ -415,7 +420,7 @@ public class Slice5Sweeps {
 
         for(double probability=0; probability<=.05; probability=FishStateUtilities.round5(probability+.005)) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
@@ -507,7 +512,7 @@ public class Slice5Sweeps {
 
         for(double markup=0; markup<=3; markup=FishStateUtilities.round(markup+1)) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
@@ -578,7 +583,7 @@ public class Slice5Sweeps {
 
         for(double markup=0; markup<=1; markup=FishStateUtilities.round(markup+.25)) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
@@ -650,7 +655,7 @@ public class Slice5Sweeps {
 
         for(int maxDaysOut = MAX_DAYS_OUT; maxDaysOut>= minDaysOut; maxDaysOut-=10) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
@@ -714,7 +719,7 @@ public class Slice5Sweeps {
         fileWriter.flush();
 
 
-        BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+        BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
         for(int failure = 1; failure>=0; failure--) {
 
@@ -894,7 +899,7 @@ public class Slice5Sweeps {
 
         for (double increase = 1; increase <= 3; increase = FishStateUtilities.round5(increase + .25)) {
 
-            BatchRunner runner = setupRunner(filename, 15, POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
             //basically we want year 4 to change big boats regulations.
@@ -987,7 +992,7 @@ public class Slice5Sweeps {
 
         for(double increase=0; increase<=3; increase=FishStateUtilities.round5(increase+1)) {
 
-            BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+            BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
 
@@ -1075,7 +1080,7 @@ public class Slice5Sweeps {
             for(double probabilityOfCheating = 0; probabilityOfCheating<=1; probabilityOfCheating+=.2) {
 
                 probabilityOfCheating = FishStateUtilities.round(probabilityOfCheating);
-                BatchRunner runner = setupRunner(filename, 15,POPULATIONS);
+                BatchRunner runner = setupRunner(filename, YEARS_TO_RUN, POPULATIONS);
 
 
                 int finalMaxDaysOut = maxDaysOut;

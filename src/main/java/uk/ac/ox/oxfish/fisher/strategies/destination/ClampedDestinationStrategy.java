@@ -125,7 +125,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         double sum = 0;
         MersenneTwisterFast random = state.getRandom();
         NauticalMap map = state.getMap();
@@ -138,7 +138,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
                         random,
                         tileGroup,
                         respectMPA,
-                        fisher,
+                        this.fisher,
                         state,
                         avoidWastelands,
                         100
@@ -153,7 +153,7 @@ public class ClampedDestinationStrategy implements DestinationStrategy, TripList
         sum = 0;
         for (int group = 0; group < discretization.getNumberOfGroups(); group++) {
             if (candidates[group] == null ||
-                    map.distance(candidates[group], fisher.getHomePort().getLocation()) > distanceMaximum)
+                    map.distance(candidates[group], this.fisher.getHomePort().getLocation()) > distanceMaximum)
                 currentPropensities[group] = 0;
             else
                 sum += currentPropensities[group];

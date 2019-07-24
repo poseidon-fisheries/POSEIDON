@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.data;
 
 import sim.field.grid.DoubleGrid2D;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -42,6 +43,7 @@ public class TowOutput implements OutputPlugin, TripListener
     final private DoubleGrid2D tows;
 
 
+
     public TowOutput(NauticalMap map) {
         tows = new DoubleGrid2D(map.getWidth(), map.getHeight());
 
@@ -50,9 +52,10 @@ public class TowOutput implements OutputPlugin, TripListener
     /**
      * turn most fished tile into a group number and add 1 to the list
      * @param record
+     * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
 
             for (Map.Entry<SeaTile, FishingRecord> effort : record.getFishingRecords())
             {

@@ -117,12 +117,12 @@ public class SNALSARDestinationStrategy implements DestinationStrategy,
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         //all choices
         List<SeaTile> options = model.getMap().getAllSeaTilesExcludingLandAsList();
         delegate.setFavoriteSpot(chooser.answer(options,
-                                                fisher.getTileRepresentation(),
-                                                model, fisher
+                                                this.fisher.getTileRepresentation(),
+                                                model, this.fisher
                                  )
         );
     }

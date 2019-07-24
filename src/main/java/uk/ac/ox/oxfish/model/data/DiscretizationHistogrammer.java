@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.data;
 
 import com.google.common.base.Joiner;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.FishingRecord;
 import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -68,9 +69,10 @@ public class DiscretizationHistogrammer implements TripListener, OutputPlugin
     /**
      * turn most fished tile into a group number and add 1 to the list
      * @param record
+     * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         if(!effortCounter) {
             SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
             if(mostFishedTileInTrip != null && discretization.getGroup(mostFishedTileInTrip) != null)

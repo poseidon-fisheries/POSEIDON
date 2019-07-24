@@ -112,7 +112,7 @@ public class PseudoLogisticLogger implements TripListener {
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record)
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher)
     {
         //if we recorded an input at the end of the last trip, now we reveal the choice
         if(log.waitingForChoice()) {
@@ -142,7 +142,7 @@ public class PseudoLogisticLogger implements TripListener {
 
         }
         assert !log.waitingForChoice();
-            log.recordInput(inputter.getRegressionInput(fisher,state));
+            log.recordInput(inputter.getRegressionInput(this.fisher, state));
 
 
 

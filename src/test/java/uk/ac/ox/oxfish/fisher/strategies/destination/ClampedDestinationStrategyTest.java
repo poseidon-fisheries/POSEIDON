@@ -31,7 +31,6 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -82,7 +81,7 @@ public class ClampedDestinationStrategyTest {
             destinationStrategy.start(state, fisher);
 
             for (int i = 0; i < 100; i++)
-                destinationStrategy.reactToFinishedTrip(null);
+                destinationStrategy.reactToFinishedTrip(null, null );
 
 
             verify(delegate, never()).setFavoriteSpot(tile3);

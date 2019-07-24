@@ -33,8 +33,7 @@ import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by carrknight on 1/21/17.
@@ -72,14 +71,14 @@ public class PseudoLogisticLoggerTest {
         SeaTile destination = state.
                 getMap().getSeaTile(1, 1);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
-        logger.reactToFinishedTrip(record);
+        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
 
         //this destination will not be ignored, but it will be associated with the inputs recorded at the end of previous trip
         destination = state.
                 getMap().getSeaTile(0, 1);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
         when(state.getDay()).thenReturn(100);
-        logger.reactToFinishedTrip(record);
+        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
 
         System.out.print(log.getData().toString());
         String[] csv = log.getData().toString().trim().split("\n");
@@ -101,7 +100,7 @@ public class PseudoLogisticLoggerTest {
         destination = state.
                 getMap().getSeaTile(0, 0);
         when(record.getMostFishedTileInTrip()).thenReturn(destination);
-        logger.reactToFinishedTrip(record);
+        logger.reactToFinishedTrip(record, mock(Fisher.class,RETURNS_DEEP_STUBS));
 
 
         System.out.println("***************************************");

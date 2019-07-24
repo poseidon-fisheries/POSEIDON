@@ -154,6 +154,12 @@ public class DestinationStrategies
         NAMES.put(LogitRPUEDestinationFactory.class,
                   "Perfect RPUE Logit");
 
+
+        CONSTRUCTORS.put("Perfect Knowledge",
+                         PerfectDestinationFactory::new);
+        NAMES.put(PerfectDestinationFactory.class,
+                  "Perfect Knowledge");
+
         CONSTRUCTORS.put("Replicator",
                          ReplicatorDestinationFactory::new);
         NAMES.put(ReplicatorDestinationFactory.class,

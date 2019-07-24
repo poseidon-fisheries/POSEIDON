@@ -7,7 +7,9 @@ import uk.ac.ox.oxfish.biology.boxcars.FishingMortalityAgentFactory;
 import uk.ac.ox.oxfish.biology.boxcars.SPRAgentBuilder;
 import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -52,6 +54,13 @@ public class AdditionalStartables {
                 "Abundance Snapshot Resetter");
 
 
+        CONSTRUCTORS.put("Biomass Snapshot Resetter",
+                SnapshotBiomassResetterFactory::new
+        );
+        NAMES.put(SnapshotBiomassResetterFactory.class,
+                "Biomass Snapshot Resetter");
+
+
         CONSTRUCTORS.put("Abundance Gatherers",
                 AbundanceGathererBuilder::new
         );
@@ -70,6 +79,14 @@ public class AdditionalStartables {
         NAMES.put(SprOracleBuilder.class,
                   "SPR Oracle");
 
+
+        CONSTRUCTORS.put("Fishing Mortality Agent",
+                         FishingMortalityAgentFactory::new
+        );
+        NAMES.put(FishingMortalityAgentFactory.class,
+                  "Fishing Mortality Agent");
+
+
         CONSTRUCTORS.put("Fish Entry By Profit",
                          FisherEntryByProfitFactory::new
         );
@@ -77,11 +94,31 @@ public class AdditionalStartables {
                   "Fish Entry By Profit");
 
 
-        CONSTRUCTORS.put("Fishing Mortality Agent",
-                         FishingMortalityAgentFactory::new
+        CONSTRUCTORS.put("Fish Entry Constant Rate",
+                         FisherEntryConstantRateFactory::new
         );
-        NAMES.put(FishingMortalityAgentFactory.class,
-                  "Fishing Mortality Agent");
+        NAMES.put(FisherEntryConstantRateFactory.class,
+                  "Fish Entry Constant Rate");
+
+
+        CONSTRUCTORS.put("Full-time Seasonal Retired Data Collectors",
+                         FullSeasonalRetiredDataCollectorsFactory::new
+        );
+        NAMES.put(FullSeasonalRetiredDataCollectorsFactory.class,
+                  "Full-time Seasonal Retired Data Collectors");
+
+        CONSTRUCTORS.put("Biomass Depletion Data Collectors",
+                         BiomassDepletionGathererFactory::new
+        );
+        NAMES.put(BiomassDepletionGathererFactory.class,
+                  "Biomass Depletion Data Collectors");
+
+        CONSTRUCTORS.put("Tow Long Logger",
+                         TowLongLoggerFactory::new
+        );
+        NAMES.put(TowLongLoggerFactory.class,
+                  "Tow Long Logger");
+
 
 
     }

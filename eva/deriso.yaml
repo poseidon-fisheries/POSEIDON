@@ -1,20 +1,12 @@
 !!uk.ac.ox.oxfish.maximization.CaliforniaDerisoOptimization
 parameters:
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Dover Sole.averageCatchability,
-  alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Longspine Thornyhead.averageCatchability,
-  alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Sablefish.averageCatchability,
-  alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Shortspine Thornyhead.averageCatchability,
-  alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Yelloweye Rockfish.averageCatchability,
-  alwaysPositive: true, maximum: 0.001, minimum: 1.0E-5}
-- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
-  alwaysPositive: true, maximum: 15000.0, minimum: 1500.0}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.multiplier,
+  alwaysPositive: false, maximum: 3.0, minimum: 0.1}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.stepSize,
+  alwaysPositive: false, maximum: 20.0, minimum: 1.0}
 runsPerSetting: 1
-scenarioFile: docs/groundfish/calibration/step1_catchability/map/start.yaml
-seed: 2
-summaryDirectory: docs/groundfish/calibration/step1_catchability/map
-yearsToIgnore: 1
-yearsToRun: 5
+scenarioFile: docs/groundfish/calibration/northquota_yesgarbage/annealing_cheating_start.yaml
+seed: 0
+summaryDirectory: docs/groundfish/calibration/northquota_yesgarbage
+yearsToIgnore: 5
+yearsToRun: 7

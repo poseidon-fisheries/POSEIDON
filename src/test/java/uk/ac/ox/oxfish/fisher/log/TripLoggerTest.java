@@ -28,8 +28,7 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 public class TripLoggerTest
@@ -56,7 +55,7 @@ public class TripLoggerTest
                                                new Catch(new double[]{100,100})));
         logger.recordEarnings(0,100,100);
         logger.recordCosts(200);
-        logger.finishTrip(10, mock(Port.class));
+        logger.finishTrip(10, mock(Port.class), mock(Fisher.class, RETURNS_DEEP_STUBS));
         //even though it's over, it is still there as current trip
         assertTrue(logger.getCurrentTrip().isCompleted());
         assertEquals(logger.getCurrentTrip().getProfitPerHour(false),-10,.001);
@@ -78,8 +77,9 @@ public class TripLoggerTest
         logger.newTrip(0,0);
         TripRecord record = logger.getCurrentTrip();
 
-        logger.finishTrip(1, mock(Port.class));
-        verify(receiver).reactToFinishedTrip(record);
+        Fisher fisher = mock(Fisher.class, RETURNS_DEEP_STUBS);
+        logger.finishTrip(1, mock(Port.class), fisher);
+        verify(receiver).reactToFinishedTrip(record, fisher);
 
 
 

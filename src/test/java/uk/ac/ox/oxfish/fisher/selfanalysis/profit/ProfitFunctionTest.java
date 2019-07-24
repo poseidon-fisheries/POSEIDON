@@ -26,11 +26,8 @@ import uk.ac.ox.oxfish.fisher.log.TripListener;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.LameTripSimulator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumStepsFactory;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
-
-import java.util.function.Function;
 
 import static org.junit.Assert.*;
 
@@ -63,7 +60,7 @@ public class ProfitFunctionTest {
         fisher.addTripListener(
                 new TripListener() {
                     @Override
-                    public void reactToFinishedTrip(TripRecord record) {
+                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                         System.out.println("day : " + state.getDay());
 
                         TripRecord simulated = function.simulateTrip(fisher,

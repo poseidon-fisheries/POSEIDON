@@ -341,7 +341,9 @@ public class  FishGUI extends GUIState{
         ScrollPane pane = new ScrollPane();
         pane.add(new MetaInspector(new FishStateProxy(state), self));
 
-        ((Console) controller).getTabPane().add("Aggregate Data", pane);
+        ((Console) controller).getTabPane().addTab("Aggregate Data", pane);
+
+
 
 
         //if possible create buttons to add fishers
@@ -435,6 +437,24 @@ public class  FishGUI extends GUIState{
             }
         });
 
+        policyButtons.add(new PolicyButton() {
+            @Override
+            public JComponent buildJComponent(FishGUI gui) {
+                JButton button = new JButton("Reset aggregate data");
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ((Console) controller).getTabPane().remove(pane);
+                        pane.removeAll();
+                        pane.add(new MetaInspector(new FishStateProxy(state), self));
+                        ((Console) controller).getTabPane().addTab("Aggregate Data", pane);
+
+                    }
+                });
+
+                return button;
+            }
+        });
 
 
         //mpa drawer

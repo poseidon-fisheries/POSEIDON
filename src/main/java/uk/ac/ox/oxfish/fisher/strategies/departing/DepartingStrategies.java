@@ -88,6 +88,11 @@ public class DepartingStrategies {
         CONSTRUCTORS.put("Exit Decorator",
                          ExitDecoratorFactory::new);
         NAMES.put(ExitDecoratorFactory.class,"Exit Decorator");
+
+
+        CONSTRUCTORS.put("Full-time Seasonal Retired Decorator",
+                         FullSeasonalRetiredDecoratorFactory::new);
+        NAMES.put(FullSeasonalRetiredDecoratorFactory.class,"Full-time Seasonal Retired Decorator");
     }
 
     private DepartingStrategies() {}

@@ -69,7 +69,7 @@ public class ThresholdExplorationProbability implements AdaptationProbability, T
 
 
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
         Double ourProfits = record.getProfitPerHour(true);
         Double toBeat = threshold.apply(model);
         double correctMultiplier = toBeat >=0 ? multiplier : 1d/multiplier;

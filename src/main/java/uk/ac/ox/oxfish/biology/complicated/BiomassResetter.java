@@ -83,11 +83,14 @@ public class BiomassResetter implements BiologyResetter {
             VariableBiomassBasedBiology biology =
                     ((VariableBiomassBasedBiology) seaTile.getBiology());
 
-            biology.setCurrentBiomass(species,
-                                      recordedBiomass *
-                                              normalizedAllocator.allocate(seaTile,map,random)
+            double newBiomass = Math.min(
+                    recordedBiomass *
+                            normalizedAllocator.allocate(seaTile, map, random),
+                    biology.getCarryingCapacity(species)
 
-                                      );
+            );
+            biology.setCurrentBiomass(species,
+                    newBiomass);
         }
 
     }

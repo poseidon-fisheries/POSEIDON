@@ -26,38 +26,40 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     ///home/carrknight/code/oxfish/docs/groundfish/calibration/step1_catchability/logit
     private String scenarioFile =
-            Paths.get("docs","groundfish","calibration","step1_catchability",
-                    "map","start.yaml").toString();
+            Paths.get("docs","groundfish","calibration","northquota_yesgarbage",
+                    "annealing_cheating_start.yaml").toString();
 
 
     private String summaryDirectory =
-            Paths.get("docs","groundfish","calibration","step1_catchability",
-                    "map").toString();
+            Paths.get("docs","groundfish","calibration","northquota_yesgarbage"
+                    ).toString();
 
-    private long seed = 2;
+    private long seed = 0;
 
 
 
-    private int yearsToRun = 5;
+    private int yearsToRun = 7; //in reality since years count to 0 this means we simulate 8 years total
 
-    private int yearsToIgnore = 1;
+    private int yearsToIgnore = 5; //years to ignore 5 means you are targeting validation days; switch it back to 2 if you are not
+    //doing sensitivity analysis for "cheating" runs
 
 
     //TARGETS
     private static final double YELLOW_QUOTA = 600.0;
     private static final double DOVER_QUOTA = 22234500;
     private static final double LONGSPINE_QUOTA = 1966250.0;
-    private static final double SABLEFISH_QUOTA = 2724935;
+    private static final double SABLEFISH_QUOTA =  1606257;
+            //2724935 for non-north quota;
     private static final double SHORTSPINE_QUOTA = 1481600.056;
-    private static final double[] YELLOW_ATTAINMENT = new double[]{6.6, 2};
-    private static final double[] DOVER_ATTAINMENT = new double[]{33.25 , 3.09};
-    private static final double[] LONGSPINE_ATTAINMENT = new double[]{51.5 , 5.06 };
-    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{52.5 , 5.06 };
-    private static final double[] SABLEFISH_ATTAINMENT = new double[]{83.65, 6.181};
-    private static final double[] HOURS_AT_SEA = new double[]{999.936, 120.382023907226};
-    private static final double[] PROFITS = new double[]{89308, 21331};
-    private static final double[] DISTANCE = new double[]{90.88762, 32};
-    private static final double[] DURATION = new double[]{69.097625, 33};
+    private static final double[] YELLOW_ATTAINMENT = new double[]{7.03, 2};//{6.6, 2};
+    private static final double[] DOVER_ATTAINMENT = new double[]{30.21 , 3.09};//{33.25 , 3.09};
+    private static final double[] LONGSPINE_ATTAINMENT = new double[]{36.31 , 5.06 };//{51.5 , 5.06 };
+    private static final double[] SHORTSPINE_ATTAINMENT = new double[]{50 , 5.06 };//{52.5 , 5.06 };
+    private static final double[] SABLEFISH_ATTAINMENT = new double[]{86.67356, 6.181};//{83.65, 6.181};
+    private static final double[] HOURS_AT_SEA = new double[]{799.44, 120.382023907226};//{999.936, 120.382023907226};
+    private static final double[] PROFITS = new double[]{134405.5,21331}; // new double[]{89308, 21331};
+  //  private static final double[] DISTANCE = new double[]{90.88762, 32};
+  //  private static final double[] DURATION = new double[]{69.097625, 33};
 
 
 
@@ -75,54 +77,54 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     {
 
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Dover Sole.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Sablefish.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
-        parameters.add(new SimpleOptimizationParameter(
-                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
-                MINIMUM_CATCHABILITY,
-                MAXIMUM_CATCHABILITY
-        ));
-
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Dover Sole.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Sablefish.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+//                MINIMUM_CATCHABILITY,
+//                MAXIMUM_CATCHABILITY
+//        ));
+//
 //        parameters.add(new SimpleOptimizationParameter(
 //                "gear.proportionSimulatedToGarbage",
 //                0,
 //                0.5
 //        ));
+//
+//
+//        parameters.add(new SimpleOptimizationParameter(
+//                "holdSizePerBoat",
+//                1500,
+//                15000
+//        ));
+//
+//                for (OptimizationParameter parameter : parameters) {
+//            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
+//        }
 
-
-        parameters.add(new SimpleOptimizationParameter(
-                "holdSizePerBoat",
-                1500,
-                15000
-        ));
-
-                for (OptimizationParameter parameter : parameters) {
-            ((SimpleOptimizationParameter) parameter).setAlwaysPositive(true);
-        }
-
-
+//
 //        parameters.add(new SimpleOptimizationParameter(
 //                "destinationStrategy.betaDistance",
 //
@@ -163,6 +165,19 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 //        ));
 
 
+                parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.probability.multiplier",
+
+                0.1,
+                3
+        ));
+                parameters.add(new SimpleOptimizationParameter(
+                "destinationStrategy.stepSize",
+
+                1,
+                20
+        ));
+
     }
 
     @Override
@@ -199,7 +214,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         DOVER_QUOTA,
                         DOVER_ATTAINMENT[0],
                         DOVER_ATTAINMENT[1],
-                        1);
+                        yearsToIgnore);
                 error +=
                         soleError;
                 double longspineLandings = deviationAttainment(
@@ -207,7 +222,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         LONGSPINE_QUOTA,
                         LONGSPINE_ATTAINMENT[0],
                         LONGSPINE_ATTAINMENT[1],
-                        1);
+                        yearsToIgnore);
                 error +=
                         longspineLandings;
                 double shortspineLanding = deviationAttainment(
@@ -215,7 +230,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         SHORTSPINE_QUOTA,
                         SHORTSPINE_ATTAINMENT[0],
                         SHORTSPINE_ATTAINMENT[1],
-                        1);
+                        yearsToIgnore);
                 error +=
                         shortspineLanding;
 
@@ -224,7 +239,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         YELLOW_QUOTA,
                         YELLOW_ATTAINMENT[0],
                         YELLOW_ATTAINMENT[1],
-                        1);
+                        yearsToIgnore);
                 error +=
                         rockfishLandings;
 
@@ -233,7 +248,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         SABLEFISH_QUOTA,
                         SABLEFISH_ATTAINMENT[0],
                         SABLEFISH_ATTAINMENT[1],
-                        1);
+                        yearsToIgnore);
                 error +=
                         sablefishLandings;
 
@@ -242,7 +257,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         model.getYearlyDataSet().getColumn("Actual Average Hours Out"),
                         HOURS_AT_SEA[0],
                         HOURS_AT_SEA[1],
-                        1
+                        yearsToIgnore
                 );
                 error +=
                         actualAverageHoursOut;
@@ -251,28 +266,28 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                         model.getYearlyDataSet().getColumn("Average Cash-Flow"),
                         PROFITS[0],
                         PROFITS[1],
-                        1
+                        yearsToIgnore
                 );
                 error +=
                         cashflow;
 
-                double duration = deviation(
-                        model.getYearlyDataSet().getColumn("Average Trip Duration"),
-                        DURATION[0],
-                        DURATION[1],
-                        1
-                );
-                error +=
-                        duration;
-
-                double distanceFromPort = deviation(
-                        model.getYearlyDataSet().getColumn("Average Distance From Port"),
-                        DISTANCE[0],
-                        DISTANCE[1],
-                        1
-                );
-                error +=
-                        distanceFromPort;
+//                double duration = deviation(
+//                        model.getYearlyDataSet().getColumn("Average Trip Duration"),
+//                        DURATION[0],
+//                        DURATION[1],
+//                        1
+//                );
+//                error +=
+//                        duration;
+//
+//                double distanceFromPort = deviation(
+//                        model.getYearlyDataSet().getColumn("Average Distance From Port"),
+//                        DISTANCE[0],
+//                        DISTANCE[1],
+//                        1
+//                );
+//                error +=
+//                        distanceFromPort;
 
 
                 Files.write(
@@ -287,8 +302,8 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                                         sablefishLandings +"," +
                                         actualAverageHoursOut +"," +
                                         cashflow +"," +
-                                        duration +"," +
-                                        distanceFromPort +"," +
+                                    //    duration +"," +
+                                    //    distanceFromPort +"," +
 
                                         Arrays.toString(x).
                                                 replace("[","").
@@ -336,12 +351,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
 
     public static void main(String[] args) throws IOException {
         double[] best = new double[]{
-                -1.40347379858342,
-                9.37268507344749,
-                7.74253632142309,
-                -6.00011591839622,
-                2.7591705869591,
-                6.84793762259298
+                -2.850,-0.822, 8.506,-0.121,-3.353,-3.860, 5.221
 
 
 
@@ -357,7 +367,7 @@ public class CaliforniaDerisoOptimization extends SimpleProblemDouble {
                 Scenario.class);
         optimization.prepareScenario(best,scenario);
         yaml.dump(scenario,
-                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("best_cpuemap.yaml").toFile()));
+                new FileWriter(Paths.get(optimization.summaryDirectory).resolve("fleetwide_cheating.yaml").toFile()));
 
 
     }

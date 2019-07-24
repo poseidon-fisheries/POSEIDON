@@ -75,7 +75,7 @@ public class ProfitFunctionRegressionTest {
         Fisher fisher = state.getFishers().get(0);
         fisher.addTripListener(new TripListener() {
             @Override
-            public void reactToFinishedTrip(TripRecord record) {
+            public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                 regression.addObservation(new GeographicalObservation<>(record.getMostFishedTileInTrip(),
                                                                         state.getHoursSinceStart(),
                                                                         record),fisher,state

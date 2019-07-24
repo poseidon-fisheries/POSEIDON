@@ -441,6 +441,20 @@ public class FishStateUtilities {
      */
     public static <T> Gatherer<T> generateYearlySum(final DataColumn column) {
 
+
+        return generateYearlySum(column,Function.identity());
+    }
+
+
+    /**
+     * takes a column of daily observations and sum them up to generate a yearly observation
+     * @param column colun to sum over
+     * @param sumTransformer takes the sum and applies an arbitrary function to it
+     * @return a sum or NAN if the column is empty
+     */
+    public static <T> Gatherer<T> generateYearlySum(final DataColumn column,
+                                                    Function<Double,Double> sumTransformer) {
+
         return new Gatherer<T>() {
             @Override
             public Double apply(T state) {
@@ -456,7 +470,7 @@ public class FishStateUtilities {
                         sum += iterator.next();
                 }
 
-                return sum;
+                return sumTransformer.apply(sum);
             }
         };
     }

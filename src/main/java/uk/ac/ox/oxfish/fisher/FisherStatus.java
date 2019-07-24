@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.metawidget.inspector.annotation.UiHidden;
@@ -207,6 +208,15 @@ public class FisherStatus implements Serializable {
     public void setNetwork(SocialNetwork network) {
         this.network = network;
     }
+
+
+    /**
+     * anything that doesn't fit a counter or a time series can be stored in this map which is nothing else than a
+     * white board to scribble fisher parameters in.
+     * Anything we don't necessarilly want to stay within a strategy object or that it affects fisher stuff across
+     * objects
+     */
+    private final HashMap<String, Object> additionalVariables = new HashMap<>();
 
 
 
@@ -495,5 +505,14 @@ public class FisherStatus implements Serializable {
      */
     public void setDailyProfitsPredictor(Predictor dailyProfitsPredictor) {
         this.dailyProfitsPredictor = dailyProfitsPredictor;
+    }
+
+    /**
+     * Getter for property 'additionalVariables'.
+     *
+     * @return Value for property 'additionalVariables'.
+     */
+    public HashMap<String, Object> getAdditionalVariables() {
+        return additionalVariables;
     }
 }

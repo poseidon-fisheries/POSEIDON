@@ -42,6 +42,7 @@ public class VariableProportionAging extends LocalAgingProcess {
     private double[][] lazyGraduation = null;
     private int daysToSimulateLastLazyEvaluation = -1;
 
+    private Species speciesConnected = null;
 
     /**
      * called after the aging process has been initialized but before it is run.
@@ -50,6 +51,8 @@ public class VariableProportionAging extends LocalAgingProcess {
      */
     @Override
     public void start(Species species) {
+        Preconditions.checkState(speciesConnected==null);
+        speciesConnected = species; //you don't want to re-use this for multiple species!!
 
     }
 
@@ -74,6 +77,8 @@ public class VariableProportionAging extends LocalAgingProcess {
 
         Preconditions.checkArgument(rounding==false,
                                     "VariableProportionAging works very poorly with rounding!");
+        Preconditions.checkArgument(species==speciesConnected,
+                                    "Wrong species!");
         double[][] abundance = localBiology.getAbundance(species).asMatrix();
 
         //scale graduating proportion lazily
@@ -134,7 +139,7 @@ public class VariableProportionAging extends LocalAgingProcess {
         double[] graduate = new double[bins];
         Preconditions.checkArgument(bins ==
                                             proportionGraduating.length);
-        Preconditions.checkArgument(bins >2);
+        Preconditions.checkArgument(bins >=2);
         assert proportionGraduating[bins-1]==0 || Double.isNaN(proportionGraduating[bins-1]);
         //going backward
         for(int i=bins-2; i>=0; i--)
