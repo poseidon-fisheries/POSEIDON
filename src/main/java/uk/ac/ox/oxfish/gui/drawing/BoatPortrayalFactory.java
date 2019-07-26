@@ -66,7 +66,10 @@ public class BoatPortrayalFactory
         BOAT_COLORS.put("grey", Color.gray);
         BOAT_COLORS.put("gray", Color.gray);
         BOAT_COLORS.put("pink", Color.pink);
-        BOAT_COLORS.put("orange", Color.orange);
+        BOAT_COLORS.put("salmon", new Color(250,128,114));
+        BOAT_COLORS.put("palevioletred", new Color(219,112,147));
+        BOAT_COLORS.put("teal", new Color(0,128,128));
+        BOAT_COLORS.put("wheat", new Color(245,222,179));
 
 
     }
