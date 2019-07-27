@@ -36,7 +36,7 @@ import java.util.List;
 
 public class Slice2019Sweeps {
 
-    private static final String SCENARIO_NAME = "fishilife_noconst_best_6h";
+    private static final String SCENARIO_NAME = "fishilife_noconst_best_8h_entry";
     private static final int YEARS_TO_RUN = 20;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/calibration/slicesweep/";

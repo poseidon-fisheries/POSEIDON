@@ -335,15 +335,15 @@ public class GenericOptimization extends SimpleProblemDouble {
 
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
-        Paths.get("docs", "indonesia_hub", "runs", "712","biomass_slice","calibration",
-                              "optimization_lime2_4years_entryexit_start.yaml");
+        Paths.get("docs", "indonesia_hub", "runs", "712","slice2019","calibration",
+                              "optimizationproblem_fishilife_noconst_start.yaml");
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -7.439,-9.032,-8.697,-2.125,-3.354,-9.514,-4.487,-10.000,-9.204, 2.723,-8.058, 1.629,-2.850, 4.363,-7.512,-5.689, 3.022,-10.000, 6.765,-6.032,-0.404, 5.465,-2.366,-7.027
+                -4.859,-9.161,-0.792, 0.262,-2.875, 8.249,-5.714,-5.446,-8.151,-0.241, 6.352, 5.286,-0.184,-4.350, 10.000,-7.982,-1.160, 8.416, 3.534, 2.826
         });
-        Path outputFile = optimizationFile.getParent().resolve("sweep").resolve("lime2_4years_entryexit_best.yaml");
+        Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve("fishilife_noconst_best.yaml");
         //  FishYAML yaml = new FishYAML();
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 
