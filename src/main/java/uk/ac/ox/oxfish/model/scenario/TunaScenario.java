@@ -219,7 +219,7 @@ public class TunaScenario implements Scenario {
             parseAllRecords(BOATS_FILE).stream().map(record -> {
                 final String portName = record.getString("port_name");
                 final Double length = record.getDouble("length_in_m");
-                final Double beam = record.getDouble("beam_in_m");
+                final Double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
                 final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
                 final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
                 final Engine engine = new Engine(
