@@ -36,7 +36,7 @@ import java.util.List;
 
 public class Slice2019Sweeps {
 
-    private static final String SCENARIO_NAME = "fishilife_noconst_best_8h_entry";
+    private static final String SCENARIO_NAME = "historical_baranov_best_hs";
     private static final int YEARS_TO_RUN = 20;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/calibration/slicesweep/";
@@ -57,7 +57,7 @@ public class Slice2019Sweeps {
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
-
+/*
 
 ////        //only boats >10GT are controlled
         effortControl("10",
@@ -99,7 +99,7 @@ public class Slice2019Sweeps {
         delaysOnce("delay_once",
                 new String[]{"big","small","medium","small10"},
                 SCENARIO_NAME, SHOCK_YEAR, 200);
-
+*/
 
     }
 
@@ -818,10 +818,10 @@ public class Slice2019Sweeps {
 //                "Actual Average Hours Out of population1",
 //                "Actual Average Hours Out of population2",
 //                "Actual Average Hours Out of population3",
-                "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
-                "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
-                "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
-                "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
+//                "SPR " + "Epinephelus areolatus" + " " + "100_areolatus",
+//                "SPR " + "Pristipomoides multidens" + " " + "100_multidens",
+//                "SPR " + "Lutjanus malabaricus" + " " + "100_malabaricus",
+//                "SPR " + "Lutjanus erythropterus" + " " + "100_erythropterus",
                 "Biomass Epinephelus areolatus",
                 "Biomass Pristipomoides multidens",
                 "Biomass Lutjanus malabaricus",
@@ -830,7 +830,7 @@ public class Slice2019Sweeps {
                 "SPR Oracle - " + "Pristipomoides multidens" ,
                 "SPR Oracle - " + "Lutjanus malabaricus",
                 "SPR Oracle - " + "Lutjanus erythropterus",
-                "Average Daily Fishing Mortality Lutjanus malabaricus",
+              //  "Average Daily Fishing Mortality Lutjanus malabaricus",
                 "Yearly Fishing Mortality Lutjanus malabaricus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",

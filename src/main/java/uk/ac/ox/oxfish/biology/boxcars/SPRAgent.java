@@ -31,12 +31,8 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -163,15 +159,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     @Override
     public void step(SimState simState) {
         sampler.observe(
-                new Function<Pair<Integer, Integer>, Double>() {
-                    @Override
-                    public Double apply(Pair<Integer, Integer> subdivisionBinPair) {
-                        return  assumedVarA/1000 * Math.pow(
-                                species.getLength(subdivisionBinPair.getFirst(),
-                                                  subdivisionBinPair.getSecond()),
-                                assumedVarB);
-                    }
-                }
+
 
         );
     }
@@ -196,7 +184,7 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        sampler.resetAbundance();
+                        sampler.resetLandings();
                     }
                 },
                 StepOrder.DATA_RESET
@@ -234,7 +222,18 @@ public class SPRAgent implements AdditionalStartable, Steppable {
                             @Override
                             public Double apply(FishState fishState) {
 
-                                return sampler.getAbundance()[finalSubdivision][finalBin];
+                                return sampler.getAbundance(
+                                        new Function<Pair<Integer, Integer>, Double>() {
+                                            @Override
+                                            public Double apply(Pair<Integer, Integer> subdivisionBinPair) {
+                                                return  assumedVarA/1000 * Math.pow(
+                                                        species.getLength(subdivisionBinPair.getFirst(),
+                                                                subdivisionBinPair.getSecond()),
+                                                        assumedVarB);
+                                            }
+                                        }
+
+                                )[finalSubdivision][finalBin];
                             }
                         }, Double.NaN
                 );

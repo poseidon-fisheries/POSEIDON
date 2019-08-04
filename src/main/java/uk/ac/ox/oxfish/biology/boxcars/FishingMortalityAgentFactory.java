@@ -50,6 +50,8 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
 
     private boolean selectivityRounding = false;
 
+    private boolean computeDailyFishingMortality = false;
+
     /**
      * Applies this function to the given argument.
      *
@@ -69,9 +71,9 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
 
 
                                             ),
-                fishState.getBiology().getSpecie(speciesName)
+                fishState.getBiology().getSpecie(speciesName),
 
-        );
+                computeDailyFishingMortality);
     }
 
     /**
@@ -163,5 +165,13 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      */
     public void setSelectivityRounding(boolean selectivityRounding) {
         this.selectivityRounding = selectivityRounding;
+    }
+
+    public boolean isComputeDailyFishingMortality() {
+        return computeDailyFishingMortality;
+    }
+
+    public void setComputeDailyFishingMortality(boolean computeDailyFishingMortality) {
+        this.computeDailyFishingMortality = computeDailyFishingMortality;
     }
 }

@@ -38,11 +38,11 @@ import java.util.function.Predicate;
 public class SliceBiomassSweeps {
 
 
-    private static final String SCENARIO_NAME = "lime2_4years_entryexit_best";
+    private static final String SCENARIO_NAME = "cmsy_nospinup_entryexit_best";
     private static final int YEARS_TO_RUN = 19;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     private static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/biomass_slice/calibration/sweep/";
-    private static final int MIN_DAYS_OUT = 10;
+    private static final int MIN_DAYS_OUT = 0;
     private static final int RUNS_PER_POLICY = 1;
     private static final int MAX_DAYS_OUT = 250;
     private static  int POPULATIONS = 4;
@@ -106,25 +106,25 @@ public class SliceBiomassSweeps {
                       SCENARIO_NAME,
                       SHOCK_YEAR, MIN_DAYS_OUT,
                       removeEntry, removeReEntry);
-
-
-////        //only boats >10GT are controlled
-        effortControl("102",
-                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT);
-
-        effortControl("102_noentry",
-                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT,
-                      removeEntry);
-
-        effortControl("102_noentry_noreentry",
-                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
-                      SCENARIO_NAME,
-                      SHOCK_YEAR, MIN_DAYS_OUT,
-                      removeEntry, removeReEntry);
+//
+//
+//////        //only boats >10GT are controlled
+//        effortControl("102",
+//                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT);
+//
+//        effortControl("102_noentry",
+//                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT,
+//                      removeEntry);
+//
+//        effortControl("102_noentry_noreentry",
+//                      new String[]{"big", "medium", "small10", "population1", "population2", "population3"},
+//                      SCENARIO_NAME,
+//                      SHOCK_YEAR, MIN_DAYS_OUT,
+//                      removeEntry, removeReEntry);
 
 //
 ////
@@ -140,13 +140,13 @@ public class SliceBiomassSweeps {
 //////
 //        delays("delay_10", new String[]{"big","small10","medium","population1","population2","population3"},
 //                SCENARIO_NAME, SHOCK_YEAR, 50);
-////
-////
-////
+//
+//
+//
 //        delaysOnce("delay_once",
 //                new String[]{"big","small","medium","small10","population0","population1","population2","population3"},
 //                SCENARIO_NAME, SHOCK_YEAR, 200);
-//    }
+
     }
 
     private static void effortControl(
@@ -539,7 +539,7 @@ public class SliceBiomassSweeps {
 //        }
 //        fileWriter.close();
 //    }
-//
+
     private static void fleetReduction(
             String name,
             final String filename, final int shockYear) throws IOException {
