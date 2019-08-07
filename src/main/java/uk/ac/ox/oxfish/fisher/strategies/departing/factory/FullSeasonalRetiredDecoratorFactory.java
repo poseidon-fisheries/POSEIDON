@@ -64,6 +64,10 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
 
     private DoubleParameter firstYearYouCanSwitch = new FixedDoubleParameter(-1);
 
+    /**
+     * consecutive years of exceeding targets or failing to hit minimum before fishermen switch
+     */
+    private DoubleParameter inertia = new FixedDoubleParameter(1);
 
 
     /**
@@ -91,7 +95,8 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
                 maxHoursOutWhenSeasonal.apply(state.getRandom()).intValue(),
                 decorated.apply(state),
                 variableName,
-                firstYearYouCanSwitch.apply(state.getRandom()).intValue()
+                firstYearYouCanSwitch.apply(state.getRandom()).intValue(),
+                getInertia().apply(state.getRandom()).intValue()
 
 
 
@@ -227,5 +232,13 @@ public class FullSeasonalRetiredDecoratorFactory implements AlgorithmFactory<Ful
      */
     public void setFirstYearYouCanSwitch(DoubleParameter firstYearYouCanSwitch) {
         this.firstYearYouCanSwitch = firstYearYouCanSwitch;
+    }
+
+    public DoubleParameter getInertia() {
+        return inertia;
+    }
+
+    public void setInertia(DoubleParameter inertia) {
+        this.inertia = inertia;
     }
 }

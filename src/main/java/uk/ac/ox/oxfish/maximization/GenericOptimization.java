@@ -21,9 +21,16 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
+import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -335,17 +342,58 @@ public class GenericOptimization extends SimpleProblemDouble {
 
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
-        Paths.get("docs", "indonesia_hub", "runs", "712","biomass_slice","calibration",
-                              "optimization_lime2_4years_entryexit_start.yaml");
+        Paths.get("docs", "indonesia_hub", "runs", "712","slice2019","calibration",
+                              "optimizationproblem_historical20_lbspr_start.yaml");
+        final String scenarioName = "historical20_lbspr";
+
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                -7.439,-9.032,-8.697,-2.125,-3.354,-9.514,-4.487,-10.000,-9.204, 2.723,-8.058, 1.629,-2.850, 4.363,-7.512,-5.689, 3.022,-10.000, 6.765,-6.032,-0.404, 5.465,-2.366,-7.027
-        });
-        Path outputFile = optimizationFile.getParent().resolve("sweep").resolve("lime2_4years_entryexit_best.yaml");
-        //  FishYAML yaml = new FishYAML();
+                0.710, 4.312, 5.106, 2.036, 1.491, 10.000, 7.336, 10.000,-8.900, 10.000, 0.616,-4.421,-2.777, 0.868, 9.425, 1.618,-9.529,-1.956,-9.174, 7.035       });
+        Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_8h.yaml");
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
+
+        //  FishYAML yaml = new FishYAML();
+        FlexibleScenario modified = (FlexibleScenario) scenario;
+        MultipleIndependentSpeciesAbundanceFactory bio = (MultipleIndependentSpeciesAbundanceFactory) modified.getBiologyInitializer();
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+                    setSteepness(new FixedDoubleParameter(.7));
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_7h.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
+
+
+        //  FishYAML yaml = new FishYAML();
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+                    setSteepness(new FixedDoubleParameter(.6));
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_6h.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
+
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            final RecruitmentBySpawningJackKnifeMaturity oldRecruitment = (RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment();
+
+
+            HockeyStickRecruitmentFactory newRecruitment = new HockeyStickRecruitmentFactory();
+            newRecruitment.setHinge(new FixedDoubleParameter(.2));
+            newRecruitment.setLengthAtMaturity(new FixedDoubleParameter(oldRecruitment.getLengthAtMaturity()));
+            final double r0 = ((FixedDoubleParameter) oldRecruitment.getVirginRecruits()).getFixedValue();
+            final double ssb0 = r0* ((FixedDoubleParameter) oldRecruitment.getCumulativePhi()).getFixedValue();
+            newRecruitment.setVirginRecruits(new FixedDoubleParameter(r0));
+
+            newRecruitment.setVirginSpawningBiomass(
+                    new FixedDoubleParameter(
+                            ssb0
+                    )
+            );
+
+            factory.setRecruitment(newRecruitment);
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_hs.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
 
     }
 

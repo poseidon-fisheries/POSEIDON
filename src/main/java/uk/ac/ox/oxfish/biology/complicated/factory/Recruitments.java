@@ -72,6 +72,10 @@ public class Recruitments {
                          LinearSSBRatioSpawningFactory::new);
         NAMES.put(LinearSSBRatioSpawningFactory.class,"Linear SSB Recruitment");
 
+        CONSTRUCTORS.put("Hockey Stick Recruitment",
+                         HockeyStickRecruitmentFactory::new);
+        NAMES.put(HockeyStickRecruitmentFactory.class,"Hockey Stick Recruitment");
+
     }
 
 

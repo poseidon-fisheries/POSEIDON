@@ -52,6 +52,22 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
 
 
     /**
+     * how many consecutive times you need to hit/miss your targets before you change your effort level
+     */
+    private final int inertia;
+
+    /**
+     * how many times we exceeded our targets (and we would like to increase our effort)
+     */
+    private int timesTargetsExceeded = 0;
+
+    /**
+     * how many times we were below our minimum targets (and we would like to decrease our effort)
+     */
+    private int timesFailureObserved = 0;
+
+
+    /**
      * people will increase effort if they are making/expect to make more than this
      */
     private final  double targetIncome;
@@ -100,6 +116,21 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
             String targetVariable,
             int neverSwitchBeforeThisYear
             ) {
+        this(status, targetIncome, minimumIncome, maxHoursOutWhenSeasonal, delegate,
+                targetVariable,neverSwitchBeforeThisYear,1);
+
+    }
+
+    public FullSeasonalRetiredDecorator(
+            EffortStatus status,
+            double targetIncome,
+            double minimumIncome,
+            int maxHoursOutWhenSeasonal,
+            DepartingStrategy delegate,
+            String targetVariable,
+            int neverSwitchBeforeThisYear,
+            int inertia
+    ) {
         this.targetVariable = targetVariable;
         Preconditions.checkState(maxHoursOutWhenSeasonal>=0);
         this.status = status;
@@ -108,7 +139,12 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
         this.delegate = delegate;
         seasonalDelegate = new MaxHoursPerYearDepartingStrategy(maxHoursOutWhenSeasonal);
         this.neverSwitchBeforeThisYear = neverSwitchBeforeThisYear;
+        this.inertia = inertia;
+
+        Preconditions.checkState(inertia>0);
     }
+
+
 
     /**
      * The fisher asks himself if he wants to leave the warm comfort of his bed.
@@ -176,16 +212,68 @@ public class FullSeasonalRetiredDecorator implements DepartingStrategy{
 
         double currentIncome = fisher.getLatestYearlyObservation(targetVariable);
 
+        //update phase (did we meet our targets?)
         switch (status){
             case FULLTIME:
                 if(currentIncome<minimumIncome)
-                    status = EffortStatus.SEASONAL;
+                {
+                    timesFailureObserved++;
+                    timesTargetsExceeded=0;
+                }
+                else{
+                    timesTargetsExceeded=0;
+                    timesFailureObserved=0;
+
+                }
                 break;
             case SEASONAL:
-                if(currentIncome<minimumIncome)
-                    status = EffortStatus.RETIRED;
+                if(currentIncome<minimumIncome) {
+                    timesFailureObserved++;
+                    timesTargetsExceeded=0;
+                }
                 else if(currentIncome>targetIncome)
+                {
+                    timesTargetsExceeded++;
+                    timesFailureObserved=0;
+
+                }
+                else{
+                    timesTargetsExceeded=0;
+                    timesFailureObserved=0;
+                }
+                break;
+            case RETIRED:
+                break;
+        }
+
+
+        //if you are convinced, convert!
+
+        switch (status){
+            case FULLTIME:
+                if(timesFailureObserved>=inertia) {
+                    assert timesTargetsExceeded==0;
+
+
+                    status = EffortStatus.SEASONAL;
+                    timesTargetsExceeded=0;
+                    timesFailureObserved=0;
+                }
+                break;
+            case SEASONAL:
+                if(timesFailureObserved>=inertia) {
+                    assert timesTargetsExceeded==0;
+
+                    status = EffortStatus.RETIRED;
+                    timesTargetsExceeded=0;
+                    timesFailureObserved=0;
+                }
+                else if(timesTargetsExceeded>=inertia) {
+                    assert timesFailureObserved==0;
                     status = EffortStatus.FULLTIME;
+                    timesTargetsExceeded=0;
+                    timesFailureObserved=0;
+                }
                 break;
             case RETIRED:
 
