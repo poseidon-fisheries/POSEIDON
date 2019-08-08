@@ -129,8 +129,6 @@ public class FadMap implements Startable, Steppable {
         };
     }
 
-    public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
-
     @NotNull
     public Bag fadsAt(SeaTile seaTile) {
         Int2D location = new Int2D(seaTile.getGridX(), seaTile.getGridY());
