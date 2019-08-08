@@ -50,7 +50,11 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 
 import java.awt.geom.Point2D;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -435,16 +439,19 @@ public class FishStateUtilities {
     }
 
     /**
+     * A functional interface that can be used to ensure that a function is serializable.
+     */
+    @FunctionalInterface
+    interface SerializableFunction<T, R> extends Function<T, R>, Serializable {}
+
+    /**
      * takes a column of daily observations and sum them up to generate a yearly observation
      * @param column colun to sum over
      * @return a sum or NAN if the column is empty
      */
     public static <T> Gatherer<T> generateYearlySum(final DataColumn column) {
-
-
-        return generateYearlySum(column,Function.identity());
+        return generateYearlySum(column, x -> x);
     }
-
 
     /**
      * takes a column of daily observations and sum them up to generate a yearly observation
@@ -452,9 +459,10 @@ public class FishStateUtilities {
      * @param sumTransformer takes the sum and applies an arbitrary function to it
      * @return a sum or NAN if the column is empty
      */
-    public static <T> Gatherer<T> generateYearlySum(final DataColumn column,
-                                                    Function<Double,Double> sumTransformer) {
-
+    public static <T> Gatherer<T> generateYearlySum(
+        final DataColumn column,
+        final SerializableFunction<Double, Double> sumTransformer
+    ) {
         return new Gatherer<T>() {
             @Override
             public Double apply(T state) {
