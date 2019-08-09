@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import org.jfree.util.Log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -46,6 +47,8 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
     private final String columnName;
     private Stoppable stoppable;
 
+    private final int MAXSTEPS = 100000;
+
     public AbstractExogenousCatches(
             LinkedHashMap<Species, Double> exogenousYearlyCatchesInKg, final String dataColumnName) {
         this.exogenousYearlyCatchesInKg = exogenousYearlyCatchesInKg;
@@ -59,6 +62,7 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
         lastExogenousCatches.clear();
 
+
         for (Map.Entry<Species, Double> catches : exogenousYearlyCatchesInKg.entrySet())
         {
             double totalBiomassCaught = 0;
@@ -69,8 +73,9 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
             List<SeaTile> tiles =  allTiles.stream().filter(
                     seaTile -> getFishableBiomass(target, seaTile) > FishStateUtilities.EPSILON).collect(Collectors.toList());
 
+            int steps = 0;
             //as long as there is fish to catch and places with fish
-            while(toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty())
+            while(steps < MAXSTEPS && toCatch > FishStateUtilities.EPSILON && !tiles.isEmpty() )
             {
 
                 //grab a tile at random
@@ -87,13 +92,17 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
                 //account for it
                 toCatch-= biomassCaught;
                 totalBiomassCaught += biomassCaught;
-                if(biomassCaught == 0 //if there is too little fish to catch (it's all rounding errors)
+                if(biomassCaught <= FishStateUtilities.EPSILON //if there is too little fish to catch (it's all rounding errors)
                 || getFishableBiomass(target, tile) <= FishStateUtilities.EPSILON) //or you consumed it all
                     tiles.remove(tile); //then don't worry about this tile anymore!
 
 
-
+                steps++;
             }
+
+            if(steps==MAXSTEPS)
+                Log.warn("Failed to fish enough in the exogenous phase");
+
             lastExogenousCatches.put(target,totalBiomassCaught);
 
 
