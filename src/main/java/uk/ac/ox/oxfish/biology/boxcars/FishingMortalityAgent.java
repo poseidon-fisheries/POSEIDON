@@ -154,9 +154,12 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         dailyCatchSampler.observe();
         if(computeDailyFishingMortality)
             lastDailyMortality =  computeDailyMortality((FishState)simState);
+        final double[][] abundance = dailyCatchSampler.getAbundance();
+
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++)
-                yearlyCatches[subdivision][bin] += dailyCatchSampler.getAbundance()[subdivision][bin];
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                yearlyCatches[subdivision][bin] += abundance[subdivision][bin];
+            }
 
         }
 
