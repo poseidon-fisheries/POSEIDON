@@ -11,8 +11,9 @@ import uk.ac.ox.oxfish.model.FishState;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory.DEFAULT_MAP_PADDING_IN_DEGREES;
 
 public class CoordinateFileBiomassAllocatorTest {
 
@@ -22,7 +23,7 @@ public class CoordinateFileBiomassAllocatorTest {
 
         Path path = Paths.get("inputs", "tests", "map.csv");
         FromFileMapInitializer initializer = new FromFileMapInitializer(
-                path,2,true,false
+            path, 2, DEFAULT_MAP_PADDING_IN_DEGREES, true, false
         );
         NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
                 new GlobalBiology(mock(Species.class)),
