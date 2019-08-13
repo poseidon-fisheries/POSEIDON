@@ -8,17 +8,15 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.Pair;
 
-public class RandomPlanFadDestinationStrategy extends FadDestinationStrategy {
+public class RandomPlanFadDestinationStrategy extends PlanBasedFadDestinationStrategy {
 
     private List<Pair<
         Function<Fisher, FadAction>,

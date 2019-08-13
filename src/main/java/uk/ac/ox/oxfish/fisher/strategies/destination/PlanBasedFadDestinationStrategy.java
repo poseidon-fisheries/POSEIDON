@@ -13,12 +13,12 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-public abstract class FadDestinationStrategy implements DestinationStrategy, FadManagerUtils {
+public abstract class PlanBasedFadDestinationStrategy implements DestinationStrategy, FadManagerUtils {
 
     final Queue<FadAction> actionQueue = new LinkedList<>();
     final NauticalMap map;
 
-    FadDestinationStrategy(NauticalMap map) { this.map = map; }
+    PlanBasedFadDestinationStrategy(NauticalMap map) { this.map = map; }
 
     /**
      * Returns the next reachable destination tile from the action queue, removing actions without a

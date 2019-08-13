@@ -82,7 +82,7 @@ public class TunaScenario implements Scenario {
     private static final Path BIOMASS_SKJ_FILE = INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv");
     private static final Path BIOMASS_YFT_FILE = INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
-    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 93);
+    private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
@@ -219,7 +219,7 @@ public class TunaScenario implements Scenario {
             parseAllRecords(BOATS_FILE).stream().map(record -> {
                 final String portName = record.getString("port_name");
                 final Double length = record.getDouble("length_in_m");
-                final Double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
+                final double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
                 final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
                 final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
                 final Engine engine = new Engine(
