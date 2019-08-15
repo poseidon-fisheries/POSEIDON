@@ -107,18 +107,7 @@ public class Slice2019Sensitivity {
     // 100 days (10+ only)
     static private Map<String, Consumer<Scenario>> policies = new HashMap();
     static {
-        policies.put(
-                "150_days",
-                buildMaxDaysRegulation(allTags, 150).andThen(removeEntry)
-        );
-        policies.put(
-                "100_days",
-                buildMaxDaysRegulation(allTags, 100).andThen(removeEntry)
-        );
-        policies.put(
-                "100_days_10+",
-                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
-        );
+
         policies.put(
                 "BAU_noentry",
                 removeEntry
@@ -133,6 +122,20 @@ public class Slice2019Sensitivity {
                     }
                 }
         );
+
+        policies.put(
+                "150_days",
+                buildMaxDaysRegulation(allTags, 150).andThen(removeEntry)
+        );
+        policies.put(
+                "100_days",
+                buildMaxDaysRegulation(allTags, 100).andThen(removeEntry)
+        );
+        policies.put(
+                "100_days_10+",
+                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
+        );
+
     }
 
 

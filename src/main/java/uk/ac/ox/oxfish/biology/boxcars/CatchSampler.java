@@ -59,7 +59,7 @@ public class CatchSampler {
     /**
      * the abundance (#) vector we are interested in; instantiated lazily
      */
-    private final double[][] abundanceToReturn;
+    private double[][] abundanceToReturn;
 
     /**
      * here we keep all the fishers we sample when we are counting for abundance
@@ -175,16 +175,16 @@ public class CatchSampler {
 
     public double[][] getAbundance(Function<Pair<Integer,Integer>,Double> subdivisionBinToWeightFunction){
 
-        for(Fisher fisher : observedFishers)
-        {
-            for(int subdivision = 0; subdivision< landings.length; subdivision++)
-                for(int bin = 0; bin< landings[0].length; bin++) {
-                    double unitWeight = subdivisionBinToWeightFunction.apply(new Pair<>(subdivision,bin));
-                    // assumedVarA/1000 * Math.pow(species.getLength(subdivision,bin), assumedVarB);
-                    abundanceToReturn[subdivision][bin] += (fisher.getDailyCounter().getSpecificLandings(species, subdivision,
-                            bin)) /unitWeight;
-                }
-        }
+        abundanceToReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+
+
+        for(int subdivision = 0; subdivision< landings.length; subdivision++)
+            for(int bin = 0; bin< landings[0].length; bin++) {
+                double unitWeight = subdivisionBinToWeightFunction.apply(new Pair<>(subdivision,bin));
+                // assumedVarA/1000 * Math.pow(species.getLength(subdivision,bin), assumedVarB);
+                abundanceToReturn[subdivision][bin] += landings[subdivision][bin] /unitWeight;
+            }
+
 
         return abundanceToReturn;
     }

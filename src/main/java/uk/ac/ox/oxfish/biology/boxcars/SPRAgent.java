@@ -102,7 +102,16 @@ public class SPRAgent implements AdditionalStartable, Steppable {
 
 
         double spr = SPR.computeSPR(
-                new StructuredAbundance(sampler.getAbundance()),
+                new StructuredAbundance(sampler.getAbundance(
+                        new Function<Pair<Integer, Integer>, Double>() {
+                            @Override
+                            public Double apply(Pair<Integer, Integer> subBinPair) {
+
+                                return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
+                                        subBinPair.getSecond()), assumedVarB);
+                            }
+                        }
+                )),
                 species,
                 assumedNaturalMortality,
                 assumedKParameter,
@@ -137,7 +146,16 @@ public class SPRAgent implements AdditionalStartable, Steppable {
     public double computeMaturityRatio(){
         double matureCatch = 0;
         double allCatches = 0;
-        double[][] abundance = sampler.getAbundance();
+        double[][] abundance = sampler.getAbundance(
+                new Function<Pair<Integer, Integer>, Double>() {
+                    @Override
+                    public Double apply(Pair<Integer, Integer> subBinPair) {
+
+                        return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
+                                subBinPair.getSecond()), assumedVarB);
+                    }
+                }
+        );
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
                 allCatches += abundance[subdivision][bin];
