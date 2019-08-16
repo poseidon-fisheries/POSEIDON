@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
+import com.univocity.parsers.common.record.Record;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -49,10 +50,13 @@ import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.function.Function.identity;
@@ -88,6 +92,7 @@ public class TunaScenario implements Scenario {
     private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
+    private int targetYear = 2018;
 
     TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
@@ -215,23 +220,27 @@ public class TunaScenario implements Scenario {
             r -> getQuantity(r.getDouble("speed"), KNOT))
         );
 
-        final List<Fisher> fishers =
-            parseAllRecords(BOATS_FILE).stream().map(record -> {
-                final String portName = record.getString("port_name");
-                final Double length = record.getDouble("length_in_m");
-                final double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
-                final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
-                final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
-                final Engine engine = new Engine(
-                    Double.NaN, // Unused
-                    0.0, // TODO
-                    asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRE_PER_HOUR)
-                );
-                fisherFactory.setPortSupplier(() -> portsByName.get(portName));
-                fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
-                fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
-                return fisherFactory.buildFisher(model);
-            }).collect(toList());
+        final Map<String, Fisher> fishersIds =
+            parseAllRecords(BOATS_FILE).stream()
+                .filter(record -> record.getInt("year") == targetYear)
+                .collect(Collectors.toMap(
+                    record -> record.getString("boat_id"),
+                    record -> {
+                        final String portName = record.getString("port_name");
+                        final Double length = record.getDouble("length_in_m");
+                        final double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
+                        final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
+                        final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                        final Engine engine = new Engine(
+                            Double.NaN, // Unused
+                            0.0, // TODO
+                            asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRE_PER_HOUR)
+                        );
+                        fisherFactory.setPortSupplier(() -> portsByName.get(portName));
+                        fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
+                        fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
+                        return fisherFactory.buildFisher(model);
+                    }));
 
         // Mutate the fisher factory back into a random boat generator
         // TODO: we don't have boat entry in the tuna model for now, but when we do, this shouldn't be entirely random
@@ -246,8 +255,16 @@ public class TunaScenario implements Scenario {
 
         final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
 
-        return new ScenarioPopulation(fishers, network, fisherFactories);
+        return new ScenarioPopulation(fishersIds.values().stream().collect(toList()), network, fisherFactories);
 
+    }
+
+    public int getTargetYear() {
+        return targetYear;
+    }
+
+    public void setTargetYear(int targetYear) {
+        this.targetYear = targetYear;
     }
 
     public static class TunaSpeciesBiomassInitializerFactory
@@ -312,10 +329,14 @@ public class TunaScenario implements Scenario {
         }
 
         @SuppressWarnings("unused")
-        public SingleSpeciesBiomassNormalizedFactory getYellowfinBiomassInitializer() { return yellowfinBiomassInitializer; }
+        public SingleSpeciesBiomassNormalizedFactory getYellowfinBiomassInitializer() {
+            return yellowfinBiomassInitializer;
+        }
 
         @SuppressWarnings("unused")
-        public SingleSpeciesBiomassNormalizedFactory getSkipjackBiomassInitializer() { return skipjackBiomassInitializer; }
+        public SingleSpeciesBiomassNormalizedFactory getSkipjackBiomassInitializer() {
+            return skipjackBiomassInitializer;
+        }
 
         @Override
         public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
