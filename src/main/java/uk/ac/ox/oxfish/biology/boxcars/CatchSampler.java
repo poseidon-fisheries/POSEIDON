@@ -55,11 +55,7 @@ public class CatchSampler {
      * here we keep the weight of fish that we are tracking!
      */
     private final double[][] landings;
-
-    /**
-     * the abundance (#) vector we are interested in; instantiated lazily
-     */
-    private double[][] abundanceToReturn;
+    
 
     /**
      * here we keep all the fishers we sample when we are counting for abundance
@@ -81,7 +77,6 @@ public class CatchSampler {
         this.samplingSelector = samplingSelector;
         this.species = species;
         this.landings = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
-        abundanceToReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         this.surveyTag = surveyTag;
     }
 
@@ -173,10 +168,46 @@ public class CatchSampler {
     }
 
 
+
+
     public double[][] getAbundance(Function<Pair<Integer,Integer>,Double> subdivisionBinToWeightFunction){
 
-        abundanceToReturn = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
 
+
+        return convertLandingsToAbundance(subdivisionBinToWeightFunction, landings);
+    }
+
+    /**
+     * given landings (in weight, kg most likely) per bin per subdivision, turn those into numbers of fish
+     * @param species species object from which to reconstruct weight per bin
+     * @param landings landings observed
+     * @return a double[subdivision][bin] containing NUMBER of fish caught
+     */
+    public static double[][] convertLandingsToAbundance(Species species,
+                                                        double[][] landings) {
+
+        return convertLandingsToAbundance(
+                new Function<Pair<Integer, Integer>, Double>() {
+                    @Override
+                    public Double apply(Pair<Integer, Integer> subdivisionBin) {
+                        return species.getWeight(subdivisionBin.getFirst(),subdivisionBin.getSecond());
+                    }
+                },
+                landings
+        );
+
+
+    }
+
+    /**
+     * given landings (in weight, kg most likely) per bin per subdivision, turn those into numbers of fish
+     * @param subdivisionBinToWeightFunction function that gives me the weight for each bin and subdivision
+     * @param landings landings observed
+     * @return a double[subdivision][bin] containing NUMBER of fish caught
+     */
+    public static double[][] convertLandingsToAbundance(Function<Pair<Integer, Integer>, Double> subdivisionBinToWeightFunction, 
+                                                        double[][] landings) {
+        double[][] abundanceToReturn = new double[landings.length][landings[0].length];
 
         for(int subdivision = 0; subdivision< landings.length; subdivision++)
             for(int bin = 0; bin< landings[0].length; bin++) {
@@ -215,5 +246,13 @@ public class CatchSampler {
     @Nullable
     public String getSurveyTag() {
         return surveyTag;
+    }
+
+    /**
+     * landings (in weight) per subdivision and bin
+     * @return
+     */
+    public double[][] getLandings() {
+        return landings;
     }
 }

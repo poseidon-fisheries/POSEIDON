@@ -56,9 +56,9 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     private final boolean computeDailyFishingMortality;
 
     /**
-     * here we track of all the catches for the year. For yearly mortality rate
+     * here we track of all the landings (IN WEIGHT) for the year. For yearly mortality rate
      */
-    double[][] yearlyCatches;
+    double[][] yearlyCatchesInWeight;
 
 
     private Stoppable dailyStoppable;
@@ -99,7 +99,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
                                              species,
                                              null);
         dailyCatchSampler.checkWhichFisherToObserve(model);
-        yearlyCatches = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        yearlyCatchesInWeight = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         dailyStoppable =
                 model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
         yearlyStoppable =
@@ -108,7 +108,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
             public void step(SimState simState) {
                 //clear
                 for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-                    Arrays.fill(yearlyCatches[subdivision], 0);
+                    Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
             }
         }, StepOrder.DATA_RESET);
 
@@ -154,11 +154,11 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         dailyCatchSampler.observe();
         if(computeDailyFishingMortality)
             lastDailyMortality =  computeDailyMortality((FishState)simState);
-        final double[][] abundance = dailyCatchSampler.getAbundance();
+        final double[][] abundance = dailyCatchSampler.getLandings();
 
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
-                yearlyCatches[subdivision][bin] += abundance[subdivision][bin];
+                yearlyCatchesInWeight[subdivision][bin] += abundance[subdivision][bin];
             }
 
         }
@@ -190,7 +190,8 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
 
         return computeMortality(
-                yearlyCatches,
+                CatchSampler.convertLandingsToAbundance(species,
+                        yearlyCatchesInWeight),
                 model.getTotalAbundance(species)
         );
 
