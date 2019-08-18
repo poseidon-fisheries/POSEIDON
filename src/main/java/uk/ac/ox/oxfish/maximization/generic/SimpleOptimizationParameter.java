@@ -26,16 +26,17 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import javax.swing.*;
+import java.io.Serializable;
 
 /**
  *
  */
-public class SimpleOptimizationParameter implements OptimizationParameter {
+public class SimpleOptimizationParameter implements OptimizationParameter, Serializable {
 
 
     private String addressToModify = "literPerKilometer";
 
-
+//8.653001061671473, -9.58434142382404, -8.75865426495877, -4.582390384747612, -8.301999276921945, 8.919668729918376, 10.0, -6.842995690650929, -2.7858534981235916, 5.2014612334092245, -8.082658031062847, 8.470875659120408, 3.8880485429604654, -6.292145788318724, -0.995228761130084, 2.314121704400924, -10.0, 10.0, -4.020849468831914, -9.098549803532164
     /**
      * assuming x comes in ranges of -10 to 10 (EVA dumb default), this represents -10
      */
