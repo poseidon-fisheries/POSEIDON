@@ -33,15 +33,12 @@ import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class GenericOptimization extends SimpleProblemDouble {
+public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
     public static final double MINIMUM_CATCHABILITY = 1.0E-5;
 
@@ -343,14 +340,14 @@ public class GenericOptimization extends SimpleProblemDouble {
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
         Paths.get("docs", "indonesia_hub", "runs", "712","slice2019","calibration",
-                              "optimizationproblem_historical20_lbspr_start.yaml");
-        final String scenarioName = "historical20_lbspr";
+                              "optimizationproblem_tnc_tropfishpoponly_start.yaml");
+        final String scenarioName = "historical20_tnc_tropfishpoponly";
 
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                0.710, 4.312, 5.106, 2.036, 1.491, 10.000, 7.336, 10.000,-8.900, 10.000, 0.616,-4.421,-2.777, 0.868, 9.425, 1.618,-9.529,-1.956,-9.174, 7.035       });
+                10.000,-5.210,-2.693, 9.124,-4.781, 3.564,-7.422,-7.747, 4.326,-6.388,-2.629,-1.447, 7.899,-6.717, 2.294,-9.101,-3.151, 4.249,-5.298, 9.943     });
         Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_8h.yaml");
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 

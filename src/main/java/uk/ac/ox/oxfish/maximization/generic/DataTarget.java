@@ -22,10 +22,12 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.io.Serializable;
+
 /**
  * anything used by the optimization problem to judge how far from objective we are
  */
-public interface DataTarget {
+public interface DataTarget extends Serializable {
 
     /**
      * computes distance from target (0 best, the higher the number the further away from optimum we are)
