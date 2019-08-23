@@ -65,6 +65,7 @@ public class DestinationStrategies {
         NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
         NAMES.put(RandomPlanFadDestinationStrategyFactory.class, "Random Plan FAD Destination Strategy");
+        NAMES.put(FadDestinationStrategyFactory.class, "FAD Destination Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
