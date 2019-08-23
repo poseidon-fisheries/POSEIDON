@@ -1,17 +1,14 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.collect.ImmutableMap;
-import com.univocity.parsers.common.record.Record;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.commons.lang3.tuple.Triple;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.*;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -22,10 +19,13 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomPlanFadDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FollowPlanFadFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FadDeploymentDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.RandomFadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
+import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -50,24 +50,18 @@ import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.CUBIC_METRE;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static tech.units.indriya.unit.Units.*;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
@@ -76,6 +70,7 @@ public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
+    public static final Path DEPLOYMENT_VALUES_FILE = INPUT_DIRECTORY.resolve("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = INPUT_DIRECTORY.resolve("shape").resolve("RFB_IATTC.shp");
     private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
     private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
@@ -96,8 +91,8 @@ public class TunaScenario implements Scenario {
 
     TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
-        fisherDefinition.setFishingStrategy(new FollowPlanFadFishingStrategyFactory());
-        fisherDefinition.setDestinationStrategy(new RandomPlanFadDestinationStrategyFactory());
+        fisherDefinition.setFishingStrategy(new RandomFadFishingStrategyFactory());
+        fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
     }
 
     @SuppressWarnings("unused")
@@ -215,15 +210,18 @@ public class TunaScenario implements Scenario {
 
         final Supplier<FuelTank> fuelTankSupplier = () -> new FuelTank(Double.POSITIVE_INFINITY);
 
-        final Map<Integer, Quantity<Speed>> speedsPerClass = parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
-            r -> r.getInt("class"),
-            r -> getQuantity(r.getDouble("speed"), KNOT))
-        );
+        final Map<Integer, Quantity<Speed>> speedsPerClass =
+            parseAllRecords(BOAT_SPEEDS_FILE).stream().collect(toMap(
+                r -> r.getInt("class"),
+                r -> getQuantity(r.getDouble("speed"), KNOT))
+            );
 
-        final Map<String, Fisher> fishersIds =
+
+        final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
-                .collect(Collectors.toMap(
+                .limit(1)
+                .collect(toMap(
                     record -> record.getString("boat_id"),
                     record -> {
                         final String portName = record.getString("port_name");
@@ -242,6 +240,8 @@ public class TunaScenario implements Scenario {
                         return fisherFactory.buildFisher(model);
                     }));
 
+        assignDeploymentLocationValues(model.getMap(), fishersByBoatId);
+
         // Mutate the fisher factory back into a random boat generator
         // TODO: we don't have boat entry in the tuna model for now, but when we do, this shouldn't be entirely random
         fisherFactory.setBoatSupplier(fisherDefinition.makeBoatSupplier(model.random));
@@ -255,8 +255,35 @@ public class TunaScenario implements Scenario {
 
         final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
 
-        return new ScenarioPopulation(fishersIds.values().stream().collect(toList()), network, fisherFactories);
+        return new ScenarioPopulation(fishersByBoatId.values().stream().collect(toList()), network, fisherFactories);
 
+    }
+
+    private void assignDeploymentLocationValues(NauticalMap nauticalMap, Map<String, Fisher> fishersByBoatId) {
+        final Map<String, Map<SeaTile, Double>> deploymentValuesPerBoatId =
+            parseAllRecords(DEPLOYMENT_VALUES_FILE).stream()
+                .filter(record -> record.getInt("year") == targetYear)
+                .map(record -> Triple.of( // oh, how I long for case classes...
+                    record.getString("boat_id"),
+                    nauticalMap.getSeaTile(new Coordinate(record.getDouble("lon"), record.getDouble("lat"))),
+                    record.getDouble("value")
+                ))
+                .filter(triple -> triple.getMiddle() != null) // make sure the entry falls on a sea tile
+                .collect(groupingBy(Triple::getLeft, toMap(Triple::getMiddle, Triple::getRight)));
+
+        final Map<SeaTile, Double> defaultDeploymentValues =
+            deploymentValuesPerBoatId.values().stream()
+                .flatMap(map -> map.keySet().stream())
+                .distinct()
+                .collect(toMap(identity(), x -> 0.0));
+
+        fishersByBoatId.forEach((boatId, fisher) -> {
+            if (fisher.getDestinationStrategy() instanceof FadDestinationStrategy) {
+                ((FadDestinationStrategy) fisher.getDestinationStrategy())
+                    .getFadDeploymentDestinationStrategy()
+                    .setDeploymentLocationValues(deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues));
+            }
+        });
     }
 
     public int getTargetYear() {

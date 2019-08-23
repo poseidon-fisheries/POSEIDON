@@ -52,9 +52,4 @@ public abstract class PlanBasedFadDestinationStrategy implements DestinationStra
         return destinationTile(fisher);
     }
 
-    @Override
-    public void start(FishState model, Fisher fisher) { }
-
-    @Override
-    public void turnOff(Fisher fisher) { }
 }
