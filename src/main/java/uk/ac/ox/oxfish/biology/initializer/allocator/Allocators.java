@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import uk.ac.ox.oxfish.biology.complicated.factory.FromLeftToRightAllocatorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,71 +36,27 @@ public class Allocators {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends BiomassAllocator>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends BiomassAllocator>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-
-
-    static
-    {
-
-
-        CONSTRUCTORS.put("Equal Allocation",
-                         ConstantAllocatorFactory::new);
-        NAMES.put(ConstantAllocatorFactory.class,"Equal Allocation");
-
-
-        CONSTRUCTORS.put("Bounded Allocation",
-                         BoundedAllocatorFactory::new);
-        NAMES.put(BoundedAllocatorFactory.class,"Bounded Allocation");
-
-        CONSTRUCTORS.put("From Left to Right Allocation",
-                         FromLeftToRightAllocatorFactory::new);
-        NAMES.put(FromLeftToRightAllocatorFactory.class,"From Left to Right Allocation");
-
-
-        CONSTRUCTORS.put("Depth Allocator",
-                         DepthAllocatorFactory::new);
-        NAMES.put(DepthAllocatorFactory.class,"Depth Allocator");
-
-        CONSTRUCTORS.put("Random Allocator",
-                         RandomAllocatorFactory::new);
-        NAMES.put(RandomAllocatorFactory.class,"Random Allocator");
-
-        CONSTRUCTORS.put("Random Smoothed Allocator",
-                         RandomSmoothedFactory::new);
-        NAMES.put(RandomSmoothedFactory.class,"Random Smoothed Allocator");
-
-        CONSTRUCTORS.put("Random Kernel Allocator",
-                         KernelizedRandomFactory::new);
-        NAMES.put(KernelizedRandomFactory.class,"Random Kernel Allocator");
-
-        CONSTRUCTORS.put("Simplex Allocator",
-                         SimplexFactory::new);
-        NAMES.put(SimplexFactory.class,"Simplex Allocator");
-
-        CONSTRUCTORS.put("Pyramids Allocator",
-                         PyramidsAllocatorFactory::new);
-        NAMES.put(PyramidsAllocatorFactory.class,"Pyramids Allocator");
-
-        CONSTRUCTORS.put("From File Allocator",
-                         CoordinateFileAllocatorFactory::new);
-        NAMES.put(CoordinateFileAllocatorFactory.class,"From File Allocator");
-
-        CONSTRUCTORS.put("From File Smoothed Allocator",
-                         SmootherFileAllocatorFactory::new);
-        NAMES.put(SmootherFileAllocatorFactory.class,"From File Smoothed Allocator");
-
-        CONSTRUCTORS.put("Shape File Allocator",
-                PolygonAllocatorFactory::new);
-        NAMES.put(PolygonAllocatorFactory.class,"Shape File Allocator");
-
-
+    static {
+        NAMES.put(ConstantAllocatorFactory.class, "Equal Allocation");
+        NAMES.put(BoundedAllocatorFactory.class, "Bounded Allocation");
+        NAMES.put(FromLeftToRightAllocatorFactory.class, "From Left to Right Allocation");
+        NAMES.put(DepthAllocatorFactory.class, "Depth Allocator");
+        NAMES.put(RandomAllocatorFactory.class, "Random Allocator");
+        NAMES.put(RandomSmoothedFactory.class, "Random Smoothed Allocator");
+        NAMES.put(KernelizedRandomFactory.class, "Random Kernel Allocator");
+        NAMES.put(SimplexFactory.class, "Simplex Allocator");
+        NAMES.put(PyramidsAllocatorFactory.class, "Pyramids Allocator");
+        NAMES.put(CoordinateFileAllocatorFactory.class, "From File Allocator");
+        NAMES.put(SmootherFileAllocatorFactory.class, "From File Smoothed Allocator");
+        NAMES.put(PolygonAllocatorFactory.class, "Shape File Allocator");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
 }

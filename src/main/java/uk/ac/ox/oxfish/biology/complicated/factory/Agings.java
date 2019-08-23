@@ -20,11 +20,11 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarAging;
 import uk.ac.ox.oxfish.biology.boxcars.FixedBoxcarBertalannfyAging;
 import uk.ac.ox.oxfish.biology.boxcars.SullivanAgingFactory;
 import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,39 +35,22 @@ import java.util.function.Supplier;
  */
 public class Agings {
 
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends AgingProcess>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends AgingProcess>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-
-    static{
-        CONSTRUCTORS.put("Yearly Aging",
-                         StandardAgingFactory::new);
-        NAMES.put(StandardAgingFactory.class,"Yearly Aging");
-
-        CONSTRUCTORS.put("Proportional Aging",
-                         ProportionalAgingFactory::new);
-        NAMES.put(ProportionalAgingFactory.class,"Proportional Aging");
-
-
-        CONSTRUCTORS.put("Fixed Boxcar VB Aging",
-                         FixedBoxcarBertalannfyAging::new);
-        NAMES.put(FixedBoxcarBertalannfyAging.class,"Fixed Boxcar VB Aging");
-
-
-        CONSTRUCTORS.put("Sullivan Matrix Aging",
-                         SullivanAgingFactory::new);
-        NAMES.put(SullivanAgingFactory.class,"Sullivan Matrix Aging");
-
-
+    static {
+        NAMES.put(StandardAgingFactory.class, "Yearly Aging");
+        NAMES.put(ProportionalAgingFactory.class, "Proportional Aging");
+        NAMES.put(FixedBoxcarBertalannfyAging.class, "Fixed Boxcar VB Aging");
+        NAMES.put(SullivanAgingFactory.class, "Sullivan Matrix Aging");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
 }

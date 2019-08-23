@@ -21,155 +21,51 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.ReplicatorDrivenDestinationStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
  * The collection of all the destination strategies factories.
  * Created by carrknight on 5/27/15.
  */
-public class DestinationStrategies
-{
+public class DestinationStrategies {
 
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
+    public static final Map<String, Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS;
 
-    /**
-     * the list of all registered CONSTRUCTORS
-     */
-    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
-
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
-
-    static{
-        CONSTRUCTORS.put("Random Favorite",
-                         RandomFavoriteDestinationFactory::new
-                         );
-        NAMES.put(RandomFavoriteDestinationFactory.class,"Random Favorite");
-        CONSTRUCTORS.put("Fixed Favorite",
-                         FixedFavoriteDestinationFactory::new);
-        NAMES.put(FixedFavoriteDestinationFactory.class,"Fixed Favorite");
-        CONSTRUCTORS.put("Always Random",
-                         RandomThenBackToPortFactory::new);
-        NAMES.put(RandomThenBackToPortFactory.class,"Always Random");
-        CONSTRUCTORS.put("Yearly HillClimber",
-                         YearlyIterativeDestinationFactory::new);
-        NAMES.put(YearlyIterativeDestinationFactory.class,"Yearly HillClimber");
-        CONSTRUCTORS.put("Per Trip Iterative",
-                         PerTripIterativeDestinationFactory::new);
-        NAMES.put(PerTripIterativeDestinationFactory.class,"Per Trip Iterative");
-
-        CONSTRUCTORS.put("Imitator-Explorator",
-                         PerTripImitativeDestinationFactory::new);
-        NAMES.put(PerTripImitativeDestinationFactory.class,"Imitator-Explorator");
-
-        CONSTRUCTORS.put("Imitator-Explorator with Head Start",
-                         PerTripImitativeWithHeadStartFactory::new);
-        NAMES.put(PerTripImitativeWithHeadStartFactory.class,"Imitator-Explorator with Head Start");
-
-        CONSTRUCTORS.put("PSO",
-                         PerTripParticleSwarmFactory::new);
-        NAMES.put(PerTripParticleSwarmFactory.class,"PSO");
-
-        CONSTRUCTORS.put("Threshold Erotetic",
-                         ThresholdEroteticDestinationFactory::new);
-        NAMES.put(ThresholdEroteticDestinationFactory.class,
-                  "Threshold Erotetic");
-
-        CONSTRUCTORS.put("Better Than Average Erotetic",
-                         BetterThanAverageEroteticDestinationFactory::new);
-        NAMES.put(BetterThanAverageEroteticDestinationFactory.class,
-                  "Better Than Average Erotetic");
-
-
-
-        CONSTRUCTORS.put("SNALSAR",
-                         SNALSARDestinationFactory::new);
-        NAMES.put(SNALSARDestinationFactory.class,
-                  "SNALSAR");
-
-        CONSTRUCTORS.put("Heatmap Based",
-                         HeatmapDestinationFactory::new);
-        NAMES.put(HeatmapDestinationFactory.class,
-                  "Heatmap Based");
-
-        CONSTRUCTORS.put("Heatmap Planning",
-                         PlanningHeatmapDestinationFactory::new);
-        NAMES.put(PlanningHeatmapDestinationFactory.class,
-                  "Heatmap Planning");
-
-        CONSTRUCTORS.put("GSA",
-                         GravitationalSearchDestinationFactory::new);
-        NAMES.put(GravitationalSearchDestinationFactory.class,
-                  "GSA");
-
-        CONSTRUCTORS.put("Unified Amateurish Dynamic Programming",
-                         UnifiedAmateurishDynamicFactory::getInstance);
-        NAMES.put(UnifiedAmateurishDynamicFactory.class,
-                  "Unified Amateurish Dynamic Programming");
-
-        CONSTRUCTORS.put("Discretized Bandit",
-                         BanditDestinationFactory::new);
-        NAMES.put(BanditDestinationFactory.class,
-                  "Discretized Bandit");
-
-        CONSTRUCTORS.put("Simple Random Utility Model",
-                SimpleRUMDestinationFactory::new);
-        NAMES.put(SimpleRUMDestinationFactory.class,
-                "Simple Random Utility Model");
-
-        CONSTRUCTORS.put("Florida Longliner",
-                         FloridaLogitDestinationFactory::new);
-        NAMES.put(FloridaLogitDestinationFactory.class,
-                  "Florida Longliner");
-
-
-        CONSTRUCTORS.put("Boolean Bare Bones",
-                         BarebonesFloridaDestinationFactory::new);
-        NAMES.put(BarebonesFloridaDestinationFactory.class,
-                  "Boolean Bare Bones");
-
-        CONSTRUCTORS.put("Continuous Bare Bones",
-                         BarebonesContinuousDestinationFactory::new);
-        NAMES.put(BarebonesContinuousDestinationFactory.class,
-                  "Continuous Bare Bones");
-
-        CONSTRUCTORS.put("Continuous Bare Bones With Intercepts",
-                         BarebonesContinuousInterceptedDestinationFactory::new);
-        NAMES.put(BarebonesContinuousInterceptedDestinationFactory.class,
-                  "Continuous Bare Bones With Intercepts");
-
-
-        CONSTRUCTORS.put("Clamped to Data",
-                         ClampedDestinationFactory::new);
-        NAMES.put(ClampedDestinationFactory.class,
-                  "Clamped to Data");
-
-
-        CONSTRUCTORS.put("Perfect RPUE Logit",
-                         LogitRPUEDestinationFactory::new);
-        NAMES.put(LogitRPUEDestinationFactory.class,
-                  "Perfect RPUE Logit");
-
-
-        CONSTRUCTORS.put("Perfect Knowledge",
-                         PerfectDestinationFactory::new);
-        NAMES.put(PerfectDestinationFactory.class,
-                  "Perfect Knowledge");
-
-        CONSTRUCTORS.put("Replicator",
-                         ReplicatorDestinationFactory::new);
-        NAMES.put(ReplicatorDestinationFactory.class,
-                  "Replicator");
-
-        CONSTRUCTORS.put("Random Plan FAD Destination Strategy",
-            RandomPlanFadDestinationStrategyFactory::new);
-        NAMES.put(RandomPlanFadDestinationStrategyFactory.class,
-            "Random Plan FAD Destination Strategy");
-
+    static {
+        NAMES.put(RandomFavoriteDestinationFactory.class, "Random Favorite");
+        NAMES.put(FixedFavoriteDestinationFactory.class, "Fixed Favorite");
+        NAMES.put(RandomThenBackToPortFactory.class, "Always Random");
+        NAMES.put(YearlyIterativeDestinationFactory.class, "Yearly HillClimber");
+        NAMES.put(PerTripIterativeDestinationFactory.class, "Per Trip Iterative");
+        NAMES.put(PerTripImitativeDestinationFactory.class, "Imitator-Explorator");
+        NAMES.put(PerTripImitativeWithHeadStartFactory.class, "Imitator-Explorator with Head Start");
+        NAMES.put(PerTripParticleSwarmFactory.class, "PSO");
+        NAMES.put(ThresholdEroteticDestinationFactory.class, "Threshold Erotetic");
+        NAMES.put(BetterThanAverageEroteticDestinationFactory.class, "Better Than Average Erotetic");
+        NAMES.put(SNALSARDestinationFactory.class, "SNALSAR");
+        NAMES.put(HeatmapDestinationFactory.class, "Heatmap Based");
+        NAMES.put(PlanningHeatmapDestinationFactory.class, "Heatmap Planning");
+        NAMES.put(GravitationalSearchDestinationFactory.class, "GSA");
+        NAMES.put(UnifiedAmateurishDynamicFactory.class, "Unified Amateurish Dynamic Programming");
+        NAMES.put(BanditDestinationFactory.class, "Discretized Bandit");
+        NAMES.put(SimpleRUMDestinationFactory.class, "Simple Random Utility Model");
+        NAMES.put(FloridaLogitDestinationFactory.class, "Florida Longliner");
+        NAMES.put(BarebonesFloridaDestinationFactory.class, "Boolean Bare Bones");
+        NAMES.put(BarebonesContinuousDestinationFactory.class, "Continuous Bare Bones");
+        NAMES.put(BarebonesContinuousInterceptedDestinationFactory.class, "Continuous Bare Bones With Intercepts");
+        NAMES.put(ClampedDestinationFactory.class, "Clamped to Data");
+        NAMES.put(LogitRPUEDestinationFactory.class, "Perfect RPUE Logit");
+        NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
+        NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
+        NAMES.put(RandomPlanFadDestinationStrategyFactory.class, "Random Plan FAD Destination Strategy");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
     private DestinationStrategies() {}

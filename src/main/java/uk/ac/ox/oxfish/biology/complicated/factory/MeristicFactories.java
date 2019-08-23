@@ -20,10 +20,10 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-
 import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,33 +34,21 @@ import java.util.function.Supplier;
  */
 public class MeristicFactories {
 
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends Meristics>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends Meristics>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-    static{
-        CONSTRUCTORS.put("Weight List Meristics",
-                         ListMeristicFactory::new);
-        NAMES.put(ListMeristicFactory.class,"Weight List Meristics");
-
-        CONSTRUCTORS.put("Stock Assessment Meristics From File",
-                         MeristicsFileFactory::new);
-        NAMES.put(MeristicsFileFactory.class,"Stock Assessment Meristics From File");
-
-
-        CONSTRUCTORS.put("Equally Spaced Von bertalanffy",
-                         EquallySpacedBertalanffyFactory::new);
-        NAMES.put(EquallySpacedBertalanffyFactory.class,"Equally Spaced Von bertalanffy");
-
-
+    static {
+        NAMES.put(ListMeristicFactory.class, "Weight List Meristics");
+        NAMES.put(MeristicsFileFactory.class, "Stock Assessment Meristics From File");
+        NAMES.put(EquallySpacedBertalanffyFactory.class, "Equally Spaced Von bertalanffy");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
     private MeristicFactories() {}
