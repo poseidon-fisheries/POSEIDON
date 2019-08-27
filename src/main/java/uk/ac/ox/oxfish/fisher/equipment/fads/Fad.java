@@ -6,7 +6,8 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 
-import static java.lang.Math.min;
+import static java.lang.StrictMath.min;
+import static java.lang.StrictMath.max;
 
 public class Fad {
 
@@ -36,9 +37,10 @@ public class Fad {
             double[] catches = new double[globalBiology.getSize()];
             for (Species species : globalBiology.getSpecies()) {
                 double currentBiomass = biology.getBiomass(species);
-                double maxCatch = biology.getCarryingCapacity(species) - currentBiomass;
+                double maxBiomass = biology.getCarryingCapacity(species);
+                double maxCatch = max(0, maxBiomass - currentBiomass);
                 double caught = min(seaTileBiology.getBiomass(species) * attractionRate, maxCatch);
-                biology.setCurrentBiomass(species, currentBiomass + caught);
+                biology.setCurrentBiomass(species, min(currentBiomass + caught, maxBiomass));
                 catches[species.getIndex()] = caught;
             }
             // Remove the catches from the underlying biology:
