@@ -34,7 +34,7 @@ public class DeployFad implements FadAction {
     ) {
         checkState(seaTile == fisher.getLocation());
         checkState(isPossible(model, fisher));
-        getFadManager(fisher).deployFad(seaTile);
+        getFadManager(fisher).deployFad(seaTile, model.random);
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
 
