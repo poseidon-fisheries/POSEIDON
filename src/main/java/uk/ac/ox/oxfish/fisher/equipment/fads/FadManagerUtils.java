@@ -1,10 +1,13 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-
-import java.util.Optional;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
+import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 /**
  * This provides convenience implementations for the various classes that need to access the
@@ -23,5 +26,7 @@ public interface FadManagerUtils {
     static Optional<Fad> oneOfDeployedFads(Fisher fisher) {
         return oneOf(getFadManager(fisher).getDeployedFads(), fisher.grabRandomizer());
     }
+
+    static Stream<Fad> fadsHere(Fisher fisher) { return bagToStream(getFadManager(fisher).getFadsHere()); }
 
 }
