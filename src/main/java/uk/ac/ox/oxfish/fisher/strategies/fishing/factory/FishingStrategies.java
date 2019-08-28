@@ -44,6 +44,7 @@ public class FishingStrategies {
         NAMES.put(FishUntilFullFactory.class, "Fish Until Full");
         NAMES.put(MaximumStepsFactory.class, "Until Full With Day Limit");
         NAMES.put(FloridaLogitReturnFactory.class, "WFS Logit Return");
+        NAMES.put(FadFishingStrategyFactory.class, "FAD Fishing Strategy");
         NAMES.put(RandomFadFishingStrategyFactory.class, "Random FAD Fishing Strategy");
         NAMES.put(FollowPlanFadFishingStrategyFactory.class, "Follow Plan FAD Fishing Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);

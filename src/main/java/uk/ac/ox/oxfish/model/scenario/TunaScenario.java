@@ -19,10 +19,9 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDeploymentDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
-import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.RandomFadFishingStrategyFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -91,7 +90,7 @@ public class TunaScenario implements Scenario {
 
     TunaScenario() {
         fisherDefinition.setGear(new PurseSeineGearFactory());
-        fisherDefinition.setFishingStrategy(new RandomFadFishingStrategyFactory());
+        fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
     }
 
@@ -220,7 +219,7 @@ public class TunaScenario implements Scenario {
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
-                .limit(1)
+                .limit(10)
                 .collect(toMap(
                     record -> record.getString("boat_id"),
                     record -> {
@@ -279,9 +278,11 @@ public class TunaScenario implements Scenario {
 
         fishersByBoatId.forEach((boatId, fisher) -> {
             if (fisher.getDestinationStrategy() instanceof FadDestinationStrategy) {
+                final Map<SeaTile, Double> deploymentValues =
+                    deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues);
                 ((FadDestinationStrategy) fisher.getDestinationStrategy())
                     .getFadDeploymentDestinationStrategy()
-                    .setDeploymentLocationValues(deploymentValuesPerBoatId.getOrDefault(boatId, defaultDeploymentValues));
+                    .setDeploymentLocationValues(deploymentValues);
             }
         });
     }
