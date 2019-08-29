@@ -39,6 +39,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 /**
  * Created by carrknight on 11/4/15.
@@ -90,18 +91,6 @@ public class PathfinderTest {
         assertFalse(route.contains(map.getSeaTile(0, 1)));
         assertFalse(route.contains(map.getSeaTile(1, 1)));
         route.poll();
-    }
-
-    private NauticalMap makeMap(int[][] altitude) {
-        assert (altitude.length > 0);
-        ObjectGrid2D grid2D = new ObjectGrid2D(altitude.length, altitude[0].length);
-        for (int i = 0; i < altitude.length; i++)
-            for (int j = 0; j < altitude[i].length; j++)
-                grid2D.set(i, j, new SeaTile(i, j, altitude[i][j], new TileHabitat(0d)));
-        return new NauticalMap(
-            new GeomGridField(grid2D), new GeomVectorField(),
-            new CartesianDistance(1), mock(Pathfinder.class)
-        );
     }
 
     @Test

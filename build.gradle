@@ -56,7 +56,7 @@ dependencies
 
     //csv helper
     compile "com.opencsv:opencsv:3.8"
-    compile "com.univocity:univocity-parsers:2.7.6"
+    compile "com.univocity:univocity-parsers:2.8.1"
 
     //logger:
     compile "com.esotericsoftware:minlog:1.3.0"
@@ -102,6 +102,8 @@ dependencies
     compile "com.google.guava:guava:23.0"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
+    // Reference implementation of JSR-385 for units of measure
+    compile group: 'systems.uom', name: 'systems-common', version: '1.0'
 
 }
 

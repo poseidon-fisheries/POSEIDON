@@ -103,7 +103,7 @@ public class FisherEquipment implements Serializable {
         FuelTank tank = new FuelTank(boat.getFuelCapacityInLiters());
         tank.refill();
         tank.consume(tank.getFuelCapacityInLiters()-boat.getLitersOfFuelInTank());
-        return new FisherEquipment(new Boat(boat.getLength(),boat.getWidth(),new Engine(boat.getWeightInKg(),boat.getEfficiencyAsLitersPerKm(),boat.getSpeedInKph()),
+        return new FisherEquipment(new Boat(boat.getLength(),boat.getWidth(),new Engine(boat.getPowerInBhp(),boat.getEfficiencyAsLitersPerKm(),boat.getSpeedInKph()),
                                             tank),hold.makeCopy(),gear.makeCopy());
     }
 }

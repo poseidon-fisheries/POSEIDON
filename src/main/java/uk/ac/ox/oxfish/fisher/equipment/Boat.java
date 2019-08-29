@@ -179,7 +179,7 @@ public class Boat {
         return tank.getLitersOfFuelInTank();
     }
 
-    public double getWeightInKg() {
+    public double getPowerInBhp() {
         return engine.getPowerInBhp();
     }
 

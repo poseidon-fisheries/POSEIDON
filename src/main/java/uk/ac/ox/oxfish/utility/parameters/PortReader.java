@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.utility.parameters;
 
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+import com.univocity.parsers.common.record.Record;
 import com.vividsolutions.jts.geom.Coordinate;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -35,6 +36,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+
+import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 /**
  * Reads a list of ports and returns an hashmap of it
@@ -82,21 +85,11 @@ public class PortReader {
                             new Function<String, Port>() {
                                 @Override
                                 public Port apply(String s) {
-                                    SeaTile location = map.getSeaTile(new Coordinate(
-                                            Double.parseDouble(splitLine[2]),
-                                            Double.parseDouble(splitLine[3])
-                                    ));
-                                    Preconditions.checkArgument(
-                                            location!=null,
-                                            "Port " + portName + " is outside the map! ");
-                                    if(location.isPortHere())
-                                        throw new IllegalArgumentException(
-                                                "There is already a port here! No space for  " +
-                                                        portName + ", it is occupied by " +
-                                                        location.grabPortHere().getName());
-                                    //adjust it a bit if needed
-                                    location = correctLocation(location,map,portName);
-
+                                    SeaTile location = computePortLocation(
+                                        map, portName,
+                                        Double.parseDouble(splitLine[2]),
+                                        Double.parseDouble(splitLine[3])
+                                    );
                                     //build the port
                                     Port toReturn = new Port(portName, location, marketmap.apply(location),
                                                           gasPriceMaker.supplyInitialPrice(location,portName));
@@ -114,6 +107,40 @@ public class PortReader {
 
     }
 
+    /**
+     * Reads ports from a CSV file with only the "name", "lon" and "lat" columns
+     * and returns a collection of Ports. As opposed to `readFile`, it doesn't
+     * start the GasPriceMaker (the PortInitializer is responsible for doing so)
+     */
+    public Collection<Port> readSimplePortFile(
+        Path pathToFile, NauticalMap map,
+        Function<SeaTile, MarketMap> marketmap,
+        GasPriceMaker gasPriceMaker, FishState model) {
+        LinkedHashMap<String, Port> ports = new LinkedHashMap<>();
+        for (Record record: parseAllRecords(pathToFile)) {
+            ports.computeIfAbsent(record.getString("port_name"), portName -> {
+                SeaTile location = computePortLocation(map, portName,
+                    record.getDouble("lon"),record.getDouble("lat"));
+                return new Port(portName, location, marketmap.apply(location),
+                    gasPriceMaker.supplyInitialPrice(location,portName));
+            });
+        }
+        return ports.values();
+    }
+
+    private SeaTile computePortLocation(NauticalMap map, String portName, double lon, double lat) {
+        SeaTile location = map.getSeaTile(new Coordinate(lon, lat));
+        Preconditions.checkArgument(
+            location != null,
+            "Port " + portName + " is outside the map! "
+        );
+        if (location.isPortHere()) throw new IllegalArgumentException(
+            "There is already a port here! No space for  " + portName +
+                ", it is occupied by " + location.grabPortHere().getName()
+        );
+        // adjust it a bit if needed
+        return correctLocation(location, map, portName);
+    }
 
     public static final int MAXIMUM_NEIGHBORHOOD = 5;
 
