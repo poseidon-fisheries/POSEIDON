@@ -48,6 +48,14 @@ public class FadMap implements Startable, Steppable {
         this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
     }
 
+    @NotNull
+    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
+        return Optional.of(seaTile)
+            .map(SeaTile::getBiology)
+            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
+            .map(biology -> (VariableBiomassBasedBiology) biology);
+    }
+
     public GlobalBiology getGlobalBiology() { return globalBiology; }
 
     @Override
@@ -82,14 +90,7 @@ public class FadMap implements Startable, Steppable {
     }
 
     @NotNull
-    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
-        return Optional.of(seaTile)
-            .map(SeaTile::getBiology)
-            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
-            .map(biology -> (VariableBiomassBasedBiology) biology);
-    }
-
-    @NotNull Optional<Double2D> getFadLocation(Fad fad) {
+    private Optional<Double2D> getFadLocation(Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
 

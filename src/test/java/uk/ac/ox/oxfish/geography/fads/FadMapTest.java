@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.geography.fads;
 
 import com.google.common.collect.ImmutableList;
+import ec.util.MersenneTwisterFast;
 import org.junit.Test;
 import sim.engine.Schedule;
 import sim.engine.SimState;
@@ -68,6 +69,7 @@ public class FadMapTest {
         simState.schedule = schedule;
 
         // Put a FAD at the East edge of the central row
+        final MersenneTwisterFast random = new MersenneTwisterFast();
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
         final Fad fad = fadManager.deployFad(startTile);
         fillBiology(fad.getBiology());

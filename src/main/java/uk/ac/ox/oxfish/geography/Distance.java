@@ -20,23 +20,37 @@
 
 package uk.ac.ox.oxfish.geography;
 
+import java.util.Collection;
+
+import static com.google.common.collect.Streams.zip;
+
 /**
  * Common interface for all distance measures over a nautical chart
  * Created by carrknight on 4/10/15.
  */
-public interface Distance
-{
+public interface Distance {
 
     /**
      * the distance between two sea-tiles
+     *
      * @param start starting sea-tile
-     * @param end ending sea-tile
-     * @param map
+     * @param end   ending sea-tile
+     * @param map   the nautical map
      * @return kilometers between the two
      */
     double distance(SeaTile start, SeaTile end, NauticalMap map);
 
-
-
+    /**
+     * Return the distance along a path of sea tiles
+     *
+     * @param path the path along which to calculate the distance
+     * @param map  the nautical map
+     * @return the total distance, in kilometers, along the sea tiles on the path
+     */
+    default double distanceAlongPath(Collection<SeaTile> path, NauticalMap map) {
+        return zip(path.stream(), path.stream().skip(1), (start, end) -> distance(start, end, map))
+            .mapToDouble(Double::doubleValue)
+            .sum();
+    }
 
 }

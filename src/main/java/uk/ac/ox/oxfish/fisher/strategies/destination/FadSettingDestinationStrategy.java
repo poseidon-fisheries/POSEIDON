@@ -1,16 +1,23 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import ec.util.MersenneTwisterFast;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
+import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.Optional;
+import java.util.Set;
 
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Streams.stream;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.fadsAt;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
-public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy {
+public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy implements FadManagerUtils {
 
     private final Bag allSeaTiles;
 
@@ -20,13 +27,34 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
     }
 
     @Override
-    protected void chooseNewRoute(SeaTile currentLocation, MersenneTwisterFast random) {
-        // just pick a totally random destination for now
-        currentRoute = Stream
-            .generate(() -> (SeaTile) oneOf(allSeaTiles, random).get())
-            .map(destination -> getRoute.apply(currentLocation, destination))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No possible route."));
+    protected Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile destination) {
+        return super.getRoute(fisher, destination)
+            .flatMap(route ->
+                Optional.ofNullable(map.getPathfinder().getRoute(map, destination, fisher.getHomePort().getLocation()))
+                    .map(routeBackToPort -> {
+                        routeBackToPort.removeFirst();
+                        route.addAll(routeBackToPort);
+                        return route;
+                    })
+            );
     }
+
+    @Override
+    Set<SeaTile> possibleDestinations(Fisher fisher) {
+        final FadManager fadManager = getFadManager(fisher);
+        return fadManager.getDeployedFads()
+            .stream()
+            .flatMap(fad -> stream(fadManager.getFadTile(fad)))
+            .collect(toImmutableSet());
+    }
+
+    @Override
+    double seaTileValue(Fisher fisher, SeaTile seaTile) {
+        // TODO: this shouldn't just be the total biomass, it should be the price for all species
+        // TODO: it shouldn't be the current FADs either, but the predicted FADs by the time we get there
+        return fadsAt(fisher, seaTile)
+            .mapToDouble(fad -> Arrays.stream(fad.getBiology().getCurrentBiomass()).sum())
+            .sum();
+    }
+
 }

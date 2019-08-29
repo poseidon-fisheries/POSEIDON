@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.Streams.stream;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.oneOfFadsHere;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
@@ -32,7 +33,7 @@ public class RandomFadFishingStrategy implements FishingStrategy, FadManagerUtil
     @NotNull
     private Stream<FadAction> possibleActions(FishState model, Fisher fisher) {
         return actions.stream()
-            .flatMap(f -> f.apply(fisher).map(Stream::of).orElseGet(Stream::empty)) // TODO: replace we get Java >= 9
+            .flatMap(f -> stream(f.apply(fisher)))
             .filter(action -> action.isPossible(model, fisher));
     }
 

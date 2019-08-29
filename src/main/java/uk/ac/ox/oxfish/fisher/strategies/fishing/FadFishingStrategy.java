@@ -19,7 +19,6 @@ import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static java.lang.StrictMath.exp;
 import static java.util.Arrays.stream;

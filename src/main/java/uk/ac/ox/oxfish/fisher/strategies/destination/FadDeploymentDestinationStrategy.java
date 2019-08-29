@@ -1,16 +1,11 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
-import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Deque;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm.drawFromSoftmax;
+import java.util.Set;
 
 public class FadDeploymentDestinationStrategy extends IntermediateDestinationsStrategy {
 
@@ -25,18 +20,12 @@ public class FadDeploymentDestinationStrategy extends IntermediateDestinationsSt
         this.deploymentLocationValues = deploymentLocationValues;
     }
 
-    protected void chooseNewRoute(SeaTile currentLocation, MersenneTwisterFast random) {
+    @Override
+    Set<SeaTile> possibleDestinations(Fisher fisher) { return deploymentLocationValues.keySet(); }
 
-        final List<Deque<SeaTile>> routes = deploymentLocationValues.keySet().stream()
-            .map(destination -> getRoute.apply(currentLocation, destination))
-            .collect(Collectors.toList());
-
-        Function<Integer, Double> destinationValue = i ->
-            routes.get(i).stream()
-                .mapToDouble(seaTile -> deploymentLocationValues.getOrDefault(seaTile, 0.0))
-                .sum();
-
-        currentRoute = routes.get(drawFromSoftmax(random, routes.size(), destinationValue));
+    @Override
+    double seaTileValue(Fisher fisher, SeaTile seaTile) {
+        return deploymentLocationValues.getOrDefault(seaTile, 0.0);
     }
 
 }
