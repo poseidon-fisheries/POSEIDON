@@ -66,6 +66,8 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     private Stoppable yearlyStoppable;
 
 
+    private double[][] lastMeasuredYearlyAbundance = null;
+
     /**
      * tell the startable to turnoff,
      */
@@ -95,6 +97,9 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     @Override
     public void start(FishState model) {
 
+        //let's look at abundance now
+        lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+
         dailyCatchSampler = new CatchSampler((Predicate<Fisher>) input -> true,
                                              species,
                                              null);
@@ -106,7 +111,11 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
                 model.scheduleEveryYear(new Steppable() {
             @Override
             public void step(SimState simState) {
-                //clear
+                //observe abundance
+                lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+
+
+                //clear landings observed
                 for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
                     Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
             }
@@ -136,7 +145,7 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
                                                   new Gatherer<FishState>() {
                                                       @Override
                                                       public Double apply(FishState fishState) {
-                                                          return computeYearlyMortality(fishState);
+                                                          return computeYearlyMortality();
 
                                                       }
                                                   },Double.NaN);
@@ -183,16 +192,15 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
     /**
      * compute daily mortality rate
-     * @param model
      * @return
      */
-    public double computeYearlyMortality(FishState model){
+    public double computeYearlyMortality(){
 
 
         return computeMortality(
                 CatchSampler.convertLandingsToAbundance(species,
                         yearlyCatchesInWeight),
-                model.getTotalAbundance(species)
+                lastMeasuredYearlyAbundance
         );
 
 
