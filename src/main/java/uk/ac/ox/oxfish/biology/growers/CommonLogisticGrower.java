@@ -46,8 +46,10 @@ public class CommonLogisticGrower implements Startable, Steppable {
 
     @Override
     public void step(SimState simState) {
+        grow((FishState) simState, this.biologies);
+    }
 
-        FishState model = ((FishState) simState);
+    protected void grow(FishState model, List<BiomassLocalBiology> biologies) {
 
         double current = 0;
         double capacity = 0;

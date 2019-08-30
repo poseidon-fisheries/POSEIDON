@@ -1,13 +1,10 @@
 library(tidyverse) # must be loaded before Hmisc (https://github.com/tidyverse/haven/issues/86#issuecomment-421645194)
-library(Hmisc) # `apt install mdbtools` needed for `mdb.get` to work
+library(Hmisc) # `sudo apt install mdbtools` needed for `mdb.get` to work on Ubuntu
 library(biogeo)
 library(knitr)
 library(here)
 
-left_lon <- -180
-right_lon <- -60
-top_lat <- -50
-bottom_lat <- 50
+limits <- read_csv(here("limits.csv"))
 
 # "WPI.mdb" is the World Port Index, obtained from:
 # https://msi.nga.mil/NGAPortal/MSI.portal?_nfpb=true&_pageLabel=msi_portal_page_62&pubCode=0015
@@ -43,10 +40,66 @@ vessels_df <-
     `PAGO PAGO` = "PAGO PAGO HARBOR",
     `PANAMA` = "BALBOA",
     `PUERTO CHIAPAS` = "PUERTO MADERO",
-    `PUERTO SUCRE` = "CUMANA (PUERTO SUCRE)"
+    `PUERTO SUCRE` = "CUMANA (PUERTO SUCRE)",
+    `CUMANA` = "CUMANA (PUERTO SUCRE)",
+    `ILO` = "PUERTO ILO"
   )) %>%
-  mutate(link = paste0("[", name, "](", url, ")")) %>%
+  mutate(wpi_port_name = case_when(
+    # Reassign some ships as per notes from K.
+    # When operating from > 1 ports, took first one in document
+    `IATTC Vessel Number` == 14604 ~ "PAGO PAGO HARBOR",
+    `IATTC Vessel Number` == 3430 ~ "PAGO PAGO HARBOR",
+    `IATTC Vessel Number` == 3196 ~ "MAZATLAN",
+    `IATTC Vessel Number` == 3694 ~ "MAZATLAN",
+    `IATTC Vessel Number` == 14592 ~ "MANTA",
+    `IATTC Vessel Number` == 991 ~ "GUAYAQUIL", # for POSORJA
+    `IATTC Vessel Number` == 3274 ~ "MANTA",
+    `IATTC Vessel Number` == 3682 ~ "MANTA",
+    `IATTC Vessel Number` == 3277 ~ "GUAYAQUIL", # for POSORJA
+    `IATTC Vessel Number` == 3727 ~ "MANTA",
+    `IATTC Vessel Number` == 3232 ~ "MANTA",
+    `IATTC Vessel Number` == 4099 ~ "MANTA",
+    `IATTC Vessel Number` == 2557 ~ "MANTA",
+    `IATTC Vessel Number` == 3577 ~ "MAZATLAN",
+    `IATTC Vessel Number` == 3010 ~ "GUAYAQUIL", # for POSORJA
+    `IATTC Vessel Number` == 3151 ~ "MANTA",
+    `IATTC Vessel Number` == 3616 ~ "BALBOA",
+    `IATTC Vessel Number` == 3250 ~ "MANTA",
+    `IATTC Vessel Number` == 3451 ~ "GUAYAQUIL",
+    `IATTC Vessel Number` == 115 ~ "MANTA",
+    `IATTC Vessel Number` == 3928 ~ "MAZATLAN",
+    `IATTC Vessel Number` == 13720 ~ "MANTA",
+    `IATTC Vessel Number` == 4138 ~ "GUAYAQUIL", # for POSORJA
+    `IATTC Vessel Number` == 12466 ~ "BALBOA",
+    `IATTC Vessel Number` == 28 ~ "MANTA",
+    `IATTC Vessel Number` == 3979 ~ "GUAYAQUIL", # for POSORJA
+    `IATTC Vessel Number` == 3259 ~ "BALBOA",
+    `IATTC Vessel Number` == 3919 ~ "MANTA",
+    `IATTC Vessel Number` == 3943 ~ "MANTA",
+    `IATTC Vessel Number` == 4114 ~ "MANTA",
+    `IATTC Vessel Number` == 3937 ~ "GUAYAQUIL", # for POSORJA
+    TRUE ~ wpi_port_name
+  )) %>%
+  mutate(
+    link = paste0("[", name, "](", url, ")"),
+    `Fish hold volume (m3)` =
+      str_match(., "(^\\d+)(?:.*Total capacity: (\\d+)m3)?") %>%
+        {
+          coalesce(.[, 3], .[, 2])
+        } %>%
+        as.integer()
+  ) %>%
+  filter(`Fish hold volume (m3)` >= 108) %>% # keep only class 3 and up
   select(-reassigned_port_name)
+
+# Unknown ports:
+#   Sta. Eugenia de Riveira: in Spain - not in WPI, but outside map anyway
+#   Punta De Piedras: in Venezuela - not in WPI, but outside map anyway
+vessels_df %>%
+  anti_join(ports_df) %>%
+  arrange(wpi_port_name, link) %>%
+  select(link, `IATTC Vessel Number`, wpi_port_name) %>%
+  kable()
 
 vessels_df %>%
   ggplot(aes(`Gross tonnage`)) +
@@ -82,17 +135,27 @@ known_ports <-
   inner_join(filter(
     ports_df,
     # keep only ports inside area of interest
-    between(lat, top_lat, bottom_lat),
-    between(lon, left_lon, right_lon)
-  )) %>%
-  dplyr::select(wpi_port_name, num_ships, lon, lat) %>%
-  arrange(desc(num_ships)) %>%
+    between(lat, limits$south, limits$north),
+    between(lon, limits$west, limits$east)
+  ))
+
+known_ports %>%
+  dplyr::select(port_name = wpi_port_name, lon, lat) %>%
+  arrange(port_name) %>%
   write_csv(here("ports.csv"))
 
-vessels_df %>%
+boats_df <-
+  vessels_df %>%
   inner_join(known_ports) %>%
-  select(wpi_port_name, `Fish hold volume (m3)`, Length, Beam, `Engine power (HP)`, `Gross tonnage`) %>%
-  write_csv(here("boats.csv"))
+  transmute(
+    port_name = wpi_port_name,
+    hold_volume_in_m3 = `Fish hold volume (m3)`,
+    carrying_capacity_in_t = `Carrying capacity (t)`,
+    length_in_m = Length,
+    beam_in_m = Beam
+  )
+
+write_csv(boats_df, here("boats.csv"))
 
 known_ports %>%
   inner_join(ports_df) %>%
@@ -120,18 +183,6 @@ vessels_df %>%
   arrange(desc(num_ships)) %>%
   kable()
 
-# Unknown ports:
-#   Sta. Eugenia de Riveira: in Spain - couldn't find in WPI
-#   Las Vegas: WTF
-#   Ilo: ???
-#   Mexico (North): WTF
-#   Punta De Piedras: in Venezuela - couldn't find in WPI
-vessels_df %>%
-  anti_join(ports_df) %>%
-  arrange(wpi_port_name, link) %>%
-  select(link, wpi_port_name) %>%
-  kable()
-
 # Download and save a map for the area we're targeting:
 source(here("scripts", "download_depth_df.R"))
 # A land height of 850 is just enough to keep the "Panama canal" open.
@@ -140,5 +191,5 @@ depth_df <-
   known_ports %>%
   filter(lon < -125) %>%
   transmute(x = lon, y = lat, depth = 1000000) %>%
-  bind_rows(download_depth_df(850, left_lon, top_lat, right_lon, bottom_lat, 0.1)) %>%
+  bind_rows(download_depth_df(850, limits$west, limits$south, limits$east, limits$north, 0.1)) %>%
   write_csv(here("depth.csv"))

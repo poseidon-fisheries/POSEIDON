@@ -1,7 +1,9 @@
 library(here)
 source(here("scripts", "download_depth_df.R"))
 
+library(maps)
 library(tidyverse)
+library(lubridate)
 library(fs)
 library(readxl)
 library(geosphere)
@@ -24,7 +26,7 @@ df_events <-
 
 df_readings <-
   dir_ls(input_path, glob = "*.csv") %>%
-  map(~ read_delim(., ";",
+  map_dfr(~ read_delim(., ";",
     na = c("", "---", "----"),
     col_types = cols(
       NOMBRE = col_character(),
@@ -40,7 +42,6 @@ df_readings <-
       RUMBO = col_skip()
     )
   )) %>%
-  bind_rows() %>%
   transmute(
     buoy_id = as.integer(str_extract(NOMBRE, "\\d{2,}")),
     date_time = FECHA,
@@ -51,6 +52,14 @@ df_readings <-
   semi_join(df_events, by = "buoy_id") %>%
   mutate(buoy_id = as_factor(as.character(buoy_id)))
 
+# TODO:
+# - remove double transmissions at same time (but which?)
+# - calculate speed (compare against `velocity` for sanity check)
+# - remove consecutive transmissions at same position
+# - remove speed = 0
+# - remove speed >5? (or >1.3m/s?)
+
+
 breaks <-
   df_readings %>%
   arrange(date_time) %>%
@@ -58,12 +67,26 @@ breaks <-
   pull(date_time) %>%
   c(min(df_readings$date_time), max(df_readings$date_time))
 
-df <-
+df_readings_with_periods <-
   df_readings %>%
   mutate(
     period = cut(date_time, breaks, include.lowest = TRUE),
-    period = fct_relabel(period, ~ str_sub(., 1, 7))
+    period = fct_relabel(period, ~ format(as_date(.), "%Y-%m"))
+  )
+
+df_readings_with_periods %>%
+  group_by(buoy_id, period) %>%
+  arrange(date_time, .by_group = TRUE) %>%
+  mutate(
+    dist = distHaversine(cbind(lon, lat), cbind(lag(lon), lag(lat))),
+    duration = interval(lag(date_time), date_time),
+    speed = dist / duration
   ) %>%
+  glimpse()
+
+# Old code:
+df <-
+  df_readings_with_periods %>%
   group_by(buoy_id, period) %>%
   group_map(~ .x %>%
     arrange(date_time) %>%
@@ -71,20 +94,19 @@ df <-
     mutate(.,
       dist = pmap_dbl(list(lon, lat, lag(lon), lag(lat)), ~ distHaversine(c(..1, ..2), c(..3, ..4))),
       i = .bincode(rowid, c(-Inf, filter(., dist > 75E4)$rowid, Inf), right = FALSE),
-      segment = map_chr(paste0(.y$buoy_id, .y$period, i), digest)
+      trajectory = map_chr(paste0(.y$buoy_id, .y$period, i), digest)
     ) %>%
-    select(date_time, lon, lat, segment)) %>%
-  group_by(segment) %>%
+    select(date_time, lon, lat, trajectory)) %>%
+  group_by(trajectory) %>%
   filter(n() > 1) %>%
   ungroup()
 
 df %>%
-  select(segment, date_time, lon, lat) %>%
+  select(trajectory, date_time, lon, lat) %>%
   write_csv(here("empirical_fad_trajectories.csv"))
 
 df %>%
-  group_by(segment) %>%
-  arrange(date_time) %>%
+  group_by(trajectory) %>%
   summarise(
     lon = first(lon),
     lat = first(lat),
@@ -96,9 +118,18 @@ df %>%
 
 # From here on, it's plots... -------------------------------------------------------
 
+df_readings %>%
+  ggplot(aes(lon, lat)) +
+  coord_quickmap(xlim = c(min(df_readings$lon), max(df_readings$lon)), ylim = c(min(df_readings$lat), max(df_readings$lat))) +
+  borders() +
+  geom_bin2d(bins = 200) +
+  #stat_density_2d(aes(fill = ..level..), geom = "polygon") +
+  scale_fill_distiller(palette= "Spectral")
+
+
 # Read the currents file so we can get a visual comparison with the velocity readings
 df_currents <-
-  read_csv("currents.csv") %>%
+  read_csv(here("currents.csv")) %>%
   filter(
     between(lon, min(df_readings$lon), max(df_readings$lon)),
     between(lat, min(df_readings$lat), max(df_readings$lat))
@@ -122,7 +153,7 @@ df %>%
   theme_classic()
 
 df %>%
-  ggplot(aes(x = date_time, y = buoy_id, color = segment)) +
+  ggplot(aes(x = date_time, y = buoy_id, color = trajectory)) +
   geom_point(alpha = 0.5) +
   facet_wrap(vars(period), scales = "free") +
   guides(colour = FALSE) +
@@ -137,22 +168,26 @@ df %>%
   arrange(date_time) %>%
   ggplot(aes(x = lon, y = lat)) +
   geom_tile(data = depth_df, aes(x = x, y = y, fill = depth)) +
-  geom_path(aes(group = segment, color = as.integer(as_factor(segment))), alpha = 0.6) +
+  geom_path(aes(group = trajectory, color = as.integer(as_factor(trajectory))), alpha = 0.6) +
   facet_wrap(vars(period)) +
   scale_colour_gradient(low = "yellow", high = "orange") +
   guides(fill = FALSE, colour = FALSE) +
-  coord_fixed() +
+  coord_quickmap(
+    xlim = c(min(df_readings$lon), max(df_readings$lon)),
+    ylim = c(min(df_readings$lat), max(df_readings$lat))
+  ) +
+  borders() +
   theme_minimal()
 
 df %>%
-  group_by(segment) %>%
+  group_by(trajectory) %>%
   filter(n() > 10) %>%
   nest() %>%
   sample_n(20) %>%
   unnest() %>%
   arrange(date_time) %>%
   ggplot(aes(x = lon, y = lat)) +
-  geom_path(aes(group = segment), alpha = 0.6) +
-  facet_wrap(vars(segment)) +
+  geom_path(aes(group = trajectory), alpha = 0.6) +
+  facet_wrap(vars(trajectory)) +
   coord_fixed() +
   theme_minimal()

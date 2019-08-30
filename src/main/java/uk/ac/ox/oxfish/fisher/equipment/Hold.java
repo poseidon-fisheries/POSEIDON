@@ -21,6 +21,9 @@
 package uk.ac.ox.oxfish.fisher.equipment;
 
 import com.google.common.base.Preconditions;
+import java.util.Optional;
+import javax.measure.Quantity;
+import javax.measure.quantity.Volume;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.Meristics;
@@ -46,6 +49,13 @@ public class Hold {
      */
     private double maximumLoad = 0;
 
+    /**
+     *  The volume of the hold, in cubic metres.
+     *  As of now, this is only used to establish the IATTC vessel class of purse seiners;
+     *  it doesn't enter in any actual capacity calculations: that's the job of `maximumLoadInKg`.
+     */
+    private final Optional<Quantity<Volume>> volume;
+
     private double[] fishHold;
 
     /**
@@ -55,6 +65,21 @@ public class Hold {
 
     private final GlobalBiology biology;
 
+    private Hold(
+        double maximumLoadInKg,
+        Optional<Quantity<Volume>> volume,
+        GlobalBiology biology
+    ) {
+        this.maximumLoad = maximumLoadInKg;
+        this.volume = volume;
+        this.biology = biology;
+        fishHold = new double[biology.getSize()];
+    }
+
+    public Hold(double maximumLoadInKg, Quantity<Volume> volume, GlobalBiology biology) {
+        this(maximumLoadInKg, Optional.of(volume), biology);
+    }
+
     /**
      * create a new empty fishHold
      * @param maximumLoadInKg maximum capacity
@@ -62,9 +87,7 @@ public class Hold {
      */
     public Hold(double maximumLoadInKg, GlobalBiology biology)
     {
-        this.maximumLoad = maximumLoadInKg;
-        this.biology = biology;
-        fishHold = new double[biology.getSize()];
+        this(maximumLoadInKg, Optional.empty(), biology);
     }
 
     /**
@@ -263,11 +286,14 @@ public class Hold {
         return weightCaughtBinned != null;
     }
 
-
     public double getWeightOfBin(Species species, int bin)
     {
         Preconditions.checkArgument(hasAbundanceInformation());
         return weightCaughtBinned[species.getIndex()][bin];
+    }
+
+    public Optional<Quantity<Volume>> getVolume() {
+        return volume;
     }
 
 }

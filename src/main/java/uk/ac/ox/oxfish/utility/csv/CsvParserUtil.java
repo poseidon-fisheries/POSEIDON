@@ -1,20 +1,29 @@
 package uk.ac.ox.oxfish.utility.csv;
 
+import com.univocity.parsers.common.AbstractParser;
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import com.univocity.parsers.csv.CsvRoutines;
-import java.io.File;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
+/**
+ * Just a bunch of utility methods to facilitate the use of the Univocity CSV parsers.
+ */
 public class CsvParserUtil {
 
     private static final CsvParserSettings defaultParserSettings = new CsvParserSettings();
-    private static final CsvRoutines csvRoutines = new CsvRoutines(defaultParserSettings);
+    private static final String defaultDtmFormat = "yyyy-MM-dd'T'HH:mm:ssX";
+    private static final ZoneId defaultZoneId = ZoneId.of("UTC");
 
     static {
         defaultParserSettings.setLineSeparatorDetectionEnabled(true);
@@ -22,18 +31,25 @@ public class CsvParserUtil {
     }
 
     public static List<Record> parseAllRecords(Path inputFilePath) {
-        return parseAllRecords(getReader(inputFilePath));
+        return parse(inputFilePath, AbstractParser::parseAllRecords);
     }
 
-    public static List<Record> parseAllRecords(Reader reader) {
-        return new CsvParser(defaultParserSettings).parseAllRecords(reader);
+    private static <T> T parse(Path inputFilePath, BiFunction<CsvParser, Reader, T> parseFunction) {
+        final CsvParser csvParser = getCsvParser();
+        T result = parseFunction.apply(csvParser, getReader(inputFilePath));
+        csvParser.stopParsing();
+        return result;
+    }
+
+    public static CsvParser getCsvParser() {
+        return new CsvParser(defaultParserSettings);
     }
 
     public static Reader getReader(Path inputFilePath) {
         return getReader(inputFilePath.normalize().toString());
     }
 
-    public static Reader getReader(String inputFileName) {
+    private static Reader getReader(String inputFileName) {
         try {
             return new FileReader(inputFileName);
         } catch (IOException e) {
@@ -43,7 +59,19 @@ public class CsvParserUtil {
         }
     }
 
-    public static <T> List<T> parseAll(final Class<T> beanType, final Path inputFilePath) {
-        return csvRoutines.parseAll(beanType, getReader(inputFilePath));
+    public static LocalDate getLocalDate(Record record, String headerName) {
+        return getLocalDate(record, headerName, defaultDtmFormat, defaultZoneId);
+    }
+
+    public static LocalDate getLocalDate(Record record, String headerName, String dtmFormat, ZoneId zoneId) {
+        return record.getDate(headerName, dtmFormat).toInstant().atZone(zoneId).toLocalDate();
+    }
+
+    public static LocalDateTime getLocalDateTime(Record record, String headerName) {
+        return getLocalDateTime(record, headerName, defaultDtmFormat, defaultZoneId);
+    }
+
+    public static LocalDateTime getLocalDateTime(Record record, String headerName, String dtmFormat, ZoneId zoneId) {
+        return record.getDate(headerName, dtmFormat).toInstant().atZone(zoneId).toLocalDateTime();
     }
 }
