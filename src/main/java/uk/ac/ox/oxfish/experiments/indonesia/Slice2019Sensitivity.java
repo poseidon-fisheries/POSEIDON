@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.jetbrains.annotations.NotNull;
 import sim.engine.Steppable;
@@ -15,8 +16,11 @@ import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,7 +29,7 @@ public class Slice2019Sensitivity {
 
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
-    public static String DIRECTORY = Paths.get("docs","indonesia_hub","runs","712","slice2019","sensitivity","lime").toString();
+    public static String DIRECTORY = Paths.get("docs","indonesia_hub","runs","712","slice2019","sensitivity","cmsy_fixed").toString();
 
     public static final int MIN_DAYS_OUT = 0;
     public static final int RUNS_PER_POLICY = 1;
@@ -108,20 +112,20 @@ public class Slice2019Sensitivity {
     static private Map<String, Consumer<Scenario>> policies = new HashMap();
     static {
 
-        policies.put(
-                "BAU_noentry",
-                removeEntry
-        );
-
-        policies.put(
-                "BAU_entry",
-                new Consumer<Scenario>() {
-                    @Override
-                    public void accept(Scenario scenario) {
-
-                    }
-                }
-        );
+//        policies.put(
+//                "BAU_noentry",
+//                removeEntry
+//        );
+//
+//        policies.put(
+//                "BAU_entry",
+//                new Consumer<Scenario>() {
+//                    @Override
+//                    public void accept(Scenario scenario) {
+//
+//                    }
+//                }
+//        );
 
         policies.put(
                 "150_days",
@@ -131,19 +135,34 @@ public class Slice2019Sensitivity {
                 "100_days",
                 buildMaxDaysRegulation(allTags, 100).andThen(removeEntry)
         );
-        policies.put(
-                "100_days_10+",
-                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
-        );
+//        policies.put(
+//                "100_days_10+",
+//                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
+//        );
 
     }
 
 
-    private static int FIRST_SCENARIO_TO_RUN = 1;
+    private static int FIRST_SCENARIO_TO_RUN = 751;
 
     public static void main(String[] args) throws IOException {
 
-        for(int i=FIRST_SCENARIO_TO_RUN; i<FIRST_SCENARIO_TO_RUN+100; i++)
+        int numberOfRuns = 250;
+
+
+        if(args.length > 0 )
+            DIRECTORY = args[0];
+        if(args.length > 1)
+            FIRST_SCENARIO_TO_RUN = Integer.parseInt(args[1]);
+        if(args.length > 2)
+            numberOfRuns = Integer.parseInt(args[2]);
+
+
+        System.out.println(DIRECTORY);
+        System.out.println(FIRST_SCENARIO_TO_RUN);
+        System.out.println(numberOfRuns);
+
+            for(int i=FIRST_SCENARIO_TO_RUN; i<FIRST_SCENARIO_TO_RUN+numberOfRuns; i++)
         {
             sensitivity("sensitivity_"+i);
         }
@@ -181,7 +200,14 @@ public class Slice2019Sensitivity {
 
         }
         fileWriter.close();
-
+        final File file = Paths.get(DIRECTORY, scenarioFileName).toFile();
+        Preconditions.checkState(
+                file.exists() && file.isDirectory() );
+        //delete temp files
+        Files.walk(Paths.get(DIRECTORY, scenarioFileName))
+                .map(Path::toFile)
+                .sorted((o1, o2) -> -o1.compareTo(o2))
+                .forEach(File::delete);
 
     }
 
@@ -248,7 +274,7 @@ public class Slice2019Sensitivity {
                 "SPR Oracle - " + "Lutjanus malabaricus",
                 "SPR Oracle - " + "Lutjanus erythropterus",
                 //  "Average Daily Fishing Mortality Lutjanus malabaricus",
-                "Yearly Fishing Mortality Lutjanus malabaricus",
+                //"Yearly Fishing Mortality Lutjanus malabaricus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
                 "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",

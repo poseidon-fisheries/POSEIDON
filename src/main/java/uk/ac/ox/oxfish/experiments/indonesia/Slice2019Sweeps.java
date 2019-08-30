@@ -36,11 +36,11 @@ import java.util.List;
 
 public class Slice2019Sweeps {
 
-    private static final String SCENARIO_NAME = "historical20_lbspr_8h_entry";
-    private static final int YEARS_TO_RUN = 20;
+    private static final String SCENARIO_NAME = "historical20_baranov_8h";
+    private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/calibration/slicesweep/";
-    public static final int MIN_DAYS_OUT = 0;
+    public static final int MIN_DAYS_OUT = 50;
     public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
     public static  int POPULATIONS = 4;
@@ -52,37 +52,37 @@ public class Slice2019Sweeps {
 
         //effort control
         //all boats are controlled
-        effortControl("all",
-                new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
-
-/*
-
-////        //only boats >10GT are controlled
-        effortControl("10",
-                new String[]{"big","medium","small10"},
-                SCENARIO_NAME,
-                SHOCK_YEAR, MIN_DAYS_OUT);
-
-////
-////        //price premium
-        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
-        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
-
-        //selectivity test
-        selectivityTest("selectivity_sweep", SCENARIO_NAME);
-
-        //price penalty
-        pricePenalty("malus_malabaricus",
-                SCENARIO_NAME,
-                10,
-                "Lutjanus malabaricus");
+//        effortControl("all",
+//                new String[]{"big","small","medium","small10"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
 
 
-
-        //fleet reduction
-        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
+//
+//////        //only boats >10GT are controlled
+//        effortControl("10",
+//                new String[]{"big","medium","small10"},
+//                SCENARIO_NAME,
+//                SHOCK_YEAR, MIN_DAYS_OUT);
+//
+//////
+//////        //price premium
+//        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
+//        pricePremium("premium_malabaricus", SCENARIO_NAME, 10, "Lutjanus malabaricus");
+//
+//        //selectivity test
+//        selectivityTest("selectivity_sweep", SCENARIO_NAME);
+//
+//        //price penalty
+//        pricePenalty("malus_malabaricus",
+//                SCENARIO_NAME,
+//                10,
+//                "Lutjanus malabaricus");
+//
+//
+//
+//        //fleet reduction
+//        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 
         //delays
         delays("delay_all", new String[]{"big","small","medium","small10"},
@@ -99,7 +99,7 @@ public class Slice2019Sweeps {
         delaysOnce("delay_once",
                 new String[]{"big","small","medium","small10"},
                 SCENARIO_NAME, SHOCK_YEAR, 200);
-*/
+
 
     }
 
@@ -232,6 +232,10 @@ public class Slice2019Sweeps {
                                                     waitTimes.put("Karangsong",finalWaitTime);
                                                     waitTimes.put("Tanjung Pandan",finalWaitTime);
                                                     waitTimes.put("Probolinggo",finalWaitTime);
+                                                    waitTimes.put("Karimunjawa",finalWaitTime);
+                                                    waitTimes.put("Desa Masalima",finalWaitTime);
+                                                    waitTimes.put("Asem Doyong",finalWaitTime);
+                                                    waitTimes.put("Pagatan",finalWaitTime);
 
 
                                                     fisherloop:
