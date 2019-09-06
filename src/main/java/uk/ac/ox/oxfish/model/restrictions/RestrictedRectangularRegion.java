@@ -1,4 +1,4 @@
-package uk.ac.ox.oxfish.model.regs;
+package uk.ac.ox.oxfish.model.restrictions;
 
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
@@ -12,9 +12,9 @@ public class RestrictedRectangularRegion {
 	 * It has the coordinates as well as the start and end day of the regulation as well as repetition values
 	 * 
 	 * Currently it can be eternal, onetime (on/off on set model days) or it can repeat annually
-	 * Repeating annually is set by month/day on and month/day off
+	 * Repeating annually is set by month/day on and month/day off OR day of year on/day of year off
 	 */
-	
+	public static final int ETERNAL=1, ONETIME=2, ANNUAL=3;
 	private boolean active=false;
 	private int westGridX, northGridY, eastGridX, southGridY;
 	//west < east, north>south, regardless of the actual grid being used. Just keeps it simpler and it 
@@ -44,7 +44,8 @@ public class RestrictedRectangularRegion {
 	}
 	
 	public boolean isBadToFishHere(FishState model, SeaTile tile){
-		return (isActive(model) && isInRegion(tile));
+//		return (isActive(model) && isInRegion(tile));
+		return isActive(model);
 	}
 	
 	public boolean canIFishHere(FishState model, SeaTile tile){
@@ -74,10 +75,12 @@ public class RestrictedRectangularRegion {
 	 * The rectangular region turns 'on' on a specified day and turns off on a specified day
 	 */
 
-	RestrictedRectangularRegion(SeaTile cornerNW, SeaTile cornerSE, int method, int startDay, int endDay){
-		if (method==2){ //One time
-			setCorners(cornerNW, cornerSE);
+	public RestrictedRectangularRegion(SeaTile cornerNW, SeaTile cornerSE, int method, int startDay, int endDay){
+		setCorners(cornerNW, cornerSE);
+		if (method==ONETIME){ //One time
 			setOneTime(startDay, endDay);
+		} else if (method==ANNUAL){//repeat Annually
+			setRepeatAnnually((startDay-1)%365+1, (endDay-1)%365+1);
 		}
 	}
 	boolean oneTime = false;
@@ -107,7 +110,7 @@ public class RestrictedRectangularRegion {
 	 * At the moment we cannot accommodate for lunar calendars, or weekly repeats
 	 */
 
-	RestrictedRectangularRegion(SeaTile cornerNW, SeaTile cornerSE, int method, int startMonth, int startDay, int endMonth, int endDay){
+	public RestrictedRectangularRegion(SeaTile cornerNW, SeaTile cornerSE, int method, int startMonth, int startDay, int endMonth, int endDay){
 		if (method==3){ //Repeat Annually
 			setCorners(cornerNW, cornerSE);
 			setRepeatAnnually(startMonth, startDay,endMonth, endDay);
@@ -139,6 +142,18 @@ public class RestrictedRectangularRegion {
 			this.oneTime=false;
 		}
 	}
+	void setRepeatAnnually(int startDayOfYear, int endDayOfYear){
+		int startMonth=1, endMonth=1, startDay=startDayOfYear, endDay=endDayOfYear;
+		while(startDay-daysInMonth(startMonth)>0){
+			startDay-=daysInMonth(startMonth);
+			startMonth++;
+		}
+		while(endDay-daysInMonth(endMonth)>0){
+			endDay-=daysInMonth(endMonth);
+			endMonth++;
+		}
+		setRepeatAnnually(startMonth, startDay, endMonth, endDay);
+	}
 	
 	/*
 	 * These methods are handy internal tools
@@ -149,7 +164,7 @@ public class RestrictedRectangularRegion {
 			return 28;
 		} else{
 			int days = 31;
-			if(days == 9 || days==4 || days == 6 || days==11) days=30; //Thirty days hath September, April June and November 
+			if(month == 9 || month==4 || month == 6 || month==11) days=30; //Thirty days hath September, April June and November 
 			return days;
 		}
 	}

@@ -152,6 +152,10 @@ public class DestinationStrategies
         NAMES.put(ReplicatorDestinationFactory.class,
                   "Replicator");
 
+        CONSTRUCTORS.put("Generalized Cognitive Strategy",
+        				GeneralizedCognitiveStrategyFactory::new);
+        NAMES.put(GeneralizedCognitiveStrategyFactory.class,
+        		"Generalized Cognitive Strategy");
     }
 
     private DestinationStrategies() {}

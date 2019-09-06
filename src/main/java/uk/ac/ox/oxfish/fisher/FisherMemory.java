@@ -20,22 +20,33 @@
 
 package uk.ac.ox.oxfish.fisher;
 
-import com.google.common.base.Preconditions;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
-import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
-import uk.ac.ox.oxfish.fisher.log.*;
-import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.FisherStartable;
-import uk.ac.ox.oxfish.model.data.collectors.*;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Preconditions;
+
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
+import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
+import uk.ac.ox.oxfish.fisher.log.LocationMemories;
+import uk.ac.ox.oxfish.fisher.log.LocationMemory;
+import uk.ac.ox.oxfish.fisher.log.SharedTripRecord;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripLogger;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FisherStartable;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
 
 public class FisherMemory implements Serializable, FisherStartable {
     /**
@@ -85,9 +96,10 @@ public class FisherMemory implements Serializable, FisherStartable {
     	return sharedTrips;
     }
     
+    
     //At this point, we will assume they are friends
     public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
-    	List<SharedTripRecord> sharedTripList=null;
+    	List<SharedTripRecord> sharedTripList= new ArrayList<SharedTripRecord>();
     	for(SharedTripRecord sharedTrip: sharedTrips){
     		if(sharedTrip.sharedWithAll() || sharedTrip.getSharedFriends().contains(friend)){
     			sharedTripList.add(sharedTrip);
@@ -147,7 +159,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         yearlyCounter = new Counter(IntervalPolicy.EVERY_YEAR);
         this.dailyTimeSeries = new FisherDailyTimeSeries();
         this.tripMemories = tripMemories;
-        this.sharedTrips = null;
+        this.sharedTrips = new ArrayList<SharedTripRecord>();
     }
 
     @Override

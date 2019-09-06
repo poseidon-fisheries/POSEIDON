@@ -339,13 +339,9 @@ public class NauticalMap implements Startable
 
     public Coordinate getCoordinates(SeaTile tile)
     {
-        return coordinateCache.computeIfAbsent(tile, new Function<SeaTile, Coordinate>() {
-            @Nullable
-            @Override
-            public Coordinate apply(@Nullable SeaTile input) {
-                return rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate();
-            }
-        });
+        return coordinateCache.computeIfAbsent(tile, 
+            input -> rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate()
+        );
     }
 
     public SeaTile getSeaTile(Coordinate coordinate)

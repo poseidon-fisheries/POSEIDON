@@ -31,8 +31,11 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.AtPort;
 import uk.ac.ox.oxfish.fisher.log.SharedTripRecord;
+import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
+import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
@@ -45,18 +48,20 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
  */
 public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 
-	static List<PubliclySharedProfit> publicProfit=null;
+	static List<PubliclySharedProfit> publicProfit=new ArrayList<PubliclySharedProfit>();
 	double minAbsoluteSatisfactoryProfit,
 			minRelativeSatisfactoryProfit,
 			weightProfit,
 			weightLaw,
 			weightCommunal,
 			weightReputation;
+	int numberOfTerritorySites;
 
 	double inverseDistanceExponent = 16.0; //
 	
-	int timeScalarFunction = 0; //Default
-	double timeScalarParameter1,timeScalarParameter2;
+//	int timeScalarFunction = 0; //Default
+//	double timeScalarParameter1,timeScalarParameter2;
+	TimeScalarFunction timeScalarFunction;
 
 	double kExplore;
 	int nExplore=1;
@@ -66,6 +71,8 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 	boolean thisTripWasExploration=false;
 	boolean needToUpdateN = false;
 	TripSharer tripSharer;
+	SeaTile chosenFishingSite;
+	boolean pickNewSite=true;
 	
 	class TripSharer implements Steppable{
 		Stoppable dailyShare;
@@ -108,7 +115,6 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 				fisher.shareTrip(bestTrips[random.nextInt(nChoices)], true, null);
 			}
 		}
-		
 	}
 	
 	class ViableDestination{
@@ -148,6 +154,39 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 		
 	}
 	
+	public GeneralizedCognitiveStrategy(
+			double minAbsoluteSatisfactoryProfit,
+			double minRelativeSatisfactoryProfit,
+			double weightProfit, 
+			double weightLaw,
+			double weightCommunal,
+			double weightReputation,
+			TimeScalarFunction timeScalarFunction,
+//			double timeScalarParameter1,
+//			double timeScalarParameter2,
+			double kExplore,
+			double numberOfTerritorySites){
+		this.minAbsoluteSatisfactoryProfit=minAbsoluteSatisfactoryProfit;
+		this.minRelativeSatisfactoryProfit=minRelativeSatisfactoryProfit;
+		this.weightProfit=weightProfit; 
+		this.weightLaw=weightLaw;
+		this.weightCommunal=weightCommunal;
+		this.weightReputation=weightReputation;
+		this.timeScalarFunction=timeScalarFunction;
+//		this.timeScalarParameter1=timeScalarParameter1;
+//		this.timeScalarParameter2=timeScalarParameter2;
+		this.kExplore=kExplore;
+		this.numberOfTerritorySites=(int)numberOfTerritorySites;
+		
+	}
+			
+
+	
+	
+	
+
+	
+	
 	void setPublicProfit(Fisher fisher, double profit){
 		boolean inList=false;
 		for(PubliclySharedProfit publicFisherProfit: publicProfit){
@@ -179,6 +218,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 	public void start(FishState model, Fisher fisher) {
 		numberOfSpecies=model.getSpecies().size();
 		tripSharer = new TripSharer(fisher);
+//		addTerritories(model.getMap(), model.random, (int)numberOfTerritorySites);
 	}
 
 	@Override
@@ -191,129 +231,172 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 			MersenneTwisterFast random, 
 			FishState model, 
 			Action currentAction) {
-		
-		SeaTile finalDestionation=fisher.getHomePort().getLocation();
-		
-		//If the fisher is at port, choose a destination
-        if(fisher.isAtPort())
-        {
-            //they are probably docked
-            assert currentAction instanceof AtPort;
-            assert fisher.isGoingToPort(); //I assume at port your destination is still the port
+        //if we have arrived
+        if(fisher.getLocation().equals(chosenFishingSite)){
+            //and we are able to fish here, fish here
+            if(fisher.canAndWantToFishHere()){
+                pickNewSite=true;
+                return fisher.getLocation();
+            }
+            //otherwise go back home
+            return fisher.getHomePort().getLocation();
+        }
+        else if(fisher.getLocation().equals(fisher.getHomePort().getLocation()) && pickNewSite){
+        	//You are at port and you need a new site
+        	chosenFishingSite=pickNewSite(fisher, random, model, currentAction);
+        	pickNewSite=false;
+            return chosenFishingSite;
+        } else {
+        //we haven't arrived
+            //if we are going to port, keep going
+            if(!fisher.isAtDestination() && fisher.isGoingToPort() )
+                return fisher.getHomePort().getLocation();
 
-            //Start with all water tiles
-            List<SeaTile> allSeaTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
-            List<ViableDestination> viableDestinations = new ArrayList<>();
-            for(SeaTile destination: allSeaTiles){
-            	ViableDestination viableDestination = new ViableDestination();
-            	viableDestination.destination=destination;
-            	viableDestination.expectedCatch = new double[numberOfSpecies];
-            	viableDestinations.add(viableDestination);
-            }
-            
-            boolean noObservations = true;
-            List<ViableDestination> observedDestinations = new ArrayList<>();
-            
-            //Now go through the finished trips and calculate expected catch at all locations 
-            for(TripRecord trip: fisher.getFinishedTrips()){
-            	//Calculate the time scalar for this trip based on the time
-            	int t=model.getDay()-trip.getTripDate();
-            	double scalar=timeScalar(t);
-            	SeaTile tripDestination = trip.getMostFishedTileInTrip();
-            	for(ViableDestination viableDestination : viableDestinations){
-            		if(viableDestination.destination.equals(tripDestination)){
-            			viableDestination.setObserved();
-            			if (!observedDestinations.contains(viableDestination))
-            				observedDestinations.add(viableDestination);
-            			noObservations = false;
-            			for(int i=0; i<numberOfSpecies; i++){
-            				viableDestination.expectedCatch[i] += scalar*trip.getSoldCatch()[i];
-            				viableDestination.scalarTotal+=scalar;
-            			}
-            			break;
-            		}
-            	}
-            }
-            
-            //Now go through trips shared by friends and add them to the mix
-            Collection<Fisher> myFriends = fisher.getSocialNetwork().getDirectedNeighbors(fisher);
+            //otherwise go/keep going to chosen fishing Site
+            return chosenFishingSite;
+        }
+    }
+        
+	private SeaTile pickNewSite(
+			Fisher fisher, 
+			MersenneTwisterFast random, 
+			FishState model, 
+			Action currentAction) {	
+		
+		SeaTile finalDestination=fisher.getHomePort().getLocation();
+
+        //Start with all water tiles
+        List<SeaTile> allSeaTiles = model.getMap().getAllSeaTilesExcludingLandAsList();
+        
+        //if (true) return allSeaTiles.get(model.getRandom().nextInt(allSeaTiles.size()));
+        
+        List<ViableDestination> viableDestinations = new ArrayList<>();
+        List<ViableDestination> unviableDestinations = new ArrayList<>();
+        
+        for(SeaTile destination: allSeaTiles){
+        	ViableDestination viableDestination = new ViableDestination();
+        	viableDestination.destination=destination;
+        	viableDestination.expectedCatch = new double[numberOfSpecies];
+        	viableDestinations.add(viableDestination);
+        }
+        
+        boolean noObservations = true;
+        List<ViableDestination> observedDestinations = new ArrayList<>();
+        
+        //Now go through the finished trips and calculate expected catch at all locations 
+        for(TripRecord trip: fisher.getFinishedTrips()){
+        	//Calculate the time scalar for this trip based on the time
+        	int t=model.getDay()-trip.getTripDate();
+        	double scalar=timeScalar(t);
+        	SeaTile tripDestination = trip.getMostFishedTileInTrip();
+        	for(ViableDestination viableDestination : viableDestinations){
+        		if(viableDestination.destination.equals(tripDestination)){
+        			viableDestination.setObserved();
+        			if (!observedDestinations.contains(viableDestination))
+        				observedDestinations.add(viableDestination);
+        			noObservations = false;
+        			for(int i=0; i<numberOfSpecies; i++){
+        				viableDestination.expectedCatch[i] += scalar*trip.getSoldCatch()[i];
+        				viableDestination.scalarTotal+=scalar;
+        			}
+        			break;
+        		}
+        	}
+        }
+        
+        //Now go through trips shared by friends and add them to the mix
+        Collection<Fisher> myFriends = fisher.getSocialNetwork().getDirectedNeighbors(fisher);
+        
+        if(myFriends!=null && !myFriends.isEmpty()){
         	for(Fisher friend : myFriends){
         		List<SharedTripRecord> friendSharedTrips = friend.getTripsSharedWith(fisher);
-        		for(SharedTripRecord friendSharedTrip: friendSharedTrips){
-        			TripRecord trip = friendSharedTrip.getTrip();
-                	int t=model.getDay()-trip.getTripDate();
-                	double scalar=timeScalar(t);
-                	SeaTile tripDestination = trip.getMostFishedTileInTrip();
-                	for(ViableDestination viableDestination : viableDestinations){
-                		if(viableDestination.destination.equals(tripDestination)){
-                			viableDestination.setObserved();
-                			if (!observedDestinations.contains(viableDestination))
-                				observedDestinations.add(viableDestination);
-                			noObservations = false;
-                			for(int i=0; i<numberOfSpecies; i++){
-                				viableDestination.expectedCatch[i] += scalar*trip.getSoldCatch()[i];
-                				viableDestination.scalarTotal+=scalar;
-                			}
-                			break;
-                		}
-                	}
+        		if(!friendSharedTrips.isEmpty()){
+	        		for(SharedTripRecord friendSharedTrip: friendSharedTrips){
+	        			TripRecord trip = friendSharedTrip.getTrip();
+	                	int t=model.getDay()-trip.getTripDate();
+	                	double scalar=timeScalar(t);
+	                	SeaTile tripDestination = trip.getMostFishedTileInTrip();
+	                	for(ViableDestination viableDestination : viableDestinations){
+	                		if(viableDestination.destination.equals(tripDestination)){
+	                			viableDestination.setObserved();
+	                			if (!observedDestinations.contains(viableDestination))
+	                				observedDestinations.add(viableDestination);
+	                			noObservations = false;
+	                			for(int i=0; i<numberOfSpecies; i++){
+	                				viableDestination.expectedCatch[i] += scalar*trip.getSoldCatch()[i];
+	                				viableDestination.scalarTotal+=scalar;
+	                			}
+	                			break;
+	                		}
+	                	}
+	        		}
         		}
         	}      
+        }
+        
+        for(ViableDestination viableDestination : viableDestinations){
+        	for(int i=0; i<numberOfSpecies; i++){
+        		//if there have been no trips there, just zero out the expected catch
+        		viableDestination.expectedCatch[i] *= (viableDestination.scalarTotal>0?(1.0/viableDestination.scalarTotal):0);
+        	}
+    		//Now that we have the expected sold catch per species at all the viable
+            //locations, we calculate the expected cost of fishing at
+            //that location
             
-            for(ViableDestination viableDestination : viableDestinations){
-            	for(int i=0; i<numberOfSpecies; i++){
-            		//if there have been no trips there, just zero out the expected catch
-            		viableDestination.expectedCatch[i] *= (viableDestination.scalarTotal>0?(1.0/viableDestination.scalarTotal):0);
-            	}
-        		//Now that we have the expected sold catch per species at all the viable
-	            //locations, we calculate the expected cost of fishing at
-	            //that location
-	            
-	            //figure out the expected price per species
-            	Port homePort = fisher.getHomePort();
-            	MarketMap marketMap =homePort.getMarketMap(fisher);
-            	
-            	for(int i=0; i<numberOfSpecies; i++){
-            		double speciesPrice = marketMap.getSpeciesPrice(i);
-            		viableDestination.expectedProfit+= viableDestination.expectedCatch[i]*speciesPrice;
-            	}
-	            //figure out the expected operational cost
-                //figure out the expected trip cost
-        		double expectedCost = estimateTripCost(viableDestination.destination,fisher, model);
-        		viableDestination.expectedProfit += -expectedCost;
-            }
-            
-            //If there is no history, then set the expected profit of EVERY location to be equal so 
-            //they have a chance to fish anywhere
-            if(noObservations){
-            	for(ViableDestination viableDestination : viableDestinations){
-            		viableDestination.expectedProfit = this.minAbsoluteSatisfactoryProfit;
-            	}
-            } else {
-            //Otherwise go through all viable locations with no observations we estimate them using inverse distance weighting
-            //This is pretty flexible and can be tuned by the exponent
-            	for(ViableDestination destination : viableDestinations){
-            		if(!observedDestinations.contains(destination)){
-            			double sumScalars = 0.0;
-            			destination.expectedProfit = 0.0;
-            			for(ViableDestination observedDestination : observedDestinations){
-            				double distance = model.getMap().distance(observedDestination.destination, destination.destination);
-            				if(distance>0){
-            					double scalar = 1.0 / Math.pow(distance,inverseDistanceExponent);
-            					destination.expectedProfit += scalar*observedDestination.expectedProfit;
-            					sumScalars+=scalar;
-            				} else { //If for some reason there is another SeaTile on top of an observed seatile...
-            					destination.expectedProfit = observedDestination.expectedProfit;
-            					sumScalars=1.0;
-            					break;
-            				}
-            			}
-            			destination.expectedProfit *= 1.0 / sumScalars;
-            		}
-            	}
-            }
-            
-            double minSocialSatisfactoryProfit=0;
+            //figure out the expected price per species
+        	Port homePort = fisher.getHomePort();
+        	MarketMap marketMap =homePort.getMarketMap(fisher);
+        	
+        	for(int i=0; i<numberOfSpecies; i++){
+        		double speciesPrice = marketMap.getSpeciesPrice(i);
+        		viableDestination.expectedProfit+= viableDestination.expectedCatch[i]*speciesPrice;
+        	}
+            //figure out the expected operational cost
+            //figure out the expected trip cost
+    		double expectedCost = estimateTripCost(viableDestination.destination,fisher, model);
+    		viableDestination.expectedProfit += -expectedCost;
+    		
+        }
+        
+        //If there is no history, then set the expected profit of EVERY location to be equal so 
+        //they have a chance to fish anywhere
+        if(noObservations){
+        	for(ViableDestination viableDestination : viableDestinations){
+        		viableDestination.expectedProfit = this.minAbsoluteSatisfactoryProfit;
+        		
+        		//This will enforce that the fisher will give preference to territorial sites 
+        		//in the absence of any other information
+        		if(fisher.isTerritory(viableDestination.destination)) viableDestination.expectedProfit *= 1.50;
+        	}
+        } else {
+        //Otherwise go through all viable locations with no observations we estimate them using inverse distance weighting
+        //This is pretty flexible and can be tuned by the exponent
+        	for(ViableDestination destination : viableDestinations){
+        		if(!observedDestinations.contains(destination)){
+        			double sumScalars = 0.0;
+        			destination.expectedProfit = 0.0;
+        			for(ViableDestination observedDestination : observedDestinations){
+        				double distance = model.getMap().distance(observedDestination.destination, destination.destination);
+        				if(distance>0){
+        					double scalar = 1.0 / Math.pow(distance,inverseDistanceExponent);
+        					destination.expectedProfit += scalar*observedDestination.expectedProfit;
+        					sumScalars+=scalar;
+        				} else { //If for some reason there is another SeaTile on top of an observed seatile...
+        					destination.expectedProfit = observedDestination.expectedProfit;
+        					sumScalars=1.0;
+        					break;
+        				}
+        			}
+        			destination.expectedProfit *= 1.0 / sumScalars;
+        			//This will enforce that the fisher will give preference to territorial sites 
+            		//in the absence of any observations
+            		if(fisher.isTerritory(destination.destination)) destination.expectedProfit *= 1.50;
+        		}
+        	}
+        }
+        
+        double minSocialSatisfactoryProfit=0;
+        if(myFriends!=null){
             int nToBeat = (int)Math.floor(myFriends.size() * minRelativeSatisfactoryProfit);
             double[] friendProfits = new double[myFriends.size()];
             if(nToBeat>0){
@@ -333,123 +416,126 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             	}
             	minSocialSatisfactoryProfit = friendProfits[nToBeat-1];
             }
-            
-            double profitCutoff = Math.max(minAbsoluteSatisfactoryProfit, minSocialSatisfactoryProfit);
-            
-            //Remove any destinations that don't offer satisfactory profit
+        }
+        
+        double profitCutoff = Math.max(minAbsoluteSatisfactoryProfit, minSocialSatisfactoryProfit);
+        
+        //Remove any destinations that don't offer satisfactory profit
+        for(ViableDestination d: viableDestinations)
+        	if(d.expectedProfit<profitCutoff) unviableDestinations.add(d);
+        viableDestinations.removeAll(unviableDestinations);
+        unviableDestinations.clear();
+        
+        
+        double highestProfit=0.0;
+        for(ViableDestination viableDestination: viableDestinations){
+        	highestProfit = Math.max(highestProfit,viableDestination.expectedProfit);
+        }
+        
+        
+        for(ViableDestination viableDestination: viableDestinations){
+            //Now we scale the expected profit to be a number maxed out at 1
+        	viableDestination.attractiveness = weightProfit * viableDestination.expectedProfit/highestProfit -
+        				weightLaw * (fisher.isAllowedToFishHere(viableDestination.destination, model)?0:1) -
+        				weightCommunal * (fisher.isBadByCommunityStandardsToFishHere(viableDestination.destination, model)?0:1)-
+        				weightReputation * (fisher.isBadReputationToFishHere(viableDestination.destination, model)?0:1);
+        }
+        //Remove any destinations with negative attractiveness
+        for(ViableDestination d: viableDestinations)
+        	if(d.attractiveness<0) unviableDestinations.add(d);
+        viableDestinations.removeAll(unviableDestinations);
+        unviableDestinations.clear();
+        
+        
+        //If the collection of viable destinations is now empty, then there simply isn't a good place to fish. 
+        //Return with a null and don't go exploring
+        if(viableDestinations.isEmpty()){
+        	System.out.println("No viable destinations");
+        	return fisher.getHomePort().getLocation();
+        }
+        
+        
+        //determine the most attractive site
+        SeaTile mostAttractiveDestination = null;
+        double bestAttraction=-10000000;
+        double totalProfits = 0;
+        for(ViableDestination viableDestination: viableDestinations){
+        	totalProfits+=viableDestination.expectedProfit;
+        	if (viableDestination.attractiveness>bestAttraction){
+        		mostAttractiveDestination = viableDestination.destination;
+        		bestAttraction = viableDestination.attractiveness;
+        		profitBest = viableDestination.expectedProfit; 
+        		setPublicProfit(fisher,profitBest);
+        	}
+        }     
+        if(mostAttractiveDestination==null){ 
+//        	System.out.println("Most attractive destination is null.");
+        	return (fisher.getHomePort().getLocation());
+        }
+        
+        //See if they had a previous trip and we need to update 'n'
+        //The number of explorations that have not paid off:
+        if(needToUpdateN){
+        	double lastProfit = (fisher.getLastFinishedTrip()!=null)?fisher.getLastFinishedTrip().getTotalTripProfit():0;
+        	if(thisTripWasExploration && lastProfit > profitBest){
+        		//Exploration paid off, reset N
+        		nExplore = 1;
+        	} else {
+        		//Exploration was a bust (or exploited), increase N
+        		nExplore++;
+        	}
+        }
+        
+        needToUpdateN = true;
+//        System.out.println("Number of viable destinations: "+viableDestinations.size());
+        boolean goExploring = (viableDestinations.size()>1)?shouldIExplore(random):false;
+        if(goExploring){
+        	totalProfits -= profitBest;
+        	thisTripWasExploration=true;
             {
-            	Iterator<ViableDestination> d = viableDestinations.iterator();
-	            while(d.hasNext()){
-	            	ViableDestination s=d.next();
-	            	if(s.expectedProfit<profitCutoff)
-	            		d.remove();
-	            }
-            }
-            
-            double highestProfit=0.0;
-            for(ViableDestination viableDestination: viableDestinations){
-            	highestProfit = Math.max(highestProfit,viableDestination.expectedProfit);
-            }
-            
-            for(ViableDestination viableDestination: viableDestinations){
-            	viableDestination.attractiveness = weightProfit * viableDestination.expectedProfit -
-            				weightLaw * (fisher.isAllowedToFishHere(viableDestination.destination, model)?0:1) -
-            				weightCommunal * (fisher.isBadByCommunityStandardsToFishHere(viableDestination.destination, model)?0:1)-
-            				weightReputation * (fisher.isBadReputationToFishHere(viableDestination.destination, model)?0:1);
-            }
-            //Remove any destinations with negative attractiveness
-            {
-            	Iterator<ViableDestination> d = viableDestinations.iterator();
-	            while(d.hasNext()){
-	            	ViableDestination s=d.next();
-	            	if(s.attractiveness<0)
-	            		d.remove();
-	            }
-            }
-            
-            //determine the most attractive site
-            SeaTile mostAttractiveDestination = null;
-            double bestAttraction=0;
-            double totalProfits = 0;
-            for(ViableDestination viableDestination: viableDestinations){
-            	totalProfits+=viableDestination.expectedProfit;
-            	if (viableDestination.attractiveness>bestAttraction){
-            		mostAttractiveDestination = viableDestination.destination;
-            		bestAttraction = viableDestination.attractiveness;
-            		profitBest = viableDestination.expectedProfit; 
-            		setPublicProfit(fisher,profitBest);
+//            	double checkSum=0;
+            	for(ViableDestination d: viableDestinations){
+            		if(d.destination==mostAttractiveDestination){
+            			d.probability=0;
+            		} else {
+            			d.probability = d.expectedProfit/totalProfits;
+//            			checkSum+=d.probability;
+            		}
             	}
-            }            
-            
-            //See if they had a previous trip and we need to update 'n'
-            //The number of explorations that have not paid off:
-            if(needToUpdateN){
-            	double lastProfit = fisher.getLastFinishedTrip().getTotalTripProfit();
-            	if(thisTripWasExploration && lastProfit > profitBest){
-            		//Exploration paid off, reset N
-            		nExplore = 1;
-            	} else {
-            		//Exploration was a bust (or exploited), increase N
-            		nExplore++;
-            	}
-            }
-            
-            needToUpdateN = true;
-            boolean goExploring = (viableDestinations.size()>1)?shouldIExplore(random):false;
-            if(goExploring){
-            	totalProfits -= profitBest;
-            	thisTripWasExploration=true;
-                {
-                	Iterator<ViableDestination> d = viableDestinations.iterator();
+//            	System.out.println("ProbSum ="+checkSum);
+/*                	Iterator<ViableDestination> d = viableDestinations.iterator();
     	            while(d.hasNext()){
     	            	ViableDestination s=d.next();
     	            	if(s.destination == mostAttractiveDestination)
     	            		d.remove();
     	            	else
     	            		s.probability = s.expectedProfit/totalProfits;
-    	            }
-                }
-                double randDouble=random.nextDouble();
-                for(ViableDestination viableDestination: viableDestinations){
-                	randDouble -= viableDestination.probability;
-                	if(randDouble<=0){
-                		finalDestionation= viableDestination.destination;
-                		break;
-                	}
-                }
-            	
-            } else {
-            	thisTripWasExploration=false;
-            	finalDestionation= mostAttractiveDestination;
+    	            }*/
             }
+            double randDouble=random.nextDouble();
+            for(ViableDestination viableDestination: viableDestinations){
+            	randDouble -= viableDestination.probability;
+            	if(randDouble<=0){
+            		finalDestination= viableDestination.destination;
+//            		System.out.println("chose "+finalDestination.getGridX()+","+finalDestination.getGridY()+" with prob "+viableDestination.probability);
+            		break;
+            	}
+            }
+        	
+        } else {
+        	thisTripWasExploration=false;
+        	finalDestination= mostAttractiveDestination;
         }
-        else
-        {
-            //we are not at port
-            assert ! (currentAction instanceof AtPort);
-            //are we there yet?
-            if(fisher.getLocation() == fisher.getDestination())
-            	finalDestionation= fisher.getHomePort().getLocation(); //return home
-            else
-            	finalDestionation= fisher.getDestination(); //stay the course!
-        }
-        return finalDestionation;
+        return finalDestination;
 	}
 
 	boolean shouldIExplore(MersenneTwisterFast random){
+//		System.out.println("n="+nExplore+", k="+kExplore+", Prob of explore: "+1/Math.pow(nExplore,kExplore));
 		return (random.nextBoolean(1/Math.pow(nExplore,kExplore)));
 	}
 	
 	double timeScalar(double t){
-		if (timeScalarFunction == 1){
-			return 1/Math.pow(t+1,timeScalarParameter1);
-		} else if (timeScalarFunction == 2) {
-			return Math.exp(-timeScalarParameter1 * t);
-		} else if (timeScalarFunction == 3) {
-			return (1+Math.exp(-timeScalarParameter1))/(1+Math.exp(-timeScalarParameter1 + timeScalarParameter2 * t));	
-		} else {
-			return 1;
-		}
+		return timeScalarFunction.timeScalar(t);
 	}
 	
 	double estimateTripCost(SeaTile destination, Fisher fisher, FishState model){

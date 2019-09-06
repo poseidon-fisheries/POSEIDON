@@ -20,16 +20,41 @@
 
 package uk.ac.ox.oxfish.experiments;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import com.esotericsoftware.minlog.Log;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.*;
+
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.CompleteNearestNeighborRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.DefaultKernelRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.DefaultRBFKernelTransductionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.GeographicallyWeightedRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.GoodBadRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.SimpleKalmanRegressionFactory;
+import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.SocialTuningRegressionFactory;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.*;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.BanditDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.GravitationalSearchDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.HeatmapDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripImitativeDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.PerTripParticleSwarmFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
+import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomThenBackToPortFactory;
 import uk.ac.ox.oxfish.geography.discretization.SquaresMapDiscretizerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
+import uk.ac.ox.oxfish.model.scenario.GeneralizedScenario;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -44,17 +69,6 @@ import uk.ac.ox.oxfish.utility.bandit.factory.UCB1BanditFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.UniformDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.DoubleSummaryStatistics;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Runs social tuning many times, looking for the right parameter
@@ -71,7 +85,7 @@ public class SocialTuningExercise {
         defaults("gear.yaml", "_gear", 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
         batchRun("gear.yaml", "_gear",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
     }
@@ -100,7 +114,7 @@ public class SocialTuningExercise {
         defaults("chaser_gas.yaml", "_chasergas",YEARS_TO_RUN,0,null);
         batchRun("chaser_gas.yaml", "_chasergas",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
@@ -110,7 +124,7 @@ public class SocialTuningExercise {
 
         batchRun("no_regrowth.yaml", "_noregrowth",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
@@ -119,7 +133,7 @@ public class SocialTuningExercise {
         defaults("fine.yaml", "_fine", YEARS_TO_RUN, 0, null);
         batchRun("fine.yaml", "_fine",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
