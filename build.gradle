@@ -137,6 +137,15 @@ task fatJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     }
 }
 
+
+task deployFatJar(type: Copy, dependsOn: fatJar) {
+    from 'build/libs/'
+    //into '.'
+    includeEmptyDirs = false
+    include 'oxfish_executable.jar'
+}
+
+
 task optimizerJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     mergeServiceFiles()
     archiveName = 'maximizer.jar'
@@ -203,6 +212,17 @@ task fatJarBatch(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJa
     }
 }
 
+
+
+task fatJarSensitivity(type: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    archiveName = 'oxfish_sensitivity.jar'
+    from sourceSets.main.output //tells the task to include the project code
+    configurations = [ project.configurations.compile ] //tells the task to shadow in the jars files in the 'runtime' scope
+    manifest {
+        attributes 'Main-Class': 'uk.ac.ox.oxfish.experiments.indonesia.Slice2019Sensitivity'
+    }
+}
 
 //this task can be called as ./gradlew buildSampleFiles and simply rebuilds the "YAML Samples" folder
 task buildSampleFiles(type: JavaExec){
