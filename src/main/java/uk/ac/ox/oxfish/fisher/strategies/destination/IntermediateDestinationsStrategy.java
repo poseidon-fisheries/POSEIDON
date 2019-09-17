@@ -6,14 +6,20 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
 import static com.google.common.collect.Streams.stream;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.fadsAt;
 import static uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm.drawFromSoftmax;
 
 abstract class IntermediateDestinationsStrategy {
@@ -56,14 +62,20 @@ abstract class IntermediateDestinationsStrategy {
     abstract double seaTileValue(Fisher fisher, SeaTile seaTile);
 
     private void chooseNewRoute(Fisher fisher, MersenneTwisterFast random) {
+
         final List<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher);
+        final Map<SeaTile, Double> seaTileValues = possibleRoutes.stream()
+            .flatMap(Deque::stream)
+            .distinct()
+            .collect(toMap(identity(), seaTile -> seaTileValue(fisher, seaTile)));
+
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
             Function<Integer, Double> destinationValue = i ->
                 possibleRoutes.get(i)
                     .stream()
-                    .mapToDouble(seaTile -> seaTileValue(fisher, seaTile))
+                    .mapToDouble(seaTileValues::get)
                     .sum();
             currentRoute = Optional.of(
                 possibleRoutes.get(drawFromSoftmax(random, possibleRoutes.size(), destinationValue))
