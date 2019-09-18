@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import org.apache.commons.collections15.set.ListOrderedSet;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -25,7 +26,10 @@ public interface FadManagerUtils {
     }
 
     static Optional<Fad> oneOfDeployedFads(Fisher fisher) {
-        return oneOf(getFadManager(fisher).getDeployedFads(), fisher.grabRandomizer());
+        final ListOrderedSet<Fad> deployedFads = getFadManager(fisher).getDeployedFads();
+        return deployedFads.isEmpty() ?
+            Optional.empty() :
+            Optional.of(oneOf(deployedFads, fisher.grabRandomizer()));
     }
 
     static Stream<Fad> fadsHere(Fisher fisher) { return bagToStream(getFadManager(fisher).getFadsHere()); }

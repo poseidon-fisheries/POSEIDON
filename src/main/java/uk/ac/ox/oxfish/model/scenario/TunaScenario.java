@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.scenario;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.commons.lang3.tuple.Triple;
@@ -8,7 +9,11 @@ import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFa
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.allocator.*;
+import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -56,11 +61,15 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.*;
+import static tech.units.indriya.unit.Units.CUBIC_METRE;
+import static tech.units.indriya.unit.Units.KILOGRAM;
+import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
@@ -199,6 +208,7 @@ public class TunaScenario implements Scenario {
         model.registerStartable(fadMap);
 
         final LinkedList<Port> ports = model.getMap().getPorts();
+        Preconditions.checkState(!ports.isEmpty());
 
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
         fisherFactory.getAdditionalSetups().add(fisher ->
@@ -245,9 +255,7 @@ public class TunaScenario implements Scenario {
         // TODO: we don't have boat entry in the tuna model for now, but when we do, this shouldn't be entirely random
         fisherFactory.setBoatSupplier(fisherDefinition.makeBoatSupplier(model.random));
         fisherFactory.setHoldSupplier(fisherDefinition.makeHoldSupplier(model.random, model.getBiology()));
-        fisherFactory.setPortSupplier(() ->
-            oneOf(ports, model.random).orElseThrow(() -> new RuntimeException("No ports!"))
-        );
+        fisherFactory.setPortSupplier(() -> oneOf(ports, model.random));
 
         final Map<String, FisherFactory> fisherFactories =
             ImmutableMap.of(FishState.DEFAULT_POPULATION_NAME, fisherFactory);

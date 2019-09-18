@@ -17,7 +17,7 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static uk.ac.ox.oxfish.utility.bandit.SoftmaxBanditAlgorithm.drawFromSoftmax;
+import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
 
@@ -26,6 +26,8 @@ abstract class IntermediateDestinationsStrategy {
     @NotNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Deque<SeaTile>> currentRoute = Optional.empty();
+    // TODO: this should be a parameter somewhere
+    private double holdFillProportionConsideredFull = 0.99;
 
     IntermediateDestinationsStrategy(NauticalMap map) {
         this.map = map;
@@ -53,8 +55,6 @@ abstract class IntermediateDestinationsStrategy {
         currentRoute = getRoute(fisher, fisher.getHomePort().getLocation());
     }
 
-    // TODO: this should be a parameter somewhere
-    private double holdFillProportionConsideredFull = 0.99;
     private boolean holdFull(Fisher fisher) {
         return fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
     }
@@ -92,14 +92,9 @@ abstract class IntermediateDestinationsStrategy {
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
-            Function<Integer, Double> destinationValue = i ->
-                possibleRoutes.get(i)
-                    .stream()
-                    .mapToDouble(seaTileValues::get)
-                    .sum();
-            currentRoute = Optional.of(
-                possibleRoutes.get(drawFromSoftmax(random, possibleRoutes.size(), destinationValue))
-            );
+            Function<Deque<SeaTile>, Double> destinationValue =
+                route -> route.stream().mapToDouble(seaTileValues::get).sum();
+            currentRoute = Optional.of(weightedOneOf(possibleRoutes, destinationValue, random));
         }
     }
 }

@@ -46,7 +46,10 @@ public class FadManager {
         return fadMap.fadsAt(fisher.getLocation());
     }
 
-    Optional<Fad> oneOfFadsHere() { return oneOf(getFadsHere(), fisher.grabRandomizer()); }
+    Optional<Fad> oneOfFadsHere() {
+        final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
+        return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();
+    }
 
     public int getNumFadsInStock() { return numFadsInStock; }
 

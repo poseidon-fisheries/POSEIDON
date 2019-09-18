@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
@@ -49,11 +51,9 @@ public class RandomPlanFadDestinationStrategy extends PlanBasedFadDestinationStr
 
     @Override
     void makeNewPlan(Fisher fisher) {
-
+        Preconditions.checkState(!possibleActions.isEmpty(), "No possible action!");
         actionQueue.addAll(Stream
-            .generate(() -> oneOf(possibleActions, fisher.grabRandomizer())
-                .orElseThrow(() -> new RuntimeException("No possible action!"))
-            )
+            .generate(() -> oneOf(possibleActions, fisher.grabRandomizer()))
             .filter(pair -> pair.getSecond().apply(fisher))
             .map(pair -> pair.getFirst().apply(fisher))
             .limit(numberOfStepsToPlan)
