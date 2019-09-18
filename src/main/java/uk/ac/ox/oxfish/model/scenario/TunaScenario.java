@@ -84,6 +84,8 @@ public class TunaScenario implements Scenario {
     private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
     private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
 
+    private static final Path SPECIES_NAMES_FILE = INPUT_DIRECTORY.resolve("species_names.csv");
+
     private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
     private static final Path BIOMASS_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
     private static final Path BIOMASS_SKJ_FILE = INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv");
@@ -305,9 +307,15 @@ public class TunaScenario implements Scenario {
 
     public static class TunaSpeciesBiomassInitializerFactory
         implements AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
+
+        Map<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toMap(
+            r -> r.getString("code"),
+            r -> r.getString("name")
+        ));
+
         // Current parameter source is: `POSEIDON Tuna Team Folder/Surplus production model/Total_OCIATTC_PT_results_n=2.csv`
         private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = makeBiomassInitializerFactory(
-            "Bigeye",
+            speciesNames.get("BET"),
             0.265079184, // logistic growth rate (r)
             getQuantity(1440940, TONNE), // total carrying capacity (K)
             getQuantity(337224, TONNE), // total biomass
@@ -315,7 +323,7 @@ public class TunaScenario implements Scenario {
             CoordinateFileAllocatorFactory::new
         );
         private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory(
-            "Yellowfin",
+            speciesNames.get("YFT"),
             0.879, // logistic growth rate (r)
             getQuantity(1202770, TONNE), // total carrying capacity (K)
             getQuantity(507295, TONNE), // total biomass
@@ -323,7 +331,7 @@ public class TunaScenario implements Scenario {
             SmootherFileAllocatorFactory::new
         );
         private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory(
-            "Skipjack",
+            speciesNames.get("SKJ"),
             1.1520938, // logistic growth rate (r)
             getQuantity(4776000, TONNE), // total carrying capacity (K)
             getQuantity(3567169, TONNE), // total biomass
