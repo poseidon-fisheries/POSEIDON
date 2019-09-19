@@ -85,11 +85,20 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
 
     private static final Path SPECIES_NAMES_FILE = INPUT_DIRECTORY.resolve("species_names.csv");
+    private static final Path SCHAEFER_PARAMS_FILE = INPUT_DIRECTORY.resolve("schaefer_params.csv");
+
+    private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
+        "BET", INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv"),
+        "SKJ", INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv"),
+        "YFT", INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv")
+    );
+
+    private static final Map<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toMap(
+        r -> r.getString("code"),
+        r -> r.getString("name")
+    ));
 
     private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
-    private static final Path BIOMASS_BET_FILE = INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv");
-    private static final Path BIOMASS_SKJ_FILE = INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv");
-    private static final Path BIOMASS_YFT_FILE = INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
@@ -227,7 +236,6 @@ public class TunaScenario implements Scenario {
                 r -> getQuantity(r.getDouble("speed"), KNOT))
             );
 
-
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
@@ -308,47 +316,28 @@ public class TunaScenario implements Scenario {
     public static class TunaSpeciesBiomassInitializerFactory
         implements AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
 
-        Map<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toMap(
-            r -> r.getString("code"),
-            r -> r.getString("name")
-        ));
+        private Map<String, SingleSpeciesBiomassNormalizedFactory> biomassInitializers =
+            parseAllRecords(SCHAEFER_PARAMS_FILE).stream().collect(toMap(
+                r -> r.getString("species_code"),
+                r -> makeBiomassInitializerFactory(
+                    r.getString("species_code"),
+                    r.getDouble("logistic_growth_rate"), // logistic growth rate (r)
+                    getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE), // total carrying capacity (K)
+                    getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE) // total biomass
+                )));
 
-        // Current parameter source is: `POSEIDON Tuna Team Folder/Surplus production model/Total_OCIATTC_PT_results_n=2.csv`
-        private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = makeBiomassInitializerFactory(
-            speciesNames.get("BET"),
-            0.265079184, // logistic growth rate (r)
-            getQuantity(1440940, TONNE), // total carrying capacity (K)
-            getQuantity(337224, TONNE), // total biomass
-            BIOMASS_BET_FILE,
-            CoordinateFileAllocatorFactory::new
-        );
-        private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = makeBiomassInitializerFactory(
-            speciesNames.get("YFT"),
-            0.879, // logistic growth rate (r)
-            getQuantity(1202770, TONNE), // total carrying capacity (K)
-            getQuantity(507295, TONNE), // total biomass
-            BIOMASS_YFT_FILE,
-            SmootherFileAllocatorFactory::new
-        );
-        private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = makeBiomassInitializerFactory(
-            speciesNames.get("SKJ"),
-            1.1520938, // logistic growth rate (r)
-            getQuantity(4776000, TONNE), // total carrying capacity (K)
-            getQuantity(3567169, TONNE), // total biomass
-            BIOMASS_SKJ_FILE,
-            SmootherFileAllocatorFactory::new
-        );
+        private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = biomassInitializers.get("BET");
+        private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = biomassInitializers.get("YFT");
+        private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = biomassInitializers.get("SKJ");
 
         private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
-            String speciesName,
+            String speciesCode,
             double logisticGrowthRate,
             Quantity<Mass> totalCarryingCapacity,
-            Quantity<Mass> totalBiomass,
-            Path initialCapacityFile,
-            Supplier<FileBiomassAllocatorFactory> biomassAllocatorSupplier
+            Quantity<Mass> totalBiomass
         ) {
             final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
-            factory.setSpeciesName(speciesName);
+            factory.setSpeciesName(speciesNames.get(speciesCode));
             factory.setGrower(new FadAwareCommonLogisticGrowerInitializerFactory(logisticGrowthRate));
             factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
             factory.setBiomassSuppliedPerCell(false);
@@ -356,8 +345,11 @@ public class TunaScenario implements Scenario {
             final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
             factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-            final FileBiomassAllocatorFactory initialCapacityAllocator = biomassAllocatorSupplier.get();
-            initialCapacityAllocator.setBiomassPath(initialCapacityFile);
+            final FileBiomassAllocatorFactory initialCapacityAllocator =
+                speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
+            System.out.println(speciesCode);
+            System.out.println(initialCapacityAllocator);
+            initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
             initialCapacityAllocator.setInputFileHasHeader(true);
             final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
             polygonAllocatorFactory.setShapeFile(IATTC_SHAPE_FILE);
