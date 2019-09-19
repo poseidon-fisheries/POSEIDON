@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.commons.lang3.tuple.Triple;
@@ -37,9 +38,8 @@ import uk.ac.ox.oxfish.geography.pathfinding.AStarFallbackPathfinder;
 import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
-import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -77,33 +78,29 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    public static final Path MAP_FILE = INPUT_DIRECTORY.resolve("depth.csv");
-    public static final Path DEPLOYMENT_VALUES_FILE = INPUT_DIRECTORY.resolve("deployment_values.csv");
-    private static final Path IATTC_SHAPE_FILE = INPUT_DIRECTORY.resolve("shape").resolve("RFB_IATTC.shp");
-    private static final Path PORTS_FILE = INPUT_DIRECTORY.resolve("ports.csv");
-    private static final Path BOATS_FILE = INPUT_DIRECTORY.resolve("boats.csv");
-    private static final Path BOAT_SPEEDS_FILE = INPUT_DIRECTORY.resolve("boat_speeds.csv");
-
-    private static final Path SPECIES_NAMES_FILE = INPUT_DIRECTORY.resolve("species_names.csv");
-    private static final Path SCHAEFER_PARAMS_FILE = INPUT_DIRECTORY.resolve("schaefer_params.csv");
-
+    public static final Path MAP_FILE = input("depth.csv");
+    public static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
+    private static final Path IATTC_SHAPE_FILE = input("shape").resolve("RFB_IATTC.shp");
+    private static final Path PORTS_FILE = input("ports.csv");
+    private static final Path PRICES_FILE = input("prices.csv");
+    private static final Path BOATS_FILE = input("boats.csv");
+    private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
+    private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
+    private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
-        "BET", INPUT_DIRECTORY.resolve("habitability_bet_2006-01-07.csv"),
-        "SKJ", INPUT_DIRECTORY.resolve("biomass_skj_2006-01-15.csv"),
-        "YFT", INPUT_DIRECTORY.resolve("biomass_yft_2006-01-15.csv")
+        "BET", input("habitability_bet_2006-01-07.csv"),
+        "SKJ", input("biomass_skj_2006-01-15.csv"),
+        "YFT", input("biomass_yft_2006-01-15.csv")
     );
-
-    private static final Map<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toMap(
+    private static final BiMap<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toImmutableBiMap(
         r -> r.getString("code"),
         r -> r.getString("name")
     ));
-
-    private static final Path CURRENTS_FILE = INPUT_DIRECTORY.resolve("currents.csv");
+    private static final Path CURRENTS_FILE = input("currents.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
-    private AlgorithmFactory<? extends Market> market = new FixedPriceMarketFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
     private int targetYear = 2018;
@@ -113,6 +110,8 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
     }
+
+    private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
     @SuppressWarnings("unused")
     public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() {
@@ -156,14 +155,6 @@ public class TunaScenario implements Scenario {
         this.weatherInitializer = weatherInitializer;
     }
 
-    public AlgorithmFactory<? extends Market> getMarket() {
-        return market;
-    }
-
-    public void setMarket(AlgorithmFactory<? extends Market> market) {
-        this.market = market;
-    }
-
     public DoubleParameter getGasPricePerLiter() {
         return gasPricePerLiter;
     }
@@ -195,19 +186,32 @@ public class TunaScenario implements Scenario {
             nauticalMap, model.random, biologyInitializer, weatherInitializer, globalBiology, model
         );
 
-        final MarketMap marketMap = new MarketMap(globalBiology);
-        globalBiology.getSpecies().forEach(species ->
-            marketMap.addMarket(species, market.apply(model))
-        );
-
         final Double gasPrice = gasPricePerLiter.apply(model.random);
         final FixedGasPrice fixedGasPrice = new FixedGasPrice(gasPrice);
 
+        final MarketMap marketMap = makeMarketMap(globalBiology);
         portInitializer
             .buildPorts(nauticalMap, model.random, seaTile -> marketMap, model, fixedGasPrice)
             .forEach(port -> port.setGasPricePerLiter(gasPrice));
 
         return new ScenarioEssentials(globalBiology, nauticalMap);
+    }
+
+    private MarketMap makeMarketMap(GlobalBiology globalBiology) {
+        Map<String, Double> prices = parseAllRecords(PRICES_FILE).stream()
+            .filter(
+                r -> r.getInt("year") == targetYear
+            )
+            .collect(toMap(
+                r -> r.getString("species_code"),
+                r -> r.getDouble("price_per_tonne")
+            ));
+        final MarketMap marketMap = new MarketMap(globalBiology);
+        globalBiology.getSpecies().forEach(species -> {
+            final String speciesCode = speciesNames.inverse().get(species.getName());
+            marketMap.addMarket(species, new FixedPriceMarket(prices.get(speciesCode)));
+        });
+        return marketMap;
     }
 
     @Override
@@ -347,8 +351,6 @@ public class TunaScenario implements Scenario {
 
             final FileBiomassAllocatorFactory initialCapacityAllocator =
                 speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
-            System.out.println(speciesCode);
-            System.out.println(initialCapacityAllocator);
             initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
             initialCapacityAllocator.setInputFileHasHeader(true);
             final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
