@@ -9,6 +9,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
+import static uk.ac.ox.oxfish.utility.FishStateUtilities.throwingMerger;
 
 public class Constructors {
 
@@ -26,14 +27,6 @@ public class Constructors {
             throwingMerger(),
             LinkedHashMap::new
         ));
-    }
-
-    /**
-     * This is needed by the toMap collector, but I think Java 9 has a toMap method that
-     * doesn't require this and that we could use once we upgrade.
-     */
-    private static <T> BinaryOperator<T> throwingMerger() {
-        return (u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
     }
 
     /**
