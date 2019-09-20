@@ -102,6 +102,10 @@ dependencies
     compile "com.google.guava:guava:23.0"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
+    //json test
+    testCompile "com.google.code.gson:gson:2.8.5"
+
+
     // Reference implementation of JSR-385 for units of measure
     compile group: 'systems.uom', name: 'systems-common', version: '1.0'
 
