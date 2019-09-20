@@ -161,38 +161,6 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }, 0d);
 
 
-        registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                if (fishers.size() == 0)
-                    return 0d;
-
-                double sum = 0;
-                for (Fisher fisher : observed.getFishers()) {
-                    sum += fisher.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-
-                }
-
-                return sum / (double) fishers.size();
-            }
-        }, 0d);
-
-
-        final NauticalMap map = state.getMap();
-        final List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
-
-        for(Species species : observed.getSpecies())
-        {
-            registerGatherer("Biomass " + species.getName(),
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState state1) {
-                                     return state1.getTotalBiomass(species);
-
-                                 }
-                             },
-                             0d);
-        }
 
 
 

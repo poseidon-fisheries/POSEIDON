@@ -65,6 +65,7 @@ import uk.ac.ox.oxfish.geography.ports.RandomPortInitializer;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectors;
 import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.factory.FixedPriceMarketFactory;
@@ -128,6 +129,10 @@ public class PrototypeScenario implements Scenario {
     private boolean cheaters = false;
 
 
+    /**
+     * automatically forces the "AdditionalFishStateDailyCollectors" plugin
+     */
+    private boolean collectAdditionalDailyData = true;
 
     /**
      * when this flag is true, agents use their memory to predict future catches and profits. It is necessary
@@ -436,6 +441,11 @@ public class PrototypeScenario implements Scenario {
             );
 
         }
+
+        if(collectAdditionalDailyData)
+            model.registerStartable(
+                    new AdditionalFishStateDailyCollectors()
+            );
 
         HashMap<String, FisherFactory> factory = new HashMap<>();
         factory.put(FishState.DEFAULT_POPULATION_NAME,

@@ -144,7 +144,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState state1) {
-                                     return originalGatherer.getLatestObservation(biomass);
+                                     return state1.getTotalBiomass(species);
                                  }
                              }
                     , Double.NaN);
