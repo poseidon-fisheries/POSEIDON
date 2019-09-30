@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
+import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
@@ -41,6 +42,7 @@ public class MakeFadSetTest {
         PurseSeineGear purseSeineGear = mock(PurseSeineGear.class);
         Fisher fisher = mock(Fisher.class);
         Regulation regulation = mock(Regulation.class);
+        final Hold hold = mock(Hold.class);
 
         // Make a full FAD and an empty tile biology
         final double carryingCapacity = 0.0;
@@ -58,6 +60,7 @@ public class MakeFadSetTest {
         when(fadManager.getFadMap()).thenReturn(fadMap);
         when(purseSeineGear.getFadManager()).thenReturn(fadManager);
         when(fisher.getLocation()).thenReturn(seaTile);
+        when(fisher.getHold()).thenReturn(hold);
         when(fisher.getRegulation()).thenReturn(regulation);
         when(fisher.isCheater()).thenReturn(false);
         when(fisher.getGear()).thenReturn(purseSeineGear);
