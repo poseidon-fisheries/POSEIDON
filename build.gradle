@@ -102,7 +102,7 @@ dependencies
     testCompile "org.mockito:mockito-all:1.9.5"
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    compile "com.google.guava:guava:23.0"
+    compile "com.google.guava:guava:28.1-jre"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
     //json test
