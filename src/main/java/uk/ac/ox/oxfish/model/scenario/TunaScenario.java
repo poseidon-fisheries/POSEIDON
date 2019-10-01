@@ -3,8 +3,11 @@ package uk.ac.ox.oxfish.model.scenario;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.commons.lang3.tuple.Triple;
+import tech.units.indriya.ComparableQuantity;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -25,6 +28,7 @@ import uk.ac.ox.oxfish.fisher.equipment.FuelTank;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
+import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
@@ -61,6 +65,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
+import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -83,6 +88,7 @@ public class TunaScenario implements Scenario {
     private static final Path IATTC_SHAPE_FILE = input("shape").resolve("RFB_IATTC.shp");
     private static final Path PORTS_FILE = input("ports.csv");
     private static final Path PRICES_FILE = input("prices.csv");
+    private static final Path COSTS_FILE = input("costs.csv");
     private static final Path BOATS_FILE = input("boats.csv");
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
@@ -225,7 +231,21 @@ public class TunaScenario implements Scenario {
         final LinkedList<Port> ports = model.getMap().getPorts();
         Preconditions.checkState(!ports.isEmpty());
 
+        final RangeMap<ComparableQuantity<Mass>, HourlyCost> hourlyCostsPerCarryingCapacity =
+            parseAllRecords(COSTS_FILE).stream().collect(toImmutableRangeMap(
+                r -> Range.openClosed(
+                    getQuantity(r.getInt("lower_capacity"), TONNE),
+                    getQuantity(r.getInt("upper_capacity"), TONNE)
+                ),
+                r -> new HourlyCost(r.getDouble("daily_cost") / 24.0)
+            ));
+
         FisherFactory fisherFactory = fisherDefinition.getFisherFactory(model, ports, 0);
+        fisherFactory.getAdditionalSetups().add(fisher -> {
+            final ComparableQuantity<Mass> capacity = getQuantity(fisher.getHold().getMaximumLoad(), KILOGRAM);
+            final HourlyCost hourlyCost = hourlyCostsPerCarryingCapacity.get(capacity);
+            fisher.getAdditionalTripCosts().add(hourlyCost);
+        });
         fisherFactory.getAdditionalSetups().add(fisher ->
             ((PurseSeineGear) fisher.getGear()).getFadManager().setFisher(fisher)
         );
@@ -252,10 +272,11 @@ public class TunaScenario implements Scenario {
                         final double beam = 1.0; // we don't have beam width in the data file, but it isn't used anyway
                         final Quantity<Mass> carryingCapacity = getQuantity(record.getDouble("carrying_capacity_in_t"), TONNE);
                         final Quantity<Volume> holdVolume = getQuantity(record.getDouble("hold_volume_in_m3"), CUBIC_METRE);
+                        final int capacityClass = IATTC.capacityClass(holdVolume);
                         final Engine engine = new Engine(
                             Double.NaN, // Unused
                             0.0, // TODO
-                            asDouble(speedsPerClass.get(IATTC.capacityClass(holdVolume)), KILOMETRE_PER_HOUR)
+                            asDouble(speedsPerClass.get(capacityClass), KILOMETRE_PER_HOUR)
                         );
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));
                         fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
