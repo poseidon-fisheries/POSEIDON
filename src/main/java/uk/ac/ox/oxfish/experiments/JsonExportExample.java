@@ -33,7 +33,7 @@ public class JsonExportExample {
             model.schedule.step(model);
 
         try {
-            final Path outputFolder = Paths.get("/", "home", "nicolas", "Desktop");
+            final Path outputFolder = Paths.get("/", "home", "nicolas", "workspace", "poseidon-viz", "interim_release_5", "public", "testdata");
             FishStateUtilities.writeAdditionalOutputsToFolder(outputFolder, model);
 
             final ArrayList<String> columnsToPrint = Lists.newArrayList(
