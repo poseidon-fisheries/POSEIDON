@@ -109,21 +109,8 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }
 
         final List<Fisher> fishers = state.getFishers();
-        //number of fishers
-        registerGatherer("Number of Fishers", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return (double) fishers.size();
-            }
-        }, 0d);
-        //fishers who are actually out
-        registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return fishers.stream().mapToDouble(
-                        value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
-            }
-        }, 0d);
+
+
 
         registerGatherer("Total Effort", new Gatherer<FishState>() {
             @Override
