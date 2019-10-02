@@ -9,6 +9,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import uk.ac.ox.oxfish.fisher.Fisher;
+import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
@@ -21,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
+import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileHeight;
+import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileWidth;
 
 public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStartable {
     // TODO: remove `setPrettyPrinting()` once we've reasonably debugged the thing
@@ -35,7 +38,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
     private Stoppable stoppable;
     private JsonOutput jsonOutput;
 
-    public JsonIndonesiaMap(String fileName) {
+    JsonIndonesiaMap(String fileName) {
         this.fileName = fileName;
     }
 
@@ -60,11 +63,10 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
         final FishState model = (FishState) simState;
         final List<JsonVesselPosition> jsonVesselPositions = new ArrayList<>();
         JsonTimestep jsonTimestep = new JsonTimestep(model.getDay(), jsonVesselPositions);
-        final Coordinate c0 = model.getMap().getCoordinates(0, 0);
-        final Coordinate c1 = model.getMap().getCoordinates(1, 0);
-        final Coordinate c2 = model.getMap().getCoordinates(0, 1);
-        double width = c0.distance(c1);
-        double height = c0.distance(c2);
+
+        final NauticalMap map = ((FishState) simState).getMap();
+        double width = seaTileWidth(map);
+        double height = seaTileHeight(map);
 
         for (Fisher fisher : model.getFishers()) {
             final Coordinate coordinates = new Coordinate(model.getMap().getCoordinates(fisher.getLocation()));
@@ -102,7 +104,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
             "lorem ipsum",
             vessels,
             ports,
-            new ArrayList<>(), // timesteps
+            new ArrayList<>(), // time steps
             Instant.parse("2018-01-01T00:00:00.00Z").getEpochSecond()
         );
         stoppable = model.scheduleEveryDay(this, StepOrder.AFTER_DATA);

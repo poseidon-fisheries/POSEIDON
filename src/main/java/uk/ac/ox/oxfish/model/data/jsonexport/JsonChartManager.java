@@ -58,7 +58,7 @@ public class JsonChartManager implements OutputPlugin {
     @Override
     public String composeFileContents() {
         Preconditions.checkNotNull(jsonChart);
-        final Gson gson = new GsonBuilder().setPrettyPrinting().serializeSpecialFloatingPointValues().create();
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(jsonChart);
     }
 }
