@@ -433,10 +433,7 @@ public class NauticalMap implements Startable
         SeaTile portSite = port.getLocation();
         Preconditions.checkArgument(portSite.isLand(), "port is not on land");
         //check it's coastal
-        Bag neighbors = new Bag();
-        rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
-                Grid2D.BOUNDED, false, neighbors,null,null);
-        boolean isCoastal = MasonUtils.<SeaTile>bagToStream(neighbors).anyMatch(SeaTile::isWater);
+        boolean isCoastal = isCoastal(portSite);
         Preconditions.checkArgument(isCoastal,"port has no neighboring sea tiles");
 
         //put it in the masterlist
@@ -445,6 +442,13 @@ public class NauticalMap implements Startable
 
         portMap.setObjectLocation(port,portSite.getGridX(),portSite.getGridY());
 
+    }
+
+    public boolean isCoastal(SeaTile seaTile) {
+        Bag neighbors = new Bag();
+        rasterBackingGrid.getMooreNeighbors(seaTile.getGridX(), seaTile.getGridY(), 1,
+                Grid2D.BOUNDED, false, neighbors,null,null);
+        return MasonUtils.<SeaTile>bagToStream(neighbors).anyMatch(SeaTile::isWater);
     }
 
     /**

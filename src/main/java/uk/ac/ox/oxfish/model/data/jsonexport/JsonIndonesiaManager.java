@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.model.data.jsonexport;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import sim.engine.Steppable;
@@ -10,13 +11,13 @@ import uk.ac.ox.oxfish.model.data.OutputPlugin;
 
 import java.util.List;
 
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
 
     private JsonIndonesiaCharts jsonIndonesiaCharts;
     private JsonIndonesiaMap jsonIndonesiaMap;
+    private JsonRegionsManager jsonRegionsManager;
     private int numYearsToSkip;
 
     /**
@@ -43,6 +44,8 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
             jsonIndonesiaMap.start(model);
             jsonIndonesiaCharts = new JsonIndonesiaCharts(filePrefix, numYearsToSkip);
             jsonIndonesiaCharts.start(model);
+            jsonRegionsManager = new JsonRegionsManager(filePrefix + "_regions.json");
+            jsonRegionsManager.start(model);
         }, StepOrder.DAWN, numYearsToSkip);
         model.getOutputPlugins().add(this);
     }
@@ -65,8 +68,9 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
     public String composeFileContents() {
         final List<String> chartPaths =
             jsonIndonesiaCharts.getChartManagers().stream().map(JsonChartManager::getFileName).collect(toList());
+        final ImmutableList<String> regionPaths = ImmutableList.of(jsonRegionsManager.getFileName());
         final JsonSimulationSet jsonSimulationSet =
-            new JsonSimulationSet(simulationTitle, jsonIndonesiaMap.getFileName(), chartPaths, emptyList());
+            new JsonSimulationSet(simulationTitle, jsonIndonesiaMap.getFileName(), chartPaths, regionPaths);
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(jsonSimulationSet);
     }
