@@ -10,6 +10,8 @@ import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFact
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
+import uk.ac.ox.oxfish.model.data.jsonexport.JsonManager;
+import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 import java.util.LinkedHashMap;
@@ -119,7 +121,8 @@ public class AdditionalStartables {
         NAMES.put(TowLongLoggerFactory.class,
                   "Tow Long Logger");
 
-
+        CONSTRUCTORS.put("Json Manager", JsonManagerFactory::new);
+        NAMES.put(JsonManagerFactory.class, "Json Manager");
 
     }
 
