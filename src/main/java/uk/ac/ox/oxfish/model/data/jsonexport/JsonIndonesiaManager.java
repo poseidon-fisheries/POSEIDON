@@ -19,19 +19,29 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
     private JsonIndonesiaMap jsonIndonesiaMap;
     private int numYearsToSkip;
 
-    public JsonIndonesiaManager(String simulationName, int numYearsToSkip) {
-        this.simulationName = simulationName;
+    /**
+     * pretty name for dashboard
+     */
+    private final String simulationTitle;
+
+    /**
+     * prefix for all the file names
+     */
+    final private String filePrefix;
+
+    public JsonIndonesiaManager(String filePrefix, int numYearsToSkip, String simulationTitle) {
+        this.filePrefix = filePrefix;
         this.numYearsToSkip = numYearsToSkip;
+        this.simulationTitle = simulationTitle;
     }
 
-    private String simulationName;
 
     @Override
     public void start(FishState model) {
         model.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> {
-            jsonIndonesiaMap = new JsonIndonesiaMap(simulationName + "_map.json");
+            jsonIndonesiaMap = new JsonIndonesiaMap(filePrefix + "_map.json");
             jsonIndonesiaMap.start(model);
-            jsonIndonesiaCharts = new JsonIndonesiaCharts(simulationName, numYearsToSkip);
+            jsonIndonesiaCharts = new JsonIndonesiaCharts(filePrefix, numYearsToSkip);
             jsonIndonesiaCharts.start(model);
         }, StepOrder.DAWN, numYearsToSkip);
         model.getOutputPlugins().add(this);
@@ -48,7 +58,7 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
 
     @Override
     public String getFileName() {
-        return simulationName + "_index.json";
+        return filePrefix + "_index.json";
     }
 
     @Override
@@ -56,7 +66,7 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
         final List<String> chartPaths =
             jsonIndonesiaCharts.getChartManagers().stream().map(JsonChartManager::getFileName).collect(toList());
         final JsonSimulationSet jsonSimulationSet =
-            new JsonSimulationSet(simulationName, jsonIndonesiaMap.getFileName(), chartPaths, emptyList());
+            new JsonSimulationSet(simulationTitle, jsonIndonesiaMap.getFileName(), chartPaths, emptyList());
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(jsonSimulationSet);
     }
