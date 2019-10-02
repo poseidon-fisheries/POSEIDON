@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
+import uk.ac.ox.oxfish.model.regs.factory.DepthMPAFactory;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileNotFoundException;
@@ -28,10 +30,16 @@ public class JsonExportExample {
         scenario.getPlugins().add(jsonManagerFactory);
 
         final FishState model = new FishState();
+
+        final DepthMPAFactory regulation = new DepthMPAFactory();
+        regulation.setMinDepth(new FixedDoubleParameter(75));
+        regulation.setMaxDepth(new FixedDoubleParameter(500000000));
+        scenario.getFisherDefinitions().get(0).setRegulation(regulation);
+
         model.setScenario(scenario);
         model.start();
 
-        while (model.getYear() < 4)
+        while (model.getYear() < 2)
             model.schedule.step(model);
 
         try {

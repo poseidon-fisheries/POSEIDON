@@ -62,7 +62,7 @@ public class DepthMPAFactory  implements AlgorithmFactory<ProtectedAreasOnly>{
 
                 double minDepth = -getMinDepth().apply(state.getRandom());
                 double maxDepth = -getMaxDepth().apply(state.getRandom());
-                for(SeaTile tile : state.getMap().getAllSeaTilesExcludingLandAsList())
+                for(SeaTile tile : state.getMap().getAllSeaTilesAsList())
                 {
                     if(tile.getAltitude()<=minDepth && tile.getAltitude()>=maxDepth)
                     {
