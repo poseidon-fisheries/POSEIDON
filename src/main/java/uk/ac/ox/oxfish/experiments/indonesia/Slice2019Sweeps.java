@@ -23,6 +23,7 @@ import uk.ac.ox.oxfish.model.regs.factory.MaxHoursOutFactory;
 import uk.ac.ox.oxfish.model.regs.factory.TriggerRegulationFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -33,10 +34,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Slice2019Sweeps {
 
-    private static final String SCENARIO_NAME = "historical20_baranov_8h";
+    private static final String SCENARIO_NAME = "historical20_baranov_8h_noquit";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/calibration/slicesweep/";
@@ -52,10 +54,10 @@ public class Slice2019Sweeps {
 
         //effort control
         //all boats are controlled
-//        effortControl("all",
-//                new String[]{"big","small","medium","small10"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, MIN_DAYS_OUT);
+        effortControl("all",
+                new String[]{"big","small","medium","small10"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, MIN_DAYS_OUT);
 
 
 //
@@ -84,21 +86,21 @@ public class Slice2019Sweeps {
 //        //fleet reduction
 //        fleetReduction("fleetreduction", SCENARIO_NAME, 1);
 
-        //delays
-        delays("delay_all", new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
-
-
-
+//        //delays
+//        delays("delay_all", new String[]{"big","small","medium","small10"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
 //
-        delays("delay_10", new String[]{"big","small10","medium"},
-                SCENARIO_NAME, SHOCK_YEAR, 50);
-
-
-
-        delaysOnce("delay_once",
-                new String[]{"big","small","medium","small10"},
-                SCENARIO_NAME, SHOCK_YEAR, 200);
+//
+//
+////
+//        delays("delay_10", new String[]{"big","small10","medium"},
+//                SCENARIO_NAME, SHOCK_YEAR, 50);
+//
+//
+//
+//        delaysOnce("delay_once",
+//                new String[]{"big","small","medium","small10"},
+//                SCENARIO_NAME, SHOCK_YEAR, 200);
 
 
     }
@@ -124,48 +126,7 @@ public class Slice2019Sweeps {
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
             runner.setScenarioSetup(
-                    scenario -> {
-
-                        //at year 4, impose regulation
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        flexible.getPlugins().add(
-                                fishState -> new AdditionalStartable() {
-                                    @Override
-                                    public void start(FishState model) {
-
-                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                (Steppable) simState -> {
-                                                    fisherloop:
-                                                    for (Fisher fisher :
-                                                            ((FishState) simState).getFishers()) {
-
-                                                        for (String tag : modifiedTags) {
-                                                            if (fisher.getTags().contains(tag)) {
-                                                                fisher.setRegulation(
-                                                                        new MaxHoursOutRegulation(
-                                                                                new ProtectedAreasOnly(),
-                                                                                finalMaxDaysOut*24d
-                                                                        ));
-                                                                continue fisherloop;
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                StepOrder.DAWN,
-                                                shockYear
-                                        );
-
-
-                                    }
-
-                                    @Override
-                                    public void turnOff() {
-
-                                    }
-                                }
-                        );
-
-                    }
+                    setupEffortControlConsumer(modifiedTags, shockYear, finalMaxDaysOut)
             );
 
 
@@ -188,8 +149,52 @@ public class Slice2019Sweeps {
         fileWriter.close();
     }
 
+    @NotNull
+    public static Consumer<Scenario> setupEffortControlConsumer(
+            String[] modifiedTags, int shockYear, int finalMaxDaysOut) {
+        return scenario -> {
+
+            //at year 4, impose regulation
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+            flexible.getPlugins().add(
+                    fishState -> new AdditionalStartable() {
+                        @Override
+                        public void start(FishState model) {
+
+                            model.scheduleOnceAtTheBeginningOfYear(
+                                    (Steppable) simState -> {
+                                        fisherloop:
+                                        for (Fisher fisher :
+                                                ((FishState) simState).getFishers()) {
+
+                                            for (String tag : modifiedTags) {
+                                                if (fisher.getTags().contains(tag)) {
+                                                    fisher.setRegulation(
+                                                            new MaxHoursOutRegulation(
+                                                                    new ProtectedAreasOnly(),
+                                                                    finalMaxDaysOut*24d
+                                                            ));
+                                                    continue fisherloop;
+                                                }
+                                            }
+                                        }
+                                    },
+                                    StepOrder.DAWN,
+                                    shockYear
+                            );
 
 
+                        }
+
+                        @Override
+                        public void turnOff() {
+
+                        }
+                    }
+            );
+
+        };
+    }
 
 
     private static void delays(
@@ -212,63 +217,7 @@ public class Slice2019Sweeps {
             //because I coded "run" poorly, we have to go through this series of pirouettes
             //to get it done right
             runner.setScenarioSetup(
-                    scenario -> {
-
-                        //at year 4, impose regulation
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        flexible.getPlugins().add(
-                                fishState -> new AdditionalStartable() {
-                                    @Override
-                                    public void start(FishState model) {
-
-                                        model.scheduleOnceAtTheBeginningOfYear(
-                                                (Steppable) simState -> {
-
-                                                    HashMap<String, Integer> waitTimes = new HashMap<>();
-                                                    waitTimes.put("Sumenep",finalWaitTime);
-                                                    waitTimes.put("Gili Iyang",finalWaitTime);
-                                                    waitTimes.put("Bajomulyo",finalWaitTime);
-                                                    waitTimes.put("Brondong",finalWaitTime);
-                                                    waitTimes.put("Karangsong",finalWaitTime);
-                                                    waitTimes.put("Tanjung Pandan",finalWaitTime);
-                                                    waitTimes.put("Probolinggo",finalWaitTime);
-                                                    waitTimes.put("Karimunjawa",finalWaitTime);
-                                                    waitTimes.put("Desa Masalima",finalWaitTime);
-                                                    waitTimes.put("Asem Doyong",finalWaitTime);
-                                                    waitTimes.put("Pagatan",finalWaitTime);
-
-
-                                                    fisherloop:
-                                                    for (Fisher fisher :
-                                                            ((FishState) simState).getFishers()) {
-
-                                                        for (String tag : modifiedTags) {
-                                                            if (fisher.getTags().contains(tag)) {
-                                                                fisher.setRegulation(
-                                                                        new PortBasedWaitTimesDecorator(
-                                                                                new ProtectedAreasOnly(),
-                                                                                waitTimes
-                                                                        ));
-                                                                continue fisherloop;
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                StepOrder.DAWN,
-                                                shockYear
-                                        );
-
-
-                                    }
-
-                                    @Override
-                                    public void turnOff() {
-
-                                    }
-                                }
-                        );
-
-                    }
+                    setupDelaysConsumer(modifiedTags, shockYear, finalWaitTime)
             );
 
 
@@ -289,6 +238,68 @@ public class Slice2019Sweeps {
             }
         }
         fileWriter.close();
+    }
+
+    @NotNull
+    public static Consumer<Scenario> setupDelaysConsumer(String[] modifiedTags,
+                                                         int shockYear, int finalWaitTime) {
+        return scenario -> {
+
+            //at year 4, impose regulation
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+            flexible.getPlugins().add(
+                    fishState -> new AdditionalStartable() {
+                        @Override
+                        public void start(FishState model) {
+
+                            model.scheduleOnceAtTheBeginningOfYear(
+                                    (Steppable) simState -> {
+
+                                        HashMap<String, Integer> waitTimes = new HashMap<>();
+                                        waitTimes.put("Sumenep",finalWaitTime);
+                                        waitTimes.put("Gili Iyang",finalWaitTime);
+                                        waitTimes.put("Bajomulyo",finalWaitTime);
+                                        waitTimes.put("Brondong",finalWaitTime);
+                                        waitTimes.put("Karangsong",finalWaitTime);
+                                        waitTimes.put("Tanjung Pandan",finalWaitTime);
+                                        waitTimes.put("Probolinggo",finalWaitTime);
+                                        waitTimes.put("Karimunjawa",finalWaitTime);
+                                        waitTimes.put("Desa Masalima",finalWaitTime);
+                                        waitTimes.put("Asem Doyong",finalWaitTime);
+                                        waitTimes.put("Pagatan",finalWaitTime);
+
+
+                                        fisherloop:
+                                        for (Fisher fisher :
+                                                ((FishState) simState).getFishers()) {
+
+                                            for (String tag : modifiedTags) {
+                                                if (fisher.getTags().contains(tag)) {
+                                                    fisher.setRegulation(
+                                                            new PortBasedWaitTimesDecorator(
+                                                                    new ProtectedAreasOnly(),
+                                                                    waitTimes
+                                                            ));
+                                                    continue fisherloop;
+                                                }
+                                            }
+                                        }
+                                    },
+                                    StepOrder.DAWN,
+                                    shockYear
+                            );
+
+
+                        }
+
+                        @Override
+                        public void turnOff() {
+
+                        }
+                    }
+            );
+
+        };
     }
 
     private static void delaysOnce(
@@ -407,53 +418,7 @@ public class Slice2019Sweeps {
             //to get it done right
             double finalProbability = probability;
             runner.setScenarioSetup(
-                    scenario -> {
-
-                        //at year 4, impose regulation
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-                        flexible.getPlugins().add(
-                                fishState -> new AdditionalStartable() {
-                                    /**
-                                     * this gets called by the fish-state right after the scenario has started. It's
-                                     * useful to set up steppables
-                                     * or just to percolate a reference to the model
-                                     *
-                                     * @param model the model
-                                     */
-                                    @Override
-                                    public void start(FishState model) {
-                                        model.scheduleEveryYear(new Steppable() {
-                                            @Override
-                                            public void step(SimState simState) {
-                                                if(model.getYear()<shockYear)
-                                                    return;
-                                                List<Fisher> toKill = new LinkedList<>();
-
-                                                for(Fisher fisher : model.getFishers()) {
-                                                    if (model.getRandom().nextDouble() < finalProbability)
-                                                        toKill.add(fisher);
-                                                }
-                                                for (Fisher sacrifice : toKill) {
-                                                    model.killSpecificFisher(sacrifice);
-
-                                                }
-
-
-                                            }
-                                        },StepOrder.DAWN);
-                                    }
-
-                                    /**
-                                     * tell the startable to turnoff,
-                                     */
-                                    @Override
-                                    public void turnOff() {
-
-                                    }
-                                }
-                        );
-
-                    }
+                    setupFleetReductionConsumer(shockYear, finalProbability)
             );
 
 
@@ -474,6 +439,58 @@ public class Slice2019Sweeps {
             }
         }
         fileWriter.close();
+    }
+
+    @NotNull
+    public static Consumer<Scenario> setupFleetReductionConsumer(int shockYear,
+                                                                  double yearlyReductionProbability) {
+        return scenario -> {
+
+            //at year 4, impose regulation
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+            flexible.getPlugins().add(
+                    fishState -> new AdditionalStartable() {
+                        /**
+                         * this gets called by the fish-state right after the scenario has started. It's
+                         * useful to set up steppables
+                         * or just to percolate a reference to the model
+                         *
+                         * @param model the model
+                         */
+                        @Override
+                        public void start(FishState model) {
+                            model.scheduleEveryYear(new Steppable() {
+                                @Override
+                                public void step(SimState simState) {
+                                    if(model.getYear()<shockYear)
+                                        return;
+                                    List<Fisher> toKill = new LinkedList<>();
+
+                                    for(Fisher fisher : model.getFishers()) {
+                                        if (model.getRandom().nextDouble() < yearlyReductionProbability)
+                                            toKill.add(fisher);
+                                    }
+                                    for (Fisher sacrifice : toKill) {
+                                        model.killSpecificFisher(sacrifice);
+
+                                    }
+
+
+                                }
+                            }, StepOrder.DAWN);
+                        }
+
+                        /**
+                         * tell the startable to turnoff,
+                         */
+                        @Override
+                        public void turnOff() {
+
+                        }
+                    }
+            );
+
+        };
     }
 
 
@@ -498,26 +515,7 @@ public class Slice2019Sweeps {
             double finalMarkup = markup;
             //add markup in the scenario
             runner.setScenarioSetup(
-                    scenario -> {
-
-                        FlexibleScenario flexible = (FlexibleScenario) scenario;
-
-                        ThreePricesMarketFactory market =
-                                ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
-                                        premiumSpecies
-                                );
-
-                        market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
-                        double newPrice = ((FixedDoubleParameter) market.getPriceAboveThresholds()).getFixedValue() *
-                                (1d + finalMarkup);
-                        market.setPriceAboveThresholds(
-                                new FixedDoubleParameter(
-                                        newPrice
-                                )
-                        );
-                        System.out.println(newPrice);
-
-                    }
+                    setupPremiumConsumer(maturityBin, premiumSpecies, finalMarkup)
             );
 
 
@@ -538,6 +536,33 @@ public class Slice2019Sweeps {
             }
         }
         fileWriter.close();
+    }
+
+    @NotNull
+    public static Consumer<Scenario>
+    setupPremiumConsumer(int maturityBin,
+                         String premiumSpecies,
+                         double finalMarkup) {
+        return scenario -> {
+
+            FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+            ThreePricesMarketFactory market =
+                    ((ThreePricesMappedFactory) flexible.getMarket()).getMarkets().get(
+                            premiumSpecies
+                    );
+
+            market.setHighAgeThreshold(new FixedDoubleParameter(maturityBin));
+            double newPrice = ((FixedDoubleParameter) market.getPriceAboveThresholds()).getFixedValue() *
+                    (1d + finalMarkup);
+            market.setPriceAboveThresholds(
+                    new FixedDoubleParameter(
+                            newPrice
+                    )
+            );
+            System.out.println(newPrice);
+
+        };
     }
 
 

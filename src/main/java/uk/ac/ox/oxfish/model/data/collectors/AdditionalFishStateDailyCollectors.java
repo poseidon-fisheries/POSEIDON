@@ -26,7 +26,9 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.FishStateDailyTimeSeries;
 import uk.ac.ox.oxfish.model.data.Gatherer;
+import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +95,53 @@ public class AdditionalFishStateDailyCollectors implements AdditionalStartable {
         }, 0d);
 
 
+
+        //fishers who are actually out
+        model.getDailyDataSet().registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return model.getFishers().stream().mapToDouble(
+                        value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
+            }
+        }, 0d);
+
+
+        //number of fishers
+        model.getDailyDataSet().registerGatherer("Number of Fishers", new Gatherer<FishState>() {
+            @Override
+            public Double apply(FishState ignored) {
+                return (double) model.getFishers().size();
+            }
+        }, 0d);
+
+
+//        for(Species species : model.getSpecies())
+//        {
+//            //get all the markets for this species
+//            final List<Market> toAggregate = model.getAllMarketsForThisSpecie(species);
+//            List<String> allPossibleColumns = FishStateDailyTimeSeries.getAllMarketColumns(toAggregate);
+//
+//            //now register each
+//
+//            for(String columnName : allPossibleColumns) {
+//                //todo this would fail if some markets have a column and others don't; too lazy to fix right now
+//                model.getDailyDataSet().registerGatherer(species + " " + columnName,
+//                                 //so "stream" is a trick from Java 8. In this case it just sums up all the data
+//                                 new Gatherer<FishState>() {
+//                                     @Override
+//                                     public Double apply(FishState model) {
+//                                         return toAggregate.stream().mapToDouble(
+//                                                 value -> value.getData().getLatestObservation(columnName))
+//                                                 .sum();
+//                                     }
+//                                 }, Double.NaN);
+//            }
+//
+//
+//
+//
+//
+//        }
     }
 
 

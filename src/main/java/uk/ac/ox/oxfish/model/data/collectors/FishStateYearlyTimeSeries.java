@@ -270,7 +270,8 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
 
         registerGatherer("Total Effort",
-                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")), 0d);
+                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")),
+                         0d);
 
 
         registerGatherer("Average Distance From Port", new Gatherer<FishState>() {
