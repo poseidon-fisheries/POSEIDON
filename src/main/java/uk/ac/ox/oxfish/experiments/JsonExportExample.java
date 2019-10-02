@@ -23,17 +23,19 @@ public class JsonExportExample {
             new FileReader(Paths.get("sensitivity", "sensitivity_1.yaml").toFile()),
             FlexibleScenario.class);
 
-        scenario.getPlugins().add(new JsonManagerFactory());
+        final JsonManagerFactory jsonManagerFactory = new JsonManagerFactory();
+        jsonManagerFactory.setNumYearsToSkip(1);
+        scenario.getPlugins().add(jsonManagerFactory);
 
         final FishState model = new FishState();
         model.setScenario(scenario);
         model.start();
 
-        while (model.getYear() < 5)
+        while (model.getYear() < 4)
             model.schedule.step(model);
 
         try {
-            final Path outputFolder = Paths.get("/", "home", "nicolas", "workspace", "poseidon-viz", "interim_release_5", "public", "testdata");
+            final Path outputFolder = Paths.get("/", "home", "nicolas", "workspace", "poseidon-viz", "interim_release_6", "public", "testdata");
             FishStateUtilities.writeAdditionalOutputsToFolder(outputFolder, model);
 
             final ArrayList<String> columnsToPrint = Lists.newArrayList(

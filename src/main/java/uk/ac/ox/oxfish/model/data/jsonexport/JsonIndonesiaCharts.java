@@ -13,36 +13,35 @@ import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
 
-public class JsonIndonesiaIndexer implements AdditionalStartable {
+public class JsonIndonesiaCharts implements AdditionalStartable {
 
     private String name;
+    private List<JsonChartManager> chartManagers;
+    private int numYearsToSkip;
+
+    public JsonIndonesiaCharts(String name, int numYearsToSkip) {
+        this.name = name;
+        this.numYearsToSkip = numYearsToSkip;
+    }
+
+    public List<JsonChartManager> getChartManagers() {
+        return chartManagers;
+    }
 
     @Override
     public void start(FishState model) {
-
-        final JsonChartManager landingsPerSpecies = landingsPerSpecies();
-        final JsonChartManager biomassPerSpecies = biomassPerSpecies();
-        final JsonChartManager depletionPerSpecies = depletionPerSpecies();
-        final JsonChartManager lutjanusMalabaricusLandings = landingsPerPopulation("Lutjanus malabaricus");
-        final JsonChartManager epinephelusAreolatusLandings = landingsPerPopulation("Epinephelus areolatus");
-        final JsonChartManager lutjanusErythropterusLandings = landingsPerPopulation("Lutjanus erythropterus");
-        final JsonChartManager pristipomoidesMultidensLandings = landingsPerPopulation("Pristipomoides multidens");
-
-        final JsonChartManager activeFishers = activeFishersPerPopulation();
-        final JsonChartManager percentageMatureCatches = percentageMatureCatches();
-
-        model.getOutputPlugins().addAll(ImmutableList.of(
-            landingsPerSpecies,
-            biomassPerSpecies,
-            depletionPerSpecies,
-            lutjanusMalabaricusLandings,
-            epinephelusAreolatusLandings,
-            lutjanusErythropterusLandings,
-            pristipomoidesMultidensLandings,
-            activeFishers,
-            percentageMatureCatches
-        ));
-
+        chartManagers = ImmutableList.of(
+            landingsPerSpecies(),
+            biomassPerSpecies(),
+            depletionPerSpecies(),
+            landingsPerPopulation("Lutjanus malabaricus"),
+            landingsPerPopulation("Epinephelus areolatus"),
+            landingsPerPopulation("Lutjanus erythropterus"),
+            landingsPerPopulation("Pristipomoides multidens"),
+            activeFishersPerPopulation(),
+            percentageMatureCatches()
+        );
+        model.getOutputPlugins().addAll(chartManagers);
     }
 
     private JsonChartManager landingsPerSpecies() {
@@ -58,8 +57,8 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
 
         return new JsonChartManager(
             "Landings per species", "Years", "Landings (kg)", emptyList(),
-            name + "_" + "landings.json", columnsToPrint, renamedColumns
-        );
+            name + "_" + "landings.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
     }
 
     JsonChartManager biomassPerSpecies() {
@@ -76,8 +75,8 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
 
         return new JsonChartManager(
             "Biomass", "Years", "Biomass (kg)", emptyList(),
-            name + "_" + "biomass.json", columnsToPrint, renamedColumns
-        );
+            name + "_" + "biomass.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
 
     }
 
@@ -95,8 +94,8 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
 
         return new JsonChartManager(
             "Depletion", "Years", "Depletion (%)", ImmutableList.of(0.4),
-            name + "_" + "depletion.json", columnsToPrint, renamedColumns
-        );
+            name + "_" + "depletion.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
 
     }
 
@@ -118,9 +117,9 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
         ));
 
         return new JsonChartManager(
-            "Landings", "Years", "Landings (kg)", emptyList(),
-            name + "_" + "landings_per_population.json", columnsToPrint, renamedColumns
-        );
+            speciesName + " Landings", "Years", "Landings (kg)", emptyList(),
+            name + "_" + speciesName +  "_landings_per_population.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
 
     }
 
@@ -142,8 +141,8 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
 
         return new JsonChartManager(
             "Active fishers", "Years", "Number of fishers", emptyList(),
-            name + "_" + "active_fishers.json", columnsToPrint, renamedColumns
-        );
+            name + "_" + "active_fishers.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
 
     }
 
@@ -165,8 +164,8 @@ public class JsonIndonesiaIndexer implements AdditionalStartable {
 
         return new JsonChartManager(
             "Percentage Mature Catches", "Years", "Mature catches (%)", emptyList(),
-            name + "_" + "mature_catches.json", columnsToPrint, renamedColumns
-        );
+            name + "_" + "mature_catches.json", columnsToPrint, renamedColumns,
+            numYearsToSkip);
 
     }
 
