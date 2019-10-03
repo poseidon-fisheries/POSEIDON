@@ -29,7 +29,7 @@ public class Slice2019Sensitivity {
 
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
-    public static String DIRECTORY = Paths.get("docs","indonesia_hub","runs","712","slice2019","sensitivity","cmsy_fixed").toString();
+    public static String DIRECTORY = Paths.get("sensitivity").toString();
 
     public static final int MIN_DAYS_OUT = 0;
     public static final int RUNS_PER_POLICY = 1;
@@ -112,11 +112,11 @@ public class Slice2019Sensitivity {
     static private Map<String, Consumer<Scenario>> policies = new HashMap();
     static {
 
-//        policies.put(
-//                "BAU_noentry",
-//                removeEntry
-//        );
-//
+        policies.put(
+                "BAU_noentry",
+                removeEntry
+        );
+
 //        policies.put(
 //                "BAU_entry",
 //                new Consumer<Scenario>() {
@@ -135,19 +135,19 @@ public class Slice2019Sensitivity {
                 "100_days",
                 buildMaxDaysRegulation(allTags, 100).andThen(removeEntry)
         );
-//        policies.put(
-//                "100_days_10+",
-//                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
-//        );
+        policies.put(
+                "100_days_10+",
+                buildMaxDaysRegulation(tenPlusTags, 100).andThen(removeEntry)
+        );
 
     }
 
 
-    private static int FIRST_SCENARIO_TO_RUN = 751;
+    private static int FIRST_SCENARIO_TO_RUN = 1700;
 
     public static void main(String[] args) throws IOException {
 
-        int numberOfRuns = 250;
+        int numberOfRuns = 100;
 
 
         if(args.length > 0 )

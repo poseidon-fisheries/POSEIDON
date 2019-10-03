@@ -37,9 +37,11 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
     );
     private Stoppable stoppable;
     private JsonOutput jsonOutput;
+    final private String modelDescription;
 
-    JsonIndonesiaMap(String fileName) {
+    JsonIndonesiaMap(String fileName, String modelDescription) {
         this.fileName = fileName;
+        this.modelDescription = modelDescription;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
             vessels.add(new JsonVessel(fisher.getID(), typeString));
         }
         jsonOutput = new JsonOutput(
-            "lorem ipsum",
+                modelDescription,
             vessels,
             ports,
             new ArrayList<>(), // time steps

@@ -11,6 +11,8 @@ public class JsonManagerFactory implements AlgorithmFactory<JsonIndonesiaManager
 
     private int numYearsToSkip = 0;
 
+    private String modelDescription = "Lorem ipsum";
+
     public int getNumYearsToSkip() {
         return numYearsToSkip;
     }
@@ -49,8 +51,26 @@ public class JsonManagerFactory implements AlgorithmFactory<JsonIndonesiaManager
      */
     @Override
     public JsonIndonesiaManager apply(FishState fishState) {
-        return new JsonIndonesiaManager(filePrefix, numYearsToSkip, dashboardName);
+        return new JsonIndonesiaManager(filePrefix, numYearsToSkip, dashboardName, modelDescription);
 
 
+    }
+
+    /**
+     * Getter for property 'modelDescription'.
+     *
+     * @return Value for property 'modelDescription'.
+     */
+    public String getModelDescription() {
+        return modelDescription;
+    }
+
+    /**
+     * Setter for property 'modelDescription'.
+     *
+     * @param modelDescription Value to set for property 'modelDescription'.
+     */
+    public void setModelDescription(String modelDescription) {
+        this.modelDescription = modelDescription;
     }
 }

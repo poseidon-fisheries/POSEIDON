@@ -30,17 +30,21 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
      */
     final private String filePrefix;
 
-    public JsonIndonesiaManager(String filePrefix, int numYearsToSkip, String simulationTitle) {
+    private final String modelDescription;
+
+    public JsonIndonesiaManager(
+            String filePrefix, int numYearsToSkip, String simulationTitle, String modelDescription) {
         this.filePrefix = filePrefix;
         this.numYearsToSkip = numYearsToSkip;
         this.simulationTitle = simulationTitle;
+        this.modelDescription = modelDescription;
     }
 
 
     @Override
     public void start(FishState model) {
         model.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> {
-            jsonIndonesiaMap = new JsonIndonesiaMap(filePrefix + "_map.json");
+            jsonIndonesiaMap = new JsonIndonesiaMap(filePrefix + "_map.json", modelDescription);
             jsonIndonesiaMap.start(model);
             jsonIndonesiaCharts = new JsonIndonesiaCharts(filePrefix, numYearsToSkip);
             jsonIndonesiaCharts.start(model);
