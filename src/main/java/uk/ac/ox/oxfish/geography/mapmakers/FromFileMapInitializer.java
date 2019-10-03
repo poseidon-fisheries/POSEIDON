@@ -120,7 +120,6 @@ public class FromFileMapInitializer implements MapInitializer {
                             altitudeSample.getMaxFirstCoordinate() + mapPaddingInDegrees,
                             altitudeSample.getMinSecondCoordinate() - mapPaddingInDegrees,
                             altitudeSample.getMaxSecondCoordinate() + mapPaddingInDegrees);
-                    System.out.println(mbr);
                     //find ratio height to width
                     double heightToWidth = mbr.getHeight()/mbr.getWidth();
                     int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);
