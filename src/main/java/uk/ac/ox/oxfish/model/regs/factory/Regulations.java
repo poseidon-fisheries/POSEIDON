@@ -67,6 +67,7 @@ public class Regulations {
         NAMES.put(PortBasedWaitTimesFactory.class, "Port Based Wait Times");
         NAMES.put(MaxHoursOutFactory.class, "Max Hours Out");
         NAMES.put(TriggerRegulationFactory.class, "Trigger Regulation");
+        NAMES.put(OffSwitchFactory.class, "Off Switch Decorator");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

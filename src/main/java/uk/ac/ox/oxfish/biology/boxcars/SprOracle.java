@@ -64,11 +64,11 @@ public class SprOracle implements AdditionalStartable {
     @Override
     public void start(FishState model) {
         model.scheduleOnceInXDays(
-            (Steppable) simState -> updateSPR(model), StepOrder.DAWN, dayOfMeasurement
+            (Steppable) simState -> updateSPR(model), StepOrder.POLICY_UPDATE, dayOfMeasurement
         );
         model.scheduleEveryYear(
             (Steppable) simState -> model.scheduleOnceInXDays(
-                (Steppable) simState1 -> updateSPR(model), StepOrder.DAWN, dayOfMeasurement
+                (Steppable) simState1 -> updateSPR(model), StepOrder.POLICY_UPDATE, dayOfMeasurement
             ),
             StepOrder.DAWN
         );
@@ -80,6 +80,7 @@ public class SprOracle implements AdditionalStartable {
     }
 
     private void updateSPR(FishState model) {
+      //  System.out.println("Observed SPR");
         double spawningBiomass = 0;
         for (int i = 0; i < species.getNumberOfBins(); i++) {
             spawningSubdivision = 0;

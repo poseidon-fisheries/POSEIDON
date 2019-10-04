@@ -11,6 +11,8 @@ import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactor
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
+import uk.ac.ox.oxfish.model.regs.OnOffSwitchRegulator;
+import uk.ac.ox.oxfish.model.regs.factory.OnOffSwitchAllocatorFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Constructors;
 
@@ -38,6 +40,8 @@ public class AdditionalStartables {
         NAMES.put(BiomassDepletionGathererFactory.class, "Biomass Depletion Data Collectors");
         NAMES.put(TowLongLoggerFactory.class, "Tow Long Logger");
         NAMES.put(JsonManagerFactory.class, "Json Manager");
+        NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
+
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 

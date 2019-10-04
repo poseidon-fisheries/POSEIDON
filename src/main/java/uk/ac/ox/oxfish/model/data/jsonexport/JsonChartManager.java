@@ -37,7 +37,7 @@ public class JsonChartManager implements OutputPlugin {
 
     @Override
     public void reactToEndOfSimulation(FishState state) {
-        final List<Double> xData = range(numYearsToSkip, state.getYear()).mapToObj(i -> (double) i).collect(toList());
+        final List<Double> xData = range(1+numYearsToSkip, 1+state.getYear()).mapToObj(i -> (double) i).collect(toList());
         jsonChart = new JsonChart(state, columnNames, title, xLabel, yLabel, xData, yLines);
         for (JsonSeries series : jsonChart.getSeries()) {
             series.setName(renamedColumns.getOrDefault(series.getName(), series.getName()));

@@ -68,7 +68,7 @@ public class Slice2019Visuals {
                                         setInertia(new FixedDoubleParameter(100));
                         }
                     }
-                }, "Business as usual but boats aren't allowed to quit the fishery"
+                }, "Business as usual but boats aren't allowed to quit the fishery. This results in a protracted period of low depletion for all species but aereolatus."
 
 
         );
@@ -300,6 +300,7 @@ public class Slice2019Visuals {
         while (model.getYear() < yearsToRun)
             model.schedule.step(model);
 
+        model.schedule.step(model);
 
         FishStateUtilities.writeAdditionalOutputsToFolder(outputDirectory,
                                                           model);

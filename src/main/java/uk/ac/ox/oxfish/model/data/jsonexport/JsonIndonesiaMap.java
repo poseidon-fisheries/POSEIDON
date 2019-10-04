@@ -92,7 +92,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
         final ArrayList<JsonPort> ports = new ArrayList<>();
         for (Port port : model.getPorts()) {
             final Coordinate coordinates = model.getMap().getCoordinates(port.getLocation());
-            ports.add(new JsonPort(coordinates.x, coordinates.y));
+            ports.add(new JsonPort(port.getName(), coordinates.x, coordinates.y));
         }
         final ArrayList<JsonVessel> vessels = new ArrayList<>();
         for (Fisher fisher : model.getFishers()) {

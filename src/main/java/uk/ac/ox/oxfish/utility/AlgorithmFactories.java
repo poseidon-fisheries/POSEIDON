@@ -74,7 +74,9 @@ import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMakers;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
 import uk.ac.ox.oxfish.model.plugins.AdditionalStartables;
+import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.PermitAllocationPolicies;
 import uk.ac.ox.oxfish.model.regs.factory.Regulations;
 import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
@@ -180,6 +182,8 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
         NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
+        CONSTRUCTOR_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.CONSTRUCTORS);
+        NAMES_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.NAMES);
     }
 
 

@@ -92,6 +92,8 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
+                        System.out.println("Resetted biomass at day " + model.getDay());
+
                         for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
                                 resetter : resetters.entrySet()) {
                             resetter.getValue().takeSnapshort(
@@ -108,6 +110,29 @@ public class SnapshotBiologyResetter implements AdditionalStartable {
                 StepOrder.AFTER_DATA,
                 yearsBeforeReset
         );
+
+//        //reset it twice: you want to make sure it gets captured by data
+//        model.scheduleOnceInXDays(
+//                new Steppable() {
+//                    @Override
+//                    public void step(SimState simState) {
+//                        System.out.println("Resetted biomass at day " + model.getDay());
+//                        for (Map.Entry<BiologyResetter, SnapshotBiomassAllocator>
+//                                resetter : resetters.entrySet()) {
+//                            resetter.getValue().takeSnapshort(
+//                                    model.getMap(),
+//                                    resetter.getKey().getSpecies());
+//                            resetter.getKey().resetAbundance(model.getMap(),model.getRandom());
+//
+//
+//                        }
+//
+//
+//                    }
+//                },
+//                StepOrder.DAWN,
+//                yearsBeforeReset*365
+//        );
     }
 
 

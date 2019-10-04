@@ -46,7 +46,7 @@ public class JsonIndonesiaManager implements AdditionalStartable, OutputPlugin {
         model.scheduleOnceAtTheBeginningOfYear((Steppable) simState -> {
             jsonIndonesiaMap = new JsonIndonesiaMap(filePrefix + "_map.json", modelDescription);
             jsonIndonesiaMap.start(model);
-            jsonIndonesiaCharts = new JsonIndonesiaCharts(filePrefix, numYearsToSkip);
+            jsonIndonesiaCharts = new JsonIndonesiaCharts(filePrefix, numYearsToSkip-1);
             jsonIndonesiaCharts.start(model);
             jsonRegionsManager = new JsonRegionsManager(filePrefix + "_regions.json");
             jsonRegionsManager.start(model);

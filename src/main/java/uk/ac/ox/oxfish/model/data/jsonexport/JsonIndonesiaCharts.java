@@ -64,10 +64,10 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
     JsonChartManager biomassPerSpecies() {
 
         ImmutableList<String> columnsToPrint = ImmutableList.of(
-            "Biomass Epinephelus areolatus",
-            "Biomass Pristipomoides multidens",
-            "Biomass Lutjanus malabaricus",
-            "Biomass Lutjanus erythropterus"
+                "Biomass Lutjanus malabaricus",
+                "Biomass Epinephelus areolatus",
+                "Biomass Lutjanus erythropterus",
+                "Biomass Pristipomoides multidens"
         );
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name.replaceAll("Biomass ", "")
@@ -83,10 +83,11 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
     JsonChartManager depletionPerSpecies() {
 
         ImmutableList<String> columnsToPrint = ImmutableList.of(
+                "SPR Oracle - Lutjanus malabaricus",
             "SPR Oracle - Epinephelus areolatus",
-            "SPR Oracle - Pristipomoides multidens",
-            "SPR Oracle - Lutjanus malabaricus",
-            "SPR Oracle - Lutjanus erythropterus"
+                "SPR Oracle - Lutjanus erythropterus",
+
+                "SPR Oracle - Pristipomoides multidens"
         );
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name.replaceAll("SPR Oracle - ", "")
@@ -103,9 +104,10 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
 
         List<String> columnsToPrint = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
-            columnsToPrint.add(speciesName + " Landings of population" + i);
-        }
+        columnsToPrint.add(speciesName + " Landings of population" + 0);
+        columnsToPrint.add(speciesName + " Landings of population" + 3);
+        columnsToPrint.add(speciesName + " Landings of population" + 1);
+        columnsToPrint.add(speciesName + " Landings of population" + 2);
 
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name
@@ -126,10 +128,11 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
     JsonChartManager activeFishersPerPopulation() {
 
         List<String> columnsToPrint = new ArrayList<>();
+        columnsToPrint.add("Number Of Active Fishers of population" + 0);
+        columnsToPrint.add("Number Of Active Fishers of population" + 3);
+        columnsToPrint.add("Number Of Active Fishers of population" + 1);
+        columnsToPrint.add("Number Of Active Fishers of population" + 2);
 
-        for (int i = 0; i < 4; i++) {
-            columnsToPrint.add("Number Of Active Fishers of population" + i);
-        }
 
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name
@@ -149,17 +152,20 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
     JsonChartManager percentageMatureCatches() {
 
         ImmutableList<String> columnsToPrint = ImmutableList.of(
-            "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
-            "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
-            "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
-            "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus"
-        );
+                "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
+
+                "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
+            "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus",
+                "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens"
+
+                );
 
         final ImmutableMap<String, String> renamedColumns = ImmutableMap.of(
-            "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus", "Epinephelus areolatus",
-            "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens", "Pristipomoides multidens",
-            "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus", "Lutjanus malabaricus",
-            "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus", "Lutjanus erythropterus"
+                "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus", "Lutjanus malabaricus",
+                "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus", "Epinephelus areolatus",
+                "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus", "Lutjanus erythropterus",
+
+                "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens", "Pristipomoides multidens"
         );
 
         return new JsonChartManager(
