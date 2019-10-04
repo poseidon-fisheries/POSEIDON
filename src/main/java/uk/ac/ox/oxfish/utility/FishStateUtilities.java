@@ -64,6 +64,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1286,7 +1287,14 @@ public class FishStateUtilities {
         return Math.abs(error);
     }
 
-
+    /**
+     * same as java.util.stream.Collectors::throwingMerger (which is annoyingly private)
+     * Useful for collecting a stream to a non-java.util.HashMap Map implementation.
+     * I think Java 9 has a toMap method that doesn't require this and that we could use once we upgrade.
+     */
+    public static <T> BinaryOperator<T> throwingMerger() {
+        return (u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
+    }
 
 }
 

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.ports;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,41 +32,21 @@ import java.util.function.Supplier;
  */
 public class PortInitializers {
 
-    /* the list of all registered CONSTRUCTORS
+    /**
+     * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends PortInitializer>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends PortInitializer>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
-
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        CONSTRUCTORS.put("Random Ports",
-                         RandomPortFactory::new);
-        NAMES.put(RandomPortFactory.class,"Random Ports");
-
-        CONSTRUCTORS.put("One Port",
-                         OnePortFactory::new);
-        NAMES.put(OnePortFactory.class,"One Port");
-
-        CONSTRUCTORS.put("Two Ports",
-                         TwoPortsFactory::new);
-        NAMES.put(TwoPortsFactory.class,"Two Ports");
-
-
-
-        CONSTRUCTORS.put("List of Ports",
-                         PortListFactory::new);
-        NAMES.put(PortListFactory.class,"List of Ports");
-
-
-
-
+        NAMES.put(RandomPortFactory.class, "Random Ports");
+        NAMES.put(OnePortFactory.class, "One Port");
+        NAMES.put(TwoPortsFactory.class, "Two Ports");
+        NAMES.put(PortListFactory.class, "List of Ports");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
-
-
-
 }

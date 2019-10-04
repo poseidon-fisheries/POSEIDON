@@ -61,6 +61,8 @@ public class FromFileMapInitializer implements MapInitializer {
     final private int gridWidthInCells;
 
 
+    private final double mapPaddingInDegrees;
+
     final private boolean header;
 
     /**
@@ -69,9 +71,12 @@ public class FromFileMapInitializer implements MapInitializer {
     final private boolean latLong;
 
 
-    public FromFileMapInitializer(Path filePath, int gridWidthInCells, boolean header, boolean latLong) {
+    public FromFileMapInitializer(
+        Path filePath, int gridWidthInCells, double mapPaddingInDegrees, boolean header, boolean latLong
+    ) {
         this.filePath = filePath;
         this.gridWidthInCells = gridWidthInCells;
+        this.mapPaddingInDegrees = mapPaddingInDegrees;
         this.header = header;
         this.latLong = latLong;
     }
@@ -111,10 +116,10 @@ public class FromFileMapInitializer implements MapInitializer {
                     //create the mbr from max-min stuff
                     Envelope mbr = new Envelope(
                             //the additional epsilon is there to prevent the very edge observations from falling out
-                            altitudeSample.getMinFirstCoordinate() - 0.000001,
-                            altitudeSample.getMaxFirstCoordinate() + 0.000001,
-                            altitudeSample.getMinSecondCoordinate()- 0.000001,
-                            altitudeSample.getMaxSecondCoordinate() + 0.000001);
+                            altitudeSample.getMinFirstCoordinate() - mapPaddingInDegrees,
+                            altitudeSample.getMaxFirstCoordinate() + mapPaddingInDegrees,
+                            altitudeSample.getMinSecondCoordinate() - mapPaddingInDegrees,
+                            altitudeSample.getMaxSecondCoordinate() + mapPaddingInDegrees);
                     //find ratio height to width
                     double heightToWidth = mbr.getHeight()/mbr.getWidth();
                     int gridHeightInCells = (int) Math.round(gridWidthInCells * heightToWidth);

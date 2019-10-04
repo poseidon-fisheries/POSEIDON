@@ -12,14 +12,16 @@ import sim.field.grid.Grid2D;
 import sim.util.Bag;
 import sim.util.Double2D;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Predicates.not;
-import static java.util.stream.Collectors.toCollection;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.toList;
 
 public class MasonUtils {
 
@@ -31,35 +33,45 @@ public class MasonUtils {
             .orElse(Stream.empty());
     }
 
-    @SuppressWarnings("unchecked")
     @NotNull
-    public static <T> Optional<T> oneOf(Bag bag, MersenneTwisterFast random) {
-        //noinspection ConstantConditions,Guava
-        return Optional.ofNullable(bag)
-            .filter(not(Bag::isEmpty))
-            .map(b -> (T) b.get(random.nextInt(b.size())));
+    public static Object oneOf(Bag candidates, MersenneTwisterFast random) {
+        validateCandidates(candidates);
+        return candidates.get(oneOfIndices(candidates, random));
     }
 
     @NotNull
-    public static <T> Optional<T> oneOf(Stream<T> stream, MersenneTwisterFast random) {
-        final ArrayList<T> list = stream.collect(toCollection(ArrayList::new));
-        return oneOf(list, random);
+    public static <T> T oneOf(List<T> candidates, MersenneTwisterFast random) {
+        return candidates.get(oneOfIndices(candidates, random));
     }
 
     @NotNull
-    public static <T> Optional<T> oneOf(List<T> list, MersenneTwisterFast random) {
-        //noinspection ConstantConditions,Guava
-        return Optional.ofNullable(list)
-            .filter(not(List::isEmpty))
-            .map(l -> l.get(random.nextInt(l.size())));
+    public static <T> T oneOf(ListOrderedSet<T> candidates, MersenneTwisterFast random) {
+        return candidates.get(oneOfIndices(candidates, random));
+    }
+
+    public static int oneOfIndices(Collection candidates, MersenneTwisterFast random) {
+        validateCandidates(candidates);
+        final int n = candidates.size();
+        return n == 1 ? 0 : random.nextInt(n);
     }
 
     @NotNull
-    public static <T> Optional<T> oneOf(ListOrderedSet<T> set, MersenneTwisterFast random) {
-        //noinspection ConstantConditions,Guava
-        return Optional.ofNullable(set)
-            .filter(not(ListOrderedSet::isEmpty))
-            .map(l -> l.get(random.nextInt(l.size())));
+    public static <T> T weightedOneOf(
+        List<T> candidates,
+        Function<T, Double> weightFunction,
+        MersenneTwisterFast random
+    ) {
+        validateCandidates(candidates);
+        if (candidates.size() == 1) return candidates.get(0);
+
+        final List<Double> weights = candidates.stream().map(weightFunction).collect(toList());
+        checkArgument(weights.stream().allMatch(w -> w >= 0));
+        final Double sum = weights.stream().reduce(0.0, Double::sum);
+        if (sum == 0) return oneOf(candidates, random);
+
+        final List<Double> probabilities = weights.stream().map(x -> x / sum).collect(toList());
+        final AliasMethod aliasMethod = new AliasMethod(probabilities, random);
+        return candidates.get(aliasMethod.next());
     }
 
     /**
@@ -89,6 +101,11 @@ public class MasonUtils {
 
     public static boolean inBounds(Double2D location, GeomField geomField) {
         return inBounds(location, geomField.getWidth(), geomField.getHeight());
+    }
+
+    private static <E> void validateCandidates(Collection<E> candidates) {
+        checkNotNull(candidates, "collection of candidates must not be null");
+        checkArgument(!candidates.isEmpty(), "collection of must not be empty");
     }
 
 }

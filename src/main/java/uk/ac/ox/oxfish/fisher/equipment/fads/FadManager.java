@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
@@ -40,14 +41,15 @@ public class FadManager {
 
     public FadMap getFadMap() { return fadMap; }
 
-    public boolean anyFadsHere() { return !getFadsHere().isEmpty(); }
-
-    private Bag getFadsHere() {
+    Bag getFadsHere() {
         checkNotNull(fisher);
         return fadMap.fadsAt(fisher.getLocation());
     }
 
-    Optional<Fad> oneOfFadsHere() { return oneOf(getFadsHere(), fisher.grabRandomizer()); }
+    Optional<Fad> oneOfFadsHere() {
+        final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
+        return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();
+    }
 
     public int getNumFadsInStock() { return numFadsInStock; }
 
@@ -57,10 +59,20 @@ public class FadManager {
     }
 
     /**
-     *  Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
+     * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
      */
     public Fad deployFad(SeaTile seaTile) {
         return deployFad(new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
+    }
+
+    /**
+     * Deploys a FAD at a random position in the given sea tile
+     */
+    public void deployFad(SeaTile seaTile, MersenneTwisterFast random) {
+        deployFad(new Double2D(
+            seaTile.getGridX() + random.nextDouble(),
+            seaTile.getGridY() + random.nextDouble()
+        ));
     }
 
     private Fad deployFad(Double2D location) {
@@ -76,5 +88,7 @@ public class FadManager {
         fadMap.remove(fad);
         numFadsInStock++;
     }
+
+    public Optional<SeaTile> getFadTile(Fad fad) { return getFadMap().getFadTile(fad); }
 
 }

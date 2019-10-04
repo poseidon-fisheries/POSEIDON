@@ -21,8 +21,8 @@
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
-import uk.ac.ox.oxfish.biology.complicated.PremadeInitialAbundance;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,30 +36,19 @@ public class InitialAbundances {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends InitialAbundance>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends InitialAbundance>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-    static{
-        CONSTRUCTORS.put("Abundance From File",
-                         InitialAbundanceFromFileFactory::new);
-        NAMES.put(InitialAbundanceFromFileFactory.class,"Abundance From File");
-
-        CONSTRUCTORS.put("Abundance From String",
-                         InitialAbundanceFromStringFactory::new);
-        NAMES.put(InitialAbundanceFromStringFactory.class,"Abundance From String");
-
-        CONSTRUCTORS.put("Abundance From List",
-                         InitialAbundanceFromListFactory::new);
-        NAMES.put(InitialAbundanceFromListFactory.class,"Abundance From List");
-
-        CONSTRUCTORS.put("Abundance in one bin",
-                         OneBinAbundanceFactory::new);
-        NAMES.put(OneBinAbundanceFactory.class,"Abundance in one bin");
+    static {
+        NAMES.put(InitialAbundanceFromFileFactory.class, "Abundance From File");
+        NAMES.put(InitialAbundanceFromStringFactory.class, "Abundance From String");
+        NAMES.put(InitialAbundanceFromListFactory.class, "Abundance From List");
+        NAMES.put(OneBinAbundanceFactory.class, "Abundance in one bin");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
 }

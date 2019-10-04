@@ -5,7 +5,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
-import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
+import uk.ac.ox.oxfish.fisher.strategies.destination.PlanBasedFadDestinationStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
@@ -13,12 +13,12 @@ import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 public class FollowPlanFadFishingStrategy implements FishingStrategy {
 
-    private FadDestinationStrategy fadDestinationStrategy(Fisher fisher) {
-        if (fisher.getDestinationStrategy() instanceof FadDestinationStrategy)
-            return (FadDestinationStrategy) (fisher.getDestinationStrategy());
+    private PlanBasedFadDestinationStrategy fadDestinationStrategy(Fisher fisher) {
+        if (fisher.getDestinationStrategy() instanceof PlanBasedFadDestinationStrategy)
+            return (PlanBasedFadDestinationStrategy) (fisher.getDestinationStrategy());
         else throw new IllegalStateException(
             "The FollowPlanFadFishingStrategy can only be "
-                + "used with a FadDestinationStrategy.");
+                + "used with a PlanBasedFadDestinationStrategy.");
     }
 
     @Override public boolean shouldFish(

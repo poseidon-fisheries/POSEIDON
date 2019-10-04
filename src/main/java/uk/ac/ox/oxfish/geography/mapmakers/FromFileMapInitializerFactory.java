@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.mapmakers;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -39,6 +40,9 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
 
     private DoubleParameter gridWidthInCell = new FixedDoubleParameter(100);
 
+    public static double DEFAULT_MAP_PADDING_IN_DEGREES = 0.000001;
+    private DoubleParameter mapPaddingInDegrees = new FixedDoubleParameter(DEFAULT_MAP_PADDING_IN_DEGREES);
+
     private boolean header = true;
 
     private boolean latLong = true;
@@ -46,9 +50,10 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
     public FromFileMapInitializerFactory() {
     }
 
-    public FromFileMapInitializerFactory(final Path mapFile, final double gridWidthInCells) {
+    public FromFileMapInitializerFactory(final Path mapFile, final double gridWidthInCells, final double mapPaddingInDegrees) {
         this.mapFile = mapFile;
         this.gridWidthInCell = new FixedDoubleParameter(gridWidthInCells);
+        this.mapPaddingInDegrees = new FixedDoubleParameter(mapPaddingInDegrees);
     }
 
 
@@ -60,8 +65,14 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      */
     @Override
     public FromFileMapInitializer apply(FishState state) {
-        return new FromFileMapInitializer(mapFile,
-                                          gridWidthInCell.apply(state.getRandom()).intValue(), header, latLong);
+        final MersenneTwisterFast rng = state.getRandom();
+        return new FromFileMapInitializer(
+            mapFile,
+            gridWidthInCell.apply(rng).intValue(),
+            mapPaddingInDegrees.apply(rng),
+            header,
+            latLong
+        );
     }
 
     /**
@@ -98,6 +109,12 @@ public class FromFileMapInitializerFactory implements AlgorithmFactory<FromFileM
      */
     public void setGridWidthInCell(DoubleParameter gridWidthInCell) {
         this.gridWidthInCell = gridWidthInCell;
+    }
+
+    public DoubleParameter getMapPaddingInDegrees() { return mapPaddingInDegrees; }
+
+    public void setMapPaddingInDegrees(DoubleParameter mapPaddingInDegrees) {
+        this.mapPaddingInDegrees = mapPaddingInDegrees;
     }
 
     /**

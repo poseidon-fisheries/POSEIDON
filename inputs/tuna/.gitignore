@@ -3,3 +3,7 @@ simulated_fad_trajectories*.csv
 fad_trajectories_validation_cases.csv
 currents_hycom_*.csv
 currents_seapodym_*.csv
+deployment_values.csv
+boat_port_frequencies.csv
+boats.csv
+costs.csv

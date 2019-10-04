@@ -1,60 +1,57 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Queue;
-import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
-import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
-import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
-import uk.ac.ox.oxfish.geography.NauticalMap;
+import uk.ac.ox.oxfish.fisher.actions.Moving;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-public abstract class FadDestinationStrategy implements DestinationStrategy, FadManagerUtils {
+public class FadDestinationStrategy implements DestinationStrategy {
 
-    final Queue<FadAction> actionQueue = new LinkedList<>();
-    final NauticalMap map;
+    private FadDeploymentDestinationStrategy fadDeploymentDestinationStrategy;
+    private FadSettingDestinationStrategy fadSettingDestinationStrategy;
 
-    FadDestinationStrategy(NauticalMap map) { this.map = map; }
-
-    /**
-     * Returns the next reachable destination tile from the action queue, removing actions without a
-     * valid destination. When the action queue is empty, the fisher goes back to port.
-     */
-    private SeaTile destinationTile(Fisher fisher) {
-        return actionQueue.isEmpty() ?
-            fisher.getHomePort().getLocation() : // go back to port if nothing planned
-            actionQueue.element().getActionTile(fisher) // look for next destination otherwise
-                .orElseGet(() -> { // if the queued action didn't result in a valid destination...
-                    actionQueue.remove(); // ...remove it from the queue...
-                    return destinationTile(fisher); // ...and look for the next one.
-                });
-    }
-
-    abstract void makeNewPlan(Fisher fisher);
-
-    @NotNull
-    public Optional<FadAction> pollActionQueue() {
-        return Optional.ofNullable(actionQueue.poll());
-    }
-
-    public boolean isActionQueueEmpty() { return actionQueue.isEmpty(); }
-
-    @Override
-    public SeaTile chooseDestination(
-        Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction
+    public FadDestinationStrategy(
+        FadDeploymentDestinationStrategy fadDeploymentDestinationStrategy,
+        FadSettingDestinationStrategy fadSettingDestinationStrategy
     ) {
-        if (fisher.isGoingToPort() && !actionQueue.isEmpty()) actionQueue.clear();
-        if (fisher.isAtPort() && actionQueue.isEmpty()) makeNewPlan(fisher);
-        return destinationTile(fisher);
+        this.fadDeploymentDestinationStrategy = fadDeploymentDestinationStrategy;
+        this.fadSettingDestinationStrategy = fadSettingDestinationStrategy;
+    }
+
+    public FadDeploymentDestinationStrategy getFadDeploymentDestinationStrategy() {
+        return fadDeploymentDestinationStrategy;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadDeploymentDestinationStrategy(FadDeploymentDestinationStrategy fadDeploymentDestinationStrategy) {
+        this.fadDeploymentDestinationStrategy = fadDeploymentDestinationStrategy;
+    }
+
+    @SuppressWarnings("unused")
+    public FadSettingDestinationStrategy getFadSettingDestinationStrategy() {
+        return fadSettingDestinationStrategy;
+    }
+
+    @SuppressWarnings("unused")
+    public void setFadSettingDestinationStrategy(FadSettingDestinationStrategy fadSettingDestinationStrategy) {
+        this.fadSettingDestinationStrategy = fadSettingDestinationStrategy;
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) { }
+    public SeaTile chooseDestination(Fisher fisher, MersenneTwisterFast random, FishState model, Action currentAction) {
 
-    @Override
-    public void turnOff(Fisher fisher) { }
+        if (currentAction instanceof Moving) {
+            return fisher.getDestination(); // don't change destination while we're moving
+        }
+        if (fisher.isAtPort()) {
+            fadDeploymentDestinationStrategy.resetRoute();
+            fadSettingDestinationStrategy.resetRoute();
+        }
+        return fadDeploymentDestinationStrategy.nextDestination(fisher, random)
+            .orElseGet(() -> fadSettingDestinationStrategy.nextDestination(fisher, random)
+                .orElseGet(() -> fisher.getHomePort().getLocation()));
+    }
+
 }

@@ -102,12 +102,11 @@ dependencies
     testCompile "org.mockito:mockito-all:1.9.5"
 
     //guava. Useful for PreConditions and sometimes specialized collections
-    compile "com.google.guava:guava:23.0"
+    compile "com.google.guava:guava:28.1-jre"
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
     //json test
     testCompile "com.google.code.gson:gson:2.8.5"
-
 
     // Reference implementation of JSR-385 for units of measure
     compile group: 'systems.uom', name: 'systems-common', version: '1.0'

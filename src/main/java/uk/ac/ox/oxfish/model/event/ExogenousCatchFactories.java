@@ -20,10 +20,8 @@
 
 package uk.ac.ox.oxfish.model.event;
 
-import uk.ac.ox.oxfish.fisher.strategies.departing.AdaptiveProbabilityDepartingFactory;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedProbabilityDepartingFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -34,26 +32,16 @@ public class ExogenousCatchFactories {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends ExogenousCatches>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends ExogenousCatches>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-
-        CONSTRUCTORS.put("Simple Exogenous Catches",
-                         SimpleExogenousCatchesFactory::new);
-        NAMES.put(SimpleExogenousCatchesFactory.class,
-                  "Simple Exogenous Catches");
-
-        CONSTRUCTORS.put("Abundance Gear Exogenous Catches",
-                         AbundanceDrivenGearExogenousCatchesFactory::new);
-        NAMES.put(AbundanceDrivenGearExogenousCatchesFactory.class,
-                  "Abundance Gear Exogenous Catches");
-
-
+        NAMES.put(SimpleExogenousCatchesFactory.class, "Simple Exogenous Catches");
+        NAMES.put(AbundanceDrivenGearExogenousCatchesFactory.class, "Abundance Gear Exogenous Catches");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

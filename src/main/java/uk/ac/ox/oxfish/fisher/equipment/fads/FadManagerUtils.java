@@ -1,10 +1,15 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
-
-import java.util.Optional;
+import org.apache.commons.collections15.set.ListOrderedSet;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
+import uk.ac.ox.oxfish.geography.SeaTile;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
+import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 
 /**
  * This provides convenience implementations for the various classes that need to access the
@@ -21,7 +26,16 @@ public interface FadManagerUtils {
     }
 
     static Optional<Fad> oneOfDeployedFads(Fisher fisher) {
-        return oneOf(getFadManager(fisher).getDeployedFads(), fisher.grabRandomizer());
+        final ListOrderedSet<Fad> deployedFads = getFadManager(fisher).getDeployedFads();
+        return deployedFads.isEmpty() ?
+            Optional.empty() :
+            Optional.of(oneOf(deployedFads, fisher.grabRandomizer()));
+    }
+
+    static Stream<Fad> fadsHere(Fisher fisher) { return bagToStream(getFadManager(fisher).getFadsHere()); }
+
+    static Stream<Fad> fadsAt(Fisher fisher, SeaTile seaTile) {
+        return bagToStream(getFadManager(fisher).getFadMap().fadsAt(seaTile));
     }
 
 }

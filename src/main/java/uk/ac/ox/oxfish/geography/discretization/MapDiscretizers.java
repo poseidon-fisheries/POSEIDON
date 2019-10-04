@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.geography.discretization;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -31,37 +32,17 @@ import java.util.function.Supplier;
  */
 public class MapDiscretizers {
 
-
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<? extends MapDiscretizer>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends MapDiscretizer>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
-
-
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        CONSTRUCTORS.put("Squared Discretization",
-                         SquaresMapDiscretizerFactory::new
-        );
         NAMES.put(SquaresMapDiscretizerFactory.class, "Squared Discretization");
-
-
-        CONSTRUCTORS.put("Centroid File Discretization",
-                         CentroidMapFileFactory::new
-        );
         NAMES.put(CentroidMapFileFactory.class, "Centroid File Discretization");
-
-
-        CONSTRUCTORS.put("Identity Discretization",
-                         IdentityDiscretizerFactory::new
-        );
         NAMES.put(IdentityDiscretizerFactory.class, "Identity Discretization");
-
-
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
-
 }

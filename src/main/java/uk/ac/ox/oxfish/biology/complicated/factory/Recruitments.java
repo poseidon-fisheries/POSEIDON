@@ -20,9 +20,9 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
 import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,50 +33,24 @@ import java.util.function.Supplier;
  */
 public class Recruitments {
 
-
-
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends RecruitmentProcess>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends RecruitmentProcess>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-
-
-    static
-    {
-
-        CONSTRUCTORS.put("Logistic Recruitment",
-                         LogisticRecruitmentFactory::new);
-        NAMES.put(LogisticRecruitmentFactory.class,"Logistic Recruitment");
-
-        CONSTRUCTORS.put("Beverton-Holt",
-                         RecruitmentBySpawningFactory::new);
-        NAMES.put(RecruitmentBySpawningFactory.class,"Beverton-Holt");
-
-        CONSTRUCTORS.put("Beverton-Holt Knife-Edge Maturity",
-                         RecruitmentBySpawningJackKnifeMaturity::new);
-        NAMES.put(RecruitmentBySpawningJackKnifeMaturity.class,"Beverton-Holt Knife-Edge Maturity");
-
-        CONSTRUCTORS.put("Fixed Recruitment",
-                         FixedRecruitmentFactory::new);
-        NAMES.put(FixedRecruitmentFactory.class,"Fixed Recruitment");
-
-        CONSTRUCTORS.put("Linear SSB Recruitment",
-                         LinearSSBRatioSpawningFactory::new);
-        NAMES.put(LinearSSBRatioSpawningFactory.class,"Linear SSB Recruitment");
-
-        CONSTRUCTORS.put("Hockey Stick Recruitment",
-                         HockeyStickRecruitmentFactory::new);
-        NAMES.put(HockeyStickRecruitmentFactory.class,"Hockey Stick Recruitment");
-
+    static {
+        NAMES.put(LogisticRecruitmentFactory.class, "Logistic Recruitment");
+        NAMES.put(RecruitmentBySpawningFactory.class, "Beverton-Holt");
+        NAMES.put(RecruitmentBySpawningJackKnifeMaturity.class, "Beverton-Holt Knife-Edge Maturity");
+        NAMES.put(FixedRecruitmentFactory.class, "Fixed Recruitment");
+        NAMES.put(LinearSSBRatioSpawningFactory.class, "Linear SSB Recruitment");
+        NAMES.put(HockeyStickRecruitmentFactory.class, "Hockey Stick Recruitment");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
-
 
 }

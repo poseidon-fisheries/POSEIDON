@@ -27,6 +27,6 @@ public class FadInitializerTest {
 
         final Fad fad = fadInitializer.apply(fadManager);
         for (Species species : globalBiology.getSpecies())
-            assertEquals(fad.getAggregatedBiology().getBiomass(species), 0, 0);
+            assertEquals(fad.getBiology().getBiomass(species), 0, 0);
     }
 }

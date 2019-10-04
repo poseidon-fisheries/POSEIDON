@@ -34,6 +34,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class TACMonoFactory implements AlgorithmFactory<MonoQuotaRegulation>
 {
+    /**
+     * This provides a static singleton instance that will be used when building the list of constructors in the
+     * {@link uk.ac.ox.oxfish.model.regs.factory.Regulations} class, so all the TACs are forced to remain connected.
+     */
+    private static TACMonoFactory instance = new TACMonoFactory();
+    public static TACMonoFactory getInstance() { return instance; };
 
     /**
      * for each model there is only one quota object being shared

@@ -30,7 +30,7 @@ public class CurrentValidator {
     public static void main(String[] args) {
 
         NauticalMap map =
-            new FromFileMapInitializer(MAP_FILE, 120, true, true)
+            new FromFileMapInitializer(MAP_FILE, 120, 0.5, true, true)
                 .makeMap(null, null, null);
 
         final Path casesPath = INPUT_DIRECTORY.resolve("fad_trajectories_validation_cases.csv");

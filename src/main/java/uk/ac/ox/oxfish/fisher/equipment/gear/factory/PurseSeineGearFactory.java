@@ -8,7 +8,7 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
-    private int initialNumberOfFads = Integer.MAX_VALUE;
+    private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
 
     @SuppressWarnings("unused")

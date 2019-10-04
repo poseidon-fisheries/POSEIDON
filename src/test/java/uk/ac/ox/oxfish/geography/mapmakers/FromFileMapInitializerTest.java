@@ -8,12 +8,12 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory.DEFAULT_MAP_PADDING_IN_DEGREES;
 
 public class FromFileMapInitializerTest {
 
@@ -22,7 +22,7 @@ public class FromFileMapInitializerTest {
     public void readMapCorrectly() {
         Path path = Paths.get("inputs", "tests", "map.csv");
         FromFileMapInitializer initializer = new FromFileMapInitializer(
-                path,2,true,false
+                path,2, DEFAULT_MAP_PADDING_IN_DEGREES, true,false
         );
         NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
                 new GlobalBiology(mock(Species.class)),
