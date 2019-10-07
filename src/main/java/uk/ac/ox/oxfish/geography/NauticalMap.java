@@ -68,6 +68,13 @@ import java.util.WeakHashMap;
  */
 public class NauticalMap implements Startable
 {
+
+    /**
+     * when you don't want to use a real geometry you can use this singleton to just cover an mpa.
+     */
+    //todo this is a placeholder; what I need to do is to kill off the geometry altogether and embrace the grid
+    public static final MasonGeometry MPA_SINGLETON = new MasonGeometry() ;
+
     /**
      * this holds the bathymetry raster grid
      */
@@ -307,7 +314,9 @@ public class NauticalMap implements Startable
                 }
                 else
                 {
-                    seaTile.assignMpa(null);
+
+                    if(seaTile.grabMPA()!=MPA_SINGLETON)
+                        seaTile.assignMpa(null);
                     assert !seaTile.isProtected() : "This tile has no MPA but still is protected";
 
                 }

@@ -56,7 +56,7 @@ public class StartingMPA {
     public MasonGeometry buildMPA(NauticalMap map){
 
 
-        MasonGeometry geometry = new MasonGeometry();
+        MasonGeometry geometry = NauticalMap.MPA_SINGLETON;
 
         for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
             if(seaTile.getGridX()>= topLeftX &&

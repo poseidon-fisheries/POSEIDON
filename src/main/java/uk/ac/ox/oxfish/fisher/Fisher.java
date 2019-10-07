@@ -781,7 +781,7 @@ public class Fisher implements Steppable, Startable{
 
     private Pair<Catch,Catch> computeCatchesHere(SeaTile context,
                                                  LocalBiology biology,
-                                                int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
+                                                 int hoursSpentFishing, GlobalBiology modelBiology, FishState state)
     {
         //transfer fish from local to here
         Catch catchOfTheDay = equipment.getGear().fish(this,
@@ -1011,21 +1011,21 @@ public class Fisher implements Steppable, Startable{
     public List<TripRecord> getFinishedTrips() {
         return memory.getTripLogger().getFinishedTrips();
     }
-    
+
     public List<SharedTripRecord> getSharedTrips(){
-    	return memory.getSharedTrips();
+        return memory.getSharedTrips();
     }
-    
+
     public List<SharedTripRecord> getTripsSharedWith(Fisher friend){
-    	Collection<Fisher> friends = this.getDirectedFriends();
-    	if(friends.contains(friend))
-    		return memory.getTripsSharedWith(friend);
-    	else
-    		return null;
+        Collection<Fisher> friends = this.getDirectedFriends();
+        if(friends.contains(friend))
+            return memory.getTripsSharedWith(friend);
+        else
+            return null;
     }
-    
+
     public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
-    	memory.shareTrip(trip, allFriends, sharedFriends);
+        memory.shareTrip(trip, allFriends, sharedFriends);
     }
 
     public String getAction() {
@@ -1294,13 +1294,13 @@ public class Fisher implements Steppable, Startable{
     public boolean isAllowedToFishHere(SeaTile tile, FishState model) {
         return status.isAllowedToFishHere(this, tile, model);
     }
-    
+
     public boolean isBadReputationToFishHere(SeaTile tile, FishState model){
-    	return status.isBadReputationToFishHere(this, tile, model);
+        return status.isBadReputationToFishHere(this, tile, model);
     }
-    
+
     public boolean isBadByCommunityStandardsToFishHere(SeaTile tile, FishState model){
-    	return status.isBadByCommunityStandardsToFishHere(this, tile, model);
+        return status.isBadByCommunityStandardsToFishHere(this, tile, model);
     }
 
     /**
@@ -1391,7 +1391,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public double getExpectedFuelConsumption(double distanceKM){
-    	return equipment.getBoat().expectedFuelConsumption(distanceKM);
+        return equipment.getBoat().expectedFuelConsumption(distanceKM);
     }
 
 
@@ -1521,7 +1521,7 @@ public class Fisher implements Steppable, Startable{
     }
 
     public double getHoursAtSeaThisYear() {
-        return memory.getHoursAtSeaThisYear();
+        return memory.getHoursAtSeaThisYear() + getHoursAtSea();
     }
 
 

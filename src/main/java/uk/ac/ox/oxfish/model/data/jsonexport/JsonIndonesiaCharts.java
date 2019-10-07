@@ -94,7 +94,7 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
         ));
 
         return new JsonChartManager(
-            "Depletion", "Years", "Depletion (%)", ImmutableList.of(0.4),
+            "SPR", "Years", "SPR (%)", ImmutableList.of(0.4),
             name + "_" + "depletion.json", columnsToPrint, renamedColumns,
             numYearsToSkip);
 

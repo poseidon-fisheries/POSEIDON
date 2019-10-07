@@ -21,10 +21,16 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import org.jetbrains.annotations.Nullable;
+import sim.display.Console;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
+import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
+import uk.ac.ox.oxfish.model.plugins.StartingMPAFactory;
+import uk.ac.ox.oxfish.model.regs.ProtectedAreasOnly;
 import uk.ac.ox.oxfish.model.regs.factory.DepthMPAFactory;
+import uk.ac.ox.oxfish.model.regs.factory.ProtectedAreasOnlyFactory;
+import uk.ac.ox.oxfish.model.regs.mpa.StartingMPA;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -44,6 +50,38 @@ public class Slice2019Visuals {
     private static final int YEARS_TO_RUN = 11;
 
     public static void main(String[] args) throws IOException {
+
+
+
+
+        runScenario(
+                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+                "mpa_rect",
+                "Marine Protected Areas - rectangle",
+                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+                YEARS_TO_RUN,
+                1,
+                0l,
+                new Consumer<Scenario>() {
+                    @Override
+                    public void accept(Scenario scenario) {
+                        FlexibleScenario flexible = (FlexibleScenario) scenario;
+
+                        StartingMPAFactory mpa = new StartingMPAFactory();
+                        mpa.getStartingMPAs().add(new StartingMPA(74,50,24,20));
+
+                        flexible.getPlugins().add(mpa);
+                        for (FisherDefinition fisherDefinition : flexible.getFisherDefinitions()) {
+                            fisherDefinition.setRegulation(new ProtectedAreasOnlyFactory());
+                        }
+
+
+                    }
+                },
+                "An arbitrary area on the edge between 712 and 713 is closed to everyone to fish in."
+
+
+        );
 
 
         runScenario(
@@ -208,15 +246,17 @@ public class Slice2019Visuals {
         );
 
 
-                runScenario(
-                        Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
-                        "mpa75",
-                        "Marine Protected Area - >75m",
-                        Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
-                        YEARS_TO_RUN,
-                        1,
-                        0l,
-                        new Consumer<Scenario>() {
+
+
+        runScenario(
+                Paths.get(Slice2019Sweeps.DIRECTORY, "historical20_baranov_8h.yaml"),
+                "mpa75",
+                "Marine Protected Area - >75m",
+                Paths.get("docs/indonesia_hub/runs/712/slice2019/visuals/"),
+                YEARS_TO_RUN,
+                1,
+                0l,
+                new Consumer<Scenario>() {
                     @Override
                     public void accept(Scenario scenario) {
                         FlexibleScenario flexible = (FlexibleScenario) scenario;
@@ -233,7 +273,7 @@ public class Slice2019Visuals {
                 }, "All areas whose depth is above 75m are closed to fishing. This protects somewhat Pristipomoides multidens and Lutjanus erythropterus; in the short run boats fish more Lutjanus malabaricus, in the long run they quit"
 
 
-                );
+        );
 
 
         runScenario(
@@ -295,6 +335,13 @@ public class Slice2019Visuals {
 
         final FishState model = new FishState(seed);
         model.setScenario(scenario);
+
+
+//        FishGUI fishGUI = new FishGUI(model);
+//        Console c = new Console(fishGUI);
+//        c.setVisible(true);
+
+
         model.start();
 
         while (model.getYear() < yearsToRun)
