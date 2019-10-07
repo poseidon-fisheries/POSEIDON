@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.sort;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
 import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileHeight;
 import static uk.ac.ox.oxfish.model.data.jsonexport.JsonExportUtils.seaTileWidth;
@@ -102,8 +104,17 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
                 .collect(joining(", ")));
             vessels.add(new JsonVessel(fisher.getID(), typeString));
         }
+
+        final ImmutableMap<String, Integer> sortOrder = ImmutableMap.of(
+            "4-9 GT", 0,
+            "15-30 GT", 1,
+            "10-14 GT", 2,
+            ">30 GT", 3
+        );
+        sort(vessels, comparingInt(v -> sortOrder.get(v.type)));
+
         jsonOutput = new JsonOutput(
-                modelDescription,
+            modelDescription,
             vessels,
             ports,
             new ArrayList<>(), // time steps
