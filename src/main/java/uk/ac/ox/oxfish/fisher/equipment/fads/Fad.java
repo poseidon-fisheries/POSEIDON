@@ -5,9 +5,12 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.model.market.Market;
 
-import static java.lang.StrictMath.min;
+import java.util.Collection;
+
 import static java.lang.StrictMath.max;
+import static java.lang.StrictMath.min;
 
 public class Fad {
 
@@ -66,4 +69,12 @@ public class Fad {
             seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
         }
     }
+
+    public double priceOfFishHere(Collection<Market> markets) {
+        return markets.stream().mapToDouble(market ->
+            getBiology().getBiomass(market.getSpecies()) * market.getMarginalPrice()
+        ).sum();
+    }
+
+
 }
