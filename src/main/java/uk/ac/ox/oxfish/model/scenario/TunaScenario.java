@@ -281,7 +281,9 @@ public class TunaScenario implements Scenario {
                         fisherFactory.setPortSupplier(() -> portsByName.get(portName));
                         fisherFactory.setBoatSupplier(() -> new Boat(length, beam, engine, fuelTankSupplier.get()));
                         fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
-                        return fisherFactory.buildFisher(model);
+                        final Fisher fisher = fisherFactory.buildFisher(model);
+                        fisher.getTags().add(record.getString("boat_id"));
+                        return fisher;
                     }));
 
         assignDeploymentLocationValues(model.getMap(), fishersByBoatId);
