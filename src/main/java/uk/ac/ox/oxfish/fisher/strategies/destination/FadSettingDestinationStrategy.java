@@ -6,8 +6,9 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.market.Market;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Optional;
 import java.util.Set;
@@ -50,11 +51,9 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
 
     @Override
     double seaTileValue(Fisher fisher, SeaTile seaTile) {
-        // TODO: this shouldn't just be the total biomass, it should be the price for all species
-        // TODO: it shouldn't be the current FADs either, but the predicted FADs by the time we get there
-        return fadsAt(fisher, seaTile)
-            .mapToDouble(fad -> Arrays.stream(fad.getBiology().getCurrentBiomass()).sum())
-            .sum();
+        // TODO: it shouldn't be the current FADs, but the predicted FADs by the time we get there
+        final Collection<Market> markets = fisher.getHomePort().getMarketMap(fisher).getMarkets();
+        return fadsAt(fisher, seaTile).mapToDouble(fad -> fad.priceOfFishHere(markets)).sum();
     }
 
 }
