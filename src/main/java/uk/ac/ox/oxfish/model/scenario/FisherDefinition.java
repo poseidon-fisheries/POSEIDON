@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -306,17 +307,8 @@ public class FisherDefinition {
         );
 
         //add tags to fisher definition
-        final String[] tags = this.tags.split(",");
-        if(tags.length>0)
-            fisherFactory.getAdditionalSetups().add(
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                            for(String tag : tags)
-                                fisher.getTags().add(tag.trim());
-                        }
-                    }
-            );
+        final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
+        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTags().addAll(tags));
 
         //add other setups
         fisherFactory.getAdditionalSetups().addAll(additionalSetups);
