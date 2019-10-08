@@ -66,6 +66,8 @@ import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * The boat catching all that delicious fish.
  * At its core it is a discrete-state automata: the Action class represents a possible state and the fisher can go through
@@ -1034,7 +1036,7 @@ public class Fisher implements Steppable, Startable{
 
     @Override
     public String toString() {
-        return "Fisher " + fisherID +"; " + getTags().stream().reduce((s, s2) -> s+" - "+s2);
+        return "Fisher " + fisherID + "; " + getTags().stream().collect(joining(" - "));
     }
 
     /**
