@@ -1,5 +1,7 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -7,16 +9,15 @@ import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
@@ -72,29 +73,54 @@ abstract class IntermediateDestinationsStrategy {
 
     abstract Set<SeaTile> possibleDestinations(Fisher fisher);
 
-    private List<Deque<SeaTile>> possibleRoutes(Fisher fisher) {
+    private ImmutableSet<Deque<SeaTile>> possibleRoutes(Fisher fisher) {
         return possibleDestinations(fisher)
             .stream()
             .flatMap(destination -> stream(getRoute(fisher, destination)))
-            .collect(toList());
+            .collect(toImmutableSet());
     }
 
     abstract double seaTileValue(Fisher fisher, SeaTile seaTile);
 
     private void chooseNewRoute(Fisher fisher, MersenneTwisterFast random) {
-
-        final List<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher);
-        final Map<SeaTile, Double> seaTileValues = possibleRoutes.stream()
-            .flatMap(Deque::stream)
-            .distinct()
-            .collect(toMap(identity(), seaTile -> seaTileValue(fisher, seaTile)));
+        final Set<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher);
 
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
-            Function<Deque<SeaTile>, Double> destinationValue =
-                route -> route.stream().mapToDouble(seaTileValues::get).sum();
-            currentRoute = Optional.of(weightedOneOf(possibleRoutes, destinationValue, random));
+            final Map<SeaTile, Double> seaTileValues =
+                possibleRoutes.stream()
+                    .flatMap(Deque::stream)
+                    .distinct()
+                    .collect(toImmutableMap(identity(), seaTile -> seaTileValue(fisher, seaTile)));
+
+            final Map<Deque<SeaTile>, Double> routeValues =
+                possibleRoutes.stream().collect(toImmutableMap(
+                    identity(),
+                    route -> routeValue(route, seaTileValues::get, fisher)
+                ));
+
+            final ImmutableMap<Deque<SeaTile>, Double> positiveRoutes =
+                routeValues.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= 0)
+                    .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            final ImmutableMap<Deque<SeaTile>, Double> candidateRoutes =
+                positiveRoutes.isEmpty() ?
+                    routeValues.entrySet().stream().collect(toImmutableMap(Map.Entry::getKey, e -> 1.0 / -e.getValue())) :
+                    positiveRoutes;
+
+            currentRoute = Optional.of(weightedOneOf(candidateRoutes.keySet().asList(), candidateRoutes::get, random));
         }
+    }
+
+    private double routeValue(Deque<SeaTile> route, ToDoubleFunction<SeaTile> seaTileValue, Fisher fisher) {
+        final double distanceInKm = map.getDistance().distanceAlongPath(route, map);
+        final double travelTimeInHours = fisher.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distanceInKm);
+        final double tripRevenues = route.stream().mapToDouble(seaTileValue).sum();
+        final double tripCost = fisher.getAdditionalTripCosts().stream()
+            .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, travelTimeInHours))
+            .sum();
+        return tripRevenues - tripCost;
     }
 }
