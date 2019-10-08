@@ -210,7 +210,7 @@ public class TunaScenario implements Scenario {
             )
             .collect(toMap(
                 r -> r.getString("species_code"),
-                r -> r.getDouble("price_per_tonne")
+                r -> r.getDouble("price_per_tonne") / 1000.0 // convert to price / kg
             ));
         final MarketMap marketMap = new MarketMap(globalBiology);
         globalBiology.getSpecies().forEach(species -> {
