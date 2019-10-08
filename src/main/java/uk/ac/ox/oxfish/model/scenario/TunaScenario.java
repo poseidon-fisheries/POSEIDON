@@ -312,7 +312,10 @@ public class TunaScenario implements Scenario {
                     nauticalMap.getSeaTile(new Coordinate(record.getDouble("lon"), record.getDouble("lat"))),
                     record.getDouble("value")
                 ))
-                .filter(triple -> triple.getMiddle() != null) // make sure the entry falls on a sea tile
+                .filter(triple -> {
+                    final SeaTile seaTile = triple.getMiddle();
+                    return seaTile != null && seaTile.isWater();
+                })
                 .collect(groupingBy(Triple::getLeft, toMap(Triple::getMiddle, Triple::getRight)));
 
         final Map<SeaTile, Double> defaultDeploymentValues =
