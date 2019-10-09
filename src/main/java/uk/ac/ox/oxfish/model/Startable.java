@@ -24,8 +24,8 @@ package uk.ac.ox.oxfish.model;
  * Anything that needs to be started
  * Created by carrknight on 5/5/15.
  */
+@FunctionalInterface
 public interface Startable {
-
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -37,5 +37,5 @@ public interface Startable {
     /**
      * tell the startable to turnoff,
      */
-    void turnOff();
+    default void turnOff() {}
 }
