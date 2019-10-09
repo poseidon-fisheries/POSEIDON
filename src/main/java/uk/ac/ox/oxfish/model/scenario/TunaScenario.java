@@ -85,7 +85,7 @@ public class TunaScenario implements Scenario {
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = input("depth.csv");
     public static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
-    private static final Path IATTC_SHAPE_FILE = input("shape").resolve("RFB_IATTC.shp");
+    private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
     private static final Path PORTS_FILE = input("ports.csv");
     private static final Path PRICES_FILE = input("prices.csv");
     private static final Path COSTS_FILE = input("costs.csv");
