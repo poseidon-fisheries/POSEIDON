@@ -62,6 +62,7 @@ public class Regulations {
         NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
         NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
         NAMES.put(TemporaryProtectedAreasFactory.class, "Temporary MPA");
+        NAMES.put(TemporaryRegulationFactory.class, "Temporary Regulation");
         NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");
         NAMES.put(WeakMultiTACStringFactory.class, "Weak Multi-TAC by List");
         NAMES.put(PortBasedWaitTimesFactory.class, "Port Based Wait Times");
