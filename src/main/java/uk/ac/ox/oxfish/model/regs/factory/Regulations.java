@@ -45,6 +45,8 @@ public class Regulations {
         NAMES.put(AnarchyFactory.class, "Anarchy");
         NAMES.put(FishingSeasonFactory.class, "Fishing Season");
         NAMES.put(ProtectedAreasOnlyFactory.class, "MPA Only");
+        NAMES.put(SpecificProtectedAreaFromShapeFileFactory.class, "Specific MPA from Shape File");
+        NAMES.put(SpecificProtectedAreaFromCoordinatesFactory.class, "Specific MPA from Coordinates");
         NAMES.put(ProtectedAreaChromosomeFactory.class, "MPA Chromosome");
         NAMES.put(FinedProtectedAreasFactory.class, "MPA with fine");
         NAMES.put(DepthMPAFactory.class, "MPA by depth");
