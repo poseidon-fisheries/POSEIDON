@@ -10,9 +10,19 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class TemporaryRegulationFactory implements AlgorithmFactory<TemporaryRegulation> {
 
-    private DoubleParameter startDay = new FixedDoubleParameter(1);
-    private DoubleParameter endDay = new FixedDoubleParameter(1);
-    private AlgorithmFactory<? extends Regulation> delegate = new ProtectedAreasOnlyFactory();
+    private DoubleParameter startDay;
+    private DoubleParameter endDay;
+    private AlgorithmFactory<? extends Regulation> delegate;
+
+    public TemporaryRegulationFactory(int startDay, int endDay, AlgorithmFactory<? extends Regulation> delegate) {
+        this.startDay = new FixedDoubleParameter(startDay);
+        this.endDay = new FixedDoubleParameter(endDay);
+        this.delegate = delegate;
+    }
+
+    @SuppressWarnings("unused") public TemporaryRegulationFactory() {
+        this(1, 1, new ProtectedAreasOnlyFactory());
+    }
 
     @SuppressWarnings("unused") public DoubleParameter getStartDay() { return startDay; }
     @SuppressWarnings("unused") public void setStartDay(DoubleParameter startDay) { this.startDay = startDay; }
