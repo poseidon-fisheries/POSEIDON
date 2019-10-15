@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -47,6 +48,12 @@ import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
 import uk.ac.ox.oxfish.model.network.EmptyNetworkBuilder;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
+import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.regs.factory.MultipleRegulationsFactory;
+import uk.ac.ox.oxfish.model.regs.factory.NoFishingFactory;
+import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromCoordinatesFactory;
+import uk.ac.ox.oxfish.model.regs.factory.SpecificProtectedAreaFromShapeFileFactory;
+import uk.ac.ox.oxfish.model.regs.factory.TemporaryRegulationFactory;
 import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -58,6 +65,9 @@ import javax.measure.quantity.Speed;
 import javax.measure.quantity.Volume;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +76,10 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
+import static java.time.Month.JANUARY;
+import static java.time.Month.JULY;
+import static java.time.Month.NOVEMBER;
+import static java.time.Month.OCTOBER;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -80,12 +94,14 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
+@SuppressWarnings("UnstableApiUsage")
 public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = input("depth.csv");
-    public static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
+    private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
+    private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
     private static final Path PORTS_FILE = input("ports.csv");
     private static final Path PRICES_FILE = input("prices.csv");
     private static final Path COSTS_FILE = input("costs.csv");
@@ -104,30 +120,41 @@ public class TunaScenario implements Scenario {
     ));
     private static final Path CURRENTS_FILE = input("currents.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
+    private int targetYear = 2018;
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-    private int targetYear = 2018;
-
+    private AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
+        new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE), "all",
+        new TemporaryRegulationFactory( // El Corralito
+            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
+            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
+        ), "all",
+        new TemporaryRegulationFactory(
+            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
+            new NoFishingFactory()
+        ), "closure A",
+        new TemporaryRegulationFactory(
+            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
+            new NoFishingFactory()
+        ), "closure B"
+    ));
     TunaScenario() {
+        fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
     }
-
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
+    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
+    public AlgorithmFactory<? extends Regulation> getRegulations() { return regulations; }
+    public void setRegulations(AlgorithmFactory<? extends Regulation> regulations) { this.regulations = regulations; }
 
-    @SuppressWarnings("unused")
-    public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() {
-        return biologyInitializers;
-    }
+    @SuppressWarnings("unused") public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() { return biologyInitializers; }
 
-    @SuppressWarnings("unused")
-    public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) {
-        this.biologyInitializers = biologyInitializers;
-    }
+    @SuppressWarnings("unused") public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) { this.biologyInitializers = biologyInitializers; }
 
     @SuppressWarnings("unused")
     public Path getPortFilePath() {
@@ -283,6 +310,7 @@ public class TunaScenario implements Scenario {
                         fisherFactory.setHoldSupplier(() -> new Hold(asDouble(carryingCapacity, KILOGRAM), holdVolume, model.getBiology()));
                         final Fisher fisher = fisherFactory.buildFisher(model);
                         fisher.getTags().add(record.getString("boat_id"));
+                        fisher.getTags().add(oneOf(ImmutableList.of("closure A", "closure B"), model.getRandom()));
                         return fisher;
                     }));
 
@@ -299,7 +327,7 @@ public class TunaScenario implements Scenario {
 
         final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
 
-        return new ScenarioPopulation(fishersByBoatId.values().stream().collect(toList()), network, fisherFactories);
+        return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
     }
 
@@ -335,11 +363,8 @@ public class TunaScenario implements Scenario {
         });
     }
 
-    public int getTargetYear() {
-        return targetYear;
-    }
-
-    public void setTargetYear(int targetYear) {
+    @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }
+    @SuppressWarnings("unused") public void setTargetYear(int targetYear) {
         this.targetYear = targetYear;
     }
 
