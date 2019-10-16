@@ -92,7 +92,7 @@ public interface Market extends Startable {
         fisher.earn(revenue);
 
         //tell regulation
-        regulation.reactToSale(species, fisher , biomassActuallySellable, revenue);
+        regulation.reactToSale(species, fisher , biomassActuallySellable, revenue, state);
 
         //return biomass sellable
         return new TradeInfo(biomassActuallySellable, species, revenue);

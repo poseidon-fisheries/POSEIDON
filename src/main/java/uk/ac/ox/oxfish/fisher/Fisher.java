@@ -814,7 +814,7 @@ public class Fisher implements Steppable, Startable{
         //make local react to catches (involves killing, usually)
         removeFishAfterFishing(modelBiology, catchesAndKept.getFirst(), catchesAndKept.getSecond(), localBiology);
         //pull the fish up, store it, and burn fuel
-        recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getFirst(), catchesAndKept.getSecond());
+        recordAndHaulCatch(hoursSpentFishing, here, catchesAndKept.getFirst(), catchesAndKept.getSecond(), state);
 
 
     }
@@ -861,7 +861,7 @@ public class Fisher implements Steppable, Startable{
         }
     }
 
-    private void recordAndHaulCatch(int hoursSpentFishing, SeaTile here, Catch catchOfTheDay, Catch notDiscarded) {
+    private void recordAndHaulCatch(int hoursSpentFishing, SeaTile here, Catch catchOfTheDay, Catch notDiscarded, FishState model) {
         //learn, record and collect
         //record it
         FishingRecord record = new FishingRecord(hoursSpentFishing,
@@ -869,7 +869,7 @@ public class Fisher implements Steppable, Startable{
         memory.getTripLogger().recordFishing(record);
 
         //now let regulations and the hold deal with it
-        status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing);
+        status.getRegulation().reactToFishing(here, this, catchOfTheDay, notDiscarded , hoursSpentFishing, model);
         load(notDiscarded);
 
         //consume gas

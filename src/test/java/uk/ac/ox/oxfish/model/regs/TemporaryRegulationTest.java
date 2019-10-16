@@ -48,8 +48,7 @@ public class TemporaryRegulationTest {
         final FishState fishState = mock(FishState.class);
         temporaryRegulation.start(fishState, mock(Fisher.class));
         cases.forEach((day, expected) -> {
-            when(fishState.getDayOfTheYear()).thenReturn(day);
-            assertEquals("on day " + day, expected, temporaryRegulation.isActive());
+            assertEquals("on day " + day, expected, temporaryRegulation.isActive(day));
         });
     }
 

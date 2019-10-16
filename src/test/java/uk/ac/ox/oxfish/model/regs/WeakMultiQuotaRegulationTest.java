@@ -93,7 +93,7 @@ public class WeakMultiQuotaRegulationTest {
         assertEquals(1,regs.getQuotaRemaining(0),.0001);
         assertEquals(2,regs.getQuotaRemaining(1),.0001);
         assertEquals(Double.POSITIVE_INFINITY,regs.getQuotaRemaining(2),.0001);
-        regs.reactToSale(two,fisher,100,123141); //sell 100 of the infinite quota
+        regs.reactToSale(two, fisher, 100, 123141, model); //sell 100 of the infinite quota
 
         assertEquals(1,regs.getQuotaRemaining(0),.0001);
         assertEquals(2,regs.getQuotaRemaining(1),.0001);
@@ -124,7 +124,7 @@ public class WeakMultiQuotaRegulationTest {
         assertEquals(2,regs.maximumBiomassSellable(fisher, one, model),FishStateUtilities.EPSILON);
 
         //sell one unit of specie 1
-        regs.reactToSale(one,fisher,1,123141);
+        regs.reactToSale(one, fisher, 1, 123141, model);
 
         assertTrue(regs.allowedAtSea(fisher, model));
         assertEquals(1,regs.getQuotaRemaining(0),FishStateUtilities.EPSILON);
@@ -135,13 +135,13 @@ public class WeakMultiQuotaRegulationTest {
 
 
         //sell another, you are still allowed to fish because there is still species 1
-        regs.reactToSale(one,fisher,1+FishStateUtilities.EPSILON/2,123141);
+        regs.reactToSale(one, fisher, 1 + FishStateUtilities.EPSILON / 2, 123141, model);
 
         assertTrue(regs.allowedAtSea(fisher, model));
         assertEquals(1,regs.getQuotaRemaining(0),FishStateUtilities.EPSILON);
         assertEquals(0,regs.getQuotaRemaining(1),FishStateUtilities.EPSILON);
         //now you shouldn't be allowed anymore!
-        regs.reactToSale(zero,fisher,1+FishStateUtilities.EPSILON/2,123141);
+        regs.reactToSale(zero, fisher, 1 + FishStateUtilities.EPSILON / 2, 123141, model);
         assertFalse(regs.allowedAtSea(fisher, model));
         assertEquals(0,regs.getQuotaRemaining(0),FishStateUtilities.EPSILON);
         assertEquals(0,regs.getQuotaRemaining(1),FishStateUtilities.EPSILON);

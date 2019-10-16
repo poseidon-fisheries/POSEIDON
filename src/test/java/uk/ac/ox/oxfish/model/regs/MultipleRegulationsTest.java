@@ -162,16 +162,17 @@ public class MultipleRegulationsTest {
         SeaTile tile = mock(SeaTile.class);
         Fisher who = mock(Fisher.class);
         Catch haul = mock(Catch.class);
-        regs.reactToFishing(tile, who, haul, haul, 10);
-        verify(mpa).reactToFishing(tile, who, haul, haul, 10);
-        verify(season).reactToFishing(tile, who, haul,haul , 10);
-        verify(quota).reactToFishing(tile, who, haul, haul, 10);
+        FishState state = mock(FishState.class);
+        regs.reactToFishing(tile, who, haul, haul, 10, state);
+        verify(mpa).reactToFishing(tile, who, haul, haul, 10, state);
+        verify(season).reactToFishing(tile, who, haul,haul , 10, state);
+        verify(quota).reactToFishing(tile, who, haul, haul, 10, state);
         //react to sale
         Species species = mock(Species.class);
-        regs.reactToSale(species, who, 100d, 100d);
-        verify(mpa).reactToSale(species, who, 100d, 100d);
-        verify(season).reactToSale(species, who, 100d, 100d);
-        verify(quota).reactToSale(species, who, 100d, 100d);
+        regs.reactToSale(species, who, 100d, 100d, state);
+        verify(mpa).reactToSale(species, who, 100d, 100d, state);
+        verify(season).reactToSale(species, who, 100d, 100d, state);
+        verify(quota).reactToSale(species, who, 100d, 100d, state);
 
 
 
