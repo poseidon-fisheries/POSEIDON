@@ -45,6 +45,10 @@ public interface Regulation extends FisherStartable
      */
     boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep);
 
+    default boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+        return canFishHere(agent, tile, model, model.getStep());
+    }
+
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      * @param agent the fisher selling its catch
@@ -55,6 +59,10 @@ public interface Regulation extends FisherStartable
      */
     double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep);
 
+    default double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
+        return maximumBiomassSellable(agent, species, model, model.getStep());
+    }
+
     /**
      * Can this fisher be at sea?
      * @param fisher the  fisher
@@ -64,6 +72,10 @@ public interface Regulation extends FisherStartable
      * at sea
      */
     boolean allowedAtSea(Fisher fisher, FishState model, int timeStep);
+
+    default boolean allowedAtSea(Fisher fisher, FishState model) {
+        return allowedAtSea(fisher, model, model.getStep());
+    }
 
     /**
      * tell the regulation object this much has been caught
@@ -78,6 +90,12 @@ public interface Regulation extends FisherStartable
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
             int hoursSpentFishing, FishState model, int timeStep);
 
+    default void reactToFishing(
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model
+    ) {
+        reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, model.getStep());
+    }
+
     /**
      * tell the regulation object this much of this species has been sold
      * @param species the species of fish sold
@@ -87,6 +105,10 @@ public interface Regulation extends FisherStartable
      * @param timeStep the time step at which the sale happened should be considered
      */
     void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep);
+
+    default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model) {
+        reactToSale(species, seller, biomass, revenue, model, model.getStep());
+    }
 
     /**
      * returns a copy of the regulation, used defensively
