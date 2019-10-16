@@ -7,6 +7,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -46,7 +47,6 @@ public class TemporaryRegulationTest {
         final TemporaryRegulation temporaryRegulation =
             new TemporaryRegulation(startDay, endDay, mock(Regulation.class));
         final FishState fishState = mock(FishState.class);
-        temporaryRegulation.start(fishState, mock(Fisher.class));
         cases.forEach((day, expected) -> {
             assertEquals("on day " + day, expected, temporaryRegulation.isActive(day));
         });
@@ -59,7 +59,7 @@ public class TemporaryRegulationTest {
         final SeaTile tile = mock(SeaTile.class);
         when(tile.isProtected()).thenReturn(true);
         final FishState state = mock(FishState.class);
-        when(state.getDayOfTheYear()).thenReturn(100);
+        when(state.getDayOfTheYear(anyInt())).thenReturn(100);
         final ProtectedAreasOnly protectedAreasOnly = new ProtectedAreasOnly();
 
         ImmutableMap.of(
