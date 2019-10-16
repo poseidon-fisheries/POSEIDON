@@ -112,19 +112,6 @@ public class FinedProtectedAreas implements Regulation{
     }
 
     /**
-     * tell the regulation object this much of this species has been sold
-     *
-     * @param species the species of fish sold
-     * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     */
-    @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-
-    }
-
-    /**
      * no reaction
      *  @param where
      * @param who
@@ -160,17 +147,6 @@ public class FinedProtectedAreas implements Regulation{
     {
         Preconditions.checkArgument(!enforcements.containsKey(mpa));
         enforcements.put(mpa, new Enforcement(hourlyProbabilityOfBeingCaught,fine));
-    }
-
-
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
     }
 
     private static class Enforcement{

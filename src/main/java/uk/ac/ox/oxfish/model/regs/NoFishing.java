@@ -15,7 +15,5 @@ public class NoFishing implements Regulation {
     @Override public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) { return false; }
     @Override public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) { return 0; }
     @Override public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) { return false; }
-    @Override public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) { }
-    @Override public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) { }
     @Override public Regulation makeCopy() { return new NoFishing(); }
 }

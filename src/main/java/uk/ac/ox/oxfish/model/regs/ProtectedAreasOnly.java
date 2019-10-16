@@ -61,24 +61,6 @@ public class ProtectedAreasOnly implements Regulation {
     }
 
     /**
-     * no reaction
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-
-    }
-
-    /**
-     * no reaction
-     */
-    @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-
-    }
-
-    /**
      * returns a copy of the regulation, used defensively
      *
      * @return
@@ -88,19 +70,4 @@ public class ProtectedAreasOnly implements Regulation {
         return new ProtectedAreasOnly();
     }
 
-    /**
-     * ignored
-     */
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    /**
-     * ignored
-     */
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
 }

@@ -35,17 +35,6 @@ public class ExternalOpenCloseSeason implements Regulation{
 
     private boolean open = true;
 
-
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
-
     /**
      * can the agent fish at this location?
      *
@@ -85,35 +74,6 @@ public class ExternalOpenCloseSeason implements Regulation{
     @Override
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return open;
-    }
-
-    /**
-     * tell the regulation object this much has been caught
-     * @param where
-     * @param who
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-
-    }
-
-    /**
-     * tell the regulation object this much of this species has been sold
-     *
-     * @param species the species of fish sold
-     * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     */
-    @Override
-    public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-
     }
 
     /**

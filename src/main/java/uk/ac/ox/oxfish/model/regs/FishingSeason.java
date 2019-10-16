@@ -83,24 +83,6 @@ public class FishingSeason implements Regulation
         return seasonOpen(model, timeStep);
     }
 
-    /**
-     * nothing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-
-    }
-
-    /**
-     * nothing
-     */
-    @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-
-    }
-
     public boolean isRespectMPAs() {
         return respectMPAs;
     }
@@ -129,19 +111,4 @@ public class FishingSeason implements Regulation
         this.respectMPAs = respectMPAs;
     }
 
-    /**
-     * ignored
-     */
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    /**
-     * ignored
-     */
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
 }

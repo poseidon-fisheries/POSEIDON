@@ -90,16 +90,6 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     }
 
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
-
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      *
@@ -124,22 +114,6 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     public Regulation makeCopy() {
         return new MultiQuotaRegulation(yearlyQuota,state);
     }
-
-    /**
-     * ignored
-     * @param where
-     * @param who
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-        //ignored
-    }
-
 
     /**
      * Can this fisher be at sea?

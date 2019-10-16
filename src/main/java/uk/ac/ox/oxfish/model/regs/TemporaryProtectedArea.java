@@ -108,35 +108,6 @@ public class TemporaryProtectedArea implements Regulation
     }
 
     /**
-     * tell the regulation object this much has been caught
-     * @param where
-     * @param who
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-        //nothing
-    }
-
-    /**
-     * tell the regulation object this much of this species has been sold
-     *
-     * @param species the species of fish sold
-     * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     */
-    @Override
-    public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
-        //nothing
-    }
-
-    /**
      * returns a copy of the regulation, used defensively
      *
      * @return

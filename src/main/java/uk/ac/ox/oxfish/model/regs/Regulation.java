@@ -86,9 +86,9 @@ public interface Regulation extends FisherStartable
      * @param hoursSpentFishing how many hours were spent fishing
      * @param timeStep the time step at which the fishing happened should be considered
      */
-    void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep);
+    default void reactToFishing(
+        SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
+        int hoursSpentFishing, FishState model, int timeStep) {}
 
     default void reactToFishing(
         SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model
@@ -104,7 +104,7 @@ public interface Regulation extends FisherStartable
      * @param revenue how much money was made off it
      * @param timeStep the time step at which the sale happened should be considered
      */
-    void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep);
+    default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {}
 
     default void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model) {
         reactToSale(species, seller, biomass, revenue, model, model.getStep());

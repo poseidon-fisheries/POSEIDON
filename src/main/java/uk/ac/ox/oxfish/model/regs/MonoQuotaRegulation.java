@@ -126,15 +126,6 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     }
 
     /**
-     *  reacts only to fish sold
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing, FishState model, int timeStep) {
-    }
-
-    /**
      * tell the regulation object this much of this species has been sold
      *  @param species  the species of fish sold
      * @param seller
@@ -194,8 +185,4 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
 
     }
 
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
 }

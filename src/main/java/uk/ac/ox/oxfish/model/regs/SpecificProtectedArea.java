@@ -28,17 +28,6 @@ public class SpecificProtectedArea implements Regulation {
     public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) { return true; }
 
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) { }
-
-    @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) { }
-
-    @Override
     public Regulation makeCopy() { return new SpecificProtectedArea(masonGeometries); }
 
-    @Override
-    public void start(FishState model, Fisher fisher) { }
-
-    @Override
-    public void turnOff(Fisher fisher) { }
 }
