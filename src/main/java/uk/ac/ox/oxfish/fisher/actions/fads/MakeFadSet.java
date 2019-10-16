@@ -90,11 +90,4 @@ public class MakeFadSet implements FadAction {
             (fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model) || fisher.isCheater());
     }
 
-    private PurseSeineGear getPurseSeineGear(Fisher fisher) {
-        if (fisher.getGear() instanceof PurseSeineGear)
-            return (PurseSeineGear) fisher.getGear();
-        else throw new IllegalStateException(
-            "MakeFadSet action can only be used with PurseSeineGear.");
-    }
-
 }
