@@ -84,7 +84,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .filter(pair -> model.getRandom().nextDouble() < pair.getSecond())
             .map(pair -> new MakeFadSet(pair.getFirst()))
             .findFirst()
-            .filter(action -> action.isPossible(model, fisher));
+            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
     }
 
     private Optional<? extends FadAction> maybeDeployFad(FishState model, Fisher fisher) {
@@ -98,7 +98,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .map(value -> probability(fadsDeploymentCoefficient, value))
             .filter(p -> model.getRandom().nextDouble() < p)
             .map(__ -> new DeployFad(fisher.getLocation()))
-            .filter(action -> action.isPossible(model, fisher));
+            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
     }
 
     @Override

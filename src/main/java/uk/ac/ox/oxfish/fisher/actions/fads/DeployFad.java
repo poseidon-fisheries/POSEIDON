@@ -33,8 +33,8 @@ public class DeployFad implements FadAction {
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
         checkState(seaTile == fisher.getLocation());
-        checkState(isPossible(model, fisher));
-        getFadManager(fisher).deployFad(seaTile, model.random);
+        if (isAllowed(model, fisher) && isPossible(model, fisher))
+            getFadManager(fisher).deployFad(seaTile, model.random);
         return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
     }
 

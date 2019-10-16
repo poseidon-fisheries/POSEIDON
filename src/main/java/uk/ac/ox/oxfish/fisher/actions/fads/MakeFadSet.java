@@ -67,8 +67,7 @@ public class MakeFadSet implements FadAction {
     @Override public boolean isPossible(FishState model, Fisher fisher) {
         return
             fisher.getHold().getPercentageFilled() < 1 &&
-            isFadHere(fisher) &&
-            (fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model) || fisher.isCheater());
+                isFadHere(fisher);
     }
 
 }

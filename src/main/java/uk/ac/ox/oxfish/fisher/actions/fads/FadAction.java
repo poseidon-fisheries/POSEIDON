@@ -14,4 +14,14 @@ public interface FadAction extends Action, FadManagerUtils {
     Optional<SeaTile> getActionTile(Fisher fisher);
     Quantity<Time> getDuration();
     boolean isPossible(FishState model, Fisher fisher);
+
+    default boolean isAllowed(FishState model, Fisher fisher) {
+        return isAllowed(model, fisher, fisher.getLocation(), model.getStep());
+    }
+
+    default boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
+        // TODO: make this time dependant for temporary regulations
+        return fisher.isCheater() || fisher.getRegulation().canFishHere(fisher, actionTile, model);
+    }
+
 }

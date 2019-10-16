@@ -54,4 +54,8 @@ public class PickUpFad implements FadAction {
             .isPresent();
     }
 
+    @Override public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
+        // this might need to be confirmed, but as far as I know, you can always pick up a FAD (without setting on it)
+        return true;
+    }
 }
