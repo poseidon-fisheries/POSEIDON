@@ -53,9 +53,9 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      * given by the quota
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
-        return Math.min(quotas.maximumBiomassSellable(agent,species,model),
-                        this.fishingSeason.maximumBiomassSellable(agent,species,model));
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+        return Math.min(quotas.maximumBiomassSellable(agent,species,model, timeStep),
+                        this.fishingSeason.maximumBiomassSellable(agent,species,model, timeStep));
     }
 
     /**
@@ -63,11 +63,11 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model) {
+            Fisher agent, SeaTile tile, FishState model, int timeStep) {
         return
                 mpaRules.canFishHere(agent,tile,model) &&
-                        fishingSeason.allowedAtSea(agent,model) &&
-                        quotas.allowedAtSea(agent,model);
+                    fishingSeason.allowedAtSea(agent, model, timeStep) &&
+                    quotas.allowedAtSea(agent, model, timeStep);
 
     }
 
@@ -80,11 +80,12 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return
-                mpaRules.allowedAtSea(fisher,model) &&
-                        fishingSeason.allowedAtSea(fisher,model) &&
-                        quotas.allowedAtSea(fisher,model);    }
+            mpaRules.allowedAtSea(fisher, model, timeStep) &&
+                fishingSeason.allowedAtSea(fisher, model, timeStep) &&
+                quotas.allowedAtSea(fisher, model, timeStep);
+    }
 
     /**
      * tell the regulation object this much inPenaltyBox been caught
@@ -97,10 +98,10 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
-        mpaRules.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing);
-        fishingSeason.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing);
-        quotas.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing);
+            int hoursSpentFishing, FishState model, int timeStep) {
+        mpaRules.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
+        fishingSeason.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
+        quotas.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     /**
@@ -113,10 +114,10 @@ public class KitchenSinkRegulation implements Regulation, QuotaPerSpecieRegulati
      */
     @Override
     public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue) {
-        mpaRules.reactToSale(species,seller,biomass,revenue);
-        fishingSeason.reactToSale(species,seller,biomass,revenue);
-        quotas.reactToSale(species,seller,biomass,revenue);
+            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        mpaRules.reactToSale(species, seller, biomass, revenue, model, timeStep);
+        fishingSeason.reactToSale(species, seller, biomass, revenue, model, timeStep);
+        quotas.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**

@@ -20,8 +20,7 @@ public interface FadAction extends Action, FadManagerUtils {
     }
 
     default boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
-        // TODO: make this time dependant for temporary regulations
-        return fisher.isCheater() || fisher.getRegulation().canFishHere(fisher, actionTile, model);
+        return fisher.isCheater() || fisher.getRegulation().canFishHere(fisher, actionTile, model, actionStep);
     }
 
 }

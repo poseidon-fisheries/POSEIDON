@@ -34,7 +34,7 @@ public class Anarchy implements Regulation {
      * can always fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
         return true;
     }
 
@@ -42,7 +42,7 @@ public class Anarchy implements Regulation {
      *  return maximum double
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
         return Double.MAX_VALUE;
     }
 
@@ -50,7 +50,7 @@ public class Anarchy implements Regulation {
      * Can always leave
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return true;
     }
 
@@ -60,7 +60,7 @@ public class Anarchy implements Regulation {
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
 
     }
 
@@ -68,7 +68,7 @@ public class Anarchy implements Regulation {
      * no reaction
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
 
     }
 

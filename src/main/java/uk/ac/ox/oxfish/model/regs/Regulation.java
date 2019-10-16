@@ -35,33 +35,35 @@ import uk.ac.ox.oxfish.model.FisherStartable;
 public interface Regulation extends FisherStartable
 {
 
-
     /**
      * can the agent fish at this location?
      * @param agent the agent that wants to fish
      * @param tile the tile the fisher is trying to fish on
      * @param model a link to the model
+     * @param timeStep the time step at which the action should be considered
      * @return true if the fisher can fish
      */
-    boolean canFishHere(Fisher agent, SeaTile tile, FishState model);
-    
+    boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep);
+
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      * @param agent the fisher selling its catch
      * @param species the species we are being asked about
      * @param model a link to the model
+     * @param timeStep the time step at which the action should be considered
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
-    double maximumBiomassSellable(Fisher agent, Species species, FishState model);
+    double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep);
 
     /**
      * Can this fisher be at sea?
      * @param fisher the  fisher
      * @param model the model
+     * @param timeStep the time step at which the action should be considered
      * @return true if it can be out. When it's false the fisher can't leave port and ought to go back to port if he is
      * at sea
      */
-    boolean allowedAtSea(Fisher fisher, FishState model);
+    boolean allowedAtSea(Fisher fisher, FishState model, int timeStep);
 
     /**
      * tell the regulation object this much has been caught
@@ -70,10 +72,11 @@ public interface Regulation extends FisherStartable
      * @param fishCaught catch object
      * @param fishRetained
      * @param hoursSpentFishing how many hours were spent fishing
+     * @param timeStep the time step at which the fishing happened should be considered
      */
     void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing);
+            int hoursSpentFishing, FishState model, int timeStep);
 
     /**
      * tell the regulation object this much of this species has been sold
@@ -81,15 +84,14 @@ public interface Regulation extends FisherStartable
      * @param seller agent selling the fish
      * @param biomass how much biomass has been sold
      * @param revenue how much money was made off it
+     * @param timeStep the time step at which the sale happened should be considered
      */
-    void reactToSale(Species species, Fisher seller, double biomass, double revenue);
+    void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep);
 
     /**
      * returns a copy of the regulation, used defensively
      * @return
      */
     Regulation makeCopy();
-
-
 
 }

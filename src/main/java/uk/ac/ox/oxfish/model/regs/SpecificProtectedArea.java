@@ -19,19 +19,19 @@ public class SpecificProtectedArea implements Regulation {
     public SpecificProtectedArea(MasonGeometry masonGeometry) { this.masonGeometries = ImmutableSet.of(masonGeometry); }
 
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) { return !masonGeometries.contains(tile.grabMPA()); }
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) { return !masonGeometries.contains(tile.grabMPA()); }
 
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) { return Double.MAX_VALUE; }
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) { return Double.MAX_VALUE; }
 
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) { return true; }
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) { return true; }
 
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing) { }
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) { }
 
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) { }
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) { }
 
     @Override
     public Regulation makeCopy() { return new SpecificProtectedArea(masonGeometries); }

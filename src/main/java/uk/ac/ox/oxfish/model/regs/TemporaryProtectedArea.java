@@ -76,8 +76,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model) {
-        return getCorrectDelegate(model).canFishHere(agent, tile, model);
+            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        return getCorrectDelegate(model).canFishHere(agent, tile, model, timeStep);
     }
 
     /**
@@ -90,8 +90,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
-        return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model);
+            Fisher agent, Species species, FishState model, int timeStep) {
+        return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     /**
@@ -103,8 +103,8 @@ public class TemporaryProtectedArea implements Regulation
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
-        return getCorrectDelegate(model).allowedAtSea(fisher, model);
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+        return getCorrectDelegate(model).allowedAtSea(fisher, model, timeStep);
     }
 
     /**
@@ -118,7 +118,7 @@ public class TemporaryProtectedArea implements Regulation
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
         //nothing
     }
 
@@ -132,7 +132,7 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue) {
+            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
         //nothing
     }
 

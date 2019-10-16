@@ -94,7 +94,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model) {
+            Fisher agent, SeaTile tile, FishState model, int timeStep) {
         return isFishingStillAllowed();
     }
 
@@ -108,7 +108,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
+            Fisher agent, Species species, FishState model, int timeStep) {
         return quotaRemaining;
     }
 
@@ -121,7 +121,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return isFishingStillAllowed();
     }
 
@@ -131,7 +131,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
     }
 
     /**
@@ -142,7 +142,7 @@ public class MonoQuotaRegulation implements QuotaPerSpecieRegulation, Steppable 
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
 
         quotaRemaining -= biomass;
         Preconditions.checkState(quotaRemaining >= 0, quotaRemaining);

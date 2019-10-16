@@ -49,9 +49,9 @@ public class FishingSeason implements Regulation
     }
 
 
-    private boolean seasonOpen(FishState state)
+    private boolean seasonOpen(FishState state, int timeStep)
     {
-        return state.getDayOfTheYear() <= daysOpened;
+        return state.getDayOfTheYear(timeStep) <= daysOpened;
     }
 
     /**
@@ -63,7 +63,7 @@ public class FishingSeason implements Regulation
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
         return   (!respectMPAs || !tile.isProtected());
     }
 
@@ -71,7 +71,7 @@ public class FishingSeason implements Regulation
      * can sell anything as long as the fishing season is open
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
         return Double.MAX_VALUE;
     }
 
@@ -79,8 +79,8 @@ public class FishingSeason implements Regulation
      * they can as long as the fishing season is open
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
-        return seasonOpen(model);
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+        return seasonOpen(model, timeStep);
     }
 
     /**
@@ -89,7 +89,7 @@ public class FishingSeason implements Regulation
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
 
     }
 
@@ -97,7 +97,7 @@ public class FishingSeason implements Regulation
      * nothing
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
 
     }
 

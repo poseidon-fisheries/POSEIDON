@@ -64,9 +64,9 @@ public class WeakMultiQuotaRegulation extends MultiQuotaRegulation {
      */
     @Override
     public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue) {
+            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
         double before = super.getQuotaRemaining(species.getIndex());
-        super.reactToSale(species, seller, biomass, revenue);
+        super.reactToSale(species, seller, biomass, revenue, model, timeStep);
         //if this was the landing that broke the quota, record the day
         double after = super.getQuotaRemaining(species.getIndex());
         if(before>FishStateUtilities.EPSILON && after <FishStateUtilities.EPSILON)

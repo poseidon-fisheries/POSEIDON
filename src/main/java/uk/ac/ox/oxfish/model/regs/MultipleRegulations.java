@@ -133,11 +133,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
         assert started;
         for(Regulation regulation : regulations)
         {
-            if(!regulation.canFishHere(agent,tile,model))
+            if(!regulation.canFishHere(agent,tile,model,timeStep))
                 return false;
         }
         return true;
@@ -155,10 +155,10 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
         assert started;
         for(Regulation regulation : regulations)
-            regulation.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing);
+            regulation.reactToFishing(where, who, fishCaught,fishRetained , hoursSpentFishing, model, timeStep);
     }
 
 
@@ -171,10 +171,10 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
         assert started;
         for(Regulation regulation : regulations)
-            regulation.reactToSale(species,seller,biomass,revenue);
+            regulation.reactToSale(species,seller,biomass,revenue,model,timeStep);
     }
 
     /**
@@ -187,12 +187,12 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
+            Fisher agent, Species species, FishState model, int timeStep) {
         double max = Double.MAX_VALUE;
         for(Regulation regulation : regulations)
         {
 
-            max = Math.min(max,regulation.maximumBiomassSellable(agent,species,model));
+            max = Math.min(max,regulation.maximumBiomassSellable(agent,species,model,timeStep));
         }
 
         return max;
@@ -207,11 +207,11 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         assert started;
         for(Regulation regulation : regulations)
         {
-            if(!regulation.allowedAtSea(fisher,model))
+            if(!regulation.allowedAtSea(fisher,model,timeStep))
                 return false;
         }
         return true;

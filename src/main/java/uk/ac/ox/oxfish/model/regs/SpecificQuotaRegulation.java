@@ -71,9 +71,9 @@ public class SpecificQuotaRegulation extends MonoQuotaRegulation {
      * ignore if wrong species.
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
         if(species == protectedSpecies)
-            super.reactToSale(species, seller, biomass, revenue);
+            super.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
 

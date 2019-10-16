@@ -115,8 +115,8 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
-        return currentRegulation.canFishHere(agent, tile, model);
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        return currentRegulation.canFishHere(agent, tile, model, timeStep);
     }
 
     /**
@@ -127,8 +127,8 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
-        return currentRegulation.maximumBiomassSellable(agent, species, model);
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+        return currentRegulation.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     /**
@@ -139,8 +139,8 @@ public class TriggerRegulation implements Regulation, Steppable {
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
-        return currentRegulation.allowedAtSea(fisher, model);
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+        return currentRegulation.allowedAtSea(fisher, model, timeStep);
     }
 
     /**
@@ -153,8 +153,8 @@ public class TriggerRegulation implements Regulation, Steppable {
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing) {
-        currentRegulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing);
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        currentRegulation.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     /**
@@ -165,8 +165,8 @@ public class TriggerRegulation implements Regulation, Steppable {
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-        currentRegulation.reactToSale(species, seller, biomass, revenue);
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        currentRegulation.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**
