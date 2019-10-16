@@ -30,14 +30,14 @@ public class MakeFadSet implements FadAction {
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
         // TODO: Gala told us that FAD sets are usually made at dawn. How should this be handled?
-        if (isPossible(model, fisher)) {
+        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
             // TODO: should FAD sets follow the same "accrued hours" logic as `Fishing`?
             final int duration = toHours(getDuration());
             if (model.getRandom().nextDouble() < SUCCESSFUL_SET_PROBABILITY) {
                 fisher.fishHere(model.getBiology(), duration, model, targetFad.getBiology());
                 model.recordFishing(fisher.getLocation());
             } else {
-                targetFad.releaseFish(getSeaTileBiology(fisher), model.getBiology());
+                targetFad.releaseFish(fisher.getLocation().getBiology(), model.getBiology());
             }
             // TODO: picking up the FAD might not always be the thing to do
             return new ActionResult(new PickUpFad(targetFad), hoursLeft - duration);
@@ -46,24 +46,6 @@ public class MakeFadSet implements FadAction {
             // action was decided, in which case the fisher has to reconsider its course of action
             // TODO: if the FAD has drifted away, should the fisher keep pursuing it?
             return new ActionResult(new Arriving(), hoursLeft);
-        }
-    }
-
-    /**
-     * Cast the sea tile's biology to the VariableBiomassBasedBiology needed to
-     * release the FAD's biomass in the underlying ocean if needed.
-     * This will have to be rewritten in a more general way when we move to
-     * age structure biology, but we'll cross that bridge when we get there.
-     */
-    private VariableBiomassBasedBiology getSeaTileBiology(Fisher fisher) {
-        final LocalBiology localBiology = fisher.getLocation().getBiology();
-        if (localBiology instanceof VariableBiomassBasedBiology)
-            return (VariableBiomassBasedBiology) localBiology;
-        else {
-            throw new IllegalStateException(
-                "MakeFadSet action can only be used with VariableBiomassBasedBiology sea tile biologies.\n" +
-                    fisher.getLocation() + " biology is " + localBiology
-            );
         }
     }
 
@@ -86,7 +68,6 @@ public class MakeFadSet implements FadAction {
         return
             fisher.getHold().getPercentageFilled() < 1 &&
             isFadHere(fisher) &&
-            (fisher.getLocation().getBiology() instanceof VariableBiomassBasedBiology) &&
             (fisher.getRegulation().canFishHere(fisher, fisher.getLocation(), model) || fisher.isCheater());
     }
 

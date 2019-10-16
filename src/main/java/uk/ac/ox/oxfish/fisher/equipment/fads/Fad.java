@@ -2,12 +2,14 @@ package uk.ac.ox.oxfish.fisher.equipment.fads;
 
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
@@ -54,19 +56,26 @@ public class Fad {
 
     public FadManager getOwner() { return owner; }
 
-    public void releaseFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
+    public void releaseFish(LocalBiology localBiology, GlobalBiology globalBiology) {
+        Optional<VariableBiomassBasedBiology> variableBiomassBasedSeaTileBiology =
+            localBiology instanceof VariableBiomassBasedBiology ?
+                Optional.of((VariableBiomassBasedBiology) localBiology) :
+                Optional.empty();
         for (Species species : globalBiology.getSpecies()) {
             // Remove biomass from the FAD...
             final double fadBiomass = biology.getBiomass(species);
             biology.setCurrentBiomass(species, 0);
-
             // ...and send that biomass down to the sea tile's biology.
+            // If the local biology is not biomass based (most likely because
+            // we're outside the habitable zone), the fish is lost.
             // In the unlikely event that the sea tile's carrying capacity is exceeded,
-            // the extra fish is lost.
-            final double seaTileBiomass = seaTileBiology.getBiomass(species);
-            final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
-            final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
-            seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
+            // the extra fish is also lost.
+            variableBiomassBasedSeaTileBiology.ifPresent(seaTileBiology -> {
+                final double seaTileBiomass = seaTileBiology.getBiomass(species);
+                final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
+                final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
+                seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
+            });
         }
     }
 
