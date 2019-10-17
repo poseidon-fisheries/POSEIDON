@@ -33,8 +33,6 @@ import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
  * This class is given a map of regulation factories it calls at its start() to fill
@@ -225,24 +223,15 @@ public class MultipleRegulations implements Regulation, QuotaPerSpecieRegulation
         regulations.clear();
     }
 
-
     private QuotaPerSpecieRegulation delegateHack = null;
 
-    private QuotaPerSpecieRegulation getQuotaDelegate(){
-        if(delegateHack== null) {
-            List<Regulation> quotaRules = getRegulations().stream().filter(
-                    new Predicate<Regulation>() {
-                        @Override
-                        public boolean test(Regulation regulation) {
-                            return regulation instanceof QuotaPerSpecieRegulation;
-                        }
-                    }).collect(Collectors.toList());
-            if(quotaRules.isEmpty())
-                return null;
-            else
-                delegateHack = (QuotaPerSpecieRegulation) quotaRules.get(0);
+    private QuotaPerSpecieRegulation getQuotaDelegate() {
+        if (delegateHack == null) {
+            delegateHack = getRegulations().stream()
+                .filter(r -> r instanceof QuotaPerSpecieRegulation)
+                .map(r -> (QuotaPerSpecieRegulation) r)
+                .findFirst().orElse(null);
         }
-
         return delegateHack;
     }
 
