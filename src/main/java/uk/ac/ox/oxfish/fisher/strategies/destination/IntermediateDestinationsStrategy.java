@@ -115,7 +115,7 @@ abstract class IntermediateDestinationsStrategy {
     }
 
     private double routeValue(Deque<SeaTile> route, ToDoubleFunction<SeaTile> seaTileValue, Fisher fisher) {
-        final double distanceInKm = map.getDistance().distanceAlongPath(route, map);
+        final double distanceInKm = map.getDistance().totalRouteDistance(route, map);
         final double travelTimeInHours = fisher.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distanceInKm);
         final double tripRevenues = route.stream().mapToDouble(seaTileValue).sum();
         final double tripCost = fisher.getAdditionalTripCosts().stream()

@@ -20,8 +20,13 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.Streams.zip;
 
 /**
@@ -40,17 +45,33 @@ public interface Distance {
      */
     double distance(SeaTile start, SeaTile end, NauticalMap map);
 
+    default ImmutableList<Pair<SeaTile, Double>> segmentLengthsAlongRoute(Collection<SeaTile> route, NauticalMap map) {
+        return zip(
+            Stream.concat(route.stream().limit(1), route.stream()), // duplicate first tile, so first distance will be 0
+            route.stream(),
+            (start, end) -> new Pair<>(end, distance(start, end, map))
+        ).collect(toImmutableList());
+    }
+
+    default ImmutableList<Pair<SeaTile, Double>> cumulativeDistanceAlongRoute(Collection<SeaTile> route, NauticalMap map) {
+        double cumulativeDistance = 0.0;
+        final ImmutableList.Builder<Pair<SeaTile, Double>> builder = new ImmutableList.Builder<>();
+        for (Pair<SeaTile, Double> pair : segmentLengthsAlongRoute(route, map)) {
+            cumulativeDistance += pair.getSecond();
+            builder.add(new Pair<>(pair.getFirst(), cumulativeDistance));
+        }
+        return builder.build();
+    }
+
     /**
-     * Return the distance along a path of sea tiles
+     * Return the distance along a route of sea tiles
      *
-     * @param path the path along which to calculate the distance
-     * @param map  the nautical map
-     * @return the total distance, in kilometers, along the sea tiles on the path
+     * @param route the route along which to calculate the distance
+     * @param map   the nautical map
+     * @return the total distance, in kilometres, along the sea tiles on the route
      */
-    default double distanceAlongPath(Collection<SeaTile> path, NauticalMap map) {
-        return zip(path.stream(), path.stream().skip(1), (start, end) -> distance(start, end, map))
-            .mapToDouble(Double::doubleValue)
-            .sum();
+    default double totalRouteDistance(Collection<SeaTile> route, NauticalMap map) {
+        return segmentLengthsAlongRoute(route, map).stream().mapToDouble(Pair::getSecond).sum();
     }
 
 }
