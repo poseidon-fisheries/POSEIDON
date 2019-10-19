@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ec.util.MersenneTwisterFast;
+import javafx.collections.ObservableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.GeneralizedCognitiveStrategy;
@@ -63,6 +64,26 @@ public class ReputationalRestrictions implements Restriction{
 		return canFishHere;
 	}
 
+	public void addTerritories(NauticalMap map, MersenneTwisterFast random, int nSites, int ulX, int ulY, int brX, int brY){
+		for(int i=0; i<nSites; i++){
+			int seaTileX = random.nextInt(brX-ulX)+ulX;
+			int seaTileY = random.nextInt(brY-ulY)+ulY;
+			SeaTile potentialSite = map.getSeaTile(seaTileX,seaTileY);
+			
+			boolean repeat=false;
+			if(!territory.isEmpty()){
+				for(Territory territorySite: territory){
+					SeaTile territorySeaTile = territorySite.getLocation();
+					if(territorySeaTile==potentialSite){
+						repeat=true;
+						break;
+					}
+				}
+				if (!repeat) territory.add(new Territory(potentialSite));
+			}
+		}
+	}
+	
 	public void addTerritories(NauticalMap map, MersenneTwisterFast random, int nSites){
 		for(int i=0; i<nSites; i++){
 			SeaTile potentialSite = map.getRandomBelowWaterLineSeaTile(random);

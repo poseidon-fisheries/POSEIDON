@@ -98,7 +98,7 @@ public class GeneralizedScenario implements Scenario{
     /**
      * the number of fishers
      */
-    private int fishers = 100;
+    private int fishers = 200;
 
 
     /**
@@ -120,9 +120,9 @@ public class GeneralizedScenario implements Scenario{
      */
     private Integer portPositionX = -1;
     /**
-     * the X position of the port on the grid. If null or a negative number the position is randomized
+     * the Y position of the port on the grid. If null or a negative number the position is randomized
      */
-    private Integer portPositionY = -1;
+    private Integer portPositionY = 25;
 
     /**
      * to use if you really want to port to be somewhere specific
@@ -186,7 +186,7 @@ public class GeneralizedScenario implements Scenario{
     {
         //best first: startingMPAs.add(new StartingMPA(5,33,35,18));
         //best third:
-        //startingMPAs.add(new StartingMPA(0,26,34,40));
+        startingMPAs.add(new StartingMPA(10,10,20,30));
     }
 
     /**

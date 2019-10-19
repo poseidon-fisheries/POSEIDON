@@ -21,13 +21,12 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
 import ec.util.MersenneTwisterFast;
-import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
 import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.InverseTimeScalarFactory;
-import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.strategies.destination.GeneralizedCognitiveStrategy;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.BetaDoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -37,12 +36,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
  */
 public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<GeneralizedCognitiveStrategy> {
 
-	private DoubleParameter minAbsoluteSatisfactoryProfit = new FixedDoubleParameter(100);
+	private DoubleParameter minAbsoluteSatisfactoryProfit = new FixedDoubleParameter(1);
 	private DoubleParameter minRelativeSatisfactoryProfit = new FixedDoubleParameter(0);
-	private DoubleParameter weightProfit = new FixedDoubleParameter(1);
-	private DoubleParameter weightLegal = new FixedDoubleParameter(1);
-	private DoubleParameter weightCommunal = new FixedDoubleParameter(1);
-	private DoubleParameter weightReputation = new FixedDoubleParameter(1);
+	private DoubleParameter weightProfit = new BetaDoubleParameter(1,1);
+	private DoubleParameter weightLegal = new BetaDoubleParameter(1,1);
+	private DoubleParameter weightCommunal = new BetaDoubleParameter(1,1);
+	private DoubleParameter weightReputation = new BetaDoubleParameter(1,1);
     private AlgorithmFactory<? extends TimeScalarFunction> timeScalarFunction =
             new InverseTimeScalarFactory();
 	private DoubleParameter kExploration = new FixedDoubleParameter(.1);
@@ -59,17 +58,17 @@ public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<Gen
 				weightCommunal.apply(random),
 				weightReputation.apply(random),
 				timeScalarFunction.apply(state),
-				kExploration.apply(random),//kExplore
-				numberOfTerritorySites.apply(random));
+				kExploration.apply(random)/*,//kExplore
+				numberOfTerritorySites.apply(random)*/);
 	}
 	
-    private DoubleParameter numberOfTerritorySites = new FixedDoubleParameter(5);
+/*    private DoubleParameter numberOfTerritorySites = new FixedDoubleParameter(5);
     public DoubleParameter getNumberOfTerritorySites(){
     	return numberOfTerritorySites;
     }
     public void setNumberOfTerritorySites(DoubleParameter nSites){
     	numberOfTerritorySites = nSites;
-    }
+    }*/
 
     public DoubleParameter getMinAbsolute(){
 		return minAbsoluteSatisfactoryProfit;

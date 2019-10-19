@@ -55,7 +55,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 			weightLaw,
 			weightCommunal,
 			weightReputation;
-	int numberOfTerritorySites;
+//	int numberOfTerritorySites;
 
 	double inverseDistanceExponent = 16.0; //
 	
@@ -164,8 +164,8 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 			TimeScalarFunction timeScalarFunction,
 //			double timeScalarParameter1,
 //			double timeScalarParameter2,
-			double kExplore,
-			double numberOfTerritorySites){
+			double kExplore/*,
+			double numberOfTerritorySites*/){
 		this.minAbsoluteSatisfactoryProfit=minAbsoluteSatisfactoryProfit;
 		this.minRelativeSatisfactoryProfit=minRelativeSatisfactoryProfit;
 		this.weightProfit=weightProfit; 
@@ -176,7 +176,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
 //		this.timeScalarParameter1=timeScalarParameter1;
 //		this.timeScalarParameter2=timeScalarParameter2;
 		this.kExplore=kExplore;
-		this.numberOfTerritorySites=(int)numberOfTerritorySites;
+//		this.numberOfTerritorySites=(int)numberOfTerritorySites;
 		
 	}
 			
@@ -437,8 +437,8 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             //Now we scale the expected profit to be a number maxed out at 1
         	viableDestination.attractiveness = weightProfit * viableDestination.expectedProfit/highestProfit -
         				weightLaw * (fisher.isAllowedToFishHere(viableDestination.destination, model)?0:1) -
-        				weightCommunal * (fisher.isBadByCommunityStandardsToFishHere(viableDestination.destination, model)?0:1)-
-        				weightReputation * (fisher.isBadReputationToFishHere(viableDestination.destination, model)?0:1);
+        				weightCommunal * (fisher.isBadByCommunityStandardsToFishHere(viableDestination.destination, model)?1:0)-
+        				weightReputation * (fisher.isBadReputationToFishHere(viableDestination.destination, model)?1:0);
         }
         //Remove any destinations with negative attractiveness
         for(ViableDestination d: viableDestinations)
@@ -450,7 +450,7 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
         //If the collection of viable destinations is now empty, then there simply isn't a good place to fish. 
         //Return with a null and don't go exploring
         if(viableDestinations.isEmpty()){
-        	System.out.println("No viable destinations");
+        //	System.out.println("No viable destinations");
         	return fisher.getHomePort().getLocation();
         }
         

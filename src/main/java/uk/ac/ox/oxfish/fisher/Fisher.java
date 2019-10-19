@@ -580,10 +580,13 @@ public class Fisher implements Steppable, Startable{
 
 
         //finish trip!
-        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort());
-        //account for the costs
-        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
-        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+        if(status.getHoursAtSea()>0) {
+	        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort());
+	        //account for the costs
+	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
+	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+        	
+        }
 
         status.setHoursAtSea(0);
         assert  isAtPort();

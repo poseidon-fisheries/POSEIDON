@@ -8,8 +8,14 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class OneReligiousHolidayFactory implements AlgorithmFactory<RegionalRestrictions>{
 
-	private DoubleParameter startDayOfYear = new FixedDoubleParameter(35); 
-	private DoubleParameter endDayOfYear = new FixedDoubleParameter(90); 
+	private DoubleParameter startDayOfYear = new FixedDoubleParameter(1); 
+	private DoubleParameter endDayOfYear = new FixedDoubleParameter(180); 
+
+	private DoubleParameter upperLeftCornerX = new FixedDoubleParameter(0); 
+	private DoubleParameter upperLeftCornerY = new FixedDoubleParameter(33); 
+	private DoubleParameter lowerRightCornerX = new FixedDoubleParameter(49); 
+	private DoubleParameter lowerRightCornerY = new FixedDoubleParameter(49); 
+
 	
 	public DoubleParameter getStartDayOfYear(){
 		return startDayOfYear;
@@ -25,10 +31,28 @@ public class OneReligiousHolidayFactory implements AlgorithmFactory<RegionalRest
 		this.endDayOfYear=endDayOfYear;
 	}
 	
+	public DoubleParameter getUpperLeftCornerX(){return upperLeftCornerX;}
+	public DoubleParameter getUpperLeftCornerY(){return upperLeftCornerY;}
+	public DoubleParameter getLowerRightCornerX(){return lowerRightCornerX;}
+	public DoubleParameter getLowerRightCornerY(){return lowerRightCornerY;}
+	
+	public void setUpperLeftCornerX(DoubleParameter value){this.upperLeftCornerX = value;}
+	public void setUpperLeftCornerY(DoubleParameter value){this.upperLeftCornerY = value;}
+	public void setLowerRightCornerX(DoubleParameter value){this.lowerRightCornerX = value;}
+	public void setLowerRightCornerY(DoubleParameter value){this.lowerRightCornerY = value;}
+	
 	@Override
 	public RegionalRestrictions apply(FishState t) {
 		RegionalRestrictions restrictions = new RegionalRestrictions();
-		restrictions.addAnnualRestriction(t.getMap().getSeaTile(0,0),t.getMap().getSeaTile(t.getMap().getWidth()-1,t.getMap().getHeight()-1), startDayOfYear.apply(t.random).intValue(),endDayOfYear.apply(t.random).intValue());
+		restrictions.addAnnualRestriction(
+				t.getMap().getSeaTile(
+						upperLeftCornerX.apply(t.random).intValue(),
+						upperLeftCornerY.apply(t.random).intValue()),
+				t.getMap().getSeaTile(
+						lowerRightCornerX.apply(t.random).intValue(),
+						lowerRightCornerY.apply(t.random).intValue()), 
+				startDayOfYear.apply(t.random).intValue(),
+				endDayOfYear.apply(t.random).intValue());
 		return restrictions;
 	}
 

@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.log;
 
+import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
 public class Territory {
