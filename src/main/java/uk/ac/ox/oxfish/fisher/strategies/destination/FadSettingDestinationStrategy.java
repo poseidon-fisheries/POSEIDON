@@ -6,6 +6,7 @@ import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;

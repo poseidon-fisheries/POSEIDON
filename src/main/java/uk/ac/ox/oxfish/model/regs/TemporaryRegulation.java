@@ -36,7 +36,7 @@ public class TemporaryRegulation implements Regulation {
             dayOfTheYear >= startDay || dayOfTheYear <= endDay;
     }
 
-    @NotNull public Regulation currentDelegate(FishState model, int timeStep) {
+    @NotNull public Regulation delegateAtStep(FishState model, int timeStep) {
         return isActive(model.getDayOfTheYear(timeStep)) ? delegateWhenActive : delegateWhenInactive;
     }
 
@@ -46,22 +46,22 @@ public class TemporaryRegulation implements Regulation {
     }
 
     @Override public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
-        return currentDelegate(model, timeStep).canFishHere(agent, tile, model, timeStep);
+        return delegateAtStep(model, timeStep).canFishHere(agent, tile, model, timeStep);
     }
 
     @Override public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
-        return currentDelegate(model, timeStep).maximumBiomassSellable(agent, species, model, timeStep);
+        return delegateAtStep(model, timeStep).maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     @Override public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
-        return currentDelegate(model, timeStep).allowedAtSea(fisher, model, timeStep);
+        return delegateAtStep(model, timeStep).allowedAtSea(fisher, model, timeStep);
     }
 
     @Override public void reactToFishing(
         SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
         int hoursSpentFishing, FishState model, int timeStep
     ) {
-        currentDelegate(model, timeStep).reactToFishing(
+        delegateAtStep(model, timeStep).reactToFishing(
             where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep
         );
     }
@@ -69,7 +69,7 @@ public class TemporaryRegulation implements Regulation {
     @Override public void reactToSale(
         Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep
     ) {
-        currentDelegate(model, timeStep).reactToSale(species, seller, biomass, revenue, model, timeStep);
+        delegateAtStep(model, timeStep).reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     @NotNull @Override public Regulation makeCopy() {

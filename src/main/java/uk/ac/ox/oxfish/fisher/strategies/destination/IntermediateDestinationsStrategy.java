@@ -1,21 +1,26 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.ToDoubleFunction;
+import java.util.function.ToDoubleBiFunction;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.collect.Streams.stream;
 import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
@@ -27,8 +32,6 @@ abstract class IntermediateDestinationsStrategy {
     @NotNull
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Deque<SeaTile>> currentRoute = Optional.empty();
-    // TODO: this should be a parameter somewhere
-    private double holdFillProportionConsideredFull = 0.99;
 
     IntermediateDestinationsStrategy(NauticalMap map) {
         this.map = map;
@@ -48,7 +51,7 @@ abstract class IntermediateDestinationsStrategy {
     private boolean goingToPort() {
         return currentRoute
             .map(Deque::peekLast)
-            .filter(seaTile -> seaTile != null && seaTile.isPortHere())
+            .filter(SeaTile::isPortHere)
             .isPresent();
     }
 
@@ -57,14 +60,16 @@ abstract class IntermediateDestinationsStrategy {
     }
 
     private boolean holdFull(Fisher fisher) {
+        // TODO: this should be a parameter somewhere
+        double holdFillProportionConsideredFull = 0.99;
         return fisher.getHold().getPercentageFilled() >= holdFillProportionConsideredFull;
     }
 
     void resetRoute() { currentRoute = Optional.empty(); }
 
-    Optional<SeaTile> nextDestination(Fisher fisher, MersenneTwisterFast random) {
+    Optional<SeaTile> nextDestination(Fisher fisher, FishState model) {
         if (holdFull(fisher) & !goingToPort()) goToPort(fisher);
-        if (!currentRoute.isPresent()) { chooseNewRoute(fisher, random); }
+        if (!currentRoute.isPresent()) { chooseNewRoute(fisher, model); }
         currentRoute
             .filter(route -> fisher.isAtDestination() && (fisher.isAtPort() || !fisher.canAndWantToFishHere()))
             .ifPresent(Deque::poll);
@@ -73,6 +78,7 @@ abstract class IntermediateDestinationsStrategy {
 
     abstract Set<SeaTile> possibleDestinations(Fisher fisher);
 
+    @SuppressWarnings("UnstableApiUsage")
     private ImmutableSet<Deque<SeaTile>> possibleRoutes(Fisher fisher) {
         return possibleDestinations(fisher)
             .stream()
@@ -82,44 +88,65 @@ abstract class IntermediateDestinationsStrategy {
 
     abstract double seaTileValue(Fisher fisher, SeaTile seaTile);
 
-    private void chooseNewRoute(Fisher fisher, MersenneTwisterFast random) {
+    private void chooseNewRoute(Fisher fisher, FishState model) {
         final Set<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher);
-
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
-            final Map<SeaTile, Double> seaTileValues =
-                possibleRoutes.stream()
-                    .flatMap(Deque::stream)
-                    .distinct()
-                    .collect(toImmutableMap(identity(), seaTile -> seaTileValue(fisher, seaTile)));
-
-            final Map<Deque<SeaTile>, Double> routeValues =
-                possibleRoutes.stream().collect(toImmutableMap(
-                    identity(),
-                    route -> routeValue(route, seaTileValues::get, fisher)
-                ));
-
-            final ImmutableMap<Deque<SeaTile>, Double> positiveRoutes =
-                routeValues.entrySet().stream()
-                    .filter(entry -> entry.getValue() >= 0)
-                    .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-
-            final ImmutableMap<Deque<SeaTile>, Double> candidateRoutes =
-                positiveRoutes.isEmpty() ?
-                    routeValues.entrySet().stream().collect(toImmutableMap(Map.Entry::getKey, e -> 1.0 / -e.getValue())) :
-                    positiveRoutes;
-
-            currentRoute = Optional.of(weightedOneOf(candidateRoutes.keySet().asList(), candidateRoutes::get, random));
+            final ImmutableMap<Deque<SeaTile>, Double> candidateRoutes = findCandidateRoutes(fisher, model, possibleRoutes);
+            currentRoute = Optional.of(weightedOneOf(candidateRoutes.keySet().asList(), candidateRoutes::get, model.getRandom()));
         }
     }
 
-    private double routeValue(Deque<SeaTile> route, ToDoubleFunction<SeaTile> seaTileValue, Fisher fisher) {
-        final double distanceInKm = map.getDistance().totalRouteDistance(route, map);
-        final double travelTimeInHours = fisher.hypotheticalTravelTimeToMoveThisMuchAtFullSpeed(distanceInKm);
-        final double tripRevenues = route.stream().mapToDouble(seaTileValue).sum();
+    private ImmutableMap<Deque<SeaTile>, Double> findCandidateRoutes(
+        Fisher fisher,
+        FishState model,
+        Set<Deque<SeaTile>> possibleRoutes
+    ) {
+
+        final Map<SeaTile, Double> seaTileValues = new HashMap<>();
+        ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStep = (seaTile, timeStep) ->
+            fisher.getRegulation().canFishHere(fisher, seaTile, model, timeStep) ?
+                seaTileValues.computeIfAbsent(seaTile, tile -> seaTileValue(fisher, tile)) :
+                0.0;
+
+        final ImmutableMap<Deque<SeaTile>, Double> routeValues =
+            possibleRoutes.stream().collect(toImmutableMap(
+                identity(),
+                route -> routeValue(route, seaTileValueAtStep, fisher, model.getHoursPerStep())
+            ));
+
+        final ImmutableMap<Deque<SeaTile>, Double> positiveRoutes =
+            routeValues.entrySet().stream()
+                .filter(entry -> entry.getValue() >= 0)
+                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return positiveRoutes.isEmpty() ?
+            routeValues.entrySet().stream().collect(toImmutableMap(Map.Entry::getKey, e -> 1.0 / -e.getValue())) :
+            positiveRoutes;
+    }
+
+    private double routeValue(
+        Deque<SeaTile> route,
+        ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStep,
+        Fisher fisher,
+        double hoursPerStep
+    ) {
+        final ImmutableList<Pair<SeaTile, Double>> cumulativeDistances =
+            map.getDistance().cumulativeDistanceAlongRoute(route, map);
+        final ImmutableList<Pair<SeaTile, Double>> travelTimesInHours =
+            cumulativeDistances.stream()
+                .map(pair -> pair.mapSecond(fisher::hypotheticalTravelTimeToMoveThisMuchAtFullSpeed))
+                .collect(toImmutableList());
+        final ImmutableList<Pair<SeaTile, Double>> valuesAlongRoute =
+            travelTimesInHours.stream()
+                .map(pair -> pair.mapSecond((seaTile, hours) ->
+                    seaTileValueAtStep.applyAsDouble(seaTile, (int) (hours / hoursPerStep))
+                )).collect(toImmutableList());
+        final double totalTravelTimeInHours = getLast(travelTimesInHours).getSecond();
+        final double tripRevenues = valuesAlongRoute.stream().mapToDouble(Pair::getSecond).sum();
         final double tripCost = fisher.getAdditionalTripCosts().stream()
-            .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, travelTimeInHours))
+            .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, totalTravelTimeInHours))
             .sum();
         return tripRevenues - tripCost;
     }
