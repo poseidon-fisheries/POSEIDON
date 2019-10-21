@@ -95,7 +95,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
         //add the default color map showing rocky areas
         encodings.put("Habitat",new ColorEncoding(
                 new TriColorMap(-1,0,1,Color.black,new Color(237, 201, 175), new Color(69, 67, 67)),
-                seaTile -> seaTile.getAltitude() >=0 ? Double.NaN : seaTile.getRockyPercentage(),
+                seaTile -> seaTile.isLand() ? Double.NaN : seaTile.getRockyPercentage(),
                 true));
 
         setSelectedEncoding("Depth");
@@ -156,7 +156,7 @@ public class ColorfulGrid extends FastObjectGridPortrayal2D {
                         }
                     },
                     seaTile ->
-                            seaTile.getAltitude() >= 0 ? Double.NaN :
+                            seaTile.isLand() ? Double.NaN :
                             BIOMASS_TRANSFORM.apply(
                                     seaTile.getBiomass(species)),
                     false,

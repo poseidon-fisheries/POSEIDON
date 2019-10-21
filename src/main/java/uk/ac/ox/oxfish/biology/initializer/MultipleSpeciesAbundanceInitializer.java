@@ -126,7 +126,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
      */
     public static LocalBiology generateAbundanceBiologyExceptOnLand(
             GlobalBiology biology, SeaTile seaTile, HashMap<SeaTile, AbundanceLocalBiology> locals) {
-        if(seaTile.getAltitude() >= 0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
 
 
@@ -181,7 +181,7 @@ public class MultipleSpeciesAbundanceInitializer implements AllocatedBiologyInit
                                 meristics.getCumulativePhi(),
                                 meristics.isAddRelativeFecundityToSpawningBiomass(),
                                 meristics.getMaturity(),
-                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE),
+                                meristics.getRelativeFecundity(), FishStateUtilities.FEMALE, false),
                 species,
                 rounding, agingProcess,
                 new NoAbundanceDiffusion(),

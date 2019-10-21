@@ -22,13 +22,12 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import org.jfree.util.Log;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.itq.ITQOrderBook;
 import uk.ac.ox.oxfish.model.regs.MultiQuotaITQRegulation;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Locker;
-import uk.ac.ox.oxfish.utility.yaml.YamlConstructor;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -91,7 +90,7 @@ public class MultiITQStringFactory implements AlgorithmFactory<MultiQuotaITQRegu
         //read them in
         for(Map.Entry<String,String> input : quotasInputted.entrySet())
         {
-            Double yearlyQuota = YamlConstructor.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
+            Double yearlyQuota = DoubleParameter.parseDoubleParameter(input.getValue().trim()).apply(state.getRandom());
             Preconditions.checkArgument(yearlyQuota>0);
             Preconditions.checkArgument(!yearlyQuota.isNaN());
             quotas[Integer.parseInt(input.getKey().trim())] = yearlyQuota;

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.fisher.log.initializers;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -30,39 +31,17 @@ import java.util.function.Supplier;
  */
 public class LogbookInitializers {
 
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final LinkedHashMap<String,
-            Supplier<AlgorithmFactory<? extends LogbookInitializer>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends LogbookInitializer>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String>
-            NAMES = new LinkedHashMap<>();
-
-
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        CONSTRUCTORS.put("No Logbook",
-                         NoLogbookFactory::new
-        );
         NAMES.put(NoLogbookFactory.class, "No Logbook");
-
-
-        CONSTRUCTORS.put("Logit-like Logbook",
-                         LogisticLogbookFactory::new
-        );
         NAMES.put(LogisticLogbookFactory.class, "Logit-like Logbook");
-
-
-        CONSTRUCTORS.put("Tows and Altitude",
-                         TowAndAltitudeFactory::new
-        );
         NAMES.put(TowAndAltitudeFactory.class, "Tows and Altitude");
-
-
-
-
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

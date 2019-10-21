@@ -16,7 +16,7 @@ Flexible:
               delegate:
                 Equal Allocation:
                   constantValue: '1.0'
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
@@ -25,7 +25,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/multidens_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
@@ -73,7 +73,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/multidens_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
@@ -94,7 +94,7 @@ Flexible:
               delegate:
                 Equal Allocation:
                   constantValue: '1.0'
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
@@ -103,7 +103,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/malabaricus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
@@ -151,7 +151,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/malabaricus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
@@ -172,7 +172,7 @@ Flexible:
               delegate:
                 Equal Allocation:
                   constantValue: '1.0'
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
@@ -181,7 +181,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/areolatus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
@@ -229,7 +229,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/areolatus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
@@ -250,7 +250,7 @@ Flexible:
               delegate:
                 Equal Allocation:
                   constantValue: '1.0'
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           histogrammerOutput: false
           initialAbundanceAllocator:
@@ -259,7 +259,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/erythropterus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           initialAbundanceFactory:
             Abundance From List:
@@ -307,7 +307,7 @@ Flexible:
                 From File Allocator:
                   biomassPath: ./inputs/indonesia/712/erythropterus_pixellated_map.csv
                   inputFileHasHeader: true
-              insidePoligon: true
+              insidePolygon: true
               shapeFile: inputs/indonesia/712/shape/WPP_boundary.shp
           recruitment:
             Fixed Recruitment:
@@ -721,13 +721,13 @@ Flexible:
             lowAgeThreshold: '1.0'
             priceAboveThresholds: '40000.0'
             priceBelowThreshold: '40000.0'
-            priceBetweenThresholds: '40000.0'  
+            priceBetweenThresholds: '40000.0'
   networkBuilder:
     Equal Out Degree:
       allowMutualFriendships: true
       degree: '2.0'
       equalOutDegree: true
-  plugins: 
+  plugins:
     - Abundance Gatherers:
         observationDay: 365
     - SPR Agent:
@@ -755,7 +755,7 @@ Flexible:
         simulatedMaxAge: '100.0'
         simulatedVirginRecruits: '1000.0'
         speciesName: Pristipomoides multidens
-        surveyTag: 100_multidens      
+        surveyTag: 100_multidens
     - SPR Agent:
         assumedKParameter: '0.5508334'
         assumedLengthAtMaturity: '37.0'
@@ -768,7 +768,7 @@ Flexible:
         simulatedMaxAge: '100.0'
         simulatedVirginRecruits: '1000.0'
         speciesName: Lutjanus erythropterus
-        surveyTag: 100_erythropterus   
+        surveyTag: 100_erythropterus
     - SPR Agent:
         assumedKParameter: '0.3300512'
         assumedLengthAtMaturity: '21.0'
@@ -781,7 +781,7 @@ Flexible:
         simulatedMaxAge: '100.0'
         simulatedVirginRecruits: '1000.0'
         speciesName: Epinephelus areolatus
-        surveyTag: 100_areolatus     
+        surveyTag: 100_areolatus
   portInitializer:
     List of Ports:
       ports:

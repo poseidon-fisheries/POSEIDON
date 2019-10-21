@@ -69,11 +69,13 @@ public class ExponentialMortalityProcess implements NaturalMortalityProcess {
         double[][] abundance = structuredAbundance.asMatrix();
         for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
         {
+            double survivingProportion = Math.exp((-mortalityParameters[subdivision] * scaling));
+
             for (int i = 0; i < structuredAbundance.getBins(); i++)
             {
 
                 abundance[subdivision][i] =  abundance[subdivision][i] *
-                        Math.exp((-mortalityParameters[subdivision]*scaling));
+                        survivingProportion;
                 if (rounding) {
                     abundance[subdivision][i] = (int) FishStateUtilities.round(abundance[subdivision][i]);
                 }

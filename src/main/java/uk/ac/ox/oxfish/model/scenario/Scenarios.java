@@ -77,5 +77,9 @@ public class Scenarios {
 
         SCENARIOS.put("Indonesia",IndonesiaScenario::new);
         DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
+
+        SCENARIOS.put("Tuna", TunaScenario::new);
+        DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
+
     }
 }

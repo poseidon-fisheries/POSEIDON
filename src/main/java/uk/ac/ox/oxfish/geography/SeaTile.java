@@ -142,7 +142,7 @@ public class SeaTile implements Startable, LocalBiology{
      * @param species  the species you care about
      * @return the biomass of this species
      */
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return biology.getBiomass(species);
     }
 
@@ -247,7 +247,7 @@ public class SeaTile implements Startable, LocalBiology{
      */
     public boolean isFishingEvenPossibleHere()
     {
-        if(altitude > 0 || getBiology() instanceof EmptyLocalBiology)
+        if(isLand() || getBiology() instanceof EmptyLocalBiology)
             return false;
         else
             return true;
@@ -259,7 +259,9 @@ public class SeaTile implements Startable, LocalBiology{
         return biology.getAbundance(species);
     }
 
+    public boolean isLand() { return altitude >= 0; }
 
+    public boolean isWater() { return !isLand(); }
 
     public Port grabPortHere() {
         return portHere;

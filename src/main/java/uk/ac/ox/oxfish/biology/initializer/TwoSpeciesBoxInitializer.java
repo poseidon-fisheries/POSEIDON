@@ -129,7 +129,7 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
 
-        if(seaTile.getAltitude() > 0)
+        if(seaTile.isLand())
             return new EmptyLocalBiology();
 
         //start by assuming both species are in
@@ -163,8 +163,8 @@ public class TwoSpeciesBoxInitializer extends  AbstractBiologyInitializer {
 
 
         BiomassLocalBiology toReturn =  new BiomassLocalBiology(
-                new Double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
-                new Double[]{firstSpeciesCapacity,secondSpeciesCapacity});
+                new double[]{random.nextDouble() * firstSpeciesCapacity,random.nextDouble() * secondSpeciesCapacity},
+                new double[]{firstSpeciesCapacity,secondSpeciesCapacity});
         biologies.put(seaTile,toReturn);
         return toReturn;
     }

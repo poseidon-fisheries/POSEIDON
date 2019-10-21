@@ -128,7 +128,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     /**
      * the original biomass assigned for each local biology. Makes resetting quick
      */
-    private HashMap<VariableBiomassBasedBiology,Double[]> originalBiomass = new HashMap<>();
+    private HashMap<VariableBiomassBasedBiology, double[]> originalBiomass = new HashMap<>();
 
 
     private final double targetDiffusionRate;
@@ -204,7 +204,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     public LocalBiology generateLocal(
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map) {
-        if(seaTile.getAltitude()>=0)
+        if(seaTile.isLand())
             return new EmptyLocalBiology();
 
         //prepare an empty biology
@@ -638,7 +638,7 @@ public class YellowBycatchInitializer implements BiologyInitializer {
     public void resetLocalBiology(Species species){
 
         //reset!
-        for (Map.Entry<VariableBiomassBasedBiology, Double[]> local : originalBiomass.entrySet()) {
+        for (Map.Entry<VariableBiomassBasedBiology, double[]> local : originalBiomass.entrySet()) {
             local.getKey().setCurrentBiomass(species,local.getValue()[species.getIndex()]);
 
         }

@@ -56,6 +56,7 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
     public static final String FISHING_DISTANCE = "DISTANCE_TOW_TO_PORT";
     public static final String TRIP_DURATION = "MEAN_TRIP_DURATION";
     public static final String HOURS_OUT = "HOURS_AT_SEA";
+    public static final String PROFITS_PER_HOUR = "TRIP_PROFITS_PER_HOUR";
 
     public FisherYearlyTimeSeries() {
         super(IntervalPolicy.EVERY_YEAR);
@@ -105,6 +106,10 @@ public class FisherYearlyTimeSeries extends TimeSeries<Fisher>
 
         registerGatherer(HOURS_OUT,
                          fisher -> observed.getYearlyCounterColumn(HOURS_OUT),Double.NaN);
+        registerGatherer(PROFITS_PER_HOUR,
+                         fisher ->
+                                 (observed.getYearlyCounterColumn(EARNINGS)-observed.getYearlyCounterColumn(VARIABLE_COSTS))/
+                                 observed.getYearlyCounterColumn(HOURS_OUT), Double.NaN);
 
         //this is a set because it gets accessed by two different gatherers and can be filled by either
         registerGatherer(FISHING_DISTANCE,

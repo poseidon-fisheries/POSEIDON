@@ -20,23 +20,12 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.sun.istack.internal.Nullable;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
-
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -58,6 +47,15 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.utility.MasonUtils;
+
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * This object stores the map/chart of the sea. It contains all the geometric fields holding locations and boundaries.
@@ -134,12 +132,19 @@ public class NauticalMap implements Startable
         this.mpaVectorField = mpaVectorField;
         this.setDistance(distance);
         this.rasterBackingGrid = (ObjectGrid2D) rasterBathymetry.getGrid();
+        this.coordinateCache = new ObjectGrid2D(getWidth(), getHeight());
         recomputeTilesMPA();
 
         ports = new LinkedList<>();
         portMap = new SparseGrid2D(getWidth(), getHeight());
         fishersMap = new SparseGrid2D(getWidth(), getHeight());
         dailyTrawlsMap = new IntGrid2D(getWidth(),getHeight());
+    }
+
+    private void resetCoordinateCache(GeomGridField rasterBathymetry) {
+        for (int i = 0; i < coordinateCache.getWidth(); i++)
+            for (int j = 0; j < coordinateCache.getHeight(); j++)
+                coordinateCache.set(i, j, rasterBathymetry.toPoint(i, j).getCoordinate());
     }
 
     public int getHeight() {
@@ -252,7 +257,7 @@ public class NauticalMap implements Startable
 
         if(waterSeaTiles == null) {
             waterSeaTiles = new LinkedList<>(getAllSeaTilesAsList());
-            waterSeaTiles.removeIf(seaTile -> seaTile.getAltitude() >=0);
+            waterSeaTiles.removeIf(SeaTile::isLand);
         }
         return waterSeaTiles;
     }
@@ -285,7 +290,6 @@ public class NauticalMap implements Startable
     public void recomputeTilesMPA() {
         waterSeaTiles = null;
         allTiles = null;
-        coordinateCache.clear();
         lineTiles = null;
         //todo this works but make a test to be sure
         for(int i=0;i<rasterBackingGrid.getWidth(); i++)
@@ -309,6 +313,7 @@ public class NauticalMap implements Startable
                 }
 
             }
+        resetCoordinateCache(rasterBathymetry);
     }
 
     /**
@@ -324,25 +329,28 @@ public class NauticalMap implements Startable
         return (SeaTile) rasterBackingGrid.get(gridX, gridY);
     }
 
-
-
-
-    public Coordinate getCoordinates(int gridX, int gridY)
-    {
-        return rasterBathymetry.toPoint(gridX,gridY).getCoordinate();
-    }
-
     /**
      * basically getting coordinates is an expensive call; so we store previous calls here
      */
-    private final WeakHashMap<SeaTile,Coordinate> coordinateCache = new WeakHashMap<>();
+    private final ObjectGrid2D coordinateCache;
 
-    public Coordinate getCoordinates(SeaTile tile)
-    {
-        return coordinateCache.computeIfAbsent(tile, 
-            input -> rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate()
-        );
+//    public Coordinate getCoordinates(SeaTile tile)
+//    {
+//        return coordinateCache.computeIfAbsent(tile, 
+//            input -> rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate()
+//        );
+//    } 
+
+public Coordinate getCoordinates(int gridX, int gridY) {
+  return (Coordinate) coordinateCache.get(gridX, gridY);
+}
+
+    public Coordinate getCoordinates(SeaTile tile) {
+        return getCoordinates(tile.getGridX(), tile.getGridY());
     }
+
+
+
 
     public SeaTile getSeaTile(Coordinate coordinate)
     {
@@ -418,7 +426,6 @@ public class NauticalMap implements Startable
     public void reactToSeaTileChange()
     {
         recomputeTilesMPA();
-        alreadyComputedNeighbors.clear();
     }
 
     /**
@@ -434,18 +441,9 @@ public class NauticalMap implements Startable
 
         //check location
         SeaTile portSite = port.getLocation();
-        Preconditions.checkArgument(portSite.getAltitude() >= 0, "port is not on land");
+        Preconditions.checkArgument(portSite.isLand(), "port is not on land");
         //check it's coastal
-        Bag neighbors = new Bag();
-        rasterBackingGrid.getMooreNeighbors(portSite.getGridX(), portSite.getGridY(), 1,
-                Grid2D.BOUNDED, false, neighbors,null,null);
-        boolean isCoastal = false;
-        for(Object tile : neighbors)
-        {
-            isCoastal = ((SeaTile)tile).getAltitude() < 0;
-            if(isCoastal)
-                break;
-        }
+        boolean isCoastal = isCoastal(portSite);
         Preconditions.checkArgument(isCoastal,"port has no neighboring sea tiles");
 
         //put it in the masterlist
@@ -454,6 +452,13 @@ public class NauticalMap implements Startable
 
         portMap.setObjectLocation(port,portSite.getGridX(),portSite.getGridY());
 
+    }
+
+    public boolean isCoastal(SeaTile seaTile) {
+        Bag neighbors = new Bag();
+        rasterBackingGrid.getMooreNeighbors(seaTile.getGridX(), seaTile.getGridY(), 1,
+                Grid2D.BOUNDED, false, neighbors,null,null);
+        return MasonUtils.<SeaTile>bagToStream(neighbors).anyMatch(SeaTile::isWater);
     }
 
     /**
@@ -472,6 +477,7 @@ public class NauticalMap implements Startable
         this.distance = distance;
     }
 
+    public Distance getDistance() { return distance; }
 
     public boolean recordFisherLocation(Fisher fisher, int x, int y) {
         return fishersMap.setObjectLocation(fisher, x, y);

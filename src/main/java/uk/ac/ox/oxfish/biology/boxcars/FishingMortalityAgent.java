@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -30,13 +29,11 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public class FishingMortalityAgent implements AdditionalStartable, Steppable {
@@ -54,15 +51,22 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     private double lastDailyMortality;
 
     /**
-     * here we track of all the catches for the year. For yearly mortality rate
+     * do we bother computing landings every day?
      */
-    double[][] yearlyCatches;
+    private final boolean computeDailyFishingMortality;
+
+    /**
+     * here we track of all the landings (IN WEIGHT) for the year. For yearly mortality rate
+     */
+    double[][] yearlyCatchesInWeight;
 
 
     private Stoppable dailyStoppable;
 
     private Stoppable yearlyStoppable;
 
+
+    private double[][] lastMeasuredYearlyAbundance = null;
 
     /**
      * tell the startable to turnoff,
@@ -77,9 +81,10 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
         }
     }
 
-    public FishingMortalityAgent(AbundanceFilter vulnerabilityFilter, Species species) {
+    public FishingMortalityAgent(AbundanceFilter vulnerabilityFilter, Species species, boolean computeDailyFishingMortality) {
         this.vulnerabilityFilter = vulnerabilityFilter;
         this.species = species;
+        this.computeDailyFishingMortality = computeDailyFishingMortality;
     }
 
 
@@ -92,46 +97,55 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     @Override
     public void start(FishState model) {
 
+        //let's look at abundance now
+        lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+
         dailyCatchSampler = new CatchSampler((Predicate<Fisher>) input -> true,
                                              species,
                                              null);
         dailyCatchSampler.checkWhichFisherToObserve(model);
-        yearlyCatches = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+        yearlyCatchesInWeight = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         dailyStoppable =
                 model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
         yearlyStoppable =
                 model.scheduleEveryYear(new Steppable() {
             @Override
             public void step(SimState simState) {
-                //clear
+                //observe abundance
+                lastMeasuredYearlyAbundance = model.getTotalAbundance(species);
+
+
+                //clear landings observed
                 for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-                    Arrays.fill(yearlyCatches[subdivision], 0);
+                    Arrays.fill(yearlyCatchesInWeight[subdivision], 0);
             }
         }, StepOrder.DATA_RESET);
 
 
-        DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
-                                                                      new Gatherer<FishState>() {
-                                                                          @Override
-                                                                          public Double apply(FishState fishState) {
-                                                                              return lastDailyMortality;
+        if(computeDailyFishingMortality) {
+            DataColumn dailyColumn = model.getDailyDataSet().registerGatherer("Daily Fishing Mortality " + species,
+                    new Gatherer<FishState>() {
+                        @Override
+                        public Double apply(FishState fishState) {
+                            return lastDailyMortality;
 
-                                                                          }
-                                                                      }, Double.NaN);
+                        }
+                    }, Double.NaN);
 
 
-        //yearly you account for the average
-        model.getYearlyDataSet().registerGatherer("Average Daily Fishing Mortality "+ species,
-                                            FishStateUtilities.generateYearlyAverage(dailyColumn),
-                                            Double.NaN)
-        ;
+            //yearly you account for the average
+            model.getYearlyDataSet().registerGatherer("Average Daily Fishing Mortality " + species,
+                    FishStateUtilities.generateYearlyAverage(dailyColumn),
+                    Double.NaN)
+            ;
 
+        }
 
         model.getYearlyDataSet().registerGatherer("Yearly Fishing Mortality " + species,
                                                   new Gatherer<FishState>() {
                                                       @Override
                                                       public Double apply(FishState fishState) {
-                                                          return computeYearlyMortality(fishState);
+                                                          return computeYearlyMortality();
 
                                                       }
                                                   },Double.NaN);
@@ -144,12 +158,17 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
     @Override
     public void step(SimState simState) {
 
-        dailyCatchSampler.resetAbundance();
+
+        dailyCatchSampler.resetLandings();
         dailyCatchSampler.observe();
-        lastDailyMortality =  computeDailyMortality((FishState)simState);
+        if(computeDailyFishingMortality)
+            lastDailyMortality =  computeDailyMortality((FishState)simState);
+        final double[][] abundance = dailyCatchSampler.getLandings();
+
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            for (int bin = 0; bin < species.getNumberOfBins(); bin++)
-                yearlyCatches[subdivision][bin] += dailyCatchSampler.getAbundance()[subdivision][bin];
+            for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
+                yearlyCatchesInWeight[subdivision][bin] += abundance[subdivision][bin];
+            }
 
         }
 
@@ -173,15 +192,15 @@ public class FishingMortalityAgent implements AdditionalStartable, Steppable {
 
     /**
      * compute daily mortality rate
-     * @param model
      * @return
      */
-    public double computeYearlyMortality(FishState model){
+    public double computeYearlyMortality(){
 
 
         return computeMortality(
-                yearlyCatches,
-                model.getTotalAbundance(species)
+                CatchSampler.convertLandingsToAbundance(species,
+                        yearlyCatchesInWeight),
+                lastMeasuredYearlyAbundance
         );
 
 

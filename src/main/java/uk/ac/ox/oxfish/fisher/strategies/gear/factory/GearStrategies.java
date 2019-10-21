@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.gear.factory;
 
 import uk.ac.ox.oxfish.fisher.strategies.gear.GearStrategy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -31,41 +32,16 @@ import java.util.function.Supplier;
  */
 public class GearStrategies {
 
-    public static final LinkedHashMap<String,
-            Supplier<AlgorithmFactory<? extends GearStrategy>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends GearStrategy>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-
-
-        CONSTRUCTORS.put("Never Change Gear", FixedGearStrategyFactory::new);
-        NAMES.put(FixedGearStrategyFactory.class,"Never Change Gear");
-
-
-        CONSTRUCTORS.put("Periodic Gear Update from List", PeriodicUpdateFromListFactory::new);
-        NAMES.put(PeriodicUpdateFromListFactory.class,"Periodic Gear Update from List");
-
-
-
-        CONSTRUCTORS.put("Periodic Gear Update Mileage", PeriodicUpdateMileageFactory::new);
-        NAMES.put(PeriodicUpdateMileageFactory.class,"Periodic Gear Update Mileage");
-
-
-
-        CONSTRUCTORS.put("Periodic Gear Update Catchability", PeriodicUpdateCatchabilityFactory::new);
-        NAMES.put(PeriodicUpdateCatchabilityFactory.class,"Periodic Gear Update Catchability");
-
-
-
-        CONSTRUCTORS.put("Periodic Gear Update Selectivity", PeriodicUpdateSelectivityFactory::new);
-        NAMES.put(PeriodicUpdateSelectivityFactory.class,"Periodic Gear Update Selectivity");
-
-
-
-
-
+        NAMES.put(FixedGearStrategyFactory.class, "Never Change Gear");
+        NAMES.put(PeriodicUpdateFromListFactory.class, "Periodic Gear Update from List");
+        NAMES.put(PeriodicUpdateMileageFactory.class, "Periodic Gear Update Mileage");
+        NAMES.put(PeriodicUpdateCatchabilityFactory.class, "Periodic Gear Update Catchability");
+        NAMES.put(PeriodicUpdateSelectivityFactory.class, "Periodic Gear Update Selectivity");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
-
 }

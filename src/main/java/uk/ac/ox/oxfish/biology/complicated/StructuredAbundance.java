@@ -51,14 +51,15 @@ public class StructuredAbundance {
     /**
      * create simple abundance as vector where each element represents a
      * length/age bin
-     * @param ageStructure
+     * @param subdivision0
      */
-    public StructuredAbundance(double[] ageStructure)
+    public StructuredAbundance(double[] subdivision0)
+
     {
         //Preconditions.checkArgument(ageStructure.length > 0); not true anymore since it could be an empty
         // biology forced to return an empty structure
         abundance = new double[1][];
-        abundance[0] = ageStructure;
+        abundance[0] = subdivision0;
     }
 
     public StructuredAbundance(double[][] abundance)

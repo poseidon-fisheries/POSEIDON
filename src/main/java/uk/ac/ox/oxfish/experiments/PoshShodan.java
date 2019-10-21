@@ -25,6 +25,7 @@ import sim.engine.Steppable;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectors;
 import uk.ac.ox.oxfish.model.regs.ExternalOpenCloseSeason;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
@@ -454,6 +455,7 @@ public class PoshShodan {
 
         FishState state = new FishState(seed);
         state.attachAdditionalGatherers();
+        state.registerStartable(new AdditionalFishStateDailyCollectors());
         state.setScenario(scenario);
         state.start();
 

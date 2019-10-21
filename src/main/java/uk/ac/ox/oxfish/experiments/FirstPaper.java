@@ -172,7 +172,7 @@ public class FirstPaper
         for (int x = 0; x < state.getMap().getWidth(); x++)
             for (int y = 0; y < state.getMap().getHeight(); y++) {
                 SeaTile seaTile = state.getMap().getSeaTile(x, y);
-                if(seaTile.getAltitude()<0)
+                if(seaTile.isWater())
                     blue[x][state.getMap().getHeight() - y - 1] = ((VariableBiomassBasedBiology) seaTile.
                             getBiology()).getCarryingCapacity(state.getSpecies().get(1));
             }

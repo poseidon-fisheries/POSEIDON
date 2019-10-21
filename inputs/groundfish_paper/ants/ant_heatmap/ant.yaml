@@ -1,0 +1,63 @@
+!!uk.ac.ox.oxfish.maximization.GenericOptimization
+parameters:
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Dover Sole.averageCatchability,
+  alwaysPositive: false, maximum: 0.00100101, minimum: 0.0008190081 }
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Longspine Thornyhead.averageCatchability,
+  alwaysPositive: false, maximum: 0.0006695728, minimum: 0.0005478323}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Sablefish.averageCatchability,
+  alwaysPositive: false, maximum: 0.0007797796, minimum: 0.0006380014}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Shortspine Thornyhead.averageCatchability,
+  alwaysPositive: false, maximum: 0.0002017384, minimum: 0.0001650586}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: gear.delegate.gears~Yelloweye Rockfish.averageCatchability,
+  alwaysPositive: false, maximum: 0.0006841653, minimum: 0.0005597716}
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: holdSizePerBoat,
+  alwaysPositive: false, maximum: 6260.182, minimum: 5121.967}
+# behavioural
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.explorationProbability,
+  alwaysPositive: false, maximum: 0.55, minimum: 0.45 }
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.probability.imitationProbability,
+  alwaysPositive: false, maximum: 1, minimum: 0.9 }
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.regression.forgettingFactor,
+  alwaysPositive: false, maximum: 1, minimum: 0.8999901 }
+- !!uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter {addressToModify: destinationStrategy.regression.spaceBandwidth,
+  alwaysPositive: false, maximum: 22, minimum: 18 }  
+runsPerSetting: 1
+scenarioFile: docs/groundfish/ants/ant_heatmap/kernel.yaml
+simulatedYears: 7
+maximization: true
+targets:
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 134405.5,
+  yearlyDataColumnName: "Average Cash-Flow", 
+  weightInverse: 21331, 
+  yearsToSkip: 5
+  }
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 799.44,
+  yearlyDataColumnName: "Actual Average Hours Out", 
+  weightInverse: 120.382023907226, 
+  yearsToSkip: 5
+  }
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 6717130,
+  yearlyDataColumnName: "Dover Sole Landings", 
+  weightInverse: 688312.5, 
+  yearsToSkip: 5
+  }  
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 1392200,
+  yearlyDataColumnName: "Sablefish Landings", 
+  weightInverse: 168428.2, 
+  yearsToSkip: 5
+  }  
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 713991.4,
+  yearlyDataColumnName: "Longspine Thornyhead Landings", 
+  weightInverse: 99614.71, 
+  yearsToSkip: 5
+  }    
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 734204.6,
+  yearlyDataColumnName: "Shortspine Thornyhead Landings", 
+  weightInverse: 75061.24, 
+  yearsToSkip: 5
+  }      
+- !!uk.ac.ox.oxfish.maximization.generic.AverageDataTarget {fixedTarget: 42.1841,
+  yearlyDataColumnName: "Yelloweye Rockfish Landings", 
+  weightInverse: 12, 
+  yearsToSkip: 5
+  }       

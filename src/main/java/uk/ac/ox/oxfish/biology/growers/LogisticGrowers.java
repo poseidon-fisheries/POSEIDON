@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.growers;
 
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,28 +32,20 @@ import java.util.function.Supplier;
  */
 public class LogisticGrowers {
 
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String, Supplier<AlgorithmFactory<? extends LogisticGrowerInitializer>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends LogisticGrowerInitializer>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        CONSTRUCTORS.put("Independent Logistic Grower",
-                SimpleLogisticGrowerFactory::new);
-        NAMES.put(SimpleLogisticGrowerFactory.class,
-                "Independent Logistic Grower");
-
-        CONSTRUCTORS.put("Common Logistic Grower",
-                CommonLogisticGrowerFactory::new);
-        NAMES.put(CommonLogisticGrowerFactory.class,
-                "Common Logistic Grower");
-
+        NAMES.put(SimpleLogisticGrowerFactory.class, "Independent Logistic Grower");
+        NAMES.put(CommonLogisticGrowerFactory.class, "Common Logistic Grower");
+        NAMES.put(FadAwareCommonLogisticGrowerInitializerFactory.class, "FAD-Aware Common Logistic Grower");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

@@ -64,7 +64,7 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                 x = random.nextInt(mapWidth);
                 y = random.nextInt(mapHeight);
             }
-            while (map.getSeaTile(x, y).getAltitude() > 0);
+            while (map.getSeaTile(x, y).isLand());
 
 
             map.getSeaTile(x,y).setHabitat(new TileHabitat(1d));
@@ -77,7 +77,7 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                 for(int h=-spread; h<=spread; h++)
                 {
                     SeaTile border = map.getSeaTile(x-spread, y + h);
-                    if(border != null && border.getAltitude() < 0)
+                    if(border != null && border.isWater())
                     {
 
                         border.setHabitat(new TileHabitat(
@@ -88,7 +88,7 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                         ));
                     }
                     border = map.getSeaTile(x+spread, y + h);
-                    if(border != null && border.getAltitude() < 0)
+                    if(border != null && border.isWater())
                     {
                         border.setHabitat(new TileHabitat(
                                 Math.min(border.getRockyPercentage() +
@@ -104,7 +104,7 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                 for(int w=-spread+1; w<spread; w++)
                 {
                     SeaTile border = map.getSeaTile(x+w, y - spread);
-                    if(border != null && border.getAltitude() < 0)
+                    if(border != null && border.isWater())
                     {
                         border.setHabitat(new TileHabitat(
                                 Math.min( border.getRockyPercentage() + Math.pow(smoothingValue.apply(random),spread),1)
@@ -113,7 +113,7 @@ public class RockyPyramidsHabitatInitializer implements HabitatInitializer {
                         ));
                     }
                     border = map.getSeaTile(x+w, y+spread);
-                    if(border != null && border.getAltitude() < 0)
+                    if(border != null && border.isWater())
                     {
                         border.setHabitat(new TileHabitat(
                                 Math.min( border.getRockyPercentage() +

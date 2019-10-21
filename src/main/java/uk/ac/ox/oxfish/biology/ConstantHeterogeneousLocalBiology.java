@@ -43,7 +43,7 @@ public class ConstantHeterogeneousLocalBiology extends AbstractBiomassBasedBiolo
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return biomasses[species.getIndex()];
     }
 

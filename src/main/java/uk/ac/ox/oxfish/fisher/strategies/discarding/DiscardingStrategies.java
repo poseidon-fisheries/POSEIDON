@@ -20,9 +20,8 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.discarding;
 
-import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
-import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.function.Supplier;
@@ -32,40 +31,15 @@ import java.util.function.Supplier;
  */
 public class DiscardingStrategies {
 
+    public static final LinkedHashMap<String, Supplier<AlgorithmFactory<? extends DiscardingStrategy>>> CONSTRUCTORS;
 
-    public static final LinkedHashMap<String,Supplier<AlgorithmFactory<? extends DiscardingStrategy>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
-
-    public static final LinkedHashMap<Class<? extends AlgorithmFactory>,String> NAMES = new LinkedHashMap<>();
-
+    public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     static {
-        CONSTRUCTORS.put("No Discarding",
-                         NoDiscardingFactory::new
-        );
-        NAMES.put(NoDiscardingFactory.class,
-                  "No Discarding");
-
-        CONSTRUCTORS.put("Discarding All Unsellable",
-                         DiscardingAllUnsellableFactory::new
-        );
-        NAMES.put(DiscardingAllUnsellableFactory.class,
-                  "Discarding All Unsellable");
-
-
-        CONSTRUCTORS.put("Specific Discarding",
-                         AlwaysDiscardTheseSpeciesFactory::new
-        );
-        NAMES.put(AlwaysDiscardTheseSpeciesFactory.class,
-                  "Specific Discarding");
-
-
-        CONSTRUCTORS.put("Age Discarding",
-                         DiscardUnderagedFactory::new
-        );
-        NAMES.put(DiscardUnderagedFactory.class,
-                  "Age Discarding");
-
+        NAMES.put(NoDiscardingFactory.class, "No Discarding");
+        NAMES.put(DiscardingAllUnsellableFactory.class, "Discarding All Unsellable");
+        NAMES.put(AlwaysDiscardTheseSpeciesFactory.class, "Specific Discarding");
+        NAMES.put(DiscardUnderagedFactory.class, "Age Discarding");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
-
 }

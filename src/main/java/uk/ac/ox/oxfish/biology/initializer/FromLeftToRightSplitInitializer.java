@@ -66,7 +66,7 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
             GlobalBiology biology, SeaTile seaTile, MersenneTwisterFast random, int mapHeightInCells,
             int mapWidthInCells, NauticalMap map)
     {
-        if (seaTile.getAltitude() > 0)
+        if (seaTile.isLand())
             return new EmptyLocalBiology();
         else
         if(seaTile.getGridY() < mapHeightInCells/2d)
@@ -100,7 +100,7 @@ public class FromLeftToRightSplitInitializer extends AbstractBiologyInitializer 
             int height = map.getHeight();
             int y = random.nextInt(height);
             SeaTile toChange = (SeaTile) baseGrid.get(x, y);
-            if (toChange.getAltitude() > 0) //land is cool man
+            if (toChange.isLand()) //land is cool man
             {
                 assert toChange.getBiomass(null) <= 0;
                 continue;

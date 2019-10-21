@@ -1,14 +1,11 @@
 package uk.ac.ox.oxfish.biology.initializer.allocator;
 
 import sim.field.geo.GeomVectorField;
-import sim.io.geo.ShapeFileImporter;
 import sim.util.geo.MasonGeometry;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.ShapeFileImporterModified;
 
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,7 +16,7 @@ public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassD
     private Path shapeFile = Paths.get("./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp");
 
 
-    private boolean insidePoligon = true;
+    private boolean insidePolygon = true;
 
     private AlgorithmFactory<? extends BiomassAllocator> delegate = new ConstantAllocatorFactory();
 
@@ -31,7 +28,7 @@ public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassD
             ShapeFileImporterModified.read(shapeFile.toUri().toURL(), polygon,
                     null, MasonGeometry.class);
             return new PolygonBiomassDecorator(polygon,
-                    insidePoligon,
+                insidePolygon,
                     delegate.apply(fishState)
                     );
 
@@ -51,12 +48,12 @@ public class PolygonAllocatorFactory implements AlgorithmFactory<PolygonBiomassD
     }
 
 
-    public boolean isInsidePoligon() {
-        return insidePoligon;
+    public boolean isInsidePolygon() {
+        return insidePolygon;
     }
 
-    public void setInsidePoligon(boolean insidePoligon) {
-        this.insidePoligon = insidePoligon;
+    public void setInsidePolygon(boolean insidePolygon) {
+        this.insidePolygon = insidePolygon;
     }
 
     public AlgorithmFactory<? extends BiomassAllocator> getDelegate() {

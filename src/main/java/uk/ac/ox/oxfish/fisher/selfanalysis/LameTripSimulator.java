@@ -59,7 +59,7 @@ public class LameTripSimulator {
         }
 
         int numberOfSpecies = state.getSpecies().size();
-        TripRecord record = new TripRecord(numberOfSpecies, fisher.getHoursAtPort());
+        TripRecord record = new TripRecord(numberOfSpecies, fisher.getHoursAtPort(),0);
 
         double timeSpentAtSea = 0;
         double gasConsumed = 0;

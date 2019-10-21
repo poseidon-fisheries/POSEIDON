@@ -50,7 +50,11 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 import uk.ac.ox.oxfish.utility.yaml.ModelResults;
 
 import java.awt.geom.Point2D;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -60,6 +64,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -435,12 +440,30 @@ public class FishStateUtilities {
     }
 
     /**
+     * A functional interface that can be used to ensure that a function is serializable.
+     */
+    @FunctionalInterface
+    interface SerializableFunction<T, R> extends Function<T, R>, Serializable {}
+
+    /**
      * takes a column of daily observations and sum them up to generate a yearly observation
      * @param column colun to sum over
      * @return a sum or NAN if the column is empty
      */
     public static <T> Gatherer<T> generateYearlySum(final DataColumn column) {
+        return generateYearlySum(column, x -> x);
+    }
 
+    /**
+     * takes a column of daily observations and sum them up to generate a yearly observation
+     * @param column colun to sum over
+     * @param sumTransformer takes the sum and applies an arbitrary function to it
+     * @return a sum or NAN if the column is empty
+     */
+    public static <T> Gatherer<T> generateYearlySum(
+        final DataColumn column,
+        final SerializableFunction<Double, Double> sumTransformer
+    ) {
         return new Gatherer<T>() {
             @Override
             public Double apply(T state) {
@@ -456,7 +479,7 @@ public class FishStateUtilities {
                         sum += iterator.next();
                 }
 
-                return sum;
+                return sumTransformer.apply(sum);
             }
         };
     }
@@ -1264,7 +1287,14 @@ public class FishStateUtilities {
         return Math.abs(error);
     }
 
-
+    /**
+     * same as java.util.stream.Collectors::throwingMerger (which is annoyingly private)
+     * Useful for collecting a stream to a non-java.util.HashMap Map implementation.
+     * I think Java 9 has a toMap method that doesn't require this and that we could use once we upgrade.
+     */
+    public static <T> BinaryOperator<T> throwingMerger() {
+        return (u, v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); };
+    }
 
 }
 

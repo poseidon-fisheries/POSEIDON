@@ -62,7 +62,8 @@ public class FishingMortalityAgentTest {
 
 
         FishingMortalityAgent agent = new FishingMortalityAgent(vulnerabilityFilter,
-                                                                                species);
+                                                                                species,
+                false);
 
 
         double[][] catches = new double[2][2];

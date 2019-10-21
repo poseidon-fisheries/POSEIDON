@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import org.jfree.util.Log;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
@@ -208,17 +209,31 @@ public class LogitDestinationStrategy implements DestinationStrategy{
         if(!fisher.isAllowedAtSea())
             return;
 
+        SeaTile destination = null;
+        int numberOfTrials = 0;
         double[][] input = this.input.getRegressionInput(fisher, state);
-        if(log!=null)
+        if (log != null)
             log.recordInput(input);
-        int armChosen = classifier.choose(input, random);
-        if(log!=null)
-            log.recordChoice(armChosen,
-                             state.getYear(),
-                             state.getDayOfTheYear());
+        int armChosen = - 1;
+        while(destination == null) {
 
-        
-        SeaTile destination = this.input.getLastExtraction().get(armChosen);
+            armChosen = classifier.choose(input, random);
+
+
+
+            destination = this.input.getLastExtraction().get(armChosen);
+            if(destination!=null && destination.isLand())
+                destination=null;
+            if(numberOfTrials++>100) {
+                Log.warn("Failed to compute any valid logit here, failed to adapt");
+                return;
+            }
+
+        }
+        if (log != null)
+            log.recordChoice(armChosen,
+                    state.getYear(),
+                    state.getDayOfTheYear());
 
         delegate.setFavoriteSpot(destination);
 

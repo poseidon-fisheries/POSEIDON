@@ -135,9 +135,10 @@ public class TACOpportunityCostManager implements TripListener, Startable, Stepp
     /**
      * computes and assigns opportunity costs to the fisher for being faster/slower than the rest
      * @param record
+     * @param fisher
      */
     @Override
-    public void reactToFinishedTrip(TripRecord record) {
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
 
         hoursAtSeaCounter+= record.getDurationInHours();
 

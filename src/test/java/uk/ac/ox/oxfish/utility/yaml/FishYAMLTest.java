@@ -211,7 +211,7 @@ public class FishYAMLTest {
                                                     "                From File Allocator:\n" +
                                                     "                  biomassPath: ./docs/indonesia_hub/runs/712/malabaricus_pixellated_map.csv\n" +
                                                     "                  inputFileHasHeader: true\n" +
-                                                    "              insidePoligon: true\n" +
+                                                    "              insidePolygon: true\n" +
                                                     "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
                                                     "          percentageLimitOnDailyMovement: '0.0'\n" +
                                                     "          speciesName: Lutjanus malabaricus\n" +
@@ -233,7 +233,7 @@ public class FishYAMLTest {
                                                     "                From File Allocator:\n" +
                                                     "                  biomassPath: ./docs/indonesia_hub/runs/712/multidens_pixellated_map.csv\n" +
                                                     "                  inputFileHasHeader: true\n" +
-                                                    "              insidePoligon: true\n" +
+                                                    "              insidePolygon: true\n" +
                                                     "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
                                                     "          percentageLimitOnDailyMovement: '0.0'\n" +
                                                     "          speciesName: Pristipomoides multidens\n" +
@@ -255,7 +255,7 @@ public class FishYAMLTest {
                                                     "                From File Allocator:\n" +
                                                     "                  biomassPath: ./docs/indonesia_hub/runs/712/areolatus_pixellated_map.csv\n" +
                                                     "                  inputFileHasHeader: true\n" +
-                                                    "              insidePoligon: true\n" +
+                                                    "              insidePolygon: true\n" +
                                                     "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
                                                     "          percentageLimitOnDailyMovement: '0.0'\n" +
                                                     "          speciesName: Epinephelus areolatus\n" +
@@ -277,7 +277,7 @@ public class FishYAMLTest {
                                                     "                From File Allocator:\n" +
                                                     "                  biomassPath: ./docs/indonesia_hub/runs/712/erythropterus_pixellated_map.csv\n" +
                                                     "                  inputFileHasHeader: true\n" +
-                                                    "              insidePoligon: true\n" +
+                                                    "              insidePolygon: true\n" +
                                                     "              shapeFile: ./docs/indonesia_hub/runs/712/shape/WPP_boundary.shp   \n" +
                                                     "          percentageLimitOnDailyMovement: '0.0'\n" +
                                                     "          speciesName: Lutjanus erythropterus\n" +

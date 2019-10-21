@@ -20,7 +20,7 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticAbundanceFilter;
+import uk.ac.ox.oxfish.fisher.equipment.gear.components.LogisticSimpleFilter;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
@@ -35,18 +35,15 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
     /**
      * the selectivity parameter A for the logistic
      */
-    private DoubleParameter selectivityAParameter = new FixedDoubleParameter(23.5035);
+    private DoubleParameter selexParameter1 = new FixedDoubleParameter(23.5035);
 
     /**
      * the selectivity parameter B for the logistic
      */
-    private DoubleParameter selectivityBParameter = new FixedDoubleParameter(9.03702);
+    private DoubleParameter selexParameter2 = new FixedDoubleParameter(9.03702);
 
-    /**
-     * whether the logistic function is log_10 or ln
-     */
-    private boolean selectivityInBaseTen = false;
 
+    private boolean computeDailyFishingMortality = false;
 
     private boolean selectivityRounding = false;
 
@@ -60,18 +57,17 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
     public FishingMortalityAgent apply(FishState fishState) {
 
         return new FishingMortalityAgent(
-                new LogisticAbundanceFilter(
-                        selectivityAParameter.apply(fishState.getRandom()),
-                        selectivityBParameter.apply(fishState.getRandom()),
+                new LogisticSimpleFilter(
                         true,selectivityRounding,
-                        selectivityInBaseTen
+                        selexParameter1.apply(fishState.getRandom()),
+                        selexParameter2.apply(fishState.getRandom())
 
 
 
                                             ),
-                fishState.getBiology().getSpecie(speciesName)
+                fishState.getBiology().getSpecie(speciesName),
 
-        );
+                computeDailyFishingMortality);
     }
 
     /**
@@ -98,17 +94,17 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @return Value for property 'selectivityAParameter'.
      */
-    public DoubleParameter getSelectivityAParameter() {
-        return selectivityAParameter;
+    public DoubleParameter getSelexParameter1() {
+        return selexParameter1;
     }
 
     /**
      * Setter for property 'selectivityAParameter'.
      *
-     * @param selectivityAParameter Value to set for property 'selectivityAParameter'.
+     * @param selexParameter1 Value to set for property 'selectivityAParameter'.
      */
-    public void setSelectivityAParameter(DoubleParameter selectivityAParameter) {
-        this.selectivityAParameter = selectivityAParameter;
+    public void setSelexParameter1(DoubleParameter selexParameter1) {
+        this.selexParameter1 = selexParameter1;
     }
 
     /**
@@ -116,35 +112,17 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      *
      * @return Value for property 'selectivityBParameter'.
      */
-    public DoubleParameter getSelectivityBParameter() {
-        return selectivityBParameter;
+    public DoubleParameter getSelexParameter2() {
+        return selexParameter2;
     }
 
     /**
      * Setter for property 'selectivityBParameter'.
      *
-     * @param selectivityBParameter Value to set for property 'selectivityBParameter'.
+     * @param selexParameter2 Value to set for property 'selectivityBParameter'.
      */
-    public void setSelectivityBParameter(DoubleParameter selectivityBParameter) {
-        this.selectivityBParameter = selectivityBParameter;
-    }
-
-    /**
-     * Getter for property 'selectivityInBaseTen'.
-     *
-     * @return Value for property 'selectivityInBaseTen'.
-     */
-    public boolean isSelectivityInBaseTen() {
-        return selectivityInBaseTen;
-    }
-
-    /**
-     * Setter for property 'selectivityInBaseTen'.
-     *
-     * @param selectivityInBaseTen Value to set for property 'selectivityInBaseTen'.
-     */
-    public void setSelectivityInBaseTen(boolean selectivityInBaseTen) {
-        this.selectivityInBaseTen = selectivityInBaseTen;
+    public void setSelexParameter2(DoubleParameter selexParameter2) {
+        this.selexParameter2 = selexParameter2;
     }
 
     /**
@@ -163,5 +141,13 @@ public class FishingMortalityAgentFactory implements AlgorithmFactory<FishingMor
      */
     public void setSelectivityRounding(boolean selectivityRounding) {
         this.selectivityRounding = selectivityRounding;
+    }
+
+    public boolean isComputeDailyFishingMortality() {
+        return computeDailyFishingMortality;
+    }
+
+    public void setComputeDailyFishingMortality(boolean computeDailyFishingMortality) {
+        this.computeDailyFishingMortality = computeDailyFishingMortality;
     }
 }

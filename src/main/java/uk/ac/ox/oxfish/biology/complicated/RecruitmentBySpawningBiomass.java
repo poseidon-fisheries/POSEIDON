@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.biology.complicated;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import org.jetbrains.annotations.Nullable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -78,8 +77,10 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
             int virginRecruits,
             double steepness,
             double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass, double[] maturity,
-            @Nullable double[] relativeFecundity, int femaleSubdivision) {
+            @Nullable double[] relativeFecundity, int femaleSubdivision, boolean recruitEveryDay) {
 
+
+        super(recruitEveryDay);
         this.cumulativePhi =cumulativePhi;
         double[] givenMaturity = Arrays.copyOf(maturity, maturity.length);
         this.maturity =
@@ -104,7 +105,8 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
             double steepness,
             double cumulativePhi, boolean addRelativeFecundityToSpawningBiomass,
             Function<Species, double[]> maturity,
-            @Nullable double[] relativeFecundity, int femaleSubdivision) {
+            @Nullable double[] relativeFecundity, int femaleSubdivision, boolean recruitEveryDay) {
+        super(recruitEveryDay);
         this.cumulativePhi =cumulativePhi;
         this.maturity = maturity;
         if(addRelativeFecundityToSpawningBiomass)
@@ -130,7 +132,7 @@ public class RecruitmentBySpawningBiomass extends YearlyRecruitmentProcess {
      *@return the number of male and female recruits
      */
     @Override
-    public double recruitYearly(
+    public double computeYearlyRecruitment(
             Species species, Meristics meristics, StructuredAbundance abundance)
     {
 

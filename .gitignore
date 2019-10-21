@@ -5,7 +5,7 @@ runs/dashboards/*
 !runs/dashboards/dashboard.R
 !runs/optimization
 temp_wfs/
-
+log.txt
 
 oxfish.iml
 ### NetBeans template
@@ -131,3 +131,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 
+.Rproj.user
+.DS_Store

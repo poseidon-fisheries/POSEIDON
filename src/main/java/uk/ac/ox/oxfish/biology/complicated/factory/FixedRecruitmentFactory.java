@@ -43,9 +43,9 @@ public class FixedRecruitmentFactory implements AlgorithmFactory<RecruitmentProc
     public RecruitmentProcess apply(FishState fishState) {
 
         if(yearly)
-            return new YearlyRecruitmentProcess(){
+            return new YearlyRecruitmentProcess(false){
                 @Override
-                protected double recruitYearly(Species species, Meristics meristics, StructuredAbundance abundance) {
+                protected double computeYearlyRecruitment(Species species, Meristics meristics, StructuredAbundance abundance) {
                     return yearlyRecruits.apply(fishState.getRandom());
                 }
 

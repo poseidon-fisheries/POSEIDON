@@ -82,6 +82,8 @@ import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
+import java.util.*;
+import static java.util.stream.Collectors.joining;
 
 /**
  * The boat catching all that delicious fish.
@@ -358,6 +360,8 @@ public class Fisher implements Steppable, Startable{
 
     }
 
+
+
     /**
      * tell the startable to turnoff,
      */
@@ -383,6 +387,8 @@ public class Fisher implements Steppable, Startable{
         bimonthlyAdaptation.turnOff(this);
         yearlyAdaptation.turnOff(this);
         tripAdaptation.turnOff(this);
+
+        getSocialNetwork().removeFisher(this,state);
     }
 
     @Override
@@ -508,11 +514,11 @@ public class Fisher implements Steppable, Startable{
     /**
      * departs
      */
-    public void undock(FishState model) {
+    public void undock() {
         assert this.status.getHoursAtSea() == 0;
         assert isAtPort();
         status.getHomePort().depart(this);
-        memory.getTripLogger().newTrip(getHoursAtPort(), model.getDay());
+        memory.getTripLogger().newTrip(getHoursAtPort(), state.getDay());
         status.setHoursAtPort(0);
     }
 
@@ -581,7 +587,7 @@ public class Fisher implements Steppable, Startable{
 
         //finish trip!
         if(status.getHoursAtSea()>0) {
-	        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort());
+	        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
 	        //account for the costs
 	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
 	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
@@ -813,7 +819,7 @@ public class Fisher implements Steppable, Startable{
     {
         //preamble
         SeaTile here = status.getLocation();
-        Preconditions.checkState(here.getAltitude() < 0, "can't fish on land!");
+        Preconditions.checkState(here.isWater(), "can't fish on land!");
         //compute the catches (but kill nothing yet)
         Pair<Catch, Catch> catchesAndKept = computeCatchesHere(status.getLocation(),
                                                                localBiology,
@@ -1085,7 +1091,7 @@ public class Fisher implements Steppable, Startable{
 
     @Override
     public String toString() {
-        return "Fisher " + fisherID +"; " + getTags().stream().reduce((s, s2) -> s+" - "+s2);
+        return "Fisher " + fisherID + "; " + getTags().stream().collect(joining(" - "));
     }
 
     /**
@@ -1574,11 +1580,35 @@ public class Fisher implements Steppable, Startable{
     public double getHoursAtSeaThisYear() {
         return memory.getHoursAtSeaThisYear();
     }
-    
     public boolean isTerritory(SeaTile tile){
 		if(status.getReputationalRisk()==null) 
 			return false;
     	else
     		return status.getReputationalRisk().isTerritory(tile);
+    }
+
+
+    /**
+     * Getter for property 'additionalVariables'.
+     *
+     * @return Value for property 'additionalVariables'.
+     */
+    public HashMap<String, Object> getAdditionalVariables() {
+        return status.getAdditionalVariables();
+    }
+
+
+    /**
+     * you've been active if you are currently out at sea or you have finished at least a trip
+     * in the past 365 days!
+     * @return
+     */
+    public boolean hasBeenActiveThisYear(){
+
+        if(getLastFinishedTrip() == null)
+            return false;
+
+        return getLastFinishedTrip().getTripDate()> state.getDay()-364 ||
+                (!getCurrentTrip().isCompleted() && getHoursAtSea()>0 );
     }
 }

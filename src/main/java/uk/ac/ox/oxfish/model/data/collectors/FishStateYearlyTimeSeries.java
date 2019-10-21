@@ -144,7 +144,7 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                              new Gatherer<FishState>() {
                                  @Override
                                  public Double apply(FishState state1) {
-                                     return originalGatherer.getLatestObservation(biomass);
+                                     return state1.getTotalBiomass(species);
                                  }
                              }
                     , Double.NaN);
@@ -270,7 +270,8 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
 
 
         registerGatherer("Total Effort",
-                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")), 0d);
+                         FishStateUtilities.generateYearlySum(originalGatherer.getColumn("Total Effort")),
+                         0d);
 
 
         registerGatherer("Average Distance From Port", new Gatherer<FishState>() {
@@ -529,7 +530,6 @@ public class FishStateYearlyTimeSeries extends TimeSeries<FishState>
                                 }).average().orElse(0d);
             }
         }, 0d);
-
 
 
         registerGatherer("Average Hours Out", new Gatherer<FishState>() {

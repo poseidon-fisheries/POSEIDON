@@ -20,11 +20,9 @@
 
 package uk.ac.ox.oxfish.biology.complicated.factory;
 
-import fr.ird.osmose.process.mortality.MortalityProcess;
-import uk.ac.ox.oxfish.biology.boxcars.EquallySpacedBertalanffyFactory;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,30 +30,20 @@ import java.util.function.Supplier;
 
 public class Mortalities {
 
-
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends NaturalMortalityProcess>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends NaturalMortalityProcess>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-    static{
-        CONSTRUCTORS.put("Proportional Mortality",
-                         ProportionalMortalityFactory::new);
-        NAMES.put(ProportionalMortalityFactory.class,"Proportional Mortality");
-
-        CONSTRUCTORS.put("Exponential Mortality",
-                         ExponentialMortalityFactory::new);
-        NAMES.put(ExponentialMortalityFactory.class,"Exponential Mortality");
-
-
-
-
+    static {
+        NAMES.put(ProportionalMortalityFactory.class, "Proportional Mortality");
+        NAMES.put(ExponentialMortalityFactory.class, "Exponential Mortality");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
     private Mortalities() {}

@@ -109,21 +109,8 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }
 
         final List<Fisher> fishers = state.getFishers();
-        //number of fishers
-        registerGatherer("Number of Fishers", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return (double) fishers.size();
-            }
-        }, 0d);
-        //fishers who are actually out
-        registerGatherer("Fishers at Sea", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                return fishers.stream().mapToDouble(
-                        value -> value.getLocation().equals(value.getHomePort().getLocation()) ? 0 : 1).sum();
-            }
-        }, 0d);
+
+
 
         registerGatherer("Total Effort", new Gatherer<FishState>() {
             @Override
@@ -161,38 +148,6 @@ public class FishStateDailyTimeSeries extends TimeSeries<FishState> {
         }, 0d);
 
 
-        registerGatherer("Average Cash-Flow", new Gatherer<FishState>() {
-            @Override
-            public Double apply(FishState ignored) {
-                if (fishers.size() == 0)
-                    return 0d;
-
-                double sum = 0;
-                for (Fisher fisher : observed.getFishers()) {
-                    sum += fisher.getDailyData().getLatestObservation(FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
-
-                }
-
-                return sum / (double) fishers.size();
-            }
-        }, 0d);
-
-
-        final NauticalMap map = state.getMap();
-        final List<SeaTile> allSeaTilesAsList = map.getAllSeaTilesAsList();
-
-        for(Species species : observed.getSpecies())
-        {
-            registerGatherer("Biomass " + species.getName(),
-                             new Gatherer<FishState>() {
-                                 @Override
-                                 public Double apply(FishState state1) {
-                                     return state1.getTotalBiomass(species);
-
-                                 }
-                             },
-                             0d);
-        }
 
 
 

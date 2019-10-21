@@ -62,7 +62,7 @@ public class Fishing implements Action
     @Override
     public ActionResult act(FishState model, Fisher agent, Regulation regulation, double hoursLeft) {
         Preconditions.checkArgument(agent.isAtDestination()); //you arrived
-        Preconditions.checkArgument(agent.getLocation().getAltitude() <= 0); //you are at sea
+        Preconditions.checkArgument(agent.getLocation().isWater()); //you are at sea
         Preconditions.checkState(
                 regulation.canFishHere(agent, agent.getLocation(), model) || accruedHours > 0 ||
         agent.isCheater()); //i should be allowed to fish here!

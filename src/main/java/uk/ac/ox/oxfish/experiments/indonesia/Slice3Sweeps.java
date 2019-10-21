@@ -62,7 +62,7 @@ import java.util.List;
 public class Slice3Sweeps {
 
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
-    public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
+    public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice5/calibration/sweep_test/";
     public static final int MIN_DAYS_OUT = 50;
     public static final int RUNS_PER_POLICY = 1;
     public static final int MAX_DAYS_OUT = 250;
@@ -70,26 +70,28 @@ public class Slice3Sweeps {
 
 
     public static void main(String[] args) throws IOException {
-        DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
+   //     DIRECTORY = "docs/indonesia_hub/runs/712/slice4/non-recalibrated/policy/";
         POPULATIONS = 4;
 
         //effort control
         //all boats are controlled
-//        effortControl("all_manyruns",
-//                      new String[]{"big","small","medium","small10"},
-//                      "pessimistic_spinup",
-//                      1, MIN_DAYS_OUT);
-//        effortControl("all_manyruns_quick_byfifty",
-//                      new String[]{"big","small","medium","small10"},
-//                      "optimistic_spinup",
-//                      1, MIN_DAYS_OUT);
+        effortControl("all_manyruns",
+                      new String[]{"big","small","medium","small10"},
+                      "pessimistic_spinup",
+                      1, MIN_DAYS_OUT);
+        effortControl("all_manyruns_quick_byfifty2",
+                      new String[]{"big","small","medium","small10"},
+                      "optimistic_spinup",
+                      1, MIN_DAYS_OUT);
 
-//                effortControl("all_quick",
-//                      new String[]{"big","small","medium","small10"},
-//                      "fixed_recruits",
-//                      1, MIN_DAYS_OUT);
+                effortControl("all_quick",
+                      new String[]{"big","small","medium","small10"},
+                      "fixed_recruits",
+                      1, MIN_DAYS_OUT);
+
+
 //        //only boats >10GT are controlled
-//        effortControl("10_manyruns_byfifty",
+//        effortControl("10_manyruns_byfifty2",
 //                      new String[]{"big","medium","small10"},
 //                      "optimistic_spinup",
 //                      1, MIN_DAYS_OUT);
@@ -103,20 +105,20 @@ public class Slice3Sweeps {
 //                      1, MIN_DAYS_OUT);
 //
 //        //price premium
-//        pricePremium("premium_multidens_quick2","optimistic_spinup",10,"Pristipomoides multidens");
-      //  pricePremium("premium_malabaricus_quick_byfifty","optimistic_spinup",10,"Lutjanus malabaricus");
+//        pricePremium("premium_multidens_quick3","optimistic_spinup",10,"Pristipomoides multidens");
+        pricePremium("premium_malabaricus_quick_byfifty3","optimistic_spinup",10,"Lutjanus malabaricus");
 //        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
-        selectivityTest("selectivity_sweep_quick","fixed_recruits");
+      //  selectivityTest("selectivity_sweep_quick2","fixed_recruits");
       //  selectivityTest("selectivity_sweep_quick3","optimistic_spinup");
  //       pricePenalty("malus_multidens_manyruns","optimistic_spinup",10,"Pristipomoides multidens");
-//        pricePenalty("malus_malabaricus_fiftyyears",
+//        pricePenalty("malus_malabaricus_fiftyyears2",
 //                     "optimistic_spinup",
 //                     10,
 //                     "Lutjanus malabaricus");
-//        pricePenalty("malus_malabaricus_",
-//                     "fixed_recruits",
-//                     10,
-//                     "Lutjanus malabaricus");
+//        pricePenalty("malus_malabaricus_2",
+ //                    "fixed_recruits",
+  //                   10,
+   //                  "Lutjanus malabaricus");
 //
 //        pricePremium("premium_multidens_quick2","pessimistic_spinup",10,"Pristipomoides multidens");
  //       pricePremium("premium_malabaricus_quick2","pessimistic_spinup",10,"Lutjanus malabaricus");
@@ -128,10 +130,10 @@ public class Slice3Sweeps {
 
 
         //fleet reduction
-   //     fleetReduction("fleetreduction_byfifty","optimistic_spinup",1);
+ //       fleetReduction("fleetreduction_byfifty2","optimistic_spinup",1);
 //        fleetReduction("fleetreduction_quick","pessimistic_spinup",1);
 
-     //   fleetReduction("fleetreduction_quick","fixed_recruits",1);
+      //  fleetReduction("fleetreduction_quick2","fixed_recruits",1);
 //
  //           delays("delay_all_quick2", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 50);
 //              delays("delay_all_quick", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 50);
@@ -143,7 +145,7 @@ public class Slice3Sweeps {
       //        delays("delay_10_quick", new String[]{"big","small10","medium"}, "fixed_recruits", 1, 50);
 
 
-        //    delaysOnce("delay_once_all_quick_byfifty", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 200);
+      //      delaysOnce("delay_once_all_quick_byfifty2", new String[]{"big","small","medium","small10"}, "optimistic_spinup", 1, 200);
         //      delaysOnce("delay_once_all_quick3", new String[]{"big","small","medium","small10"}, "pessimistic_spinup", 1, 200);
    //     delaysOnce("delay_once_all_quick", new String[]{"big","small","medium","small10"}, "fixed_recruits", 1, 200);
 
@@ -171,106 +173,6 @@ public class Slice3Sweeps {
 //        );
     }
 
-    public static void main3(String[] args) throws IOException {
-        DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
-        POPULATIONS = 3;
-
-//        effortControl("all", new String[]{"big","small","medium"}, "fixed_recruits", 4, MIN_DAYS_OUT);
-//        effortControl("large", new String[]{"big"}, "fixed_recruits", 4, MIN_DAYS_OUT);
-//        effortControl("medium", new String[]{"big","medium"}, "fixed_recruits", 4, MIN_DAYS_OUT);
-
-
-//
-//        effortControl("all_manyruns",
-//                      new String[]{"big","small","medium"},
-//                      "optimistic_recruits",
-//                      1, MIN_DAYS_OUT);
-//        effortControl("large", new String[]{"big"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
-//        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits", 1, MIN_DAYS_OUT);
-
-//        effortControl("all_manyruns",
-//                      new String[]{"big","small","medium"},
-//                      "optimistic_recruits_spinup_fixedmarket",
-//                      1,
-//                      MIN_DAYS_OUT);
-//        effortControl("large", new String[]{"big"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
-//        effortControl("medium", new String[]{"big","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, MIN_DAYS_OUT);
-
-
-//        effortControl("all_manyruns",
-//                      new String[]{"big","small","medium"},
-//                      "pessimistic_recruits_spinup",
-//                      1,
-//                      MIN_DAYS_OUT);
-
-//       fleetReduction("fleetreduction","optimistic_recruits",1);
-//       fleetReduction("fleetreduction","fixed_recruits",4);
-//        fleetReduction("fleetreduction_manyruns","optimistic_recruits_spinup_fixedmarket",1);
-//        fleetReduction("fleetreduction_manyruns","pessimistic_recruits_spinup",1);
-
-
-//        pricePremium("premium_malabaricus","fixed_recruits",10,"Lutjanus malabaricus");
-//        pricePremium("premium_multidens","fixed_recruits",10,"Pristipomoides multidens");
-//        pricePremium("premium_malabaricus","optimistic_recruits",10,"Lutjanus malabaricus");
-//        pricePremium("premium_multidens","optimistic_recruits",10,"Pristipomoides multidens");
-//        pricePremium("premium_malabaricus3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
-        //    pricePremium("premium_ero3","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus erythropterus");
-        //       pricePremium("premium_multidens3","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
-        //   pricePremium("premium_ero3","pessimistic_recruits_spinup",10,"Lutjanus erythropterus");
-
-        //    pricePremium("premium_malabaricus_manyruns","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
-        //       pricePremium("premium_multidens3","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
-
-
-        // pricePenalty("malus_malabaricus","optimistic_recruits_spinup_fixedmarket",10,"Lutjanus malabaricus");
-//        pricePenalty("malus_multidens","optimistic_recruits_spinup_fixedmarket",10,"Pristipomoides multidens");
-//        pricePenalty("malus_malabaricus","pessimistic_recruits_spinup",10,"Lutjanus malabaricus");
-//        pricePenalty("malus_multidens","pessimistic_recruits_spinup",10,"Pristipomoides multidens");
-
-
-        //    delays("delay_all_manyruns", new String[]{"big","small","medium"}, "optimistic_recruits_spinup_fixedmarket", 1, 50);
-        //      delays("delay_all_manyruns", new String[]{"big","small","medium"}, "pessimistic_recruits_spinup", 1, 50);
-
-//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits", "Lutjanus malabaricus", "100_malabaricus",
-//                    false);
-//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "optimistic_recruits", "Pristipomoides multidens", "100_multidens",
-//                    false);
-//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "fixed_recruits", "Lutjanus malabaricus", "100_malabaricus", false);
-//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "fixed_recruits", "Pristipomoides multidens", "100_multidens", false);
-//        adaptiveSPR("spr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket", "Lutjanus malabaricus", "100_malabaricus",
-//                    false);
-//        adaptiveSPR("spr_multidens", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket", "Pristipomoides multidens", "100_multidens",
-//                    false);
-
-//        adaptiveSPR("oraclespr_malabaricus", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket",
-//                    "Lutjanus malabaricus", "100_malabaricus",
-//                    true);
-//        adaptiveSPR("oraclespr_multidens", MIN_DAYS_OUT, "optimistic_recruits_spinup_fixedmarket",
-//                    "Pristipomoides multidens", "100_multidens",
-//                    true);
-
-//
-        //     recruitmentFailure("recruit_failure2","fixed_recruits",4,10);
-//        recruitmentFailure("recruit_failure","optimistic_recruits",4,2);
-//        recruitmentFailure("recruit_failure","optimistic_recruits_spinup_fixedmarket",4,2);
-
-
-//        selectivityTest("selectivity_sweep","optimistic_recruits_spinup_fixedmarket");
-//        selectivityTest("selectivity_sweep","pessimistic_recruits_spinup");
-
-
-
-
-
-
-        //FURTHER
-        DIRECTORY = DIRECTORY + "further/";
-        //pricePremium("premium_malabaricus_manyruns","pessimistic_recruits_spinup_doublegear",10,"Lutjanus malabaricus");
-    /*    pricePremium("premium_malabaricus_manyruns","optimistic_recruits_spinup_fixedmarket_doublegear",
-                     10,"Lutjanus malabaricus");
-                     */
-
-    }
 
     private static void effortControl(
             String name,
@@ -976,6 +878,8 @@ public class Slice3Sweeps {
                 "SPR Oracle - " + "Pristipomoides multidens" ,
                 "SPR Oracle - " + "Lutjanus malabaricus",
                 "SPR Oracle - " + "Lutjanus erythropterus",
+                "Average Daily Fishing Mortality Lutjanus malabaricus",
+                "Yearly Fishing Mortality Lutjanus malabaricus",
                 "Percentage Mature Catches " + "Epinephelus areolatus" + " " + "100_areolatus",
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens",
                 "Percentage Mature Catches " + "Lutjanus malabaricus" + " " + "100_malabaricus",
@@ -1294,3 +1198,4 @@ public class Slice3Sweeps {
         fileWriter.close();
     }
 }
+

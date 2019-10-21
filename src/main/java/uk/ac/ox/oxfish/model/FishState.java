@@ -55,6 +55,7 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.RandomCatchabilityTrawl;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.data.Gatherer;
 import uk.ac.ox.oxfish.model.data.OutputPlugin;
@@ -103,6 +104,11 @@ public class FishState  extends SimState{
      * list of all objects that need to be started when the model actually starts
      */
     private List<Startable> toStart;
+
+    /**
+     * may contain the fad map, if fads are used in the scenario (null otherwise)
+     */
+    private FadMap fadMap = null;
 
     /**
      * Dataset of all the columns that are updated daily
@@ -409,6 +415,8 @@ public class FishState  extends SimState{
         return  ((scheduleTime / stepsPerDay) / 365);
     }
 
+
+
     public int getHour() {
         return (int) (schedule.getTime() % stepsPerDay * 24 / stepsPerDay);
     }
@@ -503,7 +511,8 @@ public class FishState  extends SimState{
 
     public double getTotalBiomass(Species species)
     {
-        return map.getTotalBiology(species);
+        final double fadBiomass = fadMap == null ? 0 : fadMap.getTotalBiomass(species);
+        return fadBiomass + map.getTotalBiology(species);
     }
 
     public double getTotalAbundance(Species species,int bin)
@@ -536,6 +545,32 @@ public class FishState  extends SimState{
                 sum += seaTile.getAbundance(species).getAbundance(subdivision,bin);
         }
         return sum;
+    }
+
+    /**
+     * sums up the count of fish in all sea tiles and returns it as an array (safe to modify)
+     * @param species
+     * @return
+     */
+    public double[][] getTotalAbundance(Species species)
+    {
+
+        double[][] totalAbundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
+
+        for (SeaTile seaTile : map.getAllSeaTilesExcludingLandAsList()) {
+
+            for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
+            {
+                for (int bin = 0; bin < species.getNumberOfBins(); bin++)
+                {
+                    if (seaTile.isFishingEvenPossibleHere())
+                        totalAbundance[subdivision][bin] += seaTile.getAbundance(species).getAbundance(subdivision, bin);
+                }
+            }
+        }
+        assert totalAbundance[species.getNumberOfSubdivisions()-1][species.getNumberOfBins()-1] ==
+                getTotalAbundance(species,species.getNumberOfSubdivisions()-1,species.getNumberOfBins()-1);
+        return totalAbundance;
     }
 
     /**
@@ -897,4 +932,8 @@ public class FishState  extends SimState{
         aggregateDailySteppables.clear();
 
     }
+
+    public FadMap getFadMap() { return fadMap; }
+
+    public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
 }

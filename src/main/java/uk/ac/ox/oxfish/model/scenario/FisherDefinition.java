@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.scenario;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -64,6 +65,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -170,16 +172,30 @@ public class FisherDefinition {
     }
 
 
+    /**
+     * other additional setups we may want to add to the fisher;
+     */
+    private List<Consumer<Fisher>> additionalSetups = new LinkedList<>();
+
+
     //keeps track of how many fish have been built so far
     //so that we can match each to a specific port
     //when we have built enough, fishCreation resets to 0
     private int fishCreationIndex =0;
-    public Port getNextFisher(List<Port> ports)
+    public Port getNextFisher(List<Port> ports,
+                              FishState model)
     {
-        assert fishCreationIndex <flatPortArray.length;
-
-        String portName = flatPortArray[fishCreationIndex];
-
+        // this assret is not true anymore; now after creating the first batch of fishers the rest is randomized assert fishCreationIndex <flatPortArray.length;
+        String portName;
+        //you are creating the original fishers!
+        if(fishCreationIndex< flatPortArray.length) {
+            portName= flatPortArray[fishCreationIndex];
+        }
+        //you are creating additional fishers!, then pick stochastically
+        else {
+            assert model.getDay()>0;
+            portName = flatPortArray[model.getRandom().nextInt(flatPortArray.length)];
+        }
 
 
         Port toReturn = ports.stream().filter(new Predicate<Port>() {
@@ -192,12 +208,27 @@ public class FisherDefinition {
         });
 
         fishCreationIndex++;
-        if(fishCreationIndex >=flatPortArray.length)
-        {
-            assert fishCreationIndex ==flatPortArray.length;
-            fishCreationIndex =0;
-        }
+
         return toReturn;
+    }
+
+    Supplier<Engine> makeEngineSupplier(MersenneTwisterFast random) {
+        return () -> new Engine(enginePower.apply(random), literPerKilometer.apply(random), speedInKmh.apply(random));
+    }
+
+    Supplier<FuelTank> makeFuelTankSupplier(MersenneTwisterFast random) {
+        return () -> new FuelTank(fuelTankSize.apply(random));
+    }
+
+    Supplier<Hold> makeHoldSupplier(MersenneTwisterFast random, GlobalBiology biology) {
+        return () -> new Hold(holdSize.apply(random), biology);
+    }
+
+    Supplier<Boat> makeBoatSupplier(MersenneTwisterFast random) {
+        return () -> new Boat(10, 10,
+            makeEngineSupplier(random).get(),
+            makeFuelTankSupplier(random).get()
+        );
     }
 
     public FisherFactory getFisherFactory(FishState model, List<Port> ports, int firstFisherID){
@@ -214,22 +245,17 @@ public class FisherDefinition {
         LogbookInitializer log = logbook.apply(model);
         log.start(model);
 
-
-
         //create the fisher factory object, it will be used by the fishstate object to create and kill fishers
         //while the model is running
-        Supplier<Boat> boatSupplier = () -> new Boat(10, 10, new Engine(enginePower.apply(random),
-                literPerKilometer.apply(random),
-                speedInKmh.apply(random)),
-                new FuelTank(fuelTankSize.apply(random)));
-        Supplier<Hold> holdSupplier = () -> new Hold(holdSize.apply(random), biology);
+        Supplier<Boat> boatSupplier = makeBoatSupplier(random);
+        Supplier<Hold> holdSupplier = makeHoldSupplier(random, biology);
 
         FisherFactory fisherFactory = new FisherFactory(
                 //default to grabbing first port!
                 new Supplier<Port>() {
                     @Override
                     public Port get() {
-                        return getNextFisher(ports);
+                        return getNextFisher(ports,  model);
                     }
                 },
                 regulation,
@@ -281,17 +307,11 @@ public class FisherDefinition {
         );
 
         //add tags to fisher definition
-        final String[] tags = this.tags.split(",");
-        if(tags.length>0)
-            fisherFactory.getAdditionalSetups().add(
-                    new Consumer<Fisher>() {
-                        @Override
-                        public void accept(Fisher fisher) {
-                            for(String tag : tags)
-                                fisher.getTags().add(tag.trim());
-                        }
-                    }
-            );
+        final List<String> tags = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(this.tags);
+        if (!tags.isEmpty()) fisherFactory.getAdditionalSetups().add(fisher -> fisher.getTags().addAll(tags));
+
+        //add other setups
+        fisherFactory.getAdditionalSetups().addAll(additionalSetups);
 
 
 
@@ -621,5 +641,12 @@ public class FisherDefinition {
 
     public void setHourlyVariableCost(DoubleParameter hourlyVariableCost) {
         this.hourlyVariableCost = hourlyVariableCost;
+    }
+
+    /**
+     *  not sure about exposing this to YAML constructor; that's why it's "grab" and not "get"
+     */
+    public List<Consumer<Fisher>> grabAdditionalSetups() {
+        return additionalSetups;
     }
 }

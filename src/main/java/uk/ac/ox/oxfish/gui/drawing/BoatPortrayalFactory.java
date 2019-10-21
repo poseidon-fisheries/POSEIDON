@@ -20,6 +20,8 @@
 
 package uk.ac.ox.oxfish.gui.drawing;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
@@ -64,7 +66,10 @@ public class BoatPortrayalFactory
         BOAT_COLORS.put("grey", Color.gray);
         BOAT_COLORS.put("gray", Color.gray);
         BOAT_COLORS.put("pink", Color.pink);
-        BOAT_COLORS.put("orange", Color.orange);
+        BOAT_COLORS.put("salmon", new Color(250,128,114));
+        BOAT_COLORS.put("palevioletred", new Color(219,112,147));
+        BOAT_COLORS.put("teal", new Color(0,128,128));
+        BOAT_COLORS.put("wheat", new Color(245,222,179));
 
 
     }
@@ -115,21 +120,28 @@ public class BoatPortrayalFactory
     }
 
 
+    //when building a lot of pictures, all of the same type the getColor will slow everything down.
+    //this makes it faster
+    private final Table<BufferedImage,Color,BufferedImage> portrayalCache = HashBasedTable.create();
+
     public BufferedImage colorImage(BufferedImage old, Color newColor)
     {
 
-        BufferedImage img = new BufferedImage(old.getColorModel(),old.copyData(null),old.isAlphaPremultiplied(),null);
-        //grabbed from here: http://stackoverflow.com/questions/532586/change-a-specific-color-in-an-imageicon
-        final int oldRGB = Color.black.getRGB();
-        final int newRGB = newColor.getRGB();
-        for (int x = 0; x < img.getWidth(); x++) {
-            for (int y = 0; y < img.getHeight(); y++) {
-                if (img.getRGB(x, y) == oldRGB)
-                    img.setRGB(x, y, newRGB);
+        if(!portrayalCache.contains(old,newColor)) {
+            BufferedImage img = new BufferedImage(old.getColorModel(), old.copyData(null), old.isAlphaPremultiplied(),
+                                                  null);
+            //grabbed from here: http://stackoverflow.com/questions/532586/change-a-specific-color-in-an-imageicon
+            final int oldRGB = Color.black.getRGB();
+            final int newRGB = newColor.getRGB();
+            for (int x = 0; x < img.getWidth(); x++) {
+                for (int y = 0; y < img.getHeight(); y++) {
+                    if (img.getRGB(x, y) == oldRGB)
+                        img.setRGB(x, y, newRGB);
+                }
             }
+            portrayalCache.put(old,newColor,img);
         }
-
-        return  img;
+        return  portrayalCache.get(old,newColor);
 
 
     }

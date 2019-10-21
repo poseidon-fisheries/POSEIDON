@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.geography.pathfinding;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import sim.field.geo.GeomGridField;
 import sim.field.geo.GeomVectorField;
@@ -31,71 +32,121 @@ import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 import java.util.Deque;
 
+import static com.google.common.collect.Iterables.elementsEqual;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 /**
  * Created by carrknight on 11/4/15.
  */
 public class PathfinderTest {
 
-
     @Test
-    public void simplePathfindingTest() throws Exception {
+    public void simplePathfindingTest() {
 
-
-        ObjectGrid2D grid2D = new ObjectGrid2D(3,3);
         //3x3 map, where  the middle column (0,1 and 1,1 but not 2,1) has land in it
-        for(int i=0;i<3;i++)
-            for(int j=0;j<3;j++)
-                if(j == 1 && i<2)
-                    grid2D.field[i][j] = new SeaTile(i,j,100, new TileHabitat(0d));
-                else
-                    grid2D.field[i][j] = new SeaTile(i,j,-100, new TileHabitat(0d));
-
-        //great
-        NauticalMap map = new NauticalMap(new GeomGridField(grid2D),new GeomVectorField(),
-                                          new CartesianDistance(1),mock(Pathfinder.class));
-
+        NauticalMap map = makeMap(new int[][]{
+            {-1, 10, -1},
+            {-1, 10, -1},
+            {-1, -1, -1}
+        });
 
         //we want to go from 0,0 to 0,2
-        SeaTile start = map.getSeaTile(0,0);
-        SeaTile end = map.getSeaTile(0,2);
+        SeaTile start = map.getSeaTile(0, 0);
+        SeaTile end = map.getSeaTile(0, 2);
 
         //start with direct pathfinder
         StraightLinePathfinder liner = new StraightLinePathfinder();
         Deque<SeaTile> route = liner.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertEquals(route.size(), 3);
         route.poll();
-        assertEquals(route.peekFirst(),map.getSeaTile(0,1)); //it paths overland
-
-
+        assertEquals(route.peekFirst(), map.getSeaTile(0, 1)); //it paths overland
 
         //now let's do BreadthFirst
         BreadthFirstPathfinder breadthFirst = new BreadthFirstPathfinder();
         route = breadthFirst.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertTrue(route.size() > 3);
-        assertTrue(!route.contains(map.getSeaTile(0,1)));
-        assertTrue(!route.contains(map.getSeaTile(1,1)));
+        assertFalse(route.contains(map.getSeaTile(0, 1)));
+        assertFalse(route.contains(map.getSeaTile(1, 1)));
         route.poll();
-
 
         //let's do A*
         AStarPathfinder star = new AStarPathfinder(new CartesianDistance(1));
         route = star.getRoute(map, start, end);
         //it should be very short
         assertEquals(route.peekFirst(), start);
-        assertEquals(route.peekLast(),end);
+        assertEquals(route.peekLast(), end);
         assertEquals(route.size(), 5);
-        assertTrue(!route.contains(map.getSeaTile(0,1)));
-        assertTrue(!route.contains(map.getSeaTile(1,1)));
+        assertFalse(route.contains(map.getSeaTile(0, 1)));
+        assertFalse(route.contains(map.getSeaTile(1, 1)));
         route.poll();
     }
+
+    @Test
+    public void fallbackPathfindingTest() {
+
+        NauticalMap map = makeMap(new int[][]{
+            {-1, 10, -1},
+            {-1, 10, -1},
+            {-1, -1, -1}
+        });
+        final SeaTile topLeft = map.getSeaTile(0, 0);
+        final SeaTile bottomLeft = map.getSeaTile(2, 0);
+        final SeaTile topRight = map.getSeaTile(0, 2);
+
+        final CartesianDistance distance = new CartesianDistance(1);
+        final AStarFallbackPathfinder fallbackPathfinder = new AStarFallbackPathfinder(distance);
+        final AStarPathfinder aStarPathfinder = new AStarPathfinder(distance);
+        final BreadthFirstPathfinder breadthFirstPathfinder = new BreadthFirstPathfinder();
+        final StraightLinePathfinder straightLinePathfinder = new StraightLinePathfinder();
+
+        // Straight line from top left to bottom left
+        final ImmutableList<SeaTile> expectedStraightRoute = ImmutableList.of(
+            topLeft, map.getSeaTile(1, 0), bottomLeft
+        );
+        final Deque<SeaTile> straightRoute = fallbackPathfinder.getRoute(map, topLeft, bottomLeft);
+        assertTrue(elementsEqual(straightRoute, expectedStraightRoute));
+        assertTrue(elementsEqual(straightRoute, aStarPathfinder.getRoute(map, topLeft, bottomLeft)));
+        assertTrue(elementsEqual(straightRoute, breadthFirstPathfinder.getRoute(map, topLeft, bottomLeft)));
+        assertTrue(elementsEqual(straightRoute, straightLinePathfinder.getRoute(map, topLeft, bottomLeft)));
+
+        // Route around land from top left to top right
+        final Deque<SeaTile> routeAround = fallbackPathfinder.getRoute(map, topLeft, topRight);
+        final ImmutableList<SeaTile> expectedRouteAround = ImmutableList.of(
+            topLeft,
+            map.getSeaTile(1, 0),
+            map.getSeaTile(2, 1),
+            map.getSeaTile(1, 2),
+            topRight
+        );
+        assertTrue(elementsEqual(routeAround, expectedRouteAround));
+        assertTrue(elementsEqual(routeAround, aStarPathfinder.getRoute(map, topLeft, topRight)));
+        assertTrue(elementsEqual(routeAround, breadthFirstPathfinder.getRoute(map, topLeft, topRight)));
+        assertFalse(elementsEqual(routeAround, straightLinePathfinder.getRoute(map, topLeft, topRight)));
+
+        // Fallback and aStar (but not StraightLine) should return null if the map is impassable
+        // (BreadthFirstPathFinder would stall, so we're not testing it)
+        NauticalMap impassableMap = makeMap(new int[][]{
+            {-1, 10, -1},
+            {-1, 10, -1},
+            {-1, 10, -1}
+        });
+        final SeaTile start = impassableMap.getSeaTile(0, 0);
+        final SeaTile end = impassableMap.getSeaTile(0, 2);
+        assertNull(fallbackPathfinder.getRoute(impassableMap, start, end));
+        assertNull(aStarPathfinder.getRoute(impassableMap, start, end));
+        assertNotNull(straightLinePathfinder.getRoute(impassableMap, start, end));
+    }
+
 }

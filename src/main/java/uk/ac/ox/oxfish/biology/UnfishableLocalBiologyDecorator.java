@@ -52,7 +52,7 @@ public class UnfishableLocalBiologyDecorator implements LocalBiology {
      * @return the biomass of this species
      */
     @Override
-    public Double getBiomass(Species species) {
+    public double getBiomass(Species species) {
         return decorated.getBiomass(species);
     }
 

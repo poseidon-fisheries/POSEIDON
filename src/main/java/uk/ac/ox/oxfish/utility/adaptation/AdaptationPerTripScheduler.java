@@ -80,9 +80,9 @@ public class AdaptationPerTripScheduler implements TripListener, FisherStartable
     }
 
     @Override
-    public void reactToFinishedTrip(TripRecord record)
+    public void reactToFinishedTrip(TripRecord record, Fisher fisher)
     {
         for(Adaptation a : adaptations)
-            a.adapt(fisher,model,fisher.grabRandomizer());
+            a.adapt(this.fisher, model, this.fisher.grabRandomizer());
     }
 }

@@ -76,7 +76,7 @@ public class PyramidsAllocator implements BiomassAllocator {
                     x = random.nextInt(mapWidth);
                     y = random.nextInt(mapHeight);
                 }
-                while (map.getSeaTile(x, y).getAltitude() > 0);
+                while (map.getSeaTile(x, y).isLand());
                 biomass.set(x, y, peakBiomass);
                 for (int spread = 1; spread < maxSpread; spread++) {
 
@@ -84,14 +84,14 @@ public class PyramidsAllocator implements BiomassAllocator {
                     //vertical border
                     for (int h = -spread; h <= spread; h++) {
                         SeaTile border = map.getSeaTile(x - spread, y + h);
-                        if (border != null && border.getAltitude() < 0) {
+                        if (border != null && border.isWater()) {
 
                             biomass.set(x - spread, y + h,
                                         Math.min(biomass.get(x-spread,y+h) + Math.pow(smoothingValue, spread) * peakBiomass,peakBiomass));
 
                         }
                         border = map.getSeaTile(x + spread, y + h);
-                        if (border != null && border.getAltitude() < 0) {
+                        if (border != null && border.isWater()) {
                             biomass.set(x + spread, y + h,
                                         Math.min(biomass.get(x+spread,y+h) + Math.pow(smoothingValue, spread) * peakBiomass,peakBiomass));
                         }
@@ -101,13 +101,13 @@ public class PyramidsAllocator implements BiomassAllocator {
 
                     for (int w = -spread + 1; w < spread; w++) {
                         SeaTile border = map.getSeaTile(x + w, y - spread);
-                        if (border != null && border.getAltitude() < 0) {
+                        if (border != null && border.isWater()) {
                             biomass.set(x + w, y - spread,
                                         Math.min(biomass.get(x+w,y-spread) + Math.pow(smoothingValue, spread) * peakBiomass,peakBiomass));
 
                         }
                         border = map.getSeaTile(x + w, y + spread);
-                        if (border != null && border.getAltitude() < 0) {
+                        if (border != null && border.isWater()) {
                             biomass.set(x + w, y + spread,
                                         Math.min(biomass.get(x+w,y+spread) + Math.pow(smoothingValue, spread) * peakBiomass,peakBiomass));
                         }

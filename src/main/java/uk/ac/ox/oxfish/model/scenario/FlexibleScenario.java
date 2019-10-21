@@ -409,6 +409,18 @@ public class FlexibleScenario implements Scenario {
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
                                                                               FisherYearlyTimeSeries.HOURS_OUT)).average().
                                                                       orElse(Double.NaN), 0 );
+
+
+
+
+            state.getYearlyDataSet().registerGatherer("Total Hours Out of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.HOURS_OUT)).sum(),
+                                                      0 );
+
             //do not just average the trip duration per fisher because otherwise you don't weigh them according to how many trips they actually did
             state.getYearlyDataSet().registerGatherer("Average Trip Duration of "+tag, new Gatherer<FishState>() {
                 @Override
@@ -488,6 +500,30 @@ public class FlexibleScenario implements Scenario {
                                                       }, Double.NaN);
 
 
+            state.getYearlyDataSet().registerGatherer("Actual Average Cash-Flow of " +tag,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState observed) {
+                                                              List<Fisher> fishers = observed.getFishers().stream().
+                                                                      filter(new Predicate<Fisher>() {
+                                                                          @Override
+                                                                          public boolean test(Fisher fisher) {
+                                                                              return fisher.hasBeenActiveThisYear() &&
+                                                                                      fisher.getTags().contains(tag);
+                                                                          }
+                                                                      }).collect(Collectors.toList());
+                                                              return fishers.stream().
+                                                                      mapToDouble(
+                                                                              new ToDoubleFunction<Fisher>() {
+                                                                                  @Override
+                                                                                  public double applyAsDouble(Fisher value) {
+                                                                                      return value.getLatestYearlyObservation(
+                                                                                              FisherYearlyTimeSeries.CASH_FLOW_COLUMN);
+                                                                                  }
+                                                                              }).sum() /
+                                                                      fishers.size();
+                                                          }
+                                                      }, Double.NaN);
 
         }
 

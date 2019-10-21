@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 /**
@@ -139,10 +140,43 @@ public class ITQMarketBuilder  implements Startable
                                                       0d);
 
 
-            model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName, state1 -> {
-                                                         return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
-                                                     },
-                                                     Double.NaN);
+            DataColumn tradeValueColumn = model.getDailyDataSet().registerGatherer("ITQ Trade Value Of " + speciesName,
+                                                                          state1 -> {
+                                                                              return market.getDailyQuotasExchanged() * market.getDailyAveragePrice();
+                                                                          },
+                                                                          Double.NaN);
+
+            //these is probably more correct as a measure of what the prices of stuff traded were!
+            model.getYearlyDataSet().registerGatherer("ITQ Weighted Prices Of " + speciesName,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState fishState) {
+
+                                                              final Iterator<Double> numeratorIterator = tradeValueColumn.descendingIterator();
+                                                              final Iterator<Double> denominatorIterator = volumeGatherer.descendingIterator();
+                                                              if(!numeratorIterator.hasNext()) //not ready/year 1
+                                                                  return Double.NaN;
+                                                              double numerator = 0;
+                                                              double denominator = 0;
+                                                              for(int i=0; i<365; i++) {
+                                                                  //it should be step 365 times at most, but it's possible that this agent was added halfway through
+                                                                  //and only has a partially filled collection
+                                                                  if(numeratorIterator.hasNext()) {
+                                                                      assert denominatorIterator.hasNext();
+                                                                      Double tradeValue = numeratorIterator.next();
+                                                                      if(Double.isFinite(tradeValue))
+                                                                        numerator += tradeValue;
+                                                                      denominator+=denominatorIterator.next();
+                                                                  }
+                                                              }
+
+                                                              return numerator/denominator;
+
+
+                                                          }
+                                                      },
+                                                      Double.NaN
+            );
 
         }
 

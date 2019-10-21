@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
@@ -64,39 +63,32 @@ public class SprOracle implements AdditionalStartable {
      */
     @Override
     public void start(FishState model) {
-
-        model.scheduleEveryYear(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                model.scheduleOnceInXDays(new Steppable() {
-                    @Override
-                    public void step(SimState simState) {
-
-                        double spawningBiomass = 0;
-                        for(int i=0; i<species.getNumberOfBins(); i++) {
-                            spawningSubdivision = 0;
-                            if(species.getLength(spawningSubdivision, i)>maturityLength)
-                                spawningBiomass += model.getTotalAbundance(species,i) *
-                                        species.getWeight(spawningSubdivision,i);
-                        }
-
-                        spr = spawningBiomass/virginSpawningBiomass;
-                    }
-                },StepOrder.YEARLY_DATA_GATHERING,dayOfMeasurement);
-            }
-        }, StepOrder.DAWN);
-
-        model.getYearlyDataSet().registerGatherer(
-                "SPR Oracle - " + species,
-                new Gatherer<FishState>() {
-                    @Override
-                    public Double apply(FishState fishState) {
-
-                        return spr;
-                    }
-                },Double.NaN
+        model.scheduleOnceInXDays(
+            (Steppable) simState -> updateSPR(model), StepOrder.POLICY_UPDATE, dayOfMeasurement
         );
+        model.scheduleEveryYear(
+            (Steppable) simState -> model.scheduleOnceInXDays(
+                (Steppable) simState1 -> updateSPR(model), StepOrder.POLICY_UPDATE, dayOfMeasurement
+            ),
+            StepOrder.DAWN
+        );
+        model.getYearlyDataSet().registerGatherer(
+            "SPR Oracle - " + species,
+            (Gatherer<FishState>) fishState -> spr,
+            Double.NaN
+        );
+    }
 
+    private void updateSPR(FishState model) {
+      //  System.out.println("Observed SPR");
+        double spawningBiomass = 0;
+        for (int i = 0; i < species.getNumberOfBins(); i++) {
+            spawningSubdivision = 0;
+            if (species.getLength(spawningSubdivision, i) > maturityLength)
+                spawningBiomass += model.getTotalAbundance(species, i) *
+                    species.getWeight(spawningSubdivision, i);
+        }
+        spr = spawningBiomass / virginSpawningBiomass;
     }
 
     /**

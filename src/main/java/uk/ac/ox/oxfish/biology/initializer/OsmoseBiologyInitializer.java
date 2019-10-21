@@ -117,7 +117,7 @@ public class OsmoseBiologyInitializer implements BiologyInitializer {
             int mapWidthInCells, NauticalMap map) {
         OsmoseSimulation simulation = ((OsmoseGlobalBiology) biology).getSimulation();
 
-        if(seaTile.getAltitude()>0)
+        if(seaTile.isLand())
             return new EmptyLocalBiology();
 
 

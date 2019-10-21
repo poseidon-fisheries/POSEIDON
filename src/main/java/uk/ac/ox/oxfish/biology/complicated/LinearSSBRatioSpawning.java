@@ -60,16 +60,26 @@ public class LinearSSBRatioSpawning extends YearlyRecruitmentProcess {
         return virginSpawningBiomass;
     }
 
-    public LinearSSBRatioSpawning(double virginRecruits, double lenghtAtMaturity, double virginSpawningBiomass) {
+    public LinearSSBRatioSpawning(double virginRecruits, double lenghtAtMaturity,
+                                  double virginSpawningBiomass, boolean recruitEveryDay) {
+        super(recruitEveryDay);
         this.virginRecruits = virginRecruits;
         this.lenghtAtMaturity = lenghtAtMaturity;
         this.virginSpawningBiomass = virginSpawningBiomass;
     }
 
     @Override
-    protected double recruitYearly(
+    protected double computeYearlyRecruitment(
             Species species, Meristics meristics, StructuredAbundance abundance) {
 
+        double ratio = computeDepletion(species, meristics, abundance, lenghtAtMaturity, virginSpawningBiomass);
+        return virginRecruits* ratio;
+    }
+
+    public static double computeDepletion(Species species,
+                                           Meristics meristics,
+                                           StructuredAbundance abundance,
+                                           double lenghtAtMaturity, double virginSpawningBiomass) {
         double currentSpawningBiomass = 0;
 
         for(int i=0; i<abundance.getSubdivisions(); i++)
@@ -77,8 +87,7 @@ public class LinearSSBRatioSpawning extends YearlyRecruitmentProcess {
                 if(species.getLength(i,j)>=lenghtAtMaturity)
                     currentSpawningBiomass+= FishStateUtilities.weigh(abundance,meristics,i,j);
 
-        double ratio = Math.min(currentSpawningBiomass / virginSpawningBiomass,1);
-        return virginRecruits* ratio;
+        return Math.min(currentSpawningBiomass / virginSpawningBiomass,1);
     }
 
     /**

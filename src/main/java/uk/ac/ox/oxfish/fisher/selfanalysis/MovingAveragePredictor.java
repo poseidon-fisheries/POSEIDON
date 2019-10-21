@@ -112,7 +112,7 @@ public abstract class MovingAveragePredictor implements Predictor, Steppable{
                 this.fisher = fisher;
                 tripListener[0] = new TripListener() {
                     @Override
-                    public void reactToFinishedTrip(TripRecord record) {
+                    public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                         step(model);
                     }
                 };

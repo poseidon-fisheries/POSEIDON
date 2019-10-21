@@ -47,8 +47,16 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
 
     @Override
     public boolean isFishingStillAllowed() {
-        return
-                Arrays.stream(quotaRemaining).allMatch(value -> value >= 0);
+        for (double remaining : quotaRemaining) {
+            if(remaining<0)
+                return false;
+        }
+        return true;
+
+
+        //this was a lot slower
+//        return
+//                Arrays.stream(quotaRemaining).allMatch(value -> value >= 0);
 
 
     }

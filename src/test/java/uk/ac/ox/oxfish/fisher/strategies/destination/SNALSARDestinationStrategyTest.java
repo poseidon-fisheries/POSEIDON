@@ -77,8 +77,8 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
-        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
+        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
         defaultSetup(model, strategy,options);
@@ -89,7 +89,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -111,8 +111,8 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
-        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
+        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
         FeatureExtractors extractors = defaultSetup(model, strategy,options);
 
@@ -131,7 +131,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -156,9 +156,9 @@ public class SNALSARDestinationStrategyTest {
         FishState model = mock(FishState.class, RETURNS_DEEP_STUBS);
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
-        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
-        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
-        SeaTile option3 = mock(SeaTile.class);when(option3.getAltitude()).thenReturn(-100d);
+        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
+        SeaTile option3 = mock(SeaTile.class); when(option3.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2,option3);
         FeatureExtractors extractors = defaultSetup(model, strategy,options);
 
@@ -189,7 +189,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class),mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {
@@ -212,8 +212,8 @@ public class SNALSARDestinationStrategyTest {
         when(model.getRandom()).thenReturn(new MersenneTwisterFast());
         SNALSARDestinationStrategy strategy = factory.apply(model);
 
-        SeaTile option1 = mock(SeaTile.class); when(option1.getAltitude()).thenReturn(-100d);
-        SeaTile option2 = mock(SeaTile.class);when(option2.getAltitude()).thenReturn(-100d);
+        SeaTile option1 = mock(SeaTile.class); when(option1.isWater()).thenReturn(true);
+        SeaTile option2 = mock(SeaTile.class); when(option2.isWater()).thenReturn(true);
         ArrayList<SeaTile> options = Lists.newArrayList(option1, option2);
 
         FeatureExtractors extractors = defaultSetup(model, strategy,options);
@@ -234,7 +234,7 @@ public class SNALSARDestinationStrategyTest {
         int timesOption1WasChosen = 0;
         int timesOption2WasChosen = 0;
         for(int i=0; i<100; i++) {
-            strategy.reactToFinishedTrip(mock(TripRecord.class));
+            strategy.reactToFinishedTrip(mock(TripRecord.class), mock(Fisher.class,RETURNS_DEEP_STUBS));
             if(strategy.getFavoriteSpot().equals(option1))
                 timesOption1WasChosen++;
             else {

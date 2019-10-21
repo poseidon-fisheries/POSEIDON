@@ -153,6 +153,22 @@ Discretized Bandit:
     Hourly Profit Objective:
       opportunityCosts: true
 -------
+Simple Random Utility Model:
+  automaticallyAvoidMPA: true
+  automaticallyAvoidWastelands: true
+  betaCPUE:
+    Species 0: '1.0'
+  betaDistance: '-1.0'
+  betaHabit: '1.0'
+  betaRevenue: '1.0'
+  discretizer:
+    Squared Discretization:
+      horizontalSplits: '2.0'
+      verticalSplits: '2.0'
+  fleetWide: true
+  intercept: '1.0'
+  logToFile: false
+-------
 Florida Longliner:
   automaticallyAvoidMPA: true
   automaticallyAvoidWastelands: true
@@ -281,6 +297,9 @@ Perfect RPUE Logit:
   hoursOut: '120.0'
   profitBeta: '1.0'
 -------
+Perfect Knowledge:
+  maxHoursOut: '120.0'
+-------
 Replicator:
   inertia: '0.8'
   options:
@@ -305,4 +324,7 @@ Replicator:
       explorationSize: '20.0'
       gravitationalConstant: '100.0'
       initialSpeed: '0.0'
+-------
+Random Plan FAD Destination Strategy:
+  numberOfStepsToPlan: 30
 -------

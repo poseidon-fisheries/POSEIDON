@@ -181,7 +181,7 @@ public class FisherMemory implements Serializable, FisherStartable {
         tripMemories.start(model);
         tripLogger.addTripListener(new TripListener() {
             @Override
-            public void reactToFinishedTrip(TripRecord record) {
+            public void reactToFinishedTrip(TripRecord record, Fisher fisher) {
                 SeaTile mostFishedTileInTrip = record.getMostFishedTileInTrip();
                 if (mostFishedTileInTrip != null)
                     tripMemories.memorize(record, mostFishedTileInTrip);

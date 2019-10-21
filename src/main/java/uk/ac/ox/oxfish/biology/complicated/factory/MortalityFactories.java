@@ -22,6 +22,7 @@ package uk.ac.ox.oxfish.biology.complicated.factory;
 
 import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.Constructors;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,23 +33,16 @@ public class MortalityFactories {
     /**
      * the list of all registered CONSTRUCTORS
      */
-    public static final Map<String,Supplier<AlgorithmFactory<? extends NaturalMortalityProcess>>> CONSTRUCTORS =
-            new LinkedHashMap<>();
+    public static final Map<String, Supplier<AlgorithmFactory<? extends NaturalMortalityProcess>>> CONSTRUCTORS;
+
     /**
      * a link to go from class back to the name of the constructor
      */
-    public static final Map<Class<? extends AlgorithmFactory>,String> NAMES =
-            new LinkedHashMap<>();
+    public static final Map<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
-    static{
-        CONSTRUCTORS.put("Exponential Mortality",
-                         ExponentialMortalityFactory::new);
-        NAMES.put(ExponentialMortalityFactory.class,"Exponential Mortality");
-
-        CONSTRUCTORS.put("No Mortality",
-                         DummyMortalityFactory::new);
-        NAMES.put(DummyMortalityFactory.class,"No Mortality");
-
-
+    static {
+        NAMES.put(ExponentialMortalityFactory.class, "Exponential Mortality");
+        NAMES.put(DummyMortalityFactory.class, "No Mortality");
+        CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

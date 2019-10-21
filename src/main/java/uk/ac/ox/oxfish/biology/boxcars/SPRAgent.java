@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.Species;
@@ -30,15 +31,12 @@ import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.Gatherer;
-import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.utility.Pair;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class SPRAgent implements AdditionalStartable {
+public class SPRAgent implements AdditionalStartable, Steppable {
 
 
     private final String surveyTag;
@@ -63,8 +61,6 @@ public class SPRAgent implements AdditionalStartable {
 
     private final double assumedLengthBinCm;
 
-    private final List<Fisher> sampledFishers = new LinkedList<>();
-
     private final double assumedVarA;
 
     private final double assumedVarB;
@@ -72,9 +68,10 @@ public class SPRAgent implements AdditionalStartable {
     private final double assumedLenghtAtMaturity;
 
     /**
-     * here we keep the COUNT of fish that we are tracking!
+     * object sampling fishers to keep track of their landings
      */
-    private double[][] abundance;
+    private CatchSampler sampler;
+
 
     public SPRAgent(
             String surveyTag, Species species,
@@ -105,7 +102,16 @@ public class SPRAgent implements AdditionalStartable {
 
 
         double spr = SPR.computeSPR(
-                new StructuredAbundance(abundance),
+                new StructuredAbundance(sampler.getAbundance(
+                        new Function<Pair<Integer, Integer>, Double>() {
+                            @Override
+                            public Double apply(Pair<Integer, Integer> subBinPair) {
+
+                                return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
+                                        subBinPair.getSecond()), assumedVarB);
+                            }
+                        }
+                )),
                 species,
                 assumedNaturalMortality,
                 assumedKParameter,
@@ -140,6 +146,16 @@ public class SPRAgent implements AdditionalStartable {
     public double computeMaturityRatio(){
         double matureCatch = 0;
         double allCatches = 0;
+        double[][] abundance = sampler.getAbundance(
+                new Function<Pair<Integer, Integer>, Double>() {
+                    @Override
+                    public Double apply(Pair<Integer, Integer> subBinPair) {
+
+                        return assumedVarA/1000 * Math.pow(species.getLength(subBinPair.getFirst(),
+                                subBinPair.getSecond()), assumedVarB);
+                    }
+                }
+        );
         for(int subdivision =0; subdivision<species.getNumberOfSubdivisions(); subdivision++) {
             for (int bin = 0; bin < species.getNumberOfBins(); bin++) {
                 allCatches += abundance[subdivision][bin];
@@ -151,33 +167,20 @@ public class SPRAgent implements AdditionalStartable {
         return matureCatch/allCatches;
     }
 
-    private void reset(){
 
-        //clear
-        for(int subdivision=0; subdivision<species.getNumberOfSubdivisions(); subdivision++)
-            Arrays.fill(abundance[subdivision],0);
-    }
-
-    //steps each day
+    /**
+     * this is the daily step: delegate the observation to the catch sampler. This agent self-schedules so there is
+     * no need to call this directly
+     * @param simState
+     */
     @VisibleForTesting
-    public void observeFishers()
-    {
-
-        for(Fisher fisher : sampledFishers)
-        {
-            for(int subdivision = 0; subdivision< abundance.length; subdivision++)
-                for(int bin = 0; bin< abundance[0].length; bin++) {
-                    double unitWeight = assumedVarA/1000 * Math.pow(species.getLength(subdivision,bin), assumedVarB);
-                    abundance[subdivision][bin] += (fisher.getDailyCounter().getSpecificLandings(species, subdivision,
-                                                                                                 bin)) /unitWeight;
-                }
-        }
+    @Override
+    public void step(SimState simState) {
+        sampler.observe(
 
 
+        );
     }
-
-
-
 
     /**
      * this gets called by the fish-state right after the scenario has started. It's useful to set up steppables
@@ -188,28 +191,18 @@ public class SPRAgent implements AdditionalStartable {
     @Override
     public void start(FishState model) {
 
-        for(Fisher fisher : model.getFishers())
-        {
-            if(samplingSelector.test(fisher)){
-                fisher.getTags().add(surveyTag+" "+species);
-                sampledFishers.add(fisher);
-            }
-        }
+        Preconditions.checkArgument(sampler==null, "SPR Agent already Started!!");
+        sampler = new CatchSampler(samplingSelector,species,surveyTag);
+        sampler.checkWhichFisherToObserve(model);
 
-        abundance = new double[species.getNumberOfSubdivisions()][species.getNumberOfBins()];
         //every day, collect information
-        model.scheduleEveryDay(new Steppable() {
-            @Override
-            public void step(SimState simState) {
-                observeFishers();
-            }
-        }, StepOrder.DAILY_DATA_GATHERING);
+        model.scheduleEveryDay(this, StepOrder.DAILY_DATA_GATHERING);
 
         model.scheduleEveryYear(
                 new Steppable() {
                     @Override
                     public void step(SimState simState) {
-                        reset();
+                        sampler.resetLandings();
                     }
                 },
                 StepOrder.DATA_RESET
@@ -247,7 +240,18 @@ public class SPRAgent implements AdditionalStartable {
                             @Override
                             public Double apply(FishState fishState) {
 
-                                return abundance[finalSubdivision][finalBin];
+                                return sampler.getAbundance(
+                                        new Function<Pair<Integer, Integer>, Double>() {
+                                            @Override
+                                            public Double apply(Pair<Integer, Integer> subdivisionBinPair) {
+                                                return  assumedVarA/1000 * Math.pow(
+                                                        species.getLength(subdivisionBinPair.getFirst(),
+                                                                subdivisionBinPair.getSecond()),
+                                                        assumedVarB);
+                                            }
+                                        }
+
+                                )[finalSubdivision][finalBin];
                             }
                         }, Double.NaN
                 );
@@ -264,6 +268,6 @@ public class SPRAgent implements AdditionalStartable {
      */
     @Override
     public void turnOff() {
-        sampledFishers.clear();
+        sampler.resetObservedFishers();
     }
 }

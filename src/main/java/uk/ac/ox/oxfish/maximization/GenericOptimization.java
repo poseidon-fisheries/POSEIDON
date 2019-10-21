@@ -21,24 +21,28 @@
 package uk.ac.ox.oxfish.maximization;
 
 import eva2.problems.simple.SimpleProblemDouble;
+import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
+import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
+import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class GenericOptimization extends SimpleProblemDouble {
+public class GenericOptimization extends SimpleProblemDouble implements Serializable {
 
-    public static final double MINIMUM_CATCHABILITY = 9.0E-8;
+    public static final double MINIMUM_CATCHABILITY = 1.0E-5;
 
-    public static final double MAXIMUM_CATCHABILITY = 1.5E-3;
+    public static final double MAXIMUM_CATCHABILITY = 1.0E-3;
 
     private static final Path DEFAULT_PATH = Paths.get("docs",
             "indonesia_hub",
@@ -46,6 +50,8 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     private String scenarioFile =   DEFAULT_PATH.resolve("pessimistic_recruits_spinup.yaml").toString();
 
+
+    private boolean maximization = false;
 
     //todo have a summary outputting a CSV: parameter1,parameter2,...,parameterN,target1,...,targetN for logging purposes and also maybe IITP
 
@@ -56,37 +62,81 @@ public class GenericOptimization extends SimpleProblemDouble {
 
     {
 
-        for(int populations=0; populations<3; populations++) {
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Dover Sole.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Pristipomoides multidens.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Longspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Epinephelus areolatus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability",
-                    MINIMUM_CATCHABILITY,
-                    MAXIMUM_CATCHABILITY
-            ));
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Sablefish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
 
-            //garbage collectors
-            parameters.add(new SimpleOptimizationParameter(
-                    "fisherDefinitions$"+populations+".gear.delegate.proportionSimulatedToGarbage",
-                    0,
-                    .80
-            ));
-        }
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Shortspine Thornyhead.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.delegate.gears~Yelloweye Rockfish.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+        parameters.add(new SimpleOptimizationParameter(
+                "gear.proportionSimulatedToGarbage.averageCatchability",
+                MINIMUM_CATCHABILITY,
+                MAXIMUM_CATCHABILITY
+        ));
+
+
+        parameters.add(new SimpleOptimizationParameter(
+                "holdSizePerBoat",
+                2500,
+                15000
+        ));
+//
+//
+//        for(int populations=0; populations<3; populations++) {
+//
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Pristipomoides multidens.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus malabaricus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Epinephelus areolatus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.delegate.gears~Lutjanus erythropterus.averageCatchability",
+//                    MINIMUM_CATCHABILITY,
+//                    MAXIMUM_CATCHABILITY
+//            ));
+//
+//            //garbage collectors
+//            parameters.add(new SimpleOptimizationParameter(
+//                    "fisherDefinitions$"+populations+".gear.delegate.proportionSimulatedToGarbage",
+//                    0,
+//                    .80
+//            ));
+//        }
 
         /*
         for(int species=0; species<4; species++)
@@ -257,6 +307,8 @@ public class GenericOptimization extends SimpleProblemDouble {
             }
 
             double finalError = error / (double) runsPerSetting;
+            if(maximization)
+                finalError = finalError * (-1);
             System.out.println(Arrays.toString(x) + " ---> " + finalError);
             return new double[]{finalError};
 
@@ -284,11 +336,61 @@ public class GenericOptimization extends SimpleProblemDouble {
 
 
     public static void main(String[] args) throws IOException {
-        GenericOptimization optimization = new GenericOptimization();
-        Scenario scenario = optimization.buildScenario(new double[]{
-                8.698, 10.000,-8.063, 9.692, 6.399, 8.065,-1.761,-8.324, 9.044, 9.921, 9.991,-6.950,-9.557,-9.905,-3.539});
+
         FishYAML yaml = new FishYAML();
-        yaml.dump(scenario,new FileWriter(DEFAULT_PATH.resolve("results").resolve("pessimistic_recruits_spinup.yaml").toFile()));
+        Path optimizationFile =
+        Paths.get("docs", "indonesia_hub", "runs", "712","slice2019","calibration",
+                              "optimizationproblem_tnc_tropfishpoponly_start.yaml");
+        final String scenarioName = "historical20_tnc_tropfishpoponly";
+
+        GenericOptimization optimization =
+                yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
+        System.out.println(optimization.scenarioFile);
+        Scenario scenario = optimization.buildScenario(new double[]{
+                10.000,-5.210,-2.693, 9.124,-4.781, 3.564,-7.422,-7.747, 4.326,-6.388,-2.629,-1.447, 7.899,-6.717, 2.294,-9.101,-3.151, 4.249,-5.298, 9.943     });
+        Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_8h.yaml");
+        yaml.dump(scenario,new FileWriter(outputFile.toFile()));
+
+        //  FishYAML yaml = new FishYAML();
+        FlexibleScenario modified = (FlexibleScenario) scenario;
+        MultipleIndependentSpeciesAbundanceFactory bio = (MultipleIndependentSpeciesAbundanceFactory) modified.getBiologyInitializer();
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+                    setSteepness(new FixedDoubleParameter(.7));
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_7h.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
+
+
+        //  FishYAML yaml = new FishYAML();
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+                    setSteepness(new FixedDoubleParameter(.6));
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_6h.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
+
+        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
+            final RecruitmentBySpawningJackKnifeMaturity oldRecruitment = (RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment();
+
+
+            HockeyStickRecruitmentFactory newRecruitment = new HockeyStickRecruitmentFactory();
+            newRecruitment.setHinge(new FixedDoubleParameter(.2));
+            newRecruitment.setLengthAtMaturity(new FixedDoubleParameter(oldRecruitment.getLengthAtMaturity()));
+            final double r0 = ((FixedDoubleParameter) oldRecruitment.getVirginRecruits()).getFixedValue();
+            final double ssb0 = r0* ((FixedDoubleParameter) oldRecruitment.getCumulativePhi()).getFixedValue();
+            newRecruitment.setVirginRecruits(new FixedDoubleParameter(r0));
+
+            newRecruitment.setVirginSpawningBiomass(
+                    new FixedDoubleParameter(
+                            ssb0
+                    )
+            );
+
+            factory.setRecruitment(newRecruitment);
+        }
+        outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_hs.yaml");
+        yaml.dump(modified,new FileWriter(outputFile.toFile()));
 
     }
 
@@ -341,5 +443,24 @@ public class GenericOptimization extends SimpleProblemDouble {
      */
     public void setSimulatedYears(int simulatedYears) {
         this.simulatedYears = simulatedYears;
+    }
+
+
+    /**
+     * Getter for property 'maximization'.
+     *
+     * @return Value for property 'maximization'.
+     */
+    public boolean isMaximization() {
+        return maximization;
+    }
+
+    /**
+     * Setter for property 'maximization'.
+     *
+     * @param maximization Value to set for property 'maximization'.
+     */
+    public void setMaximization(boolean maximization) {
+        this.maximization = maximization;
     }
 }

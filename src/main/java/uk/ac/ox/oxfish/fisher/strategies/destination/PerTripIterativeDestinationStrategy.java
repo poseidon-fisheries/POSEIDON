@@ -86,7 +86,7 @@ public class PerTripIterativeDestinationStrategy implements DestinationStrategy 
                 new Actuator<Fisher,SeaTile>() {
                     @Override
                     public void apply(Fisher fisher, SeaTile change, FishState model) {
-                        if (change.getAltitude() < 0) //ignores "go to land" commands
+                        if (change.isWater()) //ignores "go to land" commands
                             delegate.setFavoriteSpot(change);
                     }
                 },

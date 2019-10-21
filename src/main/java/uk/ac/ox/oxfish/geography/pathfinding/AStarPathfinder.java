@@ -21,14 +21,19 @@
 package uk.ac.ox.oxfish.geography.pathfinding;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
+import com.google.common.collect.ImmutableList;
 import sim.util.Bag;
+import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.Distance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.PriorityQueue;
 
 /**
  * The A* pathfinder, as implemented here:
@@ -37,19 +42,25 @@ import java.util.*;
  */
 public class AStarPathfinder implements Pathfinder {
 
-
     private final Distance distanceFunction;
 
+    private final PathMemory memory;
 
-    private final Table<SeaTile,SeaTile,Optional<LinkedList<SeaTile>>> memory = HashBasedTable.create();
+    private final Distance distanceHeuristic = new CartesianDistance(1);
 
     /**
      * creates the A* pathfinder it uses distanceFunction both for computing the cost of moving from A to its neighbors
      * and as a straight osmoseWFSPath heuristic
      * @param distanceFunction
      */
+    public AStarPathfinder(Distance distanceFunction, PathMemory memory) {
+        this.distanceFunction = distanceFunction;
+        this.memory = memory;
+    }
+
     public AStarPathfinder(Distance distanceFunction) {
         this.distanceFunction = distanceFunction;
+        this.memory = new TableBasedPathMemory();
     }
 
     /**
@@ -61,6 +72,7 @@ public class AStarPathfinder implements Pathfinder {
      * @return a queue of steps from start to end or null if it isn't possible to go from start to end
      */
     @Override
+    @SuppressWarnings("OptionalAssignedToNull")
     public Deque<SeaTile> getRoute(
             NauticalMap map, SeaTile start, SeaTile end)
     {
@@ -72,11 +84,9 @@ public class AStarPathfinder implements Pathfinder {
         Preconditions.checkNotNull(end);
         Preconditions.checkNotNull(map);
 
-
-        Optional<LinkedList<SeaTile>> oldPath = memory.get(start, end);
-        if(oldPath!=null) {
-            return oldPath.map(LinkedList::new).orElse(null);
-        }
+        // If we already have this path in our memory, return a mutable copy of it
+        final Optional<ImmutableList<SeaTile>> knownPath = memory.getPath(start, end);
+        if (knownPath != null) return knownPath.map(LinkedList::new).orElse(null);
 
         //where we will eventually put the osmoseWFSPath
         LinkedList<SeaTile> path = new LinkedList<>();
@@ -107,7 +117,7 @@ public class AStarPathfinder implements Pathfinder {
             {
                 SeaTile neighbor = ((SeaTile) next);
 
-                if(neighbor.getAltitude() >= 0 && neighbor != end) //don't bother if it's land
+                if (neighbor.isLand() && neighbor != end) //don't bother if it's land
                     continue;
 
                 //check how much it would cost to move there
@@ -115,7 +125,7 @@ public class AStarPathfinder implements Pathfinder {
                 if(!cameFrom.containsKey(neighbor) || newCost < costSoFar.get(neighbor)) //ignore tiles that aren't in the sea or that we explored already
                 {
                     costSoFar.put(neighbor,newCost);
-                    double priority = newCost + distanceFunction.distance(end,neighbor,map );
+                    double priority = newCost + distanceHeuristic.distance(end, neighbor, map);
                     frontier.add(new FrontierElement(neighbor,priority));
                     cameFrom.put(neighbor,current);
                 }
@@ -128,8 +138,7 @@ public class AStarPathfinder implements Pathfinder {
         //if you haven't found the osmoseWFSPath, then return null
         if(cameFrom.get(end) == null)
         {
-            memory.put(start,end,Optional.empty());
-            memory.put(end,start,Optional.empty());
+            memory.putImpossiblePath(start, end);
             return null;
         }
         //build the osmoseWFSPath
@@ -141,10 +150,13 @@ public class AStarPathfinder implements Pathfinder {
             assert current!=null;
             path.add(current);
         }
-        //reverse it
-        memory.put(end,start,Optional.of(new LinkedList<>(path)));
+
+        // Since the path is from end to start, we use the opportunity to store a reversed version
+        // (storing the path in memory takes care of making an immutable copy of it)
+        memory.putPath(end, start, path);
+        // We then reverse it and store the version that goes from start to end
         Collections.reverse(path);
-        memory.put(start,end,Optional.of(new LinkedList<>(path)));
+        memory.putPath(start, end, path);
 
         //return it!
         return path;
