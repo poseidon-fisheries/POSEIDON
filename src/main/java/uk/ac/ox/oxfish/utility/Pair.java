@@ -20,6 +20,9 @@
 
 package uk.ac.ox.oxfish.utility;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 /**
  * The simplest pair object
  * Created by carrknight on 5/4/15.
@@ -43,4 +46,10 @@ public class Pair<A,B> {
     public B getSecond() {
         return second;
     }
+
+    /** Create a new pair from the first element of the pair and the result of a function applied to the second element */
+    public <R> Pair<A, R> mapSecond(Function<B, R> f) { return new Pair<>(first, f.apply(second)); }
+
+    /** Create a new pair from the first element of the pair and the result of a function applied to both elements */
+    public <R> Pair<A, R> mapSecond(BiFunction<A, B, R> f) { return new Pair<>(first, f.apply(first, second)); }
 }
