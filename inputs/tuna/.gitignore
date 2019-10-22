@@ -7,3 +7,4 @@ deployment_values.csv
 boat_port_frequencies.csv
 boats.csv
 costs.csv
+exogenous_catch.csv
