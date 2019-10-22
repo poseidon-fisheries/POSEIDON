@@ -14,14 +14,15 @@ import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.model.market.Market;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 import uk.ac.ox.oxfish.utility.Pair;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.StrictMath.exp;
-import static java.util.Arrays.stream;
 import static java.util.Comparator.comparingDouble;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.fadsHere;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
@@ -72,9 +73,8 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
         final double coefficient = fad.getOwner() == getFadManager(fisher) ?
             ownFadsSettingCoefficient :
             otherFadsSettingCoefficient;
-        // TODO: use fish prices instead of biomass
-        final double fadBiomass = stream(fad.getBiology().getCurrentBiomass()).sum();
-        return probability(coefficient, fadBiomass);
+        final Collection<Market> markets = fisher.getHomePort().getMarketMap(fisher).getMarkets();
+        return probability(coefficient, fad.priceOfFishHere(markets));
     }
 
     private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
