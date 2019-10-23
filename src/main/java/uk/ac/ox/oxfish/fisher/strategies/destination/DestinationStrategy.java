@@ -20,9 +20,12 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
+import java.util.ArrayList;
+
 import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
+import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.FisherStartable;
@@ -44,6 +47,8 @@ public interface DestinationStrategy extends FisherStartable {
             Fisher fisher, MersenneTwisterFast random,
             FishState model,
             Action currentAction);
+
+	
 
 
 }

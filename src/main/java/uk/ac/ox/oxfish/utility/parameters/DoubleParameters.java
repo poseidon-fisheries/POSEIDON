@@ -43,6 +43,8 @@ public class DoubleParameters
         names.put(NormalDoubleParameter.class,"Normal");
         parameters.put("Uniform", () -> new UniformDoubleParameter(0,1));
         names.put(UniformDoubleParameter.class,"Uniform");
+        parameters.put("Beta", () -> new BetaDoubleParameter(1,1));
+        names.put(BetaDoubleParameter.class,"Beta");
         parameters.put("Select", () -> new SelectDoubleParameter("0 1"));
         names.put(SelectDoubleParameter.class,"Select");
         parameters.put("Sin", () -> new SinusoidalDoubleParameter(1,0.01));

@@ -20,9 +20,25 @@
 
 package uk.ac.ox.oxfish.utility;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 import edu.uci.ics.jung.graph.DirectedGraph;
-import uk.ac.ox.oxfish.biology.complicated.*;
-import uk.ac.ox.oxfish.biology.complicated.factory.*;
+import uk.ac.ox.oxfish.biology.complicated.AbundanceDiffuser;
+import uk.ac.ox.oxfish.biology.complicated.AgingProcess;
+import uk.ac.ox.oxfish.biology.complicated.InitialAbundance;
+import uk.ac.ox.oxfish.biology.complicated.Meristics;
+import uk.ac.ox.oxfish.biology.complicated.NaturalMortalityProcess;
+import uk.ac.ox.oxfish.biology.complicated.RecruitmentProcess;
+import uk.ac.ox.oxfish.biology.complicated.factory.AbundanceDiffusers;
+import uk.ac.ox.oxfish.biology.complicated.factory.Agings;
+import uk.ac.ox.oxfish.biology.complicated.factory.InitialAbundances;
+import uk.ac.ox.oxfish.biology.complicated.factory.MeristicFactories;
+import uk.ac.ox.oxfish.biology.complicated.factory.Mortalities;
+import uk.ac.ox.oxfish.biology.complicated.factory.Recruitments;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowerInitializer;
 import uk.ac.ox.oxfish.biology.growers.LogisticGrowers;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
@@ -33,14 +49,24 @@ import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.WeatherInitializers;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.Gears;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.*;
-import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.*;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.LegalityFeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.ProfitFeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.ProfitThresholdExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SafetyFeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.SocialAcceptabilityFeatureExtractor;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.LegalityFeatureExtractors;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.ProfitFeatureExtractors;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.ProfitThresholdsExtractors;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.SafetyFeatureExtractors;
+import uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory.SocialAcceptabilityFeatureExtractors;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.AcquisitionFunction;
 import uk.ac.ox.oxfish.fisher.heatmap.acquisition.factory.AcquisitionFunctions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.factory.NumericalGeographicalRegressions;
 import uk.ac.ox.oxfish.fisher.heatmap.regression.numerical.GeographicalRegression;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializer;
 import uk.ac.ox.oxfish.fisher.log.initializers.LogbookInitializers;
+import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.TimeScalarFunction;
+import uk.ac.ox.oxfish.fisher.log.timeScalarFunctions.factory.TimeScalarFunctions;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.fisher.selfanalysis.factory.ObjectiveFunctions;
 import uk.ac.ox.oxfish.fisher.strategies.departing.DepartingStrategies;
@@ -84,12 +110,6 @@ import uk.ac.ox.oxfish.utility.adaptation.probability.AdaptationProbability;
 import uk.ac.ox.oxfish.utility.adaptation.probability.Probabilities;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditAlgorithms;
 import uk.ac.ox.oxfish.utility.bandit.factory.BanditSupplier;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Just a way to link a class to its constructor map
@@ -184,6 +204,8 @@ public class AlgorithmFactories {
 
         CONSTRUCTOR_MAP.put(AdditionalStartable.class, AdditionalStartables.CONSTRUCTORS);
         NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
+        CONSTRUCTOR_MAP.put(TimeScalarFunction.class, TimeScalarFunctions.CONSTRUCTORS);
+        NAMES_MAP.put(TimeScalarFunction.class, TimeScalarFunctions.NAMES);
         CONSTRUCTOR_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.CONSTRUCTORS);
         NAMES_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.NAMES);
 

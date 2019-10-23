@@ -343,13 +343,23 @@ public class NauticalMap implements Startable
      */
     private final ObjectGrid2D coordinateCache;
 
-    public Coordinate getCoordinates(int gridX, int gridY) {
-        return (Coordinate) coordinateCache.get(gridX, gridY);
-    }
+//    public Coordinate getCoordinates(SeaTile tile)
+//    {
+//        return coordinateCache.computeIfAbsent(tile, 
+//            input -> rasterBathymetry.toPoint(input.getGridX(),input.getGridY()).getCoordinate()
+//        );
+//    } 
+
+public Coordinate getCoordinates(int gridX, int gridY) {
+  return (Coordinate) coordinateCache.get(gridX, gridY);
+}
 
     public Coordinate getCoordinates(SeaTile tile) {
         return getCoordinates(tile.getGridX(), tile.getGridY());
     }
+
+
+
 
     public SeaTile getSeaTile(Coordinate coordinate)
     {

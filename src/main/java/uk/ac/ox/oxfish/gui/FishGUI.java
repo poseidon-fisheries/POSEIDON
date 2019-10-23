@@ -20,6 +20,32 @@
 
 package uk.ac.ox.oxfish.gui;
 
+import java.awt.Color;
+import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.OptionalDataException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.Map;
+
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import javafx.collections.ListChangeListener;
 import org.jetbrains.annotations.Nullable;
 import sim.display.Console;
@@ -37,28 +63,21 @@ import sim.portrayal.geo.GeomVectorFieldPortrayal;
 import sim.portrayal.grid.SparseGridPortrayal2D;
 import sim.portrayal.simple.CircledPortrayal2D;
 import sim.portrayal.simple.ImagePortrayal2D;
+import sim.portrayal.simple.RectanglePortrayal2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
 import uk.ac.ox.oxfish.Main;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.gui.controls.PolicyButton;
-import uk.ac.ox.oxfish.gui.drawing.*;
+import uk.ac.ox.oxfish.gui.drawing.BoatPortrayalFactory;
+import uk.ac.ox.oxfish.gui.drawing.ColorfulGrid;
+import uk.ac.ox.oxfish.gui.drawing.ColorfulGridSwitcher;
+import uk.ac.ox.oxfish.gui.drawing.CoordinateTransformer;
+import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * The GUI of FishState
@@ -102,6 +121,7 @@ public class  FishGUI extends GUIState{
     private final SparseGridPortrayal2D boats = new SparseGridPortrayal2D();
     private final SparseGridPortrayal2D trails = new SparseGridPortrayal2D();
 
+    private RectanglePortrayal2D communalRegion = new RectanglePortrayal2D(new Color(0,0,0),false);
 
     private final ImageIcon portIcon;// = new ImageIcon(FishGUI.class.getClassLoader().getResource("images/anchor.png"));
     private BoatPortrayalFactory boatPortrayalFactory;
@@ -287,7 +307,8 @@ public class  FishGUI extends GUIState{
 
         //MPAs portrayal
         mpaPortrayal.setField(state.getMpaVectorField());
-        mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLACK, true));
+        mpaPortrayal.setPortrayalForAll(new GeomPortrayal(Color.BLUE, true));
+        
 
         //boats
         trails.setField(state.getFisherGrid());
@@ -475,7 +496,7 @@ public class  FishGUI extends GUIState{
                 "Bathymetry", true);
         //attach it the portrayal
         display2D.attach(mainPortrayal, "Bathymetry");
-        //    display2D.attach(mpaPortrayal,"MPAs");
+        //display2D.attach(mpaPortrayal,"MPAs");
         display2D.attach(heatMap.getHeatMapPortrayal(), "Fishing Hotspots");
         display2D.attach(trails, "Boat Trails");
         display2D.attach(boats, "Boats");

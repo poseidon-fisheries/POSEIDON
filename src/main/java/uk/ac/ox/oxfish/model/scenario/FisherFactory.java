@@ -20,6 +20,10 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
+import java.util.LinkedList;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
@@ -33,11 +37,10 @@ import uk.ac.ox.oxfish.fisher.strategies.weather.WeatherEmergencyStrategy;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
+import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
+import uk.ac.ox.oxfish.model.restrictions.Restriction;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
-
-import java.util.LinkedList;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * An object produced by the scenario that allows the model to produce more fishers
@@ -51,7 +54,11 @@ public class FisherFactory
     private Supplier<Port> portSupplier;
 
     private AlgorithmFactory<? extends Regulation> regulations;
-
+    
+    private AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions;
+    
+    private AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions;
+    
     private AlgorithmFactory<? extends DepartingStrategy> departingStrategy;
 
     private AlgorithmFactory<? extends DestinationStrategy> destinationStrategy;
@@ -95,6 +102,7 @@ public class FisherFactory
             AlgorithmFactory<? extends Gear> gear, int nextID) {
         this.portSupplier = portSupplier;
         this.regulations = regulations;
+        
         this.departingStrategy = departingStrategy;
         this.destinationStrategy = destinationStrategy;
         this.fishingStrategy = fishingStrategy;
@@ -107,7 +115,24 @@ public class FisherFactory
         this.nextID = nextID;
     }
 
-
+    public FisherFactory(
+            Supplier<Port> portSupplier,
+            AlgorithmFactory<? extends Regulation> regulations,
+            AlgorithmFactory<? extends ReputationalRestrictions> reputationalRestrictions,
+            AlgorithmFactory<? extends RegionalRestrictions> communityRestrictions,
+            AlgorithmFactory<? extends DepartingStrategy> departingStrategy,
+            AlgorithmFactory<? extends DestinationStrategy> destinationStrategy,
+            AlgorithmFactory<? extends FishingStrategy> fishingStrategy,
+            AlgorithmFactory<? extends DiscardingStrategy> discardingStrategy,
+            AlgorithmFactory<? extends GearStrategy> gearStrategy,
+            AlgorithmFactory<? extends WeatherEmergencyStrategy> weatherStrategy,
+            Supplier<Boat> boatSupplier, Supplier<Hold> holdSupplier,
+            AlgorithmFactory<? extends Gear> gear, int nextID) {
+    	this(portSupplier, regulations,departingStrategy,destinationStrategy,fishingStrategy,discardingStrategy,
+    			gearStrategy,weatherStrategy,boatSupplier,holdSupplier,gear, nextID);
+        this.reputationalRestrictions = reputationalRestrictions;
+        this.communityRestrictions = communityRestrictions;
+    }
 
     /**
      * creates a fisher and returns it. Doesn't schedule it or add it to the rest of the model so use this
@@ -117,7 +142,10 @@ public class FisherFactory
      * @return
      */
     public Fisher buildFisher(FishState fishState) {
-        Fisher fisher = new Fisher(nextID++, portSupplier.get(),
+    	
+    	Fisher fisher;
+    	if(this.communityRestrictions==null){
+    		fisher = new Fisher(nextID++, portSupplier.get(),
                                    fishState.getRandom(),
                                    regulations.apply(fishState),
                                    departingStrategy.apply(fishState),
@@ -131,6 +159,25 @@ public class FisherFactory
                                    gear.apply(fishState), fishState.getSpecies().size());
         for(Consumer<Fisher> setup : additionalSetups)
             setup.accept(fisher);
+    	} else {
+    		fisher = new Fisher(nextID++, portSupplier.get(),
+                    fishState.getRandom(),
+                    regulations.apply(fishState),
+                    reputationalRestrictions.apply(fishState),
+                    communityRestrictions.apply(fishState),
+                    departingStrategy.apply(fishState),
+                    destinationStrategy.apply(fishState),
+                    fishingStrategy.apply(fishState),
+                    gearStrategy.apply(fishState),
+                    discardingStrategy.apply(fishState),
+                    weatherStrategy.apply(fishState),
+                    boatSupplier.get(),
+                    holdSupplier.get(),
+                    gear.apply(fishState), fishState.getSpecies().size());
+for(Consumer<Fisher> setup : additionalSetups)
+setup.accept(fisher);
+    		
+    	}
         return fisher;
 
     }

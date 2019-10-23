@@ -36,8 +36,9 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
-import uk.ac.ox.oxfish.model.regs.RegionalRestrictions;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
+import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 
 /**
  * contains all the transitory variables of  a fisher including:
@@ -139,15 +140,17 @@ public class FisherStatus implements Serializable {
      * The reputational risks to observe
      */
     
-    private RegionalRestrictions reputationalRisk;
+    private ReputationalRestrictions reputationalRisk;
     
-    public RegionalRestrictions getReputationalRisk(){
+    public ReputationalRestrictions getReputationalRisk(){
     	return reputationalRisk;
     }
     
-    public void setReputationalRisk(RegionalRestrictions reputationalRisk){
+    public void setReputationalRisk(ReputationalRestrictions reputationalRisk){
     	this.reputationalRisk = reputationalRisk;
     }
+    
+    
     
     /**
      * the state of the fisher: the next action they are taking
@@ -400,11 +403,12 @@ public class FisherStatus implements Serializable {
     }
     
     public boolean isBadByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    	if(communalStandards==null) System.out.println("My communal standards are not set!");
     	return communalStandards.canFishHere(agent, tile, model);
     }
 
     public boolean isBadReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
-    	return regulation.canFishHere(agent, tile, model);
+    	return reputationalRisk.canFishHere(agent, tile, model);
     }
 
     /**
