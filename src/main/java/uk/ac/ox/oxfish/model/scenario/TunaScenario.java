@@ -46,6 +46,8 @@ import uk.ac.ox.oxfish.geography.ports.FromSimpleFilePortInitializer;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
+import uk.ac.ox.oxfish.model.event.BiomassDrivenTimeSeriesExogenousCatchesFactory;
+import uk.ac.ox.oxfish.model.event.ExogenousCatches;
 import uk.ac.ox.oxfish.model.market.FixedPriceMarket;
 import uk.ac.ox.oxfish.model.market.MarketMap;
 import uk.ac.ox.oxfish.model.market.gas.FixedGasPrice;
@@ -113,6 +115,8 @@ public class TunaScenario implements Scenario {
     private static final Path BOAT_SPEEDS_FILE = input("boat_speeds.csv");
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
+    private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
+
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("habitability_bet_2006-01-07.csv"),
         "SKJ", input("biomass_skj_2006-01-15.csv"),
@@ -125,6 +129,12 @@ public class TunaScenario implements Scenario {
     private static final Path CURRENTS_FILE = input("currents.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2018;
+    private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
+        new BiomassDrivenTimeSeriesExogenousCatchesFactory(
+            EXOGENOUS_CATCHES_FILE,
+            targetYear,
+            (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode))
+        );
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
@@ -347,6 +357,9 @@ public class TunaScenario implements Scenario {
             ImmutableMap.of(FishState.DEFAULT_POPULATION_NAME, fisherFactory);
 
         final SocialNetwork network = new SocialNetwork(new EmptyNetworkBuilder());
+
+        final ExogenousCatches exogenousCatches = exogenousCatchesFactory.apply(model);
+        model.registerStartable(exogenousCatches);
 
         return new ScenarioPopulation(new ArrayList<>(fishersByBoatId.values()), network, fisherFactories);
 
