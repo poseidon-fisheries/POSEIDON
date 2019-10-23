@@ -9,7 +9,6 @@ import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
@@ -56,27 +55,37 @@ public class Fad {
 
     public FadManager getOwner() { return owner; }
 
-    public void releaseFish(LocalBiology localBiology, GlobalBiology globalBiology) {
-        Optional<VariableBiomassBasedBiology> variableBiomassBasedSeaTileBiology =
-            localBiology instanceof VariableBiomassBasedBiology ?
-                Optional.of((VariableBiomassBasedBiology) localBiology) :
-                Optional.empty();
-        for (Species species : globalBiology.getSpecies()) {
-            // Remove biomass from the FAD...
+    /**
+     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
+     */
+    public void releaseFish(Iterable<Species> allSpecies) {
+        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
+    }
+
+    /**
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology.
+     * In the unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
+     */
+    public void releaseFish(Iterable<Species> allSpecies, VariableBiomassBasedBiology seaTileBiology) {
+        allSpecies.forEach(species -> {
+            final double seaTileBiomass = seaTileBiology.getBiomass(species);
             final double fadBiomass = biology.getBiomass(species);
-            biology.setCurrentBiomass(species, 0);
-            // ...and send that biomass down to the sea tile's biology.
-            // If the local biology is not biomass based (most likely because
-            // we're outside the habitable zone), the fish is lost.
-            // In the unlikely event that the sea tile's carrying capacity is exceeded,
-            // the extra fish is also lost.
-            variableBiomassBasedSeaTileBiology.ifPresent(seaTileBiology -> {
-                final double seaTileBiomass = seaTileBiology.getBiomass(species);
-                final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
-                final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
-                seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
-            });
-        }
+            final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
+            final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
+            seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
+        });
+        releaseFish(allSpecies);
+    }
+
+    /**
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
+     * biomass based (most likely because we're outside the habitable zone), the fish is lost.
+     */
+    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
+        if (seaTileBiology instanceof VariableBiomassBasedBiology)
+            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
+        else
+            releaseFish(allSpecies);
     }
 
     public double priceOfFishHere(Collection<Market> markets) {

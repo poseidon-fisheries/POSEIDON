@@ -1,7 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import uk.ac.ox.oxfish.biology.LocalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -37,7 +35,7 @@ public class MakeFadSet implements FadAction {
                 fisher.fishHere(model.getBiology(), duration, model, targetFad.getBiology());
                 model.recordFishing(fisher.getLocation());
             } else {
-                targetFad.releaseFish(fisher.getLocation().getBiology(), model.getBiology());
+                targetFad.releaseFish(model.getBiology().getSpecies(), fisher.getLocation().getBiology());
             }
             // TODO: picking up the FAD might not always be the thing to do
             return new ActionResult(new PickUpFad(targetFad), hoursLeft - duration);

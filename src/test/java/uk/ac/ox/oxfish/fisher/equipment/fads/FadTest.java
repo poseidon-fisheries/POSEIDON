@@ -26,7 +26,7 @@ public class FadTest {
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);
 
         // release the FAD's fish into the tile biology
-        fad.releaseFish(tileBiology, globalBiology);
+        fad.releaseFish(globalBiology.getSpecies(), tileBiology);
 
         // Check that the FAD is now empty and the tile has received the fish
         assertEmptyBiology(fadBiology);
@@ -35,7 +35,7 @@ public class FadTest {
 
         // Refill the FAD and release another batch of FAD fish into the tile biology
         fillBiology(fadBiology);
-        fad.releaseFish(tileBiology, globalBiology);
+        fad.releaseFish(globalBiology.getSpecies(), tileBiology);
 
         // Check that the FAD is now empty and the tile is now at full carrying capacity
         assertEmptyBiology(fadBiology);

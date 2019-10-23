@@ -116,9 +116,9 @@ public class FadMap implements Startable, Steppable {
                     // When the FAD hits land, we need to release the aggregated fish in the sea tile it
                     // previously occupied and then tell the drifting object map that the FAD should be removed
                     // (which will in turn trigger another call back to this function).
-                    getSeaTile(oldLoc)
-                        .flatMap(FadMap::getVariableBiomassBasedBiology)
-                        .ifPresent(biology -> fad.releaseFish(biology, globalBiology));
+                    getSeaTile(oldLoc).ifPresent(seaTile ->
+                        fad.releaseFish(globalBiology.getSpecies(), seaTile.getBiology())
+                    );
                     remove(fad);
                 }
             } else {
