@@ -56,21 +56,21 @@ public class AllocatorSlice0 {
                               new String[]{"population0","population1"},
                               SCENARIO_NAME,
                               15000,
-                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0", RUNS_PER_POLICY
         );
 
         maxHoldSizeExperiment("small",
                               new String[]{"population0"},
                               SCENARIO_NAME,
                               15000,
-                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0", RUNS_PER_POLICY
         );
 
         maxHoldSizeExperiment("large",
                               new String[]{"population1"},
                               SCENARIO_NAME,
                               15000,
-                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0", RUNS_PER_POLICY
         );
 
     }
@@ -86,7 +86,7 @@ public class AllocatorSlice0 {
             final double maxHoldSize, // 15000
             final double stepSize,
             final Path inputDirectory,
-            final Path outputDirectory, final String speciesName) throws IOException {
+            final Path outputDirectory, final String speciesName, final int runsPerPolicy) throws IOException {
 
         FileWriter fileWriter = new FileWriter(MAIN_DIRECTORY.resolve(OUTPUT_FOLDER).resolve(
                                                          scenarioFileName + "_"+name+".csv").toFile());
@@ -135,7 +135,7 @@ public class AllocatorSlice0 {
 
 
             //while (runner.getRunsDone() < 1) {
-            for(int i = 0; i< RUNS_PER_POLICY; i++) {
+            for(int i = 0; i< runsPerPolicy; i++) {
                 StringBuffer tidy = new StringBuffer();
                 runner.run(tidy);
                 fileWriter.write(tidy.toString());

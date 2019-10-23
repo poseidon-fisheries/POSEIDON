@@ -59,6 +59,7 @@ public class AllocatorSlice1 {
     private final static String CALIBRATED_SCENARIO_NAME = "slice1_calibrated_spinup";
 
     private final static int shockYear = 1;
+    private static final int RUNS_PER_POLICY = 10;
 
 
     public static void main(String[] args) throws IOException {
@@ -69,21 +70,21 @@ public class AllocatorSlice1 {
                                               new String[]{"population0","population1"},
                                               CALIBRATED_SCENARIO_NAME,
                                               2000000,
-                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper"
+                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper", RUNS_PER_POLICY
         );
 
         AllocatorSlice0.maxHoldSizeExperiment("small",
                                               new String[]{"population0"},
                                               CALIBRATED_SCENARIO_NAME,
                                               2000000,
-                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper"
+                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper", RUNS_PER_POLICY
         );
 
         AllocatorSlice0.maxHoldSizeExperiment("large",
                                               new String[]{"population1"},
                                               CALIBRATED_SCENARIO_NAME,
                                               2000000,
-                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper"
+                                              50000, MAIN_DIRECTORY, MAIN_DIRECTORY, "Snapper", RUNS_PER_POLICY
         );
 
     }
