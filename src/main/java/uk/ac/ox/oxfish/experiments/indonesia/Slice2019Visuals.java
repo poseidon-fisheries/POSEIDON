@@ -23,6 +23,7 @@ package uk.ac.ox.oxfish.experiments.indonesia;
 import org.jetbrains.annotations.Nullable;
 import sim.display.Console;
 import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FullSeasonalRetiredDecoratorFactory;
+import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.MaximumDaysAYearFactory;
 import uk.ac.ox.oxfish.gui.FishGUI;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
@@ -332,6 +333,17 @@ public class Slice2019Visuals {
 
         if(modifier!=null)
             modifier.accept(scenario);
+
+        for (FisherDefinition fisherDefinition : scenario.getFisherDefinitions()) {
+            fisherDefinition.setFishingStrategy(
+                    new MaximumDaysAYearFactory(
+                            240,
+                            fisherDefinition.getFishingStrategy()
+                    )
+
+
+            );
+        }
 
         final FishState model = new FishState(seed);
         model.setScenario(scenario);

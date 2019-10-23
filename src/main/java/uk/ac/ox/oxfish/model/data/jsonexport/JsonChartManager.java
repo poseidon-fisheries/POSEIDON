@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.model.data.OutputPlugin;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
@@ -23,6 +24,9 @@ public class JsonChartManager implements OutputPlugin {
     private JsonChart jsonChart;
     private Map<String, String> renamedColumns;
     private int numYearsToSkip;
+
+    private ToDoubleFunction<Double> transformer;
+
 
     public JsonChartManager(String title, String xLabel, String yLabel, List<Double> yLines, String fileName, List<String> columnNames, Map<String, String> renamedColumns, int numYearsToSkip) {
         this.title = title;
@@ -44,6 +48,14 @@ public class JsonChartManager implements OutputPlugin {
             for (int i = 0; i < numYearsToSkip; i++) {
                 series.getYValues().removeFirst();
             }
+            if(transformer!=null)
+            {
+                for(int i=0; i<series.getYValues().size(); i++)
+                    series.getYValues().set(i,
+                                            transformer.applyAsDouble(series.getYValues().get(i))
+                                            );
+            }
+
         }
     }
 
@@ -60,5 +72,24 @@ public class JsonChartManager implements OutputPlugin {
         Preconditions.checkNotNull(jsonChart);
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(jsonChart);
+    }
+
+
+    /**
+     * Getter for property 'transformer'.
+     *
+     * @return Value for property 'transformer'.
+     */
+    public ToDoubleFunction<Double> getTransformer() {
+        return transformer;
+    }
+
+    /**
+     * Setter for property 'transformer'.
+     *
+     * @param transformer Value to set for property 'transformer'.
+     */
+    public void setTransformer(ToDoubleFunction<Double> transformer) {
+        this.transformer = transformer;
     }
 }

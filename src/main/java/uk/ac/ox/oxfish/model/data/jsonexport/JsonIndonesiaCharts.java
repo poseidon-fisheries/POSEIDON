@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.Collections.emptyList;
@@ -15,6 +17,12 @@ import static java.util.function.Function.identity;
 
 public class JsonIndonesiaCharts implements AdditionalStartable {
 
+    private static final ToDoubleFunction<Double> PERCENTILE_TRANSFORMER = new ToDoubleFunction<Double>() {
+        @Override
+        public double applyAsDouble(Double value) {
+            return FishStateUtilities.round(value * 100d);
+        }
+    };
     private String name;
     private List<JsonChartManager> chartManagers;
     private int numYearsToSkip;
@@ -93,10 +101,12 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
             identity(), name -> name.replaceAll("SPR Oracle - ", "")
         ));
 
-        return new JsonChartManager(
-            "SPR", "Years", "SPR (%)", ImmutableList.of(0.4),
-            name + "_" + "depletion.json", columnsToPrint, renamedColumns,
-            numYearsToSkip);
+        JsonChartManager sprManager = new JsonChartManager(
+                "SPR", "Years", "SPR (%)", ImmutableList.of(0.4),
+                name + "_" + "depletion.json", columnsToPrint, renamedColumns,
+                numYearsToSkip);
+        sprManager.setTransformer(PERCENTILE_TRANSFORMER);
+        return sprManager;
 
     }
 
@@ -168,10 +178,12 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
                 "Percentage Mature Catches " + "Pristipomoides multidens" + " " + "100_multidens", "Pristipomoides multidens"
         );
 
-        return new JsonChartManager(
-            "Percentage Mature Catches", "Years", "Mature catches (%)", emptyList(),
-            name + "_" + "mature_catches.json", columnsToPrint, renamedColumns,
-            numYearsToSkip);
+        JsonChartManager matureCatches = new JsonChartManager(
+                "Percentage Mature Catches", "Years", "Mature catches (%)", emptyList(),
+                name + "_" + "mature_catches.json", columnsToPrint, renamedColumns,
+                numYearsToSkip);
+        matureCatches.setTransformer(PERCENTILE_TRANSFORMER);
+        return matureCatches;
 
     }
 
