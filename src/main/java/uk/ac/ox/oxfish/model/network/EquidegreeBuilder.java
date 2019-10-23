@@ -38,15 +38,9 @@ import java.util.*;
  * Builds network where everyone has the same out-degree of edges
  * Created by carrknight on 7/1/15.
  */
-public class EquidegreeBuilder implements NetworkBuilder{
+public class EquidegreeBuilder extends AbstractNetworkBuilder{
 
     private DoubleParameter degree = new FixedDoubleParameter(2d);
-
-    /**
-     * list of additional conditions to pass before allowing friendship
-     */
-    private final LinkedList<NetworkPredicate> predicates = new LinkedList<>();
-
 
     /**
      * when this is false then do not allow both A->B and B->A connections
@@ -90,6 +84,7 @@ public class EquidegreeBuilder implements NetworkBuilder{
             }
             List<Fisher> friends = new LinkedList<>();
 
+            List<NetworkPredicate> predicates = super.computePredicates(state);
             List<Fisher> candidates = new LinkedList<>();
             for(Fisher candidate : fishers)
             {
@@ -178,6 +173,9 @@ public class EquidegreeBuilder implements NetworkBuilder{
 
         currentNetwork.addVertex(fisher);
         ObservableList<Fisher> fishers = state.getFishers();
+        List<NetworkPredicate> predicates = super.computePredicates(state);
+
+
 
         int degree = computeDegree(state.getRandom());
         Set<Fisher> friends = new HashSet<>(degree);
@@ -211,14 +209,6 @@ public class EquidegreeBuilder implements NetworkBuilder{
     public void removeFisher(
             Fisher toRemove, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
         currentNetwork.removeVertex(toRemove);
-    }
-
-    /**
-     * adds a condition that needs to be true for two fishers to be friends.
-     * @param predicate the condition to add
-     */
-    public void addPredicate(NetworkPredicate predicate){
-        predicates.add(predicate);
     }
 
     /**

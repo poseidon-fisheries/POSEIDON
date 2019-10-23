@@ -30,26 +30,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
-public class FixedNumberOfEdges implements NetworkBuilder {
+public class FixedNumberOfEdges extends AbstractNetworkBuilder {
 
 
     private DoubleParameter edges = new FixedDoubleParameter(100d);
-
-    /**
-     * list of additional conditions to pass before allowing friendship
-     */
-    private final LinkedList<NetworkPredicate> predicates = new LinkedList<>();
-
-
-    /**
-     * adds a condition that needs to be true for two fishers to be friends.
-     * @param predicate the condition to add
-     */
-    public void addPredicate(NetworkPredicate predicate){
-        predicates.add(predicate);
-    }
-
 
     /**
      * this is supposed to be called not so much when initializing the network but later on if any agent is created
@@ -97,6 +83,7 @@ public class FixedNumberOfEdges implements NetworkBuilder {
 
         ObservableList<Fisher> fishers = fishState.getFishers();
 
+        List<NetworkPredicate> predicates = computePredicates(fishState);
         mainloop:
         while(graph.getEdgeCount()<numberOfEdges)
         {

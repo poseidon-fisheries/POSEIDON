@@ -9,6 +9,7 @@ import uk.ac.ox.oxfish.biology.boxcars.SprOracleBuilder;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotAbundanceResetterFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.SnapshotBiomassResetterFactory;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
+import uk.ac.ox.oxfish.model.data.collectors.AdditionalFishStateDailyCollectorsFactory;
 import uk.ac.ox.oxfish.model.data.collectors.TowLongLoggerFactory;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonManagerFactory;
 import uk.ac.ox.oxfish.model.regs.OnOffSwitchRegulator;
@@ -41,6 +42,7 @@ public class AdditionalStartables {
         NAMES.put(TowLongLoggerFactory.class, "Tow Long Logger");
         NAMES.put(JsonManagerFactory.class, "Json Manager");
         NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
+        NAMES.put(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

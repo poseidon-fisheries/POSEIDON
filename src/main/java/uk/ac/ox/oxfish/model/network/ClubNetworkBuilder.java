@@ -29,13 +29,12 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
 
-public class ClubNetworkBuilder implements NetworkBuilder {
+public class ClubNetworkBuilder extends AbstractNetworkBuilder {
 
     private int nextClubSize;
 
     private Collection<Fisher> club;
 
-    private final Collection<NetworkPredicate> predicates = new LinkedList<>();
 
 
     private DoubleParameter clubSize = new FixedDoubleParameter(2);
@@ -43,16 +42,6 @@ public class ClubNetworkBuilder implements NetworkBuilder {
     public ClubNetworkBuilder() {
     }
 
-
-    /**
-     * adds a condition that needs to be true for two fishers to be friends.
-     *
-     * @param predicate the condition to add
-     */
-    @Override
-    public void addPredicate(NetworkPredicate predicate) {
-        predicates.add(predicate);
-    }
 
     /**
      * this is supposed to be called not so much when initializing the network but later on if any agent is created
@@ -65,6 +54,8 @@ public class ClubNetworkBuilder implements NetworkBuilder {
     @Override
     public void addFisher(
             Fisher newAddition, DirectedGraph<Fisher, FriendshipEdge> currentNetwork, FishState state) {
+
+        List<NetworkPredicate> predicates = super.computePredicates(state);
 
 
 

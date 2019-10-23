@@ -37,7 +37,7 @@ import java.util.List;
  * Builds a network using Barabasi-Albert algorithm from Jung
  * Created by carrknight on 7/1/15.
  */
-public class BarabasiAlbertBuilder implements NetworkBuilder
+public class BarabasiAlbertBuilder extends AbstractNetworkBuilder
 {
 
 
@@ -45,7 +45,6 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
 
     private int edgesPerVertex = 2;
 
-    final private LinkedList<NetworkPredicate> predicates = new LinkedList<>();
 
     /**
      * Applies this function to the given argument.
@@ -115,6 +114,10 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
 
         MersenneTwisterFast random = state.getRandom();
 
+
+        List<NetworkPredicate> predicates = super.computePredicates(state);
+
+
         int totalDegree = currentNetwork.getVertices().stream().mapToInt(fisher -> currentNetwork.degree(fisher)).sum();
         currentNetwork.addVertex(newAddition);
 
@@ -162,13 +165,4 @@ public class BarabasiAlbertBuilder implements NetworkBuilder
     }
 
 
-    /**
-     * adds a condition that needs to be true for two fishers to be friends.
-     *
-     * @param predicate the condition to add
-     */
-    @Override
-    public void addPredicate(NetworkPredicate predicate) {
-        predicates.add(predicate);
-    }
 }

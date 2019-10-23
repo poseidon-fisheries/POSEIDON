@@ -54,6 +54,8 @@ public class MaxHoldSizeRandomAllocationPolicy implements PermitAllocationPolicy
             List<Fisher> participants, FishState state) {
 
 
+        System.out.println(state.getYear() + " --- " + state.getDay());
+
         ArrayList<Fisher> participantsCopy = new ArrayList<>(participants);
         Collections.shuffle(participantsCopy,new Random(state.getRandom().nextLong()));
 

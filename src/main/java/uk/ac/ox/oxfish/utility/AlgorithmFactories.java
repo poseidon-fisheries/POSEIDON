@@ -73,6 +73,8 @@ import uk.ac.ox.oxfish.model.market.factory.Markets;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMaker;
 import uk.ac.ox.oxfish.model.market.gas.GasPriceMakers;
 import uk.ac.ox.oxfish.model.network.NetworkBuilders;
+import uk.ac.ox.oxfish.model.network.NetworkPredicate;
+import uk.ac.ox.oxfish.model.network.factory.NetworkPredicates;
 import uk.ac.ox.oxfish.model.plugins.AdditionalStartables;
 import uk.ac.ox.oxfish.model.regs.PermitAllocationPolicy;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -184,6 +186,9 @@ public class AlgorithmFactories {
         NAMES_MAP.put(AdditionalStartable.class, AdditionalStartables.NAMES);
         CONSTRUCTOR_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.CONSTRUCTORS);
         NAMES_MAP.put(PermitAllocationPolicy.class, PermitAllocationPolicies.NAMES);
+
+        CONSTRUCTOR_MAP.put(NetworkPredicate.class, NetworkPredicates.CONSTRUCTORS);
+        NAMES_MAP.put(NetworkPredicate.class, NetworkPredicates.NAMES);
     }
 
 
