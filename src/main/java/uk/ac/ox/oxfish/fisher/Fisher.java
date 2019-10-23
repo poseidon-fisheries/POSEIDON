@@ -58,6 +58,8 @@ import uk.ac.ox.oxfish.model.data.collectors.*;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
+import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;

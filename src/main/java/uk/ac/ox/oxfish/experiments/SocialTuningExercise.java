@@ -54,7 +54,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.factory.ExponentialMovingAverageFactory;
 import uk.ac.ox.oxfish.model.scenario.CaliforniaAbundanceScenario;
-import uk.ac.ox.oxfish.model.scenario.GeneralizedScenario;
 import uk.ac.ox.oxfish.model.scenario.PolicyScripts;
 import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -85,7 +84,7 @@ public class SocialTuningExercise {
         defaults("gear.yaml", "_gear", 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
         batchRun("gear.yaml", "_gear",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), 3, 2, MAIN_DIRECTORY.resolve("policy.yaml"));
     }
@@ -114,7 +113,7 @@ public class SocialTuningExercise {
         defaults("chaser_gas.yaml", "_chasergas",YEARS_TO_RUN,0,null);
         batchRun("chaser_gas.yaml", "_chasergas",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
@@ -124,7 +123,7 @@ public class SocialTuningExercise {
 
         batchRun("no_regrowth.yaml", "_noregrowth",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
@@ -133,7 +132,7 @@ public class SocialTuningExercise {
         defaults("fine.yaml", "_fine", YEARS_TO_RUN, 0, null);
         batchRun("fine.yaml", "_fine",
                  pair -> ((SocialTuningRegressionFactory) ((HeatmapDestinationFactory)
-                         ((GeneralizedScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
+                         ((PrototypeScenario) pair.getFirst()).getDestinationStrategy()).getRegression()).setNested(
                          pair.getSecond()
                  ), YEARS_TO_RUN, 0, null);
     }
