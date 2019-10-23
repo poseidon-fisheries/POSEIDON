@@ -57,16 +57,16 @@ public class FadMapTest {
 
         final VectorGrid2D vectorGrid2D = new VectorGrid2D(nauticalMap.getWidth(), nauticalMap.getHeight(), vectors);
         final CurrentMaps currentMaps = new CurrentMaps(ImmutableList.of(vectorGrid2D), t -> 0);
-        final FadInitializer fadInitializer = new FadInitializer(k, 0);
+        final FadInitializer fadInitializer = new FadInitializer(k, 0, 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentMaps, globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
 
         final Schedule schedule = mock(Schedule.class);
         final SimState simState = mock(SimState.class);
+        simState.random = new MersenneTwisterFast();
         simState.schedule = schedule;
 
         // Put a FAD at the East edge of the central row
-        final MersenneTwisterFast random = new MersenneTwisterFast();
         final SeaTile startTile = nauticalMap.getSeaTile(2, 1);
         final Fad fad = fadManager.deployFad(startTile);
         fillBiology(fad.getBiology());

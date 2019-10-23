@@ -72,11 +72,16 @@ public class FadMap implements Startable, Steppable {
     public void step(SimState simState) {
         VectorGrid2D currentsMap = currentsMaps.atSteps(simState.schedule.getSteps());
         driftingObjectsMap.applyDrift(currentsMap::move);
-        allFads().forEach(fad ->
-            getFadTile(fad)
-                .flatMap(FadMap::getVariableBiomassBasedBiology)
-                .ifPresent(biology -> fad.aggregateFish(biology, globalBiology))
-        );
+        allFads().forEach(fad -> {
+            final Optional<VariableBiomassBasedBiology> seaTileBiology =
+                getFadTile(fad).flatMap(FadMap::getVariableBiomassBasedBiology);
+            if (seaTileBiology.isPresent()) {
+                fad.aggregateFish(seaTileBiology.get(), globalBiology);
+                fad.maybeReleaseFish(globalBiology.getSpecies(), seaTileBiology.get(), simState.random);
+            } else {
+                fad.maybeReleaseFish(globalBiology.getSpecies(), simState.random);
+            }
+        });
     }
 
     @NotNull

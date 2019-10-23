@@ -20,7 +20,7 @@ public class FadTest {
         // Make a full FAD, with a carrying capacity of 0.75...
         final BiomassLocalBiology fadBiology = makeBiology(globalBiology, 0.75);
         fillBiology(fadBiology);
-        final Fad fad = new Fad(mock(FadManager.class), fadBiology, 0);
+        final Fad fad = new Fad(mock(FadManager.class), fadBiology, 0, 0);
 
         // ...and an empty tile biology, with a carrying capacity of 1.0:
         VariableBiomassBasedBiology tileBiology = makeBiology(globalBiology, 1.0);

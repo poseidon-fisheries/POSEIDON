@@ -20,7 +20,7 @@ public class FadInitializerTest {
         final GlobalBiology globalBiology =
             new GlobalBiology(new Species("A"), new Species("B"));
         final FadInitializer fadInitializer =
-            new FadInitializer(getQuantity(1d, TONNE), 0d);
+            new FadInitializer(getQuantity(1d, TONNE), 0d, 0);
         final FadMap fadMap =
             new FadMap(mock(NauticalMap.class), mock(CurrentMaps.class), globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);

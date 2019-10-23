@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
@@ -18,15 +19,18 @@ public class Fad {
     private final FadManager owner;
     private final BiomassLocalBiology biology;
     final private double attractionRate; // proportion of underlying biomass attracted per day
+    final private double fishReleaseProbability; // daily probability of releasing fish from the FAD
 
     public Fad(
         FadManager owner,
         BiomassLocalBiology biology,
-        double attractionRate
+        double attractionRate,
+        double fishReleaseProbability
     ) {
         this.owner = owner;
         this.biology = biology;
         this.attractionRate = attractionRate;
+        this.fishReleaseProbability = fishReleaseProbability;
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
@@ -86,6 +90,14 @@ public class Fad {
             releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
         else
             releaseFish(allSpecies);
+    }
+
+    public void maybeReleaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology, MersenneTwisterFast rng) {
+        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies, seaTileBiology);
+    }
+
+    public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
+        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
     }
 
     public double priceOfFishHere(Collection<Market> markets) {
