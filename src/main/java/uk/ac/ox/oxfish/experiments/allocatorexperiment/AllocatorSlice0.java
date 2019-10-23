@@ -56,21 +56,21 @@ public class AllocatorSlice0 {
                               new String[]{"population0","population1"},
                               SCENARIO_NAME,
                               15000,
-                              1000
-                              );
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
+        );
 
         maxHoldSizeExperiment("small",
                               new String[]{"population0"},
                               SCENARIO_NAME,
                               15000,
-                              1000
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
         );
 
         maxHoldSizeExperiment("large",
                               new String[]{"population1"},
                               SCENARIO_NAME,
                               15000,
-                              1000
+                              1000, MAIN_DIRECTORY, MAIN_DIRECTORY.resolve(OUTPUT_FOLDER), "Species 0"
         );
 
     }
@@ -79,11 +79,14 @@ public class AllocatorSlice0 {
 
 
 
-    private static void maxHoldSizeExperiment(String name,
-                                              String[] modifiedTags,
-                                              final String scenarioFileName,
-                                              final double maxHoldSize, // 15000
-                                              final double stepSize) throws IOException {
+    public static void maxHoldSizeExperiment(
+            String name,
+            String[] modifiedTags,
+            final String scenarioFileName,
+            final double maxHoldSize, // 15000
+            final double stepSize,
+            final Path inputDirectory,
+            final Path outputDirectory, final String speciesName) throws IOException {
 
         FileWriter fileWriter = new FileWriter(MAIN_DIRECTORY.resolve(OUTPUT_FOLDER).resolve(
                                                          scenarioFileName + "_"+name+".csv").toFile());
@@ -95,7 +98,10 @@ public class AllocatorSlice0 {
         while (currentHoldSize>0)
         {
 
-            BatchRunner runner = setupRunner(scenarioFileName, YEARS_TO_RUN, 2);
+            BatchRunner runner = setupRunner(scenarioFileName,
+                                             YEARS_TO_RUN, 2,
+                                             inputDirectory,
+                                             outputDirectory, speciesName);
 
             int finalHoldSize = (int) currentHoldSize;
 
@@ -149,17 +155,18 @@ public class AllocatorSlice0 {
 
 
     @NotNull
-    private static BatchRunner setupRunner(String filename, final int yearsToRun,
-                                          final int populations) {
+    private static BatchRunner setupRunner(
+            String filename, final int yearsToRun,
+            final int populations, final Path inputDirectory, final Path outputDirectory, final String speciesName) {
         ArrayList<String> columnsToPrint = Lists.newArrayList(
 
                 "Actual Average Cash-Flow",
-                "Species 0 Landings",
-                "Species 0 Earnings",
+                speciesName + " Landings",
+                speciesName + " Earnings",
                 "Average Distance From Port",
                 "Actual Average Hours Out",
                 "Number Of Active Fishers",
-                "Biomass Species 0");
+                "Biomass " + speciesName);
         for (int i = 0; i < populations; i++) {
             columnsToPrint.add("Total Landings of population"+i);
             columnsToPrint.add("Actual Average Cash-Flow of population"+i);
@@ -168,11 +175,11 @@ public class AllocatorSlice0 {
         }
 
         return new BatchRunner(
-                MAIN_DIRECTORY.resolve(
+                inputDirectory.resolve(
                           filename + ".yaml"),
                 yearsToRun,
                 columnsToPrint,
-                MAIN_DIRECTORY.resolve(OUTPUT_FOLDER).resolve(filename),
+                outputDirectory.resolve(filename),
                 null,
                 System.currentTimeMillis(),
                 -1
