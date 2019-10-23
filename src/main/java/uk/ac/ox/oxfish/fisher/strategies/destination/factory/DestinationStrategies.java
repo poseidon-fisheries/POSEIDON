@@ -34,10 +34,12 @@ import java.util.function.Supplier;
  */
 public class DestinationStrategies {
 
+    /**
+     * the list of all registered CONSTRUCTORS
+     */
     public static final LinkedHashMap<Class<? extends AlgorithmFactory>, String> NAMES = new LinkedHashMap<>();
 
     public static final Map<String, Supplier<AlgorithmFactory<? extends DestinationStrategy>>> CONSTRUCTORS;
-
     static {
         NAMES.put(RandomFavoriteDestinationFactory.class, "Random Favorite");
         NAMES.put(FixedFavoriteDestinationFactory.class, "Fixed Favorite");
@@ -66,9 +68,10 @@ public class DestinationStrategies {
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
         NAMES.put(RandomPlanFadDestinationStrategyFactory.class, "Random Plan FAD Destination Strategy");
         NAMES.put(FadDestinationStrategyFactory.class, "FAD Destination Strategy");
+        NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 
-    private DestinationStrategies() {}
+    private DestinationStrategies() {};
 
 }

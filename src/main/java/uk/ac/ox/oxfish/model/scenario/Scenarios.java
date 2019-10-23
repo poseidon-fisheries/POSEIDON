@@ -51,6 +51,9 @@ public class Scenarios {
         SCENARIOS.put("Flexible",FlexibleScenario::new);
         DESCRIPTIONS.put("Flexible", "The conceptual model, with multiple populations");
 
+        SCENARIOS.put("Generalized",GeneralizedScenario::new);
+        DESCRIPTIONS.put("Generalized", "Extension of the Abstract Scenario, implementing communal restrictions");
+
 
         SCENARIOS.put("California Map Scenario", CaliforniaAbundanceScenario::new);
         DESCRIPTIONS.put("California Map Scenario", "A simple test on how well does the model read and construct a world" +

@@ -20,8 +20,16 @@
 
 package uk.ac.ox.oxfish.fisher;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import com.esotericsoftware.minlog.Log;
 import com.google.common.base.Preconditions;
+
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -38,7 +46,12 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractor;
 import uk.ac.ox.oxfish.fisher.erotetic.FeatureExtractors;
-import uk.ac.ox.oxfish.fisher.log.*;
+import uk.ac.ox.oxfish.fisher.log.DiscretizedLocationMemory;
+import uk.ac.ox.oxfish.fisher.log.FishingRecord;
+import uk.ac.ox.oxfish.fisher.log.LocationMemory;
+import uk.ac.ox.oxfish.fisher.log.SharedTripRecord;
+import uk.ac.ox.oxfish.fisher.log.TripListener;
+import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.fisher.selfanalysis.FixedPredictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.Predictor;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.Cost;
@@ -54,18 +67,22 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.data.collectors.*;
+import uk.ac.ox.oxfish.model.data.collectors.Counter;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.model.data.collectors.FisherDailyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.FisherYearlyTimeSeries;
+import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.TradeInfo;
 import uk.ac.ox.oxfish.model.network.SocialNetwork;
 import uk.ac.ox.oxfish.model.regs.Regulation;
+import uk.ac.ox.oxfish.model.restrictions.RegionalRestrictions;
+import uk.ac.ox.oxfish.model.restrictions.ReputationalRestrictions;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.adaptation.Adaptation;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationDailyScheduler;
 import uk.ac.ox.oxfish.utility.adaptation.AdaptationPerTripScheduler;
-
 import java.util.*;
-
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -252,18 +269,53 @@ public class Fisher implements Steppable, Startable{
         {
             dailyCatchesPredictor[i] = new FixedPredictor(Double.NaN);
             profitPerUnitPredictor[i] = new FixedPredictor(Double.NaN);
-
-
-
         }
 
     }
 
+    
+	public Fisher(int id, Port port, 
+			MersenneTwisterFast random, 
+			Regulation regulation, 
+			ReputationalRestrictions reputationalRestrictions,
+			RegionalRestrictions communityRestrictions,
+			//strategies:
+            DepartingStrategy departingStrategy,
+            DestinationStrategy destinationStrategy,
+            FishingStrategy fishingStrategy,
+            GearStrategy gearStrategy,
+            DiscardingStrategy discardingStrategy,
+            WeatherEmergencyStrategy weatherStrategy,
+            //equipment:
+            Boat boat, Hold hold, Gear gear,
+            int numberOfSpecies) {
+		// TODO Auto-generated constructor stub
+		this(id,port,random,regulation,departingStrategy,destinationStrategy,
+				fishingStrategy,gearStrategy,discardingStrategy,weatherStrategy,boat, hold, gear, numberOfSpecies);
+		this.status.setCommunalStandards(communityRestrictions);
+		this.status.setReputationalRisk(reputationalRestrictions);
+	}
 
 
 
 
-    public SeaTile getLocation()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public SeaTile getLocation()
     {
         return status.getLocation();
     }
@@ -534,10 +586,13 @@ public class Fisher implements Steppable, Startable{
 
 
         //finish trip!
-        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(),this );
-        //account for the costs
-        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
-        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+        if(status.getHoursAtSea()>0) {
+	        TripRecord finished = memory.getTripLogger().finishTrip(status.getHoursAtSea(), getHomePort(), this);
+	        //account for the costs
+	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.VARIABLE_COSTS,finished.getTotalCosts());
+	        memory.getYearlyCounter().count(FisherYearlyTimeSeries.EARNINGS,finished.getEarnings());
+        	
+        }
 
         status.setHoursAtSea(0);
         assert  isAtPort();
@@ -1023,7 +1078,7 @@ public class Fisher implements Steppable, Startable{
     	if(friends.contains(friend))
     		return memory.getTripsSharedWith(friend);
     	else
-    		return null;
+    		return new ArrayList<SharedTripRecord>();
     }
     
     public void shareTrip(TripRecord trip, boolean allFriends, Collection<Fisher> sharedFriends ){
@@ -1524,6 +1579,12 @@ public class Fisher implements Steppable, Startable{
 
     public double getHoursAtSeaThisYear() {
         return memory.getHoursAtSeaThisYear();
+    }
+    public boolean isTerritory(SeaTile tile){
+		if(status.getReputationalRisk()==null) 
+			return false;
+    	else
+    		return status.getReputationalRisk().isTerritory(tile);
     }
 
 
