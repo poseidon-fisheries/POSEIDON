@@ -20,6 +20,7 @@
 
 package uk.ac.ox.oxfish.model.event;
 
+import com.google.common.base.Preconditions;
 import org.jfree.util.Log;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
  * Created by carrknight on 5/25/17.
  */
 public abstract class AbstractExogenousCatches implements ExogenousCatches {
+
     protected final LinkedHashMap<Species,Double> exogenousYearlyCatchesInKg;
     private final LinkedHashMap<Species,Double> lastExogenousCatches = new LinkedHashMap<>();
     private final String columnName;
@@ -172,5 +174,11 @@ public abstract class AbstractExogenousCatches implements ExogenousCatches {
 
         if(stoppable!= null)
             stoppable.stop();
+    }
+
+
+    public void updateExogenousCatches(Species species,Double targetYearlyLandings ){
+        Preconditions.checkArgument(exogenousYearlyCatchesInKg.containsKey(species));
+        exogenousYearlyCatchesInKg.put(species,targetYearlyLandings);
     }
 }

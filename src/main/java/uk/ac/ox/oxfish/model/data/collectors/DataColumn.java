@@ -152,4 +152,13 @@ public class DataColumn implements Iterable<Double>, Serializable{
     public LinkedList<Double> copy(){
         return new LinkedList<>(data);
     }
+
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("DataColumn{");
+        sb.append("data=").append(data);
+        sb.append('}');
+        return sb.toString();
+    }
 }
