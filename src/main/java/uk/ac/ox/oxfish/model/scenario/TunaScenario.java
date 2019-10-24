@@ -117,6 +117,10 @@ public class TunaScenario implements Scenario {
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
 
+    public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
+    public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
+    public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
+
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("habitability_bet_2006-01-07.csv"),
         "SKJ", input("biomass_skj_2006-01-15.csv"),
@@ -126,7 +130,6 @@ public class TunaScenario implements Scenario {
         r -> r.getString("code"),
         r -> r.getString("name")
     ));
-    private static final Path CURRENTS_FILE = input("currents.csv");
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2018;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
@@ -264,7 +267,7 @@ public class TunaScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
-        FadMapFactory fadMapFactory = new FadMapFactory(CURRENTS_FILE);
+        FadMapFactory fadMapFactory = new FadMapFactory(NEUTRAL_CURRENTS_FILE);
         final FadMap fadMap = fadMapFactory.apply(model);
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);
@@ -321,7 +324,7 @@ public class TunaScenario implements Scenario {
         final Map<String, Fisher> fishersByBoatId =
             parseAllRecords(BOATS_FILE).stream()
                 .filter(record -> record.getInt("year") == targetYear)
-                .limit(10)
+                //.limit(10)
                 .collect(toMap(
                     record -> record.getString("boat_id"),
                     record -> {
