@@ -84,27 +84,27 @@ public class GeneralizedScenario implements Scenario{
 
 
     private AlgorithmFactory<? extends BiologyInitializer> biologyInitializer =
-            new DiffusingLogisticFactory();
+            new DiffusingLogisticFactory(1000);
 
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer =
             new ConstantWeatherFactory();
 
 
     private AlgorithmFactory<? extends MapInitializer> mapInitializer =
-            new SimpleMapInitializerFactory();
+            new SimpleMapInitializerFactory(50,50,0,1000000,10);
 
 
 
     /**
      * the number of fishers
      */
-    private int fishers = 200;
+    private int fishers = 100;
 
 
     /**
      * are agents allowed to cheat?
      */
-    private boolean cheaters = false;
+    private boolean cheaters = true;
 
 
 
@@ -118,7 +118,7 @@ public class GeneralizedScenario implements Scenario{
     /**
      * the X position of the port on the grid. If null or a negative number the position is randomized
      */
-    private Integer portPositionX = -1;
+    private Integer portPositionX = 40;
     /**
      * the Y position of the port on the grid. If null or a negative number the position is randomized
      */
@@ -140,7 +140,7 @@ public class GeneralizedScenario implements Scenario{
     /**
      * hold size
      */
-    private DoubleParameter holdSize = new FixedDoubleParameter(100);
+    private DoubleParameter holdSize = new FixedDoubleParameter(500);
 
     /**
      * efficiency

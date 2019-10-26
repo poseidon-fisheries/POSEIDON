@@ -437,8 +437,8 @@ public class GeneralizedCognitiveStrategy implements DestinationStrategy {
             //Now we scale the expected profit to be a number maxed out at 1
         	viableDestination.attractiveness = weightProfit * viableDestination.expectedProfit/highestProfit -
         				weightLaw * (fisher.isAllowedToFishHere(viableDestination.destination, model)?0:1) -
-        				weightCommunal * (fisher.isBadByCommunityStandardsToFishHere(viableDestination.destination, model)?1:0)-
-        				weightReputation * (fisher.isBadReputationToFishHere(viableDestination.destination, model)?1:0);
+        				weightCommunal * (fisher.isAllowedByCommunityStandardsToFishHere(viableDestination.destination, model)?0:1)-
+        				weightReputation * (fisher.isAllowedReputationToFishHere(viableDestination.destination, model)?0:1);
         }
         //Remove any destinations with negative attractiveness
         for(ViableDestination d: viableDestinations)

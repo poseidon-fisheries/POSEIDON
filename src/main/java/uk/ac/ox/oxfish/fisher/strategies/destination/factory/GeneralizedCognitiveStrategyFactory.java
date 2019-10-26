@@ -38,17 +38,16 @@ public class GeneralizedCognitiveStrategyFactory implements AlgorithmFactory<Gen
 
 	private DoubleParameter minAbsoluteSatisfactoryProfit = new FixedDoubleParameter(1);
 	private DoubleParameter minRelativeSatisfactoryProfit = new FixedDoubleParameter(0);
-	private DoubleParameter weightProfit = new BetaDoubleParameter(1,1);
-	private DoubleParameter weightLegal = new BetaDoubleParameter(1,1);
-	private DoubleParameter weightCommunal = new BetaDoubleParameter(1,1);
-	private DoubleParameter weightReputation = new BetaDoubleParameter(1,1);
+	private DoubleParameter weightProfit = new FixedDoubleParameter(1);
+	private DoubleParameter weightLegal = new FixedDoubleParameter(1);
+	private DoubleParameter weightCommunal = new FixedDoubleParameter(1);
+	private DoubleParameter weightReputation = new FixedDoubleParameter(1);
     private AlgorithmFactory<? extends TimeScalarFunction> timeScalarFunction =
             new InverseTimeScalarFactory();
 	private DoubleParameter kExploration = new FixedDoubleParameter(.1);
 
 	@Override
 	public GeneralizedCognitiveStrategy apply(FishState state) {
-		
         MersenneTwisterFast random = state.random;
 		return new GeneralizedCognitiveStrategy(
 				minAbsoluteSatisfactoryProfit.apply(random),

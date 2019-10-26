@@ -26,16 +26,18 @@ public class RestrictedRectangularRegion {
 	
 	void setCorners(SeaTile cornerNW, SeaTile cornerSE){
 		this.westGridX = Math.min(cornerNW.getGridX(),cornerSE.getGridX());
-		this.northGridY = Math.max(cornerNW.getGridY(),cornerSE.getGridY());
+		this.northGridY = Math.min(cornerNW.getGridY(),cornerSE.getGridY());
 		this.eastGridX = Math.max(cornerNW.getGridX(),cornerSE.getGridX());
-		this.southGridY = Math.min(cornerNW.getGridY(),cornerSE.getGridY());
+		this.southGridY = Math.max(cornerNW.getGridY(),cornerSE.getGridY());
+//		System.out.println("Created Communal Region: "+westGridX + " "+northGridY + " "+ eastGridX + " " + southGridY);
 	}
 	
 	private boolean isInRegion(SeaTile tile){
+//		System.out.println("testing " + tile.getGridX() +" "+ tile.getGridY());
 		return(tile.getGridX()>=this.westGridX && 
 				tile.getGridX()<=this.eastGridX &&
-				tile.getGridY()<=this.northGridY &&
-				tile.getGridY()>= this.southGridY);
+				tile.getGridY()>=this.northGridY &&
+				tile.getGridY()<= this.southGridY);
 	}
 	
 	private boolean isActive(FishState model){
@@ -44,8 +46,8 @@ public class RestrictedRectangularRegion {
 	}
 	
 	public boolean isBadToFishHere(FishState model, SeaTile tile){
-//		return (isActive(model) && isInRegion(tile));
-		return isActive(model);
+		return (isActive(model) && isInRegion(tile));
+//		return isActive(model);
 	}
 	
 	public boolean canIFishHere(FishState model, SeaTile tile){

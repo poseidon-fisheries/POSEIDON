@@ -402,12 +402,12 @@ public class FisherStatus implements Serializable {
         return regulation.canFishHere(agent, tile, model);
     }
     
-    public boolean isBadByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean isAllowedByCommunityStandardsToFishHere(Fisher agent, SeaTile tile, FishState model) {
     	if(communalStandards==null) System.out.println("My communal standards are not set!");
     	return communalStandards.canFishHere(agent, tile, model);
     }
 
-    public boolean isBadReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean isAllowedReputationToFishHere(Fisher agent, SeaTile tile, FishState model) {
     	return reputationalRisk.canFishHere(agent, tile, model);
     }
 
@@ -519,4 +519,8 @@ public class FisherStatus implements Serializable {
     public HashMap<String, Object> getAdditionalVariables() {
         return additionalVariables;
     }
+
+	public int countTerritories() {
+		return getReputationalRisk().countTerritory();
+	}
 }
