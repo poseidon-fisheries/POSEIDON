@@ -1,9 +1,12 @@
 package uk.ac.ox.oxfish.geography.currents;
 
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiFunction;
@@ -14,10 +17,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.abs;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 
-public class CurrentVectors {
+public class CurrentVectors implements Steppable {
 
+    private final TreeMap<Integer, Map<SeaTile, Double2D>> vectorCache = new TreeMap<>();
     private final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
+
+    public CurrentVectors(TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps) {
+        this(vectorMaps, __ -> NEUTRAL);
+    }
 
     public CurrentVectors(
         TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
@@ -25,10 +33,6 @@ public class CurrentVectors {
     ) {
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
-    }
-
-    public CurrentVectors(TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps) {
-        this(vectorMaps, __ -> NEUTRAL);
     }
 
     int positiveDaysOffset(int sourceDay, int targetDay) {
@@ -43,7 +47,13 @@ public class CurrentVectors {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    public Double2D getVector(FishState fishState, SeaTile seaTile, int step) {
+    public Double2D getVector(FishState fishState, int step, SeaTile seaTile) {
+        return vectorCache
+            .computeIfAbsent(step, __ -> new HashMap<>())
+            .computeIfAbsent(seaTile, __ -> computeVector(fishState, step, seaTile));
+    }
+
+    private Double2D computeVector(FishState fishState, int step, SeaTile seaTile) {
         final int dayOfTheYear = fishState.getDayOfTheYear(step);
         if (vectorMaps.containsKey(dayOfTheYear)) {
             final Map<CurrentPattern, Map<SeaTile, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
@@ -113,9 +123,16 @@ public class CurrentVectors {
         return v1.add(v2);
     }
 
+    @Override public void step(SimState simState) {
+        // remove vectors for the previous step from the cache, as they will be needed no more
+        // TODO: schedule this
+        vectorCache.remove(((FishState) simState).getStep() - 1);
+    }
+
     private static class VectorMapAtStep {
         final int step;
         final Map<SeaTile, Double2D> vectorMap;
+
         VectorMapAtStep(int step, Map<SeaTile, Double2D> vectorMap) {
             this.step = step;
             this.vectorMap = vectorMap;
