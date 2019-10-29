@@ -88,7 +88,7 @@ public class AllocatorSlice0 {
             final Path inputDirectory,
             final Path outputDirectory, final String speciesName, final int runsPerPolicy) throws IOException {
 
-        FileWriter fileWriter = new FileWriter(MAIN_DIRECTORY.resolve(OUTPUT_FOLDER).resolve(
+        FileWriter fileWriter = new FileWriter(outputDirectory.resolve(
                                                          scenarioFileName + "_"+name+".csv").toFile());
 
         fileWriter.write("run,year,policy,variable,value\n");

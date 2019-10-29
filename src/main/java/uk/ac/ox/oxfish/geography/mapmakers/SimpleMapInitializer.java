@@ -83,8 +83,8 @@ public class SimpleMapInitializer implements MapInitializer {
 
         //choose how much of the world is land
         int actualLandWidth = maxLandWidth;
-        if(width <= 10)
-            actualLandWidth = (int) Math.ceil(width *.2);
+  //      if(width <= 10)
+ //           actualLandWidth = (int) Math.ceil(width *.2);
 
         for(int x=0; x< width; x++)
             for(int y=0; y< height; y++) {

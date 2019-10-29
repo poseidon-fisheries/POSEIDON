@@ -54,7 +54,7 @@ public class Slice2019Sweeps {
 
         //effort control
         //all boats are controlled
-        effortControl("all",
+        effortControl("all_new",
                 new String[]{"big","small","medium","small10"},
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
@@ -62,11 +62,11 @@ public class Slice2019Sweeps {
 
 //
 //////        //only boats >10GT are controlled
-//        effortControl("10",
-//                new String[]{"big","medium","small10"},
-//                SCENARIO_NAME,
-//                SHOCK_YEAR, MIN_DAYS_OUT);
-//
+        effortControl("10_new",
+                new String[]{"big","medium","small10"},
+                SCENARIO_NAME,
+                SHOCK_YEAR, MIN_DAYS_OUT);
+
 //////
 //////        //price premium
 //        pricePremium("premium_multidens", SCENARIO_NAME, 10, "Pristipomoides multidens");
@@ -837,6 +837,8 @@ public class Slice2019Sweeps {
                 "Retired fishers of population1",
                 "Retired fishers of population2",
                 "Retired fishers of population3",
+
+
 //                "Depletion Epinephelus areolatus",
 //                "Depletion Pristipomoides multidens",
 //                "Depletion Lutjanus malabaricus",
@@ -878,6 +880,10 @@ public class Slice2019Sweeps {
             columnsToPrint.add("Lutjanus malabaricus Landings of population"+i);
             columnsToPrint.add("Lutjanus erythropterus Landings of population"+i);
             columnsToPrint.add("Others Landings of population"+i);
+            columnsToPrint.add("Actual Average Distance From Port of population"+i);
+            columnsToPrint.add("Actual Average Variable Costs of population"+i);
+            columnsToPrint.add("Total Variable Costs of population"+i);
+            columnsToPrint.add("Total Hours Out of population"+i);
         }
 
 

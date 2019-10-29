@@ -364,24 +364,53 @@ public class FlexibleScenario implements Scenario {
                                         species + " " + AbstractMarket.LANDINGS_COLUMN_NAME)).sum(), Double.NaN);
 
             state.getYearlyDataSet().registerGatherer("Total Landings of " +tag,
-                    fishState ->
-                            fishState.getFishers().stream().
-                                    filter(fisher -> fisher.getTags().contains(tag)).
-                                    mapToDouble(value -> {
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> {
 
-                                        double sum = 0;
-                                        for(Species species : state.getBiology().getSpecies())
-                                            sum+=value.getLatestYearlyObservation(
-                                                    species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
-                                        return sum;
-                                    }).sum(), Double.NaN);
+                                                                          double sum = 0;
+                                                                          for(Species species : state.getBiology().getSpecies())
+                                                                              sum+=value.getLatestYearlyObservation(
+                                                                                      species + " " + AbstractMarket.LANDINGS_COLUMN_NAME);
+                                                                          return sum;
+                                                                      }).sum(), Double.NaN);
 
             state.getYearlyDataSet().registerGatherer("Average Earnings of " +tag,
                                                       fishState ->
                                                               fishState.getFishers().stream().
                                                                       filter(fisher -> fisher.getTags().contains(tag)).
                                                                       mapToDouble(value -> value.getLatestYearlyObservation(
-                                                                              FisherYearlyTimeSeries.EARNINGS)).sum(), Double.NaN);
+                                                                              FisherYearlyTimeSeries.EARNINGS)).average().orElse(Double.NaN), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Average Variable Costs of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.VARIABLE_COSTS)).average().orElse(Double.NaN), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Total Variable Costs of " +tag,
+                                                      fishState ->
+                                                              fishState.getFishers().stream().
+                                                                      filter(fisher -> fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.VARIABLE_COSTS)).sum(), Double.NaN);
+
+
+            state.getYearlyDataSet().registerGatherer("Actual Average Variable Costs of " +tag,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState observed) {
+                                                              return observed.getFishers().stream().
+                                                                      filter(fisher -> fisher.hasBeenActiveThisYear() &&
+                                                                              fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.VARIABLE_COSTS)).
+                                                                      filter(Double::isFinite).average().
+                                                                      orElse(Double.NaN);
+                                                          }
+                                                      }, Double.NaN);
 
             state.getYearlyDataSet().registerGatherer("Average Distance From Port of " +tag,
                                                       fishState ->
@@ -391,6 +420,23 @@ public class FlexibleScenario implements Scenario {
                                                                               FisherYearlyTimeSeries.FISHING_DISTANCE)).
                                                                       filter(Double::isFinite).average().
                                                                       orElse(Double.NaN), Double.NaN);
+
+            state.getYearlyDataSet().registerGatherer("Actual Average Distance From Port of " +tag,
+                                                      new Gatherer<FishState>() {
+                                                          @Override
+                                                          public Double apply(FishState observed) {
+                                                              return observed.getFishers().stream().
+                                                                      filter(fisher -> fisher.hasBeenActiveThisYear() &&
+                                                                              fisher.getTags().contains(tag)).
+                                                                      mapToDouble(value -> value.getLatestYearlyObservation(
+                                                                              FisherYearlyTimeSeries.FISHING_DISTANCE)).
+                                                                      filter(Double::isFinite).average().
+                                                                      orElse(Double.NaN);
+                                                          }
+                                                      }, Double.NaN);
+
+
+
 
             state.getYearlyDataSet().registerGatherer("Average Number of Trips of " +tag,
                                                       fishState ->
