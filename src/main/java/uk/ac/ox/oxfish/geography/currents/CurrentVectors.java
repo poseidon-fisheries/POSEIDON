@@ -23,16 +23,25 @@ public class CurrentVectors implements Steppable {
     private final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
 
-    public CurrentVectors(TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps) {
-        this(vectorMaps, __ -> NEUTRAL);
+    private final int stepsPerDay;
+
+    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
+
+    public CurrentVectors(
+        TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
+        int stepsPerDay
+    ) {
+        this(vectorMaps, __ -> NEUTRAL, stepsPerDay);
     }
 
     public CurrentVectors(
         TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
-        Function<Integer, CurrentPattern> currentPatternAtStep
+        Function<Integer, CurrentPattern> currentPatternAtStep,
+        int stepsPerDay
     ) {
         this.vectorMaps = vectorMaps;
         this.currentPatternAtStep = currentPatternAtStep;
+        this.stepsPerDay = stepsPerDay;
     }
 
     int positiveDaysOffset(int sourceDay, int targetDay) {
@@ -47,14 +56,17 @@ public class CurrentVectors implements Steppable {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    public Double2D getVector(FishState fishState, int step, SeaTile seaTile) {
+    public Double2D getVector(int step, SeaTile seaTile) {
         return vectorCache
             .computeIfAbsent(step, __ -> new HashMap<>())
-            .computeIfAbsent(seaTile, __ -> computeVector(fishState, step, seaTile));
+            .computeIfAbsent(seaTile, __ -> computeVector(step, seaTile));
     }
 
-    private Double2D computeVector(FishState fishState, int step, SeaTile seaTile) {
-        final int dayOfTheYear = fishState.getDayOfTheYear(step);
+    /**
+     * Returns the current vector for seaTile at step. Returns null if we have no currents for that sea tile.
+     */
+    private Double2D computeVector(int step, SeaTile seaTile) {
+        final int dayOfTheYear = getDayOfTheYear(step);
         if (vectorMaps.containsKey(dayOfTheYear)) {
             final Map<CurrentPattern, Map<SeaTile, Double2D>> mapsAtStep = vectorMaps.get(dayOfTheYear);
             final CurrentPattern currentPattern = currentPatternAtStep.apply(step);
@@ -62,32 +74,30 @@ public class CurrentVectors implements Steppable {
                 return mapsAtStep.get(currentPattern).get(seaTile);
             }
         }
-        return getInterpolatedVector(fishState, seaTile, step);
+        return getInterpolatedVector(seaTile, step);
     }
 
     private VectorMapAtStep lookupVectorMap(
-        FishState fishState,
         int step,
         Function<Integer, Integer> keyLookup,
         Supplier<Integer> keyFallback,
         BiFunction<Integer, Integer, Integer> offsetFunction,
         int stepDirection // +1 or -1
     ) {
-        final int oldDay = fishState.getDayOfTheYear(step);
+        final int oldDay = getDayOfTheYear(step);
         final Integer newKey = keyLookup.apply(oldDay);
         final int newDay = newKey != null ? newKey : keyFallback.get();
         final int offsetInDays = offsetFunction.apply(oldDay, newDay);
-        final int newStep = step + (offsetInDays * fishState.getStepsPerDay());
+        final int newStep = step + (offsetInDays * stepsPerDay);
         final Map<CurrentPattern, Map<SeaTile, Double2D>> mapsOnNewDay = vectorMaps.get(newDay);
         final CurrentPattern patternAtNewStep = currentPatternAtStep.apply(newStep);
         return mapsOnNewDay.containsKey(patternAtNewStep) ?
             new VectorMapAtStep(newStep, mapsOnNewDay.get(patternAtNewStep)) :
-            lookupVectorMap(fishState, newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
+            lookupVectorMap(newStep + stepDirection, keyLookup, keyFallback, offsetFunction, stepDirection);
     }
 
-    private VectorMapAtStep getVectorMapBefore(FishState fishState, int step) {
+    private VectorMapAtStep getVectorMapBefore(int step) {
         return lookupVectorMap(
-            fishState,
             step,
             vectorMaps::floorKey,
             vectorMaps::lastKey,
@@ -96,9 +106,8 @@ public class CurrentVectors implements Steppable {
         );
     }
 
-    private VectorMapAtStep getVectorMapAfter(FishState fishState, int step) {
+    private VectorMapAtStep getVectorMapAfter(int step) {
         return lookupVectorMap(
-            fishState,
             step,
             vectorMaps::ceilingKey,
             vectorMaps::firstKey,
@@ -107,14 +116,20 @@ public class CurrentVectors implements Steppable {
         );
     }
 
-    private Double2D getInterpolatedVector(FishState fishState, SeaTile seaTile, int step) {
+    /**
+     * Return the interpolated vector between the currents we have before and after step.
+     * Returns null if we don't have currents for the desired sea tile.
+     */
+    private Double2D getInterpolatedVector(SeaTile seaTile, int step) {
 
-        final VectorMapAtStep vectorMapBefore = getVectorMapBefore(fishState, step - 1);
+        final VectorMapAtStep vectorMapBefore = getVectorMapBefore(step - 1);
         final Double2D vectorBefore = vectorMapBefore.vectorMap.get(seaTile);
+        if (vectorBefore == null) return null;
         final int offsetBefore = abs(step - vectorMapBefore.step);
 
-        final VectorMapAtStep vectorMapAfter = getVectorMapAfter(fishState, step + 1);
+        final VectorMapAtStep vectorMapAfter = getVectorMapAfter(step + 1);
         final Double2D vectorAfter = vectorMapAfter.vectorMap.get(seaTile);
+        if (vectorAfter == null) return null;
         final int offsetAfter = abs(step - vectorMapAfter.step);
 
         final double totalOffset = (double) offsetBefore + offsetAfter;
