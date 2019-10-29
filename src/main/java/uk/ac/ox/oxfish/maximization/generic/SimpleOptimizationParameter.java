@@ -103,7 +103,7 @@ public class SimpleOptimizationParameter implements OptimizationParameter, Seria
 
     }
 
-    static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
+    public static void quickParametrize(Scenario scenario, double realValue, String addressToModify) {
         try{
             //try as double parameter
             OptimizationParameter.navigateAndSet(

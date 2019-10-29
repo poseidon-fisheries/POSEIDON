@@ -70,6 +70,7 @@ public class PerTripImitativeDestinationFactoryTest {
         SimpleMapInitializerFactory mapInitializer = new SimpleMapInitializerFactory();
         mapInitializer.setWidth(new FixedDoubleParameter(5));
         mapInitializer.setHeight(new FixedDoubleParameter(5));
+        mapInitializer.setMaxLandWidth(new FixedDoubleParameter(1));
         scenario.setMapInitializer(mapInitializer);
         scenario.setFishers(5);
 

@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.bandit.BanditAlgorithm;
 import uk.ac.ox.oxfish.utility.bandit.BanditAverage;
 import uk.ac.ox.oxfish.utility.bandit.EpsilonGreedyBanditAlgorithm;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Function;
 
@@ -85,7 +86,8 @@ public class BanditDestinationStrategyTest {
     @Test
     public void SampleProperlyWithinABox() throws Exception {
 
-        SimpleMapInitializer map = new SimpleMapInitializer(9, 9, 0, 0, 1, 10);
+        SimpleMapInitializer map = new SimpleMapInitializer(9, 9, 0, 0, 1, 1);
+
         MersenneTwisterFast randomizer = new MersenneTwisterFast();
         NauticalMap chart = map.makeMap(randomizer,
                                         mock(GlobalBiology.class),

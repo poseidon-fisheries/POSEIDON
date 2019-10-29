@@ -50,7 +50,8 @@ public class DoubleParameters
         parameters.put("Sin", () -> new SinusoidalDoubleParameter(1,0.01));
         names.put(SelectDoubleParameter.class,"Sin");
 
-        parameters.put("Conditional", () -> new ConditionalDoubleParameter(false,new FixedDoubleParameter(0)));
+        parameters.put("Conditional", () -> new ConditionalDoubleParameter(
+                false,new FixedDoubleParameter(0)));
         names.put(ConditionalDoubleParameter.class,"Conditional");
 
         parameters.put("NullParameter", () -> new NullParameter());

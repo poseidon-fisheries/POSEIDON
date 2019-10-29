@@ -58,6 +58,15 @@ public interface DoubleParameter extends Function<MersenneTwisterFast,Double>
         if(split[0].toLowerCase().equals("select"))
             return new SelectDoubleParameter(nodeContent.trim().replace("select",""));
 
+        if(split[0].toLowerCase().equals("beta"))
+            return new BetaDoubleParameter(Double.parseDouble(split[1]),Double.parseDouble(split[2]));
+
+        if(split[0].toLowerCase().equals("conditional"))
+            return new ConditionalDoubleParameter(Boolean.parseBoolean(split[1]),
+                    DoubleParameter.parseDoubleParameter(split[2]));
+
+
+
         throw new IllegalArgumentException("Do not recognize this double parameter!");
 
     }

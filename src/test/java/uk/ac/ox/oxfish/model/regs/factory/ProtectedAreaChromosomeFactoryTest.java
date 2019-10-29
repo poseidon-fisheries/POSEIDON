@@ -45,6 +45,8 @@ public class ProtectedAreaChromosomeFactoryTest {
         scenario.setMapInitializer(mapMaker);
         mapMaker.setHeight(new FixedDoubleParameter(4));
         mapMaker.setWidth(new FixedDoubleParameter(4));
+        mapMaker.setMaxLandWidth(new FixedDoubleParameter(1));
+
         mapMaker.setCoastalRoughness(new FixedDoubleParameter(0));
         ProtectedAreaChromosomeFactory factory = new ProtectedAreaChromosomeFactory();
         factory.setChromosome("0010010000000000");

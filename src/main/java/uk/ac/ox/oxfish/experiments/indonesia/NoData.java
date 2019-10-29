@@ -20,8 +20,11 @@
 
 package uk.ac.ox.oxfish.experiments.indonesia;
 
+import uk.ac.ox.oxfish.experiments.noisespike.AcceptableRangePredicate;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -109,5 +112,25 @@ public class NoData {
         );
 
     }
+
+
+
+    private final static Path scenarioFile = Paths.get("docs", "20191025 limited_poseidon", "base.yaml");
+
+    /**
+     * what tells us if the result is good or crap
+     */
+    private static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+
+    static {
+        predicates.add(new AcceptableRangePredicate(
+                0.05,0.25,"SPR " + "Snapper" + " " + "spr_agent"
+        ));
+        predicates.add(new AcceptableRangePredicate(
+                5000000,15000000,"Red Fish Landings"
+        ));
+
+    }
+
 
 }

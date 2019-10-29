@@ -46,7 +46,7 @@ public class RandomPortInitializerTest {
     public void portsAreAllInSeparateAreas() throws Exception
     {
 
-        SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 10);
+        SimpleMapInitializer initializer = new SimpleMapInitializer(4, 4, 0, 0, 1, 1);
         NauticalMap map = initializer.makeMap(new MersenneTwisterFast(),
                                               new GlobalBiology(new Species("fake")),
                                               mock(FishState.class));

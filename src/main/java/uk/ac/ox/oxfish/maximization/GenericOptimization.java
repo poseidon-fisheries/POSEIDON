@@ -340,14 +340,14 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         FishYAML yaml = new FishYAML();
         Path optimizationFile =
         Paths.get("docs", "indonesia_hub", "runs", "712","slice2019","calibration",
-                              "optimizationproblem_tnc_tropfishpoponly_start.yaml");
-        final String scenarioName = "historical20_tnc_tropfishpoponly";
+                              "optimizationproblem_historical20_vpar4years_cumulative.yaml");
+        final String scenarioName = "historical20_vpa4years_cumulative_2";
 
         GenericOptimization optimization =
                 yaml.loadAs(new FileReader(optimizationFile.toFile()),GenericOptimization.class);
         System.out.println(optimization.scenarioFile);
         Scenario scenario = optimization.buildScenario(new double[]{
-                10.000,-5.210,-2.693, 9.124,-4.781, 3.564,-7.422,-7.747, 4.326,-6.388,-2.629,-1.447, 7.899,-6.717, 2.294,-9.101,-3.151, 4.249,-5.298, 9.943     });
+                -8.207,-4.757,-9.443,-1.924,-4.246,-4.158,-9.681,-9.751, 2.864,-0.253, 4.651, 8.520,-6.758,-7.782, 4.285,-5.825,-0.477,-9.664, 1.917,-1.249                   });
         Path outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_8h.yaml");
         yaml.dump(scenario,new FileWriter(outputFile.toFile()));
 
