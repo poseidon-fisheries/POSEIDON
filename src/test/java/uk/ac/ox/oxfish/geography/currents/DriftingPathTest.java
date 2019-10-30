@@ -26,17 +26,16 @@ public class DriftingPathTest {
                 x -> new SeaTile(x, 0, 0, null)
             ));
 
-        final DriftingPath driftingPath = new DriftingPath(0, new Double2D(0, 0));
         final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
         final ImmutableMap<SeaTile, Double2D> tileVectors =
             seaTiles.values().stream().collect(toImmutableMap(identity(), __ -> new Double2D(1, 0)));
         vectorMaps.put(1, ImmutableMap.of(CurrentPattern.NEUTRAL, tileVectors));
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, 1);
-
         BiFunction<Integer, Integer, SeaTile> getSeaTile = (x, y) -> seaTiles.get(x);
+        final DriftingPath driftingPath = new DriftingPath(0, new Double2D(0, 0), currentVectors, getSeaTile);
 
         try {
-            driftingPath.position(-1, currentVectors, getSeaTile);
+            driftingPath.position(-1);
             fail("should have thrown an IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {}
 
@@ -45,7 +44,7 @@ public class DriftingPathTest {
         );
 
         assertEquals(
-            driftingPath.position(0, currentVectors, getSeaTile),
+            driftingPath.position(0),
             Optional.of(new Double2D(0, 0))
         );
 
@@ -54,7 +53,7 @@ public class DriftingPathTest {
         );
 
         assertEquals(
-            driftingPath.position(1, currentVectors, getSeaTile),
+            driftingPath.position(1),
             Optional.of(new Double2D(1, 0))
         );
 
@@ -64,7 +63,7 @@ public class DriftingPathTest {
         );
 
         assertEquals(
-            driftingPath.position(3, currentVectors, getSeaTile),
+            driftingPath.position(3),
             Optional.of(new Double2D(3, 0))
         );
 
@@ -76,7 +75,7 @@ public class DriftingPathTest {
         );
 
         assertEquals(
-            driftingPath.position(4, currentVectors, getSeaTile),
+            driftingPath.position(4),
             Optional.empty()
         );
 

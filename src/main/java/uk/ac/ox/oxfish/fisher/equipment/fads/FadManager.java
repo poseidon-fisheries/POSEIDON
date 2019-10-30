@@ -1,14 +1,20 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.currents.DriftingPath;
+import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -90,5 +96,23 @@ public class FadManager {
     public Optional<SeaTile> getFadTile(Fad fad) { return getFadMap().getFadTile(fad); }
 
     public FadMap getFadMap() { return fadMap; }
+
+    public ImmutableSetMultimap<SeaTile, Fad> deployedFadsByTileAtStep(int timeStep) {
+        final ImmutableSetMultimap.Builder<SeaTile, Fad> builder = new ImmutableSetMultimap.Builder<>();
+        final DriftingObjectsMap driftingObjectsMap = fadMap.getDriftingObjectsMap();
+        deployedFads.forEach(fad ->
+            driftingObjectsMap.getObjectPath(fad)
+                .position(timeStep)
+                .map(this::getSeaTile)
+                .ifPresent(seaTile -> builder.put(seaTile, fad))
+        );
+        return builder.build();
+    }
+
+    private SeaTile getSeaTile(Double2D position) { return getSeaTile(position.x, position.y); }
+
+    private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
+
+    private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y);}
 
 }

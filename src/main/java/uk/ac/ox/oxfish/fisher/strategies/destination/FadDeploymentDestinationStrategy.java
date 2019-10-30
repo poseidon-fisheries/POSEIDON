@@ -7,6 +7,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableMap;
+
 public class FadDeploymentDestinationStrategy extends IntermediateDestinationsStrategy {
 
     private Map<SeaTile, Double> deploymentLocationValues = null;
@@ -23,9 +25,8 @@ public class FadDeploymentDestinationStrategy extends IntermediateDestinationsSt
     @Override
     Set<SeaTile> possibleDestinations(Fisher fisher) { return deploymentLocationValues.keySet(); }
 
-    @Override
-    double seaTileValue(Fisher fisher, SeaTile seaTile) {
-        return deploymentLocationValues.getOrDefault(seaTile, 0.0);
+    @Override Map<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, int timeStep) {
+        return unmodifiableMap(deploymentLocationValues);
     }
 
 }

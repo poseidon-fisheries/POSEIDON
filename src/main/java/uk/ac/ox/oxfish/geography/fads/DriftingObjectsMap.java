@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Collections.unmodifiableMap;
 import static uk.ac.ox.oxfish.utility.MasonUtils.bagToStream;
 import static uk.ac.ox.oxfish.utility.MasonUtils.inBounds;
 
@@ -29,7 +30,6 @@ public class DriftingObjectsMap {
     private final BiFunction<Integer, Integer, SeaTile> getSeaTile;
     private final Map<Object, DriftingPath> objectPaths = new HashMap<>();
     private final Map<Object, BiConsumer<Double2D, Optional<Double2D>>> onMoveCallbacks = new HashMap<>();
-
     DriftingObjectsMap(
         CurrentVectors currentVectors,
         NauticalMap nauticalMap
@@ -51,12 +51,14 @@ public class DriftingObjectsMap {
         this.getSeaTile = getSeaTile;
     }
 
+    public DriftingPath getObjectPath(Object o) { return objectPaths.get(o); }
+
     void applyDrift(int timeStep) {
         Bag objects = new Bag(field.allObjects); // make a copy, as objects can be removed
         bagToStream(objects).forEach(o -> {
             final Double2D oldLoc = field.getObjectLocationAsDouble2D(o);
             final Optional<Double2D> newLoc = objectPaths.get(o)
-                .position(timeStep, currentVectors, getSeaTile)
+                .position(timeStep)
                 .filter(location -> inBounds(location, field));
             if (newLoc.isPresent()) // TODO: use `ifPresentOrElse` once we upgrade to Java >=9.
                 move(o, oldLoc, newLoc.get());
@@ -106,7 +108,7 @@ public class DriftingObjectsMap {
     ) {
         setObjectLocation(object, location);
         onMoveCallbacks.put(object, onMove);
-        objectPaths.put(object, new DriftingPath(timeStep, location));
+        objectPaths.put(object, new DriftingPath(timeStep, location, currentVectors, getSeaTile));
     }
 
     @Nullable

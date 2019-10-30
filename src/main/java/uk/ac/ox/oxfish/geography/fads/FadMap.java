@@ -34,7 +34,6 @@ public class FadMap implements Startable, Steppable {
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
     private Stoppable stoppable;
-
     FadMap(
         NauticalMap nauticalMap,
         CurrentVectors currentVectors,
@@ -44,6 +43,10 @@ public class FadMap implements Startable, Steppable {
         this.globalBiology = globalBiology;
         this.driftingObjectsMap = new DriftingObjectsMap(currentVectors, nauticalMap);
     }
+
+    public NauticalMap getNauticalMap() { return nauticalMap; }
+
+    public DriftingObjectsMap getDriftingObjectsMap() { return driftingObjectsMap; }
 
     public GlobalBiology getGlobalBiology() { return globalBiology; }
 
