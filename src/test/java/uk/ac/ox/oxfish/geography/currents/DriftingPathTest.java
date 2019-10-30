@@ -21,7 +21,7 @@ public class DriftingPathTest {
     @Test
     public void position() {
         final ImmutableMap<Integer, SeaTile> seaTiles =
-            range(0, 3).mapToObj(Integer::new).collect(toImmutableMap(
+            range(0, 3).boxed().collect(toImmutableMap(
                 identity(),
                 x -> new SeaTile(x, 0, 0, null)
             ));
@@ -38,7 +38,7 @@ public class DriftingPathTest {
         try {
             driftingPath.position(-1, currentVectors, getSeaTile);
             fail("should have thrown an IllegalArgumentException");
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException ignored) {}
 
         assertEquals(driftingPath.getPositions(), ImmutableMap.of(
             0, Optional.of(new Double2D(0, 0)))

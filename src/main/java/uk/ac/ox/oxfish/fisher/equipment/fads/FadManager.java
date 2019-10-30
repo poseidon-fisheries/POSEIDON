@@ -39,16 +39,14 @@ public class FadManager {
 
     public ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
 
-    public FadMap getFadMap() { return fadMap; }
+    Optional<Fad> oneOfFadsHere() {
+        final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
+        return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();
+    }
 
     Bag getFadsHere() {
         checkNotNull(fisher);
         return fadMap.fadsAt(fisher.getLocation());
-    }
-
-    Optional<Fad> oneOfFadsHere() {
-        final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
-        return o instanceof Fad ? Optional.of((Fad) o) : Optional.empty();
     }
 
     public int getNumFadsInStock() { return numFadsInStock; }
@@ -61,27 +59,27 @@ public class FadManager {
     /**
      * Deploys a FAD in the middle of the given sea tile, i.e., at the 0.5, 0.5 point inside the tile
      */
-    public Fad deployFad(SeaTile seaTile) {
-        return deployFad(new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5));
+    public Fad deployFad(SeaTile seaTile, int timeStep) {
+        return deployFad(new Double2D(seaTile.getGridX() + 0.5, seaTile.getGridY() + 0.5), timeStep);
+    }
+
+    private Fad deployFad(Double2D location, int timeStep) {
+        checkState(numFadsInStock >= 1);
+        numFadsInStock--;
+        final Fad newFad = fadInitializer.apply(this);
+        fadMap.deployFad(newFad, timeStep, location);
+        deployedFads.add(newFad);
+        return newFad;
     }
 
     /**
      * Deploys a FAD at a random position in the given sea tile
      */
-    public void deployFad(SeaTile seaTile, MersenneTwisterFast random) {
+    public void deployFad(SeaTile seaTile, int timeStep, MersenneTwisterFast random) {
         deployFad(new Double2D(
             seaTile.getGridX() + random.nextDouble(),
             seaTile.getGridY() + random.nextDouble()
-        ));
-    }
-
-    private Fad deployFad(Double2D location) {
-        checkState(numFadsInStock >= 1);
-        numFadsInStock--;
-        final Fad newFad = fadInitializer.apply(this);
-        fadMap.deployFad(newFad, location);
-        deployedFads.add(newFad);
-        return newFad;
+        ), timeStep);
     }
 
     public void pickUpFad(Fad fad) {
@@ -90,5 +88,7 @@ public class FadManager {
     }
 
     public Optional<SeaTile> getFadTile(Fad fad) { return getFadMap().getFadTile(fad); }
+
+    public FadMap getFadMap() { return fadMap; }
 
 }

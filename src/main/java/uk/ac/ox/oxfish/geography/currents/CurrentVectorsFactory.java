@@ -13,6 +13,7 @@ import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.EL_NINO;
@@ -28,38 +29,39 @@ public class CurrentVectorsFactory {
 
     private static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
-    TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> makeVectorMaps(NauticalMap map) {
-        return makeVectorMaps(map, ImmutableMap.of(
-            NEUTRAL, NEUTRAL_CURRENTS_FILE,
-            EL_NINO, EL_NINO_CURRENTS_FILE,
-            LA_NINA, LA_NINA_CURRENTS_FILE
-        ));
+    public static CurrentVectors makeCurrentVectors(NauticalMap map, int stepsPerDay) {
+        final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps =
+            makeVectorMaps(map, ImmutableMap.of(
+                NEUTRAL, NEUTRAL_CURRENTS_FILE,
+                EL_NINO, EL_NINO_CURRENTS_FILE,
+                LA_NINA, LA_NINA_CURRENTS_FILE
+            ));
+        return new CurrentVectors(vectorMaps, stepsPerDay);
     }
 
-    TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> makeVectorMaps(
+    private static TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> makeVectorMaps(
         NauticalMap map,
         Map<CurrentPattern, Path> currentFiles
     ) {
         TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> currentVectors = new TreeMap<>();
-        currentFiles.forEach(((currentPattern, path) ->
-            CsvParserUtil.parseAllRecords(path).forEach(record -> {
-                final int dayOfYear = getLocalDate(record, "dttm").getDayOfYear();
-                final Map<SeaTile, Double2D> seaTileDouble2DMap = currentVectors
-                    .computeIfAbsent(dayOfYear, __ -> new HashMap<>())
-                    .computeIfAbsent(currentPattern, __ -> new HashMap<>());
-                final SeaTile seaTile = map.getSeaTile(readCoordinate(record));
-                final Double2D vector = readVector(record, seaTile, map);
-                seaTileDouble2DMap.put(seaTile, vector);
-            })
-        ));
+        currentFiles.forEach((currentPattern, path) ->
+            CsvParserUtil.parseAllRecords(path).forEach(record ->
+                Optional.ofNullable(map.getSeaTile(readCoordinate(record))).ifPresent(seaTile -> {
+                    final int dayOfYear = getLocalDate(record, "dttm").getDayOfYear();
+                    final Map<SeaTile, Double2D> seaTileDouble2DMap = currentVectors
+                        .computeIfAbsent(dayOfYear, __ -> new HashMap<>())
+                        .computeIfAbsent(currentPattern, __ -> new HashMap<>());
+                    final Double2D vector = readVector(record, seaTile, map);
+                    seaTileDouble2DMap.put(seaTile, vector);
+                })));
         return currentVectors;
     }
 
-    private Coordinate readCoordinate(Record record) {
+    private static Coordinate readCoordinate(Record record) {
         return new Coordinate(record.getDouble("lon"), record.getDouble("lat"));
     }
 
-    private Double2D readVector(Record record, SeaTile seaTile, NauticalMap map) {
+    private static Double2D readVector(Record record, SeaTile seaTile, NauticalMap map) {
         final Double2D metrePerSecondVector = new Double2D(
             record.getDouble("u"),
             record.getDouble("v")

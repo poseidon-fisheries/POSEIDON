@@ -105,6 +105,9 @@ public class TunaScenario implements Scenario {
 
     public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path MAP_FILE = input("depth.csv");
+    public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
+    public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
+    public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
     private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
     private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
@@ -116,11 +119,6 @@ public class TunaScenario implements Scenario {
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
-
-    public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
-    public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
-    public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
-
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("habitability_bet_2006-01-07.csv"),
         "SKJ", input("biomass_skj_2006-01-15.csv"),
@@ -158,15 +156,18 @@ public class TunaScenario implements Scenario {
             new NoFishingFactory()
         ), "closure B"
     ));
+
     TunaScenario() {
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
     }
+
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
-    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
+
     public AlgorithmFactory<? extends Regulation> getRegulations() { return regulations; }
+
     public void setRegulations(AlgorithmFactory<? extends Regulation> regulations) { this.regulations = regulations; }
 
     @SuppressWarnings("unused") public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() { return biologyInitializers; }
@@ -267,8 +268,7 @@ public class TunaScenario implements Scenario {
     @Override
     public ScenarioPopulation populateModel(FishState model) {
 
-        FadMapFactory fadMapFactory = new FadMapFactory(NEUTRAL_CURRENTS_FILE);
-        final FadMap fadMap = fadMapFactory.apply(model);
+        final FadMap fadMap = (new FadMapFactory()).apply(model);
         model.setFadMap(fadMap);
         model.registerStartable(fadMap);
 
@@ -368,6 +368,8 @@ public class TunaScenario implements Scenario {
 
     }
 
+    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
+
     private void chooseClosurePeriod(Fisher fisher, MersenneTwisterFast rng) {
         final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
         fisher.getTags().removeIf(periods::contains);
@@ -407,6 +409,7 @@ public class TunaScenario implements Scenario {
     }
 
     @SuppressWarnings("unused") public int getTargetYear() { return targetYear; }
+
     @SuppressWarnings("unused") public void setTargetYear(int targetYear) {
         this.targetYear = targetYear;
     }

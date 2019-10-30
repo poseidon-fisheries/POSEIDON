@@ -1,10 +1,7 @@
 package uk.ac.ox.oxfish.geography.currents;
 
-import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,15 +14,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.abs;
 import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 
-public class CurrentVectors implements Steppable {
+public class CurrentVectors {
 
     private final TreeMap<Integer, Map<SeaTile, Double2D>> vectorCache = new TreeMap<>();
     private final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
 
     private final int stepsPerDay;
-
-    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
 
     public CurrentVectors(
         TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
@@ -44,6 +39,8 @@ public class CurrentVectors implements Steppable {
         this.stepsPerDay = stepsPerDay;
     }
 
+    private int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
+
     int positiveDaysOffset(int sourceDay, int targetDay) {
         checkArgument(sourceDay >= 1 && sourceDay <= 365);
         checkArgument(targetDay >= 1 && targetDay <= 365);
@@ -56,7 +53,7 @@ public class CurrentVectors implements Steppable {
         return -positiveDaysOffset(targetDay, sourceDay);
     }
 
-    public Double2D getVector(int step, SeaTile seaTile) {
+    Double2D getVector(int step, SeaTile seaTile) {
         return vectorCache
             .computeIfAbsent(step, __ -> new HashMap<>())
             .computeIfAbsent(seaTile, __ -> computeVector(step, seaTile));
@@ -138,11 +135,7 @@ public class CurrentVectors implements Steppable {
         return v1.add(v2);
     }
 
-    @Override public void step(SimState simState) {
-        // remove vectors for the previous step from the cache, as they will be needed no more
-        // TODO: schedule this
-        vectorCache.remove(((FishState) simState).getStep() - 1);
-    }
+    public void removeCachedVectors(int timeStep) { vectorCache.remove(timeStep); }
 
     private static class VectorMapAtStep {
         final int step;

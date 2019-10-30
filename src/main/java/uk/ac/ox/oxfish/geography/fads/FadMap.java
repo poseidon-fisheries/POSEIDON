@@ -14,8 +14,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.currents.CurrentMaps;
-import uk.ac.ox.oxfish.geography.currents.VectorGrid2D;
+import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
@@ -34,26 +33,16 @@ public class FadMap implements Startable, Steppable {
     private final DriftingObjectsMap driftingObjectsMap;
     private final NauticalMap nauticalMap;
     private final GlobalBiology globalBiology;
-    private final CurrentMaps currentsMaps;
     private Stoppable stoppable;
 
     FadMap(
         NauticalMap nauticalMap,
-        CurrentMaps currentsMaps,
+        CurrentVectors currentVectors,
         GlobalBiology globalBiology
     ) {
         this.nauticalMap = nauticalMap;
-        this.currentsMaps = currentsMaps;
         this.globalBiology = globalBiology;
-        this.driftingObjectsMap = new DriftingObjectsMap(nauticalMap.getWidth(), nauticalMap.getHeight());
-    }
-
-    @NotNull
-    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
-        return Optional.of(seaTile)
-            .map(SeaTile::getBiology)
-            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
-            .map(biology -> (VariableBiomassBasedBiology) biology);
+        this.driftingObjectsMap = new DriftingObjectsMap(currentVectors, nauticalMap);
     }
 
     public GlobalBiology getGlobalBiology() { return globalBiology; }
@@ -70,8 +59,7 @@ public class FadMap implements Startable, Steppable {
 
     @Override
     public void step(SimState simState) {
-        VectorGrid2D currentsMap = currentsMaps.atSteps(simState.schedule.getSteps());
-        driftingObjectsMap.applyDrift(currentsMap::move);
+        driftingObjectsMap.applyDrift(((FishState) simState).getStep());
         allFads().forEach(fad -> {
             final Optional<VariableBiomassBasedBiology> seaTileBiology =
                 getFadTile(fad).flatMap(FadMap::getVariableBiomassBasedBiology);
@@ -95,6 +83,14 @@ public class FadMap implements Startable, Steppable {
     }
 
     @NotNull
+    private static Optional<VariableBiomassBasedBiology> getVariableBiomassBasedBiology(SeaTile seaTile) {
+        return Optional.of(seaTile)
+            .map(SeaTile::getBiology)
+            .filter(biology -> biology instanceof VariableBiomassBasedBiology)
+            .map(biology -> (VariableBiomassBasedBiology) biology);
+    }
+
+    @NotNull
     private Optional<Double2D> getFadLocation(Fad fad) {
         return Optional.ofNullable(driftingObjectsMap.getObjectLocation(fad));
     }
@@ -106,11 +102,9 @@ public class FadMap implements Startable, Steppable {
         );
     }
 
-    public void deployFad(Fad fad, Double2D location) {
-        driftingObjectsMap.add(fad, location, onMove(fad));
+    public void deployFad(Fad fad, int timeStep, Double2D location) {
+        driftingObjectsMap.add(fad, timeStep, location, onMove(fad));
     }
-
-    public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
 
     @NotNull
     private BiConsumer<Double2D, Optional<Double2D>> onMove(Fad fad) {
@@ -134,6 +128,8 @@ public class FadMap implements Startable, Steppable {
             }
         };
     }
+
+    public void remove(Fad fad) { driftingObjectsMap.remove(fad); }
 
     @NotNull
     public Bag fadsAt(SeaTile seaTile) {

@@ -3,7 +3,6 @@ package uk.ac.ox.oxfish.geography.currents;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

@@ -6,7 +6,7 @@ import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.geography.currents.CurrentMaps;
+import uk.ac.ox.oxfish.geography.currents.CurrentVectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,7 @@ public class FadInitializerTest {
         final FadInitializer fadInitializer =
             new FadInitializer(getQuantity(1d, TONNE), 0d, 0);
         final FadMap fadMap =
-            new FadMap(mock(NauticalMap.class), mock(CurrentMaps.class), globalBiology);
+            new FadMap(mock(NauticalMap.class), mock(CurrentVectors.class), globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 0);
 
         final Fad fad = fadInitializer.apply(fadManager);
