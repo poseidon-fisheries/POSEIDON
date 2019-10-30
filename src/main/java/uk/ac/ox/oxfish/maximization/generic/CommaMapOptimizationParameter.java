@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import com.google.common.base.Preconditions;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 /**
  * always returns a string concatenating many numbers through a comma in a map format:
@@ -73,12 +72,12 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
 
     /**
      * consume the scenario and add the parameters
-     *
-     * @param scenario the scenario to modify
+     *  @param scenario the scenario to modify
      * @param inputs   the numerical values of the parameters to set
+     * @return
      */
     @Override
-    public double parametrize(Scenario scenario, double[] inputs) {
+    public String parametrize(Scenario scenario, double[] inputs) {
 
         Preconditions.checkArgument(inputs.length==size);
         Preconditions.checkArgument(size>0);
@@ -107,7 +106,7 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
         }
 
 
-        return realValue;
+        return String.valueOf(realValue);
 
 
     }
@@ -183,5 +182,11 @@ public class CommaMapOptimizationParameter implements OptimizationParameter {
      */
     public void setMaximum(double maximum) {
         this.maximum = maximum;
+    }
+
+
+    @Override
+    public String getName() {
+        return addressToModify;
     }
 }

@@ -1,6 +1,7 @@
 package uk.ac.ox.oxfish.experiments.indonesia;
 
 import com.google.common.base.Preconditions;
+import joptsimple.internal.Strings;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
@@ -42,14 +43,14 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
 
 
     @Override
-    public double parametrize(Scenario scenario, double[] inputs) {
+    public String parametrize(Scenario scenario, double[] inputs) {
         Preconditions.checkState(inputs.length==1);
         //normalize it 0 to 1
         double input = (inputs[0]+10d)/20d;
         Preconditions.checkState(input>=0);
         Preconditions.checkState(input<=1);
 
-        int row = (int) Math.round(input * csvContent.size());
+        int row = (int) Math.floor(input * csvContent.size());
 
         final String[] selectedRow = csvContent.get(row).split(",");
         Preconditions.checkState(selectedRow.length == addressForEachColumn.length);
@@ -61,7 +62,7 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
             );
         }
 
-        return row;
+        return Strings.join(selectedRow,";");
 
 
 
@@ -70,5 +71,10 @@ public class ReadFromCSVOptimizationParameter implements OptimizationParameter {
     @Override
     public int size() {
         return 1;
+    }
+
+    @Override
+    public String getName() {
+        return Strings.join(addressForEachColumn,";");
     }
 }

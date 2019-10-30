@@ -48,16 +48,21 @@ public class FixedOptimizationParameter implements OptimizationParameter {
 
     /**
      * consume the scenario and add the parameters
-     *
-     * @param scenario the scenario to modify
+     *  @param scenario the scenario to modify
      * @param inputs   the numerical values of the parameters to set
+     * @return
      */
     @Override
-    public double parametrize(Scenario scenario, double[] inputs) {
+    public String parametrize(Scenario scenario, double[] inputs) {
         SimpleOptimizationParameter.quickParametrize(scenario,
                                                      realValue,
                                                      address);
-        return realValue;
+        return String.valueOf(realValue);
 
+    }
+
+    @Override
+    public String getName() {
+        return address;
     }
 }

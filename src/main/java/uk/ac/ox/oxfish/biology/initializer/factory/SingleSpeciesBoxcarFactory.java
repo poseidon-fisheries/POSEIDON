@@ -132,10 +132,11 @@ public class SingleSpeciesBoxcarFactory implements AlgorithmFactory<SingleSpecie
         meristic.setMaxLengthInCm(getLInfinity());
         meristic.setkYearlyParameter(getK());
         //mortality
-        ProportionalMortalityProcess mortality = new ProportionalMortalityProcess(
+        ExponentialMortalityProcess mortality = new ExponentialMortalityProcess(
                 getYearlyMortality().apply(state.getRandom()));
         //recruitment
         RecruitmentBySpawningJackKnifeMaturity recruitment = new RecruitmentBySpawningJackKnifeMaturity();
+        recruitment.setLengthAtMaturity(lengthAtMaturity.apply(state.getRandom()));
         recruitment.setCumulativePhi(cumulativePhi);
         recruitment.setSteepness(steepness);
         Double virginRecruits = this.virginRecruits.apply(state.getRandom());

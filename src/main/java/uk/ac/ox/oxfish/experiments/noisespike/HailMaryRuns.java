@@ -432,8 +432,8 @@ public class HailMaryRuns {
                                                      randomValues[i]);
             }
             else {
-                real = parameters.get(i).parametrize(scenario,
-                                                                   new double[]{randomValues[i]});
+                real = Double.parseDouble(parameters.get(i).parametrize(scenario,
+                                                                   new double[]{randomValues[i]}));
             }
             values[i] = real;
         }

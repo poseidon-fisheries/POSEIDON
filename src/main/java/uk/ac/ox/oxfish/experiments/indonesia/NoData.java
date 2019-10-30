@@ -20,9 +20,18 @@
 
 package uk.ac.ox.oxfish.experiments.indonesia;
 
+import com.google.common.base.Preconditions;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.experiments.noisespike.AcceptableRangePredicate;
+import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -38,7 +47,9 @@ public class NoData {
     /**
      * what changes
      */
-    private static final List<SimpleOptimizationParameter> parameters = new LinkedList<>();
+    private static final List<OptimizationParameter> parameters = new LinkedList<>();
+    public static final int BATCHES = 10;
+    public static final int SCENARIOS_PER_BATCH = 500;
 
 
     static {
@@ -58,15 +69,15 @@ public class NoData {
         );
 
         parameters.add(
-                new SimpleOptimizationParameter("fisherDefinitions$1.gear.averageCatchability",
+                new SimpleOptimizationParameter("fisherDefinitions$1.gear.delegate.averageCatchability",
                                                 .0001,0.01)
         );
         parameters.add(
-                new SimpleOptimizationParameter("fisherDefinitions$1.gear.selectivityAParameter",
+                new SimpleOptimizationParameter("fisherDefinitions$1.gear.delegate.selectivityAParameter",
                                                 10,40)
         );
         parameters.add(
-                new SimpleOptimizationParameter("fisherDefinitions$1.gear.selectivityBParameter",
+                new SimpleOptimizationParameter("fisherDefinitions$1.gear.delegate.selectivityBParameter",
                                                 3,15)
         );
 
@@ -81,6 +92,16 @@ public class NoData {
         );
 
 
+
+        //inertia
+        parameters.add(
+                new SimpleOptimizationParameter("fisherDefinitions$0.departingStrategy.inertia",
+                        1,5)
+        );
+        parameters.add(
+                new SimpleOptimizationParameter("fisherDefinitions$1.departingStrategy.inertia",
+                        1,5)
+        );
 
         // market price
         parameters.add(
@@ -111,6 +132,57 @@ public class NoData {
                                                 2,20)
         );
 
+
+
+
+        try {
+            parameters.add(
+                    new ReadFromCSVOptimizationParameter(
+                            Paths.get("docs","20191025 limited_poseidon","inputs","fish_parameters.csv"),
+                            new String[]{
+                                   "biologyInitializer.LInfinity",
+                                   "biologyInitializer.k",
+                                   "biologyInitializer.lengthAtMaturity",
+                                   "biologyInitializer.yearlyMortality",
+                                   "biologyInitializer.allometricAlpha",
+                                   "biologyInitializer.allometricBeta"
+                            },
+                            true
+                    )
+            );
+
+
+           // "fisherDefinitions$1.departingStrategy.decorated.maxHoursOut",
+            parameters.add(
+                    new ReadFromCSVOptimizationParameter(
+                            Paths.get("docs","20191025 limited_poseidon","inputs","smaller_boats.csv"),
+                            new String[]{
+                                    "fisherDefinitions$0.hourlyVariableCost.",
+                                    "fisherDefinitions$0.departingStrategy.targetVariable",
+                                    "fisherDefinitions$0.fishingStrategy.daysAtSea",
+                                    "fisherDefinitions$0.holdSize",
+                            },
+                            true
+                    )
+            );
+            parameters.add(
+                    new ReadFromCSVOptimizationParameter(
+                            Paths.get("docs","20191025 limited_poseidon","inputs","bigger_boats.csv"),
+                            new String[]{
+                                    "fisherDefinitions$1.hourlyVariableCost.",
+                                    "fisherDefinitions$1.departingStrategy.targetVariable",
+                                    "fisherDefinitions$1.fishingStrategy.daysAtSea",
+                                    "fisherDefinitions$1.holdSize",
+                            },
+                            true
+                    )
+            );
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -132,5 +204,88 @@ public class NoData {
 
     }
 
+
+
+
+    public static void main(String[] args) throws IOException {
+        for (int batch = 0; batch < BATCHES; batch++) {
+
+            final Path folder = Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch" + batch);
+            folder.toFile().mkdirs();
+            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,System.currentTimeMillis(),scenarioFile);
+
+
+        }
+
+
+    }
+
+    public static void produceScenarios(Path folder, int numberToProduce,
+                                        List<OptimizationParameter> parameters,
+                                        long originalSeed,
+                                        Path scenarioFile) throws IOException {
+
+        //store all parameters in a master file, for ease of visiting
+        FileWriter masterFile = new FileWriter(folder.resolve("masterfile.csv").toFile());
+        for (OptimizationParameter parameter : parameters) {
+            masterFile.write(parameter.getName());
+            masterFile.write(",");
+
+        }
+        masterFile.write("filename");
+        masterFile.write("\n");
+        masterFile.flush();
+
+        MersenneTwisterFast random = new MersenneTwisterFast(originalSeed);
+
+        FishYAML yaml = new FishYAML();
+        for (int i = 0; i < numberToProduce; i++) {
+
+
+            double[] randomValues = new double[parameters.size()];
+            for (int h = 0; h < randomValues.length; h++) {
+                randomValues[h] = random.nextDouble() * 20 - 10;
+            }
+            Scenario scenario = yaml.loadAs(new FileReader(scenarioFile.toFile()), Scenario.class);
+            final Pair<Scenario, String[]> scenarioPair = setupScenario(scenario, randomValues, parameters);
+            yaml.dump(scenarioPair.getFirst(),new FileWriter(folder.resolve("scenario_" + i + ".yaml").toFile()));
+
+            for (String value : scenarioPair.getSecond()) {
+                masterFile.write(",");
+                masterFile.write(value);
+            }
+            masterFile.write(",");
+            masterFile.write(folder.resolve("scenario_" + i + ".yaml").toString());
+            masterFile.write("\n");
+
+            masterFile.flush();
+
+
+
+        }
+
+
+    }
+
+
+    public static Pair<Scenario,String[]> setupScenario(Scenario scenario,
+                                                        double[] randomValues,
+                                                        List<OptimizationParameter> parameters) {
+
+        Preconditions.checkState(parameters.size()==randomValues.length);
+        String[] values = new String[randomValues.length];
+        for (int i = 0; i < randomValues.length; i++) {
+
+
+                values[i] =
+                        parameters.get(i).parametrize(scenario,
+                                new double[]{randomValues[i]});
+
+
+        }
+
+
+        return new Pair<>(scenario,values);
+    }
 
 }

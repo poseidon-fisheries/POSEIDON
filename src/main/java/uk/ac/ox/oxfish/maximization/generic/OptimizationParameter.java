@@ -22,13 +22,9 @@ package uk.ac.ox.oxfish.maximization.generic;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.beanutils.PropertyUtils;
-import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
-import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 
 public interface OptimizationParameter {
 
@@ -43,8 +39,9 @@ public interface OptimizationParameter {
      * consume the scenario and add the parameters
      * @param scenario the scenario to modify
      * @param inputs the numerical values of the parameters to set
+     * @return
      */
-    public double parametrize(Scenario scenario, double inputs[] );
+    public String parametrize(Scenario scenario, double[] inputs);
 
 
 
@@ -98,4 +95,6 @@ public interface OptimizationParameter {
 
     }
 
+
+    public String getName();
 }
