@@ -71,7 +71,7 @@ abstract class IntermediateDestinationsStrategy {
     }
 
     private void chooseNewRoute(Fisher fisher, FishState model) {
-        final Set<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher);
+        final Set<Deque<SeaTile>> possibleRoutes = possibleRoutes(fisher, model.getStep());
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
@@ -87,8 +87,8 @@ abstract class IntermediateDestinationsStrategy {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private ImmutableSet<Deque<SeaTile>> possibleRoutes(Fisher fisher) {
-        return possibleDestinations(fisher)
+    private ImmutableSet<Deque<SeaTile>> possibleRoutes(Fisher fisher, int timeStep) {
+        return possibleDestinations(fisher, timeStep)
             .stream()
             .flatMap(destination -> stream(getRoute(fisher, destination)))
             .collect(toImmutableSet());
@@ -122,7 +122,7 @@ abstract class IntermediateDestinationsStrategy {
             positiveRoutes;
     }
 
-    abstract Set<SeaTile> possibleDestinations(Fisher fisher);
+    abstract Set<SeaTile> possibleDestinations(Fisher fisher, int timeStep);
 
     abstract Map<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, int timeStep);
 

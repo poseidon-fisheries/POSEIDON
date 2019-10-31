@@ -1,8 +1,7 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 import ec.util.MersenneTwisterFast;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import sim.util.Bag;
@@ -14,7 +13,6 @@ import uk.ac.ox.oxfish.geography.fads.DriftingObjectsMap;
 import uk.ac.ox.oxfish.geography.fads.FadInitializer;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -114,5 +112,17 @@ public class FadManager {
     private SeaTile getSeaTile(double x, double y) { return getSeaTile((int) x, (int) y); }
 
     private SeaTile getSeaTile(int x, int y) { return fadMap.getNauticalMap().getSeaTile(x, y);}
+
+    public ImmutableSet<SeaTile> fadLocationsInTimeStepRange(int startStep, int endStep) {
+        ImmutableSet.Builder<SeaTile> builder = new ImmutableSet.Builder<>();
+        final DriftingObjectsMap driftingObjectsMap = fadMap.getDriftingObjectsMap();
+        deployedFads.forEach(fad -> {
+            final DriftingPath path = driftingObjectsMap.getObjectPath(fad);
+            for (int t = startStep; t <= endStep; t++) {
+                path.position(t).map(this::getSeaTile).ifPresent(builder::add);
+            }
+        });
+        return builder.build();
+    }
 
 }

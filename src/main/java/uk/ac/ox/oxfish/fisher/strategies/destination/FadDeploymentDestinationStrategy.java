@@ -23,7 +23,7 @@ public class FadDeploymentDestinationStrategy extends IntermediateDestinationsSt
     }
 
     @Override
-    Set<SeaTile> possibleDestinations(Fisher fisher) { return deploymentLocationValues.keySet(); }
+    Set<SeaTile> possibleDestinations(Fisher fisher, int timeStep) { return deploymentLocationValues.keySet(); }
 
     @Override Map<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, int timeStep) {
         return unmodifiableMap(deploymentLocationValues);
