@@ -62,25 +62,16 @@ public class CartesianDistanceTest {
         final SeaTile startTile = map.getSeaTile(0, 0);
 
         final Deque<SeaTile> straightRoute = pathfinder.getRoute(map, startTile, map.getSeaTile(0, 2));
-        checkSecondValueOfPairs(distance.segmentLengthsAlongRoute(straightRoute, map), 0.0, 1.0, 1.0);
         checkSecondValueOfPairs(distance.cumulativeDistanceAlongRoute(straightRoute, map), 0.0, 1.0, 2.0);
-        assertEquals(2.0, distance.totalRouteDistance(straightRoute, map), 0.01);
 
         final Deque<SeaTile> diagonalRoute = pathfinder.getRoute(map, startTile, map.getSeaTile(2, 2));
-        checkSecondValueOfPairs(distance.segmentLengthsAlongRoute(diagonalRoute, map), 0.0, 1.41, 1.41);
         checkSecondValueOfPairs(distance.cumulativeDistanceAlongRoute(diagonalRoute, map), 0.0, 1.41, 2.82);
-        assertEquals(2.0, distance.totalRouteDistance(straightRoute, map), 2.82);
 
-        // Invariant properties
         for (SeaTile endTile : map.getAllSeaTilesAsList()) {
-            final Deque<SeaTile> route = pathfinder.getRoute(map, startTile, endTile);
-            // Segment length for first tile should always be zero
-            assertEquals(0.0, get(distance.segmentLengthsAlongRoute(route, map), 0).getSecond(), 0.01);
             // First value of cumulative distance should always be zero
+            final Deque<SeaTile> route = pathfinder.getRoute(map, startTile, endTile);
             final ImmutableList<Pair<SeaTile, Double>> cumDist = distance.cumulativeDistanceAlongRoute(route, map);
             assertEquals(0.0, get(cumDist, 0).getSecond(), 0.01);
-            // Last cumulative distance entry should always be the same as total distance
-            assertEquals(distance.totalRouteDistance(route, map), getLast(cumDist).getSecond(), 0.01);
         }
     }
 }
