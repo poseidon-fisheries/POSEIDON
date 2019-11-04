@@ -79,6 +79,7 @@ public class DeployFad implements FadAction {
 
     @Override public Quantity<Time> getDuration() {
         // TODO: what is the right number and where should it come from?
+        // Relevant issue is https://github.com/poseidon-fisheries/tuna/issues/6
         return getQuantity(1, HOUR);
     }
 }
