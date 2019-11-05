@@ -129,18 +129,14 @@ abstract class IntermediateDestinationsStrategy {
         int timeStep,
         double hoursPerStep
     ) {
-        final ImmutableList<Pair<SeaTile, Double>> cumulativeDistances =
-            map.getDistance().cumulativeDistanceAlongRoute(route, map);
-        final ImmutableList<Pair<SeaTile, Double>> travelTimesInHours =
-            cumulativeDistances.stream()
-                .map(pair -> pair.mapSecond(fisher::hypotheticalTravelTimeToMoveThisMuchAtFullSpeed))
-                .collect(toImmutableList());
+        final ImmutableList<Pair<SeaTile, Double>> travelTimeAlongRouteInHours =
+            map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph());
         final ImmutableList<Pair<SeaTile, Double>> valuesAlongRoute =
-            travelTimesInHours.stream()
+            travelTimeAlongRouteInHours.stream()
                 .map(pair -> pair.mapSecond((seaTile, hours) ->
                     seaTileValueAtStep.applyAsDouble(seaTile, timeStep + (int) (hours / hoursPerStep))
                 )).collect(toImmutableList());
-        final double totalTravelTimeInHours = getLast(travelTimesInHours).getSecond();
+        final double totalTravelTimeInHours = getLast(travelTimeAlongRouteInHours).getSecond();
         final double tripRevenues = valuesAlongRoute.stream().mapToDouble(Pair::getSecond).sum();
         final double tripCost = fisher.getAdditionalTripCosts().stream()
             .mapToDouble(cost -> cost.cost(fisher, null, null, 0.0, totalTravelTimeInHours))

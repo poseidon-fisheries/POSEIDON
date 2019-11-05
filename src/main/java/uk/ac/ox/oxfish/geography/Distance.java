@@ -27,6 +27,7 @@ import java.util.Deque;
 import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Common interface for all distance measures over a nautical chart
@@ -34,7 +35,20 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public interface Distance {
 
-    default ImmutableList<Pair<SeaTile, Double>> cumulativeDistanceAlongRoute(Deque<SeaTile> route, NauticalMap map) {
+    default ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+        Deque<SeaTile> route,
+        NauticalMap map,
+        double speedInKph
+    ) {
+        return cumulativeDistanceAlongRouteInKm(route, map).stream()
+            .map(pair -> pair.mapSecond(dist -> dist / speedInKph))
+            .collect(toImmutableList());
+    }
+
+    default ImmutableList<Pair<SeaTile, Double>> cumulativeDistanceAlongRouteInKm(
+        Deque<SeaTile> route,
+        NauticalMap map
+    ) {
         checkArgument(!route.isEmpty());
         double cumulativeDistance = 0.0;
         final ImmutableList.Builder<Pair<SeaTile, Double>> builder = ImmutableList.builder();
