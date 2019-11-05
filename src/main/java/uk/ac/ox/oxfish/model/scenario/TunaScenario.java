@@ -35,6 +35,7 @@ import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
+import uk.ac.ox.oxfish.geography.CumulativeDistanceCachingDecorator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
@@ -230,6 +231,7 @@ public class TunaScenario implements Scenario {
         final GlobalBiology globalBiology = biologyInitializer.generateGlobal(model.random, model);
         final WeatherInitializer weatherInitializer = this.weatherInitializer.apply(model);
         final NauticalMap nauticalMap = mapInitializer.apply(model).makeMap(model.random, globalBiology, model);
+        nauticalMap.setDistance(new CumulativeDistanceCachingDecorator(nauticalMap.getDistance()));
         nauticalMap.setPathfinder(new AStarFallbackPathfinder(nauticalMap.getDistance()));
 
         //this next static method calls biology.initialize, weather.initialize and the like
