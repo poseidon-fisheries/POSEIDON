@@ -10,8 +10,6 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
 
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
@@ -96,17 +94,12 @@ abstract class IntermediateDestinationsStrategy {
         FishState model,
         Set<Deque<SeaTile>> possibleRoutes
     ) {
-
-        final Map<Integer, Map<SeaTile, Double>> seaTileValuesByStep = new HashMap<>();
-        ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStep = (seaTile, timeStep) ->
-            fisher.getRegulation().canFishHere(fisher, seaTile, model, timeStep) ?
-                seaTileValuesByStep.computeIfAbsent(timeStep, step -> seaTileValuesAtStep(fisher, step)).getOrDefault(seaTile, 0.0) :
-                0.0;
-
+        final ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction = seaTileValueAtStepFunction(fisher, model);
         final ImmutableList<Pair<Deque<SeaTile>, Double>> routeValues =
-            possibleRoutes.stream().map(route ->
-                new Pair<>(route, routeValue(route, seaTileValueAtStep, fisher, model.getStep(), model.getHoursPerStep()))
-            ).collect(toImmutableList());
+            possibleRoutes.stream().map(route -> new Pair<>(
+                route,
+                routeValue(route, seaTileValueAtStepFunction, fisher, model.getStep(), model.getHoursPerStep())
+            )).collect(toImmutableList());
 
         final ImmutableList<Pair<Deque<SeaTile>, Double>> positiveRoutes =
             routeValues.stream()
@@ -120,11 +113,11 @@ abstract class IntermediateDestinationsStrategy {
 
     abstract Set<SeaTile> possibleDestinations(Fisher fisher, int timeStep);
 
-    abstract Map<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, int timeStep);
+    abstract ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(Fisher fisher, FishState fishState);
 
     private double routeValue(
         Deque<SeaTile> route,
-        ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStep,
+        ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction,
         Fisher fisher,
         int timeStep,
         double hoursPerStep
@@ -134,7 +127,7 @@ abstract class IntermediateDestinationsStrategy {
         final ImmutableList<Pair<SeaTile, Double>> valuesAlongRoute =
             travelTimeAlongRouteInHours.stream()
                 .map(pair -> pair.mapSecond((seaTile, hours) ->
-                    seaTileValueAtStep.applyAsDouble(seaTile, timeStep + (int) (hours / hoursPerStep))
+                    seaTileValueAtStepFunction.applyAsDouble(seaTile, (int) (timeStep + (hours / hoursPerStep)))
                 )).collect(toImmutableList());
         final double totalTravelTimeInHours = getLast(travelTimeAlongRouteInHours).getSecond();
         final double tripRevenues = valuesAlongRoute.stream().mapToDouble(Pair::getSecond).sum();
@@ -143,4 +136,5 @@ abstract class IntermediateDestinationsStrategy {
             .sum();
         return tripRevenues - tripCost;
     }
+
 }

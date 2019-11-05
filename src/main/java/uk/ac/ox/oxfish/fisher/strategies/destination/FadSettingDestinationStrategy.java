@@ -1,32 +1,29 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.ImmutableMap;
-import sim.util.Bag;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.ToDoubleBiFunction;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
 public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy implements FadManagerUtils {
 
-    private final Bag allSeaTiles;
-
     private final int NUM_STEPS_TO_LOOK_AHEAD = 30; // TODO: make this a parameter
 
-    public FadSettingDestinationStrategy(NauticalMap map) {
-        super(map);
-        allSeaTiles = map.getAllSeaTiles();
-    }
+    public FadSettingDestinationStrategy(NauticalMap map) { super(map); }
 
     @Override
     protected Optional<Deque<SeaTile>> getRoute(Fisher fisher, SeaTile destination) {
@@ -46,16 +43,23 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
         return getFadManager(fisher).fadLocationsInTimeStepRange(timeStep, timeStep + NUM_STEPS_TO_LOOK_AHEAD);
     }
 
-    @Override
-    ImmutableMap<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, int timeStep) {
+    @Override ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(Fisher fisher, FishState fishState) {
+        final Map<Integer, Map<SeaTile, Double>> seaTileValuesByStep = new HashMap<>();
+        return (seaTile, timeStep) ->
+            seaTileValuesByStep
+                .computeIfAbsent(timeStep, step -> seaTileValuesAtStep(fisher, fishState, timeStep))
+                .getOrDefault(seaTile, 0.0);
+    }
+
+    private ImmutableMap<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, FishState fishState, int timeStep) {
         final Collection<Market> markets = fisher.getHomePort().getMarketMap(fisher).getMarkets();
         return getFadManager(fisher)
             .deployedFadsByTileAtStep(timeStep)
             .asMap().entrySet().stream()
+            .filter(entry -> fisher.getRegulation().canFishHere(fisher, entry.getKey(), fishState, timeStep))
             .collect(toImmutableMap(
                 Map.Entry::getKey,
                 entry -> entry.getValue().stream().mapToDouble(fad -> fad.priceOfFishHere(markets)).sum()
             ));
     }
-
 }
