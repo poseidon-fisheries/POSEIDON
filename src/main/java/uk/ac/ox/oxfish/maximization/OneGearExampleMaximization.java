@@ -37,8 +37,7 @@ public class OneGearExampleMaximization extends SimpleProblemDouble {
     //an input of -10 means this catchability
     private double minCatchability =  0.00001;
 
-    //
-    // target: −3.768844221
+
 
     private int yearsToRun = 9;
 

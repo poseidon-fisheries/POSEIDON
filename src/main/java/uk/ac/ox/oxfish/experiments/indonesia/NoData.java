@@ -25,17 +25,17 @@ import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.experiments.noisespike.AcceptableRangePredicate;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
+import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * basically act as if this was a rejection ABC example
@@ -49,7 +49,7 @@ public class NoData {
      */
     private static final List<OptimizationParameter> parameters = new LinkedList<>();
     public static final int BATCHES = 10;
-    public static final int SCENARIOS_PER_BATCH = 500;
+    public static final int SCENARIOS_PER_BATCH = 5000;
 
 
     static {
@@ -57,7 +57,7 @@ public class NoData {
         //gear for the two boats
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$0.gear.delegate.averageCatchability",
-                                                .0001,0.01)
+                                                .000001,0.0001)
         );
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$0.gear.delegate.selectivityAParameter",
@@ -70,7 +70,7 @@ public class NoData {
 
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$1.gear.delegate.averageCatchability",
-                                                .0001,0.01)
+                                                .000001,0.0001)
         );
         parameters.add(
                 new SimpleOptimizationParameter("fisherDefinitions$1.gear.delegate.selectivityAParameter",
@@ -199,7 +199,7 @@ public class NoData {
                 0.05,0.25,"SPR " + "Snapper" + " " + "spr_agent"
         ));
         predicates.add(new AcceptableRangePredicate(
-                5000000,15000000,"Red Fish Landings"
+                5000000,15000000,"Snapper Landings"
         ));
 
     }
@@ -208,17 +208,92 @@ public class NoData {
 
 
     public static void main(String[] args) throws IOException {
-        for (int batch = 0; batch < BATCHES; batch++) {
 
-            final Path folder = Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch" + batch);
-            folder.toFile().mkdirs();
-            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,System.currentTimeMillis(),scenarioFile);
+//        for (int batch = 0; batch < BATCHES; batch++)
+//        {
+//
+//            final Path folder = Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch" + batch);
+//            folder.toFile().mkdirs();
+//            produceScenarios(folder, SCENARIOS_PER_BATCH,parameters,System.currentTimeMillis(),scenarioFile);
+//
+//        }
+
+//        for (int batch = 0; batch < BATCHES; batch++)
+        //  runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+0),0);
+        //runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+1),0);
+        runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+2),0);
+
+
+
+    }
+
+
+    public static void runDirectory(Path directory, long seed) throws IOException {
+
+        File[] scenarios = directory.toFile().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".yaml");
+            }
+        });
+
+        FileWriter writer = new FileWriter(directory.resolve("sweep_" + seed + ".csv").toFile());
+        writer.write("scenario,validYear");
+        writer.write("\n");
+
+
+        FishYAML yaml = new FishYAML();
+        for (File scenarioFile : scenarios) {
+
+            Scenario scenario = yaml.loadAs(new FileReader(scenarioFile), Scenario.class);
+            Optional<Integer> result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed);
+
+            System.out.println(scenarioFile.getAbsolutePath() + "," + result.orElse(-1) );
+
+            writer.write(scenarioFile.getAbsolutePath().toString() + ",");
+            writer.write(String.valueOf(result.orElse(-1)));
+            writer.write("\n");
+            writer.flush();
+        }
+        writer.close();
+
+
+    }
+
+
+    public static Optional<Integer> runModelOnce(Scenario scenarioToRun, int maxYearsToRun, long seed){
+
+        //run the model
+        FishState model = new FishState(seed);
+        model.setScenario(scenarioToRun);
+        model.start();
+        while (model.getYear() <= maxYearsToRun) {
+            model.schedule.step(model);
+        }
+        model.schedule.step(model);
+
+
+        Integer validYear = null;
+        for (validYear = maxYearsToRun; validYear > 0; validYear--) {
+
+            boolean valid = true;
+            for (AcceptableRangePredicate predicate : predicates) {
+                valid= valid & predicate.test(model,validYear);
+            }
+            System.out.println(validYear + " -- " + valid);
+
+
+            if(valid)
+                break;;
 
 
         }
 
+        return Optional.of(validYear);
 
     }
+
+
 
     public static void produceScenarios(Path folder, int numberToProduce,
                                         List<OptimizationParameter> parameters,

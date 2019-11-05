@@ -58,6 +58,7 @@ public class BoxCarSimulator {
                         biology.getAbundance(species),
                         day,
                         1);
+      //          double recruit = initialRecruits/365d;
                 mortalityProcess.cull(meristics,false,biology.getAbundance(species),1);
                 biology.getAbundance(species).asMatrix()[0][0] += recruit;
 
