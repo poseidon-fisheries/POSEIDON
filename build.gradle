@@ -113,7 +113,8 @@ dependencies
     testCompile "com.google.code.gson:gson:2.8.5"
 
     // Reference implementation of JSR-385 for units of measure
-    compile group: 'systems.uom', name: 'systems-common', version: '1.0'
+    compile 'si.uom:si-quantity:2.0'
+    compile 'si.uom:si-units:2.0'
 
 
 }
