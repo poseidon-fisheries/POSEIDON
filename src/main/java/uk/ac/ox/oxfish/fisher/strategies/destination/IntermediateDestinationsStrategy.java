@@ -1,7 +1,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -18,11 +17,9 @@ import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.collect.Streams.stream;
-import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
@@ -75,8 +72,8 @@ abstract class IntermediateDestinationsStrategy {
         if (possibleRoutes.isEmpty())
             currentRoute = Optional.empty();
         else {
-            final ImmutableMap<Deque<SeaTile>, Double> candidateRoutes = findCandidateRoutes(fisher, model, possibleRoutes);
-            currentRoute = Optional.of(weightedOneOf(candidateRoutes.keySet().asList(), candidateRoutes::get, model.getRandom()));
+            final ImmutableList<Pair<Deque<SeaTile>, Double>> candidateRoutes = findCandidateRoutes(fisher, model, possibleRoutes);
+            currentRoute = Optional.of(weightedOneOf(candidateRoutes, Pair::getSecond, model.getRandom())).map(Pair::getFirst);
         }
     }
 
@@ -94,7 +91,7 @@ abstract class IntermediateDestinationsStrategy {
             .collect(toImmutableSet());
     }
 
-    private ImmutableMap<Deque<SeaTile>, Double> findCandidateRoutes(
+    private ImmutableList<Pair<Deque<SeaTile>, Double>> findCandidateRoutes(
         Fisher fisher,
         FishState model,
         Set<Deque<SeaTile>> possibleRoutes
@@ -106,19 +103,18 @@ abstract class IntermediateDestinationsStrategy {
                 seaTileValuesByStep.computeIfAbsent(timeStep, step -> seaTileValuesAtStep(fisher, step)).getOrDefault(seaTile, 0.0) :
                 0.0;
 
-        final ImmutableMap<Deque<SeaTile>, Double> routeValues =
-            possibleRoutes.stream().collect(toImmutableMap(
-                identity(),
-                route -> routeValue(route, seaTileValueAtStep, fisher, model.getStep(), model.getHoursPerStep())
-            ));
+        final ImmutableList<Pair<Deque<SeaTile>, Double>> routeValues =
+            possibleRoutes.stream().map(route ->
+                new Pair<>(route, routeValue(route, seaTileValueAtStep, fisher, model.getStep(), model.getHoursPerStep()))
+            ).collect(toImmutableList());
 
-        final ImmutableMap<Deque<SeaTile>, Double> positiveRoutes =
-            routeValues.entrySet().stream()
-                .filter(entry -> entry.getValue() >= 0)
-                .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+        final ImmutableList<Pair<Deque<SeaTile>, Double>> positiveRoutes =
+            routeValues.stream()
+                .filter(pair -> pair.getSecond() >= 0)
+                .collect(toImmutableList());
 
         return positiveRoutes.isEmpty() ?
-            routeValues.entrySet().stream().collect(toImmutableMap(Map.Entry::getKey, e -> 1.0 / -e.getValue())) :
+            routeValues.stream().map(pair -> pair.mapSecond(value -> 1.0 / -value)).collect(toImmutableList()) :
             positiveRoutes;
     }
 
