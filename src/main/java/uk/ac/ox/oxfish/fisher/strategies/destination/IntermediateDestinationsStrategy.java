@@ -23,6 +23,8 @@ import static uk.ac.ox.oxfish.utility.MasonUtils.weightedOneOf;
 
 abstract class IntermediateDestinationsStrategy {
 
+    private static final double MAX_HOURS_AT_SEA = 3970.667; // longest trip from data
+
     protected NauticalMap map;
 
     @NotNull
@@ -95,19 +97,28 @@ abstract class IntermediateDestinationsStrategy {
         FishState model,
         Set<Deque<SeaTile>> possibleRoutes
     ) {
-        // pair routes with their list of travel times and make a list out of that
-        final ImmutableList<Pair<Deque<SeaTile>, ImmutableList<Pair<SeaTile, Double>>>> travelTimesAlongRoutesInHours =
-            possibleRoutes.stream().map(route -> new Pair<>(route,
-                map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph())
-            )).collect(toImmutableList());
 
-        final double maxTravelTimeInHours = travelTimesAlongRoutesInHours.stream()
-            .mapToDouble(pair -> getLast(pair.getSecond()).getSecond()) // extract the total travel time for each route
-            .max().getAsDouble();
+        final double maxTravelTimeInHours = MAX_HOURS_AT_SEA - fisher.getHoursAtSea();
+
+        // pair routes with their list of travel times and make a list out of that,
+        // only adding the routes that we have enough time to travel,
+        // and find the max travel time while we're looping
+        final ImmutableList.Builder<Pair<Deque<SeaTile>, ImmutableList<Pair<SeaTile, Double>>>> builder = ImmutableList.builder();
+        double greatestTravelTimeInHours = 0.0;
+        for (Deque<SeaTile> route : possibleRoutes) {
+            final ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTime =
+                map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph());
+            final double totalRouteTravelTime = getLast(cumulativeTravelTime).getSecond();
+            if (totalRouteTravelTime <= maxTravelTimeInHours) {
+                if (totalRouteTravelTime > greatestTravelTimeInHours) greatestTravelTimeInHours = totalRouteTravelTime;
+                builder.add(new Pair<>(route, cumulativeTravelTime));
+            }
+        }
+        final ImmutableList<Pair<Deque<SeaTile>, ImmutableList<Pair<SeaTile, Double>>>> travelTimesAlongRoutesInHours = builder.build();
 
         final IntStream possibleSteps = IntStream.rangeClosed(
             model.getStep(),
-            (int) (model.getStep() + (maxTravelTimeInHours / model.getHoursPerStep()))
+            (int) (model.getStep() + (greatestTravelTimeInHours / model.getHoursPerStep()))
         );
 
         final ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction =
