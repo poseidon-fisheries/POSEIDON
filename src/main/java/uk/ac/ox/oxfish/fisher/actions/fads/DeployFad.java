@@ -78,8 +78,7 @@ public class DeployFad implements FadAction {
     public Optional<SeaTile> getActionTile(Fisher fisher) { return Optional.of(seaTile); }
 
     @Override public Quantity<Time> getDuration() {
-        // TODO: what is the right number and where should it come from?
-        // Relevant issue is https://github.com/poseidon-fisheries/tuna/issues/6
-        return getQuantity(1, HOUR);
+        // see https://github.com/poseidon-fisheries/tuna/issues/6
+        return getQuantity(0, HOUR);
     }
 }
