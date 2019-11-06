@@ -13,6 +13,7 @@ import java.util.Deque;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
+import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -94,12 +95,30 @@ abstract class IntermediateDestinationsStrategy {
         FishState model,
         Set<Deque<SeaTile>> possibleRoutes
     ) {
-        final ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction = seaTileValueAtStepFunction(fisher, model);
-        final ImmutableList<Pair<Deque<SeaTile>, Double>> routeValues =
-            possibleRoutes.stream().map(route -> new Pair<>(
-                route,
-                routeValue(route, seaTileValueAtStepFunction, fisher, model.getStep(), model.getHoursPerStep())
+        // pair routes with their list of travel times and make a list out of that
+        final ImmutableList<Pair<Deque<SeaTile>, ImmutableList<Pair<SeaTile, Double>>>> travelTimesAlongRoutesInHours =
+            possibleRoutes.stream().map(route -> new Pair<>(route,
+                map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph())
             )).collect(toImmutableList());
+
+        final double maxTravelTimeInHours = travelTimesAlongRoutesInHours.stream()
+            .mapToDouble(pair -> getLast(pair.getSecond()).getSecond()) // extract the total travel time for each route
+            .max().getAsDouble();
+
+        final IntStream possibleSteps = IntStream.rangeClosed(
+            model.getStep(),
+            (int) (model.getStep() + (maxTravelTimeInHours / model.getHoursPerStep()))
+        );
+
+        final ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction =
+            seaTileValueAtStepFunction(fisher, model, possibleSteps);
+
+        final ImmutableList<Pair<Deque<SeaTile>, Double>> routeValues =
+            travelTimesAlongRoutesInHours.stream().map(pair ->
+                pair.mapSecond(travelTimes ->
+                    routeValue(travelTimes, seaTileValueAtStepFunction, fisher, model.getStep(), model.getHoursPerStep())
+                )
+            ).collect(toImmutableList());
 
         final ImmutableList<Pair<Deque<SeaTile>, Double>> positiveRoutes =
             routeValues.stream()
@@ -113,17 +132,19 @@ abstract class IntermediateDestinationsStrategy {
 
     abstract Set<SeaTile> possibleDestinations(Fisher fisher, int timeStep);
 
-    abstract ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(Fisher fisher, FishState fishState);
+    abstract ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(
+        Fisher fisher,
+        FishState fishState,
+        IntStream possibleSteps
+    );
 
     private double routeValue(
-        Deque<SeaTile> route,
+        ImmutableList<Pair<SeaTile, Double>> travelTimeAlongRouteInHours,
         ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction,
         Fisher fisher,
         int timeStep,
         double hoursPerStep
     ) {
-        final ImmutableList<Pair<SeaTile, Double>> travelTimeAlongRouteInHours =
-            map.getDistance().cumulativeTravelTimeAlongRouteInHours(route, map, fisher.getBoat().getSpeedInKph());
         final ImmutableList<Pair<SeaTile, Double>> valuesAlongRoute =
             travelTimeAlongRouteInHours.stream()
                 .map(pair -> pair.mapSecond((seaTile, hours) ->

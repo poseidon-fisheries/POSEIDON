@@ -10,13 +10,14 @@ import uk.ac.ox.oxfish.model.market.Market;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.ToDoubleBiFunction;
+import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.function.Function.identity;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 
 public class FadSettingDestinationStrategy extends IntermediateDestinationsStrategy implements FadManagerUtils {
@@ -43,12 +44,17 @@ public class FadSettingDestinationStrategy extends IntermediateDestinationsStrat
         return getFadManager(fisher).fadLocationsInTimeStepRange(timeStep, timeStep + NUM_STEPS_TO_LOOK_AHEAD);
     }
 
-    @Override ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(Fisher fisher, FishState fishState) {
-        final Map<Integer, Map<SeaTile, Double>> seaTileValuesByStep = new HashMap<>();
-        return (seaTile, timeStep) ->
-            seaTileValuesByStep
-                .computeIfAbsent(timeStep, step -> seaTileValuesAtStep(fisher, fishState, timeStep))
-                .getOrDefault(seaTile, 0.0);
+    @Override ToDoubleBiFunction<SeaTile, Integer> seaTileValueAtStepFunction(
+        Fisher fisher,
+        FishState fishState,
+        IntStream possibleSteps
+    ) {
+        final ImmutableMap<Integer, ImmutableMap<SeaTile, Double>> seaTileValuesByStep =
+            possibleSteps.boxed().collect(toImmutableMap(
+                identity(),
+                step -> seaTileValuesAtStep(fisher, fishState, step)
+            ));
+        return (seaTile, timeStep) -> seaTileValuesByStep.get(timeStep).getOrDefault(seaTile, 0.0);
     }
 
     private ImmutableMap<SeaTile, Double> seaTileValuesAtStep(Fisher fisher, FishState fishState, int timeStep) {
