@@ -71,6 +71,7 @@ public class Regulations {
         NAMES.put(MaxHoursOutFactory.class, "Max Hours Out");
         NAMES.put(TriggerRegulationFactory.class, "Trigger Regulation");
         NAMES.put(OffSwitchFactory.class, "Off Switch Decorator");
+        NAMES.put(NoFishingFactory.class, "No Fishing");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }
