@@ -5,6 +5,7 @@ import org.junit.Test;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -26,10 +27,10 @@ public class DriftingPathTest {
                 x -> new SeaTile(x, 0, 0, null)
             ));
 
-        final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
         final ImmutableMap<SeaTile, Double2D> tileVectors =
             seaTiles.values().stream().collect(toImmutableMap(identity(), __ -> new Double2D(1, 0)));
-        vectorMaps.put(1, ImmutableMap.of(CurrentPattern.NEUTRAL, tileVectors));
+        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(CurrentPattern.NEUTRAL, tileVectors)));
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, 1);
         BiFunction<Integer, Integer, SeaTile> getSeaTile = (x, y) -> seaTiles.get(x);
         final DriftingPath driftingPath = new DriftingPath(0, new Double2D(0, 0), currentVectors, getSeaTile);

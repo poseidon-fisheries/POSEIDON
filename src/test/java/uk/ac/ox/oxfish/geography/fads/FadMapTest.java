@@ -19,6 +19,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -57,8 +58,8 @@ public class FadMapTest {
             tile.setBiology(tile.isWater() ? makeBiology(globalBiology, k) : new EmptyLocalBiology());
         }
 
-        final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
-        vectorMaps.put(1, ImmutableMap.of(CurrentPattern.NEUTRAL, vectors));
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
+        vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(CurrentPattern.NEUTRAL, vectors)));
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, 1);
         final FadInitializer fadInitializer = new FadInitializer(k, 0, 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);

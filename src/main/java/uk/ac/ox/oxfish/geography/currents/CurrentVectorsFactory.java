@@ -11,6 +11,7 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
 
 import java.nio.file.Path;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class CurrentVectorsFactory {
     private static final int SECONDS_PER_DAY = 60 * 60 * 24;
 
     public static CurrentVectors makeCurrentVectors(NauticalMap map, int stepsPerDay) {
-        final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps =
+        final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps =
             makeVectorMaps(map, ImmutableMap.of(
                 NEUTRAL, NEUTRAL_CURRENTS_FILE,
                 EL_NINO, EL_NINO_CURRENTS_FILE,
@@ -39,17 +40,17 @@ public class CurrentVectorsFactory {
         return new CurrentVectors(vectorMaps, stepsPerDay);
     }
 
-    private static TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> makeVectorMaps(
+    private static TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> makeVectorMaps(
         NauticalMap map,
         Map<CurrentPattern, Path> currentFiles
     ) {
-        TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> currentVectors = new TreeMap<>();
+        TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> currentVectors = new TreeMap<>();
         currentFiles.forEach((currentPattern, path) ->
             CsvParserUtil.parseAllRecords(path).forEach(record ->
                 Optional.ofNullable(map.getSeaTile(readCoordinate(record))).ifPresent(seaTile -> {
                     final int dayOfYear = getLocalDate(record, "dttm").getDayOfYear();
                     final Map<SeaTile, Double2D> seaTileDouble2DMap = currentVectors
-                        .computeIfAbsent(dayOfYear, __ -> new HashMap<>())
+                        .computeIfAbsent(dayOfYear, __ -> new EnumMap<>(CurrentPattern.class))
                         .computeIfAbsent(currentPattern, __ -> new HashMap<>());
                     final Double2D vector = readVector(record, seaTile, map);
                     seaTileDouble2DMap.put(seaTile, vector);

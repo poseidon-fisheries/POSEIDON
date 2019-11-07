@@ -3,6 +3,7 @@ package uk.ac.ox.oxfish.geography.currents;
 import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.SeaTile;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,20 +18,20 @@ import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
 public class CurrentVectors {
 
     private final TreeMap<Integer, Map<SeaTile, Double2D>> vectorCache = new TreeMap<>();
-    private final TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
+    private final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps;
     private final Function<Integer, CurrentPattern> currentPatternAtStep;
 
     private final int stepsPerDay;
 
     public CurrentVectors(
-        TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
+        TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
         int stepsPerDay
     ) {
         this(vectorMaps, __ -> NEUTRAL, stepsPerDay);
     }
 
     public CurrentVectors(
-        TreeMap<Integer, Map<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
+        TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps,
         Function<Integer, CurrentPattern> currentPatternAtStep,
         int stepsPerDay
     ) {
