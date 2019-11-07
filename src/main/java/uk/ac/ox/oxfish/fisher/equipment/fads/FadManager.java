@@ -41,7 +41,7 @@ public class FadManager {
         this.fisher = fisher;
     }
 
-    public ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
+    ListOrderedSet<Fad> getDeployedFads() { return deployedFads; }
 
     Optional<Fad> oneOfFadsHere() {
         final Object o = oneOf(getFadsHere(), fisher.grabRandomizer());
@@ -90,8 +90,6 @@ public class FadManager {
         fadMap.remove(fad);
         numFadsInStock++;
     }
-
-    public Optional<SeaTile> getFadTile(Fad fad) { return getFadMap().getFadTile(fad); }
 
     public FadMap getFadMap() { return fadMap; }
 
