@@ -168,10 +168,6 @@ public class TunaScenario implements Scenario {
 
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
-    public AlgorithmFactory<? extends Regulation> getRegulations() { return regulations; }
-
-    public void setRegulations(AlgorithmFactory<? extends Regulation> regulations) { this.regulations = regulations; }
-
     @SuppressWarnings("unused") public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() { return biologyInitializers; }
 
     @SuppressWarnings("unused") public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) { this.biologyInitializers = biologyInitializers; }
