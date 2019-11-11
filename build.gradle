@@ -124,7 +124,9 @@ dependencies
 
 //this makes tests multi-threaded when called from gradle. Useful!
 test{
-        maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
+    minHeapSize = "2048m"
+    maxHeapSize = "2048m"
+    maxParallelForks = Math.min(Runtime.runtime.availableProcessors(),3)
 }
 
 
