@@ -4,7 +4,7 @@ plugins {
     id 'application'
     //id "us.kirchmeier.capsule" version "1.0.1"
     //id "jacoco"
-    id 'com.github.johnrengelman.shadow' version '2.0.0'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
     id "com.gradle.build-scan" version "3.0"
 
 }
