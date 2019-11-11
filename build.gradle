@@ -58,7 +58,7 @@ dependencies
 
     //csv helper
     compile "com.opencsv:opencsv:3.8"
-    compile "com.univocity:univocity-parsers:2.8.1"
+    compile "com.univocity:univocity-parsers:2.8.3"
 
     // Google's JSON library
     implementation 'com.google.code.gson:gson:2.8.5'
