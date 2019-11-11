@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ec.util.MersenneTwisterFast;
-import javafx.collections.ObservableList;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.log.Territory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.GeneralizedCognitiveStrategy;

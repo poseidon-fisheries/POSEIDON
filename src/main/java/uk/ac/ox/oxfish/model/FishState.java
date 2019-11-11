@@ -33,6 +33,7 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Doubles;
 
 import ec.util.MersenneTwisterFast;
@@ -581,6 +582,9 @@ public class FishState  extends SimState{
     {
         if(started) {
             startable.start(this);
+            //store it anyway
+            toStart.add(startable);
+
             //  scheduleOnce((Steppable) simState -> startable.start(FishState.this), StepOrder.DAWN);
         }
         else
@@ -922,6 +926,7 @@ public class FishState  extends SimState{
             fishers.clear();
 
         }
+        toStart.clear();
         yearlyDataSet.turnOff();
         yearlyCounter.turnOff();
         dailyCounter.turnOff();
@@ -936,4 +941,8 @@ public class FishState  extends SimState{
     public FadMap getFadMap() { return fadMap; }
 
     public void setFadMap(FadMap fadMap) { this.fadMap = fadMap; }
+
+    public Iterable<Startable> viewStartables(){
+        return ImmutableList.copyOf(toStart);
+    }
 }

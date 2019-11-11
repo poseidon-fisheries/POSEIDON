@@ -29,7 +29,6 @@ import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 public class FixedNumberOfEdges extends AbstractNetworkBuilder {

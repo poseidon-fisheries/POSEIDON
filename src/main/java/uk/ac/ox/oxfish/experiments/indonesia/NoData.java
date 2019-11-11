@@ -326,10 +326,9 @@ public class NoData {
             yaml.dump(scenarioPair.getFirst(),new FileWriter(folder.resolve("scenario_" + i + ".yaml").toFile()));
 
             for (String value : scenarioPair.getSecond()) {
-                masterFile.write(",");
                 masterFile.write(value);
+                masterFile.write(",");
             }
-            masterFile.write(",");
             masterFile.write(folder.resolve("scenario_" + i + ".yaml").toString());
             masterFile.write("\n");
 

@@ -6,6 +6,7 @@ plugins {
     //id "jacoco"
     id 'com.github.johnrengelman.shadow' version '2.0.0'
     id 'com.gradle.build-scan' version '1.16'
+
 }
 
 
@@ -48,6 +49,9 @@ dependencies
     compile fileTree(dir: 'libs/geomason', include: '*.jar')
     //a jury-rigged version of OSMOSE, hopefully linkable with this simulation
     compile fileTree(dir: 'libs/osmose', include: '*.jar')
+
+    //fx collections; needed for sanity
+    compile fileTree(dir: 'libs/fxbase/', include: '*.jar')
 
 
     //metawidget + apache binders. Useful for the gui
@@ -111,7 +115,14 @@ dependencies
     // Reference implementation of JSR-385 for units of measure
     compile group: 'systems.uom', name: 'systems-common', version: '1.0'
 
+//    //openfx collections!
+//    compile group: 'org.openjfx', name: 'javafx-base', version: '13.0.1'
+//    compile group: 'org.openjfx', name: 'javafx-controls', version: '13'
+
 }
+
+
+
 
 
 //this makes tests multi-threaded when called from gradle. Useful!
