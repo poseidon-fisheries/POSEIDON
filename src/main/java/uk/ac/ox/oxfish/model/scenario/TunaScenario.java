@@ -15,12 +15,12 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFactory;
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
-import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
+import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesBiomassFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesBiomassNormalizedFactory;
 import uk.ac.ox.oxfish.biology.weather.initializer.WeatherInitializer;
 import uk.ac.ox.oxfish.biology.weather.initializer.factory.ConstantWeatherFactory;
@@ -76,10 +76,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableBiMap.toImmutableBiMap;
 import static com.google.common.collect.ImmutableRangeMap.toImmutableRangeMap;
@@ -91,7 +89,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-
 import static si.uom.NonSI.KNOT;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
@@ -105,11 +102,11 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 @SuppressWarnings("UnstableApiUsage")
 public class TunaScenario implements Scenario {
 
-    public static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    public static final Path MAP_FILE = input("depth.csv");
+    private static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
     public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
     public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
     public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
+    private static final Path MAP_FILE = input("depth.csv");
     private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
     private static final Path GALAPAGOS_EEZ_SHAPE_FILE = input("galapagos_eez").resolve("eez.shp");
@@ -139,38 +136,59 @@ public class TunaScenario implements Scenario {
             (fishState, speciesCode) -> fishState.getBiology().getSpecie(speciesNames.get(speciesCode))
         );
     private FromFileMapInitializerFactory mapInitializer = new FromFileMapInitializerFactory(MAP_FILE, 94, 0.5);
-    private AlgorithmFactory<? extends BiologyInitializer> biologyInitializers = new TunaSpeciesBiomassInitializerFactory();
     private AlgorithmFactory<? extends WeatherInitializer> weatherInitializer = new ConstantWeatherFactory();
     private DoubleParameter gasPricePerLiter = new FixedDoubleParameter(0.01);
     private FisherDefinition fisherDefinition = new FisherDefinition();
-    private AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
-        new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE), "all",
-        new TemporaryRegulationFactory( // El Corralito
-            dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
-            new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
-        ), "all",
-        new TemporaryRegulationFactory(
-            dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
-            new NoFishingFactory()
-        ), "closure A",
-        new TemporaryRegulationFactory(
-            dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
-            new NoFishingFactory()
-        ), "closure B"
-    ));
+
+    private AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> biologyInitializers =
+        new MultipleIndependentSpeciesBiomassFactory(
+            parseAllRecords(SCHAEFER_PARAMS_FILE).stream().map(r -> makeBiomassInitializerFactory(
+                r.getString("species_code"),
+                r.getDouble("logistic_growth_rate"), // logistic growth rate (r)
+                getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE), // total carrying capacity (K)
+                getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE) // total biomass
+            )).collect(toList()),
+            false,
+            false
+        );
 
     TunaScenario() {
+
+        AlgorithmFactory<? extends Regulation> regulations = new MultipleRegulationsFactory(ImmutableMap.of(
+            new SpecificProtectedAreaFromShapeFileFactory(GALAPAGOS_EEZ_SHAPE_FILE), "all",
+            new TemporaryRegulationFactory( // El Corralito
+                dayOfYear(OCTOBER, 9), dayOfYear(NOVEMBER, 8),
+                new SpecificProtectedAreaFromCoordinatesFactory(4, -110, -3, -96)
+            ), "all",
+            new TemporaryRegulationFactory(
+                dayOfYear(JULY, 29), dayOfYear(OCTOBER, 8),
+                new NoFishingFactory()
+            ), "closure A",
+            new TemporaryRegulationFactory(
+                dayOfYear(NOVEMBER, 9), dayOfYear(JANUARY, 19),
+                new NoFishingFactory()
+            ), "closure B"
+        ));
         fisherDefinition.setRegulation(regulations);
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
+
     }
+
+    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
 
     private static Path input(String filename) { return INPUT_DIRECTORY.resolve(filename); }
 
-    @SuppressWarnings("unused") public AlgorithmFactory<? extends BiologyInitializer> getBiologyInitializers() { return biologyInitializers; }
+    @SuppressWarnings("unused")
+    public AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> getBiologyInitializers() {
+        return biologyInitializers;
+    }
 
-    @SuppressWarnings("unused") public void setBiologyInitializers(AlgorithmFactory<? extends BiologyInitializer> biologyInitializers) { this.biologyInitializers = biologyInitializers; }
+    @SuppressWarnings("unused")
+    public void setBiologyInitializers(AlgorithmFactory<? extends MultipleIndependentSpeciesBiomassInitializer> biologyInitializers) {
+        this.biologyInitializers = biologyInitializers;
+    }
 
     @SuppressWarnings("unused")
     public Path getPortFilePath() {
@@ -367,8 +385,6 @@ public class TunaScenario implements Scenario {
 
     }
 
-    private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
-
     private void chooseClosurePeriod(Fisher fisher, MersenneTwisterFast rng) {
         final ImmutableList<String> periods = ImmutableList.of("closure A", "closure B");
         fisher.getTags().removeIf(periods::contains);
@@ -413,75 +429,30 @@ public class TunaScenario implements Scenario {
         this.targetYear = targetYear;
     }
 
-    public static class TunaSpeciesBiomassInitializerFactory
-        implements AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer> {
+    private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
+        String speciesCode,
+        double logisticGrowthRate,
+        Quantity<Mass> totalCarryingCapacity,
+        Quantity<Mass> totalBiomass
+    ) {
+        final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
+        factory.setSpeciesName(speciesNames.get(speciesCode));
+        factory.setGrower(new FadAwareCommonLogisticGrowerInitializerFactory(logisticGrowthRate));
+        factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
+        factory.setBiomassSuppliedPerCell(false);
 
-        private Map<String, SingleSpeciesBiomassNormalizedFactory> biomassInitializers =
-            parseAllRecords(SCHAEFER_PARAMS_FILE).stream().collect(toMap(
-                r -> r.getString("species_code"),
-                r -> makeBiomassInitializerFactory(
-                    r.getString("species_code"),
-                    r.getDouble("logistic_growth_rate"), // logistic growth rate (r)
-                    getQuantity(r.getDouble("carrying_capacity_in_tonnes"), TONNE), // total carrying capacity (K)
-                    getQuantity(r.getDouble("total_biomass_in_tonnes"), TONNE) // total biomass
-                )));
+        final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
+        factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-        private SingleSpeciesBiomassNormalizedFactory bigeyeBiomassInitializer = biomassInitializers.get("BET");
-        private SingleSpeciesBiomassNormalizedFactory yellowfinBiomassInitializer = biomassInitializers.get("YFT");
-        private SingleSpeciesBiomassNormalizedFactory skipjackBiomassInitializer = biomassInitializers.get("SKJ");
+        final FileBiomassAllocatorFactory initialCapacityAllocator =
+            speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
+        initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
+        initialCapacityAllocator.setInputFileHasHeader(true);
+        final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
+        polygonAllocatorFactory.setShapeFile(IATTC_SHAPE_FILE);
+        polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
+        factory.setInitialCapacityAllocator(polygonAllocatorFactory);
 
-        private SingleSpeciesBiomassNormalizedFactory makeBiomassInitializerFactory(
-            String speciesCode,
-            double logisticGrowthRate,
-            Quantity<Mass> totalCarryingCapacity,
-            Quantity<Mass> totalBiomass
-        ) {
-            final SingleSpeciesBiomassNormalizedFactory factory = new SingleSpeciesBiomassNormalizedFactory();
-            factory.setSpeciesName(speciesNames.get(speciesCode));
-            factory.setGrower(new FadAwareCommonLogisticGrowerInitializerFactory(logisticGrowthRate));
-            factory.setCarryingCapacity(new FixedDoubleParameter(asDouble(totalCarryingCapacity, KILOGRAM)));
-            factory.setBiomassSuppliedPerCell(false);
-
-            final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
-            factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
-
-            final FileBiomassAllocatorFactory initialCapacityAllocator =
-                speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
-            initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
-            initialCapacityAllocator.setInputFileHasHeader(true);
-            final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
-            polygonAllocatorFactory.setShapeFile(IATTC_SHAPE_FILE);
-            polygonAllocatorFactory.setDelegate(initialCapacityAllocator);
-            factory.setInitialCapacityAllocator(polygonAllocatorFactory);
-
-            return factory;
-        }
-
-        @SuppressWarnings("unused")
-        public SingleSpeciesBiomassNormalizedFactory getBigeyeBiomassInitializer() {
-            return bigeyeBiomassInitializer;
-        }
-
-        @SuppressWarnings("unused")
-        public SingleSpeciesBiomassNormalizedFactory getYellowfinBiomassInitializer() {
-            return yellowfinBiomassInitializer;
-        }
-
-        @SuppressWarnings("unused")
-        public SingleSpeciesBiomassNormalizedFactory getSkipjackBiomassInitializer() {
-            return skipjackBiomassInitializer;
-        }
-
-        @Override
-        public MultipleIndependentSpeciesBiomassInitializer apply(FishState fishState) {
-            final List<SingleSpeciesBiomassInitializer> biomassInitializers = Stream.of(
-                bigeyeBiomassInitializer,
-                yellowfinBiomassInitializer,
-                skipjackBiomassInitializer
-            ).map(factory -> factory.apply(fishState)).collect(toList());
-            return new MultipleIndependentSpeciesBiomassInitializer(
-                biomassInitializers, false, false
-            );
-        }
+        return factory;
     }
 }

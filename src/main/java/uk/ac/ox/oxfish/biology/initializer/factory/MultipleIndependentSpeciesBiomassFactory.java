@@ -32,8 +32,17 @@ import java.util.stream.Collectors;
 public class MultipleIndependentSpeciesBiomassFactory implements
         AlgorithmFactory<MultipleIndependentSpeciesBiomassInitializer>{
 
+    public MultipleIndependentSpeciesBiomassFactory() {};
 
-
+    public MultipleIndependentSpeciesBiomassFactory(
+        List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories,
+        boolean addImaginarySpecies,
+        boolean constantBiomass
+    ) {
+        this.factories = factories;
+        this.addImaginarySpecies = addImaginarySpecies;
+        this.constantBiomass = constantBiomass;
+    }
 
     private List<AlgorithmFactory<SingleSpeciesBiomassInitializer>> factories = new LinkedList<>();
     {
