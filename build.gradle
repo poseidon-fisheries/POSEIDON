@@ -103,7 +103,9 @@ dependencies
 
     //testing:
     testCompile "junit:junit:4.12"
-    testCompile "org.mockito:mockito-all:1.9.5"
+//    testCompile "org.mockito:mockito-all:1.9.5"
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
+
 
     //guava. Useful for PreConditions and sometimes specialized collections
     compile "com.google.guava:guava:28.1-jre"
@@ -115,9 +117,6 @@ dependencies
     // Reference implementation of JSR-385 for units of measure
     compile group: 'systems.uom', name: 'systems-common', version: '1.0'
 
-//    //openfx collections!
-//    compile group: 'org.openjfx', name: 'javafx-base', version: '13.0.1'
-//    compile group: 'org.openjfx', name: 'javafx-controls', version: '13'
 
 }
 

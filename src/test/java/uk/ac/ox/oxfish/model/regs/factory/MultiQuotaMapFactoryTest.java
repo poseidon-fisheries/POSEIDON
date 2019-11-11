@@ -22,14 +22,8 @@ package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.esotericsoftware.minlog.Log;
 import ec.util.MersenneTwisterFast;
-import javafx.collections.ObservableList;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.initializer.factory.FromLeftToRightFactory;

@@ -22,15 +22,14 @@ package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,7 +44,7 @@ public class ClubNetworkBuilderTest {
         Fisher three = mock(Fisher.class);
         Fisher four = mock(Fisher.class);
         Fisher five = mock(Fisher.class);
-        when(state.getFishers()).thenReturn(FXCollections.observableList(Arrays.asList(one, two, three,four,five)));
+        when(state.getFishers()).thenReturn(ObservableList.observableList(one, two, three, four, five));
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 

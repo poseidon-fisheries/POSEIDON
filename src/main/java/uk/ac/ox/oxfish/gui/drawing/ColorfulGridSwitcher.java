@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.gui.drawing;
 
-import javafx.collections.MapChangeListener;
 import sim.display.Display2D;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 
@@ -32,7 +31,7 @@ import java.awt.event.ActionListener;
  * Custom combo-box to switch what is displayed
  * Created by carrknight on 4/22/15.
  */
-public class ColorfulGridSwitcher extends JComboBox<String> implements ActionListener,MapChangeListener<String, ColorEncoding>{
+public class ColorfulGridSwitcher extends JComboBox<String> implements ActionListener{
 
 
     private final  ColorfulGrid toModify;
@@ -53,7 +52,7 @@ public class ColorfulGridSwitcher extends JComboBox<String> implements ActionLis
         this.toRefresh =toRefresh;
 
 
-        toModify.getEncodings().addListener(this);
+        toModify.addListener(this);
 
         for(String key: toModify.getEncodings().keySet())
             addItem(key);
@@ -84,9 +83,7 @@ public class ColorfulGridSwitcher extends JComboBox<String> implements ActionLis
         toRefresh.repaint();
     }
 
-    @Override
-    public void onChanged(
-            Change<? extends String, ? extends ColorEncoding> change) {
+    public void gridChanged() {
 
         removeActionListener(this);
 

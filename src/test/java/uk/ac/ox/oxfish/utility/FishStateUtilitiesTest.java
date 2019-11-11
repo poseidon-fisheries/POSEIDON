@@ -22,14 +22,13 @@ package uk.ac.ox.oxfish.utility;
 
 import com.beust.jcommander.internal.Lists;
 import ec.util.MersenneTwisterFast;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -105,7 +104,7 @@ public class FishStateUtilitiesTest {
         when(fisher2.getHomePort()).thenReturn(port1);
         when(fisher3.getHomePort()).thenReturn(port2);
         when(fisher4.getHomePort()).thenReturn(port2);
-        ObservableList<Fisher> fishers = FXCollections.observableArrayList(fisher1, fisher2, fisher3, fisher4);
+        ObservableList<Fisher> fishers = ObservableList.observableList(fisher1, fisher2, fisher3, fisher4);
 
         DataColumn column1 = new DataColumn("lame");
         when(fisher1.getYearlyData().getColumn("lame")).thenReturn(column1);

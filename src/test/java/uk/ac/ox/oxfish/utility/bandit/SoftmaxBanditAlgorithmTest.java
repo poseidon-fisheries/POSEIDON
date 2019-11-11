@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 11/10/16.

@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
-import javafx.collections.ListChangeListener;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -33,6 +32,7 @@ import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
+import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
 /**
  * A support object to count opportunity costs that are incurred in a TAC by a fisher who consumes his quotas more slowly

@@ -26,7 +26,7 @@ import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.AbundanceFilter;
 import uk.ac.ox.oxfish.fisher.equipment.gear.components.FormulaAbundanceFilter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FishingMortalityAgentTest {
 

@@ -66,7 +66,7 @@ public class YearlyIterativeDestinationStrategyTest {
 
 
         //cashflow is x+y
-        doAnswer(invocation -> delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot().getGridY()).when(
+        doAnswer(invocation -> (double)(delegate.getFavoriteSpot().getGridX() + delegate.getFavoriteSpot().getGridY())).when(
                 fisher).getBankBalance();
         when(fisher.balanceXDaysAgo(360)).thenReturn(0d);
 

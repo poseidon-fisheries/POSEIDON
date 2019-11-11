@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.model;
 
 import com.esotericsoftware.minlog.Log;
 import org.junit.Test;
-import org.mockito.MockSettings;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import uk.ac.ox.oxfish.biology.GlobalBiology;

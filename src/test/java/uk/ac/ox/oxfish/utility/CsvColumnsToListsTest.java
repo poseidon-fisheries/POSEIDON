@@ -25,7 +25,7 @@ import org.junit.Test;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/30/16.

@@ -20,14 +20,7 @@
 
 package uk.ac.ox.oxfish.fisher.strategies.destination.factory;
 
-import org.junit.Assert;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.strategies.destination.LogitDestinationStrategy;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.scenario.OsmoseWFSScenario;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.nio.file.Paths;
 
 /**
  * Created by carrknight on 12/6/16.

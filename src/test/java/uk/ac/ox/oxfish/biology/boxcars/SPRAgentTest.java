@@ -20,24 +20,18 @@
 
 package uk.ac.ox.oxfish.biology.boxcars;
 
-import com.beust.jcommander.internal.Lists;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.biology.complicated.GrowthBinByList;
-import uk.ac.ox.oxfish.biology.complicated.Meristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.FisherDailyCounter;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
@@ -106,15 +100,13 @@ public class SPRAgentTest {
                 48
         );
         FishState model = mock(FishState.class,RETURNS_DEEP_STUBS);
-        when(model.getFishers()).thenReturn(
-                FXCollections.observableList(
-                        Lists.newArrayList(
-                                fisher1,
-                                fisher2
-                        )
 
+        when(model.getFishers()).thenReturn(
+                ObservableList.observableList(
+                        fisher1,fisher2
                 )
         );
+
         agent.start(model);
         agent.step(model);
         double spr = agent.computeSPR();

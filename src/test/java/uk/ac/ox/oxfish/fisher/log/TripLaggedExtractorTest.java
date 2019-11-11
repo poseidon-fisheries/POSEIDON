@@ -20,20 +20,18 @@
 
 package uk.ac.ox.oxfish.fisher.log;
 
-import com.beust.jcommander.internal.Lists;
-import javafx.collections.FXCollections;
+import com.google.common.collect.Lists;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.geography.discretization.MapDiscretization;
-import uk.ac.ox.oxfish.geography.discretization.MapDiscretizer;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.LinkedList;
 import java.util.function.Function;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -196,7 +194,8 @@ public class TripLaggedExtractorTest {
 
         FishState model = mock(FishState.class);
         when(model.getDay()).thenReturn(600);
-        when(model.getFishers()).thenReturn(FXCollections.observableArrayList(fakeFisher1, fakeFisher2));
+        when(model.getFishers()).thenReturn(ObservableList.observableList(
+               Lists.newArrayList(fakeFisher1, fakeFisher2)));
 
         extractorFisher1.start(model);
         extractorFisher1.step(model);

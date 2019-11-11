@@ -1,19 +1,19 @@
 package uk.ac.ox.oxfish.biology.boxcars;
 
 import com.beust.jcommander.internal.Lists;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.FromListMeristics;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class CatchSamplerTest {
@@ -32,7 +32,8 @@ public class CatchSamplerTest {
         );
 
         FishState model = mock(FishState.class);
-        ObservableList fisherList = FXCollections.observableList(Lists.newArrayList(yesOne,yesTwo,wrong));
+        ArrayList<Fisher> fishers = (ArrayList)Lists.newArrayList(yesOne, yesTwo, wrong);
+        ObservableList fisherList = ObservableList.observableList(fishers);
         when(model.getFishers()).thenReturn(fisherList);
 
         //one caught 10 small ones

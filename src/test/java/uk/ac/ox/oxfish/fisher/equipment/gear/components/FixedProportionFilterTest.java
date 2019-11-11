@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.equipment.gear.components;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.complicated.MeristicsInput;
-import uk.ac.ox.oxfish.biology.complicated.StockAssessmentCaliforniaMeristics;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 import static org.junit.Assert.assertEquals;

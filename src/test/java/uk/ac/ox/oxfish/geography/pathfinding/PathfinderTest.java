@@ -22,23 +22,14 @@ package uk.ac.ox.oxfish.geography.pathfinding;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
-import sim.field.geo.GeomGridField;
-import sim.field.geo.GeomVectorField;
-import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.geography.CartesianDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 
 import java.util.Deque;
 
 import static com.google.common.collect.Iterables.elementsEqual;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 /**

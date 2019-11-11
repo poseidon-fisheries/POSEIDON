@@ -24,9 +24,8 @@ import org.junit.Test;
 import sim.field.grid.IntGrid2D;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.StepOrder;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**

@@ -28,10 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static si.uom.NonSI.TONNE;
 import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.*;
 import static uk.ac.ox.oxfish.geography.TestUtilities.makeMap;
 
 public class FadMapTest {

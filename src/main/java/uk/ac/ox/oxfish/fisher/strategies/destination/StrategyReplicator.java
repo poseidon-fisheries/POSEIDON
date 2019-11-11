@@ -22,7 +22,6 @@ package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import burlap.datastructures.BoltzmannDistribution;
 import com.google.common.base.Preconditions;
-import javafx.collections.ObservableList;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -32,6 +31,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;

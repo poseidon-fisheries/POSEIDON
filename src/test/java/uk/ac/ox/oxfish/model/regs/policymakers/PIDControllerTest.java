@@ -24,11 +24,8 @@ import org.jfree.util.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.data.collectors.IntervalPolicy;
-import uk.ac.ox.oxfish.utility.adaptation.Actuator;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**

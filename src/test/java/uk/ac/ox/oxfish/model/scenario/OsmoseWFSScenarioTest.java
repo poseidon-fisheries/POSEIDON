@@ -20,16 +20,6 @@
 
 package uk.ac.ox.oxfish.model.scenario;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.junit.Test;
-import uk.ac.ox.oxfish.geography.NauticalMap;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.utility.FishStateUtilities;
-
-import java.awt.geom.Point2D;
-
-import static org.junit.Assert.*;
-
 /**
  * temporarilly suspended until I can put WFS back online
  * Created by carrknight on 11/17/16.

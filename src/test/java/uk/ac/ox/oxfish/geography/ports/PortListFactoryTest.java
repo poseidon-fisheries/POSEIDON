@@ -20,7 +20,6 @@
 
 package uk.ac.ox.oxfish.geography.ports;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;

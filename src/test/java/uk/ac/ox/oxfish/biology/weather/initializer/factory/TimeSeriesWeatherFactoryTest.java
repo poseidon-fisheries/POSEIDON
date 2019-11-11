@@ -22,15 +22,13 @@ package uk.ac.ox.oxfish.biology.weather.initializer.factory;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
-import uk.ac.ox.oxfish.biology.weather.ConstantWeather;
 import uk.ac.ox.oxfish.biology.weather.initializer.CSVWeatherInitializer;
 import uk.ac.ox.oxfish.fisher.actions.MovingTest;
 import uk.ac.ox.oxfish.model.FishState;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/29/16.

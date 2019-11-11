@@ -38,7 +38,7 @@ import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

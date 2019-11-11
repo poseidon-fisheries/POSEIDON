@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class GrowthBinByListTest {
 

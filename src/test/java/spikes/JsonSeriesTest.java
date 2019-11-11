@@ -1,11 +1,11 @@
 package spikes;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import uk.ac.ox.oxfish.model.data.jsonexport.JsonSeries;
 
-import static com.google.common.collect.Lists.*;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.newLinkedList;
 
 public class JsonSeriesTest {
     public static void main(String[] args) {

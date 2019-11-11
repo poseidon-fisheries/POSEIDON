@@ -25,7 +25,8 @@ import org.junit.Test;
 import uk.ac.ox.oxfish.utility.Pair;
 import uk.ac.ox.oxfish.utility.dynapro.AmateurishApproximateDynamicProgram;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 10/12/16.

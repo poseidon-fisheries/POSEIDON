@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.model.data;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/9/16.

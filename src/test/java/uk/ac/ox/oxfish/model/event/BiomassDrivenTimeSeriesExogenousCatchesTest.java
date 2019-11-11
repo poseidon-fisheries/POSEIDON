@@ -24,16 +24,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerFactory;
-import uk.ac.ox.oxfish.biology.growers.CommonLogisticGrowerInitializer;
-import uk.ac.ox.oxfish.biology.growers.IndependentLogisticBiomassGrower;
-import uk.ac.ox.oxfish.biology.initializer.factory.IndependentLogisticFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.WellMixedBiologyFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.SimpleMapInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
 import uk.ac.ox.oxfish.model.scenario.FisherDefinition;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
-import uk.ac.ox.oxfish.model.scenario.PrototypeScenario;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
@@ -41,7 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class BiomassDrivenTimeSeriesExogenousCatchesTest {
 

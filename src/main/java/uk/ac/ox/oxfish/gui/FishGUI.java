@@ -46,7 +46,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import javafx.collections.ListChangeListener;
 import org.jetbrains.annotations.Nullable;
 import sim.display.Console;
 import sim.display.Controller;
@@ -78,6 +77,7 @@ import uk.ac.ox.oxfish.gui.drawing.MPADrawer;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FisherFactory;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
+import uk.ac.ox.oxfish.utility.fxcollections.ListChangeListener;
 
 /**
  * The GUI of FishState

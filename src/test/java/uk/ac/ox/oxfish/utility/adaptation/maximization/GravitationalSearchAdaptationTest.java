@@ -21,13 +21,12 @@
 package uk.ac.ox.oxfish.utility.adaptation.maximization;
 
 import ec.util.MersenneTwisterFast;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.selfanalysis.ObjectiveFunction;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.adaptation.Sensor;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 import java.util.*;
@@ -59,7 +58,7 @@ public class GravitationalSearchAdaptationTest {
                                     random.nextDouble()*100,
                                     random.nextDouble()*100
                             });
-        ObservableList<Fisher> list = FXCollections.observableList(new LinkedList<>());
+        ObservableList<Fisher> list = ObservableList.observableList(new ArrayList<Fisher>());
         list.addAll(coordinates.keySet());
         when(model.getFishers()).thenReturn(list);
 

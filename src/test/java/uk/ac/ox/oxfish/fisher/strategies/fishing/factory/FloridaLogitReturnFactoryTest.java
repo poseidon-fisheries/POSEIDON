@@ -23,7 +23,6 @@ package uk.ac.ox.oxfish.fisher.strategies.fishing.factory;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.strategies.departing.DailyLogisticDepartingStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.DailyReturnDecorator;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.LogitReturnStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.MaximumDaysDecorator;
@@ -31,10 +30,8 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by carrknight on 5/25/17.

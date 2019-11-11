@@ -21,8 +21,6 @@
 package uk.ac.ox.oxfish.fisher.strategies.destination;
 
 import ec.util.MersenneTwisterFast;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Boat;
@@ -39,7 +37,9 @@ import uk.ac.ox.oxfish.geography.ports.Port;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Anarchy;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class StrategyReplicatorTest {
 
 
         FishState state = mock(FishState.class);
-        ObservableList<Fisher> fishers = FXCollections.observableList(new LinkedList<>());
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<Fisher>());
         when(state.getFishers()).thenReturn(fishers);
         MersenneTwisterFast random = new MersenneTwisterFast();
         when(state.getRandom()).thenReturn(random);

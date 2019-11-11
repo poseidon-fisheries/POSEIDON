@@ -22,12 +22,12 @@ package uk.ac.ox.oxfish.fisher.erotetic.snalsar.factory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.erotetic.snalsar.NobodyFishesHereExtractor;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class NobodyFishesHereExtractorTest {
         when(dude2.getLastFinishedTrip().getTilesFished()).thenReturn(Sets.newHashSet(bad2));
 
         FishState model = mock(FishState.class);
-        when(model.getFishers()).thenReturn(FXCollections.observableArrayList(Lists.newArrayList(dude1, dude2)));
+        when(model.getFishers()).thenReturn(ObservableList.observableList(Lists.newArrayList(dude1, dude2)));
 
         NobodyFishesHereExtractor extractor = new NobodyFishesHereExtractor();
         Map<SeaTile, Double> map = extractor.extractFeature(

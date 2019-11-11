@@ -30,7 +30,6 @@ import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.io.FileReader;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**

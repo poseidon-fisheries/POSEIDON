@@ -7,7 +7,6 @@ import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
@@ -22,10 +21,7 @@ import java.util.Optional;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.*;
 
 public class MakeFadSetTest {
 

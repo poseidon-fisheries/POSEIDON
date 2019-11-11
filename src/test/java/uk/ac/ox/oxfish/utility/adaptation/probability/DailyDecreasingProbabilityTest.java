@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.utility.adaptation.probability;
 import org.junit.Test;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 

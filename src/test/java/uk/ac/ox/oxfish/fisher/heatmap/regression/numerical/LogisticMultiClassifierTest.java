@@ -22,13 +22,9 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.numerical;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
-import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.InterceptExtractor;
-import uk.ac.ox.oxfish.fisher.heatmap.regression.extractors.ObservationExtractor;
-import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 12/5/16.

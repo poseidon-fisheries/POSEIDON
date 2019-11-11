@@ -20,13 +20,14 @@
 
 package uk.ac.ox.oxfish.model.regs;
 
-import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -44,7 +45,7 @@ public class TACOpportunityCostManagerTest {
         FishState model = mock(FishState.class);
         Species species = new Species("dummy");
         when(model.getSpecies()).thenReturn(Collections.singletonList(species));
-        when(model.getFishers()).thenReturn(FXCollections.observableList(new LinkedList<>()));
+        when(model.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>()));
         MultiQuotaRegulation quotas = new MultiQuotaRegulation(new double[]{100}, model);
         TACOpportunityCostManager manager = new TACOpportunityCostManager(
                 quotas);

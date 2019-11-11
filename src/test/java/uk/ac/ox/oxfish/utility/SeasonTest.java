@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.utility;
 import org.jfree.util.Log;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 12/2/16.

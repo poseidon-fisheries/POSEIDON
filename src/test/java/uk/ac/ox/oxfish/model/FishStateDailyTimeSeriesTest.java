@@ -21,7 +21,6 @@
 package uk.ac.ox.oxfish.model;
 
 import com.beust.jcommander.internal.Lists;
-import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.geography.NauticalMap;
@@ -29,15 +28,15 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.data.collectors.TimeSeries;
 import uk.ac.ox.oxfish.model.market.AbstractMarket;
 import uk.ac.ox.oxfish.model.market.Market;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 public class FishStateDailyTimeSeriesTest {
@@ -48,7 +47,7 @@ public class FishStateDailyTimeSeriesTest {
         FishStateDailyTimeSeries dataSet = new FishStateDailyTimeSeries();
 
         FishState state = mock(FishState.class);
-        when(state.getFishers()).thenReturn(FXCollections.observableList(new LinkedList<>()));
+        when(state.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>()));
         final NauticalMap map = mock(NauticalMap.class);
         when(map.getAllSeaTilesAsList()).thenReturn(new LinkedList<>());
         when(state.getMap()).thenReturn(map);

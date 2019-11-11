@@ -21,8 +21,6 @@
 package uk.ac.ox.oxfish.gui.widget;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 import org.metawidget.inspector.composite.CompositeInspector;
 import org.metawidget.inspector.composite.CompositeInspectorConfig;
 import org.metawidget.inspector.propertytype.PropertyTypeInspector;
@@ -30,6 +28,8 @@ import uk.ac.ox.oxfish.fisher.strategies.destination.DestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FixedFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.RandomFavoriteDestinationFactory;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by carrknight on 5/29/15.

@@ -22,12 +22,13 @@ package uk.ac.ox.oxfish.model.network;
 
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import javafx.collections.FXCollections;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +47,10 @@ public class EquidegreeBuilderTest {
         Fisher one = mock(Fisher.class);
         Fisher two = mock(Fisher.class);
         Fisher three = mock(Fisher.class);
-        when(state.getFishers()).thenReturn(FXCollections.observableList(Arrays.asList(one,two,three)));
+        when(state.getFishers()).thenReturn(ObservableList.observableList(
+                new ArrayList<>(
+                        Arrays.asList(one, two, three)))
+        );
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
@@ -86,7 +90,7 @@ public class EquidegreeBuilderTest {
         Fisher one = mock(Fisher.class);
         Fisher two = mock(Fisher.class);
         Fisher three = mock(Fisher.class);
-        when(state.getFishers()).thenReturn(FXCollections.observableList(Arrays.asList(one,two,three)));
+        when(state.getFishers()).thenReturn(ObservableList.observableList(new ArrayList<>(Arrays.asList(one, two, three))));
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 
@@ -129,7 +133,9 @@ public class EquidegreeBuilderTest {
         Fisher two = mock(Fisher.class);
         Fisher three = mock(Fisher.class);
 
-        when(state.getFishers()).thenReturn(FXCollections.observableList(Arrays.asList(one,two,three)));
+        when(state.getFishers()).thenReturn(ObservableList.observableList(
+                new ArrayList<>(Arrays.asList(one,two,three))))
+        ;
         when(state.getRandom()).thenReturn(new MersenneTwisterFast());
 
 

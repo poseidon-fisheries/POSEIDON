@@ -1,9 +1,7 @@
 package uk.ac.ox.oxfish.experiments;
 
-import org.junit.Assert;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
-import uk.ac.ox.oxfish.biology.boxcars.AbundanceGathererBuilder;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 import uk.ac.ox.oxfish.model.regs.factory.FishingSeasonFactory;
@@ -15,7 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class IndonesiaBatchRunsTest {
 

@@ -21,16 +21,13 @@
 package uk.ac.ox.oxfish.model.regs;
 
 import com.beust.jcommander.internal.Lists;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 import java.util.LinkedList;
-import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.*;
 
@@ -55,7 +52,7 @@ public class OnOffSwitchRegulatorTest {
         when(four.getRegulation()).thenReturn(decorator4);
 
         FishState state  = mock(FishState.class);
-        ObservableList<Fisher> fishers = FXCollections.observableList(Lists.newArrayList(one, two, three, four));
+        ObservableList<Fisher> fishers = ObservableList.observableList(one, two, three, four);
         when(state.getFishers()).thenReturn(fishers);
 
 
@@ -101,7 +98,7 @@ public class OnOffSwitchRegulatorTest {
         when(one.getTags()).thenReturn(Lists.newArrayList("nope"));
 
         FishState state  = mock(FishState.class);
-        ObservableList<Fisher> fishers = FXCollections.observableList(Lists.newArrayList(one, two, three, four));
+        ObservableList<Fisher> fishers = ObservableList.observableList(one, two, three, four);
         when(state.getFishers()).thenReturn(fishers);
 
 

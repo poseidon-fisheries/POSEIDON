@@ -22,7 +22,7 @@ package uk.ac.ox.oxfish.fisher.heatmap.regression.basis;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 3/7/17.

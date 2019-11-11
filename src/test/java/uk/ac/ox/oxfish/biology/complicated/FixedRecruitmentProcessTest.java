@@ -23,7 +23,7 @@ package uk.ac.ox.oxfish.biology.complicated;
 import org.junit.Test;
 import uk.ac.ox.oxfish.biology.Species;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 public class FixedRecruitmentProcessTest {

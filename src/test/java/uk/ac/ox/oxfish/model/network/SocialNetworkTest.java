@@ -20,17 +20,16 @@
 
 package uk.ac.ox.oxfish.model.network;
 
-import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.junit.Test;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.model.FishState;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +48,7 @@ public class SocialNetworkTest {
 
 
         //the world will be made of 2 fishers
-        ObservableList<Fisher> fishers = FXCollections.observableArrayList();
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());
         Fisher zero = mock(Fisher.class);
         Fisher one = mock(Fisher.class);
 
@@ -89,7 +88,7 @@ public class SocialNetworkTest {
 
 
         //the world will be made of 2 fishers
-        ObservableList<Fisher> fishers = FXCollections.observableArrayList();
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());;
         Fisher zero = mock(Fisher.class);
         Fisher one = mock(Fisher.class);
 
@@ -175,7 +174,7 @@ public class SocialNetworkTest {
         });
 
         //the world will be made of 3 fishers
-        ObservableList<Fisher> fishers = FXCollections.observableArrayList();
+        ObservableList<Fisher> fishers = ObservableList.observableList(new ArrayList<>());;
         Fisher zero = mock(Fisher.class);
         Fisher one = mock(Fisher.class);
         Fisher two = mock(Fisher.class);

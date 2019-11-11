@@ -32,7 +32,7 @@ import java.nio.file.Paths;
 import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * These tests are here to make sure that the yaml files of the narrative example

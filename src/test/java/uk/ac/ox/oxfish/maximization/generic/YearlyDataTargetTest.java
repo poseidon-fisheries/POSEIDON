@@ -6,10 +6,8 @@ import uk.ac.ox.oxfish.model.data.collectors.DataColumn;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 public class YearlyDataTargetTest {
 

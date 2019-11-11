@@ -22,13 +22,7 @@ package uk.ac.ox.oxfish.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.DoubleSummaryStatistics;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
@@ -37,8 +31,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Doubles;
 
 import ec.util.MersenneTwisterFast;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.Stoppable;
@@ -75,6 +67,7 @@ import uk.ac.ox.oxfish.model.scenario.ScenarioEssentials;
 import uk.ac.ox.oxfish.model.scenario.ScenarioPopulation;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.fxcollections.ObservableList;
 
 /**
  *
@@ -290,7 +283,7 @@ public class FishState  extends SimState{
 
         final ScenarioPopulation scenarioPopulation = scenario.populateModel(this);
         fisherFactory = scenarioPopulation.getFactory();
-        fishers = FXCollections.observableList(scenarioPopulation.getPopulation());
+        fishers = ObservableList.observableList(scenarioPopulation.getPopulation());
 
         socialNetwork = scenarioPopulation.getNetwork();
         socialNetwork.populate(this);

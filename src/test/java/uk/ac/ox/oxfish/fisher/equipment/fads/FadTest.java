@@ -8,10 +8,7 @@ import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertEmptyBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.assertFullBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.fillBiology;
-import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.makeBiology;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.TestUtilities.*;
 
 public class FadTest {
 

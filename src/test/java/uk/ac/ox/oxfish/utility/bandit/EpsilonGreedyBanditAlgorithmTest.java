@@ -22,14 +22,11 @@ package uk.ac.ox.oxfish.utility.bandit;
 
 import ec.util.MersenneTwisterFast;
 import org.junit.Test;
-import uk.ac.ox.oxfish.model.data.Averager;
 import uk.ac.ox.oxfish.model.data.ExponentialMovingAverage;
 import uk.ac.ox.oxfish.model.data.IterativeAverage;
 import uk.ac.ox.oxfish.model.data.MovingAverage;
 
-import java.util.function.Supplier;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by carrknight on 11/9/16.
