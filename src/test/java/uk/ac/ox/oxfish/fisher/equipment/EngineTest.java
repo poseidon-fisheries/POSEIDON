@@ -39,4 +39,17 @@ public class EngineTest {
         assertEquals(efficient.getGasConsumptionPerKm(1),50,.0001);
 
     }
+
+    @Test
+    public void consumeAndRefill() {
+
+        FuelTank tank = new FuelTank(1000);
+        tank.consume(100);
+        tank.consume(25);
+        assertEquals(tank.getLitersOfFuelInTank(),875,.0001);
+        assertEquals(tank.refill(),125,.0001);
+        assertEquals(tank.getLitersOfFuelInTank(),1000,.0001);
+        assertEquals(tank.getFuelCapacityInLiters(),1000,.0001);
+
+    }
 }
