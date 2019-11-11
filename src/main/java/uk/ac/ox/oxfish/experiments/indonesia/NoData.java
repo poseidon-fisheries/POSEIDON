@@ -221,7 +221,11 @@ public class NoData {
 //        for (int batch = 0; batch < BATCHES; batch++)
         //  runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+0),0);
         //runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+1),0);
-        runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+2),0);
+      //  runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+2),0);
+       // runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+3),0);
+        //runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+4),0);
+        //runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+5),0);
+        runDirectory(Paths.get("docs", "20191025 limited_poseidon", "scenarios", "batch"+6),0);
 
 
 
@@ -246,8 +250,13 @@ public class NoData {
         for (File scenarioFile : scenarios) {
 
             Scenario scenario = yaml.loadAs(new FileReader(scenarioFile), Scenario.class);
-            Optional<Integer> result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed);
-
+            Optional<Integer> result;
+            try {
+                result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed);
+            }
+            catch (OutOfMemoryError e){
+                result = Optional.of(-1000);
+            }
             System.out.println(scenarioFile.getAbsolutePath() + "," + result.orElse(-1) );
 
             writer.write(scenarioFile.getAbsolutePath().toString() + ",");
