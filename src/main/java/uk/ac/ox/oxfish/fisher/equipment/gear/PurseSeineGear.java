@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
 import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
@@ -16,15 +17,29 @@ import static tech.units.indriya.unit.Units.HOUR;
 
 public class PurseSeineGear implements Gear {
 
-    // TODO: this should probably be a general Gear property
-    public final static Quantity<Time> DURATION_OF_SET = getQuantity(4, HOUR);
-
-    // See https://github.com/nicolaspayette/tuna/issues/8
-    public final static double SUCCESSFUL_SET_PROBABILITY = 0.957;
-
     private final FadManager fadManager;
+    private double minimumSetDurationInHours;
+    private double averageSetDurationInHours;
+    private double stdDevOfSetDurationInHours;
+    private double successfulSetProbability;
 
-    public PurseSeineGear(FadManager fadManager) { this.fadManager = fadManager; }
+    public PurseSeineGear(
+        FadManager fadManager,
+        double minimumSetDurationInHours,
+        double averageSetDurationInHours,
+        double stdDevOfSetDurationInHours,
+        double successfulSetProbability
+    ) {
+        this.fadManager = fadManager;
+        this.minimumSetDurationInHours = minimumSetDurationInHours;
+        this.averageSetDurationInHours = averageSetDurationInHours;
+        this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
+        this.successfulSetProbability = successfulSetProbability;
+    }
+
+    public double getSuccessfulSetProbability() {
+        return successfulSetProbability;
+    }
 
     public FadManager getFadManager() { return fadManager; }
 
@@ -57,5 +72,13 @@ public class PurseSeineGear implements Gear {
 
     @Override
     public boolean isSame(Gear o) { return o != null; }
+
+    public Quantity<Time> nextSetDuration(MersenneTwisterFast rng) {
+        final double duration = Math.max(
+            minimumSetDurationInHours,
+            rng.nextGaussian() * stdDevOfSetDurationInHours + averageSetDurationInHours
+        );
+        return getQuantity(duration, HOUR);
+    }
 
 }

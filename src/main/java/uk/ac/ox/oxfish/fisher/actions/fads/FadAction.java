@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 public interface FadAction extends Action, FadManagerUtils {
     Optional<SeaTile> getActionTile(Fisher fisher);
-    Quantity<Time> getDuration();
+    Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng);
     boolean isPossible(FishState model, Fisher fisher);
 
     default boolean isAllowed(FishState model, Fisher fisher) {

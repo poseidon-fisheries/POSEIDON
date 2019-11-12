@@ -106,7 +106,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     public ActionResult act(
         FishState model, Fisher fisher, Regulation regulation, double hoursLeft
     ) {
-        nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration()));
+        nextAction = nextAction.filter(action -> hoursLeft >= toHours(action.getDuration(fisher, model.getRandom())));
         numConsecutiveActions = nextAction.isPresent() ? numConsecutiveActions + 1 : 0;
         final ActionResult actionResult = nextAction
             .map(action -> new ActionResult(action, hoursLeft))

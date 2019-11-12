@@ -1,15 +1,50 @@
 package uk.ac.ox.oxfish.fisher.equipment.gear.factory;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManager;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.fads.FadInitializerFactory;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 
 public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
 
     private int initialNumberOfFads = 999999; // TODO: find plausible value and allow boats to refill
     private FadInitializerFactory fadInitializerFactory = new FadInitializerFactory();
+
+    // see https://github.com/poseidon-fisheries/tuna/issues/7 re: set duration
+    private DoubleParameter minimumSetDurationInHours = new FixedDoubleParameter(3.03333333333333);
+    private DoubleParameter averageSetDurationInHours = new FixedDoubleParameter(8.0219505805135);
+    private DoubleParameter stdDevOfSetDurationInHours = new FixedDoubleParameter(2.99113291538723);
+
+    // See https://github.com/nicolaspayette/tuna/issues/8 re: successful set probability
+    private DoubleParameter successfulSetProbability = new FixedDoubleParameter(0.957);
+
+    public DoubleParameter getMinimumSetDurationInHours() { return minimumSetDurationInHours; }
+
+    public void setMinimumSetDurationInHours(DoubleParameter minimumSetDurationInHours) {
+        this.minimumSetDurationInHours = minimumSetDurationInHours;
+    }
+
+    public DoubleParameter getAverageSetDurationInHours() { return averageSetDurationInHours; }
+
+    public void setAverageSetDurationInHours(DoubleParameter averageSetDurationInHours) {
+        this.averageSetDurationInHours = averageSetDurationInHours;
+    }
+
+    public DoubleParameter getStdDevOfSetDurationInHours() { return stdDevOfSetDurationInHours; }
+
+    public void setStdDevOfSetDurationInHours(DoubleParameter stdDevOfSetDurationInHours) {
+        this.stdDevOfSetDurationInHours = stdDevOfSetDurationInHours;
+    }
+
+    public DoubleParameter getSuccessfulSetProbability() { return successfulSetProbability; }
+
+    public void setSuccessfulSetProbability(DoubleParameter successfulSetProbability) {
+        this.successfulSetProbability = successfulSetProbability;
+    }
 
     @SuppressWarnings("unused")
     public FadInitializerFactory getFadInitializerFactory() { return fadInitializerFactory; }
@@ -34,6 +69,13 @@ public class PurseSeineGearFactory implements AlgorithmFactory<PurseSeineGear> {
             fadInitializerFactory.apply(fishState),
             initialNumberOfFads
         );
-        return new PurseSeineGear(fadManager);
+        final MersenneTwisterFast rng = fishState.getRandom();
+        return new PurseSeineGear(
+            fadManager,
+            minimumSetDurationInHours.apply(rng),
+            averageSetDurationInHours.apply(rng),
+            stdDevOfSetDurationInHours.apply(rng),
+            successfulSetProbability.apply(rng)
+        );
     }
 }
