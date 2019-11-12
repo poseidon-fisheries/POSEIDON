@@ -33,13 +33,15 @@ public class DriftingPath {
 
     public Optional<Double2D> position(int timeStep) {
         checkArgument(timeStep >= initialTimeStep);
-        return positions.computeIfAbsent(timeStep, step ->
-            position(timeStep - 1).flatMap(previousPosition -> {
+        if (!positions.containsKey(timeStep)) {
+            // can't use computeIfAbsent here because it doesn't handle recursion, see e.g. https://stackoverflow.com/q/54824656/
+            positions.put(timeStep, position(timeStep - 1).flatMap(previousPosition -> {
                 final SeaTile seaTile = getSeaTile.apply((int) previousPosition.x, (int) previousPosition.y);
-                final Optional<Double2D> vector = Optional.ofNullable(currentVectors.getVector(step, seaTile));
+                final Optional<Double2D> vector = Optional.ofNullable(currentVectors.getVector(timeStep, seaTile));
                 return vector.map(previousPosition::add);
-            })
-        );
+            }));
+        }
+        return positions.get(timeStep);
     }
 
     public Map<Integer, Optional<Double2D>> getPositions() { return unmodifiableMap(positions); }
