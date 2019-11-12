@@ -74,7 +74,10 @@ abstract class IntermediateDestinationsStrategy {
             currentRoute = Optional.empty();
         else {
             final ImmutableList<Pair<Deque<SeaTile>, Double>> candidateRoutes = findCandidateRoutes(fisher, model, possibleRoutes);
-            currentRoute = Optional.of(weightedOneOf(candidateRoutes, Pair::getSecond, model.getRandom())).map(Pair::getFirst);
+            if (candidateRoutes.isEmpty())
+                currentRoute = Optional.empty();
+            else
+                currentRoute = Optional.of(weightedOneOf(candidateRoutes, Pair::getSecond, model.getRandom())).map(Pair::getFirst);
         }
     }
 
