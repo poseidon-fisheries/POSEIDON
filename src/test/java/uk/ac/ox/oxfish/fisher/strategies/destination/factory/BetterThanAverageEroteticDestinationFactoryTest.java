@@ -40,10 +40,15 @@ public class BetterThanAverageEroteticDestinationFactoryTest
     @Test
     public void plainThresholdDoesNotClearMap() throws Exception {
 
-        long seed = System.currentTimeMillis();
-        int steps = stepsItTookErotetic(2000, seed, false);
-        int steps2 = stepsItTookErotetic(2000, seed, true);
-        assertTrue(steps>steps2);
+        int timesItWasTrue=0;
+        for(int i=0; i<3; i++) {
+            long seed = System.currentTimeMillis();
+            int steps = stepsItTookErotetic(2000, seed, false);
+            int steps2 = stepsItTookErotetic(2000, seed, true);
+            if(steps>steps2)
+                timesItWasTrue++;
+        }
+        assertTrue(timesItWasTrue>1);
 
     }
 
