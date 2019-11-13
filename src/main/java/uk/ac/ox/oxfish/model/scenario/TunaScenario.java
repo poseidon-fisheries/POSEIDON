@@ -32,6 +32,7 @@ import uk.ac.ox.oxfish.fisher.equipment.Hold;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.fisher.equipment.gear.factory.PurseSeineGearFactory;
 import uk.ac.ox.oxfish.fisher.selfanalysis.profit.HourlyCost;
+import uk.ac.ox.oxfish.fisher.strategies.departing.factory.FixedRestTimeDepartingFactory;
 import uk.ac.ox.oxfish.fisher.strategies.destination.FadDestinationStrategy;
 import uk.ac.ox.oxfish.fisher.strategies.destination.factory.FadDestinationStrategyFactory;
 import uk.ac.ox.oxfish.fisher.strategies.fishing.factory.FadFishingStrategyFactory;
@@ -128,7 +129,7 @@ public class TunaScenario implements Scenario {
         r -> r.getString("name")
     ));
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
-    private int targetYear = 2018;
+    private int targetYear = 2017;
     private final BiomassDrivenTimeSeriesExogenousCatchesFactory exogenousCatchesFactory =
         new BiomassDrivenTimeSeriesExogenousCatchesFactory(
             EXOGENOUS_CATCHES_FILE,
@@ -173,7 +174,10 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setGear(new PurseSeineGearFactory());
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
-
+        ((FixedRestTimeDepartingFactory)fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
+            // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
+            new FixedDoubleParameter(374.3583)
+        );
     }
 
     private int dayOfYear(Month month, int dayOfMonth) { return LocalDate.of(targetYear, month, dayOfMonth).getDayOfYear(); }
