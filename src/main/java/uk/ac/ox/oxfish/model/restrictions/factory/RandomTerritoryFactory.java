@@ -36,13 +36,14 @@ public class RandomTerritoryFactory implements AlgorithmFactory<ReputationalRest
 	@Override
 	public ReputationalRestrictions apply(FishState t) {
 		ReputationalRestrictions restrictions = new ReputationalRestrictions();
+		int nTerr = numberOfTerritorySeaTiles.apply(t.random).intValue();
+		//System.out.println("Giving "+nTerr+" territories");
 		restrictions.addTerritories(t.getMap(),t.getRandom(), 
-				numberOfTerritorySeaTiles.apply(t.random).intValue(),
+				nTerr,
 				upperLeftCornerX.apply(t.random).intValue(),
 				upperLeftCornerY.apply(t.random).intValue(),
 				lowerRightCornerX.apply(t.random).intValue(),
 				lowerRightCornerY.apply(t.random).intValue());
 		return restrictions;
 	}
-
 }

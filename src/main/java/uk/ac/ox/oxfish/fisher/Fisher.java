@@ -1337,12 +1337,16 @@ public class Fisher implements Steppable, Startable{
         return status.isAllowedToFishHere(this, tile, model);
     }
     
-    public boolean isBadReputationToFishHere(SeaTile tile, FishState model){
-    	return status.isBadReputationToFishHere(this, tile, model);
+    public boolean isAllowedReputationToFishHere(SeaTile tile, FishState model){
+    	return status.isAllowedReputationToFishHere(this, tile, model);
     }
     
-    public boolean isBadByCommunityStandardsToFishHere(SeaTile tile, FishState model){
-    	return status.isBadByCommunityStandardsToFishHere(this, tile, model);
+    public int countTerritories(){
+    	return status.countTerritories();
+    }
+    
+    public boolean isAllowedByCommunityStandardsToFishHere(SeaTile tile, FishState model){
+    	return status.isAllowedByCommunityStandardsToFishHere(this, tile, model);
     }
 
     /**

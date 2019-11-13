@@ -174,8 +174,8 @@ public class FisherFactory
                     boatSupplier.get(),
                     holdSupplier.get(),
                     gear.apply(fishState), fishState.getSpecies().size());
-for(Consumer<Fisher> setup : additionalSetups)
-setup.accept(fisher);
+			for(Consumer<Fisher> setup : additionalSetups)
+			setup.accept(fisher);
     		
     	}
         return fisher;

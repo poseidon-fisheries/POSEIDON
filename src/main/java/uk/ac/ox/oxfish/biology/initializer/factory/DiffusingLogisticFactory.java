@@ -59,6 +59,12 @@ public class DiffusingLogisticFactory implements AlgorithmFactory<SingleSpeciesB
     private DoubleParameter minInitialCapacity = new FixedDoubleParameter(0d);
     private String speciesName = "Species 0";
 
+    public DiffusingLogisticFactory(){}
+    
+    public DiffusingLogisticFactory(double carryingCapacity){
+    	setCarryingCapacity(new FixedDoubleParameter(carryingCapacity));
+    }
+    
     /**
      * Applies this function to the given argument.
      *
