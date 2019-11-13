@@ -26,34 +26,34 @@ public class ArbitraryPause implements Regulation {
     }
 
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
-        return delegate.canFishHere(agent, tile, model);
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        return delegate.canFishHere(agent, tile, model, timeStep);
     }
 
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
-        return delegate.maximumBiomassSellable(agent, species, model);
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+        return delegate.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         if(fisher.isAtPortAndDocked() ) {
-            int dayOfTheYear = model.getDayOfTheYear();
+            int dayOfTheYear = model.getDayOfTheYear(timeStep);
             if(dayOfTheYear>=startDay && dayOfTheYear<=endDay)
                 return false;
         }
-        return delegate.allowedAtSea(fisher, model);
+        return delegate.allowedAtSea(fisher, model, timeStep);
 
     }
 
     @Override
-    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing) {
-        delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing);
+    public void reactToFishing(SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-        delegate.reactToSale(species, seller, biomass, revenue);
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        delegate.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     @Override

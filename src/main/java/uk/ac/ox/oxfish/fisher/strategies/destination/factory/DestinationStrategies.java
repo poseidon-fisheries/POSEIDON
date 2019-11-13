@@ -66,7 +66,6 @@ public class DestinationStrategies {
         NAMES.put(LogitRPUEDestinationFactory.class, "Perfect RPUE Logit");
         NAMES.put(PerfectDestinationFactory.class, "Perfect Knowledge");
         NAMES.put(ReplicatorDestinationFactory.class, "Replicator");
-        NAMES.put(RandomPlanFadDestinationStrategyFactory.class, "Random Plan FAD Destination Strategy");
         NAMES.put(FadDestinationStrategyFactory.class, "FAD Destination Strategy");
         NAMES.put(GeneralizedCognitiveStrategyFactory.class, "Generalized Cognitive Strategy");
         CONSTRUCTORS = Constructors.fromNames(NAMES);

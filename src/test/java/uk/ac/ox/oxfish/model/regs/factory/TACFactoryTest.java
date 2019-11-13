@@ -52,7 +52,7 @@ public class TACFactoryTest {
         assertEquals(tac2.getQuotaRemaining(0),200,.0001);
 
         //consume a bit of the second, it will affect the first
-        tac2.reactToSale(mock(Species.class), mock(Fisher.class) , 100, 1234);
+        tac2.reactToSale(mock(Species.class), mock(Fisher.class) , 100, 1234, state);
         assertEquals(tac1.getYearlyQuota(),200,.0001);
         assertEquals(tac1.getQuotaRemaining(0),100,.0001);
         assertEquals(tac2.getYearlyQuota(),200,.0001);

@@ -7,6 +7,8 @@ import sim.field.grid.ObjectGrid2D;
 import uk.ac.ox.oxfish.geography.habitat.TileHabitat;
 import uk.ac.ox.oxfish.geography.pathfinding.Pathfinder;
 
+import java.util.Arrays;
+
 import static org.mockito.Mockito.mock;
 
 public class TestUtilities {
@@ -17,8 +19,16 @@ public class TestUtilities {
             for (int j = 0; j < altitude[i].length; j++)
                 grid2D.set(i, j, new SeaTile(i, j, altitude[i][j], new TileHabitat(0d)));
         return new NauticalMap(
-            new GeomGridField(grid2D), new GeomVectorField(),
-            new CartesianDistance(1), mock(Pathfinder.class)
+            new GeomGridField(grid2D),
+            new GeomVectorField(),
+            new CartesianDistance(1),
+            mock(Pathfinder.class)
         );
+    }
+
+    public static NauticalMap makeMap(int width, int height, int altitude) {
+        int[][] altitudes = new int[width][height];
+        for (int[] row : altitudes) Arrays.fill(row, altitude);
+        return makeMap(altitudes);
     }
 }

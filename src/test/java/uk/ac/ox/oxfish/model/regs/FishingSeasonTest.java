@@ -27,6 +27,7 @@ import uk.ac.ox.oxfish.model.FishState;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,18 +45,18 @@ public class FishingSeasonTest {
         FishState model = mock(FishState.class);
 
         //right season, not protected===> can fish
-        when(model.getDayOfTheYear()).thenReturn(50);
+        when(model.getDayOfTheYear(anyInt())).thenReturn(50);
         when(tile.isProtected()).thenReturn(false);
         assertTrue(season.canFishHere(fisher, tile, model));
 
         //off season ===> can't fish
-        when(model.getDayOfTheYear()).thenReturn(150);
+        when(model.getDayOfTheYear(anyInt())).thenReturn(150);
         when(tile.isProtected()).thenReturn(false);
         assertTrue(season.canFishHere(fisher, tile, model));// not an MPA problem
         assertFalse(season.allowedAtSea(fisher,model));
 
         //on season, protected ===> can't fish
-        when(model.getDayOfTheYear()).thenReturn(50);
+        when(model.getDayOfTheYear(anyInt())).thenReturn(50);
         when(tile.isProtected()).thenReturn(true);
         assertFalse(season.canFishHere(fisher, tile, model));
         //turnOff caring about mpas

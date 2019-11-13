@@ -49,8 +49,8 @@ public class FadDestinationStrategy implements DestinationStrategy {
             fadDeploymentDestinationStrategy.resetRoute();
             fadSettingDestinationStrategy.resetRoute();
         }
-        return fadDeploymentDestinationStrategy.nextDestination(fisher, random)
-            .orElseGet(() -> fadSettingDestinationStrategy.nextDestination(fisher, random)
+        return fadDeploymentDestinationStrategy.nextDestination(fisher, model)
+            .orElseGet(() -> fadSettingDestinationStrategy.nextDestination(fisher, model)
                 .orElseGet(() -> fisher.getHomePort().getLocation()));
     }
 

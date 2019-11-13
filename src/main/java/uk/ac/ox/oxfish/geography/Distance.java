@@ -20,15 +20,48 @@
 
 package uk.ac.ox.oxfish.geography;
 
-import java.util.Collection;
+import com.google.common.collect.ImmutableList;
+import uk.ac.ox.oxfish.utility.Pair;
 
-import static com.google.common.collect.Streams.zip;
+import java.util.Deque;
+import java.util.Iterator;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 /**
  * Common interface for all distance measures over a nautical chart
  * Created by carrknight on 4/10/15.
  */
 public interface Distance {
+
+    default ImmutableList<Pair<SeaTile, Double>> cumulativeTravelTimeAlongRouteInHours(
+        Deque<SeaTile> route,
+        NauticalMap map,
+        double speedInKph
+    ) {
+        return cumulativeDistanceAlongRouteInKm(route, map).stream()
+            .map(pair -> pair.mapSecond(dist -> dist / speedInKph))
+            .collect(toImmutableList());
+    }
+
+    default ImmutableList<Pair<SeaTile, Double>> cumulativeDistanceAlongRouteInKm(
+        Deque<SeaTile> route,
+        NauticalMap map
+    ) {
+        checkArgument(!route.isEmpty());
+        double cumulativeDistance = 0.0;
+        final ImmutableList.Builder<Pair<SeaTile, Double>> builder = ImmutableList.builder();
+        SeaTile start = route.peek();
+        final Iterator<SeaTile> iterator = route.iterator();
+        do {
+            SeaTile end = iterator.next();
+            cumulativeDistance += distance(start, end, map);
+            builder.add(new Pair<>(end, cumulativeDistance));
+            start = end;
+        } while (iterator.hasNext());
+        return builder.build();
+    }
 
     /**
      * the distance between two sea-tiles
@@ -39,18 +72,5 @@ public interface Distance {
      * @return kilometers between the two
      */
     double distance(SeaTile start, SeaTile end, NauticalMap map);
-
-    /**
-     * Return the distance along a path of sea tiles
-     *
-     * @param path the path along which to calculate the distance
-     * @param map  the nautical map
-     * @return the total distance, in kilometers, along the sea tiles on the path
-     */
-    default double distanceAlongPath(Collection<SeaTile> path, NauticalMap map) {
-        return zip(path.stream(), path.stream().skip(1), (start, end) -> distance(start, end, map))
-            .mapToDouble(Double::doubleValue)
-            .sum();
-    }
 
 }

@@ -45,6 +45,8 @@ public class Regulations {
         NAMES.put(AnarchyFactory.class, "Anarchy");
         NAMES.put(FishingSeasonFactory.class, "Fishing Season");
         NAMES.put(ProtectedAreasOnlyFactory.class, "MPA Only");
+        NAMES.put(SpecificProtectedAreaFromShapeFileFactory.class, "Specific MPA from Shape File");
+        NAMES.put(SpecificProtectedAreaFromCoordinatesFactory.class, "Specific MPA from Coordinates");
         NAMES.put(ProtectedAreaChromosomeFactory.class, "MPA Chromosome");
         NAMES.put(FinedProtectedAreasFactory.class, "MPA with fine");
         NAMES.put(DepthMPAFactory.class, "MPA by depth");
@@ -62,12 +64,14 @@ public class Regulations {
         NAMES.put(SingleSpeciesPIDTaxationOnLandingsFactory.class, "Single Species PID Taxation");
         NAMES.put(ShodanFromFileFactory.class, "Open/Close Shodan from File");
         NAMES.put(TemporaryProtectedAreasFactory.class, "Temporary MPA");
+        NAMES.put(TemporaryRegulationFactory.class, "Temporary Regulation");
         NAMES.put(MultipleRegulationsFactory.class, "Multiple Regulations");
         NAMES.put(WeakMultiTACStringFactory.class, "Weak Multi-TAC by List");
         NAMES.put(PortBasedWaitTimesFactory.class, "Port Based Wait Times");
         NAMES.put(MaxHoursOutFactory.class, "Max Hours Out");
         NAMES.put(TriggerRegulationFactory.class, "Trigger Regulation");
         NAMES.put(OffSwitchFactory.class, "Off Switch Decorator");
+        NAMES.put(NoFishingFactory.class, "No Fishing");
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }
 }

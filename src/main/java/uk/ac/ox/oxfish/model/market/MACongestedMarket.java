@@ -134,7 +134,7 @@ public class MACongestedMarket extends AbstractBiomassMarket implements Steppabl
         fisher.earn(revenue);
 
         //tell regulation
-        regulation.reactToSale(species, fisher , biomassActuallySellable, revenue);
+        regulation.reactToSale(species, fisher, biomassActuallySellable, revenue, state);
 
         return new TradeInfo(biomassActuallySellable,species,revenue);
     }

@@ -34,9 +34,14 @@ import java.io.FileReader;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by carrknight on 4/4/17.
@@ -125,30 +130,26 @@ public class MultipleRegulationsTest {
         regs.start(mock(FishState.class),mock(Fisher.class));
 
         //same exact process for "can I be out?"
-        when(mpa.allowedAtSea(any(),any())).thenReturn(true);
-        when(season.allowedAtSea(any(),any())).thenReturn(true);
-        when(quota.allowedAtSea(any(),any())).thenReturn(true);
+        when(mpa.allowedAtSea(any(), any(), anyInt())).thenReturn(true);
+        when(season.allowedAtSea(any(), any(), anyInt())).thenReturn(true);
+        when(quota.allowedAtSea(any(), any(), anyInt())).thenReturn(true);
         assertTrue(regs.allowedAtSea(mock(Fisher.class), mock(FishState.class)));
-        when(mpa.allowedAtSea(any(),any())).thenReturn(false);
-        assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
+        when(mpa.allowedAtSea(any(), any(), anyInt())).thenReturn(false);
+        assertFalse(regs.allowedAtSea(mock(Fisher.class), mock(FishState.class)));
 
         //all true, return true
-        when(mpa.canFishHere(any(),any(),any())).thenReturn(true);
-        when(season.canFishHere(any(),any(),any())).thenReturn(true);
-        when(quota.canFishHere(any(),any(),any())).thenReturn(true);
+        when(mpa.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
+        when(season.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
+        when(quota.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
         assertTrue(regs.canFishHere(mock(Fisher.class), mock(SeaTile.class), mock(FishState.class)));
         //one false, return false
-        when(mpa.canFishHere(any(),any(),any())).thenReturn(false);
-        assertFalse(regs.canFishHere(mock(Fisher.class),mock(SeaTile.class),mock(FishState.class)));
+        when(mpa.canFishHere(any(), any(), any(), anyInt())).thenReturn(false);
+        assertFalse(regs.canFishHere(mock(Fisher.class), mock(SeaTile.class), mock(FishState.class)));
         //two/three still false
-        when(season.canFishHere(any(),any(),any())).thenReturn(true);
-        assertFalse(regs.canFishHere(mock(Fisher.class),mock(SeaTile.class),mock(FishState.class)));
-        when(quota.canFishHere(any(),any(),any())).thenReturn(true);
-        assertFalse(regs.canFishHere(mock(Fisher.class),mock(SeaTile.class),mock(FishState.class)));
-
-
-
-
+        when(season.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
+        assertFalse(regs.canFishHere(mock(Fisher.class), mock(SeaTile.class), mock(FishState.class)));
+        when(quota.canFishHere(any(), any(), any(), anyInt())).thenReturn(true);
+        assertFalse(regs.canFishHere(mock(Fisher.class), mock(SeaTile.class), mock(FishState.class)));
 
         when(season.allowedAtSea(any(),any())).thenReturn(false);
         assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
@@ -162,26 +163,27 @@ public class MultipleRegulationsTest {
         SeaTile tile = mock(SeaTile.class);
         Fisher who = mock(Fisher.class);
         Catch haul = mock(Catch.class);
-        regs.reactToFishing(tile, who, haul, haul, 10);
-        verify(mpa).reactToFishing(tile, who, haul, haul, 10);
-        verify(season).reactToFishing(tile, who, haul,haul , 10);
-        verify(quota).reactToFishing(tile, who, haul, haul, 10);
+        FishState state = mock(FishState.class);
+        regs.reactToFishing(tile, who, haul, haul, 10, state, 0);
+        verify(mpa).reactToFishing(tile, who, haul, haul, 10, state, 0);
+        verify(season).reactToFishing(tile, who, haul,haul , 10, state, 0);
+        verify(quota).reactToFishing(tile, who, haul, haul, 10, state, 0);
         //react to sale
         Species species = mock(Species.class);
-        regs.reactToSale(species, who, 100d, 100d);
-        verify(mpa).reactToSale(species, who, 100d, 100d);
-        verify(season).reactToSale(species, who, 100d, 100d);
-        verify(quota).reactToSale(species, who, 100d, 100d);
+        regs.reactToSale(species, who, 100d, 100d, state, 0);
+        verify(mpa).reactToSale(species, who, 100d, 100d, state, 0);
+        verify(season).reactToSale(species, who, 100d, 100d, state, 0);
+        verify(quota).reactToSale(species, who, 100d, 100d, state, 0);
 
 
 
         //take the minimum of the two
-        when(mpa.maximumBiomassSellable(any(),any(),any())).thenReturn(125d);
-        when(season.maximumBiomassSellable(any(),any(),any())).thenReturn(100d);
-        when(quota.maximumBiomassSellable(any(),any(),any())).thenReturn(200d);
-        assertEquals(100,regs.maximumBiomassSellable(any(),any(),any()),.0001);
-        when(quota.maximumBiomassSellable(any(),any(),any())).thenReturn(20d);
-        assertEquals(20,regs.maximumBiomassSellable(any(),any(),any()),.0001);
+        when(mpa.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(125d);
+        when(season.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(100d);
+        when(quota.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(200d);
+        assertEquals(100, regs.maximumBiomassSellable(who, species, state), .0001);
+        when(quota.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(20d);
+        assertEquals(20, regs.maximumBiomassSellable(who, species, state), .0001);
 
 
     }

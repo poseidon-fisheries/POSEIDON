@@ -164,7 +164,7 @@ public class ThreePricesMarket extends AbstractMarket {
         fisher.earn(earnings);
 
         //tell regulation
-        regulation.reactToSale(species, fisher , sold, earnings);
+        regulation.reactToSale(species, fisher, sold, earnings, state);
 
         //return data!
         return new TradeInfo(sold,species,earnings);

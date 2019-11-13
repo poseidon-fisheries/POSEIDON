@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
+import ec.util.MersenneTwisterFast;
 import org.jetbrains.annotations.NotNull;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
@@ -30,7 +31,7 @@ public class PickUpFad implements FadAction {
     ) {
         if (isPossible(model, fisher)) {
             getFadManager(fisher).pickUpFad(targetFad);
-            return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration()));
+            return new ActionResult(new Arriving(), hoursLeft - toHours(getDuration(fisher, model.getRandom())));
         } else {
             // it can happen that the FAD has drifted away, in which case the fisher has to
             // reconsider its course of action
@@ -44,7 +45,7 @@ public class PickUpFad implements FadAction {
         return getFadManager(fisher).getFadMap().getFadTile(targetFad);
     }
 
-    @Override public Quantity<Time> getDuration() {
+    @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
         return getQuantity(1, HOUR); // TODO: how long does it take to pick up a FAD?
     }
 
@@ -54,4 +55,8 @@ public class PickUpFad implements FadAction {
             .isPresent();
     }
 
+    @Override public boolean isAllowed(FishState model, Fisher fisher, SeaTile actionTile, int actionStep) {
+        // this might need to be confirmed, but as far as I know, you can always pick up a FAD (without setting on it)
+        return true;
+    }
 }

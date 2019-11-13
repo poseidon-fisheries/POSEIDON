@@ -17,10 +17,12 @@ public class FadInitializer implements Function<FadManager, Fad> {
 
     private final Quantity<Mass> carryingCapacity;
     private final double attractionRate;
+    private final double fishReleaseProbability;
 
-    FadInitializer(Quantity<Mass> carryingCapacity, double attractionRate) {
+    FadInitializer(Quantity<Mass> carryingCapacity, double attractionRate, double fishReleaseProbability) {
         this.carryingCapacity = carryingCapacity;
         this.attractionRate = attractionRate;
+        this.fishReleaseProbability = fishReleaseProbability;
     }
 
     @Override public Fad apply(@NotNull FadManager fadManager) {
@@ -29,6 +31,6 @@ public class FadInitializer implements Function<FadManager, Fad> {
         double[] carryingCapacities = new double[numSpecies];
         Arrays.fill(carryingCapacities, Measures.asDouble(carryingCapacity, KILOGRAM));
         final BiomassLocalBiology fadBiology = new BiomassLocalBiology(currentBiomasses, carryingCapacities);
-        return new Fad(fadManager, fadBiology, attractionRate);
+        return new Fad(fadManager, fadBiology, attractionRate, fishReleaseProbability);
     }
 }

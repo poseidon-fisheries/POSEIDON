@@ -76,8 +76,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model) {
-        return getCorrectDelegate(model).canFishHere(agent, tile, model);
+            Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        return getCorrectDelegate(model).canFishHere(agent, tile, model, timeStep);
     }
 
     /**
@@ -90,8 +90,8 @@ public class TemporaryProtectedArea implements Regulation
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
-        return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model);
+            Fisher agent, Species species, FishState model, int timeStep) {
+        return getCorrectDelegate(model).maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     /**
@@ -103,37 +103,8 @@ public class TemporaryProtectedArea implements Regulation
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
-        return getCorrectDelegate(model).allowedAtSea(fisher, model);
-    }
-
-    /**
-     * tell the regulation object this much has been caught
-     * @param where
-     * @param who
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
-        //nothing
-    }
-
-    /**
-     * tell the regulation object this much of this species has been sold
-     *
-     * @param species the species of fish sold
-     * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     */
-    @Override
-    public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue) {
-        //nothing
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
+        return getCorrectDelegate(model).allowedAtSea(fisher, model, timeStep);
     }
 
     /**

@@ -21,6 +21,7 @@
 package uk.ac.ox.oxfish.model.regs.factory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.MultipleRegulations;
 import uk.ac.ox.oxfish.model.regs.Regulation;
@@ -30,32 +31,47 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import static uk.ac.ox.oxfish.model.regs.MultipleRegulations.TAG_FOR_ALL;
+
 /**
  * Factory to generate multiple algorithms map
  * Created by carrknight on 4/4/17.
  */
 public class MultipleRegulationsFactory implements AlgorithmFactory<MultipleRegulations> {
 
-
-
     //maps of weird maps are really hard to read for SnakeYAML so I am going to use to separate list and
     //generate the map on the second list
 
-    private LinkedList<String> tags = new LinkedList<>();
+    private LinkedList<String> tags;
+    private LinkedList<AlgorithmFactory<? extends Regulation>> factories;
 
-    private LinkedList<AlgorithmFactory<? extends Regulation>> factories = new LinkedList<>();
-
-
-    /**
-     * the factories provided
-     */
-    {
-        tags.add("all");
-        tags.add("all");
-        factories.add(new ITQMonoFactory(2500));
-        factories.add(new ProtectedAreasOnlyFactory());
+    public MultipleRegulationsFactory(
+        LinkedList<AlgorithmFactory<? extends Regulation>> factories,
+        LinkedList<String> tags
+    ) {
+        this.factories = factories;
+        this.tags = tags;
     }
 
+    /**
+     * Allows constructing a MultipleRegulationsFactory directly with a map from regulation factories to tag,
+     * even if those will be converted to lists and then back to a map again when the MultipleRegulations object
+     * gets constructed. We take an ImmutableMap instead of just a Map because it gives us guaranteed stable
+     * iteration order of both keys and values.
+     */
+    public MultipleRegulationsFactory(ImmutableMap<AlgorithmFactory<? extends Regulation>, String> regulations) {
+        this(new LinkedList<>(regulations.keySet()), new LinkedList<>(regulations.values()));
+    }
+
+    /**
+     * default factories provided
+     */
+    public MultipleRegulationsFactory() {
+        this(ImmutableMap.of(
+            new ITQMonoFactory(2500), TAG_FOR_ALL,
+            new ProtectedAreasOnlyFactory(), TAG_FOR_ALL
+        ));
+    }
 
     /**
      * Applies this function to the given argument.

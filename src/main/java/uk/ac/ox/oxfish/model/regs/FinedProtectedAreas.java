@@ -78,7 +78,7 @@ public class FinedProtectedAreas implements Regulation{
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
         if(tile.isProtected() && !canContemplateCheating)
             return false;
         return true;
@@ -94,7 +94,7 @@ public class FinedProtectedAreas implements Regulation{
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
+            Fisher agent, Species species, FishState model, int timeStep) {
         return Double.MAX_VALUE;
     }
 
@@ -107,21 +107,8 @@ public class FinedProtectedAreas implements Regulation{
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return true;
-    }
-
-    /**
-     * tell the regulation object this much of this species has been sold
-     *
-     * @param species the species of fish sold
-     * @param seller  agent selling the fish
-     * @param biomass how much biomass has been sold
-     * @param revenue how much money was made off it
-     */
-    @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-
     }
 
     /**
@@ -135,7 +122,7 @@ public class FinedProtectedAreas implements Regulation{
     @Override
     public void reactToFishing(
             SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
+            int hoursSpentFishing, FishState model, int timeStep) {
 
         if(!where.isProtected())
             return;
@@ -160,17 +147,6 @@ public class FinedProtectedAreas implements Regulation{
     {
         Preconditions.checkArgument(!enforcements.containsKey(mpa));
         enforcements.put(mpa, new Enforcement(hourlyProbabilityOfBeingCaught,fine));
-    }
-
-
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
     }
 
     private static class Enforcement{

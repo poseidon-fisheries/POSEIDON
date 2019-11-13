@@ -25,9 +25,14 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class KitchenSinkRegulationTest {
 
@@ -44,11 +49,11 @@ public class KitchenSinkRegulationTest {
                                                                quota);
 
         //same exact process for "can I be out?"
-        when(mpa.allowedAtSea(any(),any())).thenReturn(true);
-        when(season.allowedAtSea(any(),any())).thenReturn(true);
-        when(quota.allowedAtSea(any(),any())).thenReturn(true);
+        when(mpa.allowedAtSea(any(),any(),anyInt())).thenReturn(true);
+        when(season.allowedAtSea(any(),any(),anyInt())).thenReturn(true);
+        when(quota.allowedAtSea(any(),any(),anyInt())).thenReturn(true);
         assertTrue(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
-        when(mpa.allowedAtSea(any(),any())).thenReturn(false);
+        when(mpa.allowedAtSea(any(),any(),anyInt())).thenReturn(false);
         assertFalse(regs.allowedAtSea(mock(Fisher.class),mock(FishState.class)));
 
         //all true, return true
@@ -86,11 +91,11 @@ public class KitchenSinkRegulationTest {
 
 
         //take the minimum of the two
-        when(season.maximumBiomassSellable(any(),any(),any())).thenReturn(100d);
-        when(quota.maximumBiomassSellable(any(),any(),any())).thenReturn(200d);
-        assertEquals(100,regs.maximumBiomassSellable(any(),any(),any()),.0001);
-        when(quota.maximumBiomassSellable(any(),any(),any())).thenReturn(20d);
-        assertEquals(20,regs.maximumBiomassSellable(any(),any(),any()),.0001);
+        when(season.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(100d);
+        when(quota.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(200d);
+        assertEquals(100, regs.maximumBiomassSellable(null, null, mock(FishState.class)), .0001);
+        when(quota.maximumBiomassSellable(any(), any(), any(), anyInt())).thenReturn(20d);
+        assertEquals(20, regs.maximumBiomassSellable(null, null, mock(FishState.class)), .0001);
 
 
     }

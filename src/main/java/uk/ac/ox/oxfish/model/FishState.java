@@ -389,10 +389,9 @@ public class FishState  extends SimState{
      * what day of the year (from 1 to 365) is this?
      * @return the day of the year
      */
-    public int getDayOfTheYear()
-    {
-        return (int) ((schedule.getTime() / stepsPerDay) % 365) + 1;
-    }
+    public int getDayOfTheYear() { return getDayOfTheYear((int) schedule.getTime()); }
+
+    public int getDayOfTheYear(int timeStep) { return ((timeStep / stepsPerDay) % 365) + 1; }
 
     public int getDay()
     {

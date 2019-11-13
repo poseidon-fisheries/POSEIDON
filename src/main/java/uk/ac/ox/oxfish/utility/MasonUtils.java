@@ -1,5 +1,6 @@
 package uk.ac.ox.oxfish.utility;
 
+import com.google.common.collect.ImmutableSet;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import ec.util.MersenneTwisterFast;
@@ -15,12 +16,15 @@ import sim.util.Double2D;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 public class MasonUtils {
@@ -34,7 +38,13 @@ public class MasonUtils {
     }
 
     @NotNull
+    public static <T> ImmutableSet<T> bagToSet(Bag bag) {
+        return MasonUtils.<T>bagToStream(bag).collect(toImmutableSet());
+    }
+
+    @NotNull
     public static Object oneOf(Bag candidates, MersenneTwisterFast random) {
+        //noinspection unchecked
         validateCandidates(candidates);
         return candidates.get(oneOfIndices(candidates, random));
     }
@@ -49,7 +59,8 @@ public class MasonUtils {
         return candidates.get(oneOfIndices(candidates, random));
     }
 
-    public static int oneOfIndices(Collection candidates, MersenneTwisterFast random) {
+    private static int oneOfIndices(Collection candidates, MersenneTwisterFast random) {
+        //noinspection unchecked
         validateCandidates(candidates);
         final int n = candidates.size();
         return n == 1 ? 0 : random.nextInt(n);
@@ -58,18 +69,18 @@ public class MasonUtils {
     @NotNull
     public static <T> T weightedOneOf(
         List<T> candidates,
-        Function<T, Double> weightFunction,
+        ToDoubleFunction<T> weightFunction,
         MersenneTwisterFast random
     ) {
         validateCandidates(candidates);
         if (candidates.size() == 1) return candidates.get(0);
 
-        final List<Double> weights = candidates.stream().map(weightFunction).collect(toList());
-        checkArgument(weights.stream().allMatch(w -> w >= 0));
-        final Double sum = weights.stream().reduce(0.0, Double::sum);
+        final double[] weights = candidates.stream().mapToDouble(weightFunction).toArray();
+        checkArgument(DoubleStream.of(weights).allMatch(w -> w >= 0));
+        final double sum = DoubleStream.of(weights).sum();
         if (sum == 0) return oneOf(candidates, random);
 
-        final List<Double> probabilities = weights.stream().map(x -> x / sum).collect(toList());
+        final List<Double> probabilities = stream(weights).mapToObj(x -> x / sum).collect(toList());
         final AliasMethod aliasMethod = new AliasMethod(probabilities, random);
         return candidates.get(aliasMethod.next());
     }

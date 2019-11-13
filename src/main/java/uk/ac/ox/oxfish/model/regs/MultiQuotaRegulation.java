@@ -90,16 +90,6 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
 
     }
 
-    @Override
-    public void start(FishState model, Fisher fisher) {
-
-    }
-
-    @Override
-    public void turnOff(Fisher fisher) {
-
-    }
-
     /**
      * how much of this species biomass is sellable. Zero means it is unsellable
      *
@@ -110,7 +100,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
      */
     @Override
     public double maximumBiomassSellable(
-            Fisher agent, Species species, FishState model) {
+            Fisher agent, Species species, FishState model, int timeStep) {
         return quotaRemaining[species.getIndex()] + FishStateUtilities.EPSILON/2;
     }
 
@@ -126,22 +116,6 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
     }
 
     /**
-     * ignored
-     * @param where
-     * @param who
-     * @param fishCaught catch object
-     * @param fishRetained
-     * @param hoursSpentFishing
-     */
-    @Override
-    public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained,
-            int hoursSpentFishing) {
-        //ignored
-    }
-
-
-    /**
      * Can this fisher be at sea?
      *
      * @param fisher the  fisher
@@ -150,7 +124,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return isFishingStillAllowed();
 
     }
@@ -167,7 +141,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
         double newQuota = quotaRemaining[species.getIndex()] - biomass;
         if(Log.TRACE)
             Log.trace("lowering quota for " + species + " owned by " + seller + "to " +
@@ -186,7 +160,7 @@ public class MultiQuotaRegulation implements  QuotaPerSpecieRegulation,Steppable
      */
     @Override
     public boolean canFishHere(
-            Fisher agent, SeaTile tile, FishState model) {
+            Fisher agent, SeaTile tile, FishState model, int timeStep) {
         return isFishingStillAllowed() && (!tile.isProtected() || !respectMPA);
     }
 

@@ -94,8 +94,8 @@ public class MultiQuotaITQRegulation extends MultiQuotaRegulation  {
 
     @Override
     public void reactToSale(
-            Species species, Fisher seller, double biomass, double revenue) {
-        super.reactToSale(species, seller, biomass, revenue);
+            Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        super.reactToSale(species, seller, biomass, revenue, model, timeStep);
 
     }
 

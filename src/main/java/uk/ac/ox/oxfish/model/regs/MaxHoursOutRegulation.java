@@ -52,8 +52,8 @@ public class MaxHoursOutRegulation implements Regulation {
      * @return true if the fisher can fish
      */
     @Override
-    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model) {
-        return delegate.canFishHere(agent, tile, model);
+    public boolean canFishHere(Fisher agent, SeaTile tile, FishState model, int timeStep) {
+        return delegate.canFishHere(agent, tile, model, timeStep);
     }
 
     /**
@@ -64,8 +64,8 @@ public class MaxHoursOutRegulation implements Regulation {
      * @return a positive biomass if it sellable. Zero if you need to throw everything away
      */
     @Override
-    public double maximumBiomassSellable(Fisher agent, Species species, FishState model) {
-        return delegate.maximumBiomassSellable(agent, species, model);
+    public double maximumBiomassSellable(Fisher agent, Species species, FishState model, int timeStep) {
+        return delegate.maximumBiomassSellable(agent, species, model, timeStep);
     }
 
     /**
@@ -76,9 +76,9 @@ public class MaxHoursOutRegulation implements Regulation {
      * at sea
      */
     @Override
-    public boolean allowedAtSea(Fisher fisher, FishState model) {
+    public boolean allowedAtSea(Fisher fisher, FishState model, int timeStep) {
         return fisher.getHoursAtSeaThisYear() < maxHoursOut &&
-        delegate.allowedAtSea(fisher, model);
+        delegate.allowedAtSea(fisher, model, timeStep);
     }
 
     /**
@@ -91,8 +91,8 @@ public class MaxHoursOutRegulation implements Regulation {
      */
     @Override
     public void reactToFishing(
-            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing) {
-        delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing);
+            SeaTile where, Fisher who, Catch fishCaught, Catch fishRetained, int hoursSpentFishing, FishState model, int timeStep) {
+        delegate.reactToFishing(where, who, fishCaught, fishRetained, hoursSpentFishing, model, timeStep);
     }
 
     /**
@@ -103,8 +103,8 @@ public class MaxHoursOutRegulation implements Regulation {
      * @param revenue how much money was made off it
      */
     @Override
-    public void reactToSale(Species species, Fisher seller, double biomass, double revenue) {
-        delegate.reactToSale(species, seller, biomass, revenue);
+    public void reactToSale(Species species, Fisher seller, double biomass, double revenue, FishState model, int timeStep) {
+        delegate.reactToSale(species, seller, biomass, revenue, model, timeStep);
     }
 
     /**

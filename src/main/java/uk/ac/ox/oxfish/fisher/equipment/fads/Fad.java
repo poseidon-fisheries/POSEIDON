@@ -1,28 +1,36 @@
 package uk.ac.ox.oxfish.fisher.equipment.fads;
 
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
+import uk.ac.ox.oxfish.model.market.Market;
 
-import static java.lang.StrictMath.min;
+import java.util.Collection;
+
 import static java.lang.StrictMath.max;
+import static java.lang.StrictMath.min;
 
 public class Fad {
 
     private final FadManager owner;
     private final BiomassLocalBiology biology;
     final private double attractionRate; // proportion of underlying biomass attracted per day
+    final private double fishReleaseProbability; // daily probability of releasing fish from the FAD
 
     public Fad(
         FadManager owner,
         BiomassLocalBiology biology,
-        double attractionRate
+        double attractionRate,
+        double fishReleaseProbability
     ) {
         this.owner = owner;
         this.biology = biology;
         this.attractionRate = attractionRate;
+        this.fishReleaseProbability = fishReleaseProbability;
     }
 
     public BiomassLocalBiology getBiology() { return biology; }
@@ -51,19 +59,52 @@ public class Fad {
 
     public FadManager getOwner() { return owner; }
 
-    public void releaseFish(VariableBiomassBasedBiology seaTileBiology, GlobalBiology globalBiology) {
-        for (Species species : globalBiology.getSpecies()) {
-            // Remove biomass from the FAD...
-            final double fadBiomass = biology.getBiomass(species);
-            biology.setCurrentBiomass(species, 0);
+    /**
+     * Remove biomass for all the given species from the FAD without sending it anywhere, therefore losing the fish.
+     */
+    public void releaseFish(Iterable<Species> allSpecies) {
+        allSpecies.forEach(species -> biology.setCurrentBiomass(species, 0));
+    }
 
-            // ...and send that biomass down to the sea tile's biology.
-            // In the unlikely event that the sea tile's carrying capacity is exceeded,
-            // the extra fish is lost.
+    /**
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology.
+     * In the unlikely event that the sea tile's carrying capacity is exceeded, the extra fish is lost.
+     */
+    public void releaseFish(Iterable<Species> allSpecies, VariableBiomassBasedBiology seaTileBiology) {
+        allSpecies.forEach(species -> {
             final double seaTileBiomass = seaTileBiology.getBiomass(species);
+            final double fadBiomass = biology.getBiomass(species);
             final double seaTileCarryingCapacity = seaTileBiology.getCarryingCapacity(species);
             final double newSeaTileBiomass = min(seaTileBiomass + fadBiomass, seaTileCarryingCapacity);
             seaTileBiology.setCurrentBiomass(species, newSeaTileBiomass);
-        }
+        });
+        releaseFish(allSpecies);
     }
+
+    /**
+     * Remove biomass from the FAD and send the biomass down to the sea tile's biology. If the local biology is not
+     * biomass based (most likely because we're outside the habitable zone), the fish is lost.
+     */
+    public void releaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology) {
+        if (seaTileBiology instanceof VariableBiomassBasedBiology)
+            releaseFish(allSpecies, (VariableBiomassBasedBiology) seaTileBiology);
+        else
+            releaseFish(allSpecies);
+    }
+
+    public void maybeReleaseFish(Iterable<Species> allSpecies, LocalBiology seaTileBiology, MersenneTwisterFast rng) {
+        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies, seaTileBiology);
+    }
+
+    public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
+        if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
+    }
+
+    public double priceOfFishHere(Collection<Market> markets) {
+        return markets.stream().mapToDouble(market ->
+            getBiology().getBiomass(market.getSpecies()) * market.getMarginalPrice()
+        ).sum();
+    }
+
+
 }
