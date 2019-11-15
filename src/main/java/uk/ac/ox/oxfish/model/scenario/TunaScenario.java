@@ -98,6 +98,7 @@ import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
+import static uk.ac.ox.oxfish.utility.Measures.convert;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -119,6 +120,7 @@ public class TunaScenario implements Scenario {
     private static final Path SPECIES_NAMES_FILE = input("species_names.csv");
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
+    private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("habitability_bet_2006-01-07.csv"),
         "SKJ", input("biomass_skj_2006-01-15.csv"),
@@ -170,8 +172,19 @@ public class TunaScenario implements Scenario {
                 new NoFishingFactory()
             ), "closure B"
         ));
+
+        final PurseSeineGearFactory purseSeineGearFactory = new PurseSeineGearFactory();
+        purseSeineGearFactory.getFadInitializerFactory().setCarryingCapacities(
+            parseAllRecords(FAD_CARRYING_CAPACITIES).stream()
+                .filter(r -> r.getInt("year") == targetYear)
+                .collect(toMap(
+                    r -> speciesNames.get(r.getString("species_code")),
+                    r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
+                ))
+        );
+
         fisherDefinition.setRegulation(regulations);
-        fisherDefinition.setGear(new PurseSeineGearFactory());
+        fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
         ((FixedRestTimeDepartingFactory)fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(

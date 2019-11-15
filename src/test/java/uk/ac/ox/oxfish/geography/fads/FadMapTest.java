@@ -46,9 +46,12 @@ public class FadMapTest {
             {-1, -1, -1}
         });
 
-        final GlobalBiology globalBiology = new GlobalBiology(new Species("A"), new Species("B"));
-
+        final Species speciesA = new Species("A");
+        final Species speciesB = new Species("B");
+        final GlobalBiology globalBiology = new GlobalBiology(speciesA, speciesB);
         final Quantity<Mass> k = getQuantity(1, TONNE);
+        final ImmutableMap<Species, Quantity<Mass>> fadCarryingCapacities = ImmutableMap.of(speciesA, k, speciesB, k);
+
         // Make a current map that moves FADs west
         final Double2D currentVector = new Double2D(-0.3, 0);
         final Map<SeaTile, Double2D> vectors = nauticalMap
@@ -61,7 +64,7 @@ public class FadMapTest {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps = new TreeMap<>();
         vectorMaps.put(1, new EnumMap<>(ImmutableMap.of(CurrentPattern.NEUTRAL, vectors)));
         final CurrentVectors currentVectors = new CurrentVectors(vectorMaps, 1);
-        final FadInitializer fadInitializer = new FadInitializer(k, 0, 0);
+        final FadInitializer fadInitializer = new FadInitializer(globalBiology, fadCarryingCapacities, 0, 0);
         final FadMap fadMap = new FadMap(nauticalMap, currentVectors, globalBiology);
         final FadManager fadManager = new FadManager(fadMap, fadInitializer, 1);
 
