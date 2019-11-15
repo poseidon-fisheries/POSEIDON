@@ -7,9 +7,6 @@ import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.biology.Species;
 import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
-import uk.ac.ox.oxfish.model.market.Market;
-
-import java.util.Collection;
 
 import static java.lang.StrictMath.max;
 import static java.lang.StrictMath.min;
@@ -99,12 +96,5 @@ public class Fad {
     public void maybeReleaseFish(Iterable<Species> allSpecies, MersenneTwisterFast rng) {
         if (rng.nextDouble() < fishReleaseProbability) releaseFish(allSpecies);
     }
-
-    public double priceOfFishHere(Collection<Market> markets) {
-        return markets.stream().mapToDouble(market ->
-            getBiology().getBiomass(market.getSpecies()) * market.getMarginalPrice()
-        ).sum();
-    }
-
 
 }

@@ -8,6 +8,7 @@ import uk.ac.ox.oxfish.fisher.actions.Arriving;
 import uk.ac.ox.oxfish.fisher.actions.fads.DeployFad;
 import uk.ac.ox.oxfish.fisher.actions.fads.FadAction;
 import uk.ac.ox.oxfish.fisher.actions.fads.MakeFadSet;
+import uk.ac.ox.oxfish.fisher.actions.fads.MakeUnassociatedSet;
 import uk.ac.ox.oxfish.fisher.equipment.fads.Fad;
 import uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils;
 import uk.ac.ox.oxfish.fisher.log.TripRecord;
@@ -26,12 +27,14 @@ import static java.lang.StrictMath.exp;
 import static java.util.Comparator.comparingDouble;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.fadsHere;
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
+import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.priceOfFishHere;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
 
     private Optional<? extends FadAction> nextAction = Optional.empty();
+    private double unassociatedSetCoefficient;
     private double fadsDeploymentCoefficient;
     private double ownFadsSettingCoefficient;
     private double otherFadsSettingCoefficient;
@@ -40,11 +43,13 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     private int numConsecutiveActions = 0;
 
     public FadFishingStrategy(
+        double unassociatedSetCoefficient,
         double fadsDeploymentCoefficient,
         double ownFadsSettingCoefficient,
         double otherFadsSettingCoefficient,
         double probabilityDecayCoefficient
     ) {
+        this.unassociatedSetCoefficient = unassociatedSetCoefficient;
         this.fadsDeploymentCoefficient = fadsDeploymentCoefficient;
         this.ownFadsSettingCoefficient = ownFadsSettingCoefficient;
         this.otherFadsSettingCoefficient = otherFadsSettingCoefficient;
@@ -52,8 +57,8 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     }
 
     private double probability(double coefficient, double value) {
-        return (1.0 - exp(-coefficient * (value + 1))) *
-            (1.0 / (1.0 + (probabilityDecayCoefficient * numConsecutiveActions)));
+        return (1.0 - exp(-coefficient * (value + 1))) /
+            (1.0 + (probabilityDecayCoefficient * numConsecutiveActions));
     }
 
     @Override
@@ -61,20 +66,34 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
         Fisher fisher, MersenneTwisterFast random, FishState model, TripRecord currentTrip
     ) {
         if (!nextAction.isPresent()) {
-            nextAction = maybeMakeFadSet(model, fisher);
+            nextAction = maybeMakeUnassociatedSet(model, fisher);
             if (!nextAction.isPresent()) {
-                nextAction = maybeDeployFad(model, fisher);
+                nextAction = maybeMakeFadSet(model, fisher);
+                if (!nextAction.isPresent()) {
+                    nextAction = maybeDeployFad(model, fisher);
+                }
             }
         }
         return nextAction.isPresent();
+    }
+
+    private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
+        final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
+        final double probability = probability(unassociatedSetCoefficient, priceOfFishHere);
+        return model.getRandom().nextDouble() < probability
+            ? Optional.of(new MakeUnassociatedSet())
+            : Optional.empty();
+    }
+
+    private Collection<Market> getMarkets(Fisher fisher) {
+        return fisher.getHomePort().getMarketMap(fisher).getMarkets();
     }
 
     private double fadSetProbability(Fad fad, Fisher fisher) {
         final double coefficient = fad.getOwner() == getFadManager(fisher) ?
             ownFadsSettingCoefficient :
             otherFadsSettingCoefficient;
-        final Collection<Market> markets = fisher.getHomePort().getMarketMap(fisher).getMarkets();
-        return probability(coefficient, fad.priceOfFishHere(markets));
+        return probability(coefficient, priceOfFishHere(fad.getBiology(), getMarkets(fisher)));
     }
 
     private Optional<? extends FadAction> maybeMakeFadSet(FishState model, Fisher fisher) {
@@ -86,6 +105,7 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
             .findFirst()
             .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher));
     }
+
 
     private Optional<? extends FadAction> maybeDeployFad(FishState model, Fisher fisher) {
 
@@ -116,9 +136,11 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     }
 
     @Override
-    public void start(FishState model, Fisher fisher) { }
+    public void start(FishState model, Fisher fisher) {
+    }
 
     @Override
-    public void turnOff(Fisher fisher) { }
+    public void turnOff(Fisher fisher) {
+    }
 
 }

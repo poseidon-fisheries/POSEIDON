@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.actions.ActionResult;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
@@ -10,18 +9,18 @@ import uk.ac.ox.oxfish.geography.SeaTile;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Time;
 import java.util.Optional;
 
 import static uk.ac.ox.oxfish.fisher.equipment.fads.FadManagerUtils.getFadManager;
 import static uk.ac.ox.oxfish.utility.Measures.toHours;
 
-public class MakeFadSet implements FadAction {
+public class MakeFadSet implements SetAction {
 
     private Fad targetFad;
 
-    public MakeFadSet(Fad targetFad) { this.targetFad = targetFad; }
+    public MakeFadSet(Fad targetFad) {
+        this.targetFad = targetFad;
+    }
 
     @Override
     public ActionResult act(
@@ -45,14 +44,9 @@ public class MakeFadSet implements FadAction {
         }
     }
 
-    @Override public boolean isPossible(FishState model, Fisher fisher) {
-        return
-            fisher.getHold().getPercentageFilled() < 1 &&
-                isFadHere(fisher);
-    }
-
-    @Override public Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
-        return ((PurseSeineGear) fisher.getGear()).nextSetDuration(rng);
+    @Override
+    public boolean isPossible(FishState model, Fisher fisher) {
+        return SetAction.super.isPossible(model,fisher) && isFadHere(fisher);
     }
 
     private boolean isFadHere(Fisher fisher) {
