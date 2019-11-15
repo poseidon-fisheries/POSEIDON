@@ -122,9 +122,9 @@ public class TunaScenario implements Scenario {
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
-        "BET", input("habitability_bet_2006-01-07.csv"),
-        "SKJ", input("biomass_skj_2006-01-15.csv"),
-        "YFT", input("biomass_yft_2006-01-15.csv")
+        "BET", input("2017_BET_DIST.csv"),
+        "SKJ", input("2017_SKJ_DIST.csv"),
+        "YFT", input("2017_YFT_DIST.csv")
     );
     private static final BiMap<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toImmutableBiMap(
         r -> r.getString("code"),
@@ -461,8 +461,7 @@ public class TunaScenario implements Scenario {
         final double biomassRatio = totalBiomass.divide(totalCarryingCapacity).getValue().doubleValue();
         factory.setInitialBiomassAllocator(new ConstantAllocatorFactory(biomassRatio));
 
-        final FileBiomassAllocatorFactory initialCapacityAllocator =
-            speciesCode.equals("BET") ? new CoordinateFileAllocatorFactory() : new SmootherFileAllocatorFactory();
+        final FileBiomassAllocatorFactory initialCapacityAllocator = new SmootherFileAllocatorFactory();
         initialCapacityAllocator.setBiomassPath(biomassFiles.get(speciesCode));
         initialCapacityAllocator.setInputFileHasHeader(true);
         final PolygonAllocatorFactory polygonAllocatorFactory = new PolygonAllocatorFactory();
