@@ -240,12 +240,7 @@ public class Catch {
 
     public double totalCatchWeight()
     {
-        double sum =0;
-        for (double caught : biomassCaught) {
-            sum+=caught;
-
-        }
-        return sum;
+        return totalWeight;
     }
 
     @Override

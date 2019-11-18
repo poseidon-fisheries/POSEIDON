@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish.model.data.jsonexport;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import uk.ac.ox.oxfish.model.AdditionalStartable;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.FishStateUtilities;
@@ -23,8 +24,12 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
             return FishStateUtilities.round(value * 100d);
         }
     };
+
+    private static final List<String> vesselColors = Lists.newArrayList("#008dc4", "#d48500", "#b973a0", "#d32a37");
+
     private String name;
     private List<JsonChartManager> chartManagers;
+
     private int numYearsToSkip;
 
     public JsonIndonesiaCharts(String name, int numYearsToSkip) {
@@ -47,7 +52,8 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
             landingsPerPopulation("Lutjanus erythropterus"),
             landingsPerPopulation("Pristipomoides multidens"),
             activeFishersPerPopulation(),
-            percentageMatureCatches()
+            percentageMatureCatches(),
+            cashflowPerPopulation()
         );
         model.getOutputPlugins().addAll(chartManagers);
     }
@@ -128,12 +134,44 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
                 .replaceAll("population3", "10-14 GT")
         ));
 
-        return new JsonChartManager(
-            speciesName + " Landings", "Years", "Landings (kg)", emptyList(),
-            name + "_" + speciesName +  "_landings_per_population.json", columnsToPrint, renamedColumns,
-            numYearsToSkip);
+        JsonChartManager manager = new JsonChartManager(
+                speciesName + " Landings", "Years", "Landings (kg)", emptyList(),
+                name + "_" + speciesName + "_landings_per_population.json", columnsToPrint, renamedColumns,
+                numYearsToSkip);
+        manager.setColorsToUse(vesselColors);
+        return manager;
 
     }
+
+
+
+
+    JsonChartManager cashflowPerPopulation() {
+
+        List<String> columnsToPrint = new ArrayList<>();
+        columnsToPrint.add("Average Cash-Flow of population" + 0);
+        columnsToPrint.add("Average Cash-Flow of population" + 3);
+        columnsToPrint.add("Average Cash-Flow of population" + 1);
+        columnsToPrint.add("Average Cash-Flow of population" + 2);
+
+
+        final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
+                identity(), name -> name
+                        .replaceAll("Average Cash-Flow of population0", "4-9 GT")
+                        .replaceAll("Average Cash-Flow of population1", "15-30 GT")
+                        .replaceAll("Average Cash-Flow of population2", ">30 GT")
+                        .replaceAll("Average Cash-Flow of population3", "10-14 GT")
+        ));
+
+        JsonChartManager jsonChartManager = new JsonChartManager(
+                "Average profits", "Years", "IDR", emptyList(),
+                name + "_" + "profits.json", columnsToPrint, renamedColumns,
+                numYearsToSkip);
+        jsonChartManager.setColorsToUse(vesselColors);
+        return jsonChartManager;
+
+    }
+
 
     JsonChartManager activeFishersPerPopulation() {
 
@@ -152,10 +190,12 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
                 .replaceAll("Number Of Active Fishers of population3", "10-14 GT")
         ));
 
-        return new JsonChartManager(
-            "Active fishers", "Years", "Number of fishers", emptyList(),
-            name + "_" + "active_fishers.json", columnsToPrint, renamedColumns,
-            numYearsToSkip);
+        JsonChartManager jsonChartManager = new JsonChartManager(
+                "Active fishers", "Years", "Number of fishers", emptyList(),
+                name + "_" + "active_fishers.json", columnsToPrint, renamedColumns,
+                numYearsToSkip);
+        jsonChartManager.setColorsToUse(vesselColors);
+        return jsonChartManager;
 
     }
 

@@ -79,6 +79,7 @@ import static java.util.stream.Collectors.joining;
  */
 public class Fisher implements Steppable, Startable{
 
+
     /***
      *     __   __        _      _    _
      *     \ \ / /_ _ _ _(_)__ _| |__| |___ ___
@@ -120,6 +121,8 @@ public class Fisher implements Steppable, Startable{
      */
     private boolean cheater = false;
 
+    //ten thousands liter of fuel means that you don't really need to worry about checking for fuel emergency
+    private static final int LARGE_AMOUNT_OF_GAS = 10000;
 
 
     /***
@@ -621,7 +624,7 @@ public class Fisher implements Steppable, Startable{
     private void updateFuelEmergencyFlag(NauticalMap map)
     {
 
-        if(getFuelLeft()>=999999999) //if you have boats this large, I am just going to assume you don't care about fuel
+        if(getFuelLeft()>= LARGE_AMOUNT_OF_GAS) //if you have boats this large, I am just going to assume you don't care about fuel
             return;
 
         if(!status.isFuelEmergencyOverride())

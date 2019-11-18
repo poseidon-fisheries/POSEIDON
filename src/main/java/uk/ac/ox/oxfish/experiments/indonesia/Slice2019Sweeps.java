@@ -38,7 +38,7 @@ import java.util.function.Consumer;
 
 public class Slice2019Sweeps {
 
-    private static final String SCENARIO_NAME = "historical20_baranov_8h_noquit";
+    private static final String SCENARIO_NAME = "historical20_baranov_8h";
     private static final int YEARS_TO_RUN = 25;
     //public static String DIRECTORY = "docs/indonesia_hub/runs/712/slice3/policy/";
     public static String DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/calibration/slicesweep/";
@@ -52,17 +52,30 @@ public class Slice2019Sweeps {
 
     public static void main(String[] args) throws IOException {
 
+        POPULATIONS = 5;
+        DIRECTORY = "/home/carrknight/code/oxfish/docs/indonesia_hub/runs/712/slice2019/7gt/";
+
         //effort control
         //all boats are controlled
-        effortControl("all_new",
-                new String[]{"big","small","medium","small10"},
+        effortControl("all",
+                new String[]{"big","small","medium","small10","small7"},
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
 
 
+
+//
+       //only boats >=7GT are controlled
+        effortControl("7",
+                      new String[]{"big","medium","small7","small10"},
+                      SCENARIO_NAME,
+                      SHOCK_YEAR, MIN_DAYS_OUT);
+
+
+
 //
 //////        //only boats >10GT are controlled
-        effortControl("10_new",
+        effortControl("10",
                 new String[]{"big","medium","small10"},
                 SCENARIO_NAME,
                 SHOCK_YEAR, MIN_DAYS_OUT);
@@ -823,21 +836,8 @@ public class Slice2019Sweeps {
                 "Actual Average Hours Out",
 
                 "Full-time fishers",
-                "Full-time fishers of population0",
-                "Full-time fishers of population1",
-                "Full-time fishers of population2",
-                "Full-time fishers of population3",
                 "Seasonal fishers",
-                "Seasonal fishers of population0",
-                "Seasonal fishers of population1",
-                "Seasonal fishers of population2",
-                "Seasonal fishers of population3",
                 "Retired fishers",
-                "Retired fishers of population0",
-                "Retired fishers of population1",
-                "Retired fishers of population2",
-                "Retired fishers of population3",
-
 
 //                "Depletion Epinephelus areolatus",
 //                "Depletion Pristipomoides multidens",
@@ -869,7 +869,11 @@ public class Slice2019Sweeps {
                 "Percentage Mature Catches " + "Lutjanus erythropterus" + " " + "100_erythropterus");
 
         for(int i=0; i<populations; i++){
+
             columnsToPrint.add("Total Landings of population"+i);
+            columnsToPrint.add("Full-time fishers of population"+i);
+            columnsToPrint.add("Retired fishers of population"+i);
+            columnsToPrint.add("Seasonal fishers of population"+i);
             columnsToPrint.add("Actual Average Cash-Flow of population"+i);
             columnsToPrint.add("Average Number of Trips of population"+i);
             columnsToPrint.add("Number Of Active Fishers of population"+i);

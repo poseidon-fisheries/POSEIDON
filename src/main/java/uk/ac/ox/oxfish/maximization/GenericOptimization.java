@@ -24,12 +24,14 @@ import eva2.problems.simple.SimpleProblemDouble;
 import uk.ac.ox.oxfish.biology.complicated.factory.HockeyStickRecruitmentFactory;
 import uk.ac.ox.oxfish.biology.complicated.factory.RecruitmentBySpawningJackKnifeMaturity;
 import uk.ac.ox.oxfish.biology.initializer.MultipleSpeciesAbundanceInitializer;
+import uk.ac.ox.oxfish.biology.initializer.SingleSpeciesAbundanceInitializer;
 import uk.ac.ox.oxfish.biology.initializer.factory.MultipleIndependentSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.biology.initializer.factory.SingleSpeciesAbundanceFactory;
 import uk.ac.ox.oxfish.maximization.generic.*;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.scenario.FlexibleScenario;
 import uk.ac.ox.oxfish.model.scenario.Scenario;
+import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
@@ -354,8 +356,8 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
         //  FishYAML yaml = new FishYAML();
         FlexibleScenario modified = (FlexibleScenario) scenario;
         MultipleIndependentSpeciesAbundanceFactory bio = (MultipleIndependentSpeciesAbundanceFactory) modified.getBiologyInitializer();
-        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
-            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+        for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) ((SingleSpeciesAbundanceFactory) factory).getRecruitment()).
                     setSteepness(new FixedDoubleParameter(.7));
         }
         outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_7h.yaml");
@@ -363,15 +365,15 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
 
 
         //  FishYAML yaml = new FishYAML();
-        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
-            ((RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment()).
+        for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : bio.getFactories()) {
+            ((RecruitmentBySpawningJackKnifeMaturity) ((SingleSpeciesAbundanceFactory) factory).getRecruitment()).
                     setSteepness(new FixedDoubleParameter(.6));
         }
         outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_6h.yaml");
         yaml.dump(modified,new FileWriter(outputFile.toFile()));
 
-        for (SingleSpeciesAbundanceFactory factory : bio.getFactories()) {
-            final RecruitmentBySpawningJackKnifeMaturity oldRecruitment = (RecruitmentBySpawningJackKnifeMaturity) factory.getRecruitment();
+        for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : bio.getFactories()) {
+            final RecruitmentBySpawningJackKnifeMaturity oldRecruitment = (RecruitmentBySpawningJackKnifeMaturity) ((SingleSpeciesAbundanceFactory) factory).getRecruitment();
 
 
             HockeyStickRecruitmentFactory newRecruitment = new HockeyStickRecruitmentFactory();
@@ -387,7 +389,7 @@ public class GenericOptimization extends SimpleProblemDouble implements Serializ
                     )
             );
 
-            factory.setRecruitment(newRecruitment);
+            ((SingleSpeciesAbundanceFactory) factory).setRecruitment(newRecruitment);
         }
         outputFile = optimizationFile.getParent().resolve("slicesweep").resolve(scenarioName + "_hs.yaml");
         yaml.dump(modified,new FileWriter(outputFile.toFile()));

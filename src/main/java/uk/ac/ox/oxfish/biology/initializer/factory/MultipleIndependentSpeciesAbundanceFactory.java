@@ -15,7 +15,7 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
 
 
 
-    private List<SingleSpeciesAbundanceFactory> factories = new LinkedList<>();
+    private List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> factories = new LinkedList<>();
 
     //add other species!
     private boolean addGarbageSpecies = true;
@@ -36,8 +36,10 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
         LinkedList<SingleSpeciesAbundanceInitializer> initializers =
                 new LinkedList<>();
 
-        for(SingleSpeciesAbundanceFactory factory : factories)
+        for (AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer> factory : factories) {
             initializers.add(factory.apply(fishState));
+
+        }
 
         addGarbageSpecies = true;
         return new MultipleIndependentSpeciesAbundanceInitializer(initializers, addGarbageSpecies);
@@ -64,11 +66,22 @@ public class MultipleIndependentSpeciesAbundanceFactory implements
         this.addGarbageSpecies = addGarbageSpecies;
     }
 
-    public List<SingleSpeciesAbundanceFactory> getFactories() {
+    /**
+     * Getter for property 'factories'.
+     *
+     * @return Value for property 'factories'.
+     */
+    public List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> getFactories() {
         return factories;
     }
 
-    public void setFactories(List<SingleSpeciesAbundanceFactory> factories) {
+    /**
+     * Setter for property 'factories'.
+     *
+     * @param factories Value to set for property 'factories'.
+     */
+    public void setFactories(
+            List<AlgorithmFactory<? extends SingleSpeciesAbundanceInitializer>> factories) {
         this.factories = factories;
     }
 }

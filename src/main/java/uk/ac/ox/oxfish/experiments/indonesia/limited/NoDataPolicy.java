@@ -18,7 +18,7 @@
  *
  */
 
-package uk.ac.ox.oxfish.experiments.indonesia;
+package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;

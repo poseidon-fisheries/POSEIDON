@@ -11,7 +11,7 @@ import static java.util.stream.Collectors.toList;
 
 public class JsonChart {
 
-    private static List<String> colours = ImmutableList.of(
+    public static List<String> defaultColors = ImmutableList.of(
         String.format("#%02x%02x%02x", 0, 0, 0),
         String.format("#%02x%02x%02x", 230, 159, 0),
         String.format("#%02x%02x%02x", 86, 180, 233),
@@ -34,7 +34,8 @@ public class JsonChart {
         this.yLines = yLines;
     }
 
-    public JsonChart(List<DataColumn> dataColumns, String title, String xLabel, String yLabel, List<Double> xData, List<Double> yLines) {
+    public JsonChart(List<DataColumn> dataColumns, String title, String xLabel, String yLabel, List<Double> xData, List<Double> yLines,
+                     List<String> colours) {
         this(
             title, xLabel, yLabel, xData,
             Streams.zip(
@@ -46,12 +47,18 @@ public class JsonChart {
         );
     }
 
-    public JsonChart(FishState model, List<String> columnNames, String title, String xLabel, String yLabel, List<Double> xData, List<Double> yLines) {
+    public JsonChart(FishState model, List<String> columnNames, String title, String xLabel, String yLabel, List<Double> xData, List<Double> yLines,
+                     List<String> colors) {
         this(
             columnNames.stream().map(model.getYearlyDataSet()::getColumn).collect(toList()),
-            title, xLabel, yLabel, xData, yLines
+            title, xLabel, yLabel, xData, yLines,
+            colors
         );
     }
+
+
+
+
 
     public List<JsonSeries> getSeries() {
         return series;

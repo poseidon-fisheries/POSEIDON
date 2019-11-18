@@ -34,9 +34,10 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
     private final String fileName;
     private final Map<String, String> prettyNames = ImmutableMap.of(
             "population0", "4-9 GT",
+            "population3", "10-14 GT",
+
             "population1", "15-30 GT",
-            "population2", ">30 GT",
-            "population3", "10-14 GT"
+            "population2", ">30 GT"
     );
     private Stoppable stoppable;
     private JsonOutput jsonOutput;
@@ -111,8 +112,8 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
 
         final ImmutableMap<String, Integer> sortOrder = ImmutableMap.of(
                 "4-9 GT", 0,
-                "15-30 GT", 1,
-                "10-14 GT", 2,
+                "15-30 GT", 2,
+                "10-14 GT", 1,
                 ">30 GT", 3
         );
         sort(vessels, comparingInt(v -> sortOrder.get(v.type)));

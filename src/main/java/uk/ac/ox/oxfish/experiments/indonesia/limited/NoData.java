@@ -18,10 +18,11 @@
  *
  */
 
-package uk.ac.ox.oxfish.experiments.indonesia;
+package uk.ac.ox.oxfish.experiments.indonesia.limited;
 
 import com.google.common.base.Preconditions;
 import ec.util.MersenneTwisterFast;
+import uk.ac.ox.oxfish.experiments.indonesia.ReadFromCSVOptimizationParameter;
 import uk.ac.ox.oxfish.experiments.noisespike.AcceptableRangePredicate;
 import uk.ac.ox.oxfish.maximization.generic.OptimizationParameter;
 import uk.ac.ox.oxfish.maximization.generic.SimpleOptimizationParameter;
@@ -122,7 +123,7 @@ public class NoData {
                 new SimpleOptimizationParameter("biologyInitializer.steepness",
                                                 0.8,0.95));
 
-        //new entries
+        //ne    w entries
         parameters.add(
                 new SimpleOptimizationParameter("plugins$0.profitRatioToEntrantsMultiplier",
                                                 2,20)
@@ -187,7 +188,8 @@ public class NoData {
 
 
 
-    private final static Path scenarioFile = Paths.get("docs", "20191025 limited_poseidon", "base.yaml");
+    private final static Path scenarioFile =
+            Paths.get("docs", "20191025 limited_poseidon", "base.yaml");
 
     /**
      * what tells us if the result is good or crap

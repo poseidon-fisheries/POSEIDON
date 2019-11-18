@@ -248,36 +248,6 @@ public class FishState  extends SimState{
         //      map.addCities("cities/cities.shp");
 
         biology = initialization.getBiology();
-        //add counters for catches if there is any need (aggregate catches are counted by fishers, here we want abundance based)
-        for(Species species : biology.getSpecies())
-            if(species.getNumberOfBins()>0)
-                for(int age=0; age<species.getNumberOfBins(); age++)
-                {
-                    String columnName = species + " " + FisherDailyTimeSeries.CATCHES_COLUMN_NAME + ThreePricesMarket.AGE_BIN_PREFIX + age;
-                    int finalAge = age;
-                    DataColumn dailyCatches = dailyDataSet.registerGatherer(
-                            columnName,
-                            new Gatherer<FishState>() {
-                                @Override
-                                public Double apply(FishState state) {
-
-                                    double sum = 0;
-                                    for(Fisher fisher : state.getFishers())
-                                    {
-                                        sum+= fisher.getCountedLandingsPerBin(species, finalAge);
-                                    }
-
-                                    return sum;
-
-                                }
-                            },0
-                    );
-                    yearlyDataSet.registerGatherer(columnName,
-                                                   FishStateUtilities.generateYearlySum(dailyCatches),
-                                                   0d);
-
-                }
-
 
 
 

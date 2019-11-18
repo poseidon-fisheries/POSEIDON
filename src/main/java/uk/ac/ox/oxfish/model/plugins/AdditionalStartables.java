@@ -43,6 +43,7 @@ public class AdditionalStartables {
         NAMES.put(JsonManagerFactory.class, "Json Manager");
         NAMES.put(OnOffSwitchAllocatorFactory.class, "Effort Regulator");
         NAMES.put(AdditionalFishStateDailyCollectorsFactory.class, "Additional Daily Collectors");
+        NAMES.put(CatchAtBinFactory.class, "Catch at bin Collectors");
 
         CONSTRUCTORS = Constructors.fromNames(NAMES);
     }

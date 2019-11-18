@@ -27,6 +27,8 @@ public class JsonChartManager implements OutputPlugin {
 
     private ToDoubleFunction<Double> transformer;
 
+    private List<String> colorsToUse = JsonChart.defaultColors;
+
 
     public JsonChartManager(String title, String xLabel, String yLabel, List<Double> yLines, String fileName, List<String> columnNames, Map<String, String> renamedColumns, int numYearsToSkip) {
         this.title = title;
@@ -42,7 +44,7 @@ public class JsonChartManager implements OutputPlugin {
     @Override
     public void reactToEndOfSimulation(FishState state) {
         final List<Double> xData = range(1+numYearsToSkip, 1+state.getYear()).mapToObj(i -> (double) i).collect(toList());
-        jsonChart = new JsonChart(state, columnNames, title, xLabel, yLabel, xData, yLines);
+        jsonChart = new JsonChart(state, columnNames, title, xLabel, yLabel, xData, yLines,colorsToUse);
         for (JsonSeries series : jsonChart.getSeries()) {
             series.setName(renamedColumns.getOrDefault(series.getName(), series.getName()));
             for (int i = 0; i < numYearsToSkip; i++) {
@@ -91,5 +93,23 @@ public class JsonChartManager implements OutputPlugin {
      */
     public void setTransformer(ToDoubleFunction<Double> transformer) {
         this.transformer = transformer;
+    }
+
+    /**
+     * Getter for property 'colorsToUse'.
+     *
+     * @return Value for property 'colorsToUse'.
+     */
+    public List<String> getColorsToUse() {
+        return colorsToUse;
+    }
+
+    /**
+     * Setter for property 'colorsToUse'.
+     *
+     * @param colorsToUse Value to set for property 'colorsToUse'.
+     */
+    public void setColorsToUse(List<String> colorsToUse) {
+        this.colorsToUse = colorsToUse;
     }
 }
