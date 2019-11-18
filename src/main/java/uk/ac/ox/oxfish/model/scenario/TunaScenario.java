@@ -16,7 +16,6 @@ import uk.ac.ox.oxfish.biology.growers.FadAwareCommonLogisticGrowerInitializerFa
 import uk.ac.ox.oxfish.biology.initializer.BiologyInitializer;
 import uk.ac.ox.oxfish.biology.initializer.MultipleIndependentSpeciesBiomassInitializer;
 import uk.ac.ox.oxfish.biology.initializer.allocator.ConstantAllocatorFactory;
-import uk.ac.ox.oxfish.biology.initializer.allocator.CoordinateFileAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.FileBiomassAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.PolygonAllocatorFactory;
 import uk.ac.ox.oxfish.biology.initializer.allocator.SmootherFileAllocatorFactory;
@@ -40,6 +39,7 @@ import uk.ac.ox.oxfish.geography.CumulativeTravelTimeCachingDecorator;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.NauticalMapFactory;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.geography.currents.CurrentPattern;
 import uk.ac.ox.oxfish.geography.fads.FadMap;
 import uk.ac.ox.oxfish.geography.fads.FadMapFactory;
 import uk.ac.ox.oxfish.geography.mapmakers.FromFileMapInitializerFactory;
@@ -96,6 +96,7 @@ import static tech.units.indriya.quantity.Quantities.getQuantity;
 import static tech.units.indriya.unit.Units.CUBIC_METRE;
 import static tech.units.indriya.unit.Units.KILOGRAM;
 import static tech.units.indriya.unit.Units.KILOMETRE_PER_HOUR;
+import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.Y2017;
 import static uk.ac.ox.oxfish.utility.MasonUtils.oneOf;
 import static uk.ac.ox.oxfish.utility.Measures.asDouble;
 import static uk.ac.ox.oxfish.utility.Measures.convert;
@@ -105,9 +106,16 @@ import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.parseAllRecords;
 public class TunaScenario implements Scenario {
 
     private static final Path INPUT_DIRECTORY = Paths.get("inputs", "tuna");
-    public static final Path NEUTRAL_CURRENTS_FILE = input("currents_neutral.csv");
-    public static final Path EL_NINO_CURRENTS_FILE = input("currents_el_nino.csv");
-    public static final Path LA_NINA_CURRENTS_FILE = input("currents_la_nina.csv");
+    public static final ImmutableMap<CurrentPattern, Path> currentFiles =
+        new ImmutableMap.Builder<CurrentPattern, Path>()
+            //.put(Y2015, input("currents_2015.csv"))
+            //.put(Y2016, input("currents_2016.csv"))
+            .put(Y2017, input("currents_2017.csv"))
+            //.put(Y2018, input("currents_2018.csv"))
+            //.put(NEUTRAL, input("currents_neutral.csv"))
+            //.put(EL_NINO, input("currents_el_nino.csv"))
+            //.put(LA_NINA, input("currents_la_nina.csv"))
+            .build();
     private static final Path MAP_FILE = input("depth.csv");
     private static final Path DEPLOYMENT_VALUES_FILE = input("deployment_values.csv");
     private static final Path IATTC_SHAPE_FILE = input("iattc_area").resolve("RFB_IATTC.shp");
@@ -187,7 +195,7 @@ public class TunaScenario implements Scenario {
         fisherDefinition.setGear(purseSeineGearFactory);
         fisherDefinition.setFishingStrategy(new FadFishingStrategyFactory());
         fisherDefinition.setDestinationStrategy(new FadDestinationStrategyFactory());
-        ((FixedRestTimeDepartingFactory)fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
+        ((FixedRestTimeDepartingFactory) fisherDefinition.getDepartingStrategy()).setHoursBetweenEachDeparture(
             // source: https://github.com/poseidon-fisheries/tuna/commit/4159b76f9d8e954075c5a7d63e43f571cb47ffcb
             new FixedDoubleParameter(374.3583)
         );

@@ -1,6 +1,5 @@
 package uk.ac.ox.oxfish.geography.currents;
 
-import com.google.common.collect.ImmutableMap;
 import com.univocity.parsers.common.record.Record;
 import com.vividsolutions.jts.geom.Coordinate;
 import sim.field.geo.GeomGridField;
@@ -8,6 +7,7 @@ import sim.util.Double2D;
 import uk.ac.ox.oxfish.geography.EquirectangularDistance;
 import uk.ac.ox.oxfish.geography.NauticalMap;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.model.scenario.TunaScenario;
 import uk.ac.ox.oxfish.utility.csv.CsvParserUtil;
 
 import java.nio.file.Path;
@@ -17,12 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.EL_NINO;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.LA_NINA;
-import static uk.ac.ox.oxfish.geography.currents.CurrentPattern.NEUTRAL;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.EL_NINO_CURRENTS_FILE;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.LA_NINA_CURRENTS_FILE;
-import static uk.ac.ox.oxfish.model.scenario.TunaScenario.NEUTRAL_CURRENTS_FILE;
 import static uk.ac.ox.oxfish.utility.MasonUtils.coordinateToXY;
 import static uk.ac.ox.oxfish.utility.csv.CsvParserUtil.getLocalDate;
 
@@ -32,11 +26,7 @@ public class CurrentVectorsFactory {
 
     public static CurrentVectors makeCurrentVectors(NauticalMap map, int stepsPerDay) {
         final TreeMap<Integer, EnumMap<CurrentPattern, Map<SeaTile, Double2D>>> vectorMaps =
-            makeVectorMaps(map, ImmutableMap.of(
-                NEUTRAL, NEUTRAL_CURRENTS_FILE,
-                EL_NINO, EL_NINO_CURRENTS_FILE,
-                LA_NINA, LA_NINA_CURRENTS_FILE
-            ));
+            makeVectorMaps(map, TunaScenario.currentFiles);
         return new CurrentVectors(vectorMaps, stepsPerDay);
     }
 
