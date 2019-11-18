@@ -624,6 +624,11 @@ public class Fisher implements Steppable, Startable{
     private void updateFuelEmergencyFlag(NauticalMap map)
     {
 
+        status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(status.isWeatherEmergencyOverride(),
+                this,
+                getLocation()));
+
+
         if(getFuelLeft()>= LARGE_AMOUNT_OF_GAS) //if you have boats this large, I am just going to assume you don't care about fuel
             return;
 
@@ -631,9 +636,6 @@ public class Fisher implements Steppable, Startable{
             status.setFuelEmergencyOverride(!equipment.getBoat().isFuelEnoughForTrip(
                     map.distance(status.getLocation(), getHomePort().getLocation()), 1.2));
 
-        status.setWeatherEmergencyOverride(weatherStrategy.updateWeatherEmergencyFlag(status.isWeatherEmergencyOverride(),
-                                                                                      this,
-                                                                                      getLocation()));
 
     }
 

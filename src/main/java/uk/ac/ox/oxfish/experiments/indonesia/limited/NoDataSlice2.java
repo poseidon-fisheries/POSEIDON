@@ -270,7 +270,8 @@ public class NoDataSlice2 {
 //        for (int batch = 0; batch < BATCHES; batch++)
         //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
         //runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
-        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
+       // runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
+        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+3),0);
 
 
     }

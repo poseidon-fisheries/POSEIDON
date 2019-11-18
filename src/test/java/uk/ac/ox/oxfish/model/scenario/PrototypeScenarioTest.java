@@ -118,7 +118,6 @@ public class PrototypeScenarioTest {
 
         CaliforniaAbundanceScenario scenario = new CaliforniaAbundanceScenario();
 
-
         FishState state = new FishState(123l);
         state.setScenario(scenario);
         state.start();
