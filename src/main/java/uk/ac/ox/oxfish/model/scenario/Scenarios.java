@@ -51,8 +51,8 @@ public class Scenarios {
         SCENARIOS.put("Flexible",FlexibleScenario::new);
         DESCRIPTIONS.put("Flexible", "The conceptual model, with multiple populations");
 
-//        SCENARIOS.put("Generalized",GeneralizedScenario::new);
-//        DESCRIPTIONS.put("Generalized", "Extension of the Abstract Scenario, implementing communal restrictions");
+        SCENARIOS.put("Generalized",GeneralizedScenario::new);
+        DESCRIPTIONS.put("Generalized", "Extension of the Abstract Scenario, implementing communal restrictions");
 
 
         SCENARIOS.put("California Map Scenario", CaliforniaAbundanceScenario::new);
@@ -60,8 +60,8 @@ public class Scenarios {
                 "from bathymetry data");
 
 
-//        SCENARIOS.put("Abstract 2 Populations",TwoPopulationsScenario::new);
-//        DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
+        SCENARIOS.put("Abstract 2 Populations",TwoPopulationsScenario::new);
+        DESCRIPTIONS.put("Abstract 2 Populations", "The current model, modular and using two populations");
 
 
         SCENARIOS.put("OSMOSE WFS",OsmoseWFSScenario::new);
@@ -75,11 +75,11 @@ public class Scenarios {
         DESCRIPTIONS.put("Simple California","California Scenario with DS biology");
 
 
-//        SCENARIOS.put("Indonesia",IndonesiaScenario::new);
-//        DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
-//
-//        SCENARIOS.put("Tuna", TunaScenario::new);
-//        DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
+        SCENARIOS.put("Indonesia",IndonesiaScenario::new);
+        DESCRIPTIONS.put("Indonesia","Minimum Working Model of Indonesia");
+
+        SCENARIOS.put("Tuna", TunaScenario::new);
+        DESCRIPTIONS.put("Tuna", "Minimum Working Model of Tuna");
 
     }
 }
