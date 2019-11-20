@@ -2,6 +2,7 @@ package uk.ac.ox.oxfish;
 
 
 import org.yaml.snakeyaml.Yaml;
+import uk.ac.ox.oxfish.experiments.indonesia.limited.NoDataSlice2Iterative;
 import uk.ac.ox.oxfish.maximization.*;
 
 import java.io.FileWriter;
@@ -23,6 +24,8 @@ public class MainOptimizer {
                     new FileWriter(Paths.get("eva","example.yaml").toFile()));
             yaml.dump(new MultipleGearsExampleMaximization(),
                       new FileWriter(Paths.get("eva","flexible.yaml").toFile()));
+            yaml.dump(new NoDataSlice2Iterative(),
+                      new FileWriter(Paths.get("eva","nodata_slice2.yaml").toFile()));
             yaml.dump(new GenericOptimization(),
                     new FileWriter(Paths.get("eva","generic.yaml").toFile()));
         } catch (IOException e) {

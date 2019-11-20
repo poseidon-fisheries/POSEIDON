@@ -28,6 +28,8 @@ import uk.ac.ox.oxfish.fisher.equipment.gear.HomogeneousAbundanceGear;
 import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.Pair;
+import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NullParameter;
 import uk.ac.ox.oxfish.utility.yaml.FishYAML;
 
 import java.util.HashMap;
@@ -41,6 +43,9 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
 
 
     public HashMap<String, HomogeneousGearFactory> gears = new HashMap<>();
+
+
+    private DoubleParameter hourlyGasPriceOverride = new NullParameter();
 
 
     public HeterogeneousGearFactory() {
@@ -119,7 +124,9 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
                                                  MultipleSpeciesAbundanceInitializer.FAKE_SPECIES_NAME)!=null)
         ,
                                  "Not all species have a gear assigned");
-        return new HeterogeneousAbundanceGear(gearsPerSpecies);
+        HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gearsPerSpecies);
+        heterogeneousAbundanceGear.setHourlyGasPriceOverride(hourlyGasPriceOverride.apply(state.getRandom()));
+        return heterogeneousAbundanceGear;
 
     }
 
@@ -133,8 +140,21 @@ public class HeterogeneousGearFactory implements AlgorithmFactory<HeterogeneousA
         this.gears = gears;
     }
 
+    /**
+     * Getter for property 'hourlyGasPriceOverride'.
+     *
+     * @return Value for property 'hourlyGasPriceOverride'.
+     */
+    public DoubleParameter getHourlyGasPriceOverride() {
+        return hourlyGasPriceOverride;
+    }
 
-
-
-
+    /**
+     * Setter for property 'hourlyGasPriceOverride'.
+     *
+     * @param hourlyGasPriceOverride Value to set for property 'hourlyGasPriceOverride'.
+     */
+    public void setHourlyGasPriceOverride(DoubleParameter hourlyGasPriceOverride) {
+        this.hourlyGasPriceOverride = hourlyGasPriceOverride;
+    }
 }

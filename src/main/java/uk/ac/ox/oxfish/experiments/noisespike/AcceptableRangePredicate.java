@@ -22,9 +22,7 @@ package uk.ac.ox.oxfish.experiments.noisespike;
 
 import uk.ac.ox.oxfish.model.FishState;
 
-import java.util.function.Predicate;
-
-public class AcceptableRangePredicate {
+public class AcceptableRangePredicate  {
 
 
 
@@ -44,10 +42,35 @@ public class AcceptableRangePredicate {
     public boolean test(FishState state, int yearToTest)
     {
 
-        Double measure = state.getYearlyDataSet().getColumn(columnName).get(yearToTest);
-        System.out.println(measure);
+        double measure = measure(state, yearToTest);
+        System.out.println(measure + " ---" + ((measure >= minimum && measure <= maximum)? "okay" : "fail!"));
 
         return measure >= minimum && measure <= maximum;
+
+    }
+
+    public double measure(FishState state, int yearToTest) {
+        return state.getYearlyDataSet().getColumn(columnName).get(yearToTest);
+    }
+
+
+    public double distance(FishState state, int yearToTest){
+
+
+        double between = (maximum + minimum)/2d;
+        if(test(state,yearToTest))
+            return 0;
+
+        double measure = measure(state, yearToTest);
+        if(measure > maximum)
+            return (measure-maximum)/between;
+        else
+        {
+            assert measure<minimum;
+            return (minimum-measure)/between;
+
+        }
+
 
     }
 

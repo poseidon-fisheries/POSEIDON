@@ -49,6 +49,11 @@ public class HeterogeneousAbundanceGear implements Gear
     private final HashMap<Species,HomogeneousAbundanceGear> gears;
 
 
+    /**
+     * this can be set separately: when this is a finite number then hourly gas price is not the average of each gear
+     * but rather this number
+     */
+    private Double hourlyGasPriceOverride = null;
 
 
     @SafeVarargs
@@ -60,8 +65,8 @@ public class HeterogeneousAbundanceGear implements Gear
         }
 
     }
-    
-    
+
+
 
     public HeterogeneousAbundanceGear(
             HashMap<Species, HomogeneousAbundanceGear> gears) {
@@ -140,6 +145,13 @@ public class HeterogeneousAbundanceGear implements Gear
     @Override
     public double getFuelConsumptionPerHourOfFishing(
             Fisher fisher, Boat boat, SeaTile where) {
+        if(hourlyGasPriceOverride!=null && Double.isFinite(hourlyGasPriceOverride))
+            return hourlyGasPriceOverride;
+        else
+            return getComponentsAverage();
+    }
+
+    private double getComponentsAverage() {
         double sum = 0;
         for(Gear gear : gears.values())
             //this is a ugly hack but it's surprising how expensive this averaging gets
@@ -149,7 +161,9 @@ public class HeterogeneousAbundanceGear implements Gear
 
     @Override
     public Gear makeCopy() {
-        return new HeterogeneousAbundanceGear(gears);
+        HeterogeneousAbundanceGear heterogeneousAbundanceGear = new HeterogeneousAbundanceGear(gears);
+        heterogeneousAbundanceGear.setHourlyGasPriceOverride(this.hourlyGasPriceOverride);
+        return heterogeneousAbundanceGear;
     }
 
 
@@ -161,4 +175,21 @@ public class HeterogeneousAbundanceGear implements Gear
         return Objects.equals(gears, that.gears);
     }
 
+    /**
+     * Getter for property 'hourlyGasPriceOverride'.
+     *
+     * @return Value for property 'hourlyGasPriceOverride'.
+     */
+    public Double getHourlyGasPriceOverride() {
+        return hourlyGasPriceOverride;
+    }
+
+    /**
+     * Setter for property 'hourlyGasPriceOverride'.
+     *
+     * @param hourlyGasPriceOverride Value to set for property 'hourlyGasPriceOverride'.
+     */
+    public void setHourlyGasPriceOverride(Double hourlyGasPriceOverride) {
+        this.hourlyGasPriceOverride = hourlyGasPriceOverride;
+    }
 }

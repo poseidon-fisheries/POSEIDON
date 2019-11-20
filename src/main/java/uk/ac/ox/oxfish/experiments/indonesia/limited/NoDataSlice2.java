@@ -41,21 +41,21 @@ import java.util.Optional;
 public class NoDataSlice2 {
 
 
-    final static private Path MAIN_DIRECTORY =
+    final static public Path MAIN_DIRECTORY =
             Paths.get("docs", "20191025 limited_poseidon", "slice2");
 
-    final static private Path SCENARIO_FILE = MAIN_DIRECTORY.resolve("base2.yaml");
+    final static public Path SCENARIO_FILE = MAIN_DIRECTORY.resolve("base2.yaml");
 
     //selectivity switched to simple (range betwen 7 to 25 for selex1, 0.2 to 1 for selex2 [ranges in the tropfish of the 4 species])
 
     //there is a garbage gear to calibrate (30-50?)
 
 
-    public static final int MAX_YEARS_TO_RUN = 70;
+    public static final int MAX_YEARS_TO_RUN = 40;
     /**
      * what changes
      */
-    private static final List<OptimizationParameter> parameters = new LinkedList<>();
+    public static final List<OptimizationParameter> parameters = new LinkedList<>();
     public static final int BATCHES = 10;
     public static final int SCENARIOS_PER_BATCH = 5000;
 
@@ -123,12 +123,12 @@ public class NoDataSlice2 {
 
         parameters.add(
                 new SimpleOptimizationParameter("biologyInitializer.factories$0.virginRecruits",
-                                                7500000, 15000000)
+                                                7500000, 20000000)
         );
 
         parameters.add(
                 new SimpleOptimizationParameter("biologyInitializer.factories$1.virginRecruits",
-                                                5000000, 10000000)
+                                                5000000, 15000000)
         );
 
 
@@ -233,7 +233,7 @@ public class NoDataSlice2 {
 
 
 
-    private static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
+    public static final List<AcceptableRangePredicate> predicates = new LinkedList<>();
 
 
     static {
@@ -241,7 +241,7 @@ public class NoDataSlice2 {
                 0.10,0.21,"SPR " + "Pristipomoides multidens" + " " + "spr_agent"
         ));
         predicates.add(new AcceptableRangePredicate(
-                0.02,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent"
+                0.002,0.20,"SPR " + "Lutjanus malabaricus" + " " + "spr_agent"
         ));
         predicates.add(new AcceptableRangePredicate(
                 5000000,10000000,"Lutjanus malabaricus Landings"
@@ -254,7 +254,9 @@ public class NoDataSlice2 {
 
 
 
-    public static void main(String[] args) throws IOException {
+
+
+    public static void mainRuns(String[] args) throws IOException {
 
 //        for (int batch = 0; batch < BATCHES; batch++)
 //        {
@@ -268,9 +270,9 @@ public class NoDataSlice2 {
 //        }
 
 //        for (int batch = 0; batch < BATCHES; batch++)
-        //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
-        //runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
-        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
+       //   runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
+     //   runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
+      //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
 
 
     }

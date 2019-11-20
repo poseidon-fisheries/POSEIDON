@@ -128,7 +128,7 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name
                 .replaceAll(speciesName + " ", "")
-                .replaceAll("population0", "4-9 GT")
+                .replaceAll("population0", "5-9 GT")
                 .replaceAll("population1", "15-30 GT")
                 .replaceAll("population2", ">30 GT")
                 .replaceAll("population3", "10-14 GT")
@@ -157,7 +157,7 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
 
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
                 identity(), name -> name
-                        .replaceAll("Average Cash-Flow of population0", "4-9 GT")
+                        .replaceAll("Average Cash-Flow of population0", "5-9 GT")
                         .replaceAll("Average Cash-Flow of population1", "15-30 GT")
                         .replaceAll("Average Cash-Flow of population2", ">30 GT")
                         .replaceAll("Average Cash-Flow of population3", "10-14 GT")
@@ -184,7 +184,7 @@ public class JsonIndonesiaCharts implements AdditionalStartable {
 
         final Map<String, String> renamedColumns = columnsToPrint.stream().collect(toImmutableMap(
             identity(), name -> name
-                .replaceAll("Number Of Active Fishers of population0", "4-9 GT")
+                .replaceAll("Number Of Active Fishers of population0", "5-9 GT")
                 .replaceAll("Number Of Active Fishers of population1", "15-30 GT")
                 .replaceAll("Number Of Active Fishers of population2", ">30 GT")
                 .replaceAll("Number Of Active Fishers of population3", "10-14 GT")

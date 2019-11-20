@@ -25,6 +25,7 @@ import uk.ac.ox.oxfish.fisher.Fisher;
 import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.Gear;
 import uk.ac.ox.oxfish.geography.SeaTile;
+import uk.ac.ox.oxfish.utility.FishStateUtilities;
 
 /**
  * A record describing the achieved catch for a specific instance of fishing
@@ -87,13 +88,16 @@ public class FishingRecord
         Preconditions.checkArgument(original.tileFished==newRecord.tileFished,
                                     "Fishing records do not belong to same tile!");
         return new FishingRecord(
-                        original.hoursSpentFishing + newRecord.hoursSpentFishing,
-                        original.getTileFished(),
-                        Catch.sumCatches(original.getFishCaught(),newRecord.getFishCaught())
+                original.hoursSpentFishing + newRecord.hoursSpentFishing,
+                original.getTileFished(),
+                newRecord.fishCaught.getTotalWeight() > FishStateUtilities.EPSILON ?
+                        Catch.sumCatches(original.getFishCaught(),newRecord.getFishCaught()) :
+                        original.getFishCaught());
 
 
 
-        );
+
+
     }
 
 

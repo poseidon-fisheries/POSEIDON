@@ -136,8 +136,9 @@ public class TripRecord {
     public void recordFishing(FishingRecord record)
     {
         //sum new catch!
-        for(int i=0; i<totalCatch.length; i++)
-            totalCatch[i]+=record.getFishCaught().getWeightCaught(i);
+        if(record.getFishCaught().totalCatchWeight() > FishStateUtilities.EPSILON)
+            for(int i=0; i<totalCatch.length; i++)
+                totalCatch[i]+=record.getFishCaught().getWeightCaught(i);
 
         tilesFished.merge(record.getTileFished(),
                           record,

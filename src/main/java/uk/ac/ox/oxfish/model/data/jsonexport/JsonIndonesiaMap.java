@@ -33,7 +33,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
     private final Gson gson = new GsonBuilder().create();
     private final String fileName;
     private final Map<String, String> prettyNames = ImmutableMap.of(
-            "population0", "4-9 GT",
+            "population0", "5-9 GT",
             "population3", "10-14 GT",
 
             "population1", "15-30 GT",
@@ -111,7 +111,7 @@ public class JsonIndonesiaMap implements OutputPlugin, Steppable, AdditionalStar
         }
 
         final ImmutableMap<String, Integer> sortOrder = ImmutableMap.of(
-                "4-9 GT", 0,
+                "5-9 GT", 0,
                 "15-30 GT", 2,
                 "10-14 GT", 1,
                 ">30 GT", 3
