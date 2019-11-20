@@ -1,66 +1,37 @@
 package uk.ac.ox.oxfish.fisher.actions.fads;
 
-import uk.ac.ox.oxfish.biology.BiomassLocalBiology;
+import ec.util.MersenneTwisterFast;
 import uk.ac.ox.oxfish.biology.GlobalBiology;
-import uk.ac.ox.oxfish.biology.VariableBiomassBasedBiology;
+import uk.ac.ox.oxfish.biology.LocalBiology;
 import uk.ac.ox.oxfish.fisher.Fisher;
-import uk.ac.ox.oxfish.fisher.actions.ActionResult;
+import uk.ac.ox.oxfish.fisher.actions.Action;
 import uk.ac.ox.oxfish.fisher.actions.Arriving;
-import uk.ac.ox.oxfish.fisher.equipment.Catch;
 import uk.ac.ox.oxfish.fisher.equipment.gear.PurseSeineGear;
 import uk.ac.ox.oxfish.geography.SeaTile;
-import uk.ac.ox.oxfish.model.FishState;
-import uk.ac.ox.oxfish.model.regs.Regulation;
 
-import javax.measure.Quantity;
-import javax.measure.quantity.Mass;
 import java.util.Optional;
 
-import static java.lang.Math.min;
-import static java.util.stream.IntStream.range;
-import static si.uom.NonSI.TONNE;
-import static tech.units.indriya.quantity.Quantities.getQuantity;
-import static tech.units.indriya.unit.Units.KILOGRAM;
-import static uk.ac.ox.oxfish.utility.Measures.asDouble;
-import static uk.ac.ox.oxfish.utility.Measures.toHours;
-
 public class MakeUnassociatedSet implements SetAction {
-
-    private static final Quantity<Mass> MAX_CATCH_PER_SPECIES = getQuantity(50, TONNE);
 
     @Override
     public Optional<SeaTile> getActionTile(Fisher fisher) {
         return Optional.of(fisher.getLocation());
     }
 
-    @Override
-    public ActionResult act(
-        FishState model, Fisher fisher, Regulation regulation, double hoursLeft
+    @Override public Action actionAfterSet() { return new Arriving(); }
+
+    /**
+     * The target biology of an unassociated set has to be created on the fly, and this action is delegated to
+     * the purse seine gear, which knows how much fish its likely to catch. Note that, since this is only done
+     * in the case of a successful set, there is no need for a separate method to release the fish if it fails.
+     */
+    @Override public LocalBiology targetBiology(
+        PurseSeineGear purseSeineGear,
+        GlobalBiology globalBiology,
+        LocalBiology seaTileBiology,
+        MersenneTwisterFast rng
     ) {
-        final PurseSeineGear purseSeineGear = (PurseSeineGear) fisher.getGear();
-        if (isAllowed(model, fisher) && isPossible(model, fisher)) {
-            final int duration = toHours(getDuration(fisher, model.getRandom()));
-            if (model.getRandom().nextDouble() < purseSeineGear.getSuccessfulSetProbability()) {
-                final SeaTile seaTile = fisher.getLocation();
-                final GlobalBiology globalBiology = model.getBiology();
-                final double maxCatchInKg = asDouble(MAX_CATCH_PER_SPECIES, KILOGRAM);
-                final double[] biomasses = range(0, globalBiology.getSize()).mapToDouble(i -> {
-                    final double biomassInTile = seaTile.getBiology().getBiomass(globalBiology.getSpecie(i));
-                    final double biomassCaught = model.random.nextDouble() * maxCatchInKg;
-                    return min(biomassInTile, biomassCaught);
-                }).toArray();
-                final VariableBiomassBasedBiology schoolBiology = new BiomassLocalBiology(biomasses, biomasses);
-                // Remove the catches from the underlying biology:
-                final Catch catchObject = new Catch(schoolBiology.getCurrentBiomass());
-                seaTile.getBiology().reactToThisAmountOfBiomassBeingFished(catchObject, catchObject, globalBiology);
-                // Have the fisher fish the school biology
-                fisher.fishHere(globalBiology, duration, model, schoolBiology);
-                model.recordFishing(seaTile);
-            }
-            return new ActionResult(new Arriving(), hoursLeft - duration);
-        } else {
-            return new ActionResult(new Arriving(), hoursLeft);
-        }
+        return purseSeineGear.createUnassociatedSetBiology(globalBiology, seaTileBiology, rng);
     }
 
 }

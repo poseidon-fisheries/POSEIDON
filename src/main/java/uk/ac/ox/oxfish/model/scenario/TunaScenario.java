@@ -66,6 +66,7 @@ import uk.ac.ox.oxfish.model.regs.fads.IATTC;
 import uk.ac.ox.oxfish.utility.AlgorithmFactory;
 import uk.ac.ox.oxfish.utility.parameters.DoubleParameter;
 import uk.ac.ox.oxfish.utility.parameters.FixedDoubleParameter;
+import uk.ac.ox.oxfish.utility.parameters.NormalDoubleParameter;
 
 import javax.measure.Quantity;
 import javax.measure.quantity.Mass;
@@ -129,6 +130,7 @@ public class TunaScenario implements Scenario {
     private static final Path SCHAEFER_PARAMS_FILE = input("schaefer_params.csv");
     private static final Path EXOGENOUS_CATCHES_FILE = input("exogenous_catches.csv");
     private static final Path FAD_CARRYING_CAPACITIES = input("fad_carrying_capacities.csv");
+    private static final Path UNASSOCIATED_CATCH_MEANS = input("unassociated_catch_means.csv");
     private static final ImmutableMap<String, Path> biomassFiles = ImmutableMap.of(
         "BET", input("2017_BET_DIST.csv"),
         "SKJ", input("2017_SKJ_DIST.csv"),
@@ -188,6 +190,14 @@ public class TunaScenario implements Scenario {
                 .collect(toMap(
                     r -> speciesNames.get(r.getString("species_code")),
                     r -> convert(r.getDouble("k"), TONNE, KILOGRAM)
+                ))
+        );
+        purseSeineGearFactory.setUnassociatedSetParameters(
+            parseAllRecords(UNASSOCIATED_CATCH_MEANS).stream()
+                .filter(r -> r.getInt("year") == targetYear)
+                .collect(toMap(
+                    r -> speciesNames.get(r.getString("species_code")),
+                    r -> new NormalDoubleParameter(r.getDouble("mean"), r.getDouble("sd"))
                 ))
         );
 
