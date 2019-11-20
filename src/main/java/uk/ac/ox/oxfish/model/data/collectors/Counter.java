@@ -28,9 +28,7 @@ import uk.ac.ox.oxfish.model.FishState;
 import uk.ac.ox.oxfish.model.Startable;
 import uk.ac.ox.oxfish.model.StepOrder;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
@@ -42,15 +40,12 @@ public class Counter implements Startable, Steppable
 
     final private Map<String,Double> data;
 
-    final private Map<String,Double> view;
-
     final private IntervalPolicy policy;
 
     private Stoppable receipt = null;
 
     public Counter(IntervalPolicy policy) {
         this.data = new LinkedHashMap<>();
-        view = Collections.unmodifiableMap(data);
         this.policy = policy;
     }
 
@@ -96,6 +91,9 @@ public class Counter implements Startable, Steppable
     public void count(String columnName, double add)
     {
 
+        if(add==0)
+            return;
+
         data.compute(columnName,
                      (s, oldValue) -> {
                          if(oldValue==null)
@@ -120,13 +118,9 @@ public class Counter implements Startable, Steppable
         return data.get(columnName);
     }
 
-    /**
-     * returns an unmodifiable view of the data
-     * @return unmodifiable view of the data
-     */
-    public Map<String,Double> getData()
-    {
-        return view;
+
+    public Set<String> getValidCounters(){
+        return data.keySet();
     }
 
 }

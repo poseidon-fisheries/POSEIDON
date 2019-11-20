@@ -256,7 +256,7 @@ public class NoDataSlice2 {
 
 
 
-    public static void mainRuns(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
 //        for (int batch = 0; batch < BATCHES; batch++)
 //        {
@@ -270,11 +270,14 @@ public class NoDataSlice2 {
 //        }
 
 //        for (int batch = 0; batch < BATCHES; batch++)
-       //   runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
-     //   runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
-      //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
+     //     runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+0),0);
+      //  runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+1),0);
+//        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+2),0);
 
 
+        System.out.println("scenario " + args[0]);
+        int directory = Integer.parseInt(args[0]);
+        runDirectory(MAIN_DIRECTORY.resolve("scenarios").resolve("batch"+ directory), 0);
     }
 
 
@@ -298,13 +301,19 @@ public class NoDataSlice2 {
 
             Scenario scenario = yaml.loadAs(new FileReader(scenarioFile), Scenario.class);
             Optional<Integer> result;
+            System.out.println(scenarioFile.getAbsolutePath() );
+
             try {
+                long start = System.currentTimeMillis();
                 result = runModelOnce(scenario, MAX_YEARS_TO_RUN, seed);
+                long end = System.currentTimeMillis();
+                System.out.println( "Run lasted: " + (end-start)/1000 + " seconds");
             }
             catch (OutOfMemoryError e){
                 result = Optional.of(-1000);
             }
             System.out.println(scenarioFile.getAbsolutePath() + "," + result.orElse(-1) );
+            System.out.println("--------------------------------------------------------------");
 
             writer.write(scenarioFile.getAbsolutePath().toString() + ",");
             writer.write(String.valueOf(result.orElse(-1)));

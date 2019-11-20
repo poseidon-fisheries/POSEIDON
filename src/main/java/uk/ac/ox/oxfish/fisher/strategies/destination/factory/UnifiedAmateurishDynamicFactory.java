@@ -185,7 +185,7 @@ public class UnifiedAmateurishDynamicFactory implements AlgorithmFactory<Amateur
             );
             instances.put(state,strategy);
 
-            Set<String> columns = strategy.getActionsTaken().getData().keySet();
+            Set<String> columns = strategy.getActionsTaken().getValidCounters();
             AmateurishDynamicStrategy finalStrategy = strategy;
 
             for(String string : columns) {

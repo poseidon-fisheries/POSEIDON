@@ -122,8 +122,11 @@ public class ProfitFunctionRegression implements Function<SeaTile, double[]>, Ge
         for(int i=0; i<catches.length; i++) {
             catches[i].addObservation(
                     new GeographicalObservation<>(observation.getTile(), observation.getTime(),
-                                                  //check only the very last hour spent fishing, otherwise it's too optimistic!
-                                                  observation.getValue().getLastFishingRecordOfTile(
+//                                                  //check only the very last hour spent fishing, otherwise it's too optimistic!
+//                                                  observation.getValue().getLastFishingRecordOfTile(
+//                                                          observation.getTile()).getFishCaught().getWeightCaught(i)),
+//                                     check the average during the trip
+                                                  observation.getValue().getFishingRecordOfTile(
                                                           observation.getTile()).getFishCaught().getWeightCaught(i)),
                     fisher, state
             );

@@ -85,7 +85,7 @@ public class TripRecord {
      */
     private final HashMap<SeaTile,FishingRecord> tilesFished = new HashMap<>();
 
-    private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
+  //  private final HashMap<SeaTile,FishingRecord> lastFishingRecordOfTile = new HashMap<>();
 
 
 
@@ -136,14 +136,17 @@ public class TripRecord {
     public void recordFishing(FishingRecord record)
     {
         //sum new catch!
-        if(record.getFishCaught().totalCatchWeight() > FishStateUtilities.EPSILON)
-            for(int i=0; i<totalCatch.length; i++)
-                totalCatch[i]+=record.getFishCaught().getWeightCaught(i);
+        if(record.getFishCaught().totalCatchWeight() > 0)
+        {
+            for (int i = 0; i < totalCatch.length; i++)
+                totalCatch[i] += record.getFishCaught().getWeightCaught(i);
+        }
+
 
         tilesFished.merge(record.getTileFished(),
                           record,
                           FishingRecord::sumRecords);
-        lastFishingRecordOfTile.put(record.getTileFished(),record);
+      //  lastFishingRecordOfTile.put(record.getTileFished(),record);
 
 
     }
@@ -402,7 +405,16 @@ public class TripRecord {
      *
      * @return Value for property 'lastFishingRecordOfTile'.
      */
-    public FishingRecord getLastFishingRecordOfTile(SeaTile tile) {
-        return lastFishingRecordOfTile.get(tile);
+    public FishingRecord getFishingRecordOfTile(SeaTile tile) {
+        return tilesFished.get(tile);
     }
+
+//    /**
+//     * Getter for property 'lastFishingRecordOfTile'.
+//     *
+//     * @return Value for property 'lastFishingRecordOfTile'.
+//     */
+//    public FishingRecord getLastFishingRecordOfTile(SeaTile tile) {
+//        return lastFishingRecordOfTile.get(tile);
+//    }
 }
