@@ -137,8 +137,8 @@ public class TunaScenario implements Scenario {
         "YFT", input("2017_YFT_DIST.csv")
     );
     private static final BiMap<String, String> speciesNames = parseAllRecords(SPECIES_NAMES_FILE).stream().collect(toImmutableBiMap(
-        r -> r.getString("code"),
-        r -> r.getString("name")
+        r -> r.getString("species_code"),
+        r -> r.getString("species_name")
     ));
     private final FromSimpleFilePortInitializer portInitializer = new FromSimpleFilePortInitializer(PORTS_FILE);
     private int targetYear = 2017;
