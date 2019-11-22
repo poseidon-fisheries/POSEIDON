@@ -78,11 +78,13 @@ public class FadFishingStrategy implements FishingStrategy, FadManagerUtils {
     }
 
     private Optional<? extends FadAction> maybeMakeUnassociatedSet(FishState model, Fisher fisher) {
-        final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
-        final double probability = probability(unassociatedSetCoefficient, priceOfFishHere);
-        return model.getRandom().nextDouble() < probability
-            ? Optional.of(new MakeUnassociatedSet())
-            : Optional.empty();
+        return Optional.of(new MakeUnassociatedSet())
+            .filter(action -> action.isAllowed(model, fisher) && action.isPossible(model, fisher))
+            .filter(action -> {
+                final double priceOfFishHere = priceOfFishHere(fisher.getLocation().getBiology(), getMarkets(fisher));
+                final double probability = probability(unassociatedSetCoefficient, priceOfFishHere);
+                return model.getRandom().nextDouble() < probability;
+            });
     }
 
     private Collection<Market> getMarkets(Fisher fisher) {

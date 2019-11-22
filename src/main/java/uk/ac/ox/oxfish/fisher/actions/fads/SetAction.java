@@ -47,7 +47,7 @@ public interface SetAction extends FadAction {
     }
 
     default boolean isPossible(FishState model, Fisher fisher) {
-        return fisher.getHold().getPercentageFilled() < 1;
+        return fisher.getHold().getPercentageFilled() < 1 && fisher.getLocation().isWater();
     }
 
     default Quantity<Time> getDuration(Fisher fisher, MersenneTwisterFast rng) {
